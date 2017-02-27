@@ -70,6 +70,7 @@ import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
@@ -120,6 +121,7 @@ public class App {
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
   public static boolean erInstalleretPåSDKort;
+  public static Backend backend = new Backend();
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;

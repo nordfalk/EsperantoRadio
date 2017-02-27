@@ -93,7 +93,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
           final int offset = 0;
-          String url = Backend.getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
+          String url = App.backend.getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
           Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
             @Override
             public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
@@ -101,9 +101,9 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
               if (uændret) return;
               if (json != null && !"null".equals(json)) {
                 JSONObject data = new JSONObject(json);
-                Programserie programserie = Backend.parsProgramserie(data, null);
+                Programserie programserie = App.backend.parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-                ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, App.data);
+                ArrayList<Udsendelse> udsendelser = App.backend.parseUdsendelserForProgramserie(prg, null, App.data);
                 programserie.tilføjUdsendelser(offset, udsendelser);
                 App.data.programserieFraSlug.put(programserieSlug, programserie);
               } else {

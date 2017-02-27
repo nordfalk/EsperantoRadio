@@ -104,16 +104,16 @@ public class FangBrowseIntent_akt extends Activity {
     if (udsendelse != null) {
       visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
     } else {
-      Request<?> req = new DrVolleyStringRequest(Backend.getUdsendelseStreamsUrlFraSlug(udsendelseSlug), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getUdsendelseStreamsUrlFraSlug(udsendelseSlug), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return;
           Log.d("hentStreams fikSvar(" + fraCache + " " + url);
           if (json != null && !"null".equals(json)) {
             JSONObject o = new JSONObject(json);
-            Udsendelse udsendelse2 = Backend.parseUdsendelse(null, App.data, o);
+            Udsendelse udsendelse2 = App.backend.parseUdsendelse(null, App.data, o);
             udsendelse2.setStreams(o);
-            udsendelse2.indslag = Backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
+            udsendelse2.indslag = App.backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
             udsendelse2.produktionsnummer = o.optString(DRJson.ProductionNumber.name());
             udsendelse2.shareLink = o.optString(DRJson.ShareLink.name());
 

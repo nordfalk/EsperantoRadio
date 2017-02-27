@@ -168,7 +168,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterListe();
     }
 
-    final String url = Backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr);
+    final String url = App.backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr);
     if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + url);
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
@@ -181,7 +181,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         if (json != null && !"null".equals(json)) {
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
-            kanal.setUdsendelserForDag(Backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
+            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
             opdaterListe();
           } else {
             // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
@@ -190,7 +190,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
             View v = listView.getChildAt(1);
             int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
 
-            kanal.setUdsendelserForDag(Backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
+            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
             opdaterListe();
 
             int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
@@ -564,7 +564,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterSenestSpilletViews(aq2, u2);
       return;
     }
-    Request<?> req = new DrVolleyStringRequest(Backend.getPlaylisteUrl(u2), new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(App.backend.getPlaylisteUrl(u2), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + fraCache + uændret + " " + url);
@@ -572,8 +572,8 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         // Fix: Senest spillet blev ikke opdateret.
         if (u2.playliste != null && uændret) return; // så har vi allerede den nyeste liste i MEM
         if (json != null && !"null".equals(json)) {
-          u2.playliste = Backend.parsePlayliste(new JSONArray(json));
-          if (App.grunddata.serverapi_ret_forkerte_offsets_i_playliste) Backend.retForkerteOffsetsIPlayliste(u2);
+          u2.playliste = App.backend.parsePlayliste(new JSONArray(json));
+          if (App.grunddata.serverapi_ret_forkerte_offsets_i_playliste) App.backend.retForkerteOffsetsIPlayliste(u2);
         }
         if (aktuelUdsendelseViewholder == null) return;
         opdaterSenestSpilletViews(aq2, u2);

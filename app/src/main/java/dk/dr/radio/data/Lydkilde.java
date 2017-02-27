@@ -116,7 +116,7 @@ public abstract class Lydkilde implements Serializable {
   public abstract String getNavn();
 
   public void setStreams(JSONObject o) throws JSONException {
-    streams = Backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+    streams = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
   }
 
   public void setStreams(String json) throws JSONException {

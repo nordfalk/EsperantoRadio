@@ -77,7 +77,7 @@ public class Kanal extends Lydkilde {
 
   @Override
   public String getStreamsUrl() {
-    return Backend.getKanalStreamsUrlFraSlug(slug);
+    return App.backend.getKanalStreamsUrlFraSlug(slug);
   }
 
 

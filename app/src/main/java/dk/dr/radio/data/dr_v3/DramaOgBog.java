@@ -27,7 +27,7 @@ public class DramaOgBog {
   public HashSet<String> karuselSerieSlug = new HashSet<String>();
 
   public List<Runnable> observatører = new ArrayList<Runnable>();
-  public final String url = Backend.getBogOgDramaUrl();
+  public final String url = App.backend.getBogOgDramaUrl();
 
   /**
    * Parser JSON-svar og opdaterer data derefter. Bør ikke kaldes udefra, udover i afprøvningsøjemed
@@ -46,7 +46,7 @@ public class DramaOgBog {
       if (karuselJson!=null) for (int n = 0; n < karuselJson.length(); n++) try {
         JSONObject udsendelseJson = karuselJson.getJSONObject(n);
         // TODO mangler
-        Udsendelse u = Backend.parseUdsendelse(null, App.data, udsendelseJson);
+        Udsendelse u = App.backend.parseUdsendelse(null, App.data, udsendelseJson);
         karusel.add(u);
         karuselSerieSlug.add(u.programserieSlug);
       } catch (JSONException je) {
@@ -68,7 +68,7 @@ public class DramaOgBog {
           programserie = new Programserie();
           App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
-        res.add(Backend.parsProgramserie(programserieJson, programserie));
+        res.add(App.backend.parsProgramserie(programserieJson, programserie));
 //            Log.d("DramaOgBogD "+sektionsnummer+" "+n+programserie+" "+programserie.antalUdsendelser+" "+programserie.billedeUrl);
       }
       if (!res.isEmpty()) {

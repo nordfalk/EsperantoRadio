@@ -30,13 +30,13 @@ public class Backend {
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
 
-  public static String getUdsendelseStreamsUrl(Udsendelse u) {
+  public String getUdsendelseStreamsUrl(Udsendelse u) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR - URN="+u);
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     return BASISURL + "/program?includeStreams=true&urn=" + u.urn;
   }
 
-  public static String getProgramserieUrl(Programserie ps, String programserieSlug) {
+  public String getProgramserieUrl(Programserie ps, String programserieSlug) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
@@ -46,38 +46,38 @@ public class Backend {
     return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
   }
 
-  public static String getKanalStreamsUrlFraSlug(String slug) {
+  public String getKanalStreamsUrlFraSlug(String slug) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
     return BASISURL + "/channel/" + slug + "?includeStreams=true";
   }
 
-  public static String getKanalUdsendelserUrlFraKode(String kode, String datoStr) {
+  public String getKanalUdsendelserUrlFraKode(String kode, String datoStr) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     return BASISURL + "/schedule/" + URLEncoder.encode(kode) + "/date/" + datoStr;
   }
 
-  public static String getAtilÅUrl() {
+  public String getAtilÅUrl() {
     return BASISURL + "/series-list?type=radio";
   }
 
   /** Bruges kun fra FangBrowseIntent */
-  public static String getUdsendelseStreamsUrlFraSlug(String udsendelseSlug) {
+  public String getUdsendelseStreamsUrlFraSlug(String udsendelseSlug) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
   }
 
-  public static String getSøgIUdsendelserUrl(String søgStr) {
+  public String getSøgIUdsendelserUrl(String søgStr) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     return BASISURL + "/search/programs?q=" + URLEncoder.encode(søgStr) + "&type=radio";
   }
 
-  public static String getSøgISerierUrl(String søgStr) {
+  public String getSøgISerierUrl(String søgStr) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     return BASISURL + "/search/series?q=" + URLEncoder.encode(søgStr) + "&type=radio";
   }
 
-  public static String getBogOgDramaUrl() {
+  public String getBogOgDramaUrl() {
     return BASISURL + "/radio-drama-adv";
   }
 
@@ -86,12 +86,12 @@ public class Backend {
       … den kan også bruges med slug:
       http://www.dr.dk/tjenester/mu-apps/new-programs-since/monte-carlo/2014-02-13
      */
-  public static String getNyeProgrammerSiden(String programserieSlug, String dato) {
+  public String getNyeProgrammerSiden(String programserieSlug, String dato) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
   }
 
-  public static String getPlaylisteUrl(Udsendelse u) {
+  public String getPlaylisteUrl(Udsendelse u) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
     //if (BRUG_URN)
     //  return BASISURL + "/playlist?urn=" + u.urn + "/0"; // virker ikke
@@ -126,7 +126,7 @@ public class Backend {
   /**
    * Parser udsendelser for getKanal. A la http://www.dr.dk/tjenester/mu-apps/schedule/P3/0
    */
-  public static ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+  public ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
     String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
 
     ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
@@ -155,7 +155,7 @@ public class Backend {
    * Parser udsendelser for programserie.
    * A la http://www.dr.dk/tjenester/mu-apps/series/sprogminuttet?type=radio&includePrograms=true
    */
-  public static ArrayList<Udsendelse> parseUdsendelserForProgramserie(JSONArray jsonArray, Kanal kanal, Programdata programdata) throws JSONException {
+  public ArrayList<Udsendelse> parseUdsendelserForProgramserie(JSONArray jsonArray, Kanal kanal, Programdata programdata) throws JSONException {
     ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
     for (int n = 0; n < jsonArray.length(); n++) {
       uliste.add(parseUdsendelse(kanal, programdata, jsonArray.getJSONObject(n)));
@@ -163,7 +163,7 @@ public class Backend {
     return uliste;
   }
 
-  public static Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
+  public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
     Udsendelse u = opretUdsendelse(programdata, o);
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
@@ -194,7 +194,7 @@ public class Backend {
     Played: "2014-02-06T15:58:33",
     OffsetMs: 6873000
      */
-  public static ArrayList<Playlisteelement> parsePlayliste(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Playlisteelement> parsePlayliste(JSONArray jsonArray) throws JSONException {
     ArrayList<Playlisteelement> liste = new ArrayList<Playlisteelement>();
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
@@ -240,7 +240,7 @@ public class Backend {
    * @throws JSONException
    */
 
-  public static ArrayList<Lydstream> parsStreams(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Lydstream> parsStreams(JSONArray jsonArray) throws JSONException {
     ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
     for (int n = 0; n < jsonArray.length(); n++)
       try {
@@ -281,7 +281,7 @@ public class Backend {
   OffsetMs: 1096360
   },
      */
-  public static ArrayList<Indslaglisteelement> parsIndslag(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Indslaglisteelement> parsIndslag(JSONArray jsonArray) throws JSONException {
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
     if (jsonArray == null) return liste;
     for (int n = 0; n < jsonArray.length(); n++) {
@@ -302,7 +302,7 @@ public class Backend {
    * @return objektet
    * @throws JSONException
    */
-  public static Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
+  public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
     if (ps == null) ps = new Programserie();
     ps.titel = o.getString(DRJson.Title.name());
     ps.undertitel = o.optString(DRJson.Subtitle.name(), ps.undertitel);

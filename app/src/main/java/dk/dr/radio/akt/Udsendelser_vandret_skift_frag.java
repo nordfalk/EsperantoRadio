@@ -153,7 +153,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       opdaterUdsendelser();
       return;
     }
-    String url = Backend.getProgramserieUrl(programserie, startudsendelse.programserieSlug) + "&offset=" + offset;
+    String url = App.backend.getProgramserieUrl(programserie, startudsendelse.programserieSlug) + "&offset=" + offset;
     Log.d("hentUdsendelser url=" + url);
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
@@ -164,11 +164,11 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
         if (json != null && !"null".equals(json)) {
           JSONObject data = new JSONObject(json);
           if (offset == 0) {
-            programserie = Backend.parsProgramserie(data, programserie);
+            programserie = App.backend.parsProgramserie(data, programserie);
             App.data.programserieFraSlug.put(startudsendelse.programserieSlug, programserie);
           }
           JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-          ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
+          ArrayList<Udsendelse> udsendelser = App.backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
           programserie.tilføjUdsendelser(offset, udsendelser);
           //programserie.tilføjUdsendelser(Arrays.asList(startudsendelse));
           opdaterUdsendelser();

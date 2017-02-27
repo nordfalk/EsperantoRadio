@@ -87,7 +87,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    String url = Backend.getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
+    String url = App.backend.getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
     //Log.d("XXX url=" + url);
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
@@ -96,10 +96,10 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         if (uændret) return;
         JSONObject data = new JSONObject(json);
         if (offset == 0) {
-          programserie = Backend.parsProgramserie(data, programserie);
+          programserie = App.backend.parsProgramserie(data, programserie);
           App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
-        ArrayList<Udsendelse> uds = Backend.parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, App.data);
+        ArrayList<Udsendelse> uds = App.backend.parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, App.data);
         programserie.tilføjUdsendelser(offset, uds);
         bygListe();
       }

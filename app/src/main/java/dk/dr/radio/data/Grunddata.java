@@ -140,7 +140,7 @@ public class Grunddata {
   public static void eoElsendoAlDaUdsendelse(Udsendelse e, Kanal k) {
     e.programserieSlug = e.kanalSlug = k.slug;
     if (e.slug==null) e.slug = e.kanalSlug + ":" + e.startTidKl;
-    Programdata.instans.udsendelseFraSlug.put(e.slug, e);
+    App.data.udsendelseFraSlug.put(e.slug, e);
 
     e.kanHentes = e.kanHøres = true;
     e.streams = new ArrayList<Lydstream>();
@@ -230,14 +230,14 @@ public class Grunddata {
   }
 
   public static void eo_opdaterProgramserieFraKanal(Kanal k) {
-    Programserie ps = Programdata.instans.programserieFraSlug.get(k.slug);
+    Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
       ps = new Programserie();
       ps.billedeUrl = k.eo_emblemoUrl;
       ps.beskrivelse = k.getNavn();
       ps.slug = k.slug;
       ps.titel = k.getNavn();
-      Programdata.instans.programserieFraSlug.put(k.slug, ps);
+      App.data.programserieFraSlug.put(k.slug, ps);
     } else {
       ps.getUdsendelser().clear();
     }

@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
@@ -54,8 +53,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
     View rod = inflater.inflate(R.layout.udsendelser_vandret_skift_frag, container, false);
 
-    kanal = Programdata.instans.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
-    startudsendelse = Programdata.instans.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
     if (startudsendelse == null) { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/805598045
       if (!App.PRODUKTION) { // https://www.bugsense.com/dashboard/project/cd78aa05/errors/822628124
         App.langToast("startudsendelse==null");
@@ -71,7 +70,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       ft.commit();
       return rod;
     }
-    programserie = Programdata.instans.programserieFraSlug.get(startudsendelse.programserieSlug);
+    programserie = App.data.programserieFraSlug.get(startudsendelse.programserieSlug);
     Log.d("onCreateView " + this + " viser " + " / " + startudsendelse);
 
 
@@ -165,10 +164,10 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
           JSONObject data = new JSONObject(json);
           if (offset == 0) {
             programserie = Backend.parsProgramserie(data, programserie);
-            Programdata.instans.programserieFraSlug.put(startudsendelse.programserieSlug, programserie);
+            App.data.programserieFraSlug.put(startudsendelse.programserieSlug, programserie);
           }
           JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-          ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, kanal, Programdata.instans);
+          ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
           programserie.tilføjUdsendelser(offset, udsendelser);
           //programserie.tilføjUdsendelser(Arrays.asList(startudsendelse));
           opdaterUdsendelser();

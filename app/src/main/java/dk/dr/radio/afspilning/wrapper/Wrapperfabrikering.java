@@ -2,7 +2,6 @@ package dk.dr.radio.afspilning.wrapper;
 
 import android.os.Build;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -23,8 +22,8 @@ public class Wrapperfabrikering {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) hvilken = Hvilken.GammelMediaPlayer;
 
       hvilkenSidst = hvilken;
-      if (App.prefs.getBoolean("tving_mediaplayer", Programdata.instans.grunddata.tving_mediaplayer)) hvilken = Hvilken.GammelMediaPlayer;
-      if (App.prefs.getBoolean("tving_emaplayer", Programdata.instans.grunddata.tving_emaplayer)) hvilken = Hvilken.NyEmaPlayer;
+      if (App.prefs.getBoolean("tving_mediaplayer", App.grunddata.tving_mediaplayer)) hvilken = Hvilken.GammelMediaPlayer;
+      if (App.prefs.getBoolean("tving_emaplayer", App.grunddata.tving_emaplayer)) hvilken = Hvilken.NyEmaPlayer;
 
       if (hvilken==Hvilken.NyEmaPlayer) {
         mediaPlayerWrapperKlasse = EmaPlayerWrapper.class;

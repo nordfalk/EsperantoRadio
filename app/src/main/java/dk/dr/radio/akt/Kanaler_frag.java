@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -37,8 +36,8 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
   @Override
   public void run() {
     kanaler = new ArrayList<Kanal>();
-    for (Kanal k : Programdata.instans.grunddata.kanaler) {
-      if (!k.p4underkanal) if (Programdata.instans.favoritter.erFavorit(k.slug)) { // EO ŝanĝo
+    for (Kanal k : App.grunddata.kanaler) {
+      if (!k.p4underkanal) if (App.data.favoritter.erFavorit(k.slug)) { // EO ŝanĝo
         kanaler.add(0, k);  // EO ŝanĝo
       } else {  // EO ŝanĝo
         kanaler.add(k);
@@ -71,7 +70,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
 
 
     if (savedInstanceState == null) {
-      int kanalindex = kanaler.indexOf(Programdata.instans.afspiller.getLydkilde().getKanal());
+      int kanalindex = kanaler.indexOf(App.afspiller.getLydkilde().getKanal());
       if (kanalindex == -1) kanalindex = 3; // Hvis vi ikke rammer nogen af de overordnede kanaler, så er det P4
       viewPager.setCurrentItem(kanalindex);
       Sidevisning.vist(Kanal_frag.class, kanaler.get(kanalindex).slug);
@@ -80,8 +79,8 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     kanalfaneblade.setTextSize(getResources().getDimensionPixelSize(R.dimen.metainfo_skrifstørrelse));
     kanalfaneblade.setViewPager(viewPager);
     kanalfaneblade.setOnPageChangeListener(this);
-    Programdata.instans.grunddata.observatører.add(this);
-    Programdata.instans.favoritter.observatører.add(this);  // EO ŝanĝo
+    App.grunddata.observatører.add(this);
+    App.data.favoritter.observatører.add(this);  // EO ŝanĝo
     return rod;
   }
 
@@ -104,8 +103,8 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     viewPager = null;
     adapter = null;
     kanalfaneblade = null;
-    Programdata.instans.grunddata.observatører.remove(this);
-    Programdata.instans.favoritter.observatører.remove(this);  // EO ŝanĝo
+    App.grunddata.observatører.remove(this);
+    App.data.favoritter.observatører.remove(this);  // EO ŝanĝo
     super.onDestroyView();
   }
 

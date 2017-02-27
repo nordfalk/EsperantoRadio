@@ -29,7 +29,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewDatabase;
 import android.widget.TextView;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -41,7 +40,7 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View rod = inflater.inflate(R.layout.kontakt_info_om_frag, container, false);
 
-    String url = Programdata.instans.grunddata.android_json.optString("kontakt_url", "http://dr.dk");
+    String url = App.grunddata.android_json.optString("kontakt_url", "http://dr.dk");
 
     WebView webview = (WebView) rod.findViewById(R.id.webview);
 
@@ -72,7 +71,7 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
 
   public void onClick(View v) {
     Sidevisning.vist(Sidevisning.KONTAKT_SKRIV);
-    String brødtekst = Programdata.instans.grunddata.android_json.optString("kontakt_brugerspørgsmål");
+    String brødtekst = App.grunddata.android_json.optString("kontakt_brugerspørgsmål");
     //brødtekst += "\nkanal: " + DRData.instans.afspiller.kanalNavn + " (" + DRData.instans.afspiller.kanalUrl + ")";
     brødtekst += "\n" + Log.lavKontaktinfo();
 
@@ -82,6 +81,6 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
     android.util.Log.d("Kontakt", log.toString());
     android.util.Log.d("Brødtekst", brødtekst);
 
-    App.kontakt(getActivity(), Programdata.instans.grunddata.android_json.optString("kontakt_titel", "Feedback på DR Radio Android App"), brødtekst, log.toString());
+    App.kontakt(getActivity(), App.grunddata.android_json.optString("kontakt_titel", "Feedback på DR Radio Android App"), brødtekst, log.toString());
   }
 }

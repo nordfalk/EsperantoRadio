@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -39,16 +38,16 @@ public class AfspillerStartStopReciever extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    Log.d("AfspillerReciever onReceive(" + intent + ") afspillerstatus =" + Programdata.instans.afspiller.afspillerstatus);
+    Log.d("AfspillerReciever onReceive(" + intent + ") afspillerstatus =" + App.afspiller.afspillerstatus);
     try {
       Log.registrérTestet("10. Start/stop af afspilning via notifikation", "ja");
 
       if (LUK.equals(intent.getAction())) {
-        Programdata.instans.afspiller.stopAfspilning(); // Stopper servicen og lukker notifikationen
+        App.afspiller.stopAfspilning(); // Stopper servicen og lukker notifikationen
         return;
       }
 
-      if (Programdata.instans.afspiller.afspillerstatus == Status.STOPPET) {
+      if (App.afspiller.afspillerstatus == Status.STOPPET) {
         // DRData.instans.afspiller.startAfspilning();
         // Fix for fejl: Levende ikon/widget starte afspilning fejler første gang, hvis app'en ikke er i hukommelsen
         // Det skyldtes af kanalstreams ikke var færdigindlæst. Selv cacheded streams bliver først indlæst i en
@@ -57,16 +56,16 @@ public class AfspillerStartStopReciever extends BroadcastReceiver {
         App.forgrundstråd.postDelayed(new Runnable() {
           @Override
           public void run() {
-            Programdata.instans.afspiller.startAfspilning();
+            App.afspiller.startAfspilning();
           }
         }, 1); // for en sikkerheds skyld. 1 millisekund skulle bringe den sidst i køen
       } else {
         if (PAUSE.equals(intent.getAction())) {
-          Programdata.instans.afspiller.pauseAfspilning();
+          App.afspiller.pauseAfspilning();
         } else {
-          Programdata.instans.afspiller.stopAfspilning();
+          App.afspiller.stopAfspilning();
         }
-        if (Programdata.instans.afspiller.afspillerlyde) Programdata.instans.afspiller.afspillerlyd.stop.start();
+        if (App.afspiller.afspillerlyde) App.afspiller.afspillerlyd.stop.start();
       }
 
     } catch (Exception ex) {

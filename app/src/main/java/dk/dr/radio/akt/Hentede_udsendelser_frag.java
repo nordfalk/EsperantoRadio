@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.HentedeUdsendelser;
 import dk.dr.radio.data.HentetStatus;
@@ -39,7 +38,7 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
   private ListView listView;
   private ArrayList<Udsendelse> liste = new ArrayList<Udsendelse>();
   protected View rod;
-  HentedeUdsendelser hentedeUdsendelser = Programdata.instans.hentedeUdsendelser;
+  HentedeUdsendelser hentedeUdsendelser = App.data.hentedeUdsendelser;
   private AQuery aq;
 
   @Override
@@ -181,8 +180,8 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
   private void visUdsendelse_frag(Udsendelse udsendelse) {
     if (udsendelse == null) return;
     // Tjek om udsendelsen er i RAM, og put den ind hvis den ikke er
-    if (!Programdata.instans.udsendelseFraSlug.containsKey(udsendelse.slug)) {
-      Programdata.instans.udsendelseFraSlug.put(udsendelse.slug, udsendelse);
+    if (!App.data.udsendelseFraSlug.containsKey(udsendelse.slug)) {
+      App.data.udsendelseFraSlug.put(udsendelse.slug, udsendelse);
     }
     Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
 
@@ -205,8 +204,8 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
     try {
       final Udsendelse u = (Udsendelse) v.getTag();
       if (v.getId() == R.id.hør) {
-        Programdata.instans.afspiller.setLydkilde(u);
-        Programdata.instans.afspiller.startAfspilning();
+        App.afspiller.setLydkilde(u);
+        App.afspiller.startAfspilning();
       } else if (v.getId() == R.id.slet) {
         new AlertDialog.Builder(getActivity())
             .setTitle(R.string.Slet_udsendelse)

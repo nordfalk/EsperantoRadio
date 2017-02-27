@@ -33,7 +33,6 @@ import com.androidquery.AQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Sidevisning;
@@ -49,12 +48,12 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 
-    kanalkoder = new ArrayList<String>(Programdata.instans.grunddata.p4koder);
+    kanalkoder = new ArrayList<String>(App.grunddata.p4koder);
 
     for (String k : kanalkoder) {
-      if (Programdata.instans.grunddata.kanalFraKode.get(k) == null) {
+      if (App.grunddata.kanalFraKode.get(k) == null) {
         new IllegalStateException("Kanalkode mangler! Det her må ikke ske!").printStackTrace();
-        Programdata.instans.grunddata.kanalFraKode.put(k, new Kanal()); // reparér problemet :-(
+        App.grunddata.kanalFraKode.put(k, new Kanal()); // reparér problemet :-(
       }
     }
 
@@ -92,7 +91,7 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
     private View bygListeelement(int position) {
 
       String kanalkode = kanalkoder.get(position);
-      Kanal kanal = Programdata.instans.grunddata.kanalFraKode.get(kanalkode);
+      Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
       //View view = mInflater.inflate(R.layout.kanalvalg_elem, null);
       View view = getLayoutInflater(null).inflate(R.layout.kanalvalg_elem, null, false);
       AQuery aq = new AQuery(view);
@@ -103,7 +102,7 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
       textView.text(kanal.navn.replace("P4", "")).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
       //Log.d("billedebilledebilledebillede"+billede+ikon+textView);
       // Sæt åbne/luk-ikon for P4 og højttalerikon for getKanal
-      if (Programdata.instans.afspiller.getLydkilde().getKanal().kode.equals(kanalkode)) {
+      if (App.afspiller.getLydkilde().getKanal().kode.equals(kanalkode)) {
         ikon.image(R.drawable.dri_lyd_blaa);
         //ikon.blindetekst = "Spiller nu";
       } else {
@@ -157,13 +156,13 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
     String kanalkode = kanalkoder.get(position);
 
 
-    Kanal kanal = Programdata.instans.grunddata.kanalFraKode.get(kanalkode);
+    Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
     if (kanal.p4underkanal) {
       App.prefs.edit().putString(App.P4_FORETRUKKEN_AF_BRUGER, kanalkode).commit();
     }
     App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanalkode).commit();
     // Ny getKanal valgt - send valg til afspiller
-    Programdata.instans.afspiller.setLydkilde(kanal);
+    App.afspiller.setLydkilde(kanal);
 
     FragmentManager fm = getFragmentManager();
     // Fjern backstak - så vi starter forfra i 'roden'

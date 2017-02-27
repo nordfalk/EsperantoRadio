@@ -32,8 +32,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.LinkedHashSet;
 
-import dk.dr.radio.data.Programdata;
-
 /**
  * Loggerklasse
  * - hvor man slipper for at angive tag
@@ -195,7 +193,7 @@ public class Log {
       ret += "\nFunktioner brugt: "+ Sidevisning.getViste();
   //    ret += "\nFunktioner ej brugt: "+ Sidevisning.getIkkeViste();
       ret += "\nIndstillinger: "+ App.prefs.getAll();
-      ret += "\nAfspiller: "+ Programdata.instans.afspiller.toString();
+      ret += "\nAfspiller: "+ App.afspiller.toString();
       ret += "\nUdgange: "+ udgange;
     } catch (Exception e) {
       Log.rapporterFejl(e);

@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 
 /**
@@ -46,8 +45,8 @@ public class HovedtelefonFjernetReciever extends BroadcastReceiver {
 
     if (App.prefs.getBoolean("Stop når hovedtelefoner fjernes", true)==false) return;
     if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-      if (Programdata.instans.afspiller.getAfspillerstatus() != Status.STOPPET) {
-        Programdata.instans.afspiller.pauseAfspilning();
+      if (App.afspiller.getAfspillerstatus() != Status.STOPPET) {
+        App.afspiller.pauseAfspilning();
       }
     }
   }

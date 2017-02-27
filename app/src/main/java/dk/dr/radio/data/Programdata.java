@@ -34,8 +34,6 @@ import dk.dr.radio.v3.R;
  */
 public class Programdata {
 
-  public static Programdata instans;
-
   // scp /home/j/android/dr-radio-android/DRRadiov3/res/raw/grunddata_udvikling.json j:../lundogbendsen/hjemmeside/drradiov3_grunddata.json
 
   public static final String GRUNDDATA_URL = App.instans==null? "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json" :
@@ -48,9 +46,6 @@ public class Programdata {
   //private static final String BASISURL = App.PRODUKTION
   //   ? "http://www.dr.dk/tjenester/mu-apps"
   //   : "http://dr-mu-apps.azurewebsites.net";
-
-  public Grunddata grunddata;
-  public Afspiller afspiller;
 
   public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<String, Udsendelse>();
   public HashMap<String, Programserie> programserieFraSlug = new HashMap<String, Programserie>();

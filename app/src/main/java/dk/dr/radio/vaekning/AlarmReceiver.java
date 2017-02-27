@@ -22,7 +22,6 @@ import android.content.Intent;
 import java.util.Date;
 
 import dk.dr.radio.akt.Hovedaktivitet;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -44,9 +43,9 @@ public class AlarmReceiver extends BroadcastReceiver {
     try {
       Log.d("AlarmReceiver onReceive(" + intent);
       if (App.fejlsøgning) App.langToast("AlarmReceiver onReceive(" + intent);
-      Programdata.instans.afspiller.vækningIGang = true;
-      Programdata.instans.afspiller.vækkeurWakeLock = AlarmAlertWakeLock.createPartialWakeLock(context);
-      Programdata.instans.afspiller.vækkeurWakeLock.acquire(); // preferus temon, eble 120000 ĉi tie,
+      App.afspiller.vækningIGang = true;
+      App.afspiller.vækkeurWakeLock = AlarmAlertWakeLock.createPartialWakeLock(context);
+      App.afspiller.vækkeurWakeLock.acquire(); // preferus temon, eble 120000 ĉi tie,
       Log.d("AlarmReceiver AlarmAlertWakeLock.createPartialWakeLock()");
 
       if (!Alarms.ALARM_ALERT_ACTION.equals(intent.getAction())) {
@@ -111,16 +110,16 @@ public class AlarmReceiver extends BroadcastReceiver {
       context.startActivity(playAlarm);
 
 
-      Kanal nyKanal = Programdata.instans.grunddata.kanalFraKode.get(alarm.kanalo);
+      Kanal nyKanal = App.grunddata.kanalFraKode.get(alarm.kanalo);
       if (nyKanal == null) {
         Log.rapporterFejl(new IllegalStateException("Alarm: Kanal findes ikke!" + alarm.kanalo + " for alarmstr=" + data));
-        nyKanal = Programdata.instans.grunddata.forvalgtKanal;
+        nyKanal = App.grunddata.forvalgtKanal;
       }
-      Programdata.instans.afspiller.setLydkilde(nyKanal);
-      Programdata.instans.afspiller.startAfspilning();
+      App.afspiller.setLydkilde(nyKanal);
+      App.afspiller.startAfspilning();
 
       // Skru op til 2/5 styrke hvis volumen er lavere end det
-      Programdata.instans.afspiller.tjekVolumenMindst5tedele(2);
+      App.afspiller.tjekVolumenMindst5tedele(2);
 
     } catch (Exception ex) {
       Log.rapporterFejl(ex);

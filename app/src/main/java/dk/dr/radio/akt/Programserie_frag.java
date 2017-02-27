@@ -24,7 +24,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
@@ -58,11 +57,11 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     programserieSlug = getArguments().getString(DRJson.SeriesSlug.name());
     Log.d("onCreateView " + this + " viser " + programserieSlug);
-    kanal = Programdata.instans.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
     rod = inflater.inflate(R.layout.udsendelse_frag, container, false);
     aq = new AQuery(rod);
 
-    programserie = Programdata.instans.programserieFraSlug.get(programserieSlug);
+    programserie = App.data.programserieFraSlug.get(programserieSlug);
     if (programserie == null || programserie.getUdsendelser()==null) {
       hentUdsendelser(0); // hent kun en frisk udgave hvis vi ikke allerede har en
     } else if (programserie.getUdsendelser().size()==0 && programserie.antalUdsendelser>0) {
@@ -97,9 +96,9 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         JSONObject data = new JSONObject(json);
         if (offset == 0) {
           programserie = Backend.parsProgramserie(data, programserie);
-          Programdata.instans.programserieFraSlug.put(programserieSlug, programserie);
+          App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
-        ArrayList<Udsendelse> uds = Backend.parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, Programdata.instans);
+        ArrayList<Udsendelse> uds = Backend.parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, App.data);
         programserie.tilføjUdsendelser(offset, uds);
         bygListe();
       }
@@ -121,13 +120,13 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   public void onClick(View v) {
     if (v.getId()==R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      Programdata.instans.favoritter.sætFavorit(programserieSlug, favorit.isChecked());
+      App.data.favoritter.sætFavorit(programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(getString(R.string.Programserien_er_føjet_til_favoritter));
       Log.registrérTestet("Valg af favoritprogram", programserieSlug);
     } else {
       Udsendelse udsendelse = ((Viewholder) v.getTag()).udsendelse;
-      Programdata.instans.afspiller.setLydkilde(udsendelse);
-      Programdata.instans.afspiller.startAfspilning();
+      App.afspiller.setLydkilde(udsendelse);
+      App.afspiller.startAfspilning();
     }
   }
 
@@ -251,7 +250,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           aq.id(R.id.alle_udsendelser).typeface(App.skrift_gibson);
           aq.id(R.id.beskrivelse).text(programserie.beskrivelse).typeface(App.skrift_georgia);
           Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES | Linkify.PHONE_NUMBERS);
-          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(Programdata.instans.favoritter.erFavorit(programserieSlug));
+          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(App.data.favoritter.erFavorit(programserieSlug));
         } else { // if (type == UDSENDELSE eller TIDLIGERE) {
           vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
           vh.dato = aq.id(R.id.dato).typeface(App.skrift_gibson).getTextView();

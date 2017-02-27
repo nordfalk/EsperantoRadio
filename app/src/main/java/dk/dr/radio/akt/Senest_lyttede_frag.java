@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
@@ -76,7 +75,7 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
   private void opdaterListe() {
     try {
       liste.clear();
-      liste.addAll(Programdata.instans.senestLyttede.getListe());
+      liste.addAll(App.data.senestLyttede.getListe());
       Collections.reverse(liste);
     } catch (Exception e1) {
       Log.rapporterFejl(e1);
@@ -87,8 +86,8 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
   @Override
   public void onClick(View v) {
     Lydkilde udsendelse = ((Viewholder) v.getTag()).sl.lydkilde;
-    Programdata.instans.afspiller.setLydkilde(udsendelse);
-    Programdata.instans.afspiller.startAfspilning();
+    App.afspiller.setLydkilde(udsendelse);
+    App.afspiller.startAfspilning();
   }
 
   private static class Viewholder {

@@ -33,7 +33,6 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import dk.dr.radio.akt.Basisfragment;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
@@ -53,9 +52,9 @@ public class Fjernbetjening implements Runnable {
   private Kanal forrigeKanal;
 
   public Fjernbetjening() {
-    Programdata.instans.afspiller.positionsobservatører.add(this);
+    App.afspiller.positionsobservatører.add(this);
     fjernbetjeningReciever = new ComponentName(App.pakkenavn, FjernbetjeningReciever.class.getName());
-    Programdata.instans.afspiller.observatører.add(this);
+    App.afspiller.observatører.add(this);
   }
 
 
@@ -70,7 +69,7 @@ public class Fjernbetjening implements Runnable {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) return;
     if (remoteControlClient==null) return; // ikke registreret
 
-    Lydkilde lk = Programdata.instans.afspiller.getLydkilde();
+    Lydkilde lk = App.afspiller.getLydkilde();
     Kanal k = lk.getKanal();
     Udsendelse u = lk.getUdsendelse();
     if (u==null) {
@@ -141,7 +140,7 @@ public class Fjernbetjening implements Runnable {
       }
     }
 
-    Status s = Programdata.instans.afspiller.getAfspillerstatus();
+    Status s = App.afspiller.getAfspillerstatus();
     int ps = s == Status.STOPPET ? RemoteControlClient.PLAYSTATE_PAUSED : s == Status.SPILLER ? RemoteControlClient.PLAYSTATE_PLAYING : RemoteControlClient.PLAYSTATE_BUFFERING;
     remoteControlClient.setPlaybackState(ps);
     //if (Build.VERSION.SDK_INT >= 18)

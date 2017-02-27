@@ -34,12 +34,12 @@ public class ProgramserierAtilAA {
       JSONObject programserieJson = jsonArray.getJSONObject(n);
       String programserieSlug = programserieJson.getString(DRJson.Slug.name());
       //Log.d("\n=========================================== programserieSlug = " + programserieSlug);
-      Programserie programserie = Programdata.instans.programserieFraSlug.get(programserieSlug);
+      Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
       if (programserie == null) {
         // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
         programserie = new Programserie();
         Backend.parsProgramserie(programserieJson, programserie);
-        Programdata.instans.programserieFraSlug.put(programserieSlug, programserie);
+        App.data.programserieFraSlug.put(programserieSlug, programserie);
       }
       res.add(programserie);
     }

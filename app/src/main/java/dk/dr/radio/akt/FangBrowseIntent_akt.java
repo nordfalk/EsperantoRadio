@@ -12,7 +12,6 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
@@ -59,10 +58,10 @@ public class FangBrowseIntent_akt extends Activity {
       } else if (urlFraIntent.contains("/radio/live")) {
         String[] bidder = urlFraIntent.split("/");
         final String kanalSlug = bidder[bidder.length - 1];
-        Kanal kanal = Programdata.instans.grunddata.kanalFraSlug.get(kanalSlug);
+        Kanal kanal = App.grunddata.kanalFraSlug.get(kanalSlug);
         if (kanal != null) {
-          Programdata.instans.afspiller.setLydkilde(kanal);
-          Programdata.instans.afspiller.startAfspilning();
+          App.afspiller.setLydkilde(kanal);
+          App.afspiller.startAfspilning();
         }
         Intent intent = new Intent(this, Hovedaktivitet.class)
             .putExtra(Hovedaktivitet.VIS_FRAGMENT_KLASSE, Kanaler_frag.class.getName())
@@ -101,7 +100,7 @@ public class FangBrowseIntent_akt extends Activity {
     final int tidsangivelse = tidsangivelse0;
 
 
-    final Udsendelse udsendelse = Programdata.instans.udsendelseFraSlug.get(udsendelseSlug);
+    final Udsendelse udsendelse = App.data.udsendelseFraSlug.get(udsendelseSlug);
     if (udsendelse != null) {
       visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
     } else {
@@ -112,7 +111,7 @@ public class FangBrowseIntent_akt extends Activity {
           Log.d("hentStreams fikSvar(" + fraCache + " " + url);
           if (json != null && !"null".equals(json)) {
             JSONObject o = new JSONObject(json);
-            Udsendelse udsendelse2 = Backend.parseUdsendelse(null, Programdata.instans, o);
+            Udsendelse udsendelse2 = Backend.parseUdsendelse(null, App.data, o);
             udsendelse2.setStreams(o);
             udsendelse2.indslag = Backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
             udsendelse2.produktionsnummer = o.optString(DRJson.ProductionNumber.name());
@@ -134,10 +133,10 @@ public class FangBrowseIntent_akt extends Activity {
   }
 
   private void visUdsendelseFrag(String kanalSlug, Udsendelse udsendelse, int tidsangivelse) {
-    Programdata.instans.senestLyttede.registrérLytning(udsendelse);
-    Programdata.instans.senestLyttede.sætStartposition(udsendelse, tidsangivelse);
-    Programdata.instans.afspiller.setLydkilde(udsendelse);
-    Programdata.instans.afspiller.startAfspilning();
+    App.data.senestLyttede.registrérLytning(udsendelse);
+    App.data.senestLyttede.sætStartposition(udsendelse, tidsangivelse);
+    App.afspiller.setLydkilde(udsendelse);
+    App.afspiller.startAfspilning();
     Intent intent = new Intent(this, Hovedaktivitet.class)
         .putExtra(Kanal_frag.P_kode, kanalSlug)
         .putExtra(DRJson.Slug.name(), udsendelse.slug)

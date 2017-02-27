@@ -6,7 +6,6 @@ import java.util.Date;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -17,7 +16,7 @@ import dk.dr.radio.diverse.Log;
 public class EoFavoritter extends Favoritter {
 
   void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
-    Programserie ps = Programdata.instans.programserieFraSlug.get(programserieSlug);
+    Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
     if (ps==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {

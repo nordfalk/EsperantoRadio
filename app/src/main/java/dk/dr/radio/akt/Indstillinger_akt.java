@@ -80,7 +80,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     }
 
     // Fix for crash på Android 2.1 - se https://www.bugsense.com/dashboard/project/cd78aa05/errors/1474018028
-    if (!Programdata.instans.hentedeUdsendelser.virker()) {
+    if (!App.data.hentedeUdsendelser.virker()) {
       findPreference(HentedeUdsendelser.NØGLE_placeringAfHentedeFiler).setEnabled(false);
     } else {
       new AsyncTask() {
@@ -191,8 +191,8 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
 
     Log.d("Lydformatet blev ændret fra " + aktueltLydformat + " til " + nytLydformat);
     aktueltLydformat = nytLydformat;
-    Programdata drdata = Programdata.instans;
+    Programdata drdata = App.data;
     //String url = drdata.findKanalUrlFraKode(drdata.aktuelKanal);
-    Programdata.instans.afspiller.setLydkilde(Programdata.instans.afspiller.getLydkilde());
+    App.afspiller.setLydkilde(App.afspiller.getLydkilde());
   }
 }

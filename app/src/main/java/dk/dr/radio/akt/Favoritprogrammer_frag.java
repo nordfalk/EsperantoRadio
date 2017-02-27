@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Favoritter;
@@ -41,7 +40,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   private ListView listView;
   private ArrayList<Object> liste = new ArrayList<Object>(); // Indeholder både udsendelser og -serier
   protected View rod;
-  Favoritter favoritter = Programdata.instans.favoritter;
+  Favoritter favoritter = App.data.favoritter;
   private static long sidstOpdateretAntalNyeUdsendelser;
 
   @Override
@@ -64,7 +63,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
     run();
     if (favoritter.getAntalNyeUdsendelser() < 0 || sidstOpdateretAntalNyeUdsendelser > System.currentTimeMillis() + 1000 * 60 * 10) {
       // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
-      Programdata.instans.favoritter.startOpdaterAntalNyeUdsendelser.run();
+      App.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
       sidstOpdateretAntalNyeUdsendelser = System.currentTimeMillis();
     }
 
@@ -87,10 +86,10 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
       Collections.sort(pss);
       Log.d(this + " psss = " + pss);
       for (final String programserieSlug : pss) {
-        Programserie programserie = Programdata.instans.programserieFraSlug.get(programserieSlug);
+        Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
         if (programserie != null) liste.add(programserie);
         else {
-          if (Programdata.instans.programserieSlugFindesIkke.contains(programserieSlug)) continue;
+          if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
           final int offset = 0;
           String url = Backend.getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
@@ -103,11 +102,11 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
                 JSONObject data = new JSONObject(json);
                 Programserie programserie = Backend.parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-                ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, Programdata.instans);
+                ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, App.data);
                 programserie.tilføjUdsendelser(offset, udsendelser);
-                Programdata.instans.programserieFraSlug.put(programserieSlug, programserie);
+                App.data.programserieFraSlug.put(programserieSlug, programserie);
               } else {
-                Programdata.instans.programserieSlugFindesIkke.add(programserieSlug);
+                App.data.programserieSlugFindesIkke.add(programserieSlug);
                 Log.d("programserieSlugFindesIkke for " + programserieSlug);
               }
               App.forgrundstråd.postDelayed(Favoritprogrammer_frag.this, 250); // Vent 1/4 sekund på eventuelt andre svar

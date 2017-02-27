@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
@@ -47,7 +46,7 @@ public class DramaOgBog {
       if (karuselJson!=null) for (int n = 0; n < karuselJson.length(); n++) try {
         JSONObject udsendelseJson = karuselJson.getJSONObject(n);
         // TODO mangler
-        Udsendelse u = Backend.parseUdsendelse(null, Programdata.instans, udsendelseJson);
+        Udsendelse u = Backend.parseUdsendelse(null, App.data, udsendelseJson);
         karusel.add(u);
         karuselSerieSlug.add(u.programserieSlug);
       } catch (JSONException je) {
@@ -64,10 +63,10 @@ public class DramaOgBog {
         JSONObject programserieJson = jsonArray2.getJSONObject(n);
         String programserieSlug = programserieJson.getString(DRJson.Slug.name());
         //Log.d("\n DramaOgBog =========================================== programserieSlug = " + programserieSlug);
-        Programserie programserie = Programdata.instans.programserieFraSlug.get(programserieSlug);
+        Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
         if (programserie == null) {
           programserie = new Programserie();
-          Programdata.instans.programserieFraSlug.put(programserieSlug, programserie);
+          App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
         res.add(Backend.parsProgramserie(programserieJson, programserie));
 //            Log.d("DramaOgBogD "+sektionsnummer+" "+n+programserie+" "+programserie.antalUdsendelser+" "+programserie.billedeUrl);

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Programserie;
@@ -144,8 +143,8 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     });
 
     // Indlæs A-Å-liste hvis den ikke allerede er det, så vi har en komplet programliste
-    if (App.ÆGTE_DR && Programdata.instans.programserierAtilÅ.liste == null) {
-      Programdata.instans.programserierAtilÅ.startHentData();
+    if (App.ÆGTE_DR && App.data.programserierAtilÅ.liste == null) {
+      App.data.programserierAtilÅ.startHentData();
     }
     return rod;
   }
@@ -261,16 +260,16 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     }
 
     if (søgelistecache == null) {
-      søgelistecache = new ArrayList<SoegElement>(Programdata.instans.programserieFraSlug.size());
-      Log.d("DRData.instans.programserieFraSlug?=" + Programdata.instans.programserieFraSlug);
-      if (App.ÆGTE_DR) for (Programserie ps : Programdata.instans.programserieFraSlug.values()) {
+      søgelistecache = new ArrayList<SoegElement>(App.data.programserieFraSlug.size());
+      Log.d("DRData.programdata.programserieFraSlug?=" + App.data.programserieFraSlug);
+      if (App.ÆGTE_DR) for (Programserie ps : App.data.programserieFraSlug.values()) {
         SoegElement se = new SoegElement();
         se.programserie = ps;
         se.titel = " "+ps.titel.toLowerCase() + " " + ps.undertitel.toLowerCase();
         se.beskrivelse = " "+ps.beskrivelse.toLowerCase();
         søgelistecache.add(se);
       }
-      else for (Udsendelse ps : Programdata.instans.udsendelseFraSlug.values()) {  // EO ŝanĝo
+      else for (Udsendelse ps : App.data.udsendelseFraSlug.values()) {  // EO ŝanĝo
         SoegElement se = new SoegElement();
         se.udsendelse = ps;
         se.titel = " "+(ps.titel==null?"":ps.titel.toLowerCase());

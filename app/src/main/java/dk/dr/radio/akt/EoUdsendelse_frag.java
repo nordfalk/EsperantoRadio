@@ -36,7 +36,6 @@ import java.util.List;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.esperanto.EoDiverse;
@@ -62,7 +61,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   private int playlisteElemDerSpillerNuIndex = -1;
 
   private ArrayList<Object> liste = new ArrayList<Object>();
-  Afspiller afspiller = Programdata.instans.afspiller;
+  Afspiller afspiller = App.afspiller;
   private View topView;
 
 
@@ -71,7 +70,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     public void run() {
       if (topView == null) return;
       CheckBox fav = (CheckBox) topView.findViewById(R.id.favorit);
-      fav.setChecked(Programdata.instans.favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(App.data.favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
 
@@ -82,8 +81,8 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    kanal = Programdata.instans.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
-    udsendelse = Programdata.instans.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
         Log.rapporterFejl(new IllegalStateException("afbrydManglerData " + getArguments().toString()));
@@ -105,14 +104,14 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     listView.setEmptyView(aq.id(R.id.tom).typeface(App.skrift_gibson).getView());
     listView.setOnItemClickListener(this);
     listView.setContentDescription(udsendelse.titel + " - " + (udsendelse.startTid == null ? "" : Backend.datoformat.format(udsendelse.startTid)));
-    Programdata.instans.hentedeUdsendelser.tjekOmHentet(udsendelse);
+    App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
 
     setHasOptionsMenu(true);
     bygListe();
 
     afspiller.observatører.add(this);
-    Programdata.instans.hentedeUdsendelser.observatører.add(this);
-    Programdata.instans.favoritter.observatører.add(opdaterFavoritter);
+    App.data.hentedeUdsendelser.observatører.add(this);
+    App.data.favoritter.observatører.add(opdaterFavoritter);
     return rod;
   }
 
@@ -154,8 +153,8 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(Programdata.instans.favoritter.erFavorit(udsendelse.programserieSlug));
-    if (!Programdata.instans.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.data.favoritter.erFavorit(udsendelse.programserieSlug));
+    if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
   }
@@ -194,10 +193,10 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       hør_tekst.setVisibility(View.GONE);
     }
 
-    HentetStatus hs = Programdata.instans.hentedeUdsendelser.getHentetStatus(udsendelse);
+    HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse);
     aq.id(R.id.hent);
 
-    if (!Programdata.instans.hentedeUdsendelser.virker()) {
+    if (!App.data.hentedeUdsendelser.virker()) {
       aq.gone();
     }
     else if (hs != null) {
@@ -260,8 +259,8 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   public void onDestroyView() {
     App.volleyRequestQueue.cancelAll(this);
     afspiller.observatører.remove(this);
-    Programdata.instans.hentedeUdsendelser.observatører.remove(this);
-    Programdata.instans.favoritter.observatører.remove(opdaterFavoritter);
+    App.data.hentedeUdsendelser.observatører.remove(this);
+    App.data.favoritter.observatører.remove(opdaterFavoritter);
     super.onDestroyView();
   }
 
@@ -338,18 +337,18 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     App.forgrundstråd.removeCallbacks(this);
 
     int spillerNuIndexNy = -1;
-    if (udsendelse.equals(Programdata.instans.afspiller.getLydkilde().getUdsendelse()))
+    if (udsendelse.equals(App.afspiller.getLydkilde().getUdsendelse()))
     {
       // Find og fremhævet nummeret der spilles lige nu
-      long pos = Programdata.instans.afspiller.getCurrentPosition();
+      long pos = App.afspiller.getCurrentPosition();
       spillerNuIndexNy = udsendelse.findPlaylisteElemTilTid(pos, playlisteElemDerSpillerNuIndex);
-      App.forgrundstråd.postDelayed(this, Programdata.instans.grunddata.opdaterPlaylisteEfterMs);
+      App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
     }
     if (playlisteElemDerSpillerNuIndex != spillerNuIndexNy) {
       playlisteElemDerSpillerNuIndex = spillerNuIndexNy;
       playlisteElemDerSpillerNu = playlisteElemDerSpillerNuIndex < 0 ? null : udsendelse.playliste.get(playlisteElemDerSpillerNuIndex);
     }
-    Programdata.instans.hentedeUdsendelser.tjekOmHentet(udsendelse);
+    App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
     adapter.notifyDataSetChanged(); // Opdater knapper etc
   }
 
@@ -508,7 +507,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Linkify.addLinks(titel, Linkify.WEB_URLS);
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      Programdata.instans.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      App.data.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
       Log.registrérTestet("Valg af favoritprogram", udsendelse.programserieSlug);
     } else {
@@ -566,7 +565,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Log.rapporterFejl(e);
     }
 
-    HentetStatus hs = Programdata.instans.hentedeUdsendelser.getHentetStatus(udsendelse);
+    HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse);
     if (hs != null) {
       // Skift til Hentede_frag
       try {
@@ -589,7 +588,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Log.rapporterFejl(new IllegalStateException("Udsendelsen kan ikke hentes - burde ikke kunne komme hertil"));
       return;
     }
-    Programdata.instans.hentedeUdsendelser.hent(udsendelse);
+    App.data.hentedeUdsendelser.hent(udsendelse);
   }
 
   private void hør() {
@@ -612,13 +611,13 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
                   @Override
                   public void onClick(DialogInterface dialog, int which) {
                     lydstreamList.get(which).foretrukken = true;
-                    Programdata.instans.afspiller.setLydkilde(udsendelse);
-                    Programdata.instans.afspiller.startAfspilning();
+                    App.afspiller.setLydkilde(udsendelse);
+                    App.afspiller.startAfspilning();
                   }
             }).show();
       } else {
-        Programdata.instans.afspiller.setLydkilde(udsendelse);
-        Programdata.instans.afspiller.startAfspilning();
+        App.afspiller.setLydkilde(udsendelse);
+        App.afspiller.startAfspilning();
       }
     } catch (Exception e) {
       Log.rapporterFejl(e);
@@ -642,8 +641,8 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       if (udsendelse.equals(afspiller.getLydkilde()) && afspiller.getAfspillerstatus() == Status.SPILLER) {
         afspiller.seekTo(pl.offsetMs);
       } else {
-        Programdata.instans.senestLyttede.registrérLytning(udsendelse);
-        Programdata.instans.senestLyttede.sætStartposition(udsendelse, pl.offsetMs);
+        App.data.senestLyttede.registrérLytning(udsendelse);
+        App.data.senestLyttede.sætStartposition(udsendelse, pl.offsetMs);
         afspiller.setLydkilde(udsendelse);
         afspiller.startAfspilning();
       }

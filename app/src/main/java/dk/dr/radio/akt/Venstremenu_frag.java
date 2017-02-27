@@ -35,7 +35,6 @@ import java.util.List;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.akt.diverse.GenstartProgrammet;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -120,16 +119,16 @@ public class Venstremenu_frag extends Fragment implements Runnable {
     venstremenuAdapter = new VenstremenuAdapter(getActivity());
     listView.setAdapter(venstremenuAdapter);
     listView.setItemChecked(mCurrentSelectedPosition, true);
-    Programdata.instans.favoritter.observatører.add(this);
-    Programdata.instans.hentedeUdsendelser.observatører.add(this);
+    App.data.favoritter.observatører.add(this);
+    App.data.hentedeUdsendelser.observatører.add(this);
     Alarms.setNextAlert(getActivity());
     return listView;
   }
 
   @Override
   public void onDestroyView() {
-    Programdata.instans.favoritter.observatører.remove(this);
-    Programdata.instans.hentedeUdsendelser.observatører.remove(this);
+    App.data.favoritter.observatører.remove(this);
+    App.data.hentedeUdsendelser.observatører.remove(this);
     super.onDestroyView();
   }
 
@@ -403,7 +402,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         @Override
         public View getView() {
           TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
-          int antal = Programdata.instans.favoritter.getAntalNyeUdsendelser();
+          int antal = App.data.favoritter.getAntalNyeUdsendelser();
           tekst2.setText(
               antal < 0 ? "" : // i gang med at indlæse
               getString(antal==0? R.string._ingen_nye_udsendelser_: antal==1? R.string._1_ny_udsendelse_ : R.string.___nye_udsendelser_, antal));
@@ -412,12 +411,12 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       });
       aq.id(R.id.tekst).typeface(App.skrift_gibson_fed).id(R.id.tekst2).typeface(App.skrift_gibson);
 
-      if (Programdata.instans.hentedeUdsendelser.virker()) {
+      if (App.data.hentedeUdsendelser.virker()) {
         tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_hentede_udsendendelser, null), null, Hentede_udsendelser_frag.class) {
           @Override
           public View getView() {
             TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
-            int antal = Programdata.instans.hentedeUdsendelser.getUdsendelser().size();
+            int antal = App.data.hentedeUdsendelser.getUdsendelser().size();
             tekst2.setText(" (" + antal + ")");
             return view;
           }

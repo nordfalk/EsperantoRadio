@@ -13,7 +13,6 @@ import com.androidquery.AQuery;
 import org.json.JSONObject;
 
 import dk.dr.radio.afspilning.Status;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -37,7 +36,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     String kanalkode = getArguments().getString(P_kode);
-    kanal = Programdata.instans.grunddata.kanalFraKode.get(kanalkode);
+    kanal = App.grunddata.kanalFraKode.get(kanalkode);
     rod = inflater.inflate(R.layout.kanal_nyheder_frag, container, false);
     aq = new AQuery(rod);
 
@@ -62,7 +61,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
     aq.id(R.id.titel).typeface(App.skrift_gibson);
 
 
-    Programdata.instans.afspiller.observatører.add(this);
+    App.afspiller.observatører.add(this);
     App.netværk.observatører.add(this);
     //Log.d(this + " onCreateView færdig efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     return rod;
@@ -72,7 +71,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
   public void onDestroyView() {
     super.onDestroyView();
     //TODO: rod = null; aq=null;
-    Programdata.instans.afspiller.observatører.remove(this);
+    App.afspiller.observatører.remove(this);
     App.netværk.observatører.remove(this);
 
   }
@@ -86,8 +85,8 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
       App.forgrundstråd.post(new Runnable() {
         @Override
         public void run() {
-          if (Programdata.instans.afspiller.getAfspillerstatus() == Status.STOPPET && Programdata.instans.afspiller.getLydkilde() != kanal) {
-            Programdata.instans.afspiller.setLydkilde(kanal);
+          if (App.afspiller.getAfspillerstatus() == Status.STOPPET && App.afspiller.getLydkilde() != kanal) {
+            App.afspiller.setLydkilde(kanal);
           }
         }
       });
@@ -119,7 +118,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
       };
       App.volleyRequestQueue.add(req);
     }
-    boolean spillerDenneKanal = Programdata.instans.afspiller.getAfspillerstatus() != Status.STOPPET && Programdata.instans.afspiller.getLydkilde() == kanal;
+    boolean spillerDenneKanal = App.afspiller.getAfspillerstatus() != Status.STOPPET && App.afspiller.getLydkilde() == kanal;
     boolean online = App.netværk.erOnline();
     aq.id(R.id.hør_live).enabled(online && kanal.harStreams() && !spillerDenneKanal)
         .text(!online ? "Internetforbindelse mangler" :

@@ -64,19 +64,19 @@ public class AfproevBackend {
   @Test
   public void tjek_hent_a_til_å() throws Exception {
     System.out.println("tjek_hent_a_til_å");
-    Programdata.instans.programserierAtilÅ.parseSvar(hentStreng(Backend.getAtilÅUrl()));
-    assertTrue(Programdata.instans.programserierAtilÅ.liste.size()>0);
+    App.data.programserierAtilÅ.parseSvar(hentStreng(Backend.getAtilÅUrl()));
+    assertTrue(App.data.programserierAtilÅ.liste.size()>0);
 
     int samletAntalUdsendelser = 0;
 
     // Tjek kun nummer 50 til nummer 100
-    for (Programserie ps : Programdata.instans.programserierAtilÅ.liste.subList(50, 150)) {
+    for (Programserie ps : App.data.programserierAtilÅ.liste.subList(50, 150)) {
       String url = Backend.getProgramserieUrl(ps, ps.slug) + "&offset=" + 0;
       JSONObject data = new JSONObject(hentStreng(url));
       ps = Backend.parsProgramserie(data, ps);
-      Programdata.instans.programserieFraSlug.put(ps.slug, ps);
+      App.data.programserieFraSlug.put(ps.slug, ps);
       JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-      ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, Programdata.instans);
+      ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, App.data);
 
       System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
       assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+url, ps.antalUdsendelser>= udsendelser.size());
@@ -89,13 +89,13 @@ public class AfproevBackend {
   @Test
   public void tjek_hent_podcast() throws Exception {
     System.out.println("tjek_hent_podcast");
-    Programdata.instans.dramaOgBog.parseSvar(hentStreng(Programdata.instans.dramaOgBog.url));
+    App.data.dramaOgBog.parseSvar(hentStreng(App.data.dramaOgBog.url));
     // assertThat(i.dramaOgBog.karusel, hasSize(greaterThan(0)));
-    assertNotSame(new ArrayList<Udsendelse>(), Programdata.instans.dramaOgBog.karusel);
+    assertNotSame(new ArrayList<Udsendelse>(), App.data.dramaOgBog.karusel);
 
     int sektionsnummer = 0;
-    for (ArrayList<Programserie> sektion : Programdata.instans.dramaOgBog.lister) {
-      assertTrue(Programdata.instans.dramaOgBog.overskrifter.get(sektionsnummer)+" er tom", !sektion.isEmpty());
+    for (ArrayList<Programserie> sektion : App.data.dramaOgBog.lister) {
+      assertTrue(App.data.dramaOgBog.overskrifter.get(sektionsnummer)+" er tom", !sektion.isEmpty());
       int n = 0;
       for (Programserie ps : sektion) {
         assertTrue(ps+" har ingen udsendelser", ps.antalUdsendelser>0);
@@ -104,9 +104,9 @@ public class AfproevBackend {
         String url = Backend.getProgramserieUrl(ps, ps.slug) + "&offset=" + 0;
         JSONObject data = new JSONObject(hentStreng(url));
         ps = Backend.parsProgramserie(data, ps);
-        Programdata.instans.programserieFraSlug.put(ps.slug, ps);
+        App.data.programserieFraSlug.put(ps.slug, ps);
         JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-        ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, Programdata.instans);
+        ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, null, App.data);
 
         System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
         assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+url, ps.antalUdsendelser>= udsendelser.size());
@@ -125,7 +125,7 @@ public class AfproevBackend {
 
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
-    for (Kanal k : Programdata.instans.grunddata.kanaler) {
+    for (Kanal k : App.grunddata.kanaler) {
       if (k.kode.equals("P4F")) continue;
       String url = k.getStreamsUrl();
       String data = hentStreng(url);
@@ -141,21 +141,21 @@ public class AfproevBackend {
   @Test
   public void tjekAktuelleUdsendelser() throws Exception {
     System.out.println("tjekAktuelleUdsendelser");
-    Programdata i = Programdata.instans;// = new DRData();
+    Programdata i = App.data;// = new DRData();
     //i.grunddata = new Grunddata();
     //i.grunddata.parseFællesGrunddata(Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json")));
 
     //hentSupplerendeData(i.grunddata);
     //System.exit(0);
 
-    for (Kanal kanal : i.grunddata.kanaler) {
+    for (Kanal kanal : App.grunddata.kanaler) {
       Log.d("\n\n===========================================\n\nkanal = " + kanal);
       if (Kanal.P4kode.equals(kanal.kode)) continue;
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
       String datoStr = Backend.apiDatoFormat.format(new Date());
       kanal.setUdsendelserForDag(Backend.parseUdsendelserForKanal(new JSONArray(
-              hentStreng(Backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr))), kanal, new Date(), Programdata.instans), "0");
+              hentStreng(Backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr))), kanal, new Date(), App.data), "0");
       int antalUdsendelser = 0;
       int antalUdsendelserMedPlaylister = 0;
       int antalUdsendelserMedLydstreams = 0;
@@ -184,7 +184,7 @@ public class AfproevBackend {
             JSONObject data = new JSONObject(str);
             ps = Backend.parsProgramserie(data, null);
             JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-            ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, kanal, Programdata.instans);
+            ArrayList<Udsendelse> udsendelser = Backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
             ps.tilføjUdsendelser(0, udsendelser);
             i.programserieFraSlug.put(u.programserieSlug, ps);
           }

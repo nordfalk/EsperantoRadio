@@ -24,7 +24,6 @@ package dk.dr.radio.diverse;
  */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -43,7 +42,6 @@ import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -55,7 +53,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
-import com.androidquery.callback.BitmapAjaxCallback;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.File;
@@ -85,6 +82,9 @@ import io.fabric.sdk.android.Fabric;
 
 public class App {
   public static App instans;
+  public static Programdata data;
+  public static Grunddata grunddata;
+  public static Afspiller afspiller;
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java
@@ -205,48 +205,48 @@ public class App {
     volleyRequestQueue.start();
 
     try {
-      Programdata.instans = new Programdata();
-      Programdata.instans.grunddata = new Grunddata();
+      data = new Programdata();
+      grunddata = new Grunddata();
 
       // Indlæsning af grunddata/stamdata.
       // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
       // På et senere tidspunkt henter vi nye grunddata
       grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
-      String grunddata = grunddata_prefs.getString(Programdata.GRUNDDATA_URL, null);
+      String grunddataStr = grunddata_prefs.getString(Programdata.GRUNDDATA_URL, null);
 
-      if (grunddata == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
-        grunddata = Diverse.læsStreng(res.openRawResource(R.raw.grunddata));
+      if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
+        grunddataStr = Diverse.læsStreng(res.openRawResource(R.raw.grunddata));
       }
       if (App.ÆGTE_DR) {
-        Programdata.instans.grunddata.parseFællesGrunddata(grunddata);
+        grunddata.parseFællesGrunddata(grunddataStr);
       } else {
-        Programdata.instans.grunddata.eo_parseFællesGrunddata(grunddata);
-        Programdata.instans.grunddata.ŝarĝiKanalEmblemojn(true);
-        Programdata.instans.grunddata.parseFællesGrunddata(grunddata);
+        grunddata.eo_parseFællesGrunddata(grunddataStr);
+        grunddata.ŝarĝiKanalEmblemojn(true);
+        grunddata.parseFællesGrunddata(grunddataStr);
 
-        File fil = new File(FilCache.findLokaltFilnavn(Programdata.instans.grunddata.radioTxtUrl));
+        File fil = new File(FilCache.findLokaltFilnavn(grunddata.radioTxtUrl));
         if (fil.exists()) {
           String radioTxtStr = Diverse.læsStreng(new FileInputStream(fil));
-          Programdata.instans.grunddata.leguRadioTxt(radioTxtStr);
+          grunddata.leguRadioTxt(radioTxtStr);
         } else {
           String radioTxtStr = Diverse.læsStreng(res.openRawResource(R.raw.radio));
-          Programdata.instans.grunddata.leguRadioTxt(radioTxtStr);
+          grunddata.leguRadioTxt(radioTxtStr);
         }
 
         new Thread() {
           @Override
           public void run() {
             try {
-              Programdata.instans.grunddata.ŝarĝiKanalEmblemojn(false);
+              grunddata.ŝarĝiKanalEmblemojn(false);
 
-              final String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(Programdata.instans.grunddata.radioTxtUrl, false)));
+              final String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(grunddata.radioTxtUrl, false)));
               forgrundstråd.post(new Runnable() {
                 @Override
                 public void run() {
-                  Programdata.instans.grunddata.leguRadioTxt(radioTxtStr);
+                  grunddata.leguRadioTxt(radioTxtStr);
                   // Povas esti ke la listo de kanaloj ŝanĝiĝis, pro tio denove kontrolu ĉu reŝarĝi bildojn
-                  Programdata.instans.grunddata.ŝarĝiKanalEmblemojn(true);
-                  opdaterObservatører(Programdata.instans.grunddata.observatører);
+                  grunddata.ŝarĝiKanalEmblemojn(true);
+                  opdaterObservatører(grunddata.observatører);
                 }
               });
             } catch (Exception e) {
@@ -256,7 +256,7 @@ public class App {
         }.start();
       }
 
-      for (final Kanal k : Programdata.instans.grunddata.kanaler) {
+      for (final Kanal k : grunddata.kanaler) {
         k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pakkenavn);
       }
 
@@ -264,9 +264,9 @@ public class App {
       // Hvis brugeren foretrækker P4 er vi nødt til at finde underkanalen
       kanalkode = tjekP4OgVælgUnderkanal(kanalkode);
 
-      Kanal aktuelKanal = Programdata.instans.grunddata.kanalFraKode.get(kanalkode);
+      Kanal aktuelKanal = grunddata.kanalFraKode.get(kanalkode);
       if (aktuelKanal == null || aktuelKanal == Grunddata.ukendtKanal) {
-        aktuelKanal = Programdata.instans.grunddata.forvalgtKanal;
+        aktuelKanal = grunddata.forvalgtKanal;
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
@@ -287,8 +287,8 @@ public class App {
         App.volleyRequestQueue.add(req);
       }
 
-      Programdata.instans.afspiller = new Afspiller();
-      Programdata.instans.afspiller.setLydkilde(aktuelKanal);
+      afspiller = new Afspiller();
+      afspiller.setLydkilde(aktuelKanal);
 
 
       ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -356,7 +356,7 @@ public class App {
       Log.d("Onlineinitialisering starter efter " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
 
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
-        for (final Kanal kanal : Programdata.instans.grunddata.kanaler) {
+        for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
           String url = kanal.getStreamsUrl();
           if (url==null) { // EO ŝanĝo
@@ -380,9 +380,9 @@ public class App {
         }
       }
 
-      if (Programdata.instans.favoritter.getAntalNyeUdsendelser() < 0) {
+      if (data.favoritter.getAntalNyeUdsendelser() < 0) {
         færdig = false;
-        Programdata.instans.favoritter.startOpdaterAntalNyeUdsendelser.run();
+        data.favoritter.startOpdaterAntalNyeUdsendelser.run();
       }
 
 
@@ -402,8 +402,8 @@ public class App {
       if (ÆGTE_DR && færdig && !prefs.getBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, false)) {
         prefs.edit().putBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, true);
         færdig = false;
-        Programdata.instans.dramaOgBog.startHentData();
-        Programdata.instans.programserierAtilÅ.startHentData();
+        data.dramaOgBog.startHentData();
+        data.programserierAtilÅ.startHentData();
       }
       if (færdig) {
         netværk.observatører.remove(this); // Hold ikke mere øje med om vi kommer online
@@ -420,7 +420,7 @@ public class App {
     @Override
     public void run() {
       if (!App.erOnline()) return;
-      if (sidstTjekket + (App.EMULATOR ? 1000 : Programdata.instans.grunddata.opdaterGrunddataEfterMs) > System.currentTimeMillis())
+      if (sidstTjekket + (App.EMULATOR ? 1000 : grunddata.opdaterGrunddataEfterMs) > System.currentTimeMillis())
         return;
       sidstTjekket = System.currentTimeMillis();
       Log.d("hentEvtNyeGrunddata " + (sidstTjekket - App.TIDSSTEMPEL_VED_OPSTART));
@@ -433,18 +433,18 @@ public class App {
           Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
           if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
           if (!App.ÆGTE_DR) {
-            Programdata.instans.grunddata.kanaler.clear(); // EO
-            Programdata.instans.grunddata.p4koder.clear(); // EO
-            Programdata.instans.grunddata.eo_parseFællesGrunddata(nyeGrunddata);
+            grunddata.kanaler.clear(); // EO
+            grunddata.p4koder.clear(); // EO
+            grunddata.eo_parseFællesGrunddata(nyeGrunddata);
           }
-          Programdata.instans.grunddata.parseFællesGrunddata(nyeGrunddata);
+          grunddata.parseFællesGrunddata(nyeGrunddata);
           String pn = pakkenavn;
-          for (final Kanal k : Programdata.instans.grunddata.kanaler) {
+          for (final Kanal k : grunddata.kanaler) {
             k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);
           }
-          if (!App.ÆGTE_DR) Programdata.instans.grunddata.ŝarĝiKanalEmblemojn(true);
+          if (!App.ÆGTE_DR) grunddata.ŝarĝiKanalEmblemojn(true);
           // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
-          opdaterObservatører(Programdata.instans.grunddata.observatører);
+          opdaterObservatører(grunddata.observatører);
           // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
           grunddata_prefs.edit().putString(Programdata.GRUNDDATA_URL, nyeGrunddata).commit();
         }
@@ -619,7 +619,7 @@ public class App {
   public static void kontakt(Activity akt, String emne, String txt, String vedhæftning) {
     String[] modtagere;
     try {
-      modtagere = Diverse.jsonArrayTilArrayListString(Programdata.instans.grunddata.android_json.getJSONArray("kontakt_modtagere")).toArray(new String[0]);
+      modtagere = Diverse.jsonArrayTilArrayListString(grunddata.android_json.getJSONArray("kontakt_modtagere")).toArray(new String[0]);
     } catch (Exception ex) {
       Log.e(ex);
       modtagere = new String[]{"jacob.nordfalk@gmail.com"};

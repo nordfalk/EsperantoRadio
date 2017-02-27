@@ -31,7 +31,6 @@ import com.androidquery.AQuery;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
@@ -67,7 +66,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     public void run() {
       App.forgrundstråd.removeCallbacks(this);
       try {
-        Afspiller afspiller = Programdata.instans.afspiller;
+        Afspiller afspiller = App.afspiller;
         if (afspiller.getAfspillerstatus()!=Status.STOPPET && viserUdvidetOmråde()) App.forgrundstråd.postDelayed(this, 1000);
         /*
         boolean denneUdsSpiller = udsendelse.equals(afspiller.getLydkilde()) && afspiller.getAfspillerstatus() != Status.STOPPET;
@@ -75,7 +74,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
           return;
         }
         */
-        Udsendelse u = Programdata.instans.afspiller.getLydkilde().getUdsendelse();
+        Udsendelse u = App.afspiller.getLydkilde().getUdsendelse();
         //long passeret = App.serverCurrentTimeMillis() - u.startTid.getTime();
         //long længde = u.slutTid.getTime() - u.startTid.getTime();
         //int passeretPct = længde > 0 ? (int) (passeret * 100 / længde) : 0;
@@ -126,7 +125,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
   @Override
   public void onProgressChanged(SeekBar seekBarx, int progress, boolean fromUser) {
     if (fromUser) {
-      Programdata.instans.afspiller.seekTo(progress);
+      App.afspiller.seekTo(progress);
       starttid.setText(DateUtils.formatElapsedTime(progress / 1000));
     }
   }
@@ -194,10 +193,10 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     });
     aq.id(R.id.forrige).clicked(this);
     aq.id(R.id.næste).clicked(this);
-    Programdata.instans.afspiller.observatører.add(this);
-    Programdata.instans.afspiller.forbindelseobservatører.add(this);
-    Programdata.instans.afspiller.positionsobservatører.add(this);
-    Programdata.instans.grunddata.observatører.add(this);
+    App.afspiller.observatører.add(this);
+    App.afspiller.forbindelseobservatører.add(this);
+    App.afspiller.positionsobservatører.add(this);
+    App.grunddata.observatører.add(this);
     lydstyrke.init(aq.id(R.id.lydstyrke).getSeekBar());
     run(); // opdatér views
     if (App.accessibilityManager.isEnabled()) setHasOptionsMenu(true);
@@ -206,10 +205,10 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
 
   @Override
   public void onDestroyView() {
-    Programdata.instans.afspiller.observatører.remove(this);
-    Programdata.instans.afspiller.forbindelseobservatører.remove(this);
-    Programdata.instans.afspiller.positionsobservatører.remove(this);
-    Programdata.instans.grunddata.observatører.remove(this);
+    App.afspiller.observatører.remove(this);
+    App.afspiller.forbindelseobservatører.remove(this);
+    App.afspiller.positionsobservatører.remove(this);
+    App.grunddata.observatører.remove(this);
     super.onDestroyView();
   }
 
@@ -220,7 +219,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
   @Override
   public void run() {
     App.forgrundstråd.postDelayed(opdaterSeekBar, 1000);
-    Lydkilde lydkilde = Programdata.instans.afspiller.getLydkilde();
+    Lydkilde lydkilde = App.afspiller.getLydkilde();
     Kanal kanal = lydkilde.getKanal();
     if (kanal == null) {
       Log.rapporterFejl(new IllegalStateException("kanal er null for "+lydkilde+ " "+lydkilde.getClass()));
@@ -234,14 +233,14 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         kanallogo.setImageBitmap(kanal.eo_emblemo);
       } else {
         kanallogo.setImageResource(App.ÆGTE_DR ? R.drawable.dr_logo : 0);
-        Kanal lk = Programdata.instans.grunddata.kanalFraSlug.get(kanal.slug);
+        Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
         Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.eo_emblemo+")");
       }
     }
 
     direktetekst.setVisibility(lydkilde.erDirekte()?View.VISIBLE:View.GONE);
     metainformation.setText(Html.fromHtml(udsendelse!=null?udsendelse.titel:kanal.navn));
-    switch (Programdata.instans.afspiller.getAfspillerstatus()) {
+    switch (App.afspiller.getAfspillerstatus()) {
       case STOPPET:
         startStopKnapNyImageResource = R.drawable.afspiller_spil;
         startStopKnap.setContentDescription(getString(R.string.Start_afspilning));
@@ -251,7 +250,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         startStopKnapNyImageResource = R.drawable.afspiller_pause;
         startStopKnap.setContentDescription(getString(R.string.Stop_afspilning));
         progressbar.setVisibility(View.VISIBLE);
-        int fpct = Programdata.instans.afspiller.getForbinderProcent();
+        int fpct = App.afspiller.getForbinderProcent();
         metainformation.setText(getString(R.string.Forbinder) + (fpct > 0 ? " "+fpct : ""));
         break;
       case SPILLER:
@@ -289,8 +288,8 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
       inflater.inflate(R.menu.tilg_afspiller, menu);
       MenuItem menuItem = menu.findItem(R.id.startStopKnap);
 
-      if (Programdata.instans.afspiller.getAfspillerstatus() == Status.STOPPET) {
-        menuItem.setTitle(getString(R.string.Start) + Programdata.instans.afspiller.getLydkilde().getNavn());
+      if (App.afspiller.getAfspillerstatus() == Status.STOPPET) {
+        menuItem.setTitle(getString(R.string.Start) + App.afspiller.getLydkilde().getNavn());
       } else {
         menuItem.setTitle(R.string.Stop_afspilning);
         menuItem.setIcon(R.drawable.dri_radio_stop_graa40);
@@ -302,10 +301,10 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (item.getItemId() == R.id.startStopKnap) {
-      if (Programdata.instans.afspiller.afspillerstatus == Status.STOPPET) {
-        Programdata.instans.afspiller.startAfspilning();
+      if (App.afspiller.afspillerstatus == Status.STOPPET) {
+        App.afspiller.startAfspilning();
       } else {
-        Programdata.instans.afspiller.stopAfspilning();
+        App.afspiller.stopAfspilning();
       }
     }
     return super.onOptionsItemSelected(item);
@@ -374,7 +373,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     if (!viserUdvidetOmråde()) {
       Sidevisning.vist(Afspiller_frag.class);
       indhold_overskygge.setOnTouchListener(indhold_overskygge_onTouchListener);
-      int forrigeNæsteSynlighed = Programdata.instans.afspiller.getLydkilde().erDirekte() ? View.GONE : View.VISIBLE;
+      int forrigeNæsteSynlighed = App.afspiller.getLydkilde().erDirekte() ? View.GONE : View.VISIBLE;
       aq.id(R.id.forrige).visibility(forrigeNæsteSynlighed).id(R.id.næste).visibility(forrigeNæsteSynlighed);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
         indhold_overskygge.setVisibility(View.VISIBLE);
@@ -431,18 +430,18 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
   @Override
   public void onClick(View v) {
     if (v == startStopKnap) {
-      if (Programdata.instans.afspiller.afspillerstatus == Status.STOPPET) {
-        Programdata.instans.afspiller.startAfspilning();
+      if (App.afspiller.afspillerstatus == Status.STOPPET) {
+        App.afspiller.startAfspilning();
       } else {
-        Programdata.instans.afspiller.stopAfspilning();
+        App.afspiller.stopAfspilning();
       }
     } else if (v.getId() == R.id.forrige) {
-      Programdata.instans.afspiller.forrige();
+      App.afspiller.forrige();
     } else if (v.getId() == R.id.næste) {
-      Programdata.instans.afspiller.næste();
+      App.afspiller.næste();
     } else if (v== kanallogo || v==direktetekst || v==metainformation) try {
       // Ved klik på baggrunden skal kanalforside eller aktuel udsendelsesside vises
-      Lydkilde lydkilde = Programdata.instans.afspiller.getLydkilde();
+      Lydkilde lydkilde = App.afspiller.getLydkilde();
       FragmentManager fm = getFragmentManager();
       if (lydkilde.erDirekte()) {
         // Fjern backstak - så vi starter forfra i 'roden'

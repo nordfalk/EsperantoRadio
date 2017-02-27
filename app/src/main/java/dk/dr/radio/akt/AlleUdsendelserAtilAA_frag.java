@@ -17,7 +17,6 @@ import com.androidquery.AQuery;
 import java.util.ArrayList;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.diverse.App;
@@ -50,7 +49,7 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
 
     aq.id(R.id.overskrift).typeface(App.skrift_gibson_fed).text("Alle udsendelser").getTextView();
 
-    Programdata.instans.programserierAtilÅ.observatører.add(this);
+    App.data.programserierAtilÅ.observatører.add(this);
     run();
 
     return rod;
@@ -58,7 +57,7 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
 
   @Override
   public void onDestroyView() {
-    Programdata.instans.programserierAtilÅ.observatører.remove(this);
+    App.data.programserierAtilÅ.observatører.remove(this);
     super.onDestroyView();
   }
 
@@ -67,11 +66,11 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
   public void run() {
     App.forgrundstråd.removeCallbacks(this); // Ingen gentagne kald
     liste.clear();
-    if (Programdata.instans.programserierAtilÅ.liste == null) {
-      Programdata.instans.programserierAtilÅ.startHentData();
+    if (App.data.programserierAtilÅ.liste == null) {
+      App.data.programserierAtilÅ.startHentData();
       return; // run() kaldes igen når der er data
     } else {
-      liste.addAll(Programdata.instans.programserierAtilÅ.liste);
+      liste.addAll(App.data.programserierAtilÅ.liste);
     }
     if (adapter != null) {
       adapter.notifyDataSetChanged();

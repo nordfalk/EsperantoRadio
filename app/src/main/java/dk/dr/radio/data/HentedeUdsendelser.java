@@ -181,10 +181,10 @@ public class HentedeUdsendelser {
       }
       // Sæt korrekt hentetStream på alle hentede udsendelser
       for (Udsendelse serialiseretUds : data.udsendelser) {
-        Udsendelse u = Programdata.instans.udsendelseFraSlug.get(serialiseretUds.slug);
+        Udsendelse u = App.data.udsendelseFraSlug.get(serialiseretUds.slug);
         if (u==null) {
           // Serialiserede udsendelser skal med i slug-listen
-          Programdata.instans.udsendelseFraSlug.put(serialiseretUds.slug, serialiseretUds);
+          App.data.udsendelseFraSlug.put(serialiseretUds.slug, serialiseretUds);
           tjekOmHentet(serialiseretUds);
         } else {
           tjekOmHentet(u);
@@ -311,8 +311,8 @@ public class HentedeUdsendelser {
       Log.d("HentedeUdsendelser DLS " + intent);
       if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) try {
         long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-        Programdata.instans.hentedeUdsendelser.tjekDataOprettet(); // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/803968027
-        final Udsendelse u = Programdata.instans.hentedeUdsendelser.data.udsendelseFraDownloadId.get(downloadId);
+        App.data.hentedeUdsendelser.tjekDataOprettet(); // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/803968027
+        final Udsendelse u = App.data.hentedeUdsendelser.data.udsendelseFraDownloadId.get(downloadId);
         if (u == null) {
           Log.d("Ingen udsendelse for hentning for " + downloadId + " den er nok blevet slettet");
           return;
@@ -320,14 +320,14 @@ public class HentedeUdsendelser {
 
         DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterById(downloadId);
-        Cursor c = Programdata.instans.hentedeUdsendelser.downloadService.query(query);
+        Cursor c = App.data.hentedeUdsendelser.downloadService.query(query);
         if (c.moveToFirst()) {
           Log.d("HentedeUdsendelser DLS " + c + "  " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
           if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
             App.langToast(App.res.getString(R.string.Udsendelsen___blev_hentet, u.titel));
             Log.registrérTestet("Hente udsendelse", u.slug);
 
-            final HentetStatus hs = Programdata.instans.hentedeUdsendelser.getHentetStatus(u);
+            final HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(u);
             hs.startUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
             final File hentet =  new File(URI.create(hs.startUri));
             final File dest = new File(hs.destinationFil);
@@ -355,8 +355,8 @@ public class HentedeUdsendelser {
                 protected void onPostExecute(Object o) {
                   hs.statusFlytningIGang = false;
                   hs.statustekst = lavStatustekst(hs);
-                  Programdata.instans.hentedeUdsendelser.gemListe();
-                  for (Runnable obs : new ArrayList<Runnable>(Programdata.instans.hentedeUdsendelser.observatører)) obs.run();
+                  App.data.hentedeUdsendelser.gemListe();
+                  for (Runnable obs : new ArrayList<Runnable>(App.data.hentedeUdsendelser.observatører)) obs.run();
                 }
               }.execute();
             }
@@ -365,8 +365,8 @@ public class HentedeUdsendelser {
           }
         }
         c.close();
-        Programdata.instans.hentedeUdsendelser.gemListe();
-        for (Runnable obs : new ArrayList<Runnable>(Programdata.instans.hentedeUdsendelser.observatører)) obs.run();
+        App.data.hentedeUdsendelser.gemListe();
+        for (Runnable obs : new ArrayList<Runnable>(App.data.hentedeUdsendelser.observatører)) obs.run();
         Sidevisning.vist(HentedeUdsendelser.class, u.slug);
       } catch (Exception e) {
         Log.rapporterFejl(e);

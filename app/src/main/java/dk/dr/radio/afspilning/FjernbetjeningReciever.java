@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
-import dk.dr.radio.data.Programdata;
+import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
 /**
@@ -46,30 +46,30 @@ public class FjernbetjeningReciever extends BroadcastReceiver {
       case KeyEvent.KEYCODE_HEADSETHOOK:
       case KeyEvent.KEYCODE_MEDIA_STOP:
       case KeyEvent.KEYCODE_MEDIA_PAUSE:
-        if (Programdata.instans.afspiller.getAfspillerstatus() != Status.STOPPET) {
-          Programdata.instans.afspiller.pauseAfspilning();
+        if (App.afspiller.getAfspillerstatus() != Status.STOPPET) {
+          App.afspiller.pauseAfspilning();
         }
         break;
       case KeyEvent.KEYCODE_MEDIA_PLAY:
       case KeyEvent.KEYCODE_MEDIA_REWIND:
       case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-        if (Programdata.instans.afspiller.getAfspillerstatus() == Status.STOPPET) {
-          Programdata.instans.afspiller.startAfspilning();
+        if (App.afspiller.getAfspillerstatus() == Status.STOPPET) {
+          App.afspiller.startAfspilning();
         }
         break;
       case KeyEvent.KEYCODE_MEDIA_NEXT:
-        Programdata.instans.afspiller.næste();
+        App.afspiller.næste();
         break;
       case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-        Programdata.instans.afspiller.forrige();
+        App.afspiller.forrige();
         break;
       case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
       default:
-        if (Programdata.instans.afspiller.getAfspillerstatus() == Status.STOPPET) {
-          Programdata.instans.afspiller.startAfspilning();
+        if (App.afspiller.getAfspillerstatus() == Status.STOPPET) {
+          App.afspiller.startAfspilning();
         } else {
-          Programdata.instans.afspiller.pauseAfspilning();
-          if (Programdata.instans.afspiller.afspillerlyde) Programdata.instans.afspiller.afspillerlyd.stop.start();
+          App.afspiller.pauseAfspilning();
+          if (App.afspiller.afspillerlyde) App.afspiller.afspillerlyd.stop.start();
         }
     }
   }

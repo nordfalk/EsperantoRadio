@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/yderstelayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/afspiller"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="44dp"
+        android:scaleType="center"
+        android:contentDescription="@string/start_stop"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:id="@+id/startStopKnap"
+        android:src="@drawable/afspiller_spil"
+        />
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginLeft="8dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+      <LinearLayout android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="28dp">
+        <ImageView
+            android:id="@+id/kanallogo"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:src="@drawable/kanalappendix_ab4"
+            android:scaleType="fitStart"
+            />
+
+
+        <TextView
+            android:id="@+id/direktetekst"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" LIVE"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText"
+            android:textColor="@color/grå40"
+            />
+
+      </LinearLayout>
+
+
+      <TextView
+          android:id="@+id/metainformation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textSize="@dimen/metainfo_skrifstørrelse"
+          android:text="Orientering på P1"
+          android:textStyle="bold"
+          android:singleLine="true"
+          tools:ignore="HardcodedText"
+          android:textColor="@color/grå40"/>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+  <ImageView
+      android:id="@+id/luk"
+      android:layout_width="32dp"
+      android:layout_height="match_parent"
+      android:padding="4dp"
+      android:layout_gravity="center_vertical"
+      android:contentDescription="@string/Luk_D_R_Radio"
+      android:src="@drawable/dri_luk_graa40"/>
+
+  </LinearLayout>

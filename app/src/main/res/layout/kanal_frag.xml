@@ -1,0 +1,62 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+  <!--
+      designoplæg siger 36dp, men designretningslinjer på Android siger min 48dp i højde9
+      (se http://developer.android.com/design/style/metrics-grids.html)
+              android:layout_height="36dp"
+
+Vi udvider derfor knappens trykområde med teknikken beskrevet i
+http://stackoverflow.com/questions/2949407/can-i-increase-a-buttons-onclick-area-programmatically
+      -->
+  <LinearLayout
+      android:id="@+id/rulTilAktuelUdsendelse"
+      android:orientation="vertical"
+      android:background="@drawable/elem_hvid_bg"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+  <Button
+      android:id="@+id/hør_live"
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/hørknap_højde"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:paddingLeft="4dp"
+      android:paddingRight="16dp"
+      android:drawableLeft="@drawable/dri_lyd_hvid"
+      android:text=" HØR P3"
+      android:textColor="@color/hvid"
+      android:textSize="@dimen/metainfo_skrifstørrelse"
+      android:background="@drawable/knap_blaa_bg" tools:ignore="HardcodedText"/>
+  </LinearLayout>
+
+<FrameLayout android:layout_width="match_parent"
+             android:layout_height="0dp"
+             android:layout_weight="1"
+             android:background="@color/grå10"
+          >
+
+  <dk.dr.radio.akt.diverse.PinnedSectionListView
+      android:id="@+id/listView"
+      android:divider="@null"
+      android:dividerHeight="0px"
+      android:cacheColorHint="@color/grå10"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"/>
+
+  <TextView
+      android:id="@+id/tom"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:padding="20dp"
+      android:textSize="18sp"
+      android:text="@string/Indlæser_vent_venligst___"/>
+</FrameLayout>
+
+
+</LinearLayout>

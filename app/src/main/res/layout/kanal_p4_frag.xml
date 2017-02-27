@@ -1,0 +1,99 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+  <!--
+      designoplæg siger 36dp, men designretningslinjer på Android siger min 48dp i højde9
+      (se http://developer.android.com/design/style/metrics-grids.html)
+              android:layout_height="36dp"
+
+Vi udvider derfor knappens trykområde med teknikken beskrevet i
+http://stackoverflow.com/questions/2949407/can-i-increase-a-buttons-onclick-area-programmatically
+      -->
+  <Button
+      android:id="@+id/hør_live"
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/hørknap_højde"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="4dp"
+      android:layout_gravity="center_horizontal"
+      android:paddingLeft="4dp"
+      android:paddingRight="16dp"
+      android:drawableLeft="@drawable/dri_lyd_hvid"
+      android:text=" HØR P3 LIVE" tools:ignore="HardcodedText"
+      android:textColor="@color/hvid"
+      android:background="@drawable/knap_blaa_bg"/>
+
+  <FrameLayout android:layout_width="match_parent"
+               android:layout_height="0dp"
+               android:layout_weight="1"
+      >
+
+  <dk.dr.radio.akt.diverse.PinnedSectionListView
+      android:id="@+id/listView"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"/>
+
+  <TextView
+      android:id="@+id/tom"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:padding="20dp"
+      android:textSize="18sp"
+      android:text="@string/Indlæser__vent_venligst___"/>
+
+  <!--
+          android:background="@drawable/p4_vi_gaetter_paa_at_du_vaelger_dialogbg"
+-->
+  <LinearLayout
+      android:orientation="vertical"
+      android:id="@+id/p4_vi_gætter_på_dialog"
+      android:background="@drawable/dialog_full_holo_light"
+      android:layout_width="wrap_content"
+      android:clickable="true"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:layout_gravity="center">
+
+    <TextView
+        android:id="@+id/p4_vi_gætter_på_tekst"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vi gætter på at du vælger:" tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/p4_kanalnavn"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:text="P4 Sjælland" tools:ignore="HardcodedText"/>
+
+    <TableRow
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+      <Button
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="SKIFT DISTRIKT"
+          android:id="@+id/p4_skift_distrikt" tools:ignore="HardcodedText"/>
+
+      <Button
+          android:layout_marginLeft="16dp"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/OK"
+          android:id="@+id/p4_ok"/>
+    </TableRow>
+  </LinearLayout>
+</FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<item android:id="@+id/kundividi"
+				android:icon="@android:drawable/ic_menu_share"
+				app:showAsAction="ifRoom"
+				android:title="Kundividi" />
+
+	<item android:id="@+id/kontakti_kanalon"
+				android:icon="@android:drawable/ic_menu_send"
+				app:showAsAction="ifRoom"
+				android:title="Kontakti kanalon" />
+
+</menu>

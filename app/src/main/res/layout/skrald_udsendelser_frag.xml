@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+
+  <dk.dr.radio.akt.diverse.PagerSlidingTabStrip
+      android:id="@+id/tabs2"
+      android:layout_width="match_parent"
+      android:layout_height="48dip"
+      android:background="@drawable/kanalindikator_bg"/>
+
+  <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+                                     android:id="@+id/pager2"
+                                     android:layout_width="match_parent"
+                                     android:layout_height="match_parent">
+
+  </android.support.v4.view.ViewPager>
+</LinearLayout>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/senest_spillet_container"
+    android:background="@color/hvid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+  <LinearLayout
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/grå10"
+      android:padding="8dp"
+      android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="60dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+      <TextView
+          android:id="@+id/starttid"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="17.04"
+          android:textColor="@color/grå70"
+          android:textSize="@dimen/titel_skrifstørrelse"
+          tools:ignore="HardcodedText"
+          />
+
+      <TextView
+          android:id="@+id/titel_og_kunstner"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Feel Again One | Republic"
+          android:maxLines="2"
+          tools:ignore="HardcodedText"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/senest_spillet_kunstnerbillede"
+        android:src="@drawable/eksempel_kunstner"
+        tools:ignore="ContentDescription"/>
+
+  </LinearLayout>
+</LinearLayout>

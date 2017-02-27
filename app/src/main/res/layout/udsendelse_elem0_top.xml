@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/hvid"
+    >
+  <!--
+              android:descendantFocusability="blocksDescendants"
+              gør at knappen her ikke tager fokus for hele listeelementet
+  -->
+
+  <include
+      layout="@layout/udsendelse_elem0_inkl_billede_titel"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+
+
+  <include
+      layout="@layout/udsendelse_elem0_inkl_hent_del"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+
+
+  <!--
+          android:thumb="@drawable/seekbar_haandtag"
+      <include
+              layout="@layout/udsendelse_elem_playliste_info_overskrift"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"/>
+  -->
+</LinearLayout>

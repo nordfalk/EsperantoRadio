@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+              android:gravity="center_horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+  <TextView
+      android:id="@+id/titel"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textSize="18sp"
+      android:padding="16dp"
+      android:textStyle="bold"
+      android:contentDescription="@string/Om_D_R_Radio"
+      android:text="@string/Om_DR_Radio">
+  </TextView>
+
+  <WebView
+      android:id="@+id/webview"
+      android:layout_width="match_parent"
+      android:background="@color/hvid"
+      android:layout_height="0px"
+      android:layout_weight="1"
+      />
+
+
+  <Button
+      android:id="@+id/kontakt"
+      android:text="@string/Skriv_meddelelse_til_DR"
+      android:contentDescription="@string/Skriv_meddelelse_til_D_R"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:paddingLeft="8dp"
+      android:paddingRight="8dp"
+      android:layout_marginTop="4dp"
+      android:background="@drawable/knap_blaa_bg"/>
+
+  <TextView
+      android:id="@+id/version"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textColor="@color/grå40"
+      android:textSize="10sp"
+      android:importantForAccessibility="no"
+      android:text="Version 232323" tools:ignore="HardcodedText">
+  </TextView>
+
+
+</LinearLayout>
+

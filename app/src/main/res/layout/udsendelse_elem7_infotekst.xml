@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/titel"
+    tools:ignore="HardcodedText"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp"
+    android:layout_margin="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textColor="@color/grå80"
+    android:text="De amerikanske brødre Joel og Ethan Coen har for længst skabt en række moderne klassikere, fx 'Fargo' og 'The Big Lebowski'. Nu når de et nyt højt punkt i deres karriere med 'Inside Llewyn Davis', en desillusioneret odysse rundt om en musikant, der bare aldrig slår igennem på 60'ernes folk-scene i New York. Hvad er det, de kan, de to brødre? spørger Filmland, der også anmelder den nye danske film, 'Klumpfisken'. Vært: Per Juul Carlsen. Filmland anmelder: Bullhead Hr. Peabody og Sherman Inside Llewyn Davis Klumpfisken www.dr.dk/film (Sendes også torsdag 19.03, lørdag 21.03 og søndag 1.03)."
+    android:fontFamily="serif"/>
+

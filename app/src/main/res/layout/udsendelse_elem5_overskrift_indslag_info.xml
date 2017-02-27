@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp"
+    android:background="@color/hvid"
+    android:orientation="horizontal">
+
+
+  <Button
+      android:id="@+id/playliste"
+      android:layout_width="0px"
+      android:layout_height="32dp"
+      android:layout_weight="1"
+      android:layout_marginRight="1dp"
+      android:layout_marginLeft="16dp"
+      android:text="@string/INDSLAG"
+      android:contentDescription="@string/indslag"
+      android:textColor="@color/hvid"
+      android:background="@drawable/knap_sort_bg"/>
+
+  <Button
+      android:id="@+id/info"
+      android:layout_width="0px"
+      android:layout_height="32dp"
+      android:layout_weight="1"
+      android:layout_marginLeft="1dp"
+      android:layout_marginRight="16dp"
+      android:text="@string/INFO"
+      android:contentDescription="@string/info"
+      android:textColor="@color/hvid"
+      android:background="@drawable/knap_graa40_bg"/>
+
+</LinearLayout>

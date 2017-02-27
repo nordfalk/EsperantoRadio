@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/grå70"
+    android:orientation="vertical"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/afspiller_kollapset_højde"
+      android:contentDescription="@string/afspiller"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="44dp"
+        android:scaleType="center"
+        android:contentDescription="@string/start_stop"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:id="@+id/startStopKnap"
+        android:src="@drawable/afspiller_spil"
+        />
+
+    <!--
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/start_stop_pauseknap"
+                android:background="@drawable/kanalappendix_p1d"
+                />
+    -->
+
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginLeft="2dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+      <LinearLayout android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="28dp">
+        <ImageView
+            android:id="@+id/kanallogo"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/kanalappendix_ab4"
+            />
+
+
+        <TextView
+            android:id="@+id/direktetekst"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/_LIVE"
+            android:textColor="@color/grå40"
+            />
+
+      </LinearLayout>
+
+
+
+      <TextView
+          android:id="@+id/metainformation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textSize="@dimen/metainfo_skrifstørrelse"
+          android:text="Orientering på P1"
+          android:singleLine="true"
+          tools:ignore="HardcodedText"
+          android:textColor="@color/hvid"/>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <ImageView
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        android:id="@+id/udvidSkjulKnap"
+        android:src="@drawable/dri_pil_op_graa40"/>
+
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/udvidSkjulOmråde"
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+
+    <View
+        android:background="@drawable/stiplet_linje"
+        android:layerType="software"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent" android:layout_height="3dp"/>
+
+
+    <LinearLayout android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+      <TextView
+          android:id="@+id/starttid"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="16.10"
+          android:textColor="@color/grå40"
+          android:textSize="12sp"
+          android:layout_marginLeft="4dp"
+          tools:ignore="HardcodedText"/>
+
+      <SeekBar
+          android:layout_width="0dp" android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:id="@+id/seekBar"
+          android:max="100"
+          android:progress="60"
+          android:focusable="false"
+          android:progressDrawable="@drawable/seekbar_progress"
+          />
+
+      <TextView
+          android:id="@+id/slutttid"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="16.30"
+          android:importantForAccessibility="no"
+          android:layout_marginRight="4dp"
+          android:textColor="@color/grå20"
+          android:textSize="12sp"
+          tools:ignore="HardcodedText"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+      <ImageView
+          android:id="@+id/forrige"
+          android:layout_marginRight="16dp"
+          android:src="@drawable/dri_radio_forrige_graa40"
+          android:padding="12dp"
+          android:layout_width="44dp"
+          android:layout_height="44dp"/>
+
+      <ImageView
+          android:id="@+id/næste"
+          android:src="@drawable/dri_radio_naeste_graa40"
+          android:padding="12dp"
+          android:layout_width="44dp"
+          android:layout_height="44dp"/>
+
+    </LinearLayout>
+
+    <!--
+        android:layerType="software" er nødvendig, ellers tegnes der en vandret
+         streg i stedet for stiplet linje på Android 3+
+        -->
+
+    <View
+        android:background="@drawable/stiplet_linje"
+        android:layerType="software"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_width="match_parent" android:layout_height="3dp"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+      <ImageView
+          android:src="@drawable/dri_lyd_graa40"
+          android:padding="4dp"
+          android:layout_width="32dp"
+          android:layout_height="32dp"/>
+
+      <SeekBar
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:layout_marginTop="16dp"
+          android:layout_marginBottom="16dp"
+          android:id="@+id/lydstyrke"
+          android:max="100"
+          android:progress="60"
+          android:focusable="false"
+          />
+
+
+      <ImageView
+          android:src="@drawable/dri_indstillinger_graa40"
+          android:visibility="invisible"
+          android:padding="4dp"
+          android:layout_width="44dp"
+          android:layout_height="44dp"/>
+
+
+    </LinearLayout>
+    <!--
+        android:layerType="software" er nødvendig, ellers tegnes der en vandret
+         streg i stedet for stiplet linje på Android 3+
+        -->
+  </LinearLayout>
+
+</LinearLayout>

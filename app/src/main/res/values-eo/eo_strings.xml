@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appnavn">Esperanto-radio Muzaiko</string>
+    <string name="appnavn_beta">Esperanto-radio Muzaiko beta</string>
+    <string name="navigation_drawer_open">"Malfermi maldekstran menuon"</string>
+    <string name="navigation_drawer_close">"Fermi maldekstran menuon"</string>
+    <string name="afspiller">"ludado"</string>
+    <string name="Søg">"Serĉi"</string>
+    <string name="Del">"Konigi"</string>
+    <string name="Dine_favoritprogrammer">"Viaj preferataj kanaloj"</string>
+    <string name="Downloadede_udsendelser">"Elŝutitaj elsendoj"</string>
+    <string name="Søg_efter_program">"Serĉi programon"</string>
+    <string name="Senest_lyttede">"Lastatempe aŭskultis"</string>
+    <string name="Om_D_R_Radio">"Pri Esperanto-radio Muzaiko"</string>
+    <string name="Om_DR_Radio">"Pri Esperanto-radio Muzaiko"</string>
+    <string name="Skriv_meddelelse_til_DR">"Skribu mesaĝon al la kreinto"</string>
+    <string name="Skriv_meddelelse_til_D_R">"Skribu mesaĝon al la kreinto"</string>
+    <string name="start_stop">"ludi/halti"</string>
+    <string name="Luk_D_R_Radio">"Fermi la radion"</string>
+    <string name="PLAYLISTE">"LUDLISTO"</string>
+    <string name="INDSLAG">"PROGRAMEROJ"</string>
+    <string name="indslag">"programeroj"</string>
+    <string name="DOWNLOAD">"ELŜUTI"</string>
+    <string name="playliste">"ludlisto"</string>
+    <string name="Start">"Ludi"</string>
+    <string name="D_R">"DR"</string>
+    <string name="hent_udsendelse">"elŝuti elsendon"</string>
+    <string name="Indlæser__vent_venligst___">"Ŝarĝante, bonvolu atendi ..."</string>
+    <string name="INFO">"INFO"</string>
+    <string name="info">"info"</string>
+    <string name="favorit">"preferata"</string>
+    <string name="FAVORIT">"PREFERATA"</string>
+    <string name="Her_kan_du_altid_høre_den_seneste_radioavis_og_sportsnyt">"Ĉi tie vi povas ĉiam aŭdi la lastajn radio novaĵoj kaj sportoj novaĵoj"</string>
+    <string name="_HØR_UDSENDELSE_">" AŬSKULTI ELSENDON "</string>
+    <string name="OK">"BONE"</string>
+    <string name="pause">"paŭzi"</string>
+    <string name="DR_kan_ikke_garantere_mod_tekniske_problemer__vækning">"Ni ne povas garantii kontraŭ teknikaj problemoj je vekigo"</string>
+    <string name="Kan_endnu_ikke_afspilles">"Ankoraŭ \nne ludebla"</string>
+    <string name="hør_udsendelse">"Aŭskulti elsendon"</string>
+    <string name="Kunne_ikke_oprette_forbindelse_til_DR">"Ne eblis konekti al la servilo"</string>
+    <string name="Manglende_netværksforbindelse___">"<b>Mankas retkonekto</b>\nAtendas restarigon de interreto"</string>
+    <string name="Internetforbindelse_mangler">"Retkonekto mankas"</string>
+
+    <string name="Spil_når_app_en_åbnes">"Tuj ludi"</string>
+    <string name="Start_afspilning_automatisk_når_appen_åbnes">"Komenci ludi aŭtomate kiam la apo malfermiĝas"</string>
+    <string name="Afspilning_starter_automatisk_når_appen_åbnes">"Ludas aŭtomate kiam la apo malfermiĝas"</string>
+    <string name="strømbesparende_funktioner_og_andet">"Aliaj aferoj"</string>
+    <string name="Hentede_udsendelser">"Elŝutitaj elsendoj"</string>
+    <string name="Placering_af_hentede_udsendelser">"Loko de elŝutitaj elsendoj"</string>
+    <string name="Gem_udsendelser_på">"Konservu elsendojn ĉe"</string>
+    <string name="Vælg_hvor_på_telefonen_du_vil_gemme_udsendelser_til_offline_brug_">"Elekti kie en la telefono ni savu la elsendojn por senreta ludado."</string>
+    <string name="Hent_kun_på_wifi">"Elŝuti nur sur wifi"</string>
+    <string name="Udsendelser_hentes_kun_over_wifi_fremover___">"Estonte nur elŝutu elsendojn per wifi.\n (se elsendoj estas jam survoje vi devas haltigi kaj rekomenci la elŝutojn)"</string>
+    <string name="Udsendelser_hentes_både_over_telefonnet_3g_4g_og_wifi_">"Elŝuti elsendojn kaj per telefona reto (3G / 4G) kaj per WIFi."</string>
+    <string name="Kun_til_udviklere">"Nur por programistoj"</string>
+    <string name="Beklager_kan_ikke_spille_radio">"Bedaŭrinde ne povis ludi radion"</string>
+    <string name="Tjek_din_internetforbindelse_og___">"Kontrolu vian interretan konekton"</string>
+    <string name="Start_afspilning">"Komenci ludi"</string>
+    <string name="Stop_afspilning">"Ĉesi ludi"</string>
+    <string name="D_R_Radio">"DR Radio"</string>
+    <string name="Saml_dine_favoritter_her____">"&lt;b>Kolektu viajn preferatajn elsendojn ĉi tie&lt;/b>&lt;br>Klaku sur la koro ĉe viaj preferataj kanaloj. Vi havos facilan aliron - kaj vi povas rapide vidi kiam estas novaj shows."</string>
+    <string name="_ny_udsendelse">" nova elsendo"</string>
+    <string name="_nye_udsendelser">" novaj elsendoj"</string>
+    <string name="Du_har_ingen_downloads___">"&lt;b>Vi ne elŝutis ion&lt;/b>&lt;br>Vi povas elŝuti elsendojn kaj aŭskulti ilin ĉi tie sen retkonekto."</string>
+    <string name="Slet_udsendelse">"Forigi elsendon?"</string>
+    <string name="Vil_du_slette_denne_udsendele_du_kan_altid_hente_den_igen_">"Ĉu vi volas forigi tiun ĉi elsendon? \nVi povas ĉiam elŝuti ĝin denove."</string>
+    <string name="Indstillinger">"Agordoj"</string>
+    <string name="D_R_Radio_Indstillinger">"Radio Agordoj"</string>
+    <string name="_ikke_tilgængelig_">"(Ne disponebla)"</string>
+    <string name="ledig">"libera"</string>
+    <string name="Fejl__adgang_til_eksternt_lager_mangler_indsæt_sd_kort_">"Eraro - aliro al ekstera stokado mankas (enmetu SD-karton)"</string>
+    <string name="Netværksfejl_prøv_igen_senere">"Eraro, bonvolu reprovi poste"</string>
+    <string name="SPILLER">"LUDAS"</string>
+    <string name="HØR">"AŬSKULTI"</string>
+    <string name="Spiller">"Ludas"</string>
+    <string name="Hør">"Aŭskulti"</string>
+    <string name="Programserien_er_føjet_til_favoritter">"Aldonis la elsendserion al preferataj"</string>
+    <string name="ALLE_UDSENDELSER">"ĈIUJ ELSENDOJ"</string>
+    <string name="_TIMER">" HOROJ"</string>
+    <string name="_TIME">" HORO"</string>
+    <string name="_OG_">" KAJ "</string>
+    <string name="_MINUTTER">" MINUTOJ"</string>
+    <string name="_MINUT">" MINUTO"</string>
+    <string name="Tidligere">"Antaŭe"</string>
+    <string name="Ingen_senest_lyttede">"Nenio lastatempe aŭskultita"</string>
+    <string name="LYTTET_">"AŬSKULTIS "</string>
+    <!--
+    <string name="_kl_">%2$s"</string>
+    -->
+    <string name="_kl_">"%1$s je la %2$s"</string>
+    <string name="Søgningen_gav_intet_resultat">"Neniu rezulto trovita"</string>
+    <string name="AFSPILLER">"LUDAS"</string>
+    <string name="FORBINDER">"KONEKTAS"</string>
+    <string name="INTERNETFORBINDELSE_MANGLER">"RETKONEKTO\nMANKAS"</string>
+    <string name="KAN_IKKE_AFSPILLES">"NE EBLAS\nLUDI"</string>
+    <string name="KAN_IKKE_HENTES">"NE EBLAS ELŜUTI"</string>
+    <string name="___vis_mere_">"… (MONTRI PLI)"</string>
+    <string name="Udsendelsen_kan_ikke_hentes">"La elsendo ne elŝuteblas"</string>
+    <string name="i_dag">"hodiaŭ"</string>
+    <string name="i_morgen">"morgaŭ"</string>
+    <string name="i_overmorgen">"postmorgaŭ"</string>
+    <string name="i_går">"hieraŭ"</string>
+    <string name="i_forgårs">"antaŭhieraŭ"</string>
+    <!-- bemærk, plurals virker ikke for 0 udsendelser, derfor kan getQuantityString(R.plurals...) ikke bruges -->
+    <string name="_ingen_nye_udsendelser_">"(neniuj novaj elsendoj)"</string>
+    <string name="_1_ny_udsendelse_">"(1 nova elsendo)"</string>
+    <string name="___nye_udsendelser_">"(%1$d novaj elsendoj)"</string>
+    <string name="Vækkeur">"Vekhorloĝo"</string>
+    <string name="Kontakt_info_om">"Kontakto / info / pri"</string>
+    <string name="Beklager_udsendelsen_kunne_ikke_hentes">"Pardonu, la elsendo ne elŝuteblas"</string>
+    <string name="Kunne_ikke_få_adgang_til_eksternt_lager__se_evt__">"Ne eblis malfermi eksteran memoron.\nEble agordu kie elŝutitaj elsendoj estu konservitaj"</string>
+    <string name="Klar___mb_">"Preta (%1$d MB)"</string>
+    <string name="Mislykkedes">"Malsukceso"</string>
+    <string name="Venter___">"Atendas…"</string>
+    <string name="Hentet___mb_af___mb">"Elŝutita %1$d MB el %2$d MB"</string>
+    <string name="Hentning_pauset__">"Elŝutado paŭzas…"</string>
+    <string name="Henter__">"Elŝutas…"</string>
+    <string name="Udsendelsen___blev_hentet">"Sukcese elŝutis la elsendon %1$s"</string>
+    <string name="Flytter__">Movas…</string>
+    <string name="Kunne_ikke_flytte__">"Ne povis movi %1$s al %2$s"</string>
+    <string name="Det_lykkedes_ikke_at_hente_udsendelsen___tjek_at___">"Ne sukcesis elŝuti la elsendon %1$s\nKontrolu ĉu vi havas sufiĉe da libera spaco"</string>
+    <string name="Forbinder">"Konektas"</string>
+    <string name="Angiv_vækning">Indiki vekiĝon</string>
+    <string name="Indlæser_vent_venligst___">Ŝarĝas, bonvolu atendi…</string>
+    <string name="SENEST_SPILLET">Nun estas ludata…</string>
+    <string name="LIGE_NU">NUN</string>
+    <string name="Dine_favoritter">Viaj preferataj programoj</string>
+    <string name="Stop_afspilningen_">Ĉu ĉesi ludi?</string>
+    <string name="Fortsæt_i_baggrunden">Daŭrigi fone</string>
+    <string name="Brugergrænseflade">Interfaco</string>
+    <string name="Avanceret">Por progresantoj</string>
+    <string name="Udviklertilstand">Por la programisto</string>
+    <string name="Vis_ekstra_muligheder_til_udvikling_og_fejlfinding">Montri ekstrajn eblecojn por elovuigado kaj trovi erarojn</string>
+
+    <string name="GRUNDDATA_URL_PRODUKTION">http://javabog.dk/privat/esperantoradio_kanaloj_v8.json</string>
+    <string name="GRUNDDATA_URL_UDVIKLING">http://javabog.dk/privat/esperantoradio_kanaloj_v8.json</string>
+    <string name="HENTEDE_UDS_MAPPENAVN">EsperantoRadio</string>
+    <string name="URL_TIL_DR_RADIO_BETAVERSION">http://javabog.dk/privat/EoRadio.apk</string>
+    <string name="_LIVE">REKTA</string>
+
+    <string name="Hentet">"Elŝutita"</string>
+
+
+
+<string name="AppRater_taksu">"Taksu Esperanto-radion"</string>
+<string name="AppRater_teksto">"Se vi ŝatas la programon, bonvolu uzi momenton por taksi ĝin.\n\nDankon!"</string>
+<string name="AppRater_taksi">"Taksi la programon"</string>
+<string name="AppRater_poste">"Poste"</string>
+<string name="AppRater_ne_dankon">"Ne dankon"</string>
+
+<string name="Reklamoj_taksu">"Subtenu la programon"</string>
+<string name="Reklamoj_teksto">"Tiu ĉi programo postulis multajn horojn da laboro.
+Por subteni la evoluigadon mi petas vian permeson foje montri reklamon kaj petas vin foje klaki sur la reklamojn.
+Ĉiu klako subtenas min finance - kaj post klako ne aperos reklamoj dum iom da tempo.\n
+Vi povas ĉiam ŝanĝi vian elekton pri la aperantaj/malaperantaj reklamoj en la agordoj."</string>
+<string name="Reklamoj_ne_dankon">"Ne, mi ne volas subteni vian laboron!"</string>
+<string name="Reklamoj_donaco">"Mi preferus donaci monon."</string>
+<string name="Reklamoj_bone">"Bone, mi klakos sur iom da reklamoj."</string>
+
+</resources>

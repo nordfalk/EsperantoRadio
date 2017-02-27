@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/knap_graa10_bg"
+    android:id="@+id/titel"
+    tools:ignore="HardcodedText"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:text="Alle udsendelser ..."
+    android:textStyle="bold"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:gravity="center_vertical"
+    />
+

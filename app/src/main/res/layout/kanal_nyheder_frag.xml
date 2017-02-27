@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    >
+
+
+  <Button
+      android:id="@+id/hør_live"
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/hørknap_højde"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:paddingLeft="4dp"
+      android:paddingRight="16dp"
+      android:drawableLeft="@drawable/dri_lyd_hvid"
+      android:text=" HØR DR NYHEDER"
+      android:contentDescription="hør D R nyheder"
+      android:textColor="@color/hvid"
+      android:background="@drawable/knap_blaa_bg"/>
+
+
+  <ImageView
+      android:layout_width="196dp"
+      android:id="@+id/billede"
+      android:layout_height="0dp"
+      android:layout_weight=".30"
+      android:scaleType="centerInside"
+      android:src="@drawable/dr_lyd2_stor"
+      tools:ignore="ContentDescription"/>
+<!-- hvis vi bruger et mindre ikon:
+      android:src="@drawable/dri_lyd2_graa40"
+      tools:ignore="ContentDescription" android:adjustViewBounds="true" android:cropToPadding="false"/>
+-->
+
+  <TextView
+      android:id="@+id/titel"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/Her_kan_du_altid_høre_den_seneste_radioavis_og_sportsnyt"
+      android:textSize="20sp"
+      android:gravity="center"
+      android:paddingTop="0dp"
+      android:paddingLeft="4dp"
+      android:paddingRight="4dp"
+      android:paddingBottom="0dp"
+      android:layout_marginBottom="8dp"/>
+
+
+</LinearLayout>

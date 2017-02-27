@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+   https://developer.android.com/design/patterns/navigation-drawer.html -->
+  <dimen name="navigation_drawer_width">240dp</dimen>
+
+  <!-- Værdier i skærmbilledet for kanalvalg -->
+  <dimen name="kanalvalg_tekststr">20sp</dimen>
+
+  <dimen name="kanalvisning_aktuelUdsendelse_topmargen">0dp</dimen>
+
+  <!-- små skærme skal have lille 'spil'-knap. Dens trykområde bliver udvidet til 44dp af en TouchDelegate -->
+  <dimen name="hørknap_højde">28sp</dimen>
+  <dimen name="hørknap_udvidet_klikområde">12dp</dimen>
+  <dimen name="afspiller_kollapset_højde">56dp</dimen>
+
+  <!-- vi har brug for højden på afspilleren når den er udvidet -->
+  <dimen name="afspiller_udvidet_højde_gæt">105dp</dimen>
+  <dimen name="kanalmargen">16dp</dimen>
+  <dimen name="venstremenu_padding">16dp</dimen>
+  <dimen name="titel_skrifstørrelse">18sp</dimen>
+  <dimen name="dato_skrifstørrelse">16sp</dimen>
+  <dimen name="metainfo_skrifstørrelse">14sp</dimen>
+  <dimen name="vis_flere_knap_højde">36dp</dimen>
+
+
+</resources>

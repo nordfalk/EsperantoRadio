@@ -1,0 +1,13 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:paddingLeft="16dp"
+          android:paddingTop="@dimen/venstremenu_padding"
+          android:paddingBottom="@dimen/venstremenu_padding"
+          android:text="Senest lyttede x"
+          android:textStyle="bold"
+          android:id="@+id/tekst" tools:ignore="HardcodedText"/>
+    <!--
+              android:textAppearance="?android:attr/textAppearanceMedium"
+    -->

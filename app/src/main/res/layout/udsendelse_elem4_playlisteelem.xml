@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    android:background="@drawable/elem_hvid_bg"
+    android:orientation="vertical">
+
+  <!--
+      android:layerType="software" er nødvendig, ellers tegnes der en vandret
+       streg i stedet for stiplet linje på Android 3+
+      -->
+
+  <View
+      android:id="@+id/stiplet_linje"
+      android:background="@drawable/stiplet_linje"
+      android:layerType="software"
+      android:layout_width="match_parent"
+      android:layout_marginBottom="13dp"
+      android:layout_height="3dp"/>
+
+
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0px"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+
+      <TextView
+          android:id="@+id/starttid"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="17.04"
+          android:textColor="@color/grå70"
+          android:textAppearance="?android:attr/textAppearance"
+          tools:ignore="HardcodedText"
+          />
+
+      <TextView
+          android:id="@+id/titel_og_kunstner"
+          android:layout_width="wrap_content"
+          android:layout_height="0dp"
+          android:layout_weight="1"
+          android:text="P3 Sporten  |  Polarkreis 18"
+          android:maxLines="2"
+          tools:ignore="HardcodedText"/>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/hør"
+        android:src="@drawable/dri_lyd_blaa"
+        tools:ignore="ContentDescription"/>
+  </LinearLayout>
+
+
+  <!--
+-->
+</LinearLayout>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+  <string name="appnavn">Radio</string>
+  <string name="appnavn_beta">Radio beta</string>
+-->
+  <string name="appnavn">Esperanto-radio Muzaiko</string>
+  <string name="appnavn_beta">Esperanto-radio Muzaiko beta</string>
+  <string name="navigation_drawer_open">Åbn venstremenu</string>
+  <string name="navigation_drawer_close">Luk venstremenu</string>
+  <string name="afspiller">afspiller</string>
+  <string name="Søg">Søg</string>
+  <string name="Del">Del</string>
+  <string name="Dine_favoritprogrammer">Dine favoritprogrammer</string>
+  <string name="Downloadede_udsendelser">Downloadede udsendelser</string>
+  <string name="Søg_efter_program">Søg efter program</string>
+  <string name="Senest_lyttede">Senest lyttede</string>
+  <string name="Om_D_R_Radio">Om D R Radio</string>
+  <string name="Om_DR_Radio">Om DR Radio</string>
+  <string name="Skriv_meddelelse_til_DR">Skriv meddelelse til DR</string>
+  <string name="Skriv_meddelelse_til_D_R">Skriv meddelelse til D R</string>
+  <string name="start_stop">start/stop</string>
+  <string name="Luk_D_R_Radio">Luk D R Radio</string>
+  <string name="PLAYLISTE">PLAYLISTE</string>
+  <string name="INDSLAG">INDSLAG</string>
+  <string name="indslag">indslag</string>
+  <string name="DOWNLOAD">DOWNLOAD</string>
+  <string name="playliste">playliste</string>
+  <string name="Start">Start</string>
+  <string name="D_R">D R</string>
+  <string name="hent_udsendelse">hent udsendelse</string>
+  <string name="Indlæser__vent_venligst___">Indlæser, vent venligst…</string>
+  <string name="INFO">INFO</string>
+  <string name="info">info</string>
+  <string name="favorit">favorit</string>
+  <string name="FAVORIT">FAVORIT</string>
+  <string name="Her_kan_du_altid_høre_den_seneste_radioavis_og_sportsnyt">Her kan du altid høre den seneste radioavis og sportsnyt</string>
+  <string name="_HØR_UDSENDELSE_"> HØR UDSENDELSE </string>
+  <string name="OK">OK</string>
+  <string name="pause">pause</string>
+  <string name="DR_kan_ikke_garantere_mod_tekniske_problemer__vækning">DR kan ikke garantere mod tekniske problemer i forbindelse med vækning</string>
+  <string name="Kan_endnu_ikke_afspilles">Kan endnu\nikke afspilles</string>
+  <string name="hør_udsendelse">hør udsendelse</string>
+  <string name="Kunne_ikke_oprette_forbindelse_til_DR">Kunne ikke oprette forbindelse til DR</string>
+  <string name="Manglende_netværksforbindelse___"><b>Manglende netværksforbindelse</b>\nAfventer genopretning af forbindelsen</string>
+  <string name="Internetforbindelse_mangler">Internetforbindelse mangler</string>
+
+  <string name="Spil_når_app_en_åbnes">Spil når app\'en åbnes</string>
+  <string name="Start_afspilning_automatisk_når_appen_åbnes">Start afspilning automatisk, når appen åbnes</string>
+  <string name="Afspilning_starter_automatisk_når_appen_åbnes">Afspilning starter automatisk, når appen åbnes</string>
+  <string name="strømbesparende_funktioner_og_andet">Strømbesparende funktioner og andet.</string>
+  <string name="Hentede_udsendelser">Hentede udsendelser</string>
+  <string name="Placering_af_hentede_udsendelser">Placering af hentede udsendelser</string>
+  <string name="Gem_udsendelser_på">Gem udsendelser på</string>
+  <string name="Vælg_hvor_på_telefonen_du_vil_gemme_udsendelser_til_offline_brug_">Vælg hvor på telefonen du vil gemme udsendelser du henter til senere afspilning.</string>
+  <string name="Hent_kun_på_wifi">Hent kun på wifi</string>
+  <string name="Udsendelser_hentes_kun_over_wifi_fremover___">Udsendelser hentes kun over wifi.\n(stop og genoptag hentning af en udsendelse før det træder i kraft)</string>
+  <string name="Udsendelser_hentes_både_over_telefonnet_3g_4g_og_wifi_">Udsendelser hentes både over telefonnet (3G/4G) og wifi.</string>
+  <string name="Kun_til_udviklere">Kun til udviklere</string>
+  <string name="Beklager_kan_ikke_spille_radio">Beklager, kan ikke spille radio</string>
+  <string name="Tjek_din_internetforbindelse_og___">Tjek din internetforbindelse,\n og prøv eventuelt at vælge et andet lydformat i indstillingerne</string>
+  <string name="Start_afspilning">Start afspilning</string>
+  <string name="Stop_afspilning">Stop afspilning</string>
+  <string name="D_R_Radio">D R Radio</string>
+  <string name="Saml_dine_favoritter_her____">&lt;b>Saml dine favoritter her&lt;/b>&lt;br>&lt;br>Klik på hjertet på dine yndlingsprogrammer. Du får nem adgang til dine favoritter – og du kan hurtigt se, når der er kommet nye udsendelser.</string>
+  <string name="_ny_udsendelse">" ny udsendelse"</string>
+  <string name="_nye_udsendelser">" nye udsendelser"</string>
+  <string name="Du_har_ingen_downloads___">&lt;b>Du har ingen downloads&lt;/b>&lt;br>&lt;br>Du kan downloade udsendelser og lytte til dem her uden internetforbindelse.</string>
+  <string name="Slet_udsendelse">Slet udsendelse</string>
+  <string name="Vil_du_slette_denne_udsendele_du_kan_altid_hente_den_igen_">Vil du slette denne udsendele?\nDu kan altid hente den igen.</string>
+  <string name="Indstillinger">Indstillinger</string>
+  <string name="D_R_Radio_Indstillinger">Radio Indstillinger</string>
+  <string name="_ikke_tilgængelig_">"(ikke tilgængelig)"</string>
+  <string name="ledig">"ledig"</string>
+  <string name="Fejl__adgang_til_eksternt_lager_mangler_indsæt_sd_kort_">"Fejl - adgang til eksternt lager mangler (isæt et SD-kort)"</string>
+  <string name="Netværksfejl_prøv_igen_senere">Netværksfejl, prøv igen senere</string>
+  <string name="SPILLER">"SPILLER"</string>
+  <string name="HØR">"HØR"</string>
+  <string name="Spiller">"Spiller"</string>
+  <string name="Hør">"Hør"</string>
+  <string name="Programserien_er_føjet_til_favoritter">Programserien er føjet til favoritter</string>
+  <string name="ALLE_UDSENDELSER">ALLE UDSENDELSER</string>
+  <string name="_TIMER">" TIMER"</string>
+  <string name="_TIME">" TIME"</string>
+  <string name="_OG_">" OG "</string>
+  <string name="_MINUTTER">" MINUTTER"</string>
+  <string name="_MINUT">" MINUT"</string>
+  <string name="Tidligere">Tidligere</string>
+  <string name="Ingen_senest_lyttede">Ingen senest lyttede</string>
+  <string name="LYTTET_">"LYTTET "</string>
+  <string name="_kl_">%1$s kl %2$s</string>
+  <string name="Søgningen_gav_intet_resultat">Søgningen gav intet resultat</string>
+  <string name="AFSPILLER">AFSPILLER</string>
+  <string name="FORBINDER">FORBINDER</string>
+  <string name="INTERNETFORBINDELSE_MANGLER">INTERNETFORBINDELSE\nMANGLER</string>
+  <string name="KAN_IKKE_AFSPILLES">KAN IKKE\nAFSPILLES</string>
+  <string name="KAN_IKKE_HENTES">KAN IKKE HENTES</string>
+  <string name="___vis_mere_">…(VIS MERE)</string>
+  <string name="Udsendelsen_kan_ikke_hentes">Udsendelsen kan ikke hentes</string>
+  <string name="i_dag">i dag</string>
+  <string name="i_morgen">i morgen</string>
+  <string name="i_overmorgen">i overmorgen</string>
+  <string name="i_går">i går</string>
+  <string name="i_forgårs">i forgårs</string>
+  <!-- bemærk, plurals virker ikke for 0 udsendelser, derfor kan getQuantityString(R.plurals...) ikke bruges -->
+  <string name="_ingen_nye_udsendelser_">(ingen nye udsendelser)</string>
+  <string name="_1_ny_udsendelse_">(1 ny udsendelse)</string>
+  <string name="___nye_udsendelser_">(%1$d nye udsendelser)</string>
+  <string name="Vækkeur">Vækkeur</string>
+  <string name="Kontakt_info_om">Kontakt / info / om</string>
+  <string name="Beklager_udsendelsen_kunne_ikke_hentes">Beklager, udsendelsen kunne ikke hentes</string>
+  <string name="Kunne_ikke_få_adgang_til_eksternt_lager__se_evt__">Kunne ikke få adgang til eksternt lager.\nSe eventuelt indstillingen til placering af hentede udsendelser</string>
+  <string name="Klar___mb_">Hentet (%1$d MB)</string>
+  <string name="Mislykkedes">Mislykkedes</string>
+  <string name="Venter___">Venter…</string>
+  <string name="Hentet___mb_af___mb">Hentet %1$d MB af %2$d MB</string>
+  <string name="Hentning_pauset__">"Hentning pauset… "</string>
+  <string name="Henter__">Henter…</string>
+  <string name="Udsendelsen___blev_hentet">Udsendelsen %1$s blev hentet</string>
+  <string name="Flytter__">Flytter…</string>
+  <string name="Kunne_ikke_flytte__">"Kunne ikke flytte %1$s til %2$s"</string>
+  <string name="Det_lykkedes_ikke_at_hente_udsendelsen___tjek_at___">Det lykkedes ikke at hente udsendelsen %1$s\nTjek at du har tilstrækkeligt ledigt plads</string>
+  <string name="Forbinder">Forbinder</string>
+  <string name="Angiv_vækning">Angiv vækning</string>
+  <string name="Indlæser_vent_venligst___">Indlæser, vent venligst...</string>
+  <string name="SENEST_SPILLET">SENEST SPILLET</string>
+  <string name="LIGE_NU">LIGE NU</string>
+  <string name="Dine_favoritter">Dine favoritter</string>
+  <string name="Stop_afspilningen_">Stop afspilningen?</string>
+  <string name="Fortsæt_i_baggrunden">Fortsæt i\nbaggrunden</string>
+  <string name="Brugergrænseflade">Brugergrænseflade</string>
+  <string name="Avanceret">Avanceret</string>
+  <string name="Udviklertilstand">Udviklertilstand</string>
+  <string name="Vis_ekstra_muligheder_til_udvikling_og_fejlfinding">Vis ekstra muligheder til udvikling og fejlfinding</string>
+
+  <string name="GRUNDDATA_URL_PRODUKTION">http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.drxml</string>
+  <string name="GRUNDDATA_URL_UDVIKLING">http://android.lundogbendsen.dk/drradiov3_grunddata.json</string>
+  <string name="HENTEDE_UDS_MAPPENAVN">DR_Radio</string>
+  <string name="URL_TIL_DR_RADIO_BETAVERSION">http://javabog.dk/privat/EoRadio.apk</string>
+  <string name="_LIVE">DIREKTE</string>
+
+  <string-array name="lydformat_tekst">
+    <item>AAC (HLS)</item>
+    <item>MP3 (Shoutcast)</item>
+    <item>Automatisk</item>
+  </string-array>
+
+  <string-array name="lydformat_kode">
+    <item>hls</item>
+    <item>shoutcast</item>
+    <item>auto</item>
+  </string-array>
+
+  <string-array name="lydkvalitet_tekst">
+    <item>Standard</item>
+    <item>Høj (192 kbps)</item>
+    <item>Automatisk</item>
+  </string-array>
+
+  <string-array name="lydkvalitet_kode">
+    <item>standard</item>
+    <item>høj</item>
+    <item>auto</item>
+  </string-array>
+
+</resources>

@@ -1,0 +1,22 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+  <!--
+      android:layerType="software" er nødvendig, ellers tegnes der en vandret
+       streg i stedet for stiplet linje på Android 3+
+      -->
+
+  <View
+      android:background="@drawable/stiplet_linje"
+      android:layerType="software"
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:layout_gravity="center"
+      />
+  <!--
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+  -->
+</LinearLayout>

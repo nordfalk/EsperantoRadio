@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+  <ImageView
+      android:paddingTop="16dp"
+      android:paddingLeft="16dp"
+      android:paddingRight="16dp"
+      android:layout_width="200dp"
+      android:layout_height="wrap_content"
+      android:adjustViewBounds="true"
+      android:id="@+id/billede"
+      android:src="@drawable/eksempel_udsendelse"
+      tools:ignore="ContentDescription"/>
+
+
+  <ImageView
+      android:id="@+id/kanallogo"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="16dp"
+      android:src="@drawable/skrald__kanallogo_p3"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      tools:ignore="ContentDescription"/>
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/titel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="P3 Sporten"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:layout_weight="1" tools:ignore="HardcodedText"/>
+
+
+    <CheckBox
+        android:id="@+id/favorit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/favorit"
+        android:text="@string/FAVORIT"
+        android:textColor="@color/blå"
+        android:button="@drawable/dri_favorit"/>
+  </LinearLayout>
+
+
+  <TextView
+      android:id="@+id/beskrivelse"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearance"
+      android:text="For lige om lidt bliver fremdriftsreformen implementeret."
+      tools:ignore="HardcodedText"/>
+
+  <View
+      android:background="@color/grå50"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:layout_width="match_parent"
+      android:layout_height="1dp"/>
+
+
+  <TextView
+      android:id="@+id/alle_udsendelser"
+      android:layout_marginLeft="16dp"
+      android:textColor="@color/grå50"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="ALLE UDSENDELSER (12)" tools:ignore="HardcodedText"/>
+
+  <View
+      android:background="@color/grå50"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:layout_width="match_parent"
+      android:layout_height="1dp"/>
+
+
+</LinearLayout>

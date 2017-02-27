@@ -1,0 +1,82 @@
+Solvita:
+ - Emblemoj nur aperos post restarto de la apo
+
+
+Konataj eraroj, kiuj mi korektos:
+
+ - Ĉiuj datumoj estas ĝuste nun elŝutataj 2foje
+ - Preferataj kanaloj ne funkcias
+ - Ne eblas klaki sur la rektan elsendon de Muzaiko
+ - La enhavtabelo pri estontaj elsendoj ne aperos (mi bezonas helpon pri tiu ĉu punkto)
+ - Kanalemblemo ne estas montrata sube
+
+
+
+
+Muzaiko:
+
+http://www.radionomy.com/en/radio/muzaikoinfo/
+
+
+
+http://radionomy.letoptop.fr/index.php?lang=EN
+
+
+http://radionomy.letoptop.fr/ajax/
+
+
+-------------- Kantoj
+
+http://radionomy.letoptop.fr/tracklist/get_api.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181
+http://radionomy.letoptop.fr/ajax/ajax_last_titres.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181
+
+
+-------------- Aktuala kanto
+
+
+http://radionomy.letoptop.fr/currentsong/get_api.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181
+
+    <tracks>
+    	<radioname>Muzaiko.info</radioname>
+        <rank>1</rank>
+    	<isradionomy>1</isradionomy>
+        <radurl>http://www.radionomy.com/muzaikoinfo</radurl>
+        <isactive>1</isactive> <track>
+        	<uniqueid>2071466611</uniqueid>
+        	<title>Revu viviganto</title>
+            <artists>La Perdita Generacio</artists>
+            <starttime>2015-01-15 00:51:31.12</starttime>
+            <playduration>224190</playduration>
+            <current>1</current>
+                            <cover></cover>
+            	<callmeback>206843</callmeback>
+        </track>
+    </tracks>
+
+
+http://radionomy.letoptop.fr/titre.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181&color=000000&bgcolor=FFFFFF&width=500&height=150&lang=EN&size=20
+http://radionomy.letoptop.fr/titre.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181&color=000000&bgcolor=FFFFFF&width=300&height=50&lang=FR&size=12
+
+http://radionomy.letoptop.fr/ajax/ajax_titre.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181
+
+{
+titre: "Revu viviganto",
+artiste: "La Perdita Generacio",
+pochette: "http://radionomy.letoptop.fr/images/none.png"
+}
+
+
+
+-----------
+
+
+Aŭskultantoj
+
+
+http://radionomy.letoptop.fr/audience.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181&color=000000&bgcolor=FFFFFF&width=200&height=30&lang=FR&size=12
+
+
+http://radionomy.letoptop.fr/ajax/ajax_audience.php?radiouid=14694a7d-9023-4db1-86b4-d85d96cba181
+{
+nombre: "5 "
+}

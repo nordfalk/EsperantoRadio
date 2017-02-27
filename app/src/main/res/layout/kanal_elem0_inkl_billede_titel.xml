@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/billedecontainer"
+    android:layout_width="320dp"
+    android:layout_height="180dp"
+    >
+
+
+  <ImageView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:adjustViewBounds="true"
+      android:id="@+id/billede"
+      android:src="@drawable/eksempel_udsendelse"
+      tools:ignore="ContentDescription"/>
+
+  <!--
+      <ImageButton
+              android:id="@+id/hør"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="16dp"
+              android:layout_marginLeft="16dp"
+              android:src="@drawable/dri_lyd_hvid"/>
+
+
+  <ImageView
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:adjustViewBounds="true"
+      android:src="@drawable/udsendelse_baggrundsmaske"
+      tools:ignore="ContentDescription"/>
+
+  -->
+
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginTop="-44dp"
+      android:background="@drawable/udsendelse_baggrundsgradient"
+      />
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingLeft="8dp"
+      android:paddingRight="8dp"
+      >
+
+    <TextView
+        android:id="@+id/titel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="@color/sort"
+        android:shadowRadius="2"
+        android:textColor="@color/hvid"
+        android:text="PRESSEN PÅ P3"
+        android:textSize="24sp"
+        android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" tools:ignore="HardcodedText"/>
+
+    <!--
+        android:shadowColor="@color/hvid"
+        android:shadowRadius="2"
+    -->
+    <TextView
+        android:id="@+id/lige_nu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/LIGE_NU"
+        android:textSize="16sp"
+        android:textColor="@color/blå"
+        android:gravity="center_vertical|center_horizontal"
+        android:paddingTop="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="0dp"
+        android:layout_above="@+id/titel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+  </RelativeLayout>
+
+</FrameLayout>

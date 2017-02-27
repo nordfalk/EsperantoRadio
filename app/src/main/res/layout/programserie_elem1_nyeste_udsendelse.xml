@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical">
+
+  <LinearLayout
+      android:orientation="vertical"
+      android:padding="16dp"
+      android:background="@color/grå50"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+  <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="wrap_content"
+      android:gravity="top"
+      android:layout_height="wrap_content">
+
+      <TextView
+          android:id="@+id/titel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Pressen på P3"
+          tools:ignore="HardcodedText"
+          android:textStyle="bold"
+          android:textSize="@dimen/titel_skrifstørrelse"
+          android:textColor="@color/hvid"
+          />
+
+      <TextView
+          android:id="@+id/dato"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="17. jan. 2014"
+          android:textSize="@dimen/dato_skrifstørrelse"
+          android:textColor="@color/hvid"
+          tools:ignore="HardcodedText"
+          />
+
+      <TextView
+          android:id="@+id/varighed"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="55 MIN"
+          tools:ignore="HardcodedText"
+          android:textSize="@dimen/metainfo_skrifstørrelse"
+          android:textColor="@color/grå20"/>
+
+  </LinearLayout>
+  <Button
+      android:id="@+id/hør"
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/hørknap_højde"
+      android:layout_gravity="center_horizontal"
+      android:layout_marginTop="16dp"
+      android:drawableLeft="@drawable/dri_lyd_hvid"
+      android:text="@string/_HØR_UDSENDELSE_"
+      android:textColor="@color/hvid"
+      android:focusable="false"
+      android:focusableInTouchMode="false"
+      android:paddingLeft="4dp"
+      android:paddingRight="4dp"
+      android:textSize="@dimen/metainfo_skrifstørrelse"
+      android:background="@drawable/knap_blaa_bg"/>
+  </LinearLayout>
+
+</LinearLayout>

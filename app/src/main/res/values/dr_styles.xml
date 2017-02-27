@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <style name="Theme.Dr" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowBackground">@color/hvid</item>
+    <!--
+    <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_holo_dark</item>
+    -->
+    <!--
+    <item name="android:windowActionBarOverlay">true</item>
+    <item name="windowActionBarOverlay">true</item>
+    <item name="actionBarStyle">@style/ActionBar.Solid.Dr</item>
+    <item name="android:windowActionBar">false</item>
+    <item name="windowActionBar">false</item>
+    -->
+    <item name="android:textColor">@color/sort</item>
+  </style>
+
+  <style name="Theme.Indstillinger" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowBackground">@color/hvid</item>
+    <item name="android:listViewStyle">@style/lightListView</item>
+  </style>
+  <!-- fix for at PreferenceScreen var sort på sort på Android 2: Lav hvid baggrund på ListViews
+       Se også http://stackoverflow.com/questions/3164862/black-screen-in-inner-preferencescreen -->
+  <style name="lightListView">
+    <item name="android:background">@color/hvid</item>
+  </style>
+</resources>

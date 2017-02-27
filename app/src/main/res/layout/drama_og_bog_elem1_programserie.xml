@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+  <LinearLayout
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_marginTop="4dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingLeft="8dp"
+      android:orientation="horizontal">
+
+    <ImageView tools:ignore="ContentDescription"
+               android:layout_width="107dp"
+               android:layout_height="60dp"
+               android:id="@+id/billede"
+               android:src="@drawable/eksempel_udsendelse"/>
+
+    <LinearLayout android:layout_width="0px"
+                  android:layout_height="60dp"
+                  android:layout_weight="1"
+                  android:layout_marginLeft="8dp"
+                  android:orientation="vertical">
+
+      <TextView tools:ignore="HardcodedText"
+                android:id="@+id/titel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/sort"
+                android:text="Sissel-jo Gazan: Dinosaurens fjer"
+                android:maxLines="2"/>
+
+      <TextView tools:ignore="HardcodedText"
+                android:id="@+id/antalUdsendelser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/metainfo_skrifstørrelse"
+                android:text="13 AFSNIT"
+                android:textColor="@color/grå50"/>
+    </LinearLayout>
+
+  </LinearLayout>
+  <!--
+      android:layerType="software" er nødvendig,
+      ellers tegnes der en vandret streg i stedet for stiplet linje på Android 3+
+      -->
+  <View
+      android:id="@+id/stiplet_linje"
+      android:background="@drawable/stiplet_linje"
+      android:layerType="software"
+      android:layout_width="match_parent"
+      android:layout_marginTop="4dp"
+      android:layout_height="3dp"/>
+</LinearLayout>

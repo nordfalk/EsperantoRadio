@@ -1,0 +1,36 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:background="@color/hvid"
+    android:orientation="vertical">
+
+  <!--
+    android:background="@drawable/knap_graa10_bg"
+
+      android:layerType="software" er nødvendig,
+      ellers tegnes der en vandret streg i stedet for stiplet linje på Android 3+
+      -->
+
+  <TextView
+      android:id="@+id/titel"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="I DAG"
+      android:paddingTop="4dp"
+      android:paddingBottom="4dp"
+      android:textColor="@color/grå60"
+      android:textAppearance="?android:attr/textAppearance"
+      tools:ignore="HardcodedText"/>
+  <!--
+      <View
+              android:background="@drawable/linje"
+              android:layerType="software"
+              android:layout_width="match_parent"
+              android:layout_height="3dp"/>
+  -->
+
+</LinearLayout>

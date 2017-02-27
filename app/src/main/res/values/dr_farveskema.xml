@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="rød">#ff0000</color>
+  <color name="hvid">#ffffff</color>
+  <color name="grå05x">#F2F2F2</color>
+  <color name="grå10">#E5E5E5</color>
+  <color name="grå20">#CCCCCC</color>
+  <color name="grå40">#999999</color>
+  <color name="grå50">#808080</color>
+  <color name="grå60">#666666</color>
+  <color name="grå70">#4d4d4d</color>
+  <color name="grå80">#333333</color>
+  <color name="sort">#000000</color>
+
+  <color name="blå">#55b9c4</color>
+  <color name="blå_mørk">#258994</color>
+
+  <color name="actionbar_baggrund">#E5E5E5</color>
+  <color name="actionbar_kanaler_baggrund">#E5E5E5</color>
+</resources>

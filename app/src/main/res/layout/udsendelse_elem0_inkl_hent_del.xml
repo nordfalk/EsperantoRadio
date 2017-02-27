@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:background="@color/grå20"
+    android:padding="1dp"
+    android:orientation="horizontal">
+
+
+  <Button
+      android:id="@+id/hent"
+      android:layout_width="0px"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:layout_marginRight="1dp"
+      android:paddingLeft="16dp"
+      android:drawableLeft="@drawable/dri_hent_blaa"
+      android:gravity="center_vertical"
+      android:text="@string/DOWNLOAD"
+      android:contentDescription="@string/hent_udsendelse"
+      android:textSize="12sp"
+      android:background="@drawable/elem_hvid_bg"/>
+  <!--
+        android:text="UDSENDELSEN KAN IKKE HENTES"
+        android:contentDescription="Udsendelsen kan ikke hentes"
+  -->
+  <CheckBox
+      android:id="@+id/favorit"
+      android:layout_width="0px"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:drawableLeft="@drawable/dri_favorit"
+      android:paddingLeft="16dp"
+      android:contentDescription="@string/favorit"
+      android:text="@string/FAVORIT"
+      android:textColor="@color/blå"
+      android:textSize="12sp"
+      android:button="@null"
+      android:background="@drawable/elem_hvid_bg"/>
+
+</LinearLayout>

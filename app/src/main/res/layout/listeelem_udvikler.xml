@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:orientation="vertical">
+  <!--
+          android:padding="@dimen/activity_vertical_margin"
+  -->
+
+
+  <TextView
+      android:id="@+id/titel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:background="@color/grå10"
+      android:text="Klubværelset: Kære Studerende, husk at trække vejret"
+      tools:ignore="HardcodedText"/>
+
+  <TextView
+      android:id="@+id/beskrivelse"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/grå10"
+      android:text="For lige om lidt bliver fremdriftsreformen implementeret, der skal få jer hurtigere ud af jeres uddannelse. Vi taler med Morten Østergaard om de unge studerendes bekymringer for fremtiden. For hvordan hænger dygtige og arbejdsmarkedsparate akademikere sammen med et studieliv, hvor man risikerer at udvikle stress og eksamensangst? (Genudsendelse fra onsdag). (Sendes også søndag 7.03, 18.32 og 00.05)."
+      tools:ignore="HardcodedText"/>
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/slug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="klubvaerelset-105"
+        tools:ignore="HardcodedText"
+        android:textSize="10sp"/>
+
+    <TextView
+        android:id="@+id/serieslug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="klubvaerelset"
+        tools:ignore="HardcodedText"
+        android:textSize="10sp"/>
+  </LinearLayout>
+
+  <TextView
+      android:id="@+id/json"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Til fejlfinding"
+      tools:ignore="HardcodedText"
+      android:textSize="8sp"/>
+
+</LinearLayout>

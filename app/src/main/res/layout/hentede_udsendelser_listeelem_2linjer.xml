@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants"
+    >
+  <!--
+              android:descendantFocusability="blocksDescendants"
+              gør at knappen her ikke tager fokus for hele listeelementet
+  -->
+
+  <!--
+      android:layerType="software" er nødvendig, ellers tegnes der en vandret
+       streg i stedet for stiplet linje på Android 3+
+      -->
+
+  <View
+      android:id="@+id/stiplet_linje"
+      android:background="@drawable/stiplet_linje"
+      android:layerType="software"
+      android:layout_width="match_parent"
+      android:layout_marginBottom="13dp"
+      android:layout_height="3dp"/>
+
+
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0px"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+
+      <TextView
+          android:id="@+id/linje1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="17.04"
+          tools:ignore="HardcodedText"
+          android:textSize="@dimen/metainfo_skrifstørrelse"
+          android:textColor="@color/grå50"/>
+
+      <ProgressBar
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:id="@+id/progressBar"/>
+
+      <TextView
+          android:id="@+id/linje2"
+          android:layout_width="wrap_content"
+          android:layout_height="0dp"
+          android:layout_weight="1"
+          android:text="P3 Sporten  |  Polarkreis 18"
+          android:maxLines="2"
+          tools:ignore="HardcodedText"/>
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:id="@+id/startStopKnap"
+        android:contentDescription="@string/pause"
+        android:background="@drawable/elem_hvid_bg"
+        android:src="@drawable/dri_radio_pause_graa40"/>
+
+    <ImageButton
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginLeft="4dp"
+        android:id="@+id/slet"
+        android:contentDescription="@string/delete"
+        android:background="@drawable/elem_hvid_bg"
+        android:src="@drawable/dri_skraldespand_graa40"
+        />
+
+    <ImageButton
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginLeft="4dp"
+        android:id="@+id/hør"
+        android:src="@drawable/dri_lyd_blaa"
+        android:background="@drawable/elem_hvid_bg"
+        tools:ignore="ContentDescription"/>
+
+  </LinearLayout>
+
+
+  <!--
+-->
+</LinearLayout>

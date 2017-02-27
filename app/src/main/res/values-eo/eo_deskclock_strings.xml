@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2007 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Label shown on launcher icon -->
+    <string name="app_label">"Horloĝo"</string>
+
+    <!-- Title for AlarmClock activity -->
+    <string name="alarm_list_title">"Alarmoj"</string>
+
+    <!-- Menu item on Alarm Clock screen: Add alarm -->
+    <string name="add_alarm">"Aldoni alarmon"</string>
+
+    <!-- Menu item on Alarm Clock screen: Edit alarm -->
+    <string name="menu_edit_alarm">"Redakti alarmon"</string>
+
+    <!-- Context Menu Item on Alarm Settings screen: Delete alarm -->
+    <string name="delete_alarm">"Forigu alarmon"</string>
+
+    <!-- Context Menu Item on Alarm Settings screen: Enable alarm -->
+    <string name="enable_alarm">"Enŝalti alarmon"</string>
+
+    <!-- Context Menu Item on Alarm Settings screen: Disable alarm -->
+    <string name="disable_alarm">"Turnu alarmo ekstere"</string>
+
+    <!-- Delete alarm confirmation dialog message. -->
+    <string name="delete_alarm_confirm">"Forigu la alarmon?"</string>
+
+    <!-- Menu item on Alarm Clock screen: Show clock -->
+    <string name="show_clock">"Montri horloĝo"</string>
+
+    <!-- Menu item on Alarm Clock screen: Hide clock -->
+    <string name="hide_clock">"Kaŝi horloĝo"</string>
+
+    <!-- Setting label on Set alarm screen: Label -->
+    <string name="label">"Etikedoj"</string>
+
+    <!-- Default label to display for an alarm -->
+    <string name="default_label">"Alarmo"</string>
+
+    <!-- Preference category on Alarm Settings screen: Set alarm -->
+    <string name="set_alarm">"Ŝanĝu alarmon"</string>
+
+    <!-- Setting labels on Set alarm screen: Vibration on or off -->
+    <string name="alarm_vibrate">"Vibri"</string>
+
+    <!-- Setting labels on Set alarm screen: Repeat -->
+    <string name="alarm_repeat">"Ripeti"</string>
+
+    <!-- Setting labels on Set alarm screen: Select alarm ringtone  -->
+    <string name="alert">"Ringtone"</string>
+
+    <!-- Setting labels on Set alarm screen: Set time  -->
+    <string name="time">"Tempo"</string>
+
+
+    <!-- Alarm confirmation toast: Describes how long from now until
+         alarm fires -->
+    <string-array name="alarm_set">
+        <item>Alarmo aktivigata por malpli ol unu minuto de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="DAYS" example="2 days">%1$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="HOURS" example="2 hours">%2$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="DAYS" example="2 days">%1$s</xliff:g> kaj <xliff:g id="HOURS" example="2 hours">%2$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="MINUTES" example="2 minutes">%3$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="DAYS" example="2 days">%1$s</xliff:g> kaj <xliff:g id="MINUTES" example="2 minutes">%3$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="HOURS" example="2 hours">%2$s</xliff:g> kaj <xliff:g id="MINUTES" example="2 minutes">%3$s</xliff:g> de nun.</item>
+        <item>Alarmo aktivigata por <xliff:g id="DAYS" example="2 days">%1$s</xliff:g>, <xliff:g id="HOURS" example="2 hours">%2$s</xliff:g>, kaj <xliff:g id="MINUTES" example="2 minutes">%3$s</xliff:g> de nun.</item>
+    </string-array>
+
+    <!-- Alarm confirmation toast: singular day -->
+    <string name="day">"1 tago"</string>
+
+    <!-- Alarm confirmation toast: plural days -->
+    <string name="days">"<xliff:g id="days">%s</xliff:g> tagoj"</string>
+
+    <!-- Alarm confirmation toast: singular hour -->
+    <string name="hour">"1 horo"</string>
+
+    <!-- Alarm confirmation toast: plural hours -->
+    <string name="hours"><xliff:g id="hours">%s</xliff:g> horoj</string>
+
+    <!-- Alarm confirmation toast: singular minute  -->
+    <string name="minute">"1 minuto"</string>
+
+    <!-- Alarm confirmation toast: plural minutes  -->
+    <string name="minutes">"<xliff:g id="minutes">%s</xliff:g> minutoj</string>
+
+    <!-- Repeat options that appear under an alarm on main Alarm Clock
+         screen to identify repetition schedule: special case for when
+         the alarm is set to repeat every day -->
+    <string name="every_day">Ĉiutage</string>
+
+    <!-- Repeat options that appear under an alarm on main Alarm Clock
+         screen to identify repetition schedule: special case for when
+         the alarm is set to never repeat -->
+    <string name="never">Neniam</string>
+
+
+    <!-- Repeat options that appear under an alarm on main Alarm Clock
+         screen to identify repetition schedule: concatenate days with
+         this character, i.e. "Mon, Tue, Wed" -->
+    <string name="day_concat">", "</string>
+
+
+    <!-- Done button when editing an alarm. -->
+    <string name="done">Farite</string>
+
+    <!-- Revert button when editing an alarm. -->
+    <string name="revert">Reveni</string>
+
+    <!-- Delete button when editing an alarm. -->
+    <string name="delete">Forigu</string>
+
+    <!-- Label on the main screen control used to set alarm [CHAR LIMIT=30]-->
+    <string name="control_set_alarm">Ŝanĝu alarmon</string>
+
+</resources>
+
+

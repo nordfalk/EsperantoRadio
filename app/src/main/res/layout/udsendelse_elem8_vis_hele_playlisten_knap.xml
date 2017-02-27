@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/vis_hele_playlisten"
+    tools:ignore="HardcodedText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textColor="@color/blå"
+    android:gravity="center"
+    android:background="@drawable/elem_hvid_bg"
+    android:text="VIS HELE PLAYLISTEN"
+    android:contentDescription="vis hele playlisten"
+    android:padding="16dp"
+    />

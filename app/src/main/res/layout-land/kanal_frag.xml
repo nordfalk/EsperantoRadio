@@ -1,0 +1,48 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/grå10"
+          >
+
+  <dk.dr.radio.akt.diverse.PinnedSectionListView
+      android:id="@+id/listView"
+      android:divider="@null"
+      android:dividerHeight="0px"
+      android:cacheColorHint="@color/grå10"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"/>
+
+  <TextView
+      android:id="@+id/tom"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:padding="20dp"
+      android:textSize="18sp"
+      android:text="@string/Indlæser__vent_venligst___"/>
+
+  <LinearLayout android:id="@+id/rulTilAktuelUdsendelse"
+                android:background="@drawable/elem_hvid_bg"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+  <Button
+      android:id="@+id/hør_live"
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/hørknap_højde"
+      android:layout_marginLeft="44dp"
+      android:layout_marginRight="44dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:paddingLeft="4dp"
+      android:paddingRight="16dp"
+      android:drawableLeft="@drawable/dri_lyd_hvid"
+      android:text=" HØR P3"
+      android:textColor="@color/hvid"
+      android:background="@drawable/knap_blaa_bg" tools:ignore="HardcodedText"/>
+  </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="kanalvisning_aktuelUdsendelse_topmargen">-10dp</dimen>
+  <!-- små skærme skal have lille 'spil'-knap. Dens trykområde bliver udvidet til 44dp af en TouchDelegate -->
+  <dimen name="hørknap_højde">24dp</dimen>
+  <dimen name="venstremenu_padding">12dp</dimen>
+</resources>

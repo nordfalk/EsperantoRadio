@@ -40,8 +40,8 @@ public class Programdata {
 
   public static final String GRUNDDATA_URL = App.instans==null? "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json" :
           App.PRODUKTION
-      ? App.instans.getString(R.string.GRUNDDATA_URL_PRODUKTION)
-      : App.instans.getString(R.string.GRUNDDATA_URL_UDVIKLING);
+      ? App.res.getString(R.string.GRUNDDATA_URL_PRODUKTION)
+      : App.res.getString(R.string.GRUNDDATA_URL_UDVIKLING);
   //public static final String GRUNDDATA_URL = "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";
 
   //  private static final String BASISURL = "http://dr-mu-apps.azurewebsites.net/tjenester/mu-apps";

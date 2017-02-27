@@ -15,6 +15,7 @@ import java.util.Set;
 
 import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
@@ -34,7 +35,7 @@ public class Favoritter {
 
   private void tjekDataOprettet() {
     if (favoritTilStartdato != null) return;
-    prefs = App.instans.getSharedPreferences(PREF_NØGLE, 0);
+    prefs = ApplicationSingleton.instans.getSharedPreferences(PREF_NØGLE, 0);
     String str = prefs.getString(PREF_NØGLE, "");
     if (str.length()==0) { // 28 nov 2014 - flyt data fra fælles prefs til separat fil - kan fjernes ultimo 2015
       str = App.prefs.getString(PREF_NØGLE, "");

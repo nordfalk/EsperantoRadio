@@ -31,6 +31,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
@@ -226,7 +227,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         if (getActivity()==null) { // Crash set i abetest 19. nov 2014
           String fejl = "getActivity() var null for "+Programserie_frag.this.toString();
           Log.rapporterFejl(new IllegalStateException(fejl));
-          return new TextView(App.instans); // skal aldrig vises
+          return new TextView(ApplicationSingleton.instans); // skal aldrig vises
         }
         v = getLayoutInflater(null).inflate(layoutFraType[type], parent, false);
         vh = new Viewholder();

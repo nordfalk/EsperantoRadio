@@ -38,6 +38,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 
 /**
@@ -53,7 +54,7 @@ public class Fjernbetjening implements Runnable {
 
   public Fjernbetjening() {
     Programdata.instans.afspiller.positionsobservatører.add(this);
-    fjernbetjeningReciever = new ComponentName(App.instans.getPackageName(), FjernbetjeningReciever.class.getName());
+    fjernbetjeningReciever = new ComponentName(App.pakkenavn, FjernbetjeningReciever.class.getName());
     Programdata.instans.afspiller.observatører.add(this);
   }
 
@@ -114,7 +115,7 @@ public class Fjernbetjening implements Runnable {
         Log.d("Fjernbetjening asynk artwork\n" + burl);
         // Hent med AQuery, da det sandsynligvis allerede har en cachet udgave
         // NB Brug ikke: Bitmap bm = BitmapAjaxCallback.getMemoryCached(burl, 0); - giver senere java.lang.RuntimeException: Canvas: trying to use a recycled bitmap senere
-        new AQuery(App.instans).ajax(burl, Bitmap.class, new AjaxCallback<Bitmap>() {
+        new AQuery(ApplicationSingleton.instans).ajax(burl, Bitmap.class, new AjaxCallback<Bitmap>() {
           @Override
           public void callback(String url, Bitmap bm, AjaxStatus status) {
             Log.d("Fjernbetjening AQ asynk artwork " + status.getCode() + " " + bm + "\n" + burl);
@@ -158,7 +159,7 @@ public class Fjernbetjening implements Runnable {
     if (!App.prefs.getBoolean("fjernbetjening", true)) return;
 
     Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).setComponent(fjernbetjeningReciever);
-    PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(App.instans, 0, mediaButtonIntent, 0);
+    PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, mediaButtonIntent, 0);
     // create and register the remote control client
     remoteControlClient = new RemoteControlClient(mediaPendingIntent);
     remoteControlClient.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE

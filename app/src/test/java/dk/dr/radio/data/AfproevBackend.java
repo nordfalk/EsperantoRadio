@@ -21,6 +21,7 @@ import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRBackendTidsformater;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
@@ -45,9 +46,9 @@ public class AfproevBackend {
     return data;
   }
 
-  public static class TestApp extends App {
+  public static class TestApp extends ApplicationSingleton {
     static {
-      IKKE_Android_VM = true;
+      App.IKKE_Android_VM = true;
     }
 
     @Override

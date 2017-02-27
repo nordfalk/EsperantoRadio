@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Serialisering;
 
@@ -27,7 +28,7 @@ public class SenestLyttede {
 
   private LinkedHashMap<String, SenestLyttet> liste;
 
-  private String FILNAVN = App.instans == null ? null : App.instans.getFilesDir() + "/SenestLyttede.ser";
+  private String FILNAVN = App.instans == null ? null : ApplicationSingleton.instans.getFilesDir() + "/SenestLyttede.ser";
 
   private void tjekDataOprettet() {
     if (liste != null) return;

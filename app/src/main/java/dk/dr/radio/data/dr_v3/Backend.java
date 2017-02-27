@@ -195,11 +195,11 @@ public class Backend {
     if (dagsbeskrivelse == null) {
       dagsbeskrivelse = ugedagformat.format(tid);
       String år = årformat.format(tid);
-      if (datoStr0.equals(iDagDatoStr)) dagsbeskrivelse = App.instans.getString(R.string.i_dag);
-      else if (datoStr0.equals(iMorgenDatoStr)) dagsbeskrivelse = App.instans.getString(R.string.i_morgen)+" - " + dagsbeskrivelse;
-      else if (datoStr0.equals(iOvermorgenDatoStr)) dagsbeskrivelse = App.instans.getString(R.string.i_overmorgen) + " - " + dagsbeskrivelse;
-      else if (datoStr0.equals(iGårDatoStr)) dagsbeskrivelse = App.instans.getString(R.string.i_går); // "I GÅR - "+dagsbeskrivelse;
-      else if (datoStr0.equals(iForgårsDatoStr)) dagsbeskrivelse = App.instans.getString(R.string.i_forgårs)+" - " + dagsbeskrivelse;
+      if (datoStr0.equals(iDagDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_dag);
+      else if (datoStr0.equals(iMorgenDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_morgen)+" - " + dagsbeskrivelse;
+      else if (datoStr0.equals(iOvermorgenDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_overmorgen) + " - " + dagsbeskrivelse;
+      else if (datoStr0.equals(iGårDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_går); // "I GÅR - "+dagsbeskrivelse;
+      else if (datoStr0.equals(iForgårsDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_forgårs)+" - " + dagsbeskrivelse;
       else if (år.equals(iÅrDatoStr)) dagsbeskrivelse = dagsbeskrivelse;
       else dagsbeskrivelse = dagsbeskrivelse + " " + år;
       dagsbeskrivelse = dagsbeskrivelse.toUpperCase();

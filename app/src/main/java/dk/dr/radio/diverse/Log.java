@@ -182,7 +182,7 @@ public class Log {
 
       ret += instans.getPackageName() + " (v " + version + ")" + "\nTelefonmodel: " + Build.MODEL + " " + Build.PRODUCT + "\nAndroid v" + Build.VERSION.RELEASE + " (sdk: " + Build.VERSION.SDK + ")";
       */
-      AudioManager am = (AudioManager) App.instans.getSystemService(Context.AUDIO_SERVICE);
+      AudioManager am = (AudioManager) ApplicationSingleton.instans.getSystemService(Context.AUDIO_SERVICE);
       LinkedHashSet<String> udgange = new LinkedHashSet<>();
       if (am.isBluetoothA2dpOn()) udgange.add("BluetoothA2dp");
       if (am.isBluetoothScoOn()) udgange.add("BluetoothSco");

@@ -40,6 +40,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
@@ -94,19 +95,19 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
     RemoteViews remoteViews;
     if (type == TYPE_notifikation_lille) {
       //remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_notifikation_lille);
-      remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_notifikation_stor);
+      remoteViews = new RemoteViews(App.pakkenavn, R.layout.afspiller_notifikation_stor);
     } else if (type == TYPE_notifikation_stor) {
-      remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_notifikation_stor);
+      remoteViews = new RemoteViews(App.pakkenavn, R.layout.afspiller_notifikation_stor);
     } else if (type == TYPE_låseskærm) {
       //remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_laaseskaerm);
-      remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_notifikation_stor);
+      remoteViews = new RemoteViews(App.pakkenavn, R.layout.afspiller_notifikation_stor);
     } else {
-      remoteViews = new RemoteViews(App.instans.getPackageName(), R.layout.afspiller_levendeikon);
+      remoteViews = new RemoteViews(App.pakkenavn, R.layout.afspiller_levendeikon);
     }
 
-    Intent hovedAktI = new Intent(App.instans, Hovedaktivitet.class);
+    Intent hovedAktI = new Intent(ApplicationSingleton.instans, Hovedaktivitet.class);
     hovedAktI.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    PendingIntent åbnAktivitetPI = PendingIntent.getActivity(App.instans, 0, hovedAktI, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent åbnAktivitetPI = PendingIntent.getActivity(ApplicationSingleton.instans, 0, hovedAktI, PendingIntent.FLAG_UPDATE_CURRENT);
     remoteViews.setOnClickPendingIntent(R.id.yderstelayout, åbnAktivitetPI);
 
 
@@ -126,27 +127,27 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
     remoteViews.setViewVisibility(R.id.direktetekst, lydkilde.erDirekte()?View.VISIBLE:View.GONE);
     remoteViews.setTextViewText(R.id.metainformation, udsendelse!=null?udsendelse.titel:kanal.navn);
     if (Build.VERSION.SDK_INT >= 15) {
-      remoteViews.setContentDescription(R.id.metainformation, App.instans.getString(R.string.D_R_Radio)+" " + kanal.navn);
+      remoteViews.setContentDescription(R.id.metainformation, App.res.getString(R.string.D_R_Radio)+" " + kanal.navn);
     }
     switch (Programdata.instans.afspiller.getAfspillerstatus()) {
       case STOPPET:
         remoteViews.setImageViewResource(R.id.startStopKnap, R.drawable.afspiller_spil);
-        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.instans.getString(R.string.Start_afspilning));
+        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.res.getString(R.string.Start_afspilning));
         remoteViews.setViewVisibility(R.id.progressBar, View.GONE);
         //remoteViews.setTextColor(R.id.metainformation, App.color.grå60);
         break;
       case FORBINDER:
         remoteViews.setImageViewResource(R.id.startStopKnap, R.drawable.afspiller_pause);
-        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.instans.getString(R.string.Stop_afspilning));
+        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.res.getString(R.string.Stop_afspilning));
         remoteViews.setViewVisibility(R.id.progressBar, View.VISIBLE);
         int fpct = Programdata.instans.afspiller.getForbinderProcent();
-        remoteViews.setTextViewText(R.id.metainformation, App.instans.getString(R.string.Forbinder) + (fpct > 0 ? fpct : ""));
+        remoteViews.setTextViewText(R.id.metainformation, App.res.getString(R.string.Forbinder) + (fpct > 0 ? fpct : ""));
         //remoteViews.setTextColor(R.id.metainformation, type == TYPE_hjemmeskærm ? App.color.grå60 : App.color.blå);
         break;
       case SPILLER:
         //  App.kortToast("SPILLER " + k.navn);
         remoteViews.setImageViewResource(R.id.startStopKnap, R.drawable.afspiller_pause);
-        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.instans.getString(R.string.Stop_afspilning));
+        if (Build.VERSION.SDK_INT >= 15) remoteViews.setContentDescription(R.id.startStopKnap, App.res.getString(R.string.Stop_afspilning));
         remoteViews.setViewVisibility(R.id.progressBar, View.GONE);
         //remoteViews.setTextColor(R.id.metainformation, type == TYPE_hjemmeskærm ? App.color.grå60 : App.color.grå60);
         break;
@@ -154,16 +155,16 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
 
 
     if (type == TYPE_notifikation_lille || type == TYPE_notifikation_stor || type == TYPE_låseskærm) {
-      Intent startPauseI = new Intent(App.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.PAUSE);
-      PendingIntent startPausePI = PendingIntent.getBroadcast(App.instans, 0, startPauseI, PendingIntent.FLAG_UPDATE_CURRENT);
+      Intent startPauseI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.PAUSE);
+      PendingIntent startPausePI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startPauseI, PendingIntent.FLAG_UPDATE_CURRENT);
       remoteViews.setOnClickPendingIntent(R.id.startStopKnap, startPausePI);
 
-      Intent lukI = new Intent(App.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.LUK);
-      PendingIntent lukPI = PendingIntent.getBroadcast(App.instans, 0, lukI, PendingIntent.FLAG_UPDATE_CURRENT);
+      Intent lukI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.LUK);
+      PendingIntent lukPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, lukI, PendingIntent.FLAG_UPDATE_CURRENT);
       remoteViews.setOnClickPendingIntent(R.id.luk, lukPI);
     } else {
-      Intent startStopI = new Intent(App.instans, AfspillerStartStopReciever.class);
-      PendingIntent startStopPI = PendingIntent.getBroadcast(App.instans, 0, startStopI, PendingIntent.FLAG_UPDATE_CURRENT);
+      Intent startStopI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class);
+      PendingIntent startStopPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startStopI, PendingIntent.FLAG_UPDATE_CURRENT);
       remoteViews.setOnClickPendingIntent(R.id.startStopKnap, startStopPI);
     }
 

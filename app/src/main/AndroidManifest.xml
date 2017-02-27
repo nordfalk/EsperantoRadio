@@ -22,7 +22,7 @@
 
   <application
       android:allowBackup="true"
-      android:name="dk.dr.radio.diverse.App"
+      android:name="dk.dr.radio.diverse.ApplicationSingleton"
       android:icon="@drawable/appikon_eo"
       android:logo="@drawable/appikon_eo"
       android:label="@string/appnavn_beta"

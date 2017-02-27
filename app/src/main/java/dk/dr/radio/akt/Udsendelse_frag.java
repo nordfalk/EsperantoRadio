@@ -55,6 +55,7 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
@@ -752,7 +753,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   private void hent() {
     try {
-      int tilladelse = ContextCompat.checkSelfPermission(App.instans, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+      int tilladelse = ContextCompat.checkSelfPermission(ApplicationSingleton.instans, Manifest.permission.WRITE_EXTERNAL_STORAGE);
       if (tilladelse != PackageManager.PERMISSION_GRANTED) {
         AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
         ab.setTitle("Permeso mankas");

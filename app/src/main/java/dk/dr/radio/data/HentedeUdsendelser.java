@@ -29,6 +29,7 @@ import java.util.Scanner;
 
 import dk.dr.radio.akt.Hentede_udsendelser_frag;
 import dk.dr.radio.akt.Hovedaktivitet;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -73,8 +74,8 @@ public class HentedeUdsendelser {
 
   public HentedeUdsendelser() {
     if (virker() && App.instans != null) { // App.instans==null standard JVM (udenfor Android)
-      downloadService = (DownloadManager) App.instans.getSystemService(Context.DOWNLOAD_SERVICE);
-      FILNAVN = App.instans.getFilesDir() + "/HentedeUdsendelser.ser";
+      downloadService = (DownloadManager) ApplicationSingleton.instans.getSystemService(Context.DOWNLOAD_SERVICE);
+      FILNAVN = ApplicationSingleton.instans.getFilesDir() + "/HentedeUdsendelser.ser";
     } else {
       FILNAVN = "/tmp/HentedeUdsendelser.ser";
     }
@@ -128,18 +129,18 @@ public class HentedeUdsendelser {
   public static String lavStatustekst(HentetStatus hs) {
     if (hs.status == DownloadManager.STATUS_SUCCESSFUL) {
       if (hs.statusFlytningIGang) return App.res.getString(R.string.Flytter__);
-      if (new File(hs.destinationFil).canRead()) return App.instans.getString(R.string.Klar___mb_, hs.iAlt);
-      return App.instans.getString(R.string._ikke_tilgængelig_);
+      if (new File(hs.destinationFil).canRead()) return App.res.getString(R.string.Klar___mb_, hs.iAlt);
+      return App.res.getString(R.string._ikke_tilgængelig_);
     } else if (hs.status == DownloadManager.STATUS_FAILED) {
-      return App.instans.getString(R.string.Mislykkedes);
+      return App.res.getString(R.string.Mislykkedes);
     } else if (hs.status == DownloadManager.STATUS_PENDING) {
-      return App.instans.getString(R.string.Venter___);
+      return App.res.getString(R.string.Venter___);
     } else if (hs.status == DownloadManager.STATUS_PAUSED) {
-      return App.instans.getString(R.string.Hentning_pauset__) + App.instans.getString(R.string.Hentet___mb_af___mb, hs.hentet, hs.iAlt);
+      return App.res.getString(R.string.Hentning_pauset__) + App.res.getString(R.string.Hentet___mb_af___mb, hs.hentet, hs.iAlt);
     }
     // RUNNING
-    if (hs.hentet > 0 || hs.iAlt > 0) return App.instans.getString(R.string.Hentet___mb_af___mb, hs.hentet, hs.iAlt);
-    return App.instans.getString(R.string.Henter__);
+    if (hs.hentet > 0 || hs.iAlt > 0) return App.res.getString(R.string.Hentet___mb_af___mb, hs.hentet, hs.iAlt);
+    return App.res.getString(R.string.Henter__);
   }
 
   public void tjekOmHentet(Udsendelse udsendelse) {
@@ -221,7 +222,7 @@ public class HentedeUdsendelser {
 
       File dir = findPlaceringAfHentedeFilerFraPrefs();
       Log.d("Hent uri=" + uri +" til "+dir);
-      dir = new File(dir, App.instans.getString(R.string.HENTEDE_UDS_MAPPENAVN));
+      dir = new File(dir, App.res.getString(R.string.HENTEDE_UDS_MAPPENAVN));
       dir.mkdirs();
       if (!dir.exists()) throw new IOException("kunne ikke oprette " + dir);
       File destination = new File(dir, udsendelse.slug.replace(':','_') + ".mp3");
@@ -323,7 +324,7 @@ public class HentedeUdsendelser {
         if (c.moveToFirst()) {
           Log.d("HentedeUdsendelser DLS " + c + "  " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
           if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
-            App.langToast(App.instans.getString(R.string.Udsendelsen___blev_hentet, u.titel));
+            App.langToast(App.res.getString(R.string.Udsendelsen___blev_hentet, u.titel));
             Log.registrérTestet("Hente udsendelse", u.slug);
 
             final HentetStatus hs = Programdata.instans.hentedeUdsendelser.getHentetStatus(u);
@@ -345,7 +346,7 @@ public class HentedeUdsendelser {
                     hentet.delete();
                   } catch (Exception e) {
                     e.printStackTrace();
-                    App.langToast(App.instans.getString(R.string.Kunne_ikke_flytte__, u.titel, dest));
+                    App.langToast(App.res.getString(R.string.Kunne_ikke_flytte__, u.titel, dest));
                   }
                   return null;
                 }
@@ -360,7 +361,7 @@ public class HentedeUdsendelser {
               }.execute();
             }
           } else {
-            App.langToast(App.instans.getString(R.string.Det_lykkedes_ikke_at_hente_udsendelsen___tjek_at___, u.titel));
+            App.langToast(App.res.getString(R.string.Det_lykkedes_ikke_at_hente_udsendelsen___tjek_at___, u.titel));
           }
         }
         c.close();
@@ -436,7 +437,7 @@ public class HentedeUdsendelser {
 
     Res res = new Res();
     if (Build.VERSION.SDK_INT>=19) try {
-      for (File f : App.instans.getExternalFilesDirs(Environment.DIRECTORY_PODCASTS)) {
+      for (File f : ApplicationSingleton.instans.getExternalFilesDirs(Environment.DIRECTORY_PODCASTS)) {
         res.put(f);
       }
     } catch (Exception e) { Log.rapporterFejl(e); }

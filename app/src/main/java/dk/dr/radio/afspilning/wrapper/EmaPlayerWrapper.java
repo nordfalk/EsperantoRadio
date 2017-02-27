@@ -9,7 +9,7 @@ import com.devbrackets.android.exomedia.EMAudioPlayer;
 
 import java.io.IOException;
 
-import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 
 /**
  * @author Jacob Nordfalk 28-11-14.
@@ -18,14 +18,14 @@ public class EmaPlayerWrapper extends EMAudioPlayer implements  MediaPlayerWrapp
   private PowerManager.WakeLock mWakeLock = null;
 
   public EmaPlayerWrapper() {
-    super(App.instans);
+    super(ApplicationSingleton.instans);
   }
 
 
   @Override
   public void setDataSource(final String url) throws IOException {
     //App.kortToast("EmaPlayerWrapper setDataSource\n" + url);
-    super.setDataSource(App.instans, Uri.parse(url));
+    super.setDataSource(ApplicationSingleton.instans, Uri.parse(url));
   }
 
   @Override

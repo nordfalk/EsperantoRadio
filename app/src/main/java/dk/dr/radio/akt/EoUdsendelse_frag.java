@@ -47,6 +47,7 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
@@ -545,7 +546,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   private void hent() {
     try {
-      int tilladelse = App.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, App.instans.getPackageName());
+      int tilladelse = ApplicationSingleton.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ApplicationSingleton.instans.getPackageName());
       if (tilladelse != PackageManager.PERMISSION_GRANTED) {
         AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
         ab.setTitle("Tilladelse mangler");

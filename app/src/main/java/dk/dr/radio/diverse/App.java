@@ -83,7 +83,7 @@ import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import io.fabric.sdk.android.Fabric;
 
-public class App extends Application {
+public class App {
   public static App instans;
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
@@ -96,15 +96,20 @@ public class App extends Application {
   /** Bruges på nye funktioner - for at tjekke om de altid er opfyldt i felten. Fjernes ved næste udgivelser */
   public static final boolean TJEK_ANTAGELSER = !PRODUKTION;
   public static String versionsnavn = "(ukendt)";
+  public static String pakkenavn;
+
+  public static ConnectivityManager connectivityManager;
+  public static NotificationManager notificationManager;
+  public static AudioManager audioManager;
+  public static AccessibilityManager accessibilityManager;
+
+  private static SharedPreferences grunddata_prefs;
 
   public static final String P4_FORETRUKKEN_AF_BRUGER = "P4_FORETRUKKEN_AF_BRUGER";
   private static final String DRAMA_OG_BOG__A_Å_INDLÆST = "DRAMA_OG_BOG__A_Å_INDLÆST";
   public static final String FORETRUKKEN_KANAL = "FORETRUKKEN_kanal";
   public static final String NØGLE_advaretOmInstalleretPåSDKort = "erInstalleretPåSDKort";
   public static SharedPreferences prefs;
-  public static ConnectivityManager connectivityManager;
-  public static NotificationManager notificationManager;
-  public static AudioManager audioManager;
   public static boolean fejlsøgning = false;
   public static Handler forgrundstråd;
   public static Typeface skrift_gibson;
@@ -121,56 +126,54 @@ public class App extends Application {
   public static Resources res;
   /** Tidsstempel der kan bruges til at afgøre hvilke filer der faktisk er brugt efter denne opstart */
   private static long TIDSSTEMPEL_VED_OPSTART;
-  public static AccessibilityManager accessibilityManager;
-  private static SharedPreferences grunddata_prefs;
 
 
   @SuppressLint("NewApi")
-  @Override
-  public void onCreate() {
-    TIDSSTEMPEL_VED_OPSTART = System.currentTimeMillis();
+  public App(Application ctx) {
+    if (instans != null) throw new IllegalStateException("Klassen må kun instantieres én gang");
     instans = this;
+    TIDSSTEMPEL_VED_OPSTART = System.currentTimeMillis();
 
-    prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
     fejlsøgning = prefs.getBoolean("fejlsøgning", false);
+    forgrundstråd = new Handler();
+    connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+    notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+    audioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
+    accessibilityManager = (AccessibilityManager) ctx.getSystemService(Context.ACCESSIBILITY_SERVICE);
+    res = ctx.getResources();
+    pakkenavn = ctx.getPackageName();
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale( ÆGTE_DR ?  "da_DK" : "eo");
     Locale.setDefault(sprogKonfig.locale);
-    getResources().updateConfiguration(App.sprogKonfig, null);
+    res.updateConfiguration(App.sprogKonfig, null);
 
 
     netværk = new Netvaerksstatus();
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
-      Fabric.with(this, new Crashlytics());
+      Fabric.with(ctx, new Crashlytics());
       Log.d("Crashlytics startet");
     }
-    super.onCreate();
 
-    forgrundstråd = new Handler();
-    connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-    notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    audioManager = (AudioManager) App.instans.getSystemService(Context.AUDIO_SERVICE);
-    res = App.instans.getResources();
     App.color = new DRFarver();
 
     // HTTP-forbindelser havde en fejl præ froyo, men jeg har også set problemet på Xperia Play, der er 2.3.4 (!)
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
       System.setProperty("http.keepAlive", "false");
     }
-    String packageName = getPackageName();
     try {
-      if (ÆGTE_DR) if ("dk.dr.radio".equals(packageName)) {
+      if (ÆGTE_DR) if ("dk.dr.radio".equals(pakkenavn)) {
         if (!PRODUKTION) App.langToast("Sæt PRODUKTIONs-flaget");
       } else {
         if (PRODUKTION) App.langToast("Testudgave - fjern PRODUKTIONs-flaget");
       }
       //noinspection ConstantConditions
-      PackageInfo pi = getPackageManager().getPackageInfo(packageName, 0);
-      App.versionsnavn = packageName + "/" + pi.versionName;
+      PackageInfo pi = ctx.getPackageManager().getPackageInfo(pakkenavn, 0);
+      App.versionsnavn = pakkenavn + "/" + pi.versionName;
       if (EMULATOR) App.versionsnavn += " EMU";
       Log.d("App.versionsnavn=" + App.versionsnavn);
 
@@ -179,10 +182,9 @@ public class App extends Application {
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
-    accessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
 
 
-    if (!ÆGTE_DR) FilCache.init(new File(getCacheDir(), "FilCache"));
+    if (!ÆGTE_DR) FilCache.init(new File(ctx.getCacheDir(), "FilCache"));
     // Initialisering af Volley
 
     HttpStack stack = new HurlStack();
@@ -197,7 +199,7 @@ public class App extends Application {
     // Mappe ændret fra standardmappen "volley" til "dr_volley" 19. nov 2014.
     // Det skyldtes at et hukommelsesdump viste, at Volley indekserede alle filerne i standardmappen,
     // uden om vores implementation, hvilket gav et unødvendigt overhead på ~ 1MB
-    File cacheDir = new File(getCacheDir(), "dr_volley");
+    File cacheDir = new File(ctx.getCacheDir(), "dr_volley");
     volleyCache = new DrDiskBasedCache(cacheDir);
     volleyRequestQueue = new RequestQueue(volleyCache, network);
     volleyRequestQueue.start();
@@ -209,7 +211,7 @@ public class App extends Application {
       // Indlæsning af grunddata/stamdata.
       // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
       // På et senere tidspunkt henter vi nye grunddata
-      grunddata_prefs = App.instans.getSharedPreferences("grunddata", 0);
+      grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
       String grunddata = grunddata_prefs.getString(Programdata.GRUNDDATA_URL, null);
 
       if (grunddata == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
@@ -254,9 +256,8 @@ public class App extends Application {
         }.start();
       }
 
-      String pn = App.instans.getPackageName();
       for (final Kanal k : Programdata.instans.grunddata.kanaler) {
-        k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);
+        k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pakkenavn);
       }
 
       String kanalkode = prefs.getString(FORETRUKKEN_KANAL, null);
@@ -290,8 +291,8 @@ public class App extends Application {
       Programdata.instans.afspiller.setLydkilde(aktuelKanal);
 
 
-      registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-      netværk.onReceive(this, null); // Få opdateret netværksstatus
+      ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+      netværk.onReceive(ctx, null); // Få opdateret netværksstatus
       fjernbetjening = new Fjernbetjening();
 
       // udeståendeInitialisering kaldes når aktivitet bliver synlig første gang
@@ -303,9 +304,9 @@ public class App extends Application {
     }
 
     try { // DRs skrifttyper er ikke offentliggjort i SVN, derfor kan følgende fejle:
-      skrift_gibson = Typeface.createFromAsset(getAssets(), "Gibson-Regular.otf");
-      skrift_gibson_fed = Typeface.createFromAsset(getAssets(), "Gibson-SemiBold.otf");
-      skrift_georgia = Typeface.createFromAsset(getAssets(), "Georgia.ttf");
+      skrift_gibson = Typeface.createFromAsset(ctx.getAssets(), "Gibson-Regular.otf");
+      skrift_gibson_fed = Typeface.createFromAsset(ctx.getAssets(), "Gibson-SemiBold.otf");
+      skrift_georgia = Typeface.createFromAsset(ctx.getAssets(), "Georgia.ttf");
     } catch (Exception e) {
       if (ÆGTE_DR) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
       skrift_gibson = Typeface.DEFAULT;
@@ -314,7 +315,7 @@ public class App extends Application {
     }
     skrift_gibson_fed_span = new EgenTypefaceSpan("Gibson fed", App.skrift_gibson_fed);
 
-    if (!EMULATOR) AppOpdatering.tjekForNyAPK(this);
+    if (!EMULATOR) AppOpdatering.tjekForNyAPK(ctx);
     Log.d("onCreate tog " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
   }
 
@@ -437,7 +438,7 @@ public class App extends Application {
             Programdata.instans.grunddata.eo_parseFællesGrunddata(nyeGrunddata);
           }
           Programdata.instans.grunddata.parseFællesGrunddata(nyeGrunddata);
-          String pn = App.instans.getPackageName();
+          String pn = pakkenavn;
           for (final Kanal k : Programdata.instans.grunddata.kanaler) {
             k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);
           }
@@ -566,11 +567,11 @@ public class App extends Application {
       if (App.fejlsøgning) App.kortToast("kørFørsteGangAppIkkeMereErSynlig");
       final int DAGE = 24 * 60 * 60 * 1000;
       int volleySlettet = volleyCache.sletFilerÆldreEnd(TIDSSTEMPEL_VED_OPSTART-10*DAGE);
-      int aqSlettet = Diverse.sletFilerÆldreEnd(new File(getCacheDir(), "aquery"), TIDSSTEMPEL_VED_OPSTART-4*DAGE);
+      int aqSlettet = Diverse.sletFilerÆldreEnd(new File(ApplicationSingleton.instans.getCacheDir(), "aquery"), TIDSSTEMPEL_VED_OPSTART-4*DAGE);
       // Mappe ændret fra standardmappen "volley" til "dr_volley" 19. nov 2014.
       // Det skyldtes at et hukommelsesdump viste, at Volley indekserede alle filerne i standardmappen,
       // uden om vores implementation, hvilket gav et unødvendigt overhead på ~ 1MB
-      File gammelVolleyCacheDir = new File(getCacheDir(), "volley");
+      File gammelVolleyCacheDir = new File(ApplicationSingleton.instans.getCacheDir(), "volley");
       Diverse.sletFilerÆldreEnd(gammelVolleyCacheDir, TIDSSTEMPEL_VED_OPSTART-7*DAGE);
 
       if (fejlsøgning) {
@@ -584,14 +585,14 @@ public class App extends Application {
   private static Toast forrigeToast;
   public static void langToast(String txt) {
     Log.d("langToast(" + txt);
-    if (aktivitetIForgrunden == null) txt = "DR Radio:\n" + txt;
+    if (aktivitetIForgrunden == null) txt = "Radio:\n" + txt;
     final String txt2 = txt;
     forgrundstråd.post(new Runnable() {
       @Override
       public void run() {
         // lange toasts bør blive hængende
         if (forrigeToast!=null && forrigeToast.getDuration()==Toast.LENGTH_SHORT && !App.fejlsøgning && !App.EMULATOR) forrigeToast.cancel();
-        forrigeToast = Toast.makeText(instans, txt2, Toast.LENGTH_LONG);
+        forrigeToast = Toast.makeText(ApplicationSingleton.instans, txt2, Toast.LENGTH_LONG);
         forrigeToast.show();
       }
     });
@@ -599,21 +600,21 @@ public class App extends Application {
 
   public static void kortToast(String txt) {
     Log.d("kortToast(" + txt);
-    if (aktivitetIForgrunden == null) txt = "DR Radio:\n" + txt;
+    if (aktivitetIForgrunden == null) txt = "Radio:\n" + txt;
     final String txt2 = txt;
     forgrundstråd.post(new Runnable() {
       @Override
       public void run() {
         // lange toasts bør blive hængende
         if (forrigeToast!=null && forrigeToast.getDuration()==Toast.LENGTH_SHORT && !App.fejlsøgning && !App.EMULATOR) forrigeToast.cancel();
-        forrigeToast = Toast.makeText(instans, txt2, Toast.LENGTH_SHORT);
+        forrigeToast = Toast.makeText(ApplicationSingleton.instans, txt2, Toast.LENGTH_SHORT);
         forrigeToast.show();
       }
     });
   }
 
-  public static void kortToast(int resId) { kortToast(instans.getResources().getString(resId));}
-  public static void langToast(int resId) { langToast(instans.getResources().getString(resId));}
+  public static void kortToast(int resId) { kortToast(res.getString(resId));}
+  public static void langToast(int resId) { langToast(res.getString(resId));}
 
   public static void kontakt(Activity akt, String emne, String txt, String vedhæftning) {
     String[] modtagere;
@@ -660,20 +661,6 @@ public class App extends Application {
     }
   }
 
-
-  @Override
-  public void onLowMemory() {
-    // Ryd op når der mangler RAM
-    BitmapAjaxCallback.clearCache();
-    super.onLowMemory();
-  }
-
-  @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-  @Override
-  public void onTrimMemory(int level) {
-    if (level >= TRIM_MEMORY_BACKGROUND) BitmapAjaxCallback.clearCache();
-    super.onTrimMemory(level);
-  }
 
   /**
    * I fald telefonens ur går forkert kan det ses her - alle HTTP-svar bliver jo stemplet med servertiden

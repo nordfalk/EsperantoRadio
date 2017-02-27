@@ -54,6 +54,7 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
@@ -73,11 +74,11 @@ public class Afspiller {
     MediaPlayer stop;
     MediaPlayer forbinder;    
     {
-      start = MediaPlayer.create(App.instans, R.raw.afspiller_start);
-      stop = MediaPlayer.create(App.instans, R.raw.afspiller_stop);
-      forbinder = MediaPlayer.create(App.instans, R.raw.afspiller_forbinder);
-      fejl = MediaPlayer.create(App.instans, R.raw.afspiller_fejl);
-      spiller = MediaPlayer.create(App.instans, R.raw.afspiller_spiller);      
+      start = MediaPlayer.create(ApplicationSingleton.instans, R.raw.afspiller_start);
+      stop = MediaPlayer.create(ApplicationSingleton.instans, R.raw.afspiller_stop);
+      forbinder = MediaPlayer.create(ApplicationSingleton.instans, R.raw.afspiller_forbinder);
+      fejl = MediaPlayer.create(ApplicationSingleton.instans, R.raw.afspiller_fejl);
+      spiller = MediaPlayer.create(ApplicationSingleton.instans, R.raw.afspiller_spiller);
     }    
   }
   Afspillerlyd afspillerlyd;
@@ -100,14 +101,14 @@ public class Afspiller {
   private Lydkilde lydkilde;
   public boolean vækningIGang;
   public PowerManager.WakeLock vækkeurWakeLock;
-  AudioManager audioManager = (AudioManager) App.instans.getSystemService(Context.AUDIO_SERVICE);
+  AudioManager audioManager = (AudioManager) ApplicationSingleton.instans.getSystemService(Context.AUDIO_SERVICE);
 
   private static void sætMediaPlayerLytter(MediaPlayerWrapper mediaPlayer, MediaPlayerLytter lytter) {
     mediaPlayer.setMediaPlayerLytter(lytter);
     if (lytter != null) {
       // http://developer.android.com/guide/topics/media/mediaplayer.html#wakelocks
       if (App.prefs.getBoolean("cpulås", true))
-        mediaPlayer.setWakeMode(App.instans,PowerManager.PARTIAL_WAKE_LOCK);
+        mediaPlayer.setWakeMode(ApplicationSingleton.instans,PowerManager.PARTIAL_WAKE_LOCK);
     }
   }
 
@@ -120,14 +121,14 @@ public class Afspiller {
     mediaPlayer = Wrapperfabrikering.opret();
 
     sætMediaPlayerLytter(mediaPlayer, this.lytter);
-    wifilock = ((WifiManager) App.instans.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "DR Radio");
+    wifilock = ((WifiManager) ApplicationSingleton.instans.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "DR Radio");
     wifilock.setReferenceCounted(false);
     Opkaldshaandtering opkaldshåndtering = new Opkaldshaandtering(this);
     try {
       /* kræver
         <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="22" />
       */
-      TelephonyManager tm = (TelephonyManager) App.instans.getSystemService(Context.TELEPHONY_SERVICE);
+      TelephonyManager tm = (TelephonyManager) ApplicationSingleton.instans.getSystemService(Context.TELEPHONY_SERVICE);
       tm.listen(opkaldshåndtering, PhoneStateListener.LISTEN_CALL_STATE);
     } catch (Exception e) { Log.rapporterFejl(e); }
   }
@@ -183,7 +184,7 @@ public class Afspiller {
       //opdaterNotification();
       // Start afspillerservicen så programmet ikke bliver lukket
       // når det kører i baggrunden under afspilning
-      App.instans.startService(new Intent(App.instans, HoldAppIHukommelsenService.class));
+      ApplicationSingleton.instans.startService(new Intent(ApplicationSingleton.instans, HoldAppIHukommelsenService.class));
       if (App.prefs.getBoolean("wifilås", true) && wifilock != null) {
         wifilock.acquire();
       }
@@ -197,7 +198,7 @@ public class Afspiller {
 
       if (!hovedtelefonFjernetReciever.aktiv) {
         hovedtelefonFjernetReciever.aktiv = true;
-        App.instans.registerReceiver(hovedtelefonFjernetReciever, hovedtelefonFjernetReciever.FILTER);
+        ApplicationSingleton.instans.registerReceiver(hovedtelefonFjernetReciever, hovedtelefonFjernetReciever.FILTER);
       }
       startAfspilningIntern();
 
@@ -234,7 +235,7 @@ public class Afspiller {
   private OnAudioFocusChangeListener onAudioFocusChangeListener = new OnAudioFocusChangeListener() {
     public void onAudioFocusChange(int focusChange) {
       Log.d("onAudioFocusChange " + focusChange);
-      AudioManager am = (AudioManager) App.instans.getSystemService(Context.AUDIO_SERVICE);
+      AudioManager am = (AudioManager) ApplicationSingleton.instans.getSystemService(Context.AUDIO_SERVICE);
 
       switch (focusChange) {
         // Kommer ved f.eks. en SMS eller taleinstruktion i Google Maps
@@ -284,7 +285,7 @@ public class Afspiller {
   boolean setDataSourceLyd = false;
 
   private String mpTils() {
-    AudioManager ar = (AudioManager) App.instans.getSystemService(App.AUDIO_SERVICE);
+    AudioManager ar = (AudioManager) ApplicationSingleton.instans.getSystemService(ApplicationSingleton.AUDIO_SERVICE);
     //return mediaPlayer.getCurrentPosition()+ "/"+mediaPlayer.getDuration() + "    "+mediaPlayer.isPlaying()+ar.isMusicActive();
     if (!setDataSourceLyd && ar.isMusicActive()) {
       setDataSourceLyd = true;
@@ -380,7 +381,7 @@ public class Afspiller {
     pauseAfspilningIntern();
     if (hovedtelefonFjernetReciever.aktiv) {
       hovedtelefonFjernetReciever.aktiv = false;
-      App.instans.unregisterReceiver(hovedtelefonFjernetReciever);
+      ApplicationSingleton.instans.unregisterReceiver(hovedtelefonFjernetReciever);
     }
     if (wifilock != null) wifilock.release();
     if (vækkeurWakeLock != null) {
@@ -413,7 +414,7 @@ public class Afspiller {
     pauseAfspilningIntern();
     if (wifilock != null) wifilock.release();
     // Stop afspillerservicen
-    App.instans.stopService(new Intent(App.instans, HoldAppIHukommelsenService.class));
+    ApplicationSingleton.instans.stopService(new Intent(ApplicationSingleton.instans, HoldAppIHukommelsenService.class));
     if (vækkeurWakeLock != null) {
       vækkeurWakeLock.release();
       vækkeurWakeLock = null;
@@ -451,11 +452,11 @@ public class Afspiller {
 
   private void opdaterObservatører() {
 
-    AppWidgetManager mAppWidgetManager = AppWidgetManager.getInstance(App.instans);
-    int[] appWidgetId = mAppWidgetManager.getAppWidgetIds(new ComponentName(App.instans, AfspillerIkonOgNotifikation.class));
+    AppWidgetManager mAppWidgetManager = AppWidgetManager.getInstance(ApplicationSingleton.instans);
+    int[] appWidgetId = mAppWidgetManager.getAppWidgetIds(new ComponentName(ApplicationSingleton.instans, AfspillerIkonOgNotifikation.class));
 
     for (int id : appWidgetId) {
-      AfspillerIkonOgNotifikation.opdaterUdseende(App.instans, mAppWidgetManager, id);
+      AfspillerIkonOgNotifikation.opdaterUdseende(ApplicationSingleton.instans, mAppWidgetManager, id);
     }
 
     // Notificér alle i observatørlisen - fra en kopi, sådan at de kan fjerne
@@ -771,10 +772,10 @@ public class Afspiller {
   private void vibru(int ms) {
     Log.d("vibru " + ms);
     try {
-      Vibrator vibrator = (Vibrator) App.instans.getSystemService(Activity.VIBRATOR_SERVICE);
+      Vibrator vibrator = (Vibrator) ApplicationSingleton.instans.getSystemService(Activity.VIBRATOR_SERVICE);
       vibrator.vibrate(ms);
       // Tenu telefonon veka por 1/2a sekundo
-      AlarmAlertWakeLock.createPartialWakeLock(App.instans).acquire(500);
+      AlarmAlertWakeLock.createPartialWakeLock(ApplicationSingleton.instans).acquire(500);
     } catch (Exception e) {
       e.printStackTrace();
     }

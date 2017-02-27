@@ -42,6 +42,7 @@ import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.HentedeUdsendelser;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
@@ -105,7 +106,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
                 long blockSize = stat.getBlockSize();
                 long availableBlocks = stat.getAvailableBlocks();
                 if (!fandtesFørMkdirs) dir.delete(); // ryd op
-                visVærdi[i] = dir.getParent() + "\n(" + Formatter.formatFileSize(App.instans, availableBlocks * blockSize) + " " + getString(R.string.ledig)+")";
+                visVærdi[i] = dir.getParent() + "\n(" + Formatter.formatFileSize(ApplicationSingleton.instans, availableBlocks * blockSize) + " " + getString(R.string.ledig)+")";
               } catch (Exception e) {
                 Log.e(e);
               }
@@ -127,7 +128,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
               }
             } else {
               lp.setEnabled(false);
-              int tilladelse = App.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, App.instans.getPackageName());
+              int tilladelse = ApplicationSingleton.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ApplicationSingleton.instans.getPackageName());
               if (tilladelse != PackageManager.PERMISSION_GRANTED) {
                 lp.setSummary(lp.getSummary() + " Du skal give app'en tilladelse til eksternt lager");
               } else {

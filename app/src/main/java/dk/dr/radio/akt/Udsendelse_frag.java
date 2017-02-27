@@ -324,13 +324,13 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         App.forgrundstråd.postDelayed(this, 5000);
       }
       String statustekst = hs.statustekst;
-      aq.text(statustekst.toUpperCase()).enabled(true).textColorId(R.color.grå40);
+      aq.text(statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
     } else if (!udsendelse.kanHentes) {
-      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColorId(R.color.grå40);
+      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
     } else if (!udsendelse.streamsKlar()) {
-      aq.text("").enabled(false).textColorId(R.color.grå40);
+      aq.text("").enabled(false).textColor(R.color.grå40);
     } else {
-      aq.text(R.string.DOWNLOAD).enabled(true).textColorId(R.color.blå);
+      aq.text(R.string.DOWNLOAD).enabled(true).textColor(R.color.blå);
     }
   }
 

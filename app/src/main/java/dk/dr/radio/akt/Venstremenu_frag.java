@@ -35,7 +35,7 @@ import java.util.List;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.akt.diverse.GenstartProgrammet;
-import dk.dr.radio.data.dr_v3.Backend;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -449,7 +449,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           else {
             tekst2.setVisibility(View.VISIBLE);
             Date d = new Date(Alarms.næsteAktiveAlarm);
-            tekst2.setText(getString(R.string._kl_, Backend.getDagsbeskrivelse(d).toLowerCase(), Backend.klokkenformat.format(d)));
+            tekst2.setText(getString(R.string._kl_, Datoformater.getDagsbeskrivelse(d).toLowerCase(), Datoformater.klokkenformat.format(d)));
           }
           return view;
         }

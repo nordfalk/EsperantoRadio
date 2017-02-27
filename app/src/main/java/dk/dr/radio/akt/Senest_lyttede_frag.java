@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.SenestLyttede;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -141,11 +141,11 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
         vh.titel.setText(u.titel);
         vh.dato.setVisibility(View.VISIBLE);
         Kanal k = u.getKanal();
-        vh.dato.setText((k == Grunddata.ukendtKanal ? "" : (k.navn + " - ")) + getString(R.string._kl_, Backend.getDagsbeskrivelse(u.startTid).toLowerCase(), u.startTidKl));
+        vh.dato.setText((k == Grunddata.ukendtKanal ? "" : (k.navn + " - ")) + getString(R.string._kl_, Datoformater.getDagsbeskrivelse(u.startTid).toLowerCase(), u.startTidKl));
       } else {
         Log.rapporterFejl(new Exception("forkert type"), sl.lydkilde);
       }
-      vh.varighed.setText(getString(R.string.LYTTET_)+ getString(R.string._kl_, Backend.getDagsbeskrivelse(vh.sl.tidpunkt) , Backend.klokkenformat.format(vh.sl.tidpunkt)).toUpperCase());
+      vh.varighed.setText(getString(R.string.LYTTET_)+ getString(R.string._kl_, Datoformater.getDagsbeskrivelse(vh.sl.tidpunkt) , Datoformater.klokkenformat.format(vh.sl.tidpunkt)).toUpperCase());
 
       return v;
     }

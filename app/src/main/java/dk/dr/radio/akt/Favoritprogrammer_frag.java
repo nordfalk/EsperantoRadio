@@ -28,6 +28,7 @@ import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -146,7 +147,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           aq.id(R.id.stiplet_linje).visibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
         } else {
           Udsendelse udsendelse = (Udsendelse) obj;
-          aq.id(R.id.linje1).text(Backend.datoformat.format(udsendelse.startTid)).typeface(App.skrift_gibson);
+          aq.id(R.id.linje1).text(Datoformater.datoformat.format(udsendelse.startTid)).typeface(App.skrift_gibson);
           aq.id(R.id.linje2).text(udsendelse.titel).typeface(App.skrift_gibson);
           aq.id(R.id.stiplet_linje).visibility(View.VISIBLE);
         }

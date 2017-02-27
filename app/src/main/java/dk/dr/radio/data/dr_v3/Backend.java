@@ -5,14 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
 
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
@@ -22,7 +18,6 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.v3.R;
 
 /**
  * Created by j on 26-02-17.
@@ -30,28 +25,10 @@ import dk.dr.radio.v3.R;
 
 public class Backend {
 
-  public static final Locale dansk = App.ÆGTE_DR ? new Locale("da", "DA") : Locale.getDefault(); // EO ŝanĝo
-  public static final String I_DAG = "I DAG";
-  private static final DateFormat årformat = new SimpleDateFormat("yyyy", dansk);
-  private static final DateFormat ugedagformat = new SimpleDateFormat("EEEE d. MMM", dansk);
-  public static final DateFormat datoformat = new SimpleDateFormat("d. MMM yyyy", dansk);
-  public static final DateFormat klokkenformat = new SimpleDateFormat("HH:mm", dansk);
-  static { klokkenformat.setTimeZone(TimeZone.getTimeZone("Europe/Copenhagen"));} // GMT+1 om vinteren, GMT+2 om sommeren
   private static final String BASISURL = "http://www.dr.dk/tjenester/mu-apps";
   private static final boolean BRUG_URN = true;
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
-  /**
-   * Datoformat som serveren forventer det forskellige steder
-   */
-  public static DateFormat apiDatoFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-  public static String iDagDatoStr;
-  public static String iMorgenDatoStr;
-  public static String iGårDatoStr;
-  public static String iOvermorgenDatoStr;
-  public static String iForgårsDatoStr;
-  public static String iÅrDatoStr;
-  private static HashMap<String, String> datoTilBeskrivelse = new HashMap<String, String>();
 
   public static String getUdsendelseStreamsUrl(Udsendelse u) {
     if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR - URN="+u);
@@ -121,19 +98,6 @@ public class Backend {
     return BASISURL + "/playlist/" + u.slug + "/0";
   }
 
-  public static void opdateriDagIMorgenIGårDatoStr(long nu) {
-    String nyIDagDatoStr = datoformat.format(new Date(nu));
-    if (nyIDagDatoStr.equals(iDagDatoStr)) return;
-
-    iDagDatoStr = datoformat.format(new Date(nu));
-    iMorgenDatoStr = datoformat.format(new Date(nu + 24 * 60 * 60 * 1000));
-    iOvermorgenDatoStr = datoformat.format(new Date(nu + 2 * 24 * 60 * 60 * 1000));
-    iGårDatoStr = datoformat.format(new Date(nu - 24 * 60 * 60 * 1000));
-    iForgårsDatoStr = datoformat.format(new Date(nu - 2 * 24 * 60 * 60 * 1000));
-    iÅrDatoStr = årformat.format(new Date(nu));
-    datoTilBeskrivelse.clear();
-  }
-  static { opdateriDagIMorgenIGårDatoStr(System.currentTimeMillis()); }
 
   /**
    * Fjerner http://www.dr.dk i URL'er
@@ -163,7 +127,7 @@ public class Backend {
    * Parser udsendelser for getKanal. A la http://www.dr.dk/tjenester/mu-apps/schedule/P3/0
    */
   public static ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
-    String dagsbeskrivelse = getDagsbeskrivelse(dato);
+    String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
 
     ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
     for (int n = 0; n < jsonArray.length(); n++) {
@@ -172,9 +136,9 @@ public class Backend {
       u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
       u.kanHøres = o.getBoolean(DRJson.Watchable.name());
       u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
-      u.startTidKl = klokkenformat.format(u.startTid);
+      u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
-      u.slutTidKl = klokkenformat.format(u.slutTid);
+      u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
       u.dagsbeskrivelse = dagsbeskrivelse;
 /*
       if (datoStr.equals(iDagDatoStr)) ; // ingen ting
@@ -185,27 +149,6 @@ public class Backend {
       uliste.add(u);
     }
     return uliste;
-  }
-
-  public static String getDagsbeskrivelse(Date tid) {
-    String datoStr0 = datoformat.format(tid);
-    // Vi har brug for at tjekke for ens datoer hurtigt, så vi laver datoen med objekt-lighed ==
-    // Se også String.intern()
-    String dagsbeskrivelse = datoTilBeskrivelse.get(datoStr0);
-    if (dagsbeskrivelse == null) {
-      dagsbeskrivelse = ugedagformat.format(tid);
-      String år = årformat.format(tid);
-      if (datoStr0.equals(iDagDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_dag);
-      else if (datoStr0.equals(iMorgenDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_morgen)+" - " + dagsbeskrivelse;
-      else if (datoStr0.equals(iOvermorgenDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_overmorgen) + " - " + dagsbeskrivelse;
-      else if (datoStr0.equals(iGårDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_går); // "I GÅR - "+dagsbeskrivelse;
-      else if (datoStr0.equals(iForgårsDatoStr)) dagsbeskrivelse = App.res.getString(R.string.i_forgårs)+" - " + dagsbeskrivelse;
-      else if (år.equals(iÅrDatoStr)) dagsbeskrivelse = dagsbeskrivelse;
-      else dagsbeskrivelse = dagsbeskrivelse + " " + år;
-      dagsbeskrivelse = dagsbeskrivelse.toUpperCase();
-      datoTilBeskrivelse.put(datoStr0, dagsbeskrivelse);
-    }
-    return dagsbeskrivelse;
   }
 
   /**
@@ -225,7 +168,7 @@ public class Backend {
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
     u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.BroadcastStartTime.name()));
-    u.startTidKl = klokkenformat.format(u.startTid);
+    u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
     u.slutTid = new Date(u.startTid.getTime() + o.getInt(DRJson.DurationInSeconds.name()) * 1000);
 
     if (!App.PRODUKTION && (!o.has(DRJson.Playable.name()) || !o.has(DRJson.Playable.name())))
@@ -261,7 +204,7 @@ public class Backend {
       u.kunstner = o.optString(DRJson.Artist.name());
       u.billedeUrl = o.optString(DRJson.Image.name(), null);
       u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformatPlayliste(o.getString(DRJson.Played.name()));
-      u.startTidKl = klokkenformat.format(u.startTid);
+      u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       if (App.TJEK_ANTAGELSER) ; // TODO fjern OffsetMs hvis det nye navn vitterligt ER OffsetInMs
       u.offsetMs = o.optInt(DRJson.OffsetMs.name(), o.optInt(DRJson.OffsetInMs.name(), -1));
       liste.add(u);

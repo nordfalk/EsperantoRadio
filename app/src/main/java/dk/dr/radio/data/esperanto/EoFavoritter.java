@@ -6,7 +6,7 @@ import java.util.Date;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.dr_v3.Backend;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -20,7 +20,7 @@ public class EoFavoritter extends Favoritter {
     if (ps==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {
-      Date ekde = Backend.apiDatoFormat.parse(dato);
+      Date ekde = Datoformater.apiDatoFormat.parse(dato);
       for (Udsendelse u : ps.getUdsendelser()) {
         if (u.startTid.after(ekde)) antal++;
       }

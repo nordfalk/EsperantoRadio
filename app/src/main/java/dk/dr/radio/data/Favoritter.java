@@ -67,7 +67,7 @@ public class Favoritter {
         iMorgen -= 24 * 60 * 60 * 1000 * 7;
       }
       */
-      favoritTilStartdato.put(programserieSlug, Backend.apiDatoFormat.format(new Date(iMorgen)));
+      favoritTilStartdato.put(programserieSlug, Datoformater.apiDatoFormat.format(new Date(iMorgen)));
       favoritTilAntalDagsdato.put(programserieSlug, 0);
     } else {
       favoritTilStartdato.remove(programserieSlug);

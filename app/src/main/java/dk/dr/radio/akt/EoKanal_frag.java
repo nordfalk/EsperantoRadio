@@ -36,8 +36,8 @@ import java.util.Date;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.esperanto.EoRssParsado;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
@@ -226,7 +226,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
           nyListe.add(u.dagsbeskrivelse);
           // Overskriften I DAG skal ikke 'blive hængende' øverst,
           // det løses ved at tilføje en tom overskrift lige under den
-          if (u.dagsbeskrivelse == Backend.I_DAG) nyListe.add("");
+          if (u.dagsbeskrivelse == Datoformater.I_DAG) nyListe.add("");
         }
         nyListe.add(u);
         EoGeoblokaDetektilo.esploruĈuEstasBlokata(u);

@@ -23,6 +23,7 @@ import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -81,7 +82,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     // Da ViewPager er indlejret i et fragment skal adapteren virke på den indlejrede (child)
     // fragmentmanageren - ikke på aktivitens (getFragmentManager)
     adapter = new UdsendelserAdapter(getChildFragmentManager());
-    Backend.opdateriDagIMorgenIGårDatoStr(App.serverCurrentTimeMillis());
+    Datoformater.opdateriDagIMorgenIGårDatoStr(App.serverCurrentTimeMillis());
 
     udsendelser = new ArrayList<Udsendelse>();
     udsendelser.add(startudsendelse);
@@ -263,10 +264,10 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
         return getString(R.string.i_dag);
       }
       if (u.startTidKl.equals("REKTA")) return u.startTidKl;
-      String dato = Backend.datoformat.format(u.startTid);
-      if (dato.equals(Backend.iDagDatoStr)) dato = getString(R.string.i_dag);
-      else if (dato.equals(Backend.iMorgenDatoStr)) dato = getString(R.string.i_morgen);
-      else if (dato.equals(Backend.iGårDatoStr)) dato = getString(R.string.i_går);
+      String dato = Datoformater.datoformat.format(u.startTid);
+      if (dato.equals(Datoformater.iDagDatoStr)) dato = getString(R.string.i_dag);
+      else if (dato.equals(Datoformater.iMorgenDatoStr)) dato = getString(R.string.i_morgen);
+      else if (dato.equals(Datoformater.iGårDatoStr)) dato = getString(R.string.i_går);
       return dato;
       //return DRJson.datoformat.format(u.startTid);
       //return ""+u.episodeIProgramserie+" "+u.slug;

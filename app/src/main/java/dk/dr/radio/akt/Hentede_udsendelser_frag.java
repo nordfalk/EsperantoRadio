@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.HentedeUdsendelser;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -141,14 +141,14 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
         aq.id(R.id.startStopKnap).visible().image(R.drawable.dri_radio_spil_graa40);
         aq.id(R.id.progressBar).gone();
         aq.id(R.id.linje1).text(udsendelse.titel).textColor(App.color.grå40);
-        aq.id(R.id.linje2).text(Backend.datoformat.format(udsendelse.startTid) + " - Ikke hentet");
+        aq.id(R.id.linje2).text(Datoformater.datoformat.format(udsendelse.startTid) + " - Ikke hentet");
         return v;
       }
 
       aq.id(R.id.linje1).text(udsendelse.titel)
               .textColor(hs.status == DownloadManager.STATUS_SUCCESSFUL ? Color.BLACK : App.color.grå60);
 
-      aq.id(R.id.linje2).text(Backend.datoformat.format(udsendelse.startTid).toUpperCase() + " - " + hs.statustekst.toUpperCase());
+      aq.id(R.id.linje2).text(Datoformater.datoformat.format(udsendelse.startTid).toUpperCase() + " - " + hs.statustekst.toUpperCase());
 
       if (hs.status == DownloadManager.STATUS_SUCCESSFUL) {
         aq.id(R.id.progressBar).gone();

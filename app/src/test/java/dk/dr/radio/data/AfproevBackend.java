@@ -153,7 +153,7 @@ public class AfproevBackend {
       if (Kanal.P4kode.equals(kanal.kode)) continue;
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
-      String datoStr = Backend.apiDatoFormat.format(new Date());
+      String datoStr = Datoformater.apiDatoFormat.format(new Date());
       kanal.setUdsendelserForDag(Backend.parseUdsendelserForKanal(new JSONArray(
               hentStreng(Backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr))), kanal, new Date(), App.data), "0");
       int antalUdsendelser = 0;

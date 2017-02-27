@@ -29,6 +29,7 @@ import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -283,7 +284,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           // Vis hvilke udsendelser der kan hentes
           vh.titel.setTextColor(u.kanHentes ? Color.BLACK : App.color.grå60);
         }
-        vh.dato.setText(Backend.datoformat.format(u.startTid));
+        vh.dato.setText(Datoformater.datoformat.format(u.startTid));
         //Log.d("DRJson.datoformat.format(u.startTid)=" + DRJson.datoformat.format(u.startTid));
 
         //String txt = u.getKanal().navn + ", " + ((u.slutTid.getTime() - u.startTid.getTime())/1000/60 + " MIN");

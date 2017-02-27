@@ -42,6 +42,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -162,7 +163,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
 
   private void hentSendeplanForDag(final Date dato) {
-    final String datoStr = Backend.apiDatoFormat.format(dato);
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
     if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
       opdaterListe();
     }
@@ -325,7 +326,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           nyListe.add(u.dagsbeskrivelse);
           // Overskriften I DAG skal ikke 'blive hængende' øverst,
           // det løses ved at tilføje en tom overskrift lige under den
-          if (u.dagsbeskrivelse == Backend.I_DAG) nyListe.add("");
+          if (u.dagsbeskrivelse == Datoformater.I_DAG) nyListe.add("");
         }
         nyListe.add(u);
       }

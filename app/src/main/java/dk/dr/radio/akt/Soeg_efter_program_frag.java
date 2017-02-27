@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -181,7 +181,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
           aq.id(R.id.linje2).text("Indsnævr din søgning").typeface(App.skrift_gibson);
         } else {
           Udsendelse udsendelse = (Udsendelse) obj;
-          aq.id(R.id.linje1).text(Backend.datoformat.format(udsendelse.startTid)).typeface(App.skrift_gibson);
+          aq.id(R.id.linje1).text(Datoformater.datoformat.format(udsendelse.startTid)).typeface(App.skrift_gibson);
           aq.id(R.id.linje2).text(udsendelse.titel).typeface(App.skrift_gibson);
         }
         v.setBackgroundResource(0);

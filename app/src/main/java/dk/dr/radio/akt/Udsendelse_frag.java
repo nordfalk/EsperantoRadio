@@ -53,6 +53,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -176,7 +177,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     listView = aq.id(R.id.listView).adapter(adapter).getListView();
     listView.setEmptyView(aq.id(R.id.tom).typeface(App.skrift_gibson).getView());
     listView.setOnItemClickListener(this);
-    listView.setContentDescription(udsendelse.titel + " - " + (udsendelse.startTid == null ? "" : Backend.datoformat.format(udsendelse.startTid)));
+    listView.setContentDescription(udsendelse.titel + " - " + (udsendelse.startTid == null ? "" : Datoformater.datoformat.format(udsendelse.startTid)));
     App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
     hentStreams.run();
 
@@ -254,7 +255,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(udsendelse.titel)
         .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
     aq.id(R.id.starttid).typeface(App.skrift_gibson)
-        .text(udsendelse.startTid == null ? "" : Backend.datoformat.format(udsendelse.startTid))
+        .text(udsendelse.startTid == null ? "" : Datoformater.datoformat.format(udsendelse.startTid))
         .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);

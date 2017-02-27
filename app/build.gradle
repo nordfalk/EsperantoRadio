@@ -35,7 +35,7 @@ android {
         applicationId "dk.nordfalk.esperanto.radio"
         minSdkVersion 10 // eble fakte 7 ??
         targetSdkVersion 21
-        versionCode 36
+        versionCode 37
         versionName '2.0.8'
     }
     buildTypes {

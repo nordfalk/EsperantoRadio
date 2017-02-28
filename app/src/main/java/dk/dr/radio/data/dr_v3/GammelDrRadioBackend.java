@@ -168,7 +168,8 @@ public class GammelDrRadioBackend extends Backend {
     return uliste;
   }
 
-  private Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
+  @Override
+  public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
     Udsendelse u = opretUdsendelse(programdata, o);
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
@@ -182,10 +183,6 @@ public class GammelDrRadioBackend extends Backend {
     u.kanHentes = o.optBoolean(DRJson.Downloadable.name());
     u.berigtigelseTitel = o.optString(DRJson.RectificationTitle.name(), null);
     u.berigtigelseTekst = o.optString(DRJson.RectificationText.name(), null);
-    if (!App.PRODUKTION && false) {
-      u.berigtigelseTitel = "BEKLAGER";
-      u.berigtigelseTekst = "Denne udsendelse er desværre ikke tilgængelig. For yderligere oplysninger se dr.dk/programetik";
-    }
 
     return u;
   }

@@ -40,7 +40,7 @@ public class Backend {
     return null;
   }
 
-  public Udsendelse parseUdsendelse(Object o, Programdata data, JSONObject udsendelseJson) {
+  public Udsendelse parseUdsendelse(Kanal kanal, Programdata data, JSONObject udsendelseJson) throws JSONException {
     ikkeImplementeret();
     return null;
   }

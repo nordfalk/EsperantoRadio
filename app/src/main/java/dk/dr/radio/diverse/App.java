@@ -126,7 +126,7 @@ public class App {
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
   private static boolean erInstalleretPåSDKort;
-  public static Backend backend = new GammelDrRadioBackend();
+  public static GammelDrRadioBackend backend = new GammelDrRadioBackend();
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;

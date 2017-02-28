@@ -282,36 +282,6 @@ public class Grunddata {
     return ioEstisSxargxita;
   }
 
-  private static Bitmap kreuBitmapTiomAlta(String dosiero, int alteco) {
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inScaled = false;
-    options.inDither = false;
-    options.inJustDecodeBounds = true;
-    BitmapFactory.decodeFile(dosiero, options);
-    int desiredH = alteco;
-    int srcWidth = options.outWidth;
-    int srcHeight = options.outHeight;
-    // Only scale if the source is big enough. This code is just trying to fit a image into a certain width.
-    if (desiredH > srcHeight) {
-      desiredH = srcHeight;
-    }
-    // Calculate the correct inSampleSize/scale value. This helps reduce memory use. It should be a power of 2
-    // from: http://stackoverflow.com/questions/477572/android-strange-out-of-memory-issue/823966#823966
-    int inSampleSize = 1;
-    while (srcHeight / 2 > desiredH) {
-      srcHeight /= 2;
-      srcHeight /= 2;
-      inSampleSize *= 2;
-    }
-    //float desiredScale = (float) desiredH / srcHeight;
-    options.inJustDecodeBounds = false;
-    options.inDither = false;
-    options.inSampleSize = inSampleSize;
-    options.inScaled = false;
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-    Bitmap res = BitmapFactory.decodeFile(dosiero, options);
-    return res;
-  }
 
   public void rezumo() {
     for (Kanal k : this.kanaler) {
@@ -388,7 +358,6 @@ public class Grunddata {
     }
     Log.d("parseKanaler " + kanaler + " - P4:" + p4koder);
     if (forvalgtKanal == null) forvalgtKanal = kanaler.get(2); // Det er nok P3 :-)
-    if (App.ÆGTE_DR) for (Runnable r : new ArrayList<Runnable>(observatører)) r.run();  // EO ŝanĝo
   }
 
 

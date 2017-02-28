@@ -60,6 +60,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -231,13 +232,8 @@ public class App {
         grunddata.parseFællesGrunddata(grunddataStr);
 
         File fil = new File(FilCache.findLokaltFilnavn(grunddata.radioTxtUrl));
-        if (fil.exists()) {
-          String radioTxtStr = Diverse.læsStreng(new FileInputStream(fil));
-          grunddata.leguRadioTxt(radioTxtStr);
-        } else {
-          String radioTxtStr = Diverse.læsStreng(res.openRawResource(R.raw.radio));
-          grunddata.leguRadioTxt(radioTxtStr);
-        }
+        InputStream is = fil.exists() ? new FileInputStream(fil) : res.openRawResource(R.raw.radio);
+        grunddata.leguRadioTxt(Diverse.læsStreng(is));
 
         new Thread() {
           @Override
@@ -447,6 +443,7 @@ public class App {
             grunddata.eo_parseFællesGrunddata(nyeGrunddata);
           }
           grunddata.parseFællesGrunddata(nyeGrunddata);
+          if (App.ÆGTE_DR) for (Runnable r : new ArrayList<Runnable>(grunddata.observatører)) r.run();
           String pn = pakkenavn;
           for (final Kanal k : grunddata.kanaler) {
             k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);

@@ -35,6 +35,8 @@ import static org.junit.Assert.assertTrue;
 @Config(constants = BuildConfig.class, sdk = 21, application = AfproevBackend.TestApp.class)
 public class AfproevBackend {
 
+  //Branch test
+
   static String hentStreng(String url) throws IOException {
     //String data = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(url, false, true, 1000 * 60 * 60 * 24 * 7)));
     url = url.replaceAll("Ø", "%C3%98");

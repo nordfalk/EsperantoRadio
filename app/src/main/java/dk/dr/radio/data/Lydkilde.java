@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -105,8 +104,6 @@ public abstract class Lydkilde implements Serializable {
     return kandidater;
   }
 
-  public abstract String getStreamsUrl();
-
   public abstract Kanal getKanal();
 
   public abstract boolean erDirekte();
@@ -115,12 +112,8 @@ public abstract class Lydkilde implements Serializable {
 
   public abstract String getNavn();
 
-  public void setStreams(JSONObject o) throws JSONException {
-    streams = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
-  }
-
-  public void setStreams(String json) throws JSONException {
-    setStreams(new JSONObject(json));
+  public void setStreams(ArrayList<Lydstream> str) {
+    streams = str;
   }
 
   public boolean harStreams() {

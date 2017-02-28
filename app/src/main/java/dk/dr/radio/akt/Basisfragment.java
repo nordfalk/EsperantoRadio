@@ -16,7 +16,6 @@ import java.net.URLEncoder;
 
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -243,7 +242,6 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
 
   /**
    * Billedeskalering til LastFM og discogs til playlister.
-   * @see Backend#parsePlayliste(org.json.JSONArray)
    * Image: "http://api.discogs.com/image/A-4970-1339439274-8053.jpeg",
    * ScaledImage: "http://asset.dr.dk/discoImages/?discoserver=api.discogs.com&file=%2fimage%2fA-4970-1339439274-8053.jpeg&h=400&w=400&scaleafter=crop&quality=85",
    */

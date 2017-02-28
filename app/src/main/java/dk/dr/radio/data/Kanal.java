@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -72,12 +71,6 @@ public class Kanal extends Lydkilde {
     udsendelserPerDag.put(dato, uliste);
     udsendelser.clear();
     for (ArrayList<Udsendelse> ul : udsendelserPerDag.values()) udsendelser.addAll(ul);
-  }
-
-
-  @Override
-  public String getStreamsUrl() {
-    return App.backend.getKanalStreamsUrlFraSlug(slug);
   }
 
 

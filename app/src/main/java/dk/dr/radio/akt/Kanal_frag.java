@@ -36,7 +36,6 @@ import java.util.List;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
@@ -264,12 +263,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(kanal.getStreamsUrl(), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(kanal), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
           JSONObject o = new JSONObject(json);
-          kanal.setStreams(o);
+          ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+          kanal.setStreams(s);
           Log.d("hentStreams Kanal_frag fraCache=" + fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
@@ -572,8 +572,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         // Fix: Senest spillet blev ikke opdateret.
         if (u2.playliste != null && uændret) return; // så har vi allerede den nyeste liste i MEM
         if (json != null && !"null".equals(json)) {
-          u2.playliste = App.backend.parsePlayliste(new JSONArray(json));
-          if (App.grunddata.serverapi_ret_forkerte_offsets_i_playliste) App.backend.retForkerteOffsetsIPlayliste(u2);
+          u2.playliste = App.backend.parsePlayliste(u2, new JSONArray(json));
         }
         if (aktuelUdsendelseViewholder == null) return;
         opdaterSenestSpilletViews(aq2, u2);

@@ -55,6 +55,8 @@ import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
 import com.crashlytics.android.Crashlytics;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,10 +69,13 @@ import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
 import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
+import dk.dr.radio.data.Backend;
+import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.dr_v3.Backend;
+import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
@@ -109,7 +114,7 @@ public class App {
   public static final String P4_FORETRUKKEN_AF_BRUGER = "P4_FORETRUKKEN_AF_BRUGER";
   private static final String DRAMA_OG_BOG__A_Å_INDLÆST = "DRAMA_OG_BOG__A_Å_INDLÆST";
   public static final String FORETRUKKEN_KANAL = "FORETRUKKEN_kanal";
-  public static final String NØGLE_advaretOmInstalleretPåSDKort = "erInstalleretPåSDKort";
+  private static final String NØGLE_advaretOmInstalleretPåSDKort = "erInstalleretPåSDKort";
   public static SharedPreferences prefs;
   public static boolean fejlsøgning = false;
   public static Handler forgrundstråd;
@@ -120,8 +125,8 @@ public class App {
   public static Netvaerksstatus netværk;
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
-  public static boolean erInstalleretPåSDKort;
-  public static Backend backend = new Backend();
+  private static boolean erInstalleretPåSDKort;
+  public static Backend backend = new GammelDrRadioBackend();
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
@@ -274,11 +279,12 @@ public class App {
 
       if (!aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
-        Request<?> req = new DrVolleyStringRequest(aktuelKanal.getStreamsUrl(), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return; // ingen grund til at parse det igen
-            kanal.setStreams(json);
+            ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(json).getJSONArray(DRJson.Streams.name()));
+            kanal.setStreams(s);
             Log.d("hentStreams akt fraCache=" + fraCache + " => " + kanal);
           }
         }) {
@@ -360,7 +366,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          String url = kanal.getStreamsUrl();
+          String url = App.backend.getStreamsUrl(kanal);
           if (url==null) { // EO ŝanĝo
             Log.rapporterFejl(new IllegalStateException("url er null for "+kanal));
             continue;
@@ -370,7 +376,8 @@ public class App {
             @Override
             public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
               if (uændret) return;
-              kanal.setStreams(json);
+              ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(json).getJSONArray(DRJson.Streams.name()));
+              kanal.setStreams(s);
               Log.d("hentStreams app fraCache=" + fraCache + " => " + kanal);
             }
           }) {

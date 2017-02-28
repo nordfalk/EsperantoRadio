@@ -20,11 +20,6 @@ public class AlarmLydkilde extends Lydkilde {
   }
 
   @Override
-  public String getStreamsUrl() {
-    return null;
-  }
-
-  @Override
   public Kanal getKanal() {
     return orgLydkilde.getKanal();
   }

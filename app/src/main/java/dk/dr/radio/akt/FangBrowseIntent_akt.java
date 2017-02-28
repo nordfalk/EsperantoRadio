@@ -12,7 +12,9 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
-import dk.dr.radio.data.dr_v3.Backend;
+import java.util.ArrayList;
+
+import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
@@ -112,7 +114,8 @@ public class FangBrowseIntent_akt extends Activity {
           if (json != null && !"null".equals(json)) {
             JSONObject o = new JSONObject(json);
             Udsendelse udsendelse2 = App.backend.parseUdsendelse(null, App.data, o);
-            udsendelse2.setStreams(o);
+            ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+            udsendelse2.setStreams(s);
             udsendelse2.indslag = App.backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
             udsendelse2.produktionsnummer = o.optString(DRJson.ProductionNumber.name());
             udsendelse2.shareLink = o.optString(DRJson.ShareLink.name());

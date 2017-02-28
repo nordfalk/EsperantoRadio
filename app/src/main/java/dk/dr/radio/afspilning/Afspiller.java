@@ -40,12 +40,15 @@ import android.telephony.TelephonyManager;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import dk.dr.radio.afspilning.wrapper.MediaPlayerLytter;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerWrapper;
 import dk.dr.radio.afspilning.wrapper.Wrapperfabrikering;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
@@ -143,12 +146,22 @@ public class Afspiller {
       return;
     }
     if (!lydkilde.harStreams()) {
-      Request<?> req = new DrVolleyStringRequest(lydkilde.getStreamsUrl(), new DrVolleyResonseListener() {
+      String url = null;
+      if (lydkilde instanceof Kanal) {
+        url = App.backend.getStreamsUrl((Kanal) lydkilde);
+      } else if (lydkilde instanceof Kanal) {
+        url = App.backend.getStreamsUrl((Udsendelse) lydkilde);
+      } else {
+        Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
+        return;
+      }
+      Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
-          lydkilde.setStreams(json);
+          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(json).getJSONArray(DRJson.Streams.name()));
+          lydkilde.setStreams(s);
           Log.d("hentStreams afsp fraCache=" + fraCache + " => " + lydkilde);
           if (onErrorTæller++>2) {
             App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);

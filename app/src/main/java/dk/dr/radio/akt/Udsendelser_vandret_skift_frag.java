@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;

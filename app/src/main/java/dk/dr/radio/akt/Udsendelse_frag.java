@@ -45,7 +45,6 @@ import java.util.List;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Indslaglisteelement;
@@ -84,17 +83,18 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        Request<?> req = new DrVolleyStringRequest(udsendelse.getStreamsUrl(), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(udsendelse), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return;
             Log.d("hentStreams fikSvar(" + fraCache + " " + url);
             if (json != null && !"null".equals(json)) {
               JSONObject o = new JSONObject(json);
-              udsendelse.setStreams(o);
+              ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+              udsendelse.setStreams(s);
               udsendelse.indslag = App.backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
               if (!udsendelse.harStreams()) {
-                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + udsendelse.getStreamsUrl());
+                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getStreamsUrl(udsendelse));
                 streamsVarTom.put(udsendelse, System.currentTimeMillis());
                 //App.volleyRequestQueue.getCache().remove(url);
                 App.forgrundstråd.postDelayed(hentStreams, 5000);
@@ -386,7 +386,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           if (udsendelse.playliste != null && uændret) return;
           if (json == null || "null".equals(json)) return; // fejl
           Log.d("UDS fikSvar playliste(" + fraCache + uændret + " " + url);
-          ArrayList<Playlisteelement> playliste = App.backend.parsePlayliste(new JSONArray(json));
+          ArrayList<Playlisteelement> playliste = App.backend.parsePlayliste(udsendelse, new JSONArray(json));
           if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
             // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
             // selvom serveren har ombestemt sig, og siger at listen er tom.
@@ -395,7 +395,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
             return;
           }
           udsendelse.playliste = playliste;
-          if (App.grunddata.serverapi_ret_forkerte_offsets_i_playliste) App.backend.retForkerteOffsetsIPlayliste(udsendelse);
 //          Log.d("UDS fikSvar playliste: " + json);
           if (!aktuelUdsendelsePåKanalen()) { // Aktuel udsendelse skal have senest spillet nummer øverst
             Collections.reverse(udsendelse.playliste); // andre udsendelser skal have stigende tid nedad

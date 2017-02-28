@@ -1,12 +1,10 @@
 package dk.dr.radio.data;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import dk.dr.radio.data.dr_v3.Backend;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -70,14 +68,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   @Override
   public String toString() {
     return slug + "/" + episodeIProgramserie;//startTid + "/" + slutTid;
-  }
-
-
-  @Override
-  public String getStreamsUrl() {
-    if (!App.ÆGTE_DR) Log.rapporterFejl(new IllegalStateException("Eo getStreamsUrl ne devus okazi "+this));
-    Log.d("getStreamsUrl "+this);
-    return App.backend.getUdsendelseStreamsUrl(this);
   }
 
 
@@ -155,8 +145,9 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   }
 
   @Override
-  public void setStreams(JSONObject o) throws JSONException {
-    super.setStreams(o);
+  public void setStreams(ArrayList<Lydstream> str) {
+    super.setStreams(str);
+    /*
     if (!App.PRODUKTION) {
       boolean kanHøresNy = findBedsteStreams(false).size() > 0;
       boolean kanHentesNy = findBedsteStreams(true).size() > 0;
@@ -164,7 +155,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
         Log.d("API løj om kanHentes for " + o.optString(DRJson.Slug.name())+": "+kanHentes +"->" +kanHentesNy);
       if (kanHøres && !kanHøresNy)
         Log.d("API løj om kanHøres for " + o.optString(DRJson.Slug.name())+": "+kanHøres +"->" +kanHøresNy);
-    }
+    }*/
     kanHøres = findBedsteStreams(false).size() > 0;
     kanHentes = findBedsteStreams(true).size() > 0;
   }

@@ -1,11 +1,12 @@
 package dk.dr.radio.data.esperanto;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.diverse.Log;
 
 /**
  * Created by j on 03-10-15.
@@ -29,19 +30,12 @@ public class EoKanal extends Kanal {
     return eo_rektaElsendo!=null;
   }
 
-  @Override
   public String getStreamsUrl() {
     return eo_elsendojRssUrl;
   }
 
   @Override
-  public void setStreams(JSONObject o) throws JSONException {
+  public void setStreams(ArrayList<Lydstream> str)  {
     throw new IllegalArgumentException("Ne rajtas voki, la rezulto ne estas JSON");
-  }
-
-  @Override
-  public void setStreams(String json) throws JSONException {
-    Log.d("eo RSS QQ por " + this + " =" + json);
-    EoRssParsado.ŝarĝiElsendojnDeRssUrl(json, this);
   }
 }

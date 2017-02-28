@@ -137,7 +137,7 @@ public class App {
 
   @SuppressLint("NewApi")
   public App(Application ctx) {
-    if (instans != null) throw new IllegalStateException("Klassen må kun instantieres én gang");
+    if (instans != null && !IKKE_Android_VM) throw new IllegalStateException("Klassen må kun instantieres én gang");
     instans = this;
     TIDSSTEMPEL_VED_OPSTART = System.currentTimeMillis();
 
@@ -159,14 +159,13 @@ public class App {
     res.updateConfiguration(App.sprogKonfig, null);
 
 
-    netværk = new Netvaerksstatus();
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
       Fabric.with(ctx, new Crashlytics());
       Log.d("Crashlytics startet");
     }
 
-    App.color = new DRFarver();
+    if (!IKKE_Android_VM) App.color = new DRFarver();
 
     // HTTP-forbindelser havde en fejl præ froyo, men jeg har også set problemet på Xperia Play, der er 2.3.4 (!)
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -299,6 +298,7 @@ public class App {
       afspiller.setLydkilde(aktuelKanal);
 
 
+      netværk = new Netvaerksstatus();
       ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
       netværk.onReceive(ctx, null); // Få opdateret netværksstatus
       fjernbetjening = new Fjernbetjening();
@@ -691,11 +691,6 @@ public class App {
       App.serverkorrektionTilKlienttidMs = serverkorrektionTilKlienttidMs2;
       new Exception("SERVERTID korrigeret med " + serverkorrektionTilKlienttidMs2 / 1000 / 60 + " min til " + new Date(servertid)).printStackTrace();
     }
-  }
-
-  /** Kan kaldet til at afgøre om vi er igang med at teste noget fra en main()-metode eller app'en rent faktisk kører */
-  public static boolean testFraMain() {
-    return instans == null;
   }
 
   /**

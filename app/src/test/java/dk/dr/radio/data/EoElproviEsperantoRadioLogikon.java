@@ -2,35 +2,49 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dk.dr.radio.data.afproevning;
+package dk.dr.radio.data;
+
+import android.app.Application;
+import android.os.Build;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 
 import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.dr_v3.DRBackendTidsformater;
 import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.data.esperanto.EoRssParsado;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
+import dk.dr.radio.v3.BuildConfig;
 
 /**
  *
  * @author j
  */
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21, application = EoElproviEsperantoRadioLogikon.EoTestApp.class)
 public class EoElproviEsperantoRadioLogikon {
-  public static final int ĉefdatumojID = 8;
-  private static final String ŜLOSILO_ĈEFDATUMOJ = "esperantoradio_kanaloj_v" + ĉefdatumojID;
-  private static final String kanalojUrl = "http://javabog.dk/privat/" + ŜLOSILO_ĈEFDATUMOJ + ".json";
-  private static final String ŜLOSILO_ELSENDOJ = "elsendoj";
-  /**
-   * @param args the command line arguments
-   */
-  public static void main(String[] args) throws Exception {
+  public static class EoTestApp extends Application {
+    static {
+      App.IKKE_Android_VM = true;
+    }
+  }
 
+  @Test
+  public void testLogik() throws Exception {
+    App.IKKE_Android_VM = true;
     System.out.println(  new File(".").getAbsolutePath() );
     System.out.println(  EoDiverse.unescapeHtml3("&#8217;") );
     System.out.println(EoDiverse.unescapeHtml3("Nikolin&#8217; dum la intervjuo."));
@@ -39,23 +53,17 @@ public class EoElproviEsperantoRadioLogikon {
     App.data = new Programdata();
 
     FilCache.init(new File("datumoj"));
-    //String grunddata = Kasxejo.hentUrlSomStreng(kanalojUrl);
-    String grunddata = Diverse.læsStreng(new FileInputStream(
-        "src/esperanto/res/raw/esperantoradio_kanaloj_v" + ĉefdatumojID + ".json"));
+    String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw-eo/esperantoradio_kanaloj_v8.json"));
     System.out.println("===================================================================1");
-    System.out.println("===================================================================");
     Grunddata ĉefdatumoj2 = App.grunddata = new Grunddata();
     System.out.println("===================================================================2");
-    System.out.println("===================================================================");
     ĉefdatumoj2.eo_parseFællesGrunddata(grunddata);
     App.grunddata.parseFællesGrunddata(grunddata);
 
     System.out.println("===================================================================3");
-    System.out.println("===================================================================");
     String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(ĉefdatumoj2.radioTxtUrl, true)));
     ĉefdatumoj2.leguRadioTxt(radioTxtStr);
     System.out.println("===================================================================3");
-    System.out.println("===================================================================");
     ŝarĝiElsendojnDeRss(ĉefdatumoj2, false);
     //ĉefdatumoj2.ŝarĝiElsendojnDeRssUrl("http://radioverda.squarespace.com/storage/audio/radioverda.xml",
     //ĉefdatumoj2.ŝarĝiElsendojnDeRssUrl("http://radioverda.squarespace.com/programoj/rss.xml",

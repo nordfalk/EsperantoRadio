@@ -48,6 +48,7 @@ android {
             applicationIdSuffix 'beta'
         }
     }
+    /*
     productFlavors {
         din_variant {
             applicationId "dk.dit.efternavn.radio"
@@ -56,6 +57,7 @@ android {
             applicationId "dk.nordfalk.esperanto.radio"
         }
     }
+    */
 }
 
 dependencies {

@@ -36,7 +36,7 @@ public class Programdata {
 
   // scp /home/j/android/dr-radio-android/DRRadiov3/res/raw/grunddata_udvikling.json j:../lundogbendsen/hjemmeside/drradiov3_grunddata.json
 
-  public static final String GRUNDDATA_URL = App.instans==null? "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json" :
+  public static final String GRUNDDATA_URL = App.IKKE_Android_VM? "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json" :
           App.PRODUKTION
       ? App.res.getString(R.string.GRUNDDATA_URL_PRODUKTION)
       : App.res.getString(R.string.GRUNDDATA_URL_UDVIKLING);

@@ -2,7 +2,7 @@
 	// ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per
 	// http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'
 	//
-	// scp /home/j/android/esperanto/esperanto-telefono/EoRadio/app/src/esperanto/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/
+	// scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/
 
 
 	"intervals": {

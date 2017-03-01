@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import dk.dr.radio.data.Grunddata;
+import dk.dr.radio.data.EoGrunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.Log;
@@ -71,7 +71,7 @@ public class EoRssParsado {
         e.startTidKl = p.nextText().replaceAll(":00$", "00");// "Thu, 01 Aug 2013 12:01:01 +02:00" -> ..." +0200"
         //Log.d("xxxxx "+e.datoStr);
         e.startTid = new Date(Date.parse(e.startTidKl));
-        e.startTidKl = Grunddata.datoformato.format(e.startTid);
+        e.startTidKl = EoGrunddata.datoformato.format(e.startTid);
         e.slug = k.slug+":"+e.startTidKl;
       } else if ("image".equals(tag)) {
         e.billedeUrl = p.nextText();
@@ -166,8 +166,8 @@ public class EoRssParsado {
         String txt = p.nextText();
         e.startTidKl = txt.split("T")[0];
         //Log.d("e.datoStr="+e.datoStr);
-        e.startTid = Grunddata.datoformato.parse(e.startTidKl);
-        e.startTidKl = Grunddata.datoformato.format(e.startTid);
+        e.startTid = EoGrunddata.datoformato.parse(e.startTidKl);
+        e.startTidKl = EoGrunddata.datoformato.format(e.startTid);
         e.slug = "vk:"+txt.split("\\+")[0];
       } else if ("link".equals(tag)) {
         String type = p.getAttributeValue(null, "type");
@@ -215,13 +215,13 @@ public class EoRssParsado {
         }
 
 
-        Grunddata.eoElsendoAlDaUdsendelse(e, k);
+        EoGrunddata.eoElsendoAlDaUdsendelse(e, k);
       }
       Log.d(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
     } catch (Exception ex) {
       Log.e("Eraro parsante " + k.kode, ex);
     }
-    Grunddata.eo_opdaterProgramserieFraKanal(k);
+    EoGrunddata.eo_opdaterProgramserieFraKanal(k);
   }
 
 }

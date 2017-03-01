@@ -132,8 +132,6 @@
     <string name="Udviklertilstand">Por la programisto</string>
     <string name="Vis_ekstra_muligheder_til_udvikling_og_fejlfinding">Montri ekstrajn eblecojn por elovuigado kaj trovi erarojn</string>
 
-    <string name="GRUNDDATA_URL_PRODUKTION">http://javabog.dk/privat/esperantoradio_kanaloj_v8.json</string>
-    <string name="GRUNDDATA_URL_UDVIKLING">http://javabog.dk/privat/esperantoradio_kanaloj_v8.json</string>
     <string name="HENTEDE_UDS_MAPPENAVN">EsperantoRadio</string>
     <string name="URL_TIL_DR_RADIO_BETAVERSION">http://javabog.dk/privat/EoRadio.apk</string>
     <string name="_LIVE">REKTA</string>

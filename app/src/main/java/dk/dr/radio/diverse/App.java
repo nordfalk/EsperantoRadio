@@ -58,9 +58,7 @@ import com.crashlytics.android.Crashlytics;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -70,11 +68,14 @@ import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
 import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
+import dk.dr.radio.data.Backend;
+import dk.dr.radio.data.EoGrunddata;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
+import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
@@ -125,7 +126,7 @@ public class App {
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
   private static boolean erInstalleretPåSDKort;
-  public static GammelDrRadioBackend backend = new GammelDrRadioBackend();
+  public static Backend backend;
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
@@ -134,10 +135,7 @@ public class App {
   private static long TIDSSTEMPEL_VED_OPSTART;
 
 
-  @SuppressLint("NewApi")
-  public App(Application ctx) {
-    if (instans != null && !IKKE_Android_VM) throw new IllegalStateException("Klassen må kun instantieres én gang");
-    instans = this;
+  public void init(Application ctx) {
     TIDSSTEMPEL_VED_OPSTART = System.currentTimeMillis();
 
     prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -152,8 +150,10 @@ public class App {
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
 
+    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
+
     sprogKonfig = new Configuration();
-    sprogKonfig.locale = new Locale( ÆGTE_DR ?  "da_DK" : "eo");
+    sprogKonfig.locale = new Locale(ÆGTE_DR ? "da_DK" : "eo");
     Locale.setDefault(sprogKonfig.locale);
     res.updateConfiguration(App.sprogKonfig, null);
 
@@ -163,8 +163,6 @@ public class App {
       Fabric.with(ctx, new Crashlytics());
       Log.d("Crashlytics startet");
     }
-
-    if (!IKKE_Android_VM) App.color = new DRFarver();
 
     // HTTP-forbindelser havde en fejl præ froyo, men jeg har også set problemet på Xperia Play, der er 2.3.4 (!)
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -182,8 +180,9 @@ public class App {
       if (EMULATOR) App.versionsnavn += " EMU";
       Log.d("App.versionsnavn=" + App.versionsnavn);
 
-      App.erInstalleretPåSDKort = 0!=(pi.applicationInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE);
-      if (!App.erInstalleretPåSDKort) prefs.edit().remove(NØGLE_advaretOmInstalleretPåSDKort).commit();
+      App.erInstalleretPåSDKort = 0 != (pi.applicationInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE);
+      if (!App.erInstalleretPåSDKort)
+        prefs.edit().remove(NØGLE_advaretOmInstalleretPåSDKort).commit();
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -209,56 +208,30 @@ public class App {
     volleyRequestQueue = new RequestQueue(volleyCache, network);
     volleyRequestQueue.start();
 
+
+    netværk = new Netvaerksstatus();
+    ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    netværk.onReceive(ctx, null); // Få opdateret netværksstatus
+
+    afspiller = new Afspiller();
+    fjernbetjening = new Fjernbetjening();
+  }
+
+  public void initData(Application ctx) {
     try {
       data = new Programdata();
-      grunddata = new Grunddata();
 
       // Indlæsning af grunddata/stamdata.
       // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
       // På et senere tidspunkt henter vi nye grunddata
       grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
-      String grunddataStr = grunddata_prefs.getString(Programdata.GRUNDDATA_URL, null);
+      String grunddataStr = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
 
       if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
-        grunddataStr = Diverse.læsStreng(res.openRawResource(R.raw.grunddata));
+        grunddataStr = Diverse.læsStreng(res.openRawResource(App.backend.getGrunddataRes()));
       }
-      if (App.ÆGTE_DR) {
-        grunddata.parseFællesGrunddata(grunddataStr);
-      } else {
-        grunddata.eo_parseFællesGrunddata(grunddataStr);
-        grunddata.ŝarĝiKanalEmblemojn(true);
-        grunddata.parseFællesGrunddata(grunddataStr);
-
-        File fil = new File(FilCache.findLokaltFilnavn(grunddata.radioTxtUrl));
-        InputStream is = fil.exists() ? new FileInputStream(fil) : res.openRawResource(R.raw.radio);
-        grunddata.leguRadioTxt(Diverse.læsStreng(is));
-
-        new Thread() {
-          @Override
-          public void run() {
-            try {
-              grunddata.ŝarĝiKanalEmblemojn(false);
-
-              final String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(grunddata.radioTxtUrl, false)));
-              forgrundstråd.post(new Runnable() {
-                @Override
-                public void run() {
-                  grunddata.leguRadioTxt(radioTxtStr);
-                  // Povas esti ke la listo de kanaloj ŝanĝiĝis, pro tio denove kontrolu ĉu reŝarĝi bildojn
-                  grunddata.ŝarĝiKanalEmblemojn(true);
-                  opdaterObservatører(grunddata.observatører);
-                }
-              });
-            } catch (Exception e) {
-              Log.e(e);
-            }
-          }
-        }.start();
-      }
-
-      for (final Kanal k : grunddata.kanaler) {
-        k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pakkenavn);
-      }
+      grunddata = App.backend.initGrunddata(grunddataStr, null);
+      if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
 
       String kanalkode = prefs.getString(FORETRUKKEN_KANAL, null);
       // Hvis brugeren foretrækker P4 er vi nødt til at finde underkanalen
@@ -288,37 +261,11 @@ public class App {
         App.volleyRequestQueue.add(req);
       }
 
-      afspiller = new Afspiller();
       afspiller.setLydkilde(aktuelKanal);
 
-
-      netværk = new Netvaerksstatus();
-      ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-      netværk.onReceive(ctx, null); // Få opdateret netværksstatus
-      fjernbetjening = new Fjernbetjening();
-
-      // udeståendeInitialisering kaldes når aktivitet bliver synlig første gang
-      // - muligvis aldrig hvis app'en kun betjenes via levende ikon
-
     } catch (Exception ex) {
-      // Burde der være popop-advarsel til bruger om intern fejl og rapporter til udvikler-dialog ?
       Log.rapporterFejl(ex);
     }
-
-    try { // DRs skrifttyper er ikke offentliggjort i SVN, derfor kan følgende fejle:
-      skrift_gibson = Typeface.createFromAsset(ctx.getAssets(), "Gibson-Regular.otf");
-      skrift_gibson_fed = Typeface.createFromAsset(ctx.getAssets(), "Gibson-SemiBold.otf");
-      skrift_georgia = Typeface.createFromAsset(ctx.getAssets(), "Georgia.ttf");
-    } catch (Exception e) {
-      if (ÆGTE_DR) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
-      skrift_gibson = Typeface.DEFAULT;
-      skrift_gibson_fed = Typeface.DEFAULT_BOLD;
-      skrift_georgia = Typeface.SERIF;
-    }
-    skrift_gibson_fed_span = new EgenTypefaceSpan("Gibson fed", App.skrift_gibson_fed);
-
-    if (!EMULATOR) AppOpdatering.tjekForNyAPK(ctx);
-    Log.d("onCreate tog " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
   }
 
   public static String tjekP4OgVælgUnderkanal(String kanalkode) {
@@ -427,18 +374,18 @@ public class App {
         return;
       sidstTjekket = System.currentTimeMillis();
       Log.d("hentEvtNyeGrunddata " + (sidstTjekket - App.TIDSSTEMPEL_VED_OPSTART));
-      Request<?> req = new DrVolleyStringRequest(Programdata.GRUNDDATA_URL, new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getGrunddataUrl(), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String nyeGrunddata, boolean fraCache, boolean uændret) throws Exception {
           if (uændret || fraCache) return; // ingen grund til at parse det igen
-          String gamleGrunddata = grunddata_prefs.getString(Programdata.GRUNDDATA_URL, null);
+          String gamleGrunddata = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
           if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
           Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
           if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
           if (!App.ÆGTE_DR) {
             grunddata.kanaler.clear(); // EO
             grunddata.p4koder.clear(); // EO
-            grunddata.eo_parseFællesGrunddata(nyeGrunddata);
+            ((EoGrunddata) grunddata).eo_parseFællesGrunddata(nyeGrunddata);
           }
           grunddata.parseFællesGrunddata(nyeGrunddata);
           if (App.ÆGTE_DR) for (Runnable r : new ArrayList<Runnable>(grunddata.observatører)) r.run();
@@ -446,11 +393,11 @@ public class App {
           for (final Kanal k : grunddata.kanaler) {
             k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);
           }
-          if (!App.ÆGTE_DR) grunddata.ŝarĝiKanalEmblemojn(true);
+          if (!App.ÆGTE_DR) ((EoGrunddata) grunddata).ŝarĝiKanalEmblemojn(true);
           // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
           opdaterObservatører(grunddata.observatører);
           // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
-          grunddata_prefs.edit().putString(Programdata.GRUNDDATA_URL, nyeGrunddata).commit();
+          grunddata_prefs.edit().putString(App.backend.getGrunddataUrl(), nyeGrunddata).commit();
         }
       }) {
         public Priority getPriority() {
@@ -463,15 +410,6 @@ public class App {
 
   /** Opdaterer alle observatører fra forgrundstråden, præcist én gang (selv ved gentagne kald) */
   public static void opdaterObservatører(ArrayList<Runnable> observatører) {
-    // xxx ne funcias
-    /*
-    Lydkilde lk = DRData.instans.afspiller.getLydkilde();
-    if (lk instanceof Kanal) {
-      lk = DRData.instans.grunddata.kanalFraSlug.get(lk.getKanal().slug);
-      DRData.instans.afspiller.setLydkilde(lk);
-    }
-    */
-
     // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
     for (Runnable r : new ArrayList<Runnable>(observatører)) {
       forgrundstråd.removeCallbacks(r);
@@ -487,6 +425,31 @@ public class App {
     return (networkInfo != null && networkInfo.isConnected());
   }
 
+
+  public void aktivitetOnCreate(Basisaktivitet ctx) {
+    ctx.getResources().updateConfiguration(App.sprogKonfig, null);
+
+    // Forgrundsinitialisering der skal ske før app'en bliver synlig første gang
+    // - muligvis aldrig hvis app'en kun betjenes via levende ikon, eller kun er aktiv i baggrunden
+
+    if (App.color!=null) return; // initialisering allerede sket
+    App.color = new DRFarver();
+
+    try { // DRs skrifttyper er ikke offentliggjort i SVN, derfor kan følgende fejle:
+      skrift_gibson = Typeface.createFromAsset(ctx.getAssets(), "Gibson-Regular.otf");
+      skrift_gibson_fed = Typeface.createFromAsset(ctx.getAssets(), "Gibson-SemiBold.otf");
+      skrift_georgia = Typeface.createFromAsset(ctx.getAssets(), "Georgia.ttf");
+    } catch (Exception e) {
+      if (ÆGTE_DR) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
+      skrift_gibson = Typeface.DEFAULT;
+      skrift_gibson_fed = Typeface.DEFAULT_BOLD;
+      skrift_georgia = Typeface.SERIF;
+    }
+    skrift_gibson_fed_span = new EgenTypefaceSpan("Gibson fed", App.skrift_gibson_fed);
+
+    if (!EMULATOR) AppOpdatering.tjekForNyAPK(ctx);
+    Log.d("onCreate tog " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
+  }
 
   public static Activity aktivitetIForgrunden = null;
   public static Activity senesteAktivitetIForgrunden = null;
@@ -528,7 +491,7 @@ public class App {
     }
   };
 
-  public void aktivitetStartet(Activity akt) {
+  public void aktivitetOnStart(Activity akt) {
     senesteAktivitetIForgrunden = aktivitetIForgrunden = akt;
     sætProgressbar.run();
     if (onlineinitialisering != null) {
@@ -542,7 +505,7 @@ public class App {
     forgrundstråd.postDelayed(synlighedsSporing, 50);
   }
 
-  public void aktivitetStoppet(Activity akt) {
+  public void aktivitetOnStop(Activity akt) {
     if (akt != aktivitetIForgrunden) return; // en anden aktivitet er allerede startet
     aktivitetIForgrunden = null;
     if (kørFørsteGangAppIkkeMereErSynlig != null) forgrundstråd.postDelayed(kørFørsteGangAppIkkeMereErSynlig, 1000);

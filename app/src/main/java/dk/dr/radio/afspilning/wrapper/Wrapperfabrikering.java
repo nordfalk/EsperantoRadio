@@ -12,8 +12,7 @@ public class Wrapperfabrikering {
 
 
   private static Class<? extends MediaPlayerWrapper> mediaPlayerWrapperKlasse = null;
-  enum Hvilken { GammelMediaPlayer, NyExoPlayer, NyEmaPlayer };
-  private static Hvilken hvilkenSidst;
+  enum Hvilken { GammelMediaPlayer, NyEmaPlayer };
 
   public static MediaPlayerWrapper opret() {
     if (mediaPlayerWrapperKlasse == null) {
@@ -21,9 +20,8 @@ public class Wrapperfabrikering {
       Hvilken hvilken = Hvilken.NyEmaPlayer;
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) hvilken = Hvilken.GammelMediaPlayer;
 
-      hvilkenSidst = hvilken;
-      if (App.prefs.getBoolean("tving_mediaplayer", App.grunddata.tving_mediaplayer)) hvilken = Hvilken.GammelMediaPlayer;
-      if (App.prefs.getBoolean("tving_emaplayer", App.grunddata.tving_emaplayer)) hvilken = Hvilken.NyEmaPlayer;
+      if (App.prefs.getBoolean("tving_mediaplayer", false)) hvilken = Hvilken.GammelMediaPlayer;
+      if (App.prefs.getBoolean("tving_emaplayer", false)) hvilken = Hvilken.NyEmaPlayer;
 
       if (hvilken==Hvilken.NyEmaPlayer) {
         mediaPlayerWrapperKlasse = EmaPlayerWrapper.class;

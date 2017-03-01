@@ -148,14 +148,14 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
   protected void onStart() {
     super.onStart();
     if (App.fejlsøgning) Log.d(this + " onStart()");
-    App.instans.aktivitetStartet(this);
+    App.instans.aktivitetOnStart(this);
   }
 
   @Override
   protected void onStop() {
     super.onStop();
     if (App.fejlsøgning) Log.d(this + " onStop()");
-    App.instans.aktivitetStoppet(this);
+    App.instans.aktivitetOnStop(this);
   }
 
   @Override

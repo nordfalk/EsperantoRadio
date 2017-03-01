@@ -11,13 +11,15 @@ import com.androidquery.callback.BitmapAjaxCallback;
  */
 
 public class ApplicationSingleton extends Application {
-  public static ApplicationSingleton instans;
+  public static Application instans;
 
   @Override
   public void onCreate() {
     instans = this;
     super.onCreate();
-    new App(this);
+    App.instans = new App();
+    App.instans.init(this);
+    App.instans.initData(this);
   }
 
   @Override

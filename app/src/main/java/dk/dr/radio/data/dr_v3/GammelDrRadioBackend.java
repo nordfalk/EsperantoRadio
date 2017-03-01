@@ -4,12 +4,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
@@ -19,12 +21,37 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.v3.R;
 
 /**
  * Created by j on 26-02-17.
  */
 
 public class GammelDrRadioBackend extends Backend {
+
+  public String getGrunddataUrl() {
+    // "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";
+    if (App.PRODUKTION) return "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.drxml";
+/*
+scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_udvikling.json  j:../lundogbendsen/hjemmeside/drradiov3_grunddata.json
+*/
+    else return "http://android.lundogbendsen.dk/drradiov3_grunddata.json";
+  }
+
+  public int getGrunddataRes() {
+    return R.raw.grunddata;
+  }
+
+  public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata) throws JSONException, IOException {
+    if (grunddata == null) grunddata = new Grunddata();
+    grunddata.parseFællesGrunddata(grunddataStr);
+    for (final Kanal k : grunddata.kanaler) {
+      k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
+    }
+    return grunddata;
+  }
+
+  //  private static final String BASISURL = "http://dr-mu-apps.azurewebsites.net/tjenester/mu-apps";
 
   private static final String BASISURL = "http://www.dr.dk/tjenester/mu-apps";
   private static final boolean BRUG_URN = true;

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +30,7 @@ public class Basisaktivitet extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    getResources().updateConfiguration(App.sprogKonfig, null);
+    App.instans.aktivitetOnCreate(this);
     super.onCreate(savedInstanceState);
   }
 
@@ -134,13 +133,13 @@ public class Basisaktivitet extends AppCompatActivity {
   protected void onStart() {
     super.onStart();
     if (App.fejlsøgning) Log.d(this + " onStart()");
-    App.instans.aktivitetStartet(this);
+    App.instans.aktivitetOnStart(this);
   }
 
   @Override
   protected void onStop() {
     super.onStop();
     if (App.fejlsøgning) Log.d(this + " onStop()");
-    App.instans.aktivitetStoppet(this);
+    App.instans.aktivitetOnStop(this);
   }
 }

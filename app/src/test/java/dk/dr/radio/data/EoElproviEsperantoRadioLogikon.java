@@ -5,7 +5,6 @@
 package dk.dr.radio.data;
 
 import android.app.Application;
-import android.os.Build;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,16 +13,10 @@ import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
 
-import dk.dr.radio.data.Programdata;
-import dk.dr.radio.data.dr_v3.DRBackendTidsformater;
-import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.data.esperanto.EoRssParsado;
-import dk.dr.radio.data.Grunddata;
-import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
@@ -50,14 +43,13 @@ public class EoElproviEsperantoRadioLogikon {
   public void testLogik() throws Exception {
     //Date.parse("Mon, 13 Aug 2012 05:25:10 +0000");
     //Date.parse("Thu, 01 Aug 2013 12:01:01 +02:00");
-    String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw-eo/esperantoradio_kanaloj_v8.json"));
+    String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
+    App.backend = new EsperantoRadioBackend();
     System.out.println("===================================================================1");
-    Grunddata ĉefdatumoj2 = App.grunddata = new Grunddata();
+    EoGrunddata ĉefdatumoj2 = (EoGrunddata) App.backend.initGrunddata(grunddata, null);
+    App.grunddata = ĉefdatumoj2;
     System.out.println("===================================================================2");
-    ĉefdatumoj2.eo_parseFællesGrunddata(grunddata);
-    App.grunddata.parseFællesGrunddata(grunddata);
 
-    System.out.println("===================================================================3");
     String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(ĉefdatumoj2.radioTxtUrl, true)));
     ĉefdatumoj2.leguRadioTxt(radioTxtStr);
     System.out.println("===================================================================3");

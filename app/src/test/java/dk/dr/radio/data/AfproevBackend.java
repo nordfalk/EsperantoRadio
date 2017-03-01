@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = AfproevBackend.TestApp.class)
+@Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevBackend.TestApp.class)
 public class AfproevBackend {
 
   static String hentStreng(String url) throws IOException {
@@ -48,6 +48,7 @@ public class AfproevBackend {
   public static class TestApp extends ApplicationSingleton {
     static {
       App.IKKE_Android_VM = true;
+      App.ÆGTE_DR = true;
     }
 
     @Override

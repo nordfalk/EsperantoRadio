@@ -63,7 +63,7 @@ public class AfproevBackend {
   @Test
   public void tjek_hent_a_til_å() throws Exception {
     System.out.println("tjek_hent_a_til_å");
-    App.data.programserierAtilÅ.parseSvar(hentStreng(App.backend.getAtilÅUrl()));
+    App.data.programserierAtilÅ.parseAlleProgramserierAtilÅ(hentStreng(App.backend.getAlleProgramserierAtilÅUrl()));
     assertTrue(App.data.programserierAtilÅ.liste.size()>0);
 
     int samletAntalUdsendelser = 0;
@@ -88,7 +88,7 @@ public class AfproevBackend {
   @Test
   public void tjek_hent_podcast() throws Exception {
     System.out.println("tjek_hent_podcast");
-    App.data.dramaOgBog.parseSvar(hentStreng(App.data.dramaOgBog.url));
+    App.data.dramaOgBog.parseBogOgDrama(hentStreng(App.backend.getBogOgDramaUrl()));
     // assertThat(i.dramaOgBog.karusel, hasSize(greaterThan(0)));
     assertNotSame(new ArrayList<Udsendelse>(), App.data.dramaOgBog.karusel);
 
@@ -113,7 +113,7 @@ public class AfproevBackend {
         int m = 0;
         for (Udsendelse u : udsendelser) {
           if (m++ > 5) break; // Tjek kun de første 5.
-          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(hentStreng(App.backend.getStreamsUrl(u))).getJSONArray(DRJson.Streams.name()));
+          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(hentStreng(App.backend.getUdsendelseUrl(u))));
           u.setStreams(s);
           assertTrue(u+" kan ikke høres ", u.kanHentes);
         }
@@ -127,10 +127,10 @@ public class AfproevBackend {
   public void tjekDirekteUdsendelser() throws Exception {
     for (Kanal k : App.grunddata.kanaler) {
       if (k.kode.equals("P4F")) continue;
-      String url = App.backend.getStreamsUrl(k);
+      String url = App.backend.getKanalUrl(k);
       String data = hentStreng(url);
       JSONObject o = new JSONObject(data);
-      ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+      ArrayList<Lydstream> s = App.backend.parsStreams(o);
       k.setStreams(s);
       assertTrue(k.findBedsteStreams(false).size() > 0);
     }
@@ -156,17 +156,17 @@ public class AfproevBackend {
 
       String datoStr = Datoformater.apiDatoFormat.format(new Date());
       kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(new JSONArray(
-              hentStreng(App.backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr))), kanal, new Date(), App.data), "0");
+              hentStreng(App.backend.getUdsendelserPåKanalUrl(kanal, datoStr))), kanal, new Date(), App.data), "0");
       int antalUdsendelser = 0;
       int antalUdsendelserMedPlaylister = 0;
       int antalUdsendelserMedLydstreams = 0;
       for (Udsendelse u : kanal.udsendelser) {
         Log.d("\nudsendelse = " + u);
         antalUdsendelser++;
-        JSONObject obj = new JSONObject(hentStreng(App.backend.getStreamsUrl(u)));
+        JSONObject obj = new JSONObject(hentStreng(App.backend.getUdsendelseUrl(u)));
         //Log.d(obj.toString(2));
         boolean MANGLER_SeriesSlug = !obj.has(DRJson.SeriesSlug.name());
-        ArrayList<Lydstream> s = App.backend.parsStreams(obj.getJSONArray(DRJson.Streams.name()));
+        ArrayList<Lydstream> s = App.backend.parsStreams(obj);
         u.setStreams(s);
         if (!u.kanHøres) Log.d("Ingen lydstreams!!");
         else antalUdsendelserMedLydstreams++;

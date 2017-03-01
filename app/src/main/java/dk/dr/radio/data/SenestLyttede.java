@@ -67,7 +67,7 @@ public class SenestLyttede {
         long tid = System.currentTimeMillis();
         Serialisering.gem(liste, FILNAVN);
         if (!App.PRODUKTION) Log.d("SenestLyttede: " + liste);
-        Log.d("SenestLyttede: Gemning tog " + (System.currentTimeMillis() - tid) + " ms - filstr:" + new File(FILNAVN).length());
+        //Log.d("SenestLyttede: Gemning tog " + (System.currentTimeMillis() - tid) + " ms - filstr:" + new File(FILNAVN).length());
       } catch (Exception e) { // her kan ske en java.util.ConcurrentModificationException hvis forgrundstråden ændrer i listen samtidigt
         Log.rapporterFejl(e);
       }

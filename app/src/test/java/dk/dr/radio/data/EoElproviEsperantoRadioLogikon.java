@@ -39,20 +39,17 @@ public class EoElproviEsperantoRadioLogikon {
   public static class EoTestApp extends Application {
     static {
       App.IKKE_Android_VM = true;
+      App.data = new Programdata();
+      File filcache = new File("testcache-esperanto");
+      FilCache.init(filcache);
+      System.out.println( "Cache-mappe er "+ filcache );
     }
   }
 
   @Test
   public void testLogik() throws Exception {
-    App.IKKE_Android_VM = true;
-    System.out.println(  new File(".").getAbsolutePath() );
-    System.out.println(  EoDiverse.unescapeHtml3("&#8217;") );
-    System.out.println(EoDiverse.unescapeHtml3("Nikolin&#8217; dum la intervjuo."));
     //Date.parse("Mon, 13 Aug 2012 05:25:10 +0000");
     //Date.parse("Thu, 01 Aug 2013 12:01:01 +02:00");
-    App.data = new Programdata();
-
-    FilCache.init(new File("datumoj"));
     String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw-eo/esperantoradio_kanaloj_v8.json"));
     System.out.println("===================================================================1");
     Grunddata ĉefdatumoj2 = App.grunddata = new Grunddata();

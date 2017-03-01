@@ -30,10 +30,6 @@ public class EoKanal extends Kanal {
     return eo_rektaElsendo!=null;
   }
 
-  public String getStreamsUrl() {
-    return eo_elsendojRssUrl;
-  }
-
   @Override
   public void setStreams(ArrayList<Lydstream> str)  {
     throw new IllegalArgumentException("Ne rajtas voki, la rezulto ne estas JSON");

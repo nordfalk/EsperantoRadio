@@ -27,14 +27,13 @@ public class DramaOgBog {
   public HashSet<String> karuselSerieSlug = new HashSet<String>();
 
   public List<Runnable> observatører = new ArrayList<Runnable>();
-  public final String url = App.backend.getBogOgDramaUrl();
 
   /**
    * Parser JSON-svar og opdaterer data derefter. Bør ikke kaldes udefra, udover i afprøvningsøjemed
    * @param json
    * @throws JSONException
    */
-  public void parseSvar(String json) throws JSONException {
+  public void parseBogOgDrama(String json) throws JSONException {
     JSONArray jsonArray = new JSONArray(json);
     overskrifter.clear();
     lister.clear();
@@ -50,7 +49,7 @@ public class DramaOgBog {
         karusel.add(u);
         karuselSerieSlug.add(u.programserieSlug);
       } catch (JSONException je) {
-        Log.d("Fejl i "+ url +" element nr +"+n+ ": " + je);
+        Log.d("Fejl i "+ App.backend.getBogOgDramaUrl() +" element nr +"+n+ ": " + je);
         Log.d(karuselJson.getJSONObject(n));
         Log.e(je);
       }
@@ -80,11 +79,11 @@ public class DramaOgBog {
   }
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(App.backend.getBogOgDramaUrl(), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         if (uændret) return;
-        parseSvar(json);
+        parseBogOgDrama(json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
     }) {

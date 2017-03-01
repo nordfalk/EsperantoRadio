@@ -83,18 +83,17 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(udsendelse), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(App.backend.getUdsendelseUrl(udsendelse), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return;
             Log.d("hentStreams fikSvar(" + fraCache + " " + url);
             if (json != null && !"null".equals(json)) {
               JSONObject o = new JSONObject(json);
-              ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
-              udsendelse.setStreams(s);
-              udsendelse.indslag = App.backend.parsIndslag(o.optJSONArray(DRJson.Chapters.name()));
+              udsendelse.indslag = App.backend.parsIndslag(o);
+              udsendelse.setStreams(App.backend.parsStreams(o));
               if (!udsendelse.harStreams()) {
-                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getStreamsUrl(udsendelse));
+                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getUdsendelseUrl(udsendelse));
                 streamsVarTom.put(udsendelse, System.currentTimeMillis());
                 //App.volleyRequestQueue.getCache().remove(url);
                 App.forgrundstråd.postDelayed(hentStreams, 5000);

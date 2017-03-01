@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
@@ -106,12 +105,12 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
     App.forgrundstråd.removeCallbacks(this);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(kanal), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getKanalUrl(kanal), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
           JSONObject o = new JSONObject(json);
-          ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+          ArrayList<Lydstream> s = App.backend.parsStreams(o);
           kanal.setStreams(s);
           Log.d("hentStreams Kanal_nyheder_frag fraCache=" + fraCache + " => " + kanal);
           run(); // Opdatér igen

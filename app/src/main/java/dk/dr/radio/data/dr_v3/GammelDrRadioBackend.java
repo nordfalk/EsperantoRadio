@@ -32,41 +32,72 @@ public class GammelDrRadioBackend extends Backend {
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
 
   @Override
-  public String getStreamsUrl(Udsendelse u) {
+  public String getUdsendelseUrl(Udsendelse u) {
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     return BASISURL + "/program?includeStreams=true&urn=" + u.urn;
   }
 
+  /** Bruges kun fra FangBrowseIntent */
   @Override
-  public String getProgramserieUrl(Programserie ps, String programserieSlug) {
-    if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
-    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
-    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
-    if (BRUG_URN && ps != null)
-      return BASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
-    return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
+  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
+    return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
   }
 
+
   @Override
-  public String getStreamsUrl(Kanal kanal) {
+  public String getKanalUrl(Kanal kanal) {
     //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
     return BASISURL + "/channel/" + kanal.slug + "?includeStreams=true";
   }
 
-  @Override
-  public String getKanalUdsendelserUrlFraKode(String kode, String datoStr) {
-    return BASISURL + "/schedule/" + URLEncoder.encode(kode) + "/date/" + datoStr;
-  }
+
+  /**
+   * Parse en stream.
+   * F.eks. Streams-objekt fra
+   * http://www.dr.dk/tjenester/mu-apps/channel?urn=urn:dr:mu:bundle:4f3b8926860d9a33ccfdafb9&includeStreams=true
+   * http://www.dr.dk/tjenester/mu-apps/program?includeStreams=true&urn=urn:dr:mu:programcard:531520836187a20f086b5bf9
+   * @param jsonobj
+   * @return
+   * @throws JSONException
+   */
 
   @Override
-  public String getAtilÅUrl() {
-    return BASISURL + "/series-list?type=radio";
+  public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
+    JSONArray jsonArray = jsonobj.getJSONArray(DRJson.Streams.name());
+    ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
+    for (int n = 0; n < jsonArray.length(); n++)
+      try {
+        JSONObject o = jsonArray.getJSONObject(n);
+        //Log.d("streamjson=" + o.toString());
+        Lydstream l = new Lydstream();
+        //if (o.getInt("FileSize")!=0) { Log.d("streamjson=" + o.toString(2)); System.exit(0); }
+        l.url = o.getString(DRJson.Uri.name());
+        if (l.url.startsWith("rtmp:")) continue; // Skip Adobe Real-Time Messaging Protocol til Flash
+        int type = o.getInt(DRJson.Type.name());
+        l.type = type < 0 ? DRJson.StreamType.Ukendt : DRJson.StreamType.values()[type];
+        if (l.type == DRJson.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
+        //if (l.type == StreamType.IOS) continue; // Gamle HLS streams der ikke virker på Android
+        if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
+        l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
+        l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
+        l.kbps = o.getInt(DRJson.Kbps.name());
+        lydData.add(l);
+        if (App.fejlsøgning) Log.d("lydstream=" + l);
+      } catch (Exception e) {
+        Log.rapporterFejl(e);
+      }
+    return lydData;
   }
 
-  /** Bruges kun fra FangBrowseIntent */
+
+
+  /* ------------------------------------------------------------------------------ */
+  /* -           Diverse                                                          - */
+  /* ------------------------------------------------------------------------------ */
+
   @Override
-  public String getUdsendelseStreamsUrlFraSlug(String udsendelseSlug) {
-    return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
+  public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
+    return BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
   }
 
   /*
@@ -82,6 +113,11 @@ public class GammelDrRadioBackend extends Backend {
   */
 
   @Override
+  public String getAlleProgramserierAtilÅUrl() {
+    return BASISURL + "/series-list?type=radio";
+  }
+
+  @Override
   public String getBogOgDramaUrl() {
     return BASISURL + "/radio-drama-adv";
   }
@@ -94,11 +130,6 @@ public class GammelDrRadioBackend extends Backend {
   @Override
   public String getNyeProgrammerSiden(String programserieSlug, String dato) {
     return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
-  }
-
-  @Override
-  public String getPlaylisteUrl(Udsendelse u) {
-    return BASISURL + "/playlist/" + u.slug + "/0";
   }
 
 
@@ -187,6 +218,16 @@ public class GammelDrRadioBackend extends Backend {
     return u;
   }
 
+
+  /* ------------------------------------------------------------------------------ */
+  /* -                     Playlister                                             - */
+  /* ------------------------------------------------------------------------------ */
+
+  @Override
+  public String getPlaylisteUrl(Udsendelse u) {
+    return BASISURL + "/playlist/" + u.slug + "/0";
+  }
+
   /*
     Title: "Back to life",
     Artist: "Soul II Soul",
@@ -233,42 +274,10 @@ public class GammelDrRadioBackend extends Backend {
     }
   }
 
-  /**
-   * Parse en stream.
-   * F.eks. Streams-objekt fra
-   * http://www.dr.dk/tjenester/mu-apps/channel?urn=urn:dr:mu:bundle:4f3b8926860d9a33ccfdafb9&includeStreams=true
-   * http://www.dr.dk/tjenester/mu-apps/program?includeStreams=true&urn=urn:dr:mu:programcard:531520836187a20f086b5bf9
-   * @param jsonArray
-   * @return
-   * @throws JSONException
-   */
 
-  @Override
-  public ArrayList<Lydstream> parsStreams(JSONArray jsonArray) throws JSONException {
-    ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
-    for (int n = 0; n < jsonArray.length(); n++)
-      try {
-        JSONObject o = jsonArray.getJSONObject(n);
-        //Log.d("streamjson=" + o.toString());
-        Lydstream l = new Lydstream();
-        //if (o.getInt("FileSize")!=0) { Log.d("streamjson=" + o.toString(2)); System.exit(0); }
-        l.url = o.getString(DRJson.Uri.name());
-        if (l.url.startsWith("rtmp:")) continue; // Skip Adobe Real-Time Messaging Protocol til Flash
-        int type = o.getInt(DRJson.Type.name());
-        l.type = type < 0 ? DRJson.StreamType.Ukendt : DRJson.StreamType.values()[type];
-        if (l.type == DRJson.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
-        //if (l.type == StreamType.IOS) continue; // Gamle HLS streams der ikke virker på Android
-        if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
-        l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
-        l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
-        l.kbps = o.getInt(DRJson.Kbps.name());
-        lydData.add(l);
-        if (App.fejlsøgning) Log.d("lydstream=" + l);
-      } catch (Exception e) {
-        Log.rapporterFejl(e);
-      }
-    return lydData;
-  }
+  /* ------------------------------------------------------------------------------ */
+  /* -                     Indslag                                                - */
+  /* ------------------------------------------------------------------------------ */
 
   /*
     http://www.dr.dk/tjenester/mu-apps/program/p2-koncerten-616 eller
@@ -286,8 +295,9 @@ public class GammelDrRadioBackend extends Backend {
   },
      */
   @Override
-  public ArrayList<Indslaglisteelement> parsIndslag(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
+    JSONArray jsonArray = jsonObj.optJSONArray(DRJson.Chapters.name());
     if (jsonArray == null) return liste;
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
@@ -298,6 +308,21 @@ public class GammelDrRadioBackend extends Backend {
       liste.add(u);
     }
     return liste;
+  }
+
+
+  /* ------------------------------------------------------------------------------ */
+  /* -                     Programserier                                          - */
+  /* ------------------------------------------------------------------------------ */
+
+  @Override
+  public String getProgramserieUrl(Programserie ps, String programserieSlug) {
+    if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
+    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
+    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
+    if (BRUG_URN && ps != null)
+      return BASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
+    return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
   }
 
   /**

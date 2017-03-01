@@ -30,7 +30,7 @@ public class Backend {
     return programserie;
   }
 
-  public String getAtilÅUrl() {
+  public String getAlleProgramserierAtilÅUrl() {
     ikkeImplementeret();
     return null;
   }
@@ -55,7 +55,7 @@ public class Backend {
     return null;
   }
 
-  public String getKanalUdsendelserUrlFraKode(String kode, String datoStr) {
+  public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
     ikkeImplementeret();
     return null;
   }
@@ -70,7 +70,7 @@ public class Backend {
     return null;
   }
 
-  public String getUdsendelseStreamsUrlFraSlug(String udsendelseSlug) {
+  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
     ikkeImplementeret();
     return null;
   }
@@ -80,23 +80,23 @@ public class Backend {
     return null;
   }
 
-  public ArrayList<Indslaglisteelement> parsIndslag(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
     ikkeImplementeret();
     return null;
   }
 
 
-  public String getStreamsUrl(Kanal kanal) {
+  public String getKanalUrl(Kanal kanal) {
     ikkeImplementeret();
     return null;
   }
 
-  public String getStreamsUrl(Udsendelse udsendelse) {
+  public String getUdsendelseUrl(Udsendelse udsendelse) {
     ikkeImplementeret();
     return null;
   }
 
-  public ArrayList<Lydstream> parsStreams(JSONArray jsonArray) throws JSONException {
+  public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
     ikkeImplementeret();
     return null;
   }

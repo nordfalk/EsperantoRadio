@@ -48,7 +48,6 @@ import java.util.List;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerLytter;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerWrapper;
 import dk.dr.radio.afspilning.wrapper.Wrapperfabrikering;
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
@@ -148,9 +147,9 @@ public class Afspiller {
     if (!lydkilde.harStreams()) {
       String url = null;
       if (lydkilde instanceof Kanal) {
-        url = App.backend.getStreamsUrl((Kanal) lydkilde);
+        url = App.backend.getKanalUrl((Kanal) lydkilde);
       } else if (lydkilde instanceof Kanal) {
-        url = App.backend.getStreamsUrl((Udsendelse) lydkilde);
+        url = App.backend.getUdsendelseUrl((Udsendelse) lydkilde);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
@@ -160,7 +159,7 @@ public class Afspiller {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
-          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(json).getJSONArray(DRJson.Streams.name()));
+          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(json));
           lydkilde.setStreams(s);
           Log.d("hentStreams afsp fraCache=" + fraCache + " => " + lydkilde);
           if (onErrorTæller++>2) {
@@ -336,9 +335,9 @@ public class Afspiller {
           Log.d("mediaPlayer.setDataSource( " + lydstream);
 
           mediaPlayer.setDataSource(lydstream.url);
-          Log.d("mediaPlayer.setDataSource() slut");
+          //Log.d("mediaPlayer.setDataSource() slut");
           mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-          Log.d("mediaPlayer.setDataSource() slut  " + mpTils());
+          //Log.d("mediaPlayer.setDataSource() slut  " + mpTils());
           mediaPlayer.prepare();
           Log.d("mediaPlayer.prepare() slut  " + mpTils());
         } catch (Exception ex) {

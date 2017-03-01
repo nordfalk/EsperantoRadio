@@ -26,7 +26,7 @@ public class ProgramserierAtilAA {
    * @param json
    * @throws JSONException
    */
-  void parseSvar(String json) throws JSONException {
+  void parseAlleProgramserierAtilÅ(String json) throws JSONException {
     JSONArray jsonArray = new JSONArray(json);
     ArrayList<Programserie> res = new ArrayList<Programserie>();
     for (int n = 0; n < jsonArray.length(); n++) {
@@ -50,12 +50,12 @@ public class ProgramserierAtilAA {
 
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(App.backend.getAtilÅUrl(), new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(App.backend.getAlleProgramserierAtilÅUrl(), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);
         if (uændret) return;
-        parseSvar(json);
+        parseAlleProgramserierAtilÅ(json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
     }) {

@@ -167,7 +167,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterListe();
     }
 
-    final String url = App.backend.getKanalUdsendelserUrlFraKode(kanal.kode, datoStr);
+    final String url = App.backend.getUdsendelserPåKanalUrl(kanal, datoStr);
     if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + url);
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
@@ -263,12 +263,12 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(App.backend.getStreamsUrl(kanal), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getKanalUrl(kanal), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
           JSONObject o = new JSONObject(json);
-          ArrayList<Lydstream> s = App.backend.parsStreams(o.getJSONArray(DRJson.Streams.name()));
+          ArrayList<Lydstream> s = App.backend.parsStreams(o);
           kanal.setStreams(s);
           Log.d("hentStreams Kanal_frag fraCache=" + fraCache + " => " + kanal);
           run(); // Opdatér igen

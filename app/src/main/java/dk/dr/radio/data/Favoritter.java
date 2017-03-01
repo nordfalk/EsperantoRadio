@@ -100,6 +100,7 @@ public class Favoritter {
       tjekDataOprettet();
       //if (dd.equals(dato) && favoritTilAntalDagsdato.keySet().equals(favoritTilStartdato.keySet())) return;
       Log.d("Favoritter: Opdaterer favoritTilStartdato=" + favoritTilStartdato + "  favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
+      if (!App.ÆGTE_DR) return;
       for (final String programserieSlug : favoritTilStartdato.keySet()) {
         String dato = favoritTilStartdato.get(programserieSlug);
         startOpdaterAntalNyeUdsendelserForProgramserie(programserieSlug, dato);

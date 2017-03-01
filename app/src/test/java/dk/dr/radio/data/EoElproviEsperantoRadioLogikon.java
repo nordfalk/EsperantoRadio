@@ -50,8 +50,8 @@ public class EoElproviEsperantoRadioLogikon {
     App.grunddata = ĉefdatumoj2;
     System.out.println("===================================================================2");
 
-    String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(ĉefdatumoj2.radioTxtUrl, true)));
-    ĉefdatumoj2.leguRadioTxt(radioTxtStr);
+    //String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(ĉefdatumoj2.radioTxtUrl, true)));
+    //ĉefdatumoj2.leguRadioTxt(radioTxtStr);
     System.out.println("===================================================================3");
     ŝarĝiElsendojnDeRss(ĉefdatumoj2, false);
     //ĉefdatumoj2.ŝarĝiElsendojnDeRssUrl("http://radioverda.squarespace.com/storage/audio/radioverda.xml",

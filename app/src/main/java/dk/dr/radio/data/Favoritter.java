@@ -100,7 +100,6 @@ public class Favoritter {
       tjekDataOprettet();
       //if (dd.equals(dato) && favoritTilAntalDagsdato.keySet().equals(favoritTilStartdato.keySet())) return;
       Log.d("Favoritter: Opdaterer favoritTilStartdato=" + favoritTilStartdato + "  favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
-      if (!App.ÆGTE_DR) return;
       for (final String programserieSlug : favoritTilStartdato.keySet()) {
         String dato = favoritTilStartdato.get(programserieSlug);
         startOpdaterAntalNyeUdsendelserForProgramserie(programserieSlug, dato);
@@ -108,7 +107,7 @@ public class Favoritter {
     }
   };
 
-  void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
+  protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
     String url = App.backend.getNyeProgrammerSiden(programserieSlug, dato);
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override

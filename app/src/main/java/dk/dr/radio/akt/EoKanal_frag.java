@@ -38,6 +38,7 @@ import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EoRssParsado;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
@@ -54,7 +55,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   private ListView listView;
   private ArrayList<Object> liste = new ArrayList<Object>();
   private int aktuelUdsendelseIndex = -1;
-  private Kanal kanal;
+  private EoKanal kanal;
   protected View rod;
   private boolean brugerHarNavigeret;
   private int antalHentedeSendeplaner;
@@ -75,7 +76,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     String kanalkode = getArguments().getString(P_kode);
     rod = null;
-    kanal = App.grunddata.kanalFraKode.get(kanalkode);
+    kanal = (EoKanal) App.grunddata.kanalFraKode.get(kanalkode);
     //Log.d(this + " onCreateView 2 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     if (rod == null) rod = inflater.inflate(R.layout.kanal_frag, container, false);
     if (kanal == null) {

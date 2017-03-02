@@ -9,11 +9,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Datoformater;
@@ -27,49 +24,36 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.R;
 
 /**
  * Created by j on 26-02-17.
  */
 
-public class GammelDrRadioBackend extends Backend {
+public class NyDrRadioBackend extends Backend {
 
   public String getGrunddataUrl() {
-    // "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";
-    if (App.PRODUKTION) return "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.drxml";
-/*
-scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_udvikling.json  j:../lundogbendsen/hjemmeside/drradiov3_grunddata.json
-*/
-    else return "http://android.lundogbendsen.dk/drradiov3_grunddata.json";
+    return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
   }
 
   public InputStream getLokaleGrunddata(Context ctx) {
     return ctx.getResources().openRawResource(R.raw.grunddata);
   }
 
-  private static boolean serverapi_ret_forkerte_offsets_i_playliste;
-
   public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata) throws JSONException, IOException {
     if (grunddata == null) grunddata = new Grunddata();
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
 
-    try {
-      grunddata.opdaterGrunddataEfterMs = grunddata.json.getJSONObject("intervals").getInt("settings") * 1000;
-      grunddata.opdaterPlaylisteEfterMs = grunddata.json.getJSONObject("intervals").getInt("playlist") * 1000;
-    } catch (Exception e) {
-      Log.e(e);
-    } // Ikke kritisk
-
-    JSONObject android_json = grunddata.android_json;
-    serverapi_ret_forkerte_offsets_i_playliste = android_json.optBoolean("serverapi_ret_forkerte_offsets_i_playliste", true);
-    DRBackendTidsformater.servertidsformatAndre = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatAndre"), DRBackendTidsformater.servertidsformatAndre);
-    DRBackendTidsformater.servertidsformatPlaylisteAndre2 = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatPlaylisteAndre2"), DRBackendTidsformater.servertidsformatPlaylisteAndre2);
 
     grunddata.kanaler.clear();
     grunddata.p4koder.clear();
-    parseKanaler(grunddata, grunddata.json.getJSONArray("channels"), false);
+
+    InputStream is = App.assets.open("apisvar/all-active-dr-radio-channels");
+    JSONArray jsonArray = new JSONArray(Diverse.læsStreng(is));
+    is.close();
+    parseKanaler(grunddata, jsonArray);
     Log.d("parseKanaler " + grunddata.kanaler + " - P4:" + grunddata.p4koder);
 
     for (final Kanal k : grunddata.kanaler) {
@@ -78,48 +62,139 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return grunddata;
   }
 
-  private void parseKanaler(Grunddata grunddata, JSONArray jsonArray, boolean parserP4underkanaler) throws JSONException {
+  private void parseKanaler(Grunddata grunddata, JSONArray jsonArray) throws JSONException {
+/*
+{
+Type: "Channel",
+StreamingServers: [],
+Url: "http://www.dr.dk/P1",
+SourceUrl: "dr.dk/mas/whatson/channel/P1D",
+WebChannel: false,
+Slug: "p1",
+Urn: "urn:dr:mu:bundle:4f3b8918860d9a33ccfdaf4d",
+PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71849a11f9d162028cfe7",
+Title: "DR P1",
+Subtitle: ""
+},
 
+{
+Type: "Channel",
+StreamingServers: [],
+Url: "http://www.dr.dk/P2",
+SourceUrl: "dr.dk/mas/whatson/channel/P2D",
+WebChannel: false,
+Slug: "p2",
+Urn: "urn:dr:mu:bundle:4f3b8919860d9a33ccfdaf54",
+PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71865a11f9d162028cfea",
+Title: "DR P2",
+Subtitle: ""
+},
+
+{
+Type: "Channel",
+StreamingServers: [],
+Url: "http://www.dr.dk/P4/bornholm",
+SourceUrl: "dr.dk/mas/whatson/channel/RØ4",
+WebChannel: false,
+Slug: "p4bornholm",
+Urn: "urn:dr:mu:bundle:4f3b892b860d9a33ccfdafd2",
+PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71a58a11f9d162028d003",
+Title: "P4 Bornholm",
+Subtitle: ""
+},
+
+
+ */
+    String ingenPlaylister = grunddata.json.optString("ingenPlaylister");
     int antal = jsonArray.length();
     for (int i = 0; i < antal; i++) {
       JSONObject j = jsonArray.getJSONObject(i);
-      String kanalkode = j.optString("scheduleIdent", Kanal.P4kode);
+      if (!"Channel".equals(j.getString(DRJson.Type.name()))) {
+        Log.d("parseKanaler: Ukendt type: "+j);
+        continue;
+      }
+      /*
+      "scheduleIdent": "RØ4",
+        SourceUrl: "dr.dk/mas/whatson/channel/RØ4",
+
+       */
+      String kanalkode = j.getString(DRJson.SourceUrl.name());
+      kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/')+1); // Klampkode til at få P1D, P2D, KH4,
       Kanal k = grunddata.kanalFraKode.get(kanalkode);
       if (k == null) {
         k = new Kanal();
-        k.kode = j.optString("scheduleIdent", Kanal.P4kode);
+        k.kode = kanalkode;
         grunddata.kanalFraKode.put(k.kode, k);
       }
-      k.navn = j.getString("title");
-      k.urn = j.getString("urn");
-      k.slug = j.optString("slug", "p4");
-      k.ingenPlaylister = j.optBoolean("hideLatestTrack", false);
-      k.p4underkanal = parserP4underkanaler;
+      /*
+    "title": "P1",
+    "title": "P4",
+      "title": "P4 Bornholm",
+
+Title: "DR P2",
+Title: "P4 Bornholm",
+       */
+      k.navn = j.getString(DRJson.Title.name());
+      if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode
+      k.urn = j.getString(DRJson.Urn.name());
+      k.slug = j.getString(DRJson.Slug.name());
+      k.ingenPlaylister = ingenPlaylister.contains(k.slug);
+      k.p4underkanal = j.getString(DRJson.Url.name()).startsWith("http://www.dr.dk/P4");  // Klampkode
+      if (k.p4underkanal) grunddata.p4koder.add(k.kode);
       grunddata.kanaler.add(k);
-      if (parserP4underkanaler) grunddata.p4koder.add(k.kode);
       grunddata.kanalFraSlug.put(k.slug, k);
-      if (j.optBoolean("isDefault")) grunddata.forvalgtKanal = k;
+      if (k.navn.equals("P3")) grunddata.forvalgtKanal = k;
 
-      JSONArray underkanaler = j.optJSONArray("channels");
-      if (underkanaler != null) {
-        if (!Kanal.P4kode.equals(k.kode)) Log.rapporterFejl(new IllegalStateException("Forkert P4-kode: "), k.kode);
-        parseKanaler(grunddata, underkanaler, true);
+
+      k.setStreams(parsKanalStreams(j));
+    }
+  }
+
+
+  private ArrayList<Lydstream> parsKanalStreams(JSONObject jsonObject) throws JSONException {
+    ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
+    JSONArray jsonArrayServere = jsonObject.getJSONArray("StreamingServers");
+    for (int i = 0; i < jsonArrayServere.length(); i++)
+      try {
+        JSONObject jsonServer = jsonArrayServere.getJSONObject(i);
+        String vLinkType = jsonServer.getString("LinkType");
+        if (vLinkType.equals("HDS")) continue;
+        DRJson.StreamType streamType = DRJson.StreamType.Ukendt;
+        if (vLinkType.equals("ICY")) streamType = DRJson.StreamType.Shoutcast;
+        else if (vLinkType.equals("HLS")) streamType = DRJson.StreamType.HLS_fra_Akamai;
+
+
+        String vServer = jsonServer.getString("Server");
+
+        JSONArray jsonArrayKvaliteter = jsonServer.getJSONArray("Qualities");
+        for (int j = 0; j < jsonArrayKvaliteter.length(); j++) {
+
+          JSONObject jsonKvalitet = jsonArrayKvaliteter.getJSONObject(j);
+          int vKbps = jsonKvalitet.getInt("Kbps");
+
+          JSONArray jsonArrayStreams = jsonKvalitet.getJSONArray("Streams");
+          for (int k = 0; k < jsonArrayStreams.length(); k++) {
+            JSONObject jsonStream = jsonArrayStreams.getJSONObject(k);
+
+            if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
+            Lydstream l = new Lydstream();
+            l.url = vServer + "/" + jsonStream.getString("Stream");
+            l.type = streamType;
+            l.kbps = vKbps;
+            l.kvalitet = vKbps==-1?DRJson.StreamQuality.Variable: vKbps>100?DRJson.StreamQuality.High : DRJson.StreamQuality.Medium ;
+            lydData.add(l);
+            if (App.fejlsøgning) Log.d("lydstream=" + l);
+          }
+        }
+      } catch (Exception e){
+        Log.rapporterFejl(e);
       }
-    }
+    return lydData;
   }
 
-  private DateFormat[] parseDRBackendTidsformater(JSONArray servertidsformatAndreJson, DateFormat[] servertidsformatAndre) throws JSONException {
-    if (servertidsformatAndreJson==null) return  servertidsformatAndre;
-    DateFormat[] res = new DateFormat[servertidsformatAndreJson.length()];
-    for (int i=0; i<res.length; i++) {
-      res[i] = new SimpleDateFormat(servertidsformatAndreJson.getString(i), Locale.US);
-    }
-    return res;
-  }
 
-  //  private static final String BASISURL = "http://dr-mu-apps.azurewebsites.net/tjenester/mu-apps";
 
-  private static final String BASISURL = "http://www.dr.dk/tjenester/mu-apps";
+  private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
   private static final boolean BRUG_URN = true;
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
@@ -139,8 +214,8 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
   @Override
   public String getKanalUrl(Kanal kanal) {
-    //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
-    return BASISURL + "/channel/" + kanal.slug + "?includeStreams=true";
+    //return null; // ikke nødvendigt - vi har det fra grunddata
+    return BASISURL + "/channel/" + kanal.slug;
   }
 
 
@@ -156,32 +231,9 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
   @Override
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
-    JSONArray jsonArray = jsonobj.getJSONArray(DRJson.Streams.name());
-    ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
-    for (int n = 0; n < jsonArray.length(); n++)
-      try {
-        JSONObject o = jsonArray.getJSONObject(n);
-        //Log.d("streamjson=" + o.toString());
-        Lydstream l = new Lydstream();
-        //if (o.getInt("FileSize")!=0) { Log.d("streamjson=" + o.toString(2)); System.exit(0); }
-        l.url = o.getString(DRJson.Uri.name());
-        if (l.url.startsWith("rtmp:")) continue; // Skip Adobe Real-Time Messaging Protocol til Flash
-        int type = o.getInt(DRJson.Type.name());
-        l.type = type < 0 ? DRJson.StreamType.Ukendt : DRJson.StreamType.values()[type];
-        if (l.type == DRJson.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
-        //if (l.type == StreamType.IOS) continue; // Gamle HLS streams der ikke virker på Android
-        if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
-        l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
-        l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
-        l.kbps = o.getInt(DRJson.Kbps.name());
-        lydData.add(l);
-        if (App.fejlsøgning) Log.d("lydstream=" + l);
-      } catch (Exception e) {
-        Log.rapporterFejl(e);
-      }
-    return lydData;
+    Log.d("IGNORERER parsStreams");
+    return null;
   }
-
 
 
   /* ------------------------------------------------------------------------------ */
@@ -346,7 +398,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       u.offsetMs = o.optInt(DRJson.OffsetMs.name(), o.optInt(DRJson.OffsetInMs.name(), -1));
       liste.add(u);
     }
-    if (serverapi_ret_forkerte_offsets_i_playliste) retForkerteOffsetsIPlayliste(udsendelse, liste);
     return liste;
   }
 

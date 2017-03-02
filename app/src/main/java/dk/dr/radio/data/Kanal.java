@@ -38,25 +38,13 @@ public class Kanal extends Lydkilde {
   public static final String P4kode = "P4F";
   public String navn;
   public transient int kanallogo_resid;
+  public transient Bitmap kanallogo_eo; // Bruges pt kun i EsperantoRadio
+
   public boolean p4underkanal;
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
   public transient SortedMap<String, ArrayList<Udsendelse>> udsendelserPerDag = new TreeMap<String, ArrayList<Udsendelse>>();
   /** P1 har ingen senest spillet og der er aldrig playlister på denne kanal */
   public boolean ingenPlaylister;
-
-  //// EO
-  public transient Bitmap eo_emblemo;
-  public String eo_hejmpaĝoEkrane;
-  public String eo_hejmpaĝoButono;
-  public String eo_retpoŝto;
-  public Udsendelse eo_rektaElsendo;
-  public String eo_emblemoUrl;
-  public String eo_datumFonto;
-  public ArrayList<Udsendelse> eo_udsendelserFraRadioTxt; // Provizora variablo - por kontroli ĉu ni maltrafas ion dum parsado de RSS
-  public String eo_elsendojRssUrl;
-  public String eo_elsendojRssUrl2;
-  public boolean eo_elsendojRssIgnoruTitolon;
-  public boolean eo_montruTitolojn;
 
   @Override
   public String toString() {

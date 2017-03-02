@@ -37,6 +37,10 @@ public enum DRJson {
 
   /* Drama og Bog */
   Spots, Series
+
+  /* Nye */
+  , SourceUrl, Url, StreamingServers,
+
   ;
 
   /*

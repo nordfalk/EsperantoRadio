@@ -102,7 +102,6 @@ public class Afspiller {
   private Lydkilde lydkilde;
   public boolean vækningIGang;
   public PowerManager.WakeLock vækkeurWakeLock;
-  AudioManager audioManager = (AudioManager) ApplicationSingleton.instans.getSystemService(Context.AUDIO_SERVICE);
 
   private static void sætMediaPlayerLytter(MediaPlayerWrapper mediaPlayer, MediaPlayerLytter lytter) {
     mediaPlayer.setMediaPlayerLytter(lytter);
@@ -201,7 +200,7 @@ public class Afspiller {
       }
 
       // Se http://developer.android.com/training/managing-audio/audio-focus.html
-      int res = audioManager.requestAudioFocus(onAudioFocusChangeListener,
+      int res = App.audioManager.requestAudioFocus(onAudioFocusChangeListener,
           AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
       if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         App.fjernbetjening.registrér();
@@ -235,10 +234,10 @@ public class Afspiller {
 
   /** Sørg for at volumen er skruet op til en minimumsværdi, angivet i 5'tedele af fuld styrke */
   public void tjekVolumenMindst5tedele(int min5) {
-    int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-    int nu = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+    int max = App.audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+    int nu = App.audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
     if (nu < min5 * max / 5) {
-      audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, min5 * max / 5, AudioManager.FLAG_SHOW_UI);
+      App.audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, min5 * max / 5, AudioManager.FLAG_SHOW_UI);
     }
   }
 

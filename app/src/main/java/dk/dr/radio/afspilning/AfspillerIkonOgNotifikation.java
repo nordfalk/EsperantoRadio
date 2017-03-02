@@ -38,6 +38,7 @@ import dk.dr.radio.akt.Hovedaktivitet;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -113,12 +114,12 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
     Lydkilde lydkilde = App.afspiller.getLydkilde();
     Kanal kanal = lydkilde.getKanal();
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (kanal.kanallogo_resid==0 && kanal.eo_emblemo==null) {
+    if (kanal.kanallogo_resid==0 && kanal.kanallogo_eo ==null) {
       remoteViews.setViewVisibility(R.id.kanallogo, View.GONE);
     } else {
       remoteViews.setViewVisibility(R.id.kanallogo, View.VISIBLE);
-      if (kanal.eo_emblemo!=null) {
-        remoteViews.setImageViewBitmap(R.id.kanallogo, kanal.eo_emblemo);
+      if (kanal.kanallogo_eo !=null) {
+        remoteViews.setImageViewBitmap(R.id.kanallogo, kanal.kanallogo_eo);
       } else {
       remoteViews.setImageViewResource(R.id.kanallogo, kanal.kanallogo_resid);
     }

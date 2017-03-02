@@ -46,6 +46,7 @@ public abstract class Lydkilde implements Serializable {
     ArrayList<Lydstream> kandidater = new ArrayList<Lydstream>();
     if (hentetStream != null && new File(hentetStream.url).canRead()) kandidater.add(hentetStream);
     if (streams == null) return kandidater;
+    if (App.prefs==null) return streams; // Kan forekomme under afprøvning
 
     //Bedst bedst = new Bedst();
     String ønsketkvalitet = App.prefs.getString("lydkvalitet", "auto");
@@ -113,6 +114,7 @@ public abstract class Lydkilde implements Serializable {
   public abstract String getNavn();
 
   public void setStreams(ArrayList<Lydstream> str) {
+    if (str == null) return;
     streams = str;
   }
 

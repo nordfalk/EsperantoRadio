@@ -18,43 +18,31 @@
 
 package dk.dr.radio.data;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.data.dr_v3.DramaOgBog;
 import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
-import dk.dr.radio.v3.R;
 
 /**
  * Det centrale objekt som alt andet bruger til
  */
 public class Programdata {
 
-  public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<String, Udsendelse>();
-  public HashMap<String, Programserie> programserieFraSlug = new HashMap<String, Programserie>();
+  public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<>();
+  public HashMap<String, Programserie> programserieFraSlug = new HashMap<>();
 
   /**
    * Manglende 'SeriesSlug' (i andre kald end det for dagsprogrammet for en kanal!)
    * betyder at der ikke er en programserie, og videre navigering derfor skal slås fra.
    * 9.okt 2014
    */
-  public HashSet<String> programserieSlugFindesIkke = new HashSet<String>();
+  public HashSet<String> programserieSlugFindesIkke = new HashSet<>();
 
   public SenestLyttede senestLyttede = new SenestLyttede();
   public Favoritter favoritter = App.ÆGTE_DR? new Favoritter() : new EoFavoritter();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
   public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
   public DramaOgBog dramaOgBog = new DramaOgBog();
-    /*
-     * Kald
-		 * http://www.dr.dk/tjenester/mu-apps/search/programs?q=monte&type=radio
-		 * vil kun returnere radio programmer
-		 * http://www.dr.dk/tjenester/mu-apps/search/series?q=monte&type=radio
-		 * vil kun returnere radio serier
-		 */
-
 }

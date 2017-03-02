@@ -229,12 +229,12 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     if (App.ÆGTE_DR) {
       kanallogo.setImageResource(kanal.kanallogo_resid);
     } else {
-      if (kanal.eo_emblemo!=null) {
-        kanallogo.setImageBitmap(kanal.eo_emblemo);
+      if (kanal.kanallogo_eo !=null) {
+        kanallogo.setImageBitmap(kanal.kanallogo_eo);
       } else {
         kanallogo.setImageResource(App.ÆGTE_DR ? R.drawable.dr_logo : 0);
         Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
-        Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.eo_emblemo+")");
+        Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.kanallogo_eo +")");
       }
     }
 

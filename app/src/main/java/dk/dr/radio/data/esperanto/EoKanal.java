@@ -1,5 +1,7 @@
 package dk.dr.radio.data.esperanto;
 
+import android.graphics.Bitmap;
+
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -13,6 +15,21 @@ import dk.dr.radio.data.Udsendelse;
  */
 public class EoKanal extends Kanal {
   private static final long serialVersionUID = 1L;
+
+  //// EO
+  public String eo_hejmpaĝoEkrane;
+  public String eo_hejmpaĝoButono;
+  public String eo_retpoŝto;
+  public Udsendelse eo_rektaElsendo;
+  public String eo_emblemoUrl;
+  public String eo_datumFonto;
+  public ArrayList<Udsendelse> eo_udsendelserFraRadioTxt; // Provizora variablo - por kontroli ĉu ni maltrafas ion dum parsado de RSS
+  public String eo_elsendojRssUrl;
+  public String eo_elsendojRssUrl2;
+  public boolean eo_elsendojRssIgnoruTitolon;
+  public boolean eo_montruTitolojn;
+
+
   /** Finder den aktuelle udsendelse på kanalen */
   @Override
   public Udsendelse getUdsendelse() {
@@ -28,10 +45,5 @@ public class EoKanal extends Kanal {
   @Override
   public boolean erDirekte() {
     return eo_rektaElsendo!=null;
-  }
-
-  @Override
-  public void setStreams(ArrayList<Lydstream> str)  {
-    throw new IllegalArgumentException("Ne rajtas voki, la rezulto ne estas JSON");
   }
 }

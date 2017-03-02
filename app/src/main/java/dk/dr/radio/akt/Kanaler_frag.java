@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.akt.diverse.PagerSlidingTabStrip;
@@ -182,7 +183,11 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
 
     @Override
     public Bitmap getPageIconBitmap(int position) {
-      return kanaler2.get(position).eo_emblemo;
+      Kanal k = kanaler2.get(position);
+      if (k instanceof EoKanal) {
+        return ((EoKanal)k).kanallogo_eo;
+      }
+      return null;
     }
   }
 }

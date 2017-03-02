@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -214,7 +215,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
   public static String skalérBillede(Udsendelse u, int bredde, int højde) {
     if (!App.ÆGTE_DR) {
       if (u.billedeUrl != null) return u.billedeUrl;
-      return u.getKanal().eo_emblemoUrl;
+      return ((EoKanal) u.getKanal()).eo_emblemoUrl;
     }
 //    u.billedeUrl = null;
     return u.billedeUrl==null

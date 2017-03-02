@@ -1,5 +1,7 @@
 package dk.dr.radio.data;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,16 +30,9 @@ public abstract class Backend {
     Log.rapporterFejl(new IllegalStateException("Ikke implementeret i "+getClass().getSimpleName()));
   }
 
-  public String getGrunddataUrl() {
-    /*
-scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/
-     */
-    return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
-  }
+  public abstract String getGrunddataUrl();
 
-  public int getGrunddataRes() {
-    return R.raw.esperantoradio_kanaloj_v8;
-  }
+  public abstract InputStream getLokaleGrunddata(Context ctx);
 
 
   public abstract Grunddata initGrunddata(String grunddataStr, final Grunddata grunddata) throws JSONException, IOException;

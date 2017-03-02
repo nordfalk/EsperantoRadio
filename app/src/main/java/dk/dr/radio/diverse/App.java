@@ -35,6 +35,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
@@ -69,7 +70,6 @@ import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
 import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
 import dk.dr.radio.data.Backend;
-import dk.dr.radio.data.EoGrunddata;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
@@ -131,6 +131,7 @@ public class App {
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
   public static Resources res;
+  public static AssetManager assets;
   /** Tidsstempel der kan bruges til at afgøre hvilke filer der faktisk er brugt efter denne opstart */
   private static long TIDSSTEMPEL_VED_OPSTART;
 
@@ -144,8 +145,8 @@ public class App {
     connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
     notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
     audioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-    accessibilityManager = (AccessibilityManager) ctx.getSystemService(Context.ACCESSIBILITY_SERVICE);
     res = ctx.getResources();
+    assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
@@ -188,7 +189,7 @@ public class App {
     }
 
 
-    if (!ÆGTE_DR) FilCache.init(new File(ctx.getCacheDir(), "FilCache"));
+    FilCache.init(new File(ctx.getCacheDir(), "FilCache"));
     // Initialisering af Volley
 
     HttpStack stack = new HurlStack();
@@ -228,7 +229,7 @@ public class App {
       String grunddataStr = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
 
       if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
-        grunddataStr = Diverse.læsStreng(res.openRawResource(App.backend.getGrunddataRes()));
+        grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ctx));
       }
       grunddata = App.backend.initGrunddata(grunddataStr, null);
       if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
@@ -382,22 +383,13 @@ public class App {
           if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
           Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
           if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
-          if (!App.ÆGTE_DR) {
-            grunddata.kanaler.clear(); // EO
-            grunddata.p4koder.clear(); // EO
-            ((EoGrunddata) grunddata).eo_parseFællesGrunddata(nyeGrunddata);
-          }
-          grunddata.parseFællesGrunddata(nyeGrunddata);
-          if (App.ÆGTE_DR) for (Runnable r : new ArrayList<Runnable>(grunddata.observatører)) r.run();
-          String pn = pakkenavn;
-          for (final Kanal k : grunddata.kanaler) {
-            k.kanallogo_resid = res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", pn);
-          }
-          if (!App.ÆGTE_DR) ((EoGrunddata) grunddata).ŝarĝiKanalEmblemojn(true);
+          try {
+            grunddata = App.backend.initGrunddata(nyeGrunddata, grunddata);
+            // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
+            grunddata_prefs.edit().putString(App.backend.getGrunddataUrl(), nyeGrunddata).commit();
+          } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
           // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
           opdaterObservatører(grunddata.observatører);
-          // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
-          grunddata_prefs.edit().putString(App.backend.getGrunddataUrl(), nyeGrunddata).commit();
         }
       }) {
         public Priority getPriority() {
@@ -434,6 +426,7 @@ public class App {
 
     if (App.color!=null) return; // initialisering allerede sket
     App.color = new DRFarver();
+    accessibilityManager = (AccessibilityManager) ctx.getSystemService(Context.ACCESSIBILITY_SERVICE); // tager tid i test
 
     try { // DRs skrifttyper er ikke offentliggjort i SVN, derfor kan følgende fejle:
       skrift_gibson = Typeface.createFromAsset(ctx.getAssets(), "Gibson-Regular.otf");

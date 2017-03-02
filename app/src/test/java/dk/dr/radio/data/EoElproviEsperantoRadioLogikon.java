@@ -13,7 +13,9 @@ import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Iterator;
 
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EoRssParsado;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
@@ -46,7 +48,7 @@ public class EoElproviEsperantoRadioLogikon {
     String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
     App.backend = new EsperantoRadioBackend();
     System.out.println("===================================================================1");
-    EoGrunddata ĉefdatumoj2 = (EoGrunddata) App.backend.initGrunddata(grunddata, null);
+    Grunddata ĉefdatumoj2 = App.backend.initGrunddata(grunddata, null);
     App.grunddata = ĉefdatumoj2;
     System.out.println("===================================================================2");
 
@@ -62,11 +64,43 @@ public class EoElproviEsperantoRadioLogikon {
     System.out.println("===================================================================");
     System.out.println("===================================================================");
     System.out.println("===================================================================");
-    ĉefdatumoj2.rezumo();
+    rezumo(ĉefdatumoj2);
     System.out.println("===================================================================");
     System.out.println("===================================================================");
     System.out.println("===================================================================");
-    ĉefdatumoj2.forprenuMalplenajnKanalojn();
+    forprenuMalplenajnKanalojn(ĉefdatumoj2);
+  }
+
+
+
+  public void forprenuMalplenajnKanalojn(Grunddata ĉefdatumoj2) {
+    for (Iterator<Kanal> ki = ĉefdatumoj2.kanaler.iterator(); ki.hasNext(); ) {
+      EoKanal k = (EoKanal) ki.next();
+      if (k.udsendelser.isEmpty()) {
+        Log.d("============ FORPRENAS "+k.kode +", ĉar ĝi ne havas elsendojn! "+k.eo_datumFonto);
+      }
+    }
+  }
+
+
+
+  public void rezumo(Grunddata ĉefdatumoj2) {
+    for (Kanal k0 : ĉefdatumoj2.kanaler) {
+      EoKanal k = (EoKanal) k0;
+      Log.d("============ "+k.kode +" ============= "+k.udsendelser.size()+" "+k.eo_datumFonto);
+      int n = 0;
+      for (Udsendelse e : k.udsendelser) {
+//        Log.d(n++ +" "+ e.startTidKl +" "+e.titel +" "+e.sonoUrl+" "+e.beskrivelse);
+        Log.d(n++ +" '"+ e.slug+"'"+" "+e.titel);
+        if (n>300) {
+          Log.d("...");
+          break;
+        }
+      }
+      if (k.eo_udsendelserFraRadioTxt != null && k.eo_udsendelserFraRadioTxt.size()>k.udsendelser.size()) {
+        Log.rapporterFejl(new IllegalStateException(), "k.eo_udsendelserFraRadioTxt.size()>k.udsendelser.size() for "+k+": "+k.eo_udsendelserFraRadioTxt.size()+" > " +k.udsendelser.size());
+      }
+    }
   }
 
 
@@ -74,7 +108,8 @@ public class EoElproviEsperantoRadioLogikon {
    * @return true se io estis ŝarĝita
    */
   static void ŝarĝiElsendojnDeRss(Grunddata ĉefdatumoj2, boolean nurLokajn) {
-    for (Kanal k : ĉefdatumoj2.kanaler) {
+    for (Kanal k0 : ĉefdatumoj2.kanaler) {
+      EoKanal k = (EoKanal) k0;
       ŝarĝiElsendojnDeRssUrl(k.eo_elsendojRssUrl, k, nurLokajn);
       //ŝarĝiElsendojnDeRssUrl(k.eo_json.optString("elsendojRssUrl1", null), k, nurLokajn);
       //ŝarĝiElsendojnDeRssUrl(k.json.optString("elsendojRssUrl2", null), k, nurLokajn);
@@ -82,7 +117,7 @@ public class EoElproviEsperantoRadioLogikon {
   }
 
 
-  static void ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, Kanal k, boolean nurLokajn) {
+  static void ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, EoKanal k, boolean nurLokajn) {
     try {
       if (elsendojRssUrl== null) return;
       String dosiero = FilCache.findLokaltFilnavn(elsendojRssUrl);

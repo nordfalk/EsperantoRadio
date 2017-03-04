@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -31,7 +30,9 @@ import dk.dr.radio.v3.R;
  * Created by j on 26-02-17.
  */
 
-public class NyDrRadioBackend extends Backend {
+public class MuOnlineRadioBackend extends Backend {
+
+  private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
 
   public String getGrunddataUrl() {
     return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
@@ -194,26 +195,29 @@ Title: "P4 Bornholm",
 
 
 
-  private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
+  private static final String GLBASISURL = "http://www.dr.dk/tjenester/mu-apps";
   private static final boolean BRUG_URN = true;
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
 
   @Override
-  public String getUdsendelseUrl(Udsendelse u) {
+  public String getUdsendelseStreamsUrl(Udsendelse u) {
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
-    return BASISURL + "/program?includeStreams=true&urn=" + u.urn;
+    // http://www.dr.dk/mu-online/api/1.3/programcard/dokumania-37-tavse-vidner
+    // return BASISURL + "/programcard/" + u.slug;
+    if (u.ny_streamDataUrl==null) Log.e(new IllegalStateException("Ingen streams? " + u));
+    return u.ny_streamDataUrl;
   }
 
   /** Bruges kun fra FangBrowseIntent */
   @Override
   public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
-    return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
+    return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
   }
 
 
   @Override
-  public String getKanalUrl(Kanal kanal) {
+  public String getKanalStreamsUrl(Kanal kanal) {
     //return null; // ikke nødvendigt - vi har det fra grunddata
     return BASISURL + "/channel/" + kanal.slug;
   }
@@ -231,9 +235,26 @@ Title: "P4 Bornholm",
 
   @Override
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
-    Log.d("IGNORERER parsStreams");
-    return null;
+
+    ArrayList<Lydstream> lydData = new ArrayList<>();
+    JSONArray jsonArrayStreams = jsonobj.getJSONArray("Links");
+    for (int k = 0; k < jsonArrayStreams.length(); k++) {
+      JSONObject jsonStream = jsonArrayStreams.getJSONObject(k);
+      String type = jsonStream.getString("Target");
+      if ("HDS".equals(type)) continue;
+
+      //if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
+        Lydstream l = new Lydstream();
+      l.url = jsonStream.getString("Uri");
+      l.type = DRJson.StreamType.HLS_fra_Akamai;
+      l.kbps = -1;
+      l.kvalitet = DRJson.StreamQuality.Variable;
+        lydData.add(l);
+      //if (App.fejlsøgning) Log.d("lydstream=" + l);
+      }
+    return lydData;
   }
+
 
 
   /* ------------------------------------------------------------------------------ */
@@ -242,29 +263,18 @@ Title: "P4 Bornholm",
 
   @Override
   public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
-    return BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
+    // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
+    return BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
   }
-
-  /*
-  public String getSøgIUdsendelserUrl(String søgStr) {
-    if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
-    return BASISURL + "/search/programs?q=" + URLEncoder.encode(søgStr) + "&type=radio";
-  }
-
-  public String getSøgISerierUrl(String søgStr) {
-    if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
-    return BASISURL + "/search/series?q=" + URLEncoder.encode(søgStr) + "&type=radio";
-  }
-  */
 
   @Override
   public String getAlleProgramserierAtilÅUrl() {
-    return BASISURL + "/series-list?type=radio";
+    return GLBASISURL + "/series-list?type=radio";
   }
 
   @Override
   public String getBogOgDramaUrl() {
-    return BASISURL + "/radio-drama-adv";
+    return GLBASISURL + "/radio-drama-adv";
   }
 
   /*
@@ -274,7 +284,7 @@ Title: "P4 Bornholm",
      */
   @Override
   public String getNyeProgrammerSiden(String programserieSlug, String dato) {
-    return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
+    return GLBASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
   }
 
 
@@ -288,44 +298,41 @@ Title: "P4 Bornholm",
     return url;
   }
 
-  private static Udsendelse opretUdsendelse(Programdata programdata, JSONObject o) throws JSONException {
-    String slug = o.optString(DRJson.Slug.name());  // Bemærk - kan være tom!
-    Udsendelse u = new Udsendelse();
-    u.slug = slug;
-    programdata.udsendelseFraSlug.put(u.slug, u);
-    u.titel = o.getString(DRJson.Title.name());
-    u.beskrivelse = o.getString(DRJson.Description.name());
-    u.billedeUrl = fjernHttpWwwDrDk(o.optString(DRJson.ImageUrl.name(), null));
-    u.programserieSlug = o.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom!
-    u.episodeIProgramserie = o.optInt(DRJson.Episode.name());
-    u.urn = o.optString(DRJson.Urn.name());  // Bemærk - kan være tom!
-    return u;
-  }
-
   /**
    * Parser udsendelser for getKanal. A la http://www.dr.dk/tjenester/mu-apps/schedule/P3/0
    */
   @Override
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
     String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
+    JSONArray jsonArray = new JSONObject(jsonStr).getJSONArray("Broadcasts");
+
 
     ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
-      Udsendelse u = opretUdsendelse(programdata, o);
+      JSONObject udsJson = o.optJSONObject("ProgramCard");
+      Udsendelse u = new Udsendelse();
+      u.slug = udsJson.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
+      u.urn = udsJson.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
+      programdata.udsendelseFraSlug.put(u.slug, u);
+      u.titel = o.getString(DRJson.Title.name());
+      u.beskrivelse = o.getString(DRJson.Description.name());
+      JSONObject udsData = udsJson.optJSONObject("PrimaryAsset");
+      if (udsData != null) {
+        u.ny_streamDataUrl = udsData.getString("Uri");
+        u.kanHentes = udsData.getBoolean("Downloadable");
+      }
+      u.billedeUrl = fjernHttpWwwDrDk(udsJson.getString("PrimaryImageUri")); // "http://www.dr.dk/mu-online/api/1.3/bar/58b6d5e96187a412f0affe17"
+      u.programserieSlug = udsJson.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
+      u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
       u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
-      u.kanHøres = o.getBoolean(DRJson.Watchable.name());
+      u.kanHøres = true; //o.getBoolean(DRJson.Watchable.name());
       u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
       u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
       u.dagsbeskrivelse = dagsbeskrivelse;
-/*
-      if (datoStr.equals(iDagDatoStr)) ; // ingen ting
-      else if (datoStr.equals(iMorgenDatoStr)) u.startTidKl += " - i morgen";
-      else if (datoStr.equals(iGårDatoStr)) u.startTidKl += " - i går";
-      else u.startTidKl += " - " + datoStr;
-*/
+
       uliste.add(u);
     }
     return uliste;
@@ -346,14 +353,23 @@ Title: "P4 Bornholm",
 
   @Override
   public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
-    Udsendelse u = opretUdsendelse(programdata, o);
+    Udsendelse u = new Udsendelse();
+    u.slug = o.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
+    u.urn = o.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
+    programdata.udsendelseFraSlug.put(u.slug, u);
+    u.titel = o.getString(DRJson.Title.name());
+    u.beskrivelse = o.getString(DRJson.Description.name());
+    u.ny_streamDataUrl = o.getString("ResourceUri");
+    u.billedeUrl = fjernHttpWwwDrDk(o.getString("ImageUrl")); // "http://www.dr.dk/mu-online/api/1.3/bar/58b6d5e96187a412f0affe17"
+    u.programserieSlug = o.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
+    u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
     u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.BroadcastStartTime.name()));
     u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
     u.slutTid = new Date(u.startTid.getTime() + o.getInt(DRJson.DurationInSeconds.name()) * 1000);
 
-    if (!App.PRODUKTION && (!o.has(DRJson.Playable.name()) || !o.has(DRJson.Playable.name())))
+    if (!App.PRODUKTION && (!o.has(DRJson.Playable.name()) || !o.has(DRJson.Downloadable.name())))
       Log.rapporterFejl(new IllegalStateException("Mangler Playable eller Downloadable"), o.toString());
     u.kanHøres = o.optBoolean(DRJson.Playable.name());
     u.kanHentes = o.optBoolean(DRJson.Downloadable.name());
@@ -370,7 +386,7 @@ Title: "P4 Bornholm",
 
   @Override
   public String getPlaylisteUrl(Udsendelse u) {
-    return BASISURL + "/playlist/" + u.slug + "/0";
+    return GLBASISURL + "/playlist/" + u.slug + "/0";
   }
 
   /*
@@ -384,6 +400,7 @@ Title: "P4 Bornholm",
      */
   @Override
   public ArrayList<Playlisteelement> parsePlayliste(Udsendelse udsendelse, JSONArray jsonArray) throws JSONException {
+    // Til GLBASISURL
     ArrayList<Playlisteelement> liste = new ArrayList<Playlisteelement>();
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
@@ -403,6 +420,7 @@ Title: "P4 Bornholm",
 
   /** Fix for fejl i server-API hvor offsets i playlister forskydes en time frem i tiden */
   private static void retForkerteOffsetsIPlayliste(Udsendelse udsendelse, ArrayList<Playlisteelement> playliste) {
+    // Til GLBASISURL
     if (playliste.size()==0) return;
     // Server-API forskyder offsets i spillelister med præcis 1 time - opdag det og fix det
     int ENTIME = 1000*60*60;
@@ -440,6 +458,7 @@ Title: "P4 Bornholm",
      */
   @Override
   public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
+    // Til GLBASISURL
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
     JSONArray jsonArray = jsonObj.optJSONArray(DRJson.Chapters.name());
     if (jsonArray == null) return liste;
@@ -465,8 +484,8 @@ Title: "P4 Bornholm",
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
     if (BRUG_URN && ps != null)
-      return BASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
-    return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
+      return GLBASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
+    return GLBASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
   }
 
   /**
@@ -478,6 +497,7 @@ Title: "P4 Bornholm",
    */
   @Override
   public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
+    // Til GLBASISURL
     if (ps == null) ps = new Programserie();
     ps.titel = o.getString(DRJson.Title.name());
     ps.undertitel = o.optString(DRJson.Subtitle.name(), ps.undertitel);

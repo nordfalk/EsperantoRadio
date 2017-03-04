@@ -14,7 +14,7 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.io.FileInputStream;
 
-import dk.dr.radio.data.dr_v3.NyDrRadioBackend;
+import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.net.Diverse;
@@ -43,7 +43,7 @@ public class AfproevNyBackendEo extends Application {
     //Date.parse("Thu, 01 Aug 2013 12:01:01 +02:00");
     //String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
     String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
-    App.backend = new NyDrRadioBackend();
+    App.backend = new MuOnlineRadioBackend();
     System.out.println("===================================================================1");
     Grunddata ĉefdatumoj2 = App.backend.initGrunddata(grunddataStr, null);
     App.grunddata = ĉefdatumoj2;

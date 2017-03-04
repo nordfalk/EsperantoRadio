@@ -1,6 +1,7 @@
 package dk.dr.radio.data.dr_v3;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -48,6 +49,7 @@ public class DRBackendTidsformater {
    */
   public static DateFormat[] servertidsformatAndre = new SimpleDateFormat[]{
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz", Locale.US),
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US),
   };
 
 
@@ -68,11 +70,14 @@ public class DRBackendTidsformater {
       Date res = tidsformat.parse(tid);
       return res;
     } catch (Exception e) {
-      Log.d("Kunne ikke ikke parse "+tid+" med "+tidsformat.format(juleaften)+" "+e+" (prøver med et andet)");
+      //Log.d("Kunne ikke ikke parse "+tid+" med "+tidsformat.format(juleaften)+" "+e+" (prøver med et andet)");
       for (DateFormat tidsformatAndet : tidsformatAndre) {
         try {
           return tidsformatAndet.parse(tid);
-        } catch (Exception ex) { Log.d("Kunne ikke heller ikke parse "+tid+" med "+tidsformat.format(juleaften)+" "+ex); }
+        } catch (Exception ex) {
+          DecimalFormat df = (DecimalFormat) tidsformatAndet.getNumberFormat();
+          //Log.d("Kunne ikke heller ikke parse "+tid+" med "+tidsformatAndet.format(juleaften)+" / "+df.toPattern()+" "+ex);
+        }
       }
       Log.rapporterFejl(new IllegalArgumentException("åh nej, der kom endnu et servertidsformat, vi ikke kender! "+tid));
       if (App.EMULATOR) throw new Error(); // Stop med et crash i emulatoren

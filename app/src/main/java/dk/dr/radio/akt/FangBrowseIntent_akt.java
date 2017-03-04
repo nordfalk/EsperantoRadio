@@ -117,7 +117,6 @@ public class FangBrowseIntent_akt extends Activity {
             ArrayList<Lydstream> s = App.backend.parsStreams(o);
             udsendelse2.setStreams(s);
             udsendelse2.indslag = App.backend.parsIndslag(o);
-            udsendelse2.produktionsnummer = o.optString(DRJson.ProductionNumber.name());
             udsendelse2.shareLink = o.optString(DRJson.ShareLink.name());
 
             visUdsendelseFrag(kanalSlug, udsendelse2, tidsangivelse);

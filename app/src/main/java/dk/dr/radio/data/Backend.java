@@ -92,7 +92,7 @@ public abstract class Backend {
     return null;
   }
 
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata data) throws JSONException {
+  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata data) throws JSONException {
     ikkeImplementeret();
     return null;
   }
@@ -103,12 +103,12 @@ public abstract class Backend {
   }
 
 
-  public String getKanalUrl(Kanal kanal) {
+  public String getKanalStreamsUrl(Kanal kanal) {
     ikkeImplementeret();
     return null;
   }
 
-  public String getUdsendelseUrl(Udsendelse udsendelse) {
+  public String getUdsendelseStreamsUrl(Udsendelse udsendelse) {
     ikkeImplementeret();
     return null;
   }

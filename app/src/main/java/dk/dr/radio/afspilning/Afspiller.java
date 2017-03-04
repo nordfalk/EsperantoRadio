@@ -146,9 +146,9 @@ public class Afspiller {
     if (!lydkilde.harStreams()) {
       String url = null;
       if (lydkilde instanceof Kanal) {
-        url = App.backend.getKanalUrl((Kanal) lydkilde);
+        url = App.backend.getKanalStreamsUrl((Kanal) lydkilde);
       } else if (lydkilde instanceof Kanal) {
-        url = App.backend.getUdsendelseUrl((Udsendelse) lydkilde);
+        url = App.backend.getUdsendelseStreamsUrl((Udsendelse) lydkilde);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;

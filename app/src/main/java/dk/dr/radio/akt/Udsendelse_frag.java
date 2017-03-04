@@ -83,7 +83,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        Request<?> req = new DrVolleyStringRequest(App.backend.getUdsendelseUrl(udsendelse), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(App.backend.getUdsendelseStreamsUrl(udsendelse), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return;
@@ -93,7 +93,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
               udsendelse.indslag = App.backend.parsIndslag(o);
               udsendelse.setStreams(App.backend.parsStreams(o));
               if (!udsendelse.harStreams()) {
-                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getUdsendelseUrl(udsendelse));
+                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getUdsendelseStreamsUrl(udsendelse));
                 streamsVarTom.put(udsendelse, System.currentTimeMillis());
                 //App.volleyRequestQueue.getCache().remove(url);
                 App.forgrundstråd.postDelayed(hentStreams, 5000);
@@ -109,7 +109,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
                 Log.d("Server ombestemte sig, der var streams alligevel: "+ udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
                 streamsVarTom.remove(udsendelse);
               }
-              udsendelse.produktionsnummer = o.optString(DRJson.ProductionNumber.name());
               udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
               // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
               // der ikke er en programserie, og videre navigering derfor skal slås fra

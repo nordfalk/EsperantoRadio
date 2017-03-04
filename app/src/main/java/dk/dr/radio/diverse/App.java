@@ -75,6 +75,7 @@ import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
+import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
@@ -151,6 +152,7 @@ public class App {
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
 
+//    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
     backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
 
     sprogKonfig = new Configuration();
@@ -246,7 +248,7 @@ public class App {
 
       if (!aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
-        Request<?> req = new DrVolleyStringRequest(App.backend.getKanalUrl(aktuelKanal), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return; // ingen grund til at parse det igen
@@ -308,7 +310,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          String url = App.backend.getKanalUrl(kanal);
+          String url = App.backend.getKanalStreamsUrl(kanal);
           if (url==null) { // EO ŝanĝo
             Log.rapporterFejl(new IllegalStateException("url er null for "+kanal));
             continue;

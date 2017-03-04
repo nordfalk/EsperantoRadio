@@ -180,7 +180,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         if (json != null && !"null".equals(json)) {
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
-            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
+            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
             opdaterListe();
           } else {
             // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
@@ -189,7 +189,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
             View v = listView.getChildAt(1);
             int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
 
-            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(new JSONArray(json), kanal, dato, App.data), datoStr);
+            kanal.setUdsendelserForDag(App.backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
             opdaterListe();
 
             int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
@@ -263,7 +263,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(App.backend.getKanalUrl(kanal), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen

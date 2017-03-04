@@ -125,7 +125,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
 
   @Override
-  public String getUdsendelseUrl(Udsendelse u) {
+  public String getUdsendelseStreamsUrl(Udsendelse u) {
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     return BASISURL + "/program?includeStreams=true&urn=" + u.urn;
   }
@@ -138,7 +138,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
 
   @Override
-  public String getKanalUrl(Kanal kanal) {
+  public String getKanalStreamsUrl(Kanal kanal) {
     //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
     return BASISURL + "/channel/" + kanal.slug + "?includeStreams=true";
   }
@@ -254,8 +254,9 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
    * Parser udsendelser for getKanal. A la http://www.dr.dk/tjenester/mu-apps/schedule/P3/0
    */
   @Override
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(JSONArray jsonArray, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
     String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
+    JSONArray jsonArray = new JSONArray(jsonStr);
 
     ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
     for (int n = 0; n < jsonArray.length(); n++) {

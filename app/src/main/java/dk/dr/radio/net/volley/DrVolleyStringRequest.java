@@ -23,6 +23,10 @@ public class DrVolleyStringRequest extends StringRequest {
   public DrVolleyStringRequest(String url, final DrVolleyResonseListener listener) {
     super(url, listener, listener);
     lytter = listener;
+    if (url==null) {
+      Log.rapporterFejl(new IllegalStateException("Fik null-URL"));
+      return;
+    }
     lytter.url = url;
     if (!App.ÆGTE_DR && url.startsWith("http://www.dr.dk/tjenester")) {
       Log.rapporterFejl(new IllegalAccessException("Dette er ikke en DR app: "+url));

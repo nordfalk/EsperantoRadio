@@ -42,7 +42,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public boolean kanHøres;
   /** Om der er mulighed for at hente udsendelsen ned til offline brug. Opdateret efter at streams er hentet. */
   public boolean kanHentes;
-  public String produktionsnummer;
   public String shareLink;
   //public transient int startposition;// hvis der allerede er lyttet til denne senestLyttet så notér det her så afspilning kan fortsætte herfra
   public int episodeIProgramserie;
@@ -57,6 +56,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public ArrayList<String> sonoUrl = new ArrayList<String>();
   public String rektaElsendaPriskriboUrl;
   //// EO
+  public String ny_streamDataUrl;
 
   public Udsendelse(String s) {
     titel = s;

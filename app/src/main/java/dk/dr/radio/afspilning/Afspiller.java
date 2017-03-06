@@ -147,7 +147,7 @@ public class Afspiller {
       String url = null;
       if (lydkilde instanceof Kanal) {
         url = App.backend.getKanalStreamsUrl((Kanal) lydkilde);
-      } else if (lydkilde instanceof Kanal) {
+      } else if (lydkilde instanceof Udsendelse) {
         url = App.backend.getUdsendelseStreamsUrl((Udsendelse) lydkilde);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));

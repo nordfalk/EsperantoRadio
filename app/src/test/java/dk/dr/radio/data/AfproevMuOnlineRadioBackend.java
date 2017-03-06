@@ -1,6 +1,5 @@
 package dk.dr.radio.data;
 
-
 import android.app.Application;
 import android.os.Build;
 
@@ -32,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevMuOnlineRadioBackend.TestApp.class)
 public class AfproevMuOnlineRadioBackend {
+
 
   public static class TestApp extends Application {
     static {
@@ -100,18 +100,12 @@ public class AfproevMuOnlineRadioBackend {
       for (Udsendelse u : kanal.udsendelser) {
         url = backend.getUdsendelseStreamsUrl(u);
         Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+u+ "    "+url);
-        if (url == null) continue;
-        JSONObject obj = new JSONObject(hentStreng(url));
-        Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+obj);
-        ArrayList<Lydstream> s = backend.parsStreams(obj);
-        u.setStreams(s);
-
-        if (!u.kanHøres) Log.d("Ingen lydstreams!!");
-
-        u.playliste = backend.parsePlayliste(u, new JSONArray(hentStreng(backend.getPlaylisteUrl(u))));
-        if (u.playliste.size() > 0) {
-          antalUdsendelserMedPlaylister++;
-          Log.d("u.playliste= " + u.playliste);
+        if (url != null) {
+          JSONObject obj = new JSONObject(hentStreng(url));
+          Log.d(kanal.navn + ": " + u.startTidKl + " " + u.titel + " " + obj);
+          ArrayList<Lydstream> s = backend.parsStreams(obj);
+          u.setStreams(s);
+          if (!u.kanHøres) Log.d("Ingen lydstreams!!");
         }
 
 

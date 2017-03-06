@@ -82,7 +82,7 @@ public class DramaOgBog {
     Request<?> req = new DrVolleyStringRequest(App.backend.getBogOgDramaUrl(), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (uændret) return;
+        if (uændret || json.equals("null")) return;
         parseBogOgDrama(json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }

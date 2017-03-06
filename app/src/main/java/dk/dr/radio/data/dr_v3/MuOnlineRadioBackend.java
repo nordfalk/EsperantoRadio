@@ -33,6 +33,7 @@ import dk.dr.radio.v3.R;
 public class MuOnlineRadioBackend extends Backend {
 
   private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
+  private static final String UDESTÅR = "http://javabog.dk/filer/null.json";
 
   public String getGrunddataUrl() {
     return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
@@ -64,48 +65,6 @@ public class MuOnlineRadioBackend extends Backend {
   }
 
   private void parseKanaler(Grunddata grunddata, JSONArray jsonArray) throws JSONException {
-/*
-{
-Type: "Channel",
-StreamingServers: [],
-Url: "http://www.dr.dk/P1",
-SourceUrl: "dr.dk/mas/whatson/channel/P1D",
-WebChannel: false,
-Slug: "p1",
-Urn: "urn:dr:mu:bundle:4f3b8918860d9a33ccfdaf4d",
-PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71849a11f9d162028cfe7",
-Title: "DR P1",
-Subtitle: ""
-},
-
-{
-Type: "Channel",
-StreamingServers: [],
-Url: "http://www.dr.dk/P2",
-SourceUrl: "dr.dk/mas/whatson/channel/P2D",
-WebChannel: false,
-Slug: "p2",
-Urn: "urn:dr:mu:bundle:4f3b8919860d9a33ccfdaf54",
-PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71865a11f9d162028cfea",
-Title: "DR P2",
-Subtitle: ""
-},
-
-{
-Type: "Channel",
-StreamingServers: [],
-Url: "http://www.dr.dk/P4/bornholm",
-SourceUrl: "dr.dk/mas/whatson/channel/RØ4",
-WebChannel: false,
-Slug: "p4bornholm",
-Urn: "urn:dr:mu:bundle:4f3b892b860d9a33ccfdafd2",
-PrimaryImageUri: "http://www.dr.dk/mu-online/api/1.3/Bar/51b71a58a11f9d162028d003",
-Title: "P4 Bornholm",
-Subtitle: ""
-},
-
-
- */
     String ingenPlaylister = grunddata.json.optString("ingenPlaylister");
     int antal = jsonArray.length();
     for (int i = 0; i < antal; i++) {
@@ -213,6 +172,9 @@ Title: "P4 Bornholm",
   @Override
   public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
     return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
+    // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
+    // http://www.dr.dk/mu-online/api/1.3/programcard/lagsus-2017-03-14
+    // http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=urn:dr:mu:bundle:57d7b0c86187a40ef406898b
   }
 
 
@@ -241,7 +203,7 @@ Title: "P4 Bornholm",
     for (int k = 0; k < jsonArrayStreams.length(); k++) {
       JSONObject jsonStream = jsonArrayStreams.getJSONObject(k);
       String type = jsonStream.getString("Target");
-      if ("HDS".equals(type)) continue;
+      if ("HDS".equals(type)) continue; // HDS (HTTP Dynamic Streaming fra Adobe) kan ikke afspilles på Android
 
       //if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
         Lydstream l = new Lydstream();
@@ -269,22 +231,20 @@ Title: "P4 Bornholm",
 
   @Override
   public String getAlleProgramserierAtilÅUrl() {
-    return GLBASISURL + "/series-list?type=radio";
+    // return GLBASISURL + "/series-list?type=radio";
+    return UDESTÅR; // UDESTÅR
   }
 
   @Override
   public String getBogOgDramaUrl() {
-    return GLBASISURL + "/radio-drama-adv";
+    // return GLBASISURL + "/radio-drama-adv";
+    return UDESTÅR; // UDESTÅR
   }
 
-  /*
-      http://www.dr.dk/tjenester/mu-apps/new-programs-since/2014-02-13?urn=urn:dr:mu:bundle:4f3b8b29860d9a33ccfdb775
-      … den kan også bruges med slug:
-      http://www.dr.dk/tjenester/mu-apps/new-programs-since/monte-carlo/2014-02-13
-     */
   @Override
   public String getNyeProgrammerSiden(String programserieSlug, String dato) {
-    return GLBASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
+    // return GLBASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
+    return UDESTÅR; // UDESTÅR
   }
 
 
@@ -317,11 +277,6 @@ Title: "P4 Bornholm",
       programdata.udsendelseFraSlug.put(u.slug, u);
       u.titel = o.getString(DRJson.Title.name());
       u.beskrivelse = o.getString(DRJson.Description.name());
-      JSONObject udsData = udsJson.optJSONObject("PrimaryAsset");
-      if (udsData != null) {
-        u.ny_streamDataUrl = udsData.getString("Uri");
-        u.kanHentes = udsData.getBoolean("Downloadable");
-      }
       u.billedeUrl = fjernHttpWwwDrDk(udsJson.getString("PrimaryImageUri")); // "http://www.dr.dk/mu-online/api/1.3/bar/58b6d5e96187a412f0affe17"
       u.programserieSlug = udsJson.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
       u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
@@ -332,6 +287,14 @@ Title: "P4 Bornholm",
       u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
       u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
       u.dagsbeskrivelse = dagsbeskrivelse;
+      JSONObject udsData = udsJson.optJSONObject("PrimaryAsset");
+      if (udsData != null) {
+        u.ny_streamDataUrl = udsData.getString("Uri");
+        u.kanHentes = udsData.getBoolean("Downloadable");
+        Log.d("Der var streams for " + u.startTidKl + " "+u);
+      } else {
+        Log.d("Ingen streams for " + u.startTidKl + " "+u);
+      }
 
       uliste.add(u);
     }
@@ -386,90 +349,25 @@ Title: "P4 Bornholm",
 
   @Override
   public String getPlaylisteUrl(Udsendelse u) {
-    return GLBASISURL + "/playlist/" + u.slug + "/0";
+    // return GLBASISURL + "/playlist/" + u.slug + "/0";
+    return UDESTÅR; // UDESTÅR
   }
 
-  /*
-    Title: "Back to life",
-    Artist: "Soul II Soul",
-    DetailId: "2213875-1-1",
-    Image: "http://api.discogs.com/image/A-4970-1339439274-8053.jpeg",
-    ScaledImage: "http://asset.dr.dk/discoImages/?discoserver=api.discogs.com&file=%2fimage%2fA-4970-1339439274-8053.jpeg&h=400&w=400&scaleafter=crop&quality=85",
-    Played: "2014-02-06T15:58:33",
-    OffsetMs: 6873000
-     */
   @Override
   public ArrayList<Playlisteelement> parsePlayliste(Udsendelse udsendelse, JSONArray jsonArray) throws JSONException {
-    // Til GLBASISURL
+    // Til GLBASISURL - UDESTÅR
     ArrayList<Playlisteelement> liste = new ArrayList<Playlisteelement>();
-    for (int n = 0; n < jsonArray.length(); n++) {
-      JSONObject o = jsonArray.getJSONObject(n);
-      if (n==0) Log.d("parsePlayliste "+o);
-      Playlisteelement u = new Playlisteelement();
-      u.titel = o.getString(DRJson.Title.name());
-      u.kunstner = o.optString(DRJson.Artist.name());
-      u.billedeUrl = o.optString(DRJson.Image.name(), null);
-      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformatPlayliste(o.getString(DRJson.Played.name()));
-      u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-      if (App.TJEK_ANTAGELSER) ; // TODO fjern OffsetMs hvis det nye navn vitterligt ER OffsetInMs
-      u.offsetMs = o.optInt(DRJson.OffsetMs.name(), o.optInt(DRJson.OffsetInMs.name(), -1));
-      liste.add(u);
-    }
     return liste;
   }
-
-  /** Fix for fejl i server-API hvor offsets i playlister forskydes en time frem i tiden */
-  private static void retForkerteOffsetsIPlayliste(Udsendelse udsendelse, ArrayList<Playlisteelement> playliste) {
-    // Til GLBASISURL
-    if (playliste.size()==0) return;
-    // Server-API forskyder offsets i spillelister med præcis 1 time - opdag det og fix det
-    int ENTIME = 1000*60*60;
-//            if (playliste.get(0).offsetMs>=ENTIME && playliste.get(playliste.size()-1).offsetMs>udsendelse.)
-    long varighed = udsendelse.slutTid.getTime() - udsendelse.startTid.getTime();
-    Log.d("ret_forkerte_offsets_i_playliste " + udsendelse  + "  varighed " + varighed/ENTIME+" timer - start " +udsendelse.startTid);
-    Log.d("ret_forkerte_offsets_i_playliste "+playliste);
-    if (playliste.get(playliste.size()-1).offsetMs>=ENTIME && playliste.get(0).offsetMs>varighed) {
-      Log.d("ret_forkerte_offsets_i_playliste UDFØRES");
-      for (Playlisteelement e : playliste) e.offsetMs -= ENTIME;
-    } else {
-      Log.d("ret_forkerte_offsets_i_playliste udføres IKKE");
-    }
-  }
-
 
   /* ------------------------------------------------------------------------------ */
   /* -                     Indslag                                                - */
   /* ------------------------------------------------------------------------------ */
 
-  /*
-    http://www.dr.dk/tjenester/mu-apps/program/p2-koncerten-616 eller
-    http://www.dr.dk/tjenester/mu-apps/program?includeStreams=true&urn=urn:dr:mu:programcard:53813014a11f9d16e00f9691
-  Chapters: [
-  {
-  Title: "Introduktion til koncerten",
-  Description: "P2s Svend Rastrup Andersen klæder dig på til aftenens koncert. Mød også fløjtenisten i Montreal Symfonikerne Tim Hutchins, og hør ham fortælle om orkestrets chefdirigenter, Kent Nagano (nuværende) og Charles Dutoit.",
-  OffsetMs: 0
-  },
-  {
-  Title: "Wagner: Forspil til Parsifal",
-  Description: "Parsifal udspiller sig i et univers af gralsriddere og gralsvogtere , der vogter over den hellige gral.",
-  OffsetMs: 1096360
-  },
-     */
   @Override
   public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
-    // Til GLBASISURL
+    // Til GLBASISURL - UDESTÅR
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
-    JSONArray jsonArray = jsonObj.optJSONArray(DRJson.Chapters.name());
-    if (jsonArray == null) return liste;
-    for (int n = 0; n < jsonArray.length(); n++) {
-      JSONObject o = jsonArray.getJSONObject(n);
-      Indslaglisteelement u = new Indslaglisteelement();
-      u.titel = o.getString(DRJson.Title.name());
-      u.beskrivelse = o.getString(DRJson.Description.name());
-      u.offsetMs = o.optInt(DRJson.OffsetMs.name(), -1);
-      liste.add(u);
-    }
     return liste;
   }
 
@@ -480,12 +378,12 @@ Title: "P4 Bornholm",
 
   @Override
   public String getProgramserieUrl(Programserie ps, String programserieSlug) {
-    if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
     if (BRUG_URN && ps != null)
       return GLBASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
     return GLBASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
+    // http://www.dr.dk/mu/programcard?Relations.Slug=%22laagsus%22
   }
 
   /**
@@ -508,21 +406,4 @@ Title: "P4 Bornholm",
     ps.antalUdsendelser = o.optInt(DRJson.TotalPrograms.name(), ps.antalUdsendelser);
     return ps;
   }
-
-
-
-  /*
-  public static void main(String[] a) throws ParseException {
-    System.out.println(servertidsformat.format(new Date()));
-    System.out.println(servertidsformat.parse("2014-01-16T09:04:00+01:00"));
-  }
-*/
-
-    /*
-     * Kald
-		 * http://www.dr.dk/tjenester/mu-apps/search/programs?q=monte&type=radio
-		 * vil kun returnere radio programmer
-		 * http://www.dr.dk/tjenester/mu-apps/search/series?q=monte&type=radio
-		 * vil kun returnere radio serier
-		 */
 }

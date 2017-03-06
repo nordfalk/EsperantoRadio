@@ -152,8 +152,8 @@ public class App {
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
 
-//    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
-    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
+    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
+//    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(ÆGTE_DR ? "da_DK" : "eo");

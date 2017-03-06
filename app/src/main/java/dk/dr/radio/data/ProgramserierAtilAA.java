@@ -54,7 +54,7 @@ public class ProgramserierAtilAA {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);
-        if (uændret) return;
+        if (uændret || json.equals("null")) return;
         parseAlleProgramserierAtilÅ(json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }

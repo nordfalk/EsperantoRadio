@@ -3,6 +3,7 @@ package dk.dr.radio.akt;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
+import dk.emda.EmdaHovedAkt;
 
 public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 
@@ -40,6 +42,10 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
   protected void onCreate(Bundle savedInstanceState) {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
+
+    if (App.UDS_EMDA) {
+      startActivity(new Intent(this, EmdaHovedAkt.class));
+    }
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

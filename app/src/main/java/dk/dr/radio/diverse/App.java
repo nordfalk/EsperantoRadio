@@ -88,6 +88,7 @@ import dk.dr.radio.v3.R;
 import io.fabric.sdk.android.Fabric;
 
 public class App {
+  public static boolean UDS_EMDA = true;
   public static App instans;
   public static Programdata data;
   public static Grunddata grunddata;
@@ -151,9 +152,10 @@ public class App {
     pakkenavn = ctx.getPackageName();
 
     App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
+    App.UDS_EMDA = true;
 
-    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
-//    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
+//    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
+    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(ÆGTE_DR ? "da_DK" : "eo");

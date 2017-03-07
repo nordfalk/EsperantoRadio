@@ -19,12 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import dk.dk.niclas.NiclasHovedAkt;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 import dk.emda.EmdaHovedAkt;
 
@@ -43,8 +45,11 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    if (App.UDS_EMDA) {
+    if (Udseende.UDS_EMDA) {
       startActivity(new Intent(this, EmdaHovedAkt.class));
+    }
+    if (Udseende.UDS_NICLAS) {
+      startActivity(new Intent(this, NiclasHovedAkt.class));
     }
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {

@@ -29,8 +29,8 @@ android {
         abortOnError false
     }
     compileSdkVersion 23
-    buildToolsVersion '25.0.0'
-    useLibrary  'org.apache.http.legacy'
+    buildToolsVersion '25.0.2'
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "dk.nordfalk.esperanto.radio"
         minSdkVersion 10 // eble fakte 7 ??
@@ -61,12 +61,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.devbrackets.android:exomedia:2.4.2'
-    compile 'com.googlecode.android-query:android-query:0.25.9'
     compile files('libs/volley.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    testCompile 'org.robolectric:robolectric:3.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.devbrackets.android:exomedia:2.4.2'
+    compile 'com.googlecode.android-query:android-query:0.25.9'
+    compile 'com.android.support.constraint:constraint-layout:+'
+    testCompile 'org.robolectric:robolectric:3.1'
 }

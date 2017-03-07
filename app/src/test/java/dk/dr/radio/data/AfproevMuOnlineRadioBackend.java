@@ -24,7 +24,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
-import static dk.dr.radio.data.AfproevBackend.hentStreng;
+import static dk.dr.radio.data.AfproevGammelDrRadioBackend.hentStreng;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 

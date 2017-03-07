@@ -32,8 +32,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevBackend.TestApp.class)
-public class AfproevBackend {
+@Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevGammelDrRadioBackend.TestApp.class)
+public class AfproevGammelDrRadioBackend {
 
   static String hentStreng(String url) throws IOException {
     //String data = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(url, false, true, 1000 * 60 * 60 * 24 * 7)));

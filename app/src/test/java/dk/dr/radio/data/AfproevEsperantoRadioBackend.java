@@ -29,8 +29,8 @@ import dk.dr.radio.v3.BuildConfig;
  * @author j
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = EoElproviEsperantoRadioLogikon.EoTestApp.class)
-public class EoElproviEsperantoRadioLogikon {
+@Config(constants = BuildConfig.class, sdk = 21, application = AfproevEsperantoRadioBackend.EoTestApp.class)
+public class AfproevEsperantoRadioBackend {
   public static class EoTestApp extends Application {
     static {
       App.IKKE_Android_VM = true;

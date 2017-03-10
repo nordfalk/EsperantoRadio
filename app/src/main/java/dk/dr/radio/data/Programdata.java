@@ -21,6 +21,8 @@ package dk.dr.radio.data;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import dk.dk.niclas.MestSete;
+import dk.dk.niclas.SidsteChance;
 import dk.dr.radio.data.dr_v3.DramaOgBog;
 import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.diverse.App;
@@ -45,4 +47,6 @@ public class Programdata {
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
   public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
   public DramaOgBog dramaOgBog = new DramaOgBog();
+  public MestSete mestSete = new MestSete();
+  public SidsteChance sidsteChance = new SidsteChance();
 }

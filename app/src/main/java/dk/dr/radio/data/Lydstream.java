@@ -8,12 +8,14 @@ import dk.dr.radio.data.dr_v3.DRJson;
 public class Lydstream implements Comparable<Lydstream> {
   public String url;
   public DRJson.StreamType type;
-  //public DRJson.StreamKind kind;
+  public DRJson.StreamKind kind;
   public DRJson.StreamQuality kvalitet;
   public String format;
   public int score;
   public boolean foretrukken;
   public int kbps;
+  public int bitrate; // kan vælge at omregne til kbps istedet for at have det her felt, hvis det er bedre.
+  public String subtitlesUrl;
 
   @Override
   public String toString() {

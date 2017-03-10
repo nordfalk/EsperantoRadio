@@ -64,7 +64,8 @@ public enum DRJson {
     HLS_fra_Akamai, // 4 oprindeligt 'HLS' - virker på Android 4
     HTTP, // 5 Til on demand/hentning af lyd
     Shoutcast, // 6 Til Android 2
-    Ukendt;  // = -1 i JSON-svar
+    Ukendt, // = -1 i JSON-svar
+    Download; //TIl TV streams - da de har en download type
     static StreamType[] v = values();
 
   }

@@ -45,11 +45,13 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    if (Udseende.UDS_EMDA) {
-      startActivity(new Intent(this, EmdaHovedAkt.class));
-    }
-    if (Udseende.UDS_NICLAS) {
-      startActivity(new Intent(this, NiclasHovedAkt.class));
+    if (App.ÆGTE_DR) {
+      if (Udseende.UDS_EMDA) {
+        startActivity(new Intent(this, EmdaHovedAkt.class));
+      }
+      if (Udseende.UDS_NICLAS) {
+        startActivity(new Intent(this, NiclasHovedAkt.class));
+      }
     }
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {

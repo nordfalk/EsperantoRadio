@@ -76,6 +76,7 @@ import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
 import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
@@ -246,7 +247,7 @@ public class App {
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
-      if (!aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
+      if (ÆGTE_DR && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
         Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
@@ -262,6 +263,10 @@ public class App {
           }
         };
         App.volleyRequestQueue.add(req);
+      }
+      if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
+        Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
+        aktuelKanal = grunddata.kanaler.get(0); // Problemet er at afspiller forventer en udsendelse på kanalen
       }
 
       afspiller.setLydkilde(aktuelKanal);
@@ -307,7 +312,7 @@ public class App {
       boolean færdig = true;
       Log.d("Onlineinitialisering starter efter " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
 
-      if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
+      if (ÆGTE_DR && App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
           String url = App.backend.getKanalStreamsUrl(kanal);

@@ -36,14 +36,6 @@ public class Favoritter {
     if (favoritTilStartdato != null) return;
     prefs = ApplicationSingleton.instans.getSharedPreferences(PREF_NØGLE, 0);
     String str = prefs.getString(PREF_NØGLE, "");
-    if (str.length()==0) { // 28 nov 2014 - flyt data fra fælles prefs til separat fil - kan fjernes ultimo 2015
-      str = App.prefs.getString(PREF_NØGLE, "");
-      if (str.length()!=0) {
-        App.prefs.edit().remove(PREF_NØGLE).commit();
-        prefs.edit().putString(PREF_NØGLE, str).commit();
-      }
-    }
-
     Log.d("Favoritter: læst " + str);
     favoritTilStartdato = strengTilMap(str);
     if (favoritTilStartdato.isEmpty()) antalNyeUdsendelser = 0;
@@ -162,11 +154,11 @@ public class Favoritter {
    */
   public static HashMap<String, String> strengTilMap(String str) {
     HashMap<String, String> map = new HashMap<String, String>();
-    for (String linje : str.split(",")) {
+    for (String linje : str.split(",")) try {
       if (linje.length() == 0) continue;
       String[] d = linje.split(" ");
       map.put(d[0], d[1]);
-    }
+    } catch (Exception e) { Log.rapporterFejl(e, str); };
     return map;
   }
 

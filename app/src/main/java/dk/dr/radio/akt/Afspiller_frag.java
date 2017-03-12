@@ -218,6 +218,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
 
   @Override
   public void run() {
+    if (getActivity()==null) return;
     App.forgrundstråd.postDelayed(opdaterSeekBar, 1000);
     Lydkilde lydkilde = App.afspiller.getLydkilde();
     Kanal kanal = lydkilde.getKanal();

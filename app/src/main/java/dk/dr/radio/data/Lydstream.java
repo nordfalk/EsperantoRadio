@@ -19,7 +19,8 @@ public class Lydstream implements Comparable<Lydstream> {
 
   @Override
   public String toString() {
-    return score + "/" + type + "/" + kvalitet + kbps + "/" + format + "\n" + url+ "\n";
+    //return score + "/" + type + "/" + kvalitet + kbps + "/" + format + "\n" + url+ "\n";
+    return type + " " + url;
   }
 
   @Override

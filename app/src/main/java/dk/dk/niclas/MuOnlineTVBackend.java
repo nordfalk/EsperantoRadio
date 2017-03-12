@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Backend;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.dr_v3.DRBackendTidsformater;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -185,19 +187,56 @@ public class MuOnlineTVBackend extends Backend {
         return BASISURL + "/programcard/" + udsendelseSlug;
     }
 
-    public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata data) throws JSONException {
-        return null;
+    public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+        String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
+        JSONArray jsonArray = new JSONObject(jsonStr).getJSONArray("Broadcasts");
+
+
+        ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+        for (int n = 0; n < jsonArray.length(); n++) {
+            JSONObject o = jsonArray.getJSONObject(n);
+            JSONObject udsJson = o.optJSONObject("ProgramCard");
+            Udsendelse u = new Udsendelse();
+            u.slug = udsJson.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
+            u.urn = udsJson.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
+            programdata.udsendelseFraSlug.put(u.slug, u);
+            u.titel = o.getString(DRJson.Title.name());
+            u.beskrivelse = o.getString(DRJson.Description.name());
+            u.billedeUrl = udsJson.getString("PrimaryImageUri"); // http://www.dr.dk/mu-online/api/1.3/Bar/524a5b6b6187a2141c5e3511
+            u.programserieSlug = udsJson.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
+            u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
+            u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
+            u.kanHøres = true; //o.getBoolean(DRJson.Watchable.name());
+            u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
+            u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
+            u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
+            u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
+            u.dagsbeskrivelse = dagsbeskrivelse;
+            JSONObject udsData = udsJson.optJSONObject("PrimaryAsset");
+            if (udsData != null) {
+                u.ny_streamDataUrl = udsData.getString("Uri");
+                u.kanHentes = udsData.getBoolean("Downloadable");
+                Log.d("Der var streams for " + u.startTidKl + " "+u);
+            } else {
+                Log.d("Ingen streams for " + u.startTidKl + " "+u);
+            }
+
+            uliste.add(u);
+        }
+        return uliste;
     }
 
     //Unødvendig funktion?
+    @Override
     public String getUdsendelseStreamsUrl(Udsendelse udsendelse) {
-        if (udsendelse.ny_streamDataUrl==null) Log.e(new IllegalStateException("Ingen streams? " + udsendelse));
+        //if (udsendelse.ny_streamDataUrl==null) Log.e(new IllegalStateException("Ingen streams? " + udsendelse));
         return udsendelse.ny_streamDataUrl;
     }
 
 //Fra primary asset
 //    http://www.dr.dk/mu-online/api/1.3/manifest/urn:dr:mu:manifest:58acd5e56187a40d68d0d829
-    public ArrayList<Lydstream> parseStreams(JSONObject jsonobj) throws JSONException {
+    @Override
+    public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
 
         ArrayList<Lydstream> lydData = new ArrayList<>();
 

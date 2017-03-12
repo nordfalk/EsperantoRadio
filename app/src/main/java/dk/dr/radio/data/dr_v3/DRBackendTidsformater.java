@@ -50,6 +50,7 @@ public class DRBackendTidsformater {
   public static DateFormat[] servertidsformatAndre = new SimpleDateFormat[]{
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz", Locale.US),
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US),
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.US),
   };
 
 
@@ -86,7 +87,7 @@ public class DRBackendTidsformater {
     }
   }
 
-  static Date parseUpålideigtServertidsformat(String tid) {
+  public static Date parseUpålideigtServertidsformat(String tid) {
     return parseUpålideigtServertidsformat(tid, servertidsformat, servertidsformatAndre);
   }
 

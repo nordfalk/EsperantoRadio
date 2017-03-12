@@ -86,9 +86,6 @@ public class AfproevMuOnlineTVBackend {
       String url = backend.getUdsendelserPåKanalUrl(kanal, datoStr);
       String udsPKstr = hentStreng(url);
       kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(udsPKstr, kanal, dato, App.data), datoStr);
-      int antalUdsendelser = 0;
-      int antalUdsendelserMedPlaylister = 0;
-      int antalUdsendelserMedLydstreams = 0;
 
       for (Udsendelse u : kanal.udsendelser) {
         url = backend.getUdsendelseStreamsUrl(u);
@@ -99,25 +96,6 @@ public class AfproevMuOnlineTVBackend {
           ArrayList<Lydstream> s = backend.parsStreams(obj);
           u.setStreams(s);
           if (!u.kanHøres) Log.d("Ingen lydstreams!!");
-        }
-
-
-        boolean gavNull = false;
-        Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
-        if (ps == null) try {
-          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug));
-          if ("null".equals(str)) gavNull = true;
-          else {
-            JSONObject data = new JSONObject(str);
-            Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+ps);
-            ps = backend.parsProgramserie(data, null);
-            JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-            ArrayList<Udsendelse> udsendelser = backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
-            ps.tilføjUdsendelser(0, udsendelser);
-            i.programserieFraSlug.put(u.programserieSlug, ps);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
         }
       }
     }

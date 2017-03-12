@@ -67,7 +67,8 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
 
   @Override
   public String toString() {
-    return slug + "/" + episodeIProgramserie;//startTid + "/" + slutTid;
+    // return slug + "/" + episodeIProgramserie;//startTid + "/" + slutTid;
+    return slug + "/" + startTidKl;
   }
 
 

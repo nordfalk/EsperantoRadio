@@ -82,7 +82,8 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    kanal = (EoKanal) App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    if (kanalx instanceof EoKanal) kanal = (EoKanal) kanalx;
     udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
     if (udsendelse == null) {
       if (!App.PRODUKTION)

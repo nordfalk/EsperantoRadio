@@ -53,7 +53,9 @@ public class Log {
    * tror vil afhjælpe en evt senere fejlfinding
    */
   private static synchronized void logappend(String s) {
-    Crashlytics.log(s);
+    if (!App.EMULATOR) {
+      Crashlytics.log(s);
+    }
     if (log.length() > 57500) {
       log.delete(0, 10000);
     }

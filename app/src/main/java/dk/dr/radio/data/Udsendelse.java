@@ -58,6 +58,11 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   //// EO
   public String ny_streamDataUrl;
 
+  //TV
+  public String sæsonSlug;
+  public String sæsonUrn;
+  public String sæsonTitel;
+
   public Udsendelse(String s) {
     titel = s;
   }

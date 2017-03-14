@@ -11,7 +11,7 @@ public enum DRJson {
   SeriesSlug, // unik ID for en programserie
   Urn,        // en anden slags unik ID - https://en.wikipedia.org/wiki/Uniform_Resource_Name
   Title, Description, ImageUrl,
-  StartTime, EndTime,
+  StartTime, EndTime, StartPublish, EndPublish,
   Streams,
   Uri, Played, Artist, Image,
   Type, Kind, Quality, Kbps, ChannelSlug, TotalPrograms, Programs,

@@ -136,7 +136,45 @@ public class MuOnlineTVBackend extends Backend {
             }
         return lydData;
     }
+//    http://www.dr.dk/mu-online/api/1.3/list/view/season?id=bonderoeven-3&limit=5&offset=0
+    public Sæson parseUdsendelserForSæson(Sæson sæson, Programdata programdata, JSONArray jsonArray) throws JSONException {
+        ArrayList<Udsendelse> udsendelser = new ArrayList<>();
 
+        for(int i = 0; i < jsonArray.length(); i++){
+            JSONObject udsendelseJson = jsonArray.getJSONObject(i);
+            Udsendelse udsendelse = parseUdsendelse(null, programdata, udsendelseJson);
+            udsendelser.add(udsendelse);
+        }
+
+        sæson.udsendelser = udsendelser;
+
+        return sæson;
+    }
+
+ //   http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=bonderoeven-tv&onlyincludefirstepisode=true&limit=15&offset=0
+    //Henter kun sæsoner, og ignorerer episoderne.
+    public ArrayList<Sæson> parseListOfSeasons(String programserieSlug, Programdata programdata, JSONArray jsonArray) throws JSONException {
+        ArrayList<Sæson> sæsoner = new ArrayList<>();
+
+        for(int i = 0; i < jsonArray.length(); i++){
+            Sæson sæson = new Sæson();
+            JSONObject o = jsonArray.getJSONObject(i);
+            sæson.sæsonÅr = o.getInt("SeasonNumber");
+            sæson.sæsonSlug = o.getString("Slug");
+            sæson.sæsonUrn = o.getString("Urn");
+            sæson.sæsonTitel = o.getString("Title");
+            JSONObject episodes = o.getJSONObject("Episodes");
+            sæson.totalSize = episodes.getInt("TotalSize");
+            programdata.sæsonFraSlug.put(sæson.sæsonSlug, sæson);
+            sæsoner.add(sæson);
+            Programserie programserie = programdata.programserieFraSlug.get(programserieSlug);
+            if(programserie != null){
+                programserie.sæsoner.put(sæson.sæsonSlug, sæson);
+            }
+        }
+
+        return sæsoner;
+    }
 
     public Programserie parseAlleAfsnitAfProgramserie(String programserieSlug, Programserie programserie){
         if(programserie == null) programserie = new Programserie();
@@ -146,18 +184,30 @@ public class MuOnlineTVBackend extends Backend {
         return programserie;
     }
 
-    //Evt lav funktioner til at hente alle sæsoner og alle episoder i en sæson.
-//    http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=bonderoeven-tv&onlyincludefirstepisode={onlyincludefirstepisode}&limit=5&offset=0
-
-
-
     //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-mostviewed_channel_channelType_limit_offset
-    public MestSete getMestSete(MestSete mestSete, int offset){
+    //http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=&channeltype=TV&limit=15&offset=0
+    public MestSete getMestSete(MestSete mestSete, Programdata programdata, JSONArray jsonArray) throws JSONException {
+        if(mestSete == null) mestSete = new MestSete();
+
+        for(int i = 0; i < jsonArray.length(); i++){
+            JSONObject programJson = jsonArray.getJSONObject(i);
+            mestSete.udsendelser.add(parseUdsendelse(null, programdata, programJson));
+        }
+        programdata.mestSete = mestSete;
+
         return mestSete;
     }
 
     //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-lastchance_limit_offset_channel
-    public SidsteChance getSidstechance(SidsteChance sidstechance, int offset){
+    public SidsteChance getSidstechance(SidsteChance sidstechance, Programdata programdata, JSONArray jsonArray) throws JSONException {
+        if(sidstechance == null) sidstechance = new SidsteChance();
+
+        for(int i = 0; i < jsonArray.length(); i++){
+            JSONObject programJson = jsonArray.getJSONObject(i);
+            sidstechance.udsendelser.add(parseUdsendelse(null, programdata, programJson));
+        }
+        programdata.sidsteChance = sidstechance;
+
         return sidstechance;
     }
 
@@ -167,8 +217,54 @@ public class MuOnlineTVBackend extends Backend {
         return programserie;
     }
 
-    public Udsendelse parseUdsendelse(Kanal kanal, Programdata data, JSONObject udsendelseJson) throws JSONException {
-        return null;
+    private static final boolean BRUG_URN = true;
+    private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
+    private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
+
+    /**
+     * Fjerner http://www.dr.dk i URL'er
+     */
+    private static String fjernHttpWwwDrDk(String url) {
+        if (url != null && url.startsWith(HTTP_WWW_DR_DK)) {
+            return url.substring(HTTP_WWW_DR_DK_lgd);
+        }
+        return url;
+    }
+
+//Programcard
+    public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject udsendelseJson) throws JSONException {
+        Udsendelse u = new Udsendelse();
+        u.slug = udsendelseJson.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
+        u.urn = udsendelseJson.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
+        programdata.udsendelseFraSlug.put(u.slug, u);
+        u.titel = udsendelseJson.getString(DRJson.Title.name());
+        u.billedeUrl = udsendelseJson.getString("PrimaryImageUri"); // http://www.dr.dk/mu-online/api/1.3/Bar/524a5b6b6187a2141c5e3511
+        u.programserieSlug = udsendelseJson.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
+        if(kanal != null) {
+            u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
+        } else {
+            u.kanalSlug = udsendelseJson.optString("PrimaryChannelSlug");
+        }
+        u.kanHøres = true; //o.getBoolean(DRJson.Watchable.name());
+        JSONObject udsData = udsendelseJson.optJSONObject("PrimaryAsset");
+        if (udsData != null) {
+            u.ny_streamDataUrl = udsData.getString("Uri");
+            u.kanHentes = udsData.getBoolean("Downloadable");
+            u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(udsData.getString(DRJson.StartPublish.name()));
+            u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
+            u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(udsData.getString(DRJson.EndPublish.name()));
+            u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
+
+            Log.d("Der var streams for " + u.startTidKl + " "+u);
+        } else {
+            Log.d("Ingen streams for " + u);
+        }
+
+        u.sæsonSlug = udsendelseJson.optString("SeasonSlug");
+        u.sæsonUrn = udsendelseJson.optString("SeasonUrn");
+        u.sæsonTitel = udsendelseJson.optString("SeasonTitle");
+
+        return u;
     }
 
     public String getProgramserieUrl(Programserie programserie, String programserieSlug) {
@@ -187,38 +283,24 @@ public class MuOnlineTVBackend extends Backend {
         return BASISURL + "/programcard/" + udsendelseSlug;
     }
 
+//    http://www.dr.dk/mu-online/api/1.3/schedule/dr1?broadcastdate=2017-03-13%2022:27:13
     public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
         String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
         JSONArray jsonArray = new JSONObject(jsonStr).getJSONArray("Broadcasts");
-
 
         ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
         for (int n = 0; n < jsonArray.length(); n++) {
             JSONObject o = jsonArray.getJSONObject(n);
             JSONObject udsJson = o.optJSONObject("ProgramCard");
-            Udsendelse u = new Udsendelse();
-            u.slug = udsJson.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
-            u.urn = udsJson.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
-            programdata.udsendelseFraSlug.put(u.slug, u);
-            u.titel = o.getString(DRJson.Title.name());
+            Udsendelse u = parseUdsendelse(kanal, programdata, udsJson);
             u.beskrivelse = o.getString(DRJson.Description.name());
-            u.billedeUrl = udsJson.getString("PrimaryImageUri"); // http://www.dr.dk/mu-online/api/1.3/Bar/524a5b6b6187a2141c5e3511
-            u.programserieSlug = udsJson.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
             u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
-            u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
-            u.kanHøres = true; //o.getBoolean(DRJson.Watchable.name());
-            u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
-            u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-            u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
-            u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
             u.dagsbeskrivelse = dagsbeskrivelse;
-            JSONObject udsData = udsJson.optJSONObject("PrimaryAsset");
-            if (udsData != null) {
-                u.ny_streamDataUrl = udsData.getString("Uri");
-                u.kanHentes = udsData.getBoolean("Downloadable");
-                Log.d("Der var streams for " + u.startTidKl + " "+u);
-            } else {
-                Log.d("Ingen streams for " + u.startTidKl + " "+u);
+            if(u.startTidKl == null){ //no primary asset (F.eks. ved udsendelses-ophør)
+                u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
+                u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
+                u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
+                u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
             }
 
             uliste.add(u);

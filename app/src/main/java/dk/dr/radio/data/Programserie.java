@@ -2,9 +2,11 @@ package dk.dr.radio.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import dk.dk.niclas.Sæson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
@@ -23,6 +25,9 @@ public class Programserie { //implements Serializable {
   private ArrayList<Udsendelse> udsendelserListe;
   private TreeMap<Integer, ArrayList<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, ArrayList<Udsendelse>>();
   private TreeSet<Udsendelse> udsendelserSorteret;
+
+  //tv
+  public HashMap<String, Sæson> sæsoner;
 
   public ArrayList<Udsendelse> getUdsendelser() {
     return udsendelserListe;

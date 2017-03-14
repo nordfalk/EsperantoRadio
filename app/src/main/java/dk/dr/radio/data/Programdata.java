@@ -23,6 +23,7 @@ import java.util.HashSet;
 
 import dk.dk.niclas.MestSete;
 import dk.dk.niclas.SidsteChance;
+import dk.dk.niclas.Sæson;
 import dk.dr.radio.data.dr_v3.DramaOgBog;
 import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.diverse.App;
@@ -34,7 +35,7 @@ public class Programdata {
 
   public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<>();
   public HashMap<String, Programserie> programserieFraSlug = new HashMap<>();
-
+  public HashMap<String, Sæson> sæsonFraSlug = new HashMap<>();
   /**
    * Manglende 'SeriesSlug' (i andre kald end det for dagsprogrammet for en kanal!)
    * betyder at der ikke er en programserie, og videre navigering derfor skal slås fra.

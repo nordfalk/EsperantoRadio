@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cont_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        card_view:cardCornerRadius="4dp">
+
+        <RelativeLayout
+            android:id="@+id/cont_card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF">
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:id="@+id/im_item_icon"
+                android:src="@drawable/eksempel_udsendelse"
+                tools:ignore="ContentDescription"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="-44dp"
+                android:background="@drawable/udsendelse_baggrundsgradient"
+                />
+
+
+            <TextView
+                android:id="@+id/lbl_item_sub_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/lbl_item_text"
+                android:paddingLeft="16dp"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:text="PRESSEN PÅ P3" />
+
+            <TextView
+                android:id="@+id/lbl_item_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/im_item_icon"
+                android:paddingLeft="16dp" />
+
+
+            <Button
+                android:id="@+id/btn_card_load"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_below="@+id/lbl_item_text"
+                android:background="@drawable/dri_lyd_blaa"
+                android:textColor="@color/colorAccent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/lige_nu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LIGE_NU"
+                android:textSize="16sp"
+                android:textColor="@android:color/holo_blue_bright"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingTop="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="0dp"
+                android:layout_above="@+id/lbl_item_sub_title"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

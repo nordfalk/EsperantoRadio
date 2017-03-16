@@ -73,7 +73,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
     toolbar.setLogo(App.ÆGTE_DR ? R.drawable.dr_logo : R.drawable.appikon_eo);
     toolbar.setTitle(getString(R.string.Angiv_vækning));
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
-    toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+    toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {

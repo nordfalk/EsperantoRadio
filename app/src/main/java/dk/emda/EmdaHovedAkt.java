@@ -16,7 +16,7 @@ public class EmdaHovedAkt extends AppCompatActivity {
     private static final String EXTRA_QUOTE = "EXTRA_QUOTE";
     private static final String EXTRA_ATTR = "EXTRA_ATTR";
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity"; //test
 
 
     @Override

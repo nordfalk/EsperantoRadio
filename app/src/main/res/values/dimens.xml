@@ -4,9 +4,6 @@
    https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
 
-    <!-- Værdier i skærmbilledet for kanalvalg -->
-    <dimen name="kanalvalg_tekststr">20sp</dimen>
-
     <dimen name="kanalvisning_aktuelUdsendelse_topmargen">0dp</dimen>
 
     <!-- små skærme skal have lille 'spil'-knap. Dens trykområde bliver udvidet til 44dp af en TouchDelegate -->

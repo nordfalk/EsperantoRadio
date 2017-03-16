@@ -23,7 +23,6 @@
     <string name="DOWNLOAD">"ELŜUTI"</string>
     <string name="playliste">"ludlisto"</string>
     <string name="Start">"Ludi"</string>
-    <string name="D_R">"DR"</string>
     <string name="hent_udsendelse">"elŝuti elsendon"</string>
     <string name="Indlæser__vent_venligst___">"Ŝarĝante, bonvolu atendi ..."</string>
     <string name="INFO">"INFO"</string>
@@ -136,23 +135,5 @@
     <string name="URL_TIL_DR_RADIO_BETAVERSION">http://javabog.dk/privat/EoRadio.apk</string>
     <string name="_LIVE">REKTA</string>
 
-    <string name="Hentet">"Elŝutita"</string>
-
-
-
-<string name="AppRater_taksu">"Taksu Esperanto-radion"</string>
-<string name="AppRater_teksto">"Se vi ŝatas la programon, bonvolu uzi momenton por taksi ĝin.\n\nDankon!"</string>
-<string name="AppRater_taksi">"Taksi la programon"</string>
-<string name="AppRater_poste">"Poste"</string>
-<string name="AppRater_ne_dankon">"Ne dankon"</string>
-
-<string name="Reklamoj_taksu">"Subtenu la programon"</string>
-<string name="Reklamoj_teksto">"Tiu ĉi programo postulis multajn horojn da laboro.
-Por subteni la evoluigadon mi petas vian permeson foje montri reklamon kaj petas vin foje klaki sur la reklamojn.
-Ĉiu klako subtenas min finance - kaj post klako ne aperos reklamoj dum iom da tempo.\n
-Vi povas ĉiam ŝanĝi vian elekton pri la aperantaj/malaperantaj reklamoj en la agordoj."</string>
-<string name="Reklamoj_ne_dankon">"Ne, mi ne volas subteni vian laboron!"</string>
-<string name="Reklamoj_donaco">"Mi preferus donaci monon."</string>
-<string name="Reklamoj_bone">"Bone, mi klakos sur iom da reklamoj."</string>
 
 </resources>

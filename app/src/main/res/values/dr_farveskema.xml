@@ -2,7 +2,6 @@
 <resources>
   <color name="rød">#ff0000</color>
   <color name="hvid">#ffffff</color>
-  <color name="grå05x">#F2F2F2</color>
   <color name="grå10">#E5E5E5</color>
   <color name="grå20">#CCCCCC</color>
   <color name="grå40">#999999</color>
@@ -16,5 +15,4 @@
   <color name="blå_mørk">#258994</color>
 
   <color name="actionbar_baggrund">#E5E5E5</color>
-  <color name="actionbar_kanaler_baggrund">#E5E5E5</color>
 </resources>

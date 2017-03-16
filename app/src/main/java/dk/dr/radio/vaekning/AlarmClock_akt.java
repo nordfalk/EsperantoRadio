@@ -288,14 +288,6 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
         finish();
         return true;
       }
-      if (item.getItemId()==R.id.menu_item_add_alarm) {
-        addNewAlarm();
-        return true;
-      }
-    if (item.getItemId()==R.id.menu_item_done) {
-      finish();
-      return true;
-    }
     return super.onOptionsItemSelected(item);
   }
 

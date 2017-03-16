@@ -54,6 +54,7 @@ import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -144,12 +145,20 @@ public class Afspiller {
       return;
     }
     if (!lydkilde.harStreams()) {
+      if (lydkilde instanceof Udsendelse) {
+        Udsendelse u = (Udsendelse) lydkilde;
+        if (u.sonoUrl!=null && u.sonoUrl.size()>0) lydkilde.setStreams(EsperantoRadioBackend.lavSimpelLydstreamFraUrl(u.sonoUrl.get(0)));
+      };
+    }
+    if (!lydkilde.harStreams()) {
       String url = null;
       if (lydkilde instanceof Kanal) {
         url = App.backend.getKanalStreamsUrl((Kanal) lydkilde);
       } else if (lydkilde instanceof Udsendelse) {
         url = App.backend.getUdsendelseStreamsUrl((Udsendelse) lydkilde);
-      } else {
+      };
+
+      if (url==null) {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
       }

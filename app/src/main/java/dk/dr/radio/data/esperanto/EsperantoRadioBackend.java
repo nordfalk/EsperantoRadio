@@ -3,6 +3,7 @@ package dk.dr.radio.data.esperanto;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -189,16 +190,23 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
     e.slutTid = e.startTid;
 
+    String url = e.sonoUrl.get(0);
+    ArrayList<Lydstream> streams = lavSimpelLydstreamFraUrl(url);
+    e.setStreams(streams);
+    assert e.kanHentes == e.kanHøres == true;
+  }
+
+  @NonNull
+  public static ArrayList<Lydstream> lavSimpelLydstreamFraUrl(String url) {
     Lydstream ls = new Lydstream();
-    ls.url = e.sonoUrl.get(0);
+    ls.url = url;
     ls.type = DRJson.StreamType.HTTP;
     ls.format = "mp3";
     ls.kvalitet = DRJson.StreamQuality.High;
 
     ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
     streams.add(ls);
-    e.setStreams(streams);
-    assert e.kanHentes == e.kanHøres == true;
+    return streams;
   }
 
 
@@ -207,7 +215,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     HashSet<Kanal> kanalojDeRadioTxt = new HashSet<>();
     for (String unuo : radioTxt.split("\n\r?\n")) {
       unuo = unuo.trim();
-      //Log.d("Unuo: "+unuo);
+      Log.d("Unuo: "+unuo);
       if (unuo.length() == 0) {
         continue;
       }
@@ -223,7 +231,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
            http://www.melburno.org.au/3ZZZradio/mp3/2011-09-26.3ZZZ.radio.mp3
            Anonco : el retmesaĝo de Floréal Martorell « Katastrofo ĉe Vinilkosmo/ Eurokka Kanto : informo pri la kompaktdisko Hiphopa Kompilo 2 « Miela obsedo » Legado: el la verko de Ken Linton Kanako el Kananam ĉapitro 12 « Stranga ĝardeno » Lez el Monato de aŭgusto /septembro « Tantamas ŝtopiĝoj » de Ivo durwael Karlo el Monato » Eksplofas la popola kolero » [...]
            */
-          e.kanalSlug = x[0].replaceAll(" ","").toLowerCase();
+          e.kanalSlug = x[0].replaceAll(" ","").toLowerCase().replaceAll("ĉ", "cx");
           e.startTidKl = x[1];
           e.startTid = datoformato.parse(x[1]);
           e.sonoUrl.add(x[2]);

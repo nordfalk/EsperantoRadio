@@ -44,6 +44,7 @@ import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class Indstillinger_akt extends PreferenceActivity implements OnPreferenceChangeListener, Runnable {
@@ -58,7 +59,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     setContentView(R.layout.indstillinger_akt);
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    toolbar.setLogo(App.ÆGTE_DR ? R.drawable.dr_logo : R.drawable.appikon_eo);
+    toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon_eo);
     toolbar.setTitle(R.string.Indstillinger);
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
     toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
@@ -73,7 +74,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     addPreferencesFromResource(R.xml.indstillinger);
 
     // Find lydformat
-    if (App.ÆGTE_DR) {
+    if (!Udseende.ESPERANTO) {
       lydformatlp = (ListPreference) findPreference(Lydkilde.INDST_lydformat);
       lydformatlp.setOnPreferenceChangeListener(this);
       aktueltLydformat = lydformatlp.getValue();
@@ -185,7 +186,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
   }
 
   public void run() {
-    if (!App.ÆGTE_DR) return;
+    if (Udseende.ESPERANTO) return;
     String nytLydformat = lydformatlp.getValue();
     if (nytLydformat.equals(aktueltLydformat)) return;
 

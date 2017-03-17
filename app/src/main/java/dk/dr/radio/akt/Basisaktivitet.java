@@ -21,6 +21,7 @@ import java.util.Date;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class Basisaktivitet extends AppCompatActivity {
@@ -40,7 +41,7 @@ public class Basisaktivitet extends AppCompatActivity {
     super.setContentView(layoutResID);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     if (toolbar != null) {
-      toolbar.setLogo(App.ÆGTE_DR ? R.drawable.dr_logo : R.drawable.appikon_eo);
+      toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon_eo);
       setSupportActionBar(toolbar);
       ActionBar ab = getSupportActionBar();
       ab.setDisplayShowTitleEnabled(false);

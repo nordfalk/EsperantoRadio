@@ -12,7 +12,7 @@ import java.util.Map;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 
 /**
  * Oprettet af Jacob Nordfalk d 13-03-14.
@@ -28,7 +28,7 @@ public class DrVolleyStringRequest extends StringRequest {
       return;
     }
     lytter.url = url;
-    if (!App.ÆGTE_DR && url.startsWith("http://www.dr.dk/tjenester")) {
+    if (Udseende.ESPERANTO && url.startsWith("http://www.dr.dk/tjenester")) {
       Log.rapporterFejl(new IllegalAccessException("Dette er ikke en DR app: "+url));
     }
 

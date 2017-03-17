@@ -37,6 +37,7 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 
@@ -143,7 +144,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     });
 
     // Indlæs A-Å-liste hvis den ikke allerede er det, så vi har en komplet programliste
-    if (App.ÆGTE_DR && App.data.programserierAtilÅ.liste == null) {
+    if (!Udseende.ESPERANTO && App.data.programserierAtilÅ.liste == null) {
       App.data.programserierAtilÅ.startHentData();
     }
     return rod;
@@ -262,7 +263,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     if (søgelistecache == null) {
       søgelistecache = new ArrayList<SoegElement>(App.data.programserieFraSlug.size());
       Log.d("DRData.programdata.programserieFraSlug?=" + App.data.programserieFraSlug);
-      if (App.ÆGTE_DR) for (Programserie ps : App.data.programserieFraSlug.values()) {
+      if (!Udseende.ESPERANTO) for (Programserie ps : App.data.programserieFraSlug.values()) {
         SoegElement se = new SoegElement();
         se.programserie = ps;
         se.titel = " "+ps.titel.toLowerCase() + " " + ps.undertitel.toLowerCase();

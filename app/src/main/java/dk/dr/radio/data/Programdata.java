@@ -26,7 +26,7 @@ import dk.dk.niclas.SidsteChance;
 import dk.dk.niclas.Sæson;
 import dk.dr.radio.data.dr_v3.DramaOgBog;
 import dk.dr.radio.data.esperanto.EoFavoritter;
-import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Udseende;
 
 /**
  * Det centrale objekt som alt andet bruger til
@@ -44,7 +44,7 @@ public class Programdata {
   public HashSet<String> programserieSlugFindesIkke = new HashSet<>();
 
   public SenestLyttede senestLyttede = new SenestLyttede();
-  public Favoritter favoritter = App.ÆGTE_DR? new Favoritter() : new EoFavoritter();
+  public Favoritter favoritter = !Udseende.ESPERANTO ? new Favoritter() : new EoFavoritter();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
   public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
   public DramaOgBog dramaOgBog = new DramaOgBog();

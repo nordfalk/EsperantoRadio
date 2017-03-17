@@ -3,7 +3,6 @@ package dk.dr.radio.data;
 import android.app.Application;
 import android.os.Build;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,12 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dk.niclas.MuOnlineTVBackend;
-import dk.dr.radio.data.dr_v3.DRJson;
-import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
@@ -36,7 +34,7 @@ public class AfproevMuOnlineTVBackend {
   public static class TestApp extends Application {
     static {
       App.IKKE_Android_VM = true;
-      App.ÆGTE_DR = true;
+      Udseende.ESPERANTO = false;
     }
 
     @Override

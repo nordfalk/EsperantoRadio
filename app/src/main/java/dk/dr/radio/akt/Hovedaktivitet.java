@@ -45,7 +45,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    if (App.ÆGTE_DR) {
+    if (!Udseende.ESPERANTO) {
       if (Udseende.UDS_EMDA) {
         startActivity(new Intent(this, EmdaHovedAkt.class));
       }

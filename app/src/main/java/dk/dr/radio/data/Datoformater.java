@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 /**
@@ -15,7 +16,7 @@ import dk.dr.radio.v3.R;
  */
 
 public class Datoformater {
-  public static final Locale dansk = App.ÆGTE_DR ? new Locale("da", "DA") : Locale.getDefault(); // EO ŝanĝo
+  public static final Locale dansk = !Udseende.ESPERANTO ? new Locale("da", "DA") : Locale.getDefault(); // EO ŝanĝo
   public static final DateFormat klokkenformat = new SimpleDateFormat("HH:mm", dansk);
   /**
    * Datoformat som serveren forventer det forskellige steder

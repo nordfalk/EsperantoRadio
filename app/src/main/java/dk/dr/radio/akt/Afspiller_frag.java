@@ -38,6 +38,7 @@ import dk.dr.radio.akt.diverse.AnimationAdapter;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class Afspiller_frag extends Basisfragment implements Runnable, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -227,13 +228,13 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
       return;
     }
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (App.ÆGTE_DR) {
+    if (!Udseende.ESPERANTO) {
       kanallogo.setImageResource(kanal.kanallogo_resid);
     } else {
       if (kanal.kanallogo_eo !=null) {
         kanallogo.setImageBitmap(kanal.kanallogo_eo);
       } else {
-        kanallogo.setImageResource(App.ÆGTE_DR ? R.drawable.dr_logo : 0);
+        kanallogo.setImageResource(!Udseende.ESPERANTO ? R.drawable.dr_logo : 0);
         Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
         Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.kanallogo_eo +")");
       }

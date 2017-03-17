@@ -75,7 +75,6 @@ import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
-import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
@@ -98,7 +97,6 @@ public class App {
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java
   public static boolean IKKE_Android_VM = false; // Hvis test fra almindelig JVM
 
-  public static boolean ÆGTE_DR = false;
   /** Sæt sprogvalg til dansk eller esperanto alt efter hvilken version der køres med */
   public static Configuration sprogKonfig;
   /** Bruges på nye funktioner - for at tjekke om de altid er opfyldt i felten. Fjernes ved næste udgivelser */
@@ -151,13 +149,13 @@ public class App {
     assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
-    App.ÆGTE_DR = App.prefs.getBoolean("ÆGTE_DR", App.ÆGTE_DR);
+    Udseende.ESPERANTO = !App.prefs.getBoolean("ÆGTE_DR", !Udseende.ESPERANTO);
 
 //    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
-    backend = App.ÆGTE_DR? new GammelDrRadioBackend() : new EsperantoRadioBackend();
+    backend = !Udseende.ESPERANTO ? new GammelDrRadioBackend() : new EsperantoRadioBackend();
 
     sprogKonfig = new Configuration();
-    sprogKonfig.locale = new Locale(ÆGTE_DR ? "da_DK" : "eo");
+    sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
     Locale.setDefault(sprogKonfig.locale);
     res.updateConfiguration(App.sprogKonfig, null);
 
@@ -173,7 +171,7 @@ public class App {
       System.setProperty("http.keepAlive", "false");
     }
     try {
-      if (ÆGTE_DR) if ("dk.dr.radio".equals(pakkenavn)) {
+      if (!Udseende.ESPERANTO) if ("dk.dr.radio".equals(pakkenavn)) {
         if (!PRODUKTION) App.langToast("Sæt PRODUKTIONs-flaget");
       } else {
         if (PRODUKTION) App.langToast("Testudgave - fjern PRODUKTIONs-flaget");
@@ -247,7 +245,7 @@ public class App {
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
-      if (ÆGTE_DR && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
+      if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
         Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
@@ -312,7 +310,7 @@ public class App {
       boolean færdig = true;
       Log.d("Onlineinitialisering starter efter " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
 
-      if (ÆGTE_DR && App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
+      if (!Udseende.ESPERANTO && App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
           String url = App.backend.getKanalStreamsUrl(kanal);
@@ -357,7 +355,7 @@ public class App {
       // kan der komme rigtig mange store anomdninger i kø
       //  - det gøres kun én gang, hvilket skulle dække de fleste scenarier
       // TODO den rigtige løsning burde være at svarene for Drama&Bog og A-Å bliver hængende i cachen, tjekket her burde være om de er i cachen eller ej
-      if (ÆGTE_DR && færdig && !prefs.getBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, false)) {
+      if (!Udseende.ESPERANTO && færdig && !prefs.getBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, false)) {
         prefs.edit().putBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, true);
         færdig = false;
         data.dramaOgBog.startHentData();
@@ -440,7 +438,7 @@ public class App {
       skrift_gibson_fed = Typeface.createFromAsset(ctx.getAssets(), "Gibson-SemiBold.otf");
       skrift_georgia = Typeface.createFromAsset(ctx.getAssets(), "Georgia.ttf");
     } catch (Exception e) {
-      if (ÆGTE_DR) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
+      if (!Udseende.ESPERANTO) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
       skrift_gibson = Typeface.DEFAULT;
       skrift_gibson_fed = Typeface.DEFAULT_BOLD;
       skrift_georgia = Typeface.SERIF;

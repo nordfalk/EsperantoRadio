@@ -19,6 +19,7 @@ import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 
 /**
  * @author j
@@ -206,14 +207,14 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
    * F.eks. http://asset.dr.dk/imagescaler/?file=http://www.dr.dk/mu/bar/544e40f7a11f9d16c4c96db7&w=620&h=349
    */
   private static String skalérBilledeFraUrl(String url, int bredde, int højde) {
-    if (!App.ÆGTE_DR) return url;
+    if (Udseende.ESPERANTO) return url;
     String res = "http://asset.dr.dk/imagescaler/?file=" + url + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
     if (App.fejlsøgning) Log.d("skalérBilledeFraUrl " + url + " " + bredde + "x" + højde + " giver: " + res);
     return res;
   }
 
   public static String skalérBillede(Udsendelse u, int bredde, int højde) {
-    if (!App.ÆGTE_DR) {
+    if (Udseende.ESPERANTO) {
       if (u.billedeUrl != null) return u.billedeUrl;
       return ((EoKanal) u.getKanal()).eo_emblemoUrl;
     }

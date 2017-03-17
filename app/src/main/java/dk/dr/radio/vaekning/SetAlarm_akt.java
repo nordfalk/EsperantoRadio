@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 /**
@@ -70,7 +71,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
     // Override the default content view.
     setContentView(R.layout.deskclock_set_alarm);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    toolbar.setLogo(App.ÆGTE_DR ? R.drawable.dr_logo : R.drawable.appikon_eo);
+    toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon_eo);
     toolbar.setTitle(getString(R.string.Angiv_vækning));
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
     toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);

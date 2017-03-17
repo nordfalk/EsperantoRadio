@@ -21,6 +21,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
@@ -36,7 +37,7 @@ public class AfproevMuOnlineRadioBackend {
   public static class TestApp extends Application {
     static {
       App.IKKE_Android_VM = true;
-      App.ÆGTE_DR = true;
+      Udseende.ESPERANTO = false;
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -400,7 +399,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
           public void run() {
-            App.prefs.edit().putBoolean("ÆGTE_DR", !App.ÆGTE_DR).commit();
+            App.prefs.edit().putBoolean("ÆGTE_DR", Udseende.ESPERANTO).commit();
             startActivity(new Intent(getActivity(), GenstartProgrammet.class));
           }
         });
@@ -460,7 +459,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       }
 
 
-      if (App.ÆGTE_DR) {
+      if (!Udseende.ESPERANTO) {
         tilføj(R.layout.venstremenu_elem_overskrift, DramaOgBog_frag.class);
         aq.id(R.id.tekst).text("DR Podcast").typeface(App.skrift_gibson_fed);
 
@@ -509,7 +508,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       });
       aq.id(R.id.tekst).text(R.string.Indstillinger).typeface(App.skrift_gibson_fed);
 
-      if (App.ÆGTE_DR) {
+      if (!Udseende.ESPERANTO) {
         tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
         aq.id(R.id.tekst).text("Vælg P4-område").typeface(App.skrift_gibson_fed);
       }
@@ -524,7 +523,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.URL_TIL_DR_RADIO_BETAVERSION))));
           }
         });
-        if (App.ÆGTE_DR) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);
+        if (!Udseende.ESPERANTO) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);
         else aq.id(R.id.tekst).text("Elŝuti plej novan provversion.\n\nNuna versio:\n" + App.versionsnavn);
         aq.typeface(App.skrift_gibson).textSize(12);
       }

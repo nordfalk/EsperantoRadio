@@ -394,23 +394,25 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         });
         aq.id(R.id.tekst).text("Skift esperanto / dansk").typeface(App.skrift_gibson_fed);
 
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            Udseende.UDS_EMDA = true;
-            startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
-          }
-        });
-        aq.id(R.id.tekst).text("Emda").typeface(App.skrift_gibson_fed);
+        if (!Udseende.ESPERANTO) {
+          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+            @Override
+            public void run() {
+              Udseende.UDS_EMDA = true;
+              startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
+            }
+          });
+          aq.id(R.id.tekst).text("Emda").typeface(App.skrift_gibson_fed);
 
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            Udseende.UDS_NICLAS = true;
-            startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
-          }
-        });
-        aq.id(R.id.tekst).text("Niclas").typeface(App.skrift_gibson_fed);
+          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+            @Override
+            public void run() {
+              Udseende.UDS_NICLAS = true;
+              startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
+            }
+          });
+          aq.id(R.id.tekst).text("Niclas").typeface(App.skrift_gibson_fed);
+        }
 
         tilføj(R.layout.venstremenu_elem_adskiller_tynd);
       }

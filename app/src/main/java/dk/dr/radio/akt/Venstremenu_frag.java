@@ -383,18 +383,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
 
     public VenstremenuAdapter(final Context themedContext) {
       layoutInflater = (LayoutInflater) themedContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-/*
-      tilføj(R.layout.venstremenu_elem_soeg, Soeg_efter_program_frag.class);
-      aq.id(R.id.tekst).typeface(App.skrift_gibson_fed);
 
-      //tilføj(R.layout.venstremenu_elem_adskiller_tynd);
-*/
-      /*
-      FORSIDE_INDEX = elem.size();
-      tilføj(R.layout.venstremenu_elem_overskrift, Kanaler_frag.class);
-      aq.id(R.id.tekst).text("Forside");
-      aq.typeface(App.skrift_gibson_fed);
-      */
       if (!App.PRODUKTION) {
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
@@ -403,8 +392,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
             startActivity(new Intent(getActivity(), GenstartProgrammet.class));
           }
         });
-        aq.id(R.id.tekst).text("Skift udseende").typeface(App.skrift_gibson_fed);
-        aq.typeface(App.skrift_gibson).textSize(12);
+        aq.id(R.id.tekst).text("Skift esperanto / dansk").typeface(App.skrift_gibson_fed);
 
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
@@ -414,7 +402,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           }
         });
         aq.id(R.id.tekst).text("Emda").typeface(App.skrift_gibson_fed);
-        aq.typeface(App.skrift_gibson).textSize(12);
 
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override

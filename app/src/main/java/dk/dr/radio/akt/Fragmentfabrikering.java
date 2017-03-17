@@ -15,8 +15,11 @@ public class Fragmentfabrikering {
 
   public static Fragment udsendelse(Udsendelse udsendelse) {
     Fragment fragment;
-    if (!Udseende.ESPERANTO) fragment = new Udsendelse_frag();
-    else fragment = new EoUdsendelse_frag();
+    if (Udseende.ESPERANTO) {
+      fragment = new EoUdsendelse_frag();
+    } else {
+      fragment = new Udsendelse_frag();
+    }
     Bundle args = new Bundle();
     args.putString(DRJson.Slug.name(), udsendelse.slug);
     fragment.setArguments(args);
@@ -25,8 +28,11 @@ public class Fragmentfabrikering {
 
   public static Fragment kanal(Kanal k) {
     Fragment f;
-    if (!Udseende.ESPERANTO) f = k.kode.equals("DRN") ? new Kanal_nyheder_frag() :  new Kanal_frag();
-    else f = new EoKanal_frag();
+    if (Udseende.ESPERANTO) {
+      f = new EoKanal_frag();
+    } else {
+      f = k.kode.equals("DRN") ? new Kanal_nyheder_frag() :  new Kanal_frag();
+    }
     Bundle b = new Bundle();
     b.putString(Kanal_frag.P_kode, k.kode);
     f.setArguments(b);

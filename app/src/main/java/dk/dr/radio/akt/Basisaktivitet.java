@@ -41,7 +41,7 @@ public class Basisaktivitet extends AppCompatActivity {
     super.setContentView(layoutResID);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     if (toolbar != null) {
-      toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon_eo);
+      toolbar.setLogo(Udseende.ESPERANTO ? R.drawable.appikon_eo : R.drawable.dr_logo);
       setSupportActionBar(toolbar);
       ActionBar ab = getSupportActionBar();
       ab.setDisplayShowTitleEnabled(false);

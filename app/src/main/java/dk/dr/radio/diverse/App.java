@@ -433,16 +433,9 @@ public class App {
     App.color = new DRFarver();
     accessibilityManager = (AccessibilityManager) ctx.getSystemService(Context.ACCESSIBILITY_SERVICE); // tager tid i test
 
-    try { // DRs skrifttyper er ikke offentliggjort i SVN, derfor kan følgende fejle:
-      skrift_gibson = Typeface.createFromAsset(ctx.getAssets(), "Gibson-Regular.otf");
-      skrift_gibson_fed = Typeface.createFromAsset(ctx.getAssets(), "Gibson-SemiBold.otf");
-      skrift_georgia = Typeface.createFromAsset(ctx.getAssets(), "Georgia.ttf");
-    } catch (Exception e) {
-      if (!Udseende.ESPERANTO) Log.d("DRs skrifttyper er ikke tilgængelige: "+ e);
-      skrift_gibson = Typeface.DEFAULT;
-      skrift_gibson_fed = Typeface.DEFAULT_BOLD;
-      skrift_georgia = Typeface.SERIF;
-    }
+    skrift_gibson = Typeface.DEFAULT;
+    skrift_gibson_fed = Typeface.DEFAULT_BOLD;
+    skrift_georgia = Typeface.SERIF;
     skrift_gibson_fed_span = new EgenTypefaceSpan("Gibson fed", App.skrift_gibson_fed);
 
     if (!EMULATOR) AppOpdatering.tjekForNyAPK(ctx);
@@ -510,7 +503,7 @@ public class App {
     forgrundstråd.postDelayed(synlighedsSporing, 50);
   }
 
-  Runnable synlighedsSporing = new Runnable() {
+  private Runnable synlighedsSporing = new Runnable() {
     boolean sidstSynlig = false;
     @Override
     public void run() {

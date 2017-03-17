@@ -33,15 +33,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import dk.dk.niclas.NiclasHovedAkt;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.akt.diverse.GenstartProgrammet;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmClock_akt;
 import dk.dr.radio.vaekning.Alarms;
+import dk.emda.EmdaHovedAkt;
 
 
 /**
@@ -393,6 +396,38 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       aq.id(R.id.tekst).text("Forside");
       aq.typeface(App.skrift_gibson_fed);
       */
+      if (!App.PRODUKTION) {
+        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+          @Override
+          public void run() {
+            App.prefs.edit().putBoolean("ÆGTE_DR", !App.ÆGTE_DR).commit();
+            startActivity(new Intent(getActivity(), GenstartProgrammet.class));
+          }
+        });
+        aq.id(R.id.tekst).text("Skift udseende").typeface(App.skrift_gibson_fed);
+        aq.typeface(App.skrift_gibson).textSize(12);
+
+        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+          @Override
+          public void run() {
+            Udseende.UDS_EMDA = true;
+            startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
+          }
+        });
+        aq.id(R.id.tekst).text("Emda").typeface(App.skrift_gibson_fed);
+        aq.typeface(App.skrift_gibson).textSize(12);
+
+        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+          @Override
+          public void run() {
+            Udseende.UDS_NICLAS = true;
+            startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
+          }
+        });
+        aq.id(R.id.tekst).text("Niclas").typeface(App.skrift_gibson_fed);
+
+        tilføj(R.layout.venstremenu_elem_adskiller_tynd);
+      }
 
       tilføj(R.layout.venstremenu_elem_overskrift, Senest_lyttede_frag.class);
       aq.id(R.id.tekst).text(R.string.Senest_lyttede).typeface(App.skrift_gibson_fed);
@@ -489,20 +524,9 @@ public class Venstremenu_frag extends Fragment implements Runnable {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.URL_TIL_DR_RADIO_BETAVERSION))));
           }
         });
-        if (App.ÆGTE_DR) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn + "\n" + "/" + Build.MODEL + " " + Build.PRODUCT);
-        else aq.id(R.id.tekst).text("Elŝuti plej novan provversion.\n\nNuna versio:\n" + App.versionsnavn + "\n\n" + Build.MODEL + " " + Build.PRODUCT);
-
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            App.prefs.edit().putBoolean("ÆGTE_DR", !App.ÆGTE_DR).commit();
-            startActivity(new Intent(getActivity(), GenstartProgrammet.class));
-          }
-        });
-        aq.id(R.id.tekst).text("Skift udseende").typeface(App.skrift_gibson_fed);
-
+        if (App.ÆGTE_DR) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);
+        else aq.id(R.id.tekst).text("Elŝuti plej novan provversion.\n\nNuna versio:\n" + App.versionsnavn);
         aq.typeface(App.skrift_gibson).textSize(12);
-
       }
     }
 

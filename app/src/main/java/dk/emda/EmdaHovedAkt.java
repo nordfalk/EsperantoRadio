@@ -33,13 +33,17 @@ public class EmdaHovedAkt extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        tabLayout.getTabAt(0).setIcon(R.drawable.hjem);
+        tabLayout.getTabAt(1).setIcon(R.drawable.favourite);
+        tabLayout.getTabAt(2).setIcon(R.drawable.kanalertab);
+
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new EmdahTab1_Frag(), "TAB1");
-        adapter.addFragment(new EmdahTab2_Frag(), "TAB2");
+        adapter.addFragment(new EmdahTab1_Frag(), "home");
+        adapter.addFragment(new EmdahTab2_Frag(), "favourite");
         adapter.addFragment(new EmdahTab3_Frag(), "TAB3");
         adapter.addFragment(new EmdahTab4_Frag(), "TAB4");
         viewPager.setAdapter(adapter);

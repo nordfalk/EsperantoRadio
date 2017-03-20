@@ -8,6 +8,11 @@ import java.util.List;
  */
 
 public class EmdahDerpData {
+
+
+
+
+
     private static final String[] titles={"Nothingness cannot be defined",
             "Time is like a river made up of the events which happen, and a violent stream; " +
                     "for as soon as a thing has been seen, it is carried away, and another comes" +
@@ -25,6 +30,7 @@ public class EmdahDerpData {
                     " seasons, or the wind, but you can change yourself. That is something you" +
                     " have charge of."
     };
+
 
     private static final String[] subTitles = {"Bruce Lee",
             "Marcus Aurelius",

@@ -41,7 +41,7 @@ public class EmdahTab1_Frag extends Fragment implements EmdahAdapter.ItemClickCa
         listData = (ArrayList) EmdahDerpData.getListData();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rec_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL, false));
 
         adapter = new EmdahAdapter(EmdahDerpData.getListData(),getActivity());
         recyclerView.setAdapter(adapter);

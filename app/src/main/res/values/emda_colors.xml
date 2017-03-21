@@ -10,4 +10,5 @@
     <color name="bluetheme3">#0082FF</color>
     <color name="bluetheme4">#26547F</color>
     <color name="bluetheme5">#002140</color>
+    <color name="bluetheme5_fade">#002a40</color>
 </resources>

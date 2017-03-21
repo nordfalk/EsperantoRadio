@@ -39,7 +39,7 @@ public class EmdaHovedAkt extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(R.drawable.hjem);
         tabLayout.getTabAt(1).setIcon(R.drawable.favourite);
         tabLayout.getTabAt(2).setIcon(R.drawable.kanalertab);
-        tabLayout.setBackgroundColor(ContextCompat.getColor(getBaseContext(),R.color.bluetheme5));
+        tabLayout.setBackgroundColor(ContextCompat.getColor(getBaseContext(),R.color.bluetheme4));
 
 
         tabLayout.getTabAt(0).getIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);

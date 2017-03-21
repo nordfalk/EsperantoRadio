@@ -5,5 +5,9 @@
     <color name="colorAccent">#448AFF</color>
 
 
-
+    <color name="bluetheme1">#00417F</color>
+    <color name="bluetheme2">#4CA8FF</color>
+    <color name="bluetheme3">#0082FF</color>
+    <color name="bluetheme4">#26547F</color>
+    <color name="bluetheme5">#002140</color>
 </resources>

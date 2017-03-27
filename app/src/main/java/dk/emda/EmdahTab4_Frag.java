@@ -56,6 +56,7 @@ public class EmdahTab4_Frag extends Fragment {
                 final String url = App.backend.getUdsendelserPåKanalUrl(kanal, datoStr);
                 final String dr ="http://www.dr.dk/";
 
+
                 new AsyncTask() {
                     @Override
                     protected Object doInBackground(Object[] params) {

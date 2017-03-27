@@ -1,7 +1,12 @@
 package dk.emda;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Kanal;
+import dk.dr.radio.diverse.App;
 
 /**
  * Created by Emdadollah on 08-03-2017.
@@ -9,6 +14,12 @@ import java.util.List;
 
 public class EmdahDerpData {
 
+
+    final Kanal kanal = App.grunddata.kanaler.get(2); // P3
+
+    final Date dato = new Date();
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
+    final String url = App.backend.getUdsendelserPåKanalUrl(kanal, datoStr);
 
 
 

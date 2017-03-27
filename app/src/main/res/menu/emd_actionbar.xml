@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="vmenu"
+        android:id="@+id/vmenu"
+        android:icon="@drawable/menu_icon_left"
+        android:showAsAction="always" />
+    <item android:title="@string/Søg"
+        android:id="@+id/søg"
+        android:icon="@drawable/dri_soeg_hvid"
+        android:visible="false"
+        android:showAsAction="always" />
+</menu>

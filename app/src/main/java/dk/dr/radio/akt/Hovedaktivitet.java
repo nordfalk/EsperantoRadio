@@ -28,7 +28,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
-import dk.emda.EmdaHovedAkt;
+import dk.emda.emdah_akt.EmdaHovedAkt;
 
 public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 

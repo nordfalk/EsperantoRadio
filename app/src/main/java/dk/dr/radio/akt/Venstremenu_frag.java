@@ -43,7 +43,7 @@ import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmClock_akt;
 import dk.dr.radio.vaekning.Alarms;
-import dk.emda.EmdaHovedAkt;
+import dk.emda.emdah_akt.EmdaHovedAkt;
 
 
 /**

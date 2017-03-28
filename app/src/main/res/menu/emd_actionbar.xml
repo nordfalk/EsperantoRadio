@@ -10,6 +10,5 @@
     <item android:title="@string/Søg"
         android:id="@+id/søg"
         android:icon="@drawable/dri_soeg_hvid"
-        android:visible="false"
         app:showAsAction="always" />
 </menu>

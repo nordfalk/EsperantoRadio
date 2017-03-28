@@ -53,7 +53,7 @@ import dk.emda.emdah_akt.EmdaHovedAkt;
  */
 public class Venstremenu_frag extends Fragment implements Runnable {
 
-  /**
+  /**uu
    * Remember the position of the selected item.
    */
   private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";

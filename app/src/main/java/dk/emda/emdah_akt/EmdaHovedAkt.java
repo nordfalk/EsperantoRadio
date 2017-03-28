@@ -1,4 +1,4 @@
-package dk.emda;
+package dk.emda.emdah_akt;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import dk.dr.radio.v3.R;
+import dk.emda.SectionsPageAdapter;
 
 public class EmdaHovedAkt extends AppCompatActivity {
     private SectionsPageAdapter mSectionsPageAdapter;

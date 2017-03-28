@@ -1,4 +1,4 @@
-package dk.emda;
+package dk.emda.emdah_akt;
 
 import android.os.AsyncTask;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package dk.emda;
+package dk.emda.emdah_akt;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import dk.dr.radio.v3.R;
+import dk.emda.EmdahAdapter;
+import dk.emda.ListItem;
+import dk.emda.emdah_akt.EmdahDetailActivity;
+import dk.emda.emdah_data.EmdahDerpData;
 
 import java.util.ArrayList;
 

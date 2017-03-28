@@ -1,4 +1,4 @@
-package dk.emda;
+package dk.emda.emdah_akt;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,21 +15,21 @@ import dk.dr.radio.v3.R;
  * Created by User on 2/28/2017.
  */
 
-public class EmdahTab2_Frag extends Fragment {
-    private static final String TAG = "Tab2Fragment";
+public class EmdahTab3_Frag extends Fragment {
+    private static final String TAG = "Tab3Fragment";
 
     private Button btnTEST;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.emdah_tab2_frag,container,false);
-        btnTEST = (Button) view.findViewById(R.id.button2);
+        View view = inflater.inflate(R.layout.emdah_tab3_frag,container,false);
+        btnTEST = (Button) view.findViewById(R.id.button3);
 
         btnTEST.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "TESTING BUTTON CLICK 2", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "TESTING BUTTON CLICK 3", Toast.LENGTH_SHORT).show();
             }
         });
 

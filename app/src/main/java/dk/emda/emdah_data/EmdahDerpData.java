@@ -1,4 +1,4 @@
-package dk.emda;
+package dk.emda.emdah_data;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +7,7 @@ import java.util.List;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
+import dk.emda.ListItem;
 
 /**
  * Created by Emdadollah on 08-03-2017.

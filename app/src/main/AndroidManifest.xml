@@ -167,8 +167,8 @@
             android:name="io.fabric.ApiKey"
             android:value="4981f42254f5c456be5e9aac886a9c0aea0c4420" />
 
-        <activity android:name="dk.emda.EmdaHovedAkt" />
-        <activity android:name="dk.emda.EmdahDetailActivity" />
+        <activity android:name="dk.emda.emdah_akt.EmdaHovedAkt" />
+        <activity android:name="dk.emda.emdah_akt.EmdahDetailActivity" />
         <activity android:name="dk.dk.niclas.NiclasHovedAkt"></activity>
 
 

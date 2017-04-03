@@ -105,12 +105,12 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
     App.forgrundstråd.removeCallbacks(this);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
           JSONObject o = new JSONObject(json);
-          ArrayList<Lydstream> s = App.backend.parsStreams(o);
+          ArrayList<Lydstream> s = kanal.getBackend().parsStreams(o);
           kanal.setStreams(s);
           Log.d("hentStreams Kanal_nyheder_frag fraCache=" + fraCache + " => " + kanal);
           run(); // Opdatér igen

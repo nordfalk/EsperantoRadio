@@ -78,7 +78,7 @@ public class MuOnlineTVBackend extends Backend {
             kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/')+1); // Klampkode til at få alle kanalKoder fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR",
             Kanal k = grunddata.kanalFraKode.get(kanalkode);
             if (k == null) {
-                k = new Kanal();
+                k = new Kanal(this);
                 k.kode = kanalkode;
                 grunddata.kanalFraKode.put(k.kode, k);
             }

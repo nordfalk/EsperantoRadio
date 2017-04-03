@@ -27,7 +27,7 @@ import dk.dr.radio.v3.R;
 public abstract class Backend {
 
   private void ikkeImplementeret() {
-    Log.rapporterFejl(new IllegalStateException("Ikke implementeret i "+getClass().getSimpleName()));
+    throw new IllegalStateException("Ikke implementeret i "+getClass().getSimpleName());
   }
 
   public abstract String getGrunddataUrl();

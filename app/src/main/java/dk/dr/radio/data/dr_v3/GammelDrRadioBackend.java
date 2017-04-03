@@ -86,7 +86,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       String kanalkode = j.optString("scheduleIdent", Kanal.P4kode);
       Kanal k = grunddata.kanalFraKode.get(kanalkode);
       if (k == null) {
-        k = new Kanal();
+        k = new Kanal(this);
         k.kode = j.optString("scheduleIdent", Kanal.P4kode);
         grunddata.kanalFraKode.put(k.kode, k);
       }

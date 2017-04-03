@@ -67,7 +67,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     int antal = kanalojJs.length();
     for (int i = 0; i < antal; i++) {
       JSONObject kJs = kanalojJs.getJSONObject(i);
-      EoKanal k = new EoKanal();
+      EoKanal k = new EoKanal(this);
       k.slug = k.kode = kJs.optString("kodo", null);
       if (k.kode ==null) continue;
       k.navn = kJs.getString("nomo");
@@ -250,7 +250,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
           if (k == null) {
             Log.d("Nekonata kanalnomo - ALDONAS GXIN: " + e.kanalSlug);
-            k = new EoKanal();
+            k = new EoKanal(this);
             k.kode = k.slug = e.kanalSlug;
             k.navn = x[0];
             k.eo_datumFonto = "radio.txt";

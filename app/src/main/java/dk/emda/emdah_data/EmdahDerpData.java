@@ -20,7 +20,7 @@ public class EmdahDerpData {
 
     final Date dato = new Date();
     final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    final String url = App.backend.getUdsendelserPåKanalUrl(kanal, datoStr);
+    final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
 
 
 

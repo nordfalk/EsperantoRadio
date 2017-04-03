@@ -313,7 +313,7 @@ public class App {
       if (!Udseende.ESPERANTO && App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          String url = App.backend.getKanalStreamsUrl(kanal);
+          String url = kanal.getBackend().getKanalStreamsUrl(kanal);
           if (url==null) { // EO ŝanĝo
             Log.rapporterFejl(new IllegalStateException("url er null for "+kanal));
             continue;
@@ -323,7 +323,7 @@ public class App {
             @Override
             public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
               if (uændret) return;
-              ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(json));
+              ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(json));
               kanal.setStreams(s);
               Log.d("hentStreams app fraCache=" + fraCache + " => " + kanal);
             }

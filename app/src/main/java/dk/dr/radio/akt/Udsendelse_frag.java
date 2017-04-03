@@ -83,17 +83,17 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        Request<?> req = new DrVolleyStringRequest(App.backend.getUdsendelseStreamsUrl(udsendelse), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getUdsendelseStreamsUrl(udsendelse), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return;
             Log.d("hentStreams fikSvar(" + fraCache + " " + url);
             if (json != null && !"null".equals(json)) {
               JSONObject o = new JSONObject(json);
-              udsendelse.indslag = App.backend.parsIndslag(o);
-              udsendelse.setStreams(App.backend.parsStreams(o));
+              udsendelse.indslag = kanal.getBackend().parsIndslag(o);
+              udsendelse.setStreams(kanal.getBackend().parsStreams(o));
               if (!udsendelse.harStreams()) {
-                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + App.backend.getUdsendelseStreamsUrl(udsendelse));
+                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + kanal.getBackend().getUdsendelseStreamsUrl(udsendelse));
                 streamsVarTom.put(udsendelse, System.currentTimeMillis());
                 //App.volleyRequestQueue.getCache().remove(url);
                 App.forgrundstråd.postDelayed(hentStreams, 5000);
@@ -375,7 +375,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed() || kanal.ingenPlaylister) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      Request<?> req = new DrVolleyStringRequest(App.backend.getPlaylisteUrl(udsendelse), new DrVolleyResonseListener() {
+      Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getPlaylisteUrl(udsendelse), new DrVolleyResonseListener() {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (App.fejlsøgning) Log.d("fikSvar playliste(" + fraCache + " " + url + "   " + this);
@@ -384,7 +384,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           if (udsendelse.playliste != null && uændret) return;
           if (json == null || "null".equals(json)) return; // fejl
           Log.d("UDS fikSvar playliste(" + fraCache + uændret + " " + url);
-          ArrayList<Playlisteelement> playliste = App.backend.parsePlayliste(udsendelse, new JSONArray(json));
+          ArrayList<Playlisteelement> playliste = kanal.getBackend().parsePlayliste(udsendelse, new JSONArray(json));
           if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
             // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
             // selvom serveren har ombestemt sig, og siger at listen er tom.

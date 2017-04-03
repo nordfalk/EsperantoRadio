@@ -53,7 +53,7 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
     for (String k : kanalkoder) {
       if (App.grunddata.kanalFraKode.get(k) == null) {
         new IllegalStateException("Kanalkode mangler! Det her må ikke ske!").printStackTrace();
-        App.grunddata.kanalFraKode.put(k, new Kanal()); // reparér problemet :-(
+        App.grunddata.kanalFraKode.put(k, new Kanal(null)); // reparér problemet :-(
       }
     }
 

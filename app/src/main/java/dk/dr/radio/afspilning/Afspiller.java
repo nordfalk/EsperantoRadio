@@ -153,9 +153,9 @@ public class Afspiller {
     if (!lydkilde.harStreams()) {
       String url = null;
       if (lydkilde instanceof Kanal) {
-        url = App.backend.getKanalStreamsUrl((Kanal) lydkilde);
+        url = lydkilde.getBackend().getKanalStreamsUrl((Kanal) lydkilde);
       } else if (lydkilde instanceof Udsendelse) {
-        url = App.backend.getUdsendelseStreamsUrl((Udsendelse) lydkilde);
+        url = lydkilde.getBackend().getUdsendelseStreamsUrl((Udsendelse) lydkilde);
       };
 
       if (url==null) {

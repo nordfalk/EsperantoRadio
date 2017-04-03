@@ -82,7 +82,7 @@ public class MuOnlineRadioBackend extends Backend {
       kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/')+1); // Klampkode til at få P1D, P2D, KH4,
       Kanal k = grunddata.kanalFraKode.get(kanalkode);
       if (k == null) {
-        k = new Kanal();
+        k = new Kanal(this);
         k.kode = kanalkode;
         grunddata.kanalFraKode.put(k.kode, k);
       }

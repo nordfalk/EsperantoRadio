@@ -6,6 +6,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
@@ -28,6 +29,10 @@ public class EoKanal extends Kanal {
   public String eo_elsendojRssUrl2;
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
+
+  public EoKanal(Backend backend) {
+    super(backend);
+  }
 
 
   /** Finder den aktuelle udsendelse på kanalen */

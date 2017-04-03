@@ -46,6 +46,16 @@ public class Kanal extends Lydkilde {
   /** P1 har ingen senest spillet og der er aldrig playlister på denne kanal */
   public boolean ingenPlaylister;
 
+  private Backend backend;
+
+  public Kanal(Backend backend) {
+    this.backend = backend;
+  }
+
+  public Backend getBackend() {
+    return backend;
+  }
+
   @Override
   public String toString() {
     return kode;// + "/" + navn + "/" + logoUrl;

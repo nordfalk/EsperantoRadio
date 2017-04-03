@@ -53,7 +53,7 @@ public class EmdahTab4_Frag extends Fragment {
 
                 final Date dato = new Date();
                 final String datoStr = Datoformater.apiDatoFormat.format(dato);
-                final String url = App.backend.getUdsendelserPåKanalUrl(kanal, datoStr);
+                final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
                 final String dr ="http://www.dr.dk/";
 
 
@@ -62,7 +62,7 @@ public class EmdahTab4_Frag extends Fragment {
                     protected Object doInBackground(Object[] params) {
                         try {
                             String data = Diverse.hentUrlSomStreng(url);
-                            ArrayList<Udsendelse> liste = App.backend.parseUdsendelserForKanal(data, kanal, dato, App.data);
+                            ArrayList<Udsendelse> liste = kanal.getBackend().parseUdsendelserForKanal(data, kanal, dato, App.data);
                             kanal.setUdsendelserForDag(liste, datoStr);
 
                             System.out.println("Kanal "+kanal);

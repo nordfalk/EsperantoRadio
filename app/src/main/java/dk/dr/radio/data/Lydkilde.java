@@ -126,4 +126,8 @@ public abstract class Lydkilde implements Serializable {
   public String toString() {
     return slug + " str=" + streams;
   }
+
+  public Backend getBackend() {
+    return getKanal().getBackend();
+  }
 }

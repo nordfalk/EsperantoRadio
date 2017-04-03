@@ -31,19 +31,9 @@
 ",
 
 
-	"XXX_feedback_modtagere": ["jacob.nordfalk@gmail.com" ],
-
-	"XXX_feedback_brugerspørgsmål": "Dankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube.---\nv8.json",
-
-	"XXX_drift_statusmeddelelse": "NE UZATA",
-
 	"hejmpaĝo": "https://github.com/nordfalk/esperanto-telefono/blob/wiki/EsperantoRadio.md",
-
 	"elsendojUrl": "http://esperanto-radio.com/radio.txt",
-
 	"komenca_kanalo": "muzaiko",
-
-    "channels": [ ],
 
 	"kanaloj": [
 		{

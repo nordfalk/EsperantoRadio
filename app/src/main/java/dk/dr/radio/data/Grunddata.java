@@ -23,7 +23,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Grunddata {
   /**
@@ -32,7 +34,7 @@ public class Grunddata {
   public JSONObject android_json;
   public JSONObject json;
 
-  public List<String> p4koder = new ArrayList<String>();
+  public Set<String> p4koder = new LinkedHashSet<>();
   public List<Kanal> kanaler = new ArrayList<Kanal>();
   public Kanal forvalgtKanal;
   public ArrayList<Runnable> observatører = new ArrayList<Runnable>(); // Om grunddata/stamdata ændrer sig

@@ -229,7 +229,7 @@ public class App {
       grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
       String grunddataStr = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
 
-      if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste - det er nok en frisk installation
+      if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste start - det er nok en frisk installation
         grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ctx));
       }
       grunddata = App.backend.initGrunddata(grunddataStr, null);

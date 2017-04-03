@@ -46,7 +46,7 @@ public class Kanal extends Lydkilde {
   /** P1 har ingen senest spillet og der er aldrig playlister på denne kanal */
   public boolean ingenPlaylister;
 
-  private Backend backend;
+  private transient Backend backend;
 
   public Kanal(Backend backend) {
     this.backend = backend;

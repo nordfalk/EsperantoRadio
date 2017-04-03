@@ -57,12 +57,12 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
 
-    grunddata.kanaler.clear();
-    grunddata.p4koder.clear();
     JSONArray kanalojJs = grunddata.json.getJSONArray("kanaloj");
 
     // Erstat med evt ny værdi
     //radioTxtUrl = json.optString("elsendojUrl", radioTxtUrl);
+    grunddata.kanaler.removeAll(kanaler);
+    kanaler.clear();
 
     int antal = kanalojJs.length();
     for (int i = 0; i < antal; i++) {
@@ -81,7 +81,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
       k.eo_montruTitolojn = kJs.optBoolean("montruTitolojn", false);
 
-      grunddata.kanaler.add(k);
+      kanaler.add(k);
 
       if (rektaElsendaSonoUrl != null) {
         Udsendelse rektaElsendo = new Udsendelse();
@@ -104,9 +104,10 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         //k.udsendelser.add(el);
       }
     }
+    grunddata.kanaler.addAll(kanaler);
 
 
-    for (Kanal k : grunddata.kanaler) {
+    for (Kanal k : kanaler) {
       grunddata.kanalFraKode.put(k.kode, k);
       grunddata.kanalFraSlug.put(k.slug, k);
     }

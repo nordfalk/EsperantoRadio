@@ -53,7 +53,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata) throws JSONException, IOException {
     if (grunddata == null) grunddata = new Grunddata();
     grunddata.json = new JSONObject(grunddataStr);
-    grunddata.android_json = grunddata.json.getJSONObject("android");
+    JSONObject android_json = grunddata.android_json = grunddata.json.getJSONObject("android");
 
     try {
       grunddata.opdaterGrunddataEfterMs = grunddata.json.getJSONObject("intervals").getInt("settings") * 1000;
@@ -62,17 +62,17 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       Log.e(e);
     } // Ikke kritisk
 
-    JSONObject android_json = grunddata.android_json;
     serverapi_ret_forkerte_offsets_i_playliste = android_json.optBoolean("serverapi_ret_forkerte_offsets_i_playliste", true);
     DRBackendTidsformater.servertidsformatAndre = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatAndre"), DRBackendTidsformater.servertidsformatAndre);
     DRBackendTidsformater.servertidsformatPlaylisteAndre2 = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatPlaylisteAndre2"), DRBackendTidsformater.servertidsformatPlaylisteAndre2);
 
-    grunddata.kanaler.clear();
-    grunddata.p4koder.clear();
+    grunddata.kanaler.removeAll(kanaler);
+    kanaler.clear();
     parseKanaler(grunddata, grunddata.json.getJSONArray("channels"), false);
-    Log.d("parseKanaler " + grunddata.kanaler + " - P4:" + grunddata.p4koder);
+    Log.d("parseKanaler " + kanaler + " - P4:" + grunddata.p4koder);
+    grunddata.kanaler.addAll(kanaler);
 
-    for (final Kanal k : grunddata.kanaler) {
+    for (final Kanal k : kanaler) {
       k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
     }
     return grunddata;
@@ -95,7 +95,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       k.slug = j.optString("slug", "p4");
       k.ingenPlaylister = j.optBoolean("hideLatestTrack", false);
       k.p4underkanal = parserP4underkanaler;
-      grunddata.kanaler.add(k);
+      kanaler.add(k);
       if (parserP4underkanaler) grunddata.p4koder.add(k.kode);
       grunddata.kanalFraSlug.put(k.slug, k);
       if (j.optBoolean("isDefault")) grunddata.forvalgtKanal = k;

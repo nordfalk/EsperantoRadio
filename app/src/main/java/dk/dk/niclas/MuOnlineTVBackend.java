@@ -46,13 +46,14 @@ public class MuOnlineTVBackend extends Backend {
         grunddata.json = new JSONObject(grunddataStr);
         grunddata.android_json = grunddata.json.getJSONObject("android");
 
-        grunddata.kanaler.clear();
-
         InputStream is = App.assets.open("apisvar/all-active-dr-tv-channels");
         JSONArray jsonArray = new JSONArray(Diverse.læsStreng(is));
         is.close();
+        grunddata.kanaler.removeAll(kanaler);
+        kanaler.clear();
         parseKanaler(grunddata, jsonArray);
         Log.d("parseKanaler " + grunddata.kanaler);
+        grunddata.kanaler.addAll(kanaler);
 
         for (final Kanal k : grunddata.kanaler) {
             k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn); // TODO skal have puttet logoerne ind.
@@ -88,7 +89,7 @@ public class MuOnlineTVBackend extends Backend {
             k.urn = j.getString(DRJson.Urn.name());
             k.slug = j.getString(DRJson.Slug.name());
             k.ingenPlaylister = ingenPlaylister.contains(k.slug);
-            grunddata.kanaler.add(k);
+            kanaler.add(k);
             grunddata.kanalFraSlug.put(k.slug, k);
 
             k.setStreams(parseKanalStreams(j));

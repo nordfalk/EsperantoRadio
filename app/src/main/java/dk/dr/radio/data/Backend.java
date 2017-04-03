@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
@@ -25,6 +26,7 @@ import dk.dr.radio.v3.R;
  */
 
 public abstract class Backend {
+  public List<Kanal> kanaler = new ArrayList<>();
 
   private void ikkeImplementeret() {
     throw new IllegalStateException("Ikke implementeret i "+getClass().getSimpleName());

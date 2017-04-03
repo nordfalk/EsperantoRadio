@@ -49,14 +49,14 @@ public class MuOnlineRadioBackend extends Backend {
     grunddata.android_json = grunddata.json.getJSONObject("android");
 
 
-    grunddata.kanaler.clear();
-    grunddata.p4koder.clear();
-
     InputStream is = App.assets.open("apisvar/all-active-dr-radio-channels");
     JSONArray jsonArray = new JSONArray(Diverse.læsStreng(is));
     is.close();
+    grunddata.kanaler.removeAll(kanaler);
+    kanaler.clear();
     parseKanaler(grunddata, jsonArray);
     Log.d("parseKanaler " + grunddata.kanaler + " - P4:" + grunddata.p4koder);
+    grunddata.kanaler.addAll(kanaler);
 
     for (final Kanal k : grunddata.kanaler) {
       k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
@@ -101,7 +101,7 @@ Title: "P4 Bornholm",
       k.ingenPlaylister = ingenPlaylister.contains(k.slug);
       k.p4underkanal = j.getString(DRJson.Url.name()).startsWith("http://www.dr.dk/P4");  // Klampkode
       if (k.p4underkanal) grunddata.p4koder.add(k.kode);
-      grunddata.kanaler.add(k);
+      kanaler.add(k);
       grunddata.kanalFraSlug.put(k.slug, k);
       if (k.navn.equals("P3")) grunddata.forvalgtKanal = k;
 

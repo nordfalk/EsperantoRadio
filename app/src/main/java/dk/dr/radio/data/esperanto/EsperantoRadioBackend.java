@@ -152,7 +152,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
   private boolean ŝarĝiKanalEmblemojn(Grunddata grunddata, boolean nurLokajn) {
     boolean ioEstisSxargxita = false;
-    for (Kanal k0 : new ArrayList<>(grunddata.kanaler)) {
+    for (Kanal k0 : new ArrayList<>(kanaler)) {
       EoKanal k = (EoKanal) k0;
 
       if (k.eo_emblemoUrl != null && k.kanallogo_eo == null) try {
@@ -281,7 +281,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       }
     }
 
-    for (Kanal k : grunddata.kanaler) {
+    for (Kanal k : kanaler) {
       eo_opdaterProgramserieFraKanal((EoKanal) k);
     }
   }

@@ -24,6 +24,7 @@ import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
+import dk.dr.radio.v3.R;
 
 public class MuOnlineTVBackend extends Backend {
 
@@ -35,9 +36,8 @@ public class MuOnlineTVBackend extends Backend {
         return null;
     }
 
-    @Override
     public InputStream getLokaleGrunddata(Context ctx) {
-        return null;
+        return ctx.getResources().openRawResource(R.raw.grunddata);
     }
 
     @Override
@@ -52,10 +52,10 @@ public class MuOnlineTVBackend extends Backend {
         grunddata.kanaler.removeAll(kanaler);
         kanaler.clear();
         parseKanaler(grunddata, jsonArray);
-        Log.d("parseKanaler " + grunddata.kanaler);
+        Log.d("parseKanaler " + kanaler);
         grunddata.kanaler.addAll(kanaler);
 
-        for (final Kanal k : grunddata.kanaler) {
+        for (final Kanal k : kanaler) {
             k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn); // TODO skal have puttet logoerne ind.
         }
         return grunddata;
@@ -88,7 +88,7 @@ public class MuOnlineTVBackend extends Backend {
             if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode til DR Ultra og DR K
             k.urn = j.getString(DRJson.Urn.name());
             k.slug = j.getString(DRJson.Slug.name());
-            k.ingenPlaylister = ingenPlaylister.contains(k.slug);
+            k.ingenPlaylister = true; // aldrig spillelister for TV = ingenPlaylister.contains(k.slug);
             kanaler.add(k);
             grunddata.kanalFraSlug.put(k.slug, k);
 

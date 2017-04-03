@@ -65,6 +65,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import dk.dk.niclas.MuOnlineTVBackend;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
@@ -126,7 +127,7 @@ public class App {
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
   private static boolean erInstalleretPåSDKort;
-  public static Backend backend;
+  public static Backend[] backend;
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
@@ -152,7 +153,8 @@ public class App {
     Udseende.ESPERANTO = !App.prefs.getBoolean("ÆGTE_DR", !Udseende.ESPERANTO);
 
 //    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
-    backend = !Udseende.ESPERANTO ? new GammelDrRadioBackend() : new EsperantoRadioBackend();
+    backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
+            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -220,21 +222,26 @@ public class App {
   }
 
   public void initData(Application ctx) {
-    try {
-      data = new Programdata();
+    data = new Programdata();
 
-      // Indlæsning af grunddata/stamdata.
-      // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
-      // På et senere tidspunkt henter vi nye grunddata
-      grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
-      String grunddataStr = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
+    // Indlæsning af grunddata/stamdata.
+    // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
+    // På et senere tidspunkt henter vi nye grunddata
+    grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
+    for (Backend backend : App.backend) try {
+      Log.d("Initialiserer backend "+backend);
+      String grunddataStr = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
 
       if (grunddataStr == null || App.EMULATOR) { // Ingen grunddata fra sidste start - det er nok en frisk installation
-        grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ctx));
+        grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(ctx));
       }
-      grunddata = App.backend.initGrunddata(grunddataStr, null);
-      if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
+      if (grunddataStr != null) {
+        grunddata = backend.initGrunddata(grunddataStr, grunddata);
+      }
+    } catch (Exception e) { Log.e(""+backend, e); }
+    if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
 
+    try {
       String kanalkode = prefs.getString(FORETRUKKEN_KANAL, null);
       // Hvis brugeren foretrækker P4 er vi nødt til at finde underkanalen
       kanalkode = tjekP4OgVælgUnderkanal(kanalkode);
@@ -247,11 +254,11 @@ public class App {
 
       if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
-        Request<?> req = new DrVolleyStringRequest(App.backend.getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
+        Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return; // ingen grund til at parse det igen
-            ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(json));
+            ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(json));
             kanal.setStreams(s);
             Log.d("hentStreams akt fraCache=" + fraCache + " => " + kanal);
           }
@@ -380,28 +387,31 @@ public class App {
         return;
       sidstTjekket = System.currentTimeMillis();
       Log.d("hentEvtNyeGrunddata " + (sidstTjekket - App.TIDSSTEMPEL_VED_OPSTART));
-      Request<?> req = new DrVolleyStringRequest(App.backend.getGrunddataUrl(), new DrVolleyResonseListener() {
-        @Override
-        public void fikSvar(String nyeGrunddata, boolean fraCache, boolean uændret) throws Exception {
-          if (uændret || fraCache) return; // ingen grund til at parse det igen
-          String gamleGrunddata = grunddata_prefs.getString(App.backend.getGrunddataUrl(), null);
-          if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
-          Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
-          if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
-          try {
-            grunddata = App.backend.initGrunddata(nyeGrunddata, grunddata);
-            // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
-            grunddata_prefs.edit().putString(App.backend.getGrunddataUrl(), nyeGrunddata).commit();
-          } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
-          // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
-          opdaterObservatører(grunddata.observatører);
-        }
-      }) {
-        public Priority getPriority() {
-          return Priority.LOW;
-        }
-      };
-      App.volleyRequestQueue.add(req);
+      for (final Backend backend : App.backend) {
+        if (backend.getGrunddataUrl()==null) continue;
+        Request<?> req = new DrVolleyStringRequest(backend.getGrunddataUrl(), new DrVolleyResonseListener() {
+          @Override
+          public void fikSvar(String nyeGrunddata, boolean fraCache, boolean uændret) throws Exception {
+            if (uændret || fraCache) return; // ingen grund til at parse det igen
+            String gamleGrunddata = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
+            if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
+            Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
+            if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
+            try {
+              grunddata = backend.initGrunddata(nyeGrunddata, grunddata);
+              // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
+              grunddata_prefs.edit().putString(backend.getGrunddataUrl(), nyeGrunddata).commit();
+            } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
+            // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
+            opdaterObservatører(grunddata.observatører);
+          }
+        }) {
+          public Priority getPriority() {
+            return Priority.LOW;
+          }
+        };
+        App.volleyRequestQueue.add(req);
+      }
     }
   };
 

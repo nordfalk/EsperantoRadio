@@ -37,7 +37,7 @@ public class ProgramserierAtilAA {
       if (programserie == null) {
         // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
         programserie = new Programserie();
-        App.backend.parsProgramserie(programserieJson, programserie);
+        App.backend[0].parsProgramserie(programserieJson, programserie);
         App.data.programserieFraSlug.put(programserieSlug, programserie);
       }
       res.add(programserie);
@@ -50,7 +50,7 @@ public class ProgramserierAtilAA {
 
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(App.backend.getAlleProgramserierAtilÅUrl(), new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(App.backend[0].getAlleProgramserierAtilÅUrl(), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);

@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.Udseende;
 
 /**
@@ -15,7 +16,7 @@ public class Fragmentfabrikering {
 
   public static Fragment udsendelse(Udsendelse udsendelse) {
     Fragment fragment;
-    if (Udseende.ESPERANTO) {
+    if (udsendelse.getBackend() instanceof EsperantoRadioBackend) {
       fragment = new EoUdsendelse_frag();
     } else {
       fragment = new Udsendelse_frag();
@@ -28,7 +29,7 @@ public class Fragmentfabrikering {
 
   public static Fragment kanal(Kanal k) {
     Fragment f;
-    if (Udseende.ESPERANTO) {
+    if (k.getBackend() instanceof EsperantoRadioBackend) {
       f = new EoKanal_frag();
     } else {
       f = k.kode.equals("DRN") ? new Kanal_nyheder_frag() :  new Kanal_frag();

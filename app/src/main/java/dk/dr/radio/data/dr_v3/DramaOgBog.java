@@ -45,11 +45,11 @@ public class DramaOgBog {
       if (karuselJson!=null) for (int n = 0; n < karuselJson.length(); n++) try {
         JSONObject udsendelseJson = karuselJson.getJSONObject(n);
         // TODO mangler
-        Udsendelse u = App.backend.parseUdsendelse(null, App.data, udsendelseJson);
+        Udsendelse u = App.backend[0].parseUdsendelse(null, App.data, udsendelseJson);
         karusel.add(u);
         karuselSerieSlug.add(u.programserieSlug);
       } catch (JSONException je) {
-        Log.d("Fejl i "+ App.backend.getBogOgDramaUrl() +" element nr +"+n+ ": " + je);
+        Log.d("Fejl i "+ App.backend[0].getBogOgDramaUrl() +" element nr +"+n+ ": " + je);
         Log.d(karuselJson.getJSONObject(n));
         Log.e(je);
       }
@@ -67,7 +67,7 @@ public class DramaOgBog {
           programserie = new Programserie();
           App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
-        res.add(App.backend.parsProgramserie(programserieJson, programserie));
+        res.add(App.backend[0].parsProgramserie(programserieJson, programserie));
 //            Log.d("DramaOgBogD "+sektionsnummer+" "+n+programserie+" "+programserie.antalUdsendelser+" "+programserie.billedeUrl);
       }
       if (!res.isEmpty()) {
@@ -79,7 +79,7 @@ public class DramaOgBog {
   }
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(App.backend.getBogOgDramaUrl(), new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(App.backend[0].getBogOgDramaUrl(), new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
         if (uændret || json.equals("null")) return;

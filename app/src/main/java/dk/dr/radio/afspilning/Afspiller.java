@@ -167,7 +167,7 @@ public class Afspiller {
         @Override
         public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
           if (uændret) return; // ingen grund til at parse det igen
-          ArrayList<Lydstream> s = App.backend.parsStreams(new JSONObject(json));
+          ArrayList<Lydstream> s = App.backend[0].parsStreams(new JSONObject(json));
           lydkilde.setStreams(s);
           Log.d("hentStreams afsp fraCache=" + fraCache + " => " + lydkilde);
           if (onErrorTæller++>2) {

@@ -35,24 +35,29 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
 
 
   @Override
-  public void run() {
-    kanaler = new ArrayList<Kanal>();
+  public void run() { // Opbyg ny liste af kanaler
+    kanaler = new ArrayList<>(50);
+    ArrayList<Kanal> kanalerEjFavorit = new ArrayList<>(50);
     for (Kanal k : App.grunddata.kanaler) {
-      if (!k.p4underkanal) if (App.data.favoritter.erFavorit(k.slug)) { // EO ŝanĝo
-        kanaler.add(0, k);  // EO ŝanĝo
-      } else {  // EO ŝanĝo
-        kanaler.add(k);
+      if (k.p4underkanal) continue;
+      if (App.data.favoritter.erFavorit(k.slug)) {
+        kanaler.add(k);  // Favoritkanaler kommer først i listen
+      } else {
+        kanalerEjFavorit.add(k);
       }
     }
-    if (adapter != null) {
+    kanaler.addAll(kanalerEjFavorit); // Tilføj ikke-favoritter sidst i listen
+    if (adapter != null) { // Sørg for at den valgte kanal stadig er den, der vises
+      int glIndex = viewPager.getCurrentItem();
+      Kanal valgtKanal = adapter.kanaler2.get(glIndex);
+      Log.d("Kanal_frag opdaterer fra index "+glIndex+" valgt "+valgtKanal);
       adapter.kanaler2 = kanaler;
-      int valgt = viewPager.getCurrentItem();
       adapter.notifyDataSetChanged();
-      if (valgt >= kanaler.size()) {
-        viewPager.setCurrentItem(0);
-      }
-      if (kanaler.contains(eoValgtKanal)) viewPager.setCurrentItem(kanaler.indexOf(eoValgtKanal));
-      kanalfaneblade.notifyDataSetChanged(); // EO ŝanĝo
+      int nyIndex = kanaler.indexOf(valgtKanal);
+      Log.d("Kanal_frag opdaterer til index "+nyIndex+" valgt "+valgtKanal);
+      if (nyIndex<0) nyIndex = glIndex;
+      viewPager.setCurrentItem(nyIndex);
+      kanalfaneblade.notifyDataSetChanged();
     }
   }
 
@@ -177,17 +182,13 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     }
 
     @Override
-    public String getPageContentDescription(int position) {
-      return kanaler2.get(position).navn;
+    public Bitmap getPageIconBitmap(int position) {
+      return kanaler2.get(position).kanallogo_eo;
     }
 
     @Override
-    public Bitmap getPageIconBitmap(int position) {
-      Kanal k = kanaler2.get(position);
-      if (k instanceof EoKanal) {
-        return ((EoKanal)k).kanallogo_eo;
-      }
-      return null;
+    public String getPageContentDescription(int position) {
+      return kanaler2.get(position).navn;
     }
   }
 }

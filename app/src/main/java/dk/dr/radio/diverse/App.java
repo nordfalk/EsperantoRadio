@@ -168,6 +168,9 @@ public class App {
       Log.d("Crashlytics startet");
     }
 
+    //com.jakewharton.threetenabp.AndroidThreeTen.init(ctx);
+    net.danlew.android.joda.JodaTimeAndroid.init(ctx);
+
     // HTTP-forbindelser havde en fejl præ froyo, men jeg har også set problemet på Xperia Play, der er 2.3.4 (!)
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
       System.setProperty("http.keepAlive", "false");

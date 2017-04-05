@@ -81,28 +81,32 @@ public class DRBackendTidsformater {
         }
       }
       Log.rapporterFejl(new IllegalArgumentException("åh nej, der kom endnu et servertidsformat, vi ikke kender! "+tid));
-      if (App.EMULATOR) throw new Error(); // Stop med et crash i emulatoren
+      //if (App.EMULATOR) throw new Error(); // Stop med et crash i emulatoren
       // Giv juleaften, bare for at gøre *etellerandet* !!   :-(
       return juleaften;
     }
   }
 
   public static Date parseUpålideigtServertidsformat(String tid) {
-    return parseUpålideigtServertidsformat(tid, servertidsformat, servertidsformatAndre);
+    return new Date(org.joda.time.Instant.parse(tid).getMillis());
+    //if (tid.endsWith("Z")) return new Date(org.threeten.bp.Instant.parse(tid).toEpochMilli());
+    //return new Date(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(tid, Instant.FROM).toEpochMilli());
+    //return parseUpålideigtServertidsformat(tid, servertidsformat, servertidsformatAndre);
   }
 
   static Date parseUpålideigtServertidsformatPlayliste(String tid) {
-    return parseUpålideigtServertidsformat(tid, servertidsformatPlayliste, servertidsformatPlaylisteAndre2);
+    return new Date(org.joda.time.Instant.parse(tid).getMillis());
+    //return new Date(org.threeten.bp.Instant.parse(tid).toEpochMilli());
+    //return parseUpålideigtServertidsformat(tid, servertidsformatPlayliste, servertidsformatPlaylisteAndre2);
   }
 
 
 
   public static void main(String[] a) throws Exception {
 //    DRBackendTidsformater.servertidsformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US); // +01:00 springes over da kolon i +01:00 er ikke-standard Java
-//    parseUpålideigtServertidsformat("2014-02-13T10:03:00+01:00");
+    parseUpålideigtServertidsformat("2014-02-13T10:03:00+01:00");
     DRBackendTidsformater.servertidsformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz", Locale.US); // +01:00 springes over da kolon i +01:00 er ikke-standard Java
-    Date res = parseUpålideigtServertidsformat("2016-04-01T08:03:00+0000");
-    System.out.println("res = "+res);
+    System.out.println("res = "+ parseUpålideigtServertidsformat("2017-03-27T04:00:35+0000"));
   }
 
 

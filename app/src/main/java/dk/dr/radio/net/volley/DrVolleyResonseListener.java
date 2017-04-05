@@ -33,6 +33,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
       App.sætErIGang(false, url);
     } catch (Exception e) {
       Log.e(url, e);
+      Log.d("response = "+response);
       onErrorResponse(new VolleyError(e));
     }
   }
@@ -58,9 +59,9 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
    * @param error Fejlen
    */
   protected void fikFejl(VolleyError error) {
-    Log.e("fikFejl '" + error.networkResponse + "' for " + url, error);
+    Log.e("fikFejl networkResponse='" + error.networkResponse + "' for " + url, error);
     //error.printStackTrace();
-    if (App.fejlsøgning) Log.e("fikFejl startet herfra:", startetHerfra);
+    if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
   }
 
   /**

@@ -32,6 +32,11 @@
 # Refereres fra AQuery, men bruges ikke
 -dontwarn oauth.signpost.**
 
+ #### -- Picasso --
+ -dontwarn com.squareup.picasso.**
+
+ #### -- OkHttp --
+ -dontwarn com.squareup.okhttp.internal.**
 
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);

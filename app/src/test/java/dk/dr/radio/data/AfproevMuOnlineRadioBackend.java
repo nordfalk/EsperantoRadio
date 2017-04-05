@@ -52,7 +52,7 @@ public class AfproevMuOnlineRadioBackend {
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
-      App.backend = backend = new MuOnlineRadioBackend();
+      App.backend[0] = backend = new MuOnlineRadioBackend();
       //App.instans.initData(this);
       App.data = new Programdata();
       try {

@@ -392,7 +392,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
             startActivity(new Intent(getActivity(), GenstartProgrammet.class));
           }
         });
-        aq.id(R.id.tekst).text("Skift esperanto / dansk").typeface(App.skrift_gibson_fed);
+        aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
 
         if (!Udseende.ESPERANTO) {
           tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
@@ -402,7 +402,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
               startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
             }
           });
-          aq.id(R.id.tekst).text("Emda").typeface(App.skrift_gibson_fed);
+          aq.id(R.id.tekst).text("Vis Emda").typeface(App.skrift_gibson_fed);
 
           tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
             @Override
@@ -411,7 +411,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
               startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
             }
           });
-          aq.id(R.id.tekst).text("Niclas").typeface(App.skrift_gibson_fed);
+          aq.id(R.id.tekst).text("Vis Niclas").typeface(App.skrift_gibson_fed);
         }
 
         tilføj(R.layout.venstremenu_elem_adskiller_tynd);

@@ -82,7 +82,7 @@ public class Fjernbetjening implements Runnable {
       forrigeUdsendelse = u;
       forrigeKanal = k;
       // Skift baggrundsbillede
-      Log.d("Fjernbetjening opdater " + lk + " k=" + k + " u=" + u + " d=" + lk.erDirekte());
+      if (App.fejlsøgning) Log.d("Fjernbetjening opdater " + lk + " k=" + k + " u=" + u + " d=" + lk.erDirekte());
       if (lk.erDirekte()) {
         remoteControlClient.editMetadata(false)
             .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, u == null ? "" : u.titel)
@@ -111,7 +111,7 @@ public class Fjernbetjening implements Runnable {
       } else {
 
         final String burl = Basisfragment.skalérBillede(u);
-        Log.d("Fjernbetjening asynk artwork\n" + burl);
+        if (App.fejlsøgning) Log.d("Fjernbetjening asynk artwork\n" + burl);
         // Hent med AQuery, da det sandsynligvis allerede har en cachet udgave
         // NB Brug ikke: Bitmap bm = BitmapAjaxCallback.getMemoryCached(burl, 0); - giver senere java.lang.RuntimeException: Canvas: trying to use a recycled bitmap senere
         new AQuery(ApplicationSingleton.instans).ajax(burl, Bitmap.class, new AjaxCallback<Bitmap>() {

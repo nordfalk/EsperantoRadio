@@ -50,7 +50,7 @@ public class Programserie { //implements Serializable {
         udsendelserListe.addAll(lx);
       }
       udsendelserSorteret.addAll(uds);
-      if (!Arrays.equals(udsendelserListe.toArray(), udsendelserSorteret.toArray())) {
+      if (App.fejlsøgning && !Arrays.equals(udsendelserListe.toArray(), udsendelserSorteret.toArray())) {
         Log.d("tilføjUdsendelser INKONSISTENS? nu:\nlisten:" + udsendelserListe + "\nsorter:" + udsendelserSorteret);
       }
 //      udsendelserListe.clear();

@@ -216,7 +216,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     HashSet<Kanal> kanalojDeRadioTxt = new HashSet<>();
     for (String unuo : radioTxt.split("\n\r?\n")) {
       unuo = unuo.trim();
-      Log.d("Unuo: "+unuo);
+      if (App.fejlsøgning) Log.d("Unuo: "+unuo);
       if (unuo.length() == 0) {
         continue;
       }

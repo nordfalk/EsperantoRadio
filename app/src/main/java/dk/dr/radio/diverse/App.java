@@ -227,6 +227,7 @@ public class App {
   public void initData(Application ctx) {
     data = new Programdata();
 
+    grunddata = new Grunddata();
     // Indlæsning af grunddata/stamdata.
     // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
     // På et senere tidspunkt henter vi nye grunddata
@@ -239,8 +240,9 @@ public class App {
         grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(ctx));
       }
       if (grunddataStr != null) {
-        grunddata = backend.initGrunddata(grunddataStr, grunddata);
+        backend.initGrunddata(grunddata, grunddataStr);
       }
+      grunddata.kanaler.addAll(backend.kanaler);
     } catch (Exception e) { Log.e(""+backend, e); }
     if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
 
@@ -396,13 +398,22 @@ public class App {
           @Override
           public void fikSvar(String nyeGrunddata, boolean fraCache, boolean uændret) throws Exception {
             if (uændret || fraCache) return; // ingen grund til at parse det igen
+            nyeGrunddata = nyeGrunddata.trim();
             String gamleGrunddata = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
             if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
-            Log.d("Vi fik nye grunddata: fraCache=" + fraCache + nyeGrunddata);
-            if (!PRODUKTION || App.fejlsøgning) App.kortToast("Vi fik nye grunddata");
+            Log.d("Vi fik nye grunddata: fraCache=" + fraCache);
+            if (!PRODUKTION || App.fejlsøgning) {
+              Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
+              Log.d("ny="+nyeGrunddata.length()+" "+nyeGrunddata.hashCode()+ " "+nyeGrunddata.replace('\n',' '));
+              Log.d("gl="+gamleGrunddata.substring(gamleGrunddata.length()-20).replace('\n',' ')+"'XX");
+              Log.d("ny="+nyeGrunddata.substring(nyeGrunddata.length()-20).replace('\n',' ')+"'XX");
+              App.kortToast("Vi fik nye grunddata");
+            }
             try {
-              grunddata = backend.initGrunddata(nyeGrunddata, grunddata);
+              backend.initGrunddata(grunddata, nyeGrunddata);
               // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
+              grunddata.kanaler.clear();
+              for (Backend b : App.backend) grunddata.kanaler.addAll(b.kanaler);
               grunddata_prefs.edit().putString(backend.getGrunddataUrl(), nyeGrunddata).commit();
             } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
             // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662

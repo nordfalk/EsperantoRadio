@@ -53,7 +53,7 @@ public class AfproevMuOnlineTVBackend {
       App.data = new Programdata();
       try {
         String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
-        App.grunddata = backend.initGrunddata(grunddataStr, null);
+        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
       } catch (Exception e) {
         e.printStackTrace();
       }

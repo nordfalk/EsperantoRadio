@@ -41,7 +41,7 @@ public abstract class Backend {
   public abstract InputStream getLokaleGrunddata(Context ctx);
 
 
-  public abstract Grunddata initGrunddata(String grunddataStr, final Grunddata grunddata) throws JSONException, IOException;
+  public abstract void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException;
 
   public String getNyeProgrammerSiden(String programserieSlug, String dato) {
     ikkeImplementeret();

@@ -50,8 +50,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
   private static boolean serverapi_ret_forkerte_offsets_i_playliste;
 
-  public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata) throws JSONException, IOException {
-    if (grunddata == null) grunddata = new Grunddata();
+  public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     JSONObject android_json = grunddata.android_json = grunddata.json.getJSONObject("android");
 
@@ -66,16 +65,13 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     DRBackendTidsformater.servertidsformatAndre = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatAndre"), DRBackendTidsformater.servertidsformatAndre);
     DRBackendTidsformater.servertidsformatPlaylisteAndre2 = parseDRBackendTidsformater(android_json.optJSONArray("servertidsformatPlaylisteAndre2"), DRBackendTidsformater.servertidsformatPlaylisteAndre2);
 
-    grunddata.kanaler.removeAll(kanaler);
     kanaler.clear();
     parseKanaler(grunddata, grunddata.json.getJSONArray("channels"), false);
     Log.d("parseKanaler " + kanaler + " - P4:" + grunddata.p4koder);
-    grunddata.kanaler.addAll(kanaler);
 
     for (final Kanal k : kanaler) {
       k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
     }
-    return grunddata;
   }
 
   private void parseKanaler(Grunddata grunddata, JSONArray jsonArray, boolean parserP4underkanaler) throws JSONException {

@@ -1,17 +1,22 @@
 package dk.dr.radio.diverse;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.widget.Toast;
+import android.support.v7.app.AlertDialog;
+import android.text.format.DateUtils;
+import android.util.Log;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 
 import dk.dr.radio.v3.BuildConfig;
+import dk.dr.radio.v3.R;
 
 
 /**
@@ -40,33 +45,88 @@ public class AppOpdatering {
     return lm;
   }
 
-  public static void tjekForNyAPK(final Context ctx) {
+  public static void tjekForNyAPK(final Activity akt) {
     if (!BuildConfig.DEBUG) return; // kun når APKen ikke er signeret med en publiceringsnøgle
-    final SharedPreferences prefs = ctx.getSharedPreferences("AppOpdatering",0);
+    final SharedPreferences prefs = akt.getSharedPreferences("AppOpdatering",0);
     new AsyncTask<Long,Long,Long>() {
       @Override
       protected Long doInBackground(Long... params) {
         try {
           return AppOpdatering.findTidsstempelForSenesteAPK();
         } catch (Exception e) {
-          Log.d("AppOpdatering kunne ikke tjekke for ny version:"+e);
+          Log.d("AppOpdatering", "kunne ikke tjekke for ny version:"+e);
         }
         return null;
       };
 
+      private static final boolean AFPRØVNING = false;
       @Override
-      protected void onPostExecute(Long tidsstempel) {
+      protected void onPostExecute(final Long tidsstempel) {
         if (tidsstempel==null) return;
-        String NØGLE = "tidsstempelForSenesteAPK";
-        long glTidsstempel = prefs.getLong(NØGLE, 0);
-        if (tidsstempel>glTidsstempel && glTidsstempel>0) {
-          Toast.makeText(ctx, "Der er kommet en ny version af app'en.\nDu kan hente en ny version i venstremenuen.", Toast.LENGTH_LONG).show();
-          ctx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(APK_URL)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+          final String NØGLE = "tidsstempelForSenesteAPK";
+          long glTidsstempel = prefs.getLong(NØGLE, 0);
+
+          if (!AFPRØVNING) {
+            if (tidsstempel <= glTidsstempel) {
+              Log.d("AppOpdatering", "Vi har den nyeste: tidsstempel=" + tidsstempel + " glTidsstempel=" + glTidsstempel);
+              return;
+            }
+
+            // Tjek at der ikke allerede er installeret en ny udgave på anden vis (f.eks. USB-kabel)
+            PackageInfo pInfo = akt.getPackageManager().getPackageInfo(akt.getPackageName(), 0);
+            if (pInfo.lastUpdateTime >= tidsstempel || glTidsstempel == 0) {
+              Log.d("AppOpdatering", "sætter tidsstempel til pakkens tidsstempel: " + pInfo.lastUpdateTime);
+              prefs.edit().putLong(NØGLE, pInfo.lastUpdateTime).commit();
+              return;
+            }
+          }
+
+
           nyApkErTilgængelig = new Date(tidsstempel);
-        }
-        if (tidsstempel>glTidsstempel || glTidsstempel==0) {
-          prefs.edit().putLong(NØGLE, tidsstempel).commit();
-        }
+          Log.d("AppOpdatering", "Ny version er klar "+nyApkErTilgængelig);
+          final Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(AppOpdatering.APK_URL));
+//          DateFormat dateFormat = new SimpleDateFormat(); // DateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM, Locale.getDefault());
+
+          new AlertDialog.Builder(akt).setIcon(R.drawable.appikon_beta).setTitle("Ny version er klar")
+                  .setMessage(DateUtils.getRelativeTimeSpanString(tidsstempel) + " kom en ny betaversion af "+
+                          akt.getString(R.string.app_name)+".\n\nVil du opdatere?")
+//                            "(den kom for er fra "+dateFormat.format(new Date(tidsstempel))+".\n\nVil du opdatere?")
+                  .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                      akt.startActivity(downloadIntent);
+                      prefs.edit().putLong(NØGLE, tidsstempel).commit();
+                    }
+                  })
+                  .setNegativeButton("Senere", null)
+                  .setNeutralButton("Nej", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                      prefs.edit().putLong(NØGLE, tidsstempel).commit();
+                    }
+                  })
+/* Ikke nødvendigt med en notifikation,
+                  .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                      android.support.v4.app.NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(akt)
+                              .setSmallIcon(R.drawable.appikon)
+                              .setContentTitle(akt.getString(R.string.app_name)+" opdatering")
+                              .setContentText("Der er kommet en ny version af "+akt.getString(R.string.app_name)+"\nTryk her for at hente den.");
+
+                      PendingIntent notifyPendingIntent = PendingIntent.getActivity( akt, 0,downloadIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+                      mBuilder.setContentIntent(notifyPendingIntent);
+                      NotificationManager mNotificationManager = (NotificationManager) akt.getSystemService(Context.NOTIFICATION_SERVICE);
+                      mNotificationManager.notify(0, mBuilder.build());
+
+                      Toast.makeText(akt, "Du kan opdatere senere med notifikationen øverst.", Toast.LENGTH_LONG).show();
+                    }
+                  })
+*/
+                  .show();
+        } catch (Exception e) { e.printStackTrace(); }
       }
     }.execute();
   }

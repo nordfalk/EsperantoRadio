@@ -52,8 +52,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
 
 
-  public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata0) throws JSONException, IOException {
-    final Grunddata grunddata = grunddata0 != null ? grunddata0 : new Grunddata();
+  public void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
 
@@ -61,7 +60,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
     // Erstat med evt ny værdi
     //radioTxtUrl = json.optString("elsendojUrl", radioTxtUrl);
-    grunddata.kanaler.removeAll(kanaler);
     kanaler.clear();
 
     int antal = kanalojJs.length();
@@ -104,7 +102,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         //k.udsendelser.add(el);
       }
     }
-    grunddata.kanaler.addAll(kanaler);
 
 
     for (Kanal k : kanaler) {
@@ -146,7 +143,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         }
       }
     }.start();
-    return grunddata;
+    Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
   }
 
 
@@ -262,7 +259,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
             grunddata.kanalFraKode.put(k.kode, k);
             grunddata.kanalFraSlug.put(k.slug, k);
-            grunddata.kanaler.add(k);
+            kanaler.add(k);
           }
           if (!"rss".equals(k.eo_datumFonto)) {
             k.eo_datumFonto = "radio.txt";

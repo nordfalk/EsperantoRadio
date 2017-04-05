@@ -45,11 +45,11 @@ public class AfproevEsperantoRadioBackend {
   public void testLogik() throws Exception {
     //Date.parse("Mon, 13 Aug 2012 05:25:10 +0000");
     //Date.parse("Thu, 01 Aug 2013 12:01:01 +02:00");
-    String grunddata = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
+    String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
     App.backend = new Backend[] { new EsperantoRadioBackend() };
     System.out.println("===================================================================1");
-    Grunddata ĉefdatumoj2 = App.backend[0].initGrunddata(grunddata, null);
-    App.grunddata = ĉefdatumoj2;
+    App.backend[0].initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+    Grunddata ĉefdatumoj2 = App.grunddata;
     System.out.println("===================================================================2");
 
     //String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(ĉefdatumoj2.radioTxtUrl, true)));

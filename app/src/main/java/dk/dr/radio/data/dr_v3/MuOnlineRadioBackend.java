@@ -43,8 +43,7 @@ public class MuOnlineRadioBackend extends Backend {
     return ctx.getResources().openRawResource(R.raw.grunddata);
   }
 
-  public Grunddata initGrunddata(String grunddataStr, Grunddata grunddata) throws JSONException, IOException {
-    if (grunddata == null) grunddata = new Grunddata();
+  public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
 
@@ -52,16 +51,13 @@ public class MuOnlineRadioBackend extends Backend {
     InputStream is = App.assets.open("apisvar/all-active-dr-radio-channels");
     JSONArray jsonArray = new JSONArray(Diverse.læsStreng(is));
     is.close();
-    grunddata.kanaler.removeAll(kanaler);
     kanaler.clear();
     parseKanaler(grunddata, jsonArray);
-    Log.d("parseKanaler " + grunddata.kanaler + " - P4:" + grunddata.p4koder);
-    grunddata.kanaler.addAll(kanaler);
+    Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
 
     for (final Kanal k : grunddata.kanaler) {
       k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
     }
-    return grunddata;
   }
 
   private void parseKanaler(Grunddata grunddata, JSONArray jsonArray) throws JSONException {

@@ -267,15 +267,15 @@ public class MuOnlineTVBackend extends Backend {
 
         return u;
     }
-
-    public String getProgramserieUrl(Programserie programserie, String programserieSlug) {
+/*
+    public String getProgramserieUrl(Programserie programserie, String programserieSlug, int offset) {
         return null;
     }
 
     public ArrayList<Udsendelse> parseUdsendelserForProgramserie(JSONArray jsonArray, Kanal kanal, Programdata data) throws JSONException {
         return null;
     }
-
+*/
     public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
         return BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
     }
@@ -346,17 +346,14 @@ public class MuOnlineTVBackend extends Backend {
             l.kind = DRJson.StreamKind.Video;
             if(subtitles != null)
             l.subtitlesUrl = subtitles;
+            l.url = jsonStream.getString("Uri");
 
             if("Download".equals(type)){
-                l.url = jsonStream.getString("Uri");
+                l.type = DRJson.StreamType.HTTP_Download;
                 l.bitrate = jsonStream.getInt("Bitrate");
-                lydData.add(l);
-                continue;
+            } else {
+                l.type = DRJson.StreamType.HLS_fra_Akamai;
             }
-
-            l.url = jsonStream.getString("Uri");
-            l.type = DRJson.StreamType.HLS_fra_Akamai;
-            l.kbps = -1;
             l.kvalitet = DRJson.StreamQuality.Variable;
             lydData.add(l);
         }

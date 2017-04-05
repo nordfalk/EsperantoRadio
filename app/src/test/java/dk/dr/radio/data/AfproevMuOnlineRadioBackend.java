@@ -113,7 +113,7 @@ public class AfproevMuOnlineRadioBackend {
         boolean gavNull = false;
         Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
         if (ps == null) try {
-          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug));
+          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
           if ("null".equals(str)) gavNull = true;
           else {
             JSONObject data = new JSONObject(str);

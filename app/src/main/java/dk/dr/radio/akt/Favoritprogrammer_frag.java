@@ -92,7 +92,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
           final int offset = 0;
-          String url = App.backend[0].getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
+          String url = App.backend[0].getProgramserieUrl(programserie, programserieSlug, offset);
           Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
             @Override
             public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {

@@ -1,15 +1,11 @@
 package dk.dr.radio.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Netvaerksstatus;
@@ -64,7 +60,7 @@ public abstract class Lydkilde implements Serializable {
             if ("hls".equals(ønsketformat)) score += 40;
             if ("auto".equals(ønsketformat)) score += 20;
             break; // bryd ud af switch
-          case HTTP:
+          case HTTP_Download:
             if (tilHentning) score += 20;
             if ("shoutcast".equals(ønsketformat)) score += 40;
             break; // bryd ud af switch

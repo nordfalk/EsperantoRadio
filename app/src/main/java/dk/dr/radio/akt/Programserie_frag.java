@@ -86,8 +86,8 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    String url = kanal.getBackend().getProgramserieUrl(programserie, programserieSlug) + "&offset=" + offset;
-    //Log.d("XXX url=" + url);
+    String url = kanal.getBackend().getProgramserieUrl(programserie, programserieSlug, offset);
+    if (url==null) return; // ikke understøttet af backend
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override

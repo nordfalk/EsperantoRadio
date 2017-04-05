@@ -410,13 +410,13 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   /* ------------------------------------------------------------------------------ */
 
   @Override
-  public String getProgramserieUrl(Programserie ps, String programserieSlug) {
+  public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
     if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
     if (BRUG_URN && ps != null)
-      return BASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
-    return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
+      return BASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true&offset="+offset;
+    return BASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true&offset="+offset;
   }
 
   /**

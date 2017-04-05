@@ -201,7 +201,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   public static ArrayList<Lydstream> lavSimpelLydstreamFraUrl(String url) {
     Lydstream ls = new Lydstream();
     ls.url = url;
-    ls.type = DRJson.StreamType.HTTP;
+    ls.type = DRJson.StreamType.HTTP_Download;
     ls.format = "mp3";
     ls.kvalitet = DRJson.StreamQuality.High;
 

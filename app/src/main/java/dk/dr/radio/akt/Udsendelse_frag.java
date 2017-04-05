@@ -83,7 +83,9 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getUdsendelseStreamsUrl(udsendelse), new DrVolleyResonseListener() {
+        String url = kanal.getBackend().getUdsendelseStreamsUrl(udsendelse);
+        if (url==null) return; // ikke understøttet af backend
+        Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
           @Override
           public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
             if (uændret) return;

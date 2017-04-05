@@ -377,12 +377,12 @@ Title: "P4 Bornholm",
   /* ------------------------------------------------------------------------------ */
 
   @Override
-  public String getProgramserieUrl(Programserie ps, String programserieSlug) {
+  public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
     if (BRUG_URN && ps != null)
-      return GLBASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true";
-    return GLBASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true";
+      return GLBASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true&offset="+offset;
+    return GLBASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true&offset="+offset;
     // http://www.dr.dk/mu/programcard?Relations.Slug=%22laagsus%22
   }
 

@@ -62,10 +62,9 @@ public enum DRJson {
     RTSP, // 2 tidligere 'Android' - udfases
     HDS, // 3 Adobe  HTTP Dynamic Streaming
     HLS_fra_Akamai, // 4 oprindeligt 'HLS' - virker på Android 4
-    HTTP, // 5 Til on demand/hentning af lyd
+    HTTP_Download, // 5 Til on demand/hentning/download af lyd - også TIl TV streams - da de har en download type
     Shoutcast, // 6 Til Android 2
-    Ukendt, // = -1 i JSON-svar
-    Download; //TIl TV streams - da de har en download type
+    Ukendt; // = -1 i JSON-svar
     static StreamType[] v = values();
 
   }

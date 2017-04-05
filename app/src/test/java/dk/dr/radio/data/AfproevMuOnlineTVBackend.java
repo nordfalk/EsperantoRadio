@@ -49,7 +49,7 @@ public class AfproevMuOnlineTVBackend {
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
-      App.backend[0] = backend = new MuOnlineTVBackend();
+      App.backend = new Backend[] { backend = new MuOnlineTVBackend()};
       App.data = new Programdata();
       try {
         String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));

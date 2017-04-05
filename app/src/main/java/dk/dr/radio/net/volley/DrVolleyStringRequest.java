@@ -24,8 +24,8 @@ public class DrVolleyStringRequest extends StringRequest {
     super(url, listener, listener);
     lytter = listener;
     if (url==null) {
-      Log.rapporterFejl(new IllegalStateException("Fik null-URL"));
-      return;
+      // Der er ikke noget at gøre her - vi crasher alligevel i en følgefejl, så hellere crashe med det samme
+      throw new IllegalStateException("Fik null-URL");
     }
     lytter.url = url;
     if (Udseende.ESPERANTO && url.startsWith("http://www.dr.dk/tjenester")) {

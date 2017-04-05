@@ -78,7 +78,7 @@ public class AfproevGammelDrRadioBackend {
 
     // Tjek kun nummer 50 til nummer 100
     for (Programserie ps : App.data.programserierAtilÅ.liste.subList(50, 60)) {
-      String url = backend.getProgramserieUrl(ps, ps.slug) + "&offset=" + 0;
+      String url = backend.getProgramserieUrl(ps, ps.slug, 0);
       JSONObject data = new JSONObject(hentStreng(url));
       ps = backend.parsProgramserie(data, ps);
       App.data.programserieFraSlug.put(ps.slug, ps);
@@ -108,7 +108,7 @@ public class AfproevGammelDrRadioBackend {
         assertTrue(ps+" har ingen udsendelser", ps.antalUdsendelser>0);
         if (n++ > 3) break; // Tjek kun de første 3.
 
-        String url = backend.getProgramserieUrl(ps, ps.slug) + "&offset=" + 0;
+        String url = backend.getProgramserieUrl(ps, ps.slug, 0);
         JSONObject data = new JSONObject(hentStreng(url));
         ps = backend.parsProgramserie(data, ps);
         App.data.programserieFraSlug.put(ps.slug, ps);
@@ -187,7 +187,7 @@ public class AfproevGammelDrRadioBackend {
         boolean gavNull = false;
         Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
         if (ps == null) try {
-          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug));
+          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
           if ("null".equals(str)) gavNull = true;
           else {
             JSONObject data = new JSONObject(str);

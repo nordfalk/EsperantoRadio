@@ -26,7 +26,6 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.v3.R;
@@ -149,12 +148,11 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser(final int offset) {
-    if (Udseende.ESPERANTO) {
+    String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset);
+    if (url == null) {
       opdaterUdsendelser();
       return;
     }
-    String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug) + "&offset=" + offset;
-    Log.d("hentUdsendelser url=" + url);
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override

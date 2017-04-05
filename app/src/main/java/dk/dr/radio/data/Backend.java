@@ -29,7 +29,11 @@ public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
 
   private void ikkeImplementeret() {
-    throw new IllegalStateException("Ikke implementeret i "+getClass().getSimpleName());
+    Exception x = new Exception("Ikke implementeret i " + getClass().getSimpleName());
+    StackTraceElement[] ss = x.getStackTrace();
+    System.err.println(x);
+    for (int i=1; i<5; i++)
+      System.err.println("\tat " + ss[i]);
   }
 
   public abstract String getGrunddataUrl();
@@ -64,7 +68,7 @@ public abstract class Backend {
     return null;
   }
 
-  public String getProgramserieUrl(Programserie programserie, String programserieSlug) {
+  public String getProgramserieUrl(Programserie programserie, String programserieSlug, int offset) {
     ikkeImplementeret();
     return null;
   }

@@ -147,7 +147,9 @@ public class MestSeteFrag extends Basisfragment {
 
         @Override
         public int getItemCount() {
-            return mestSete.udsendelser.size();
+            if(mestSete.udsendelser.get(kanalSlug) != null) {
+                return mestSete.udsendelser.get(kanalSlug).size();
+            } else return 0;
         }
 
         private void initImageView(ImageView imageView, int position){

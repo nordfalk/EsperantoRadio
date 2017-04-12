@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import dk.dk.niclas.Sæson;
+import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 

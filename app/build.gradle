@@ -84,4 +84,6 @@ dependencies {
     // Joda-time - fylder 450 kb mere !
     compile 'net.danlew:android.joda:2.9.9'
     testCompile 'org.robolectric:robolectric:3.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }

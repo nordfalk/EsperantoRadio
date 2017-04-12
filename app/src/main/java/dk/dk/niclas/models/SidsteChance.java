@@ -1,4 +1,4 @@
-package dk.dk.niclas;
+package dk.dk.niclas.models;
 
 import java.util.ArrayList;
 

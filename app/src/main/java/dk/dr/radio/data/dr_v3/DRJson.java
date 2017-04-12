@@ -90,6 +90,10 @@ public enum DRJson {
     static StreamConnection[] v = values();
   }
 
+  public enum TVKanaler{
+
+  }
+
   /*
   Programserie
   {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="list_kanaler_image_size">40dp</dimen>
+    <dimen name="list_mestsete_image_size">40dp</dimen>
+    <dimen name="list_mestsete_description_size">12sp</dimen>
+</resources>

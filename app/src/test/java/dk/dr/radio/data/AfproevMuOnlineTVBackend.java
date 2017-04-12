@@ -14,7 +14,7 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dk.dk.niclas.MuOnlineTVBackend;
+import dk.dk.niclas.utilities.MuOnlineTVBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;

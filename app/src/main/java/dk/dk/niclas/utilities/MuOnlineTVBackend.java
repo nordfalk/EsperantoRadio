@@ -1,4 +1,4 @@
-package dk.dk.niclas;
+package dk.dk.niclas.utilities;
 
 import android.content.Context;
 
@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
+import dk.dk.niclas.models.MestSete;
+import dk.dk.niclas.models.SidsteChance;
+import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
@@ -29,7 +32,6 @@ import dk.dr.radio.v3.R;
 public class MuOnlineTVBackend extends Backend {
 
     private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
-
 
         @Override
     public String getGrunddataUrl() {
@@ -53,7 +55,7 @@ public class MuOnlineTVBackend extends Backend {
         Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
 
         for (final Kanal k : kanaler) {
-            k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn); // TODO skal have puttet logoerne ind.
+            k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn); // TODO skal have puttet de korrekte logoer ind.
         }
     }
 
@@ -183,7 +185,9 @@ public class MuOnlineTVBackend extends Backend {
 
     //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-mostviewed_channel_channelType_limit_offset
     //http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=&channeltype=TV&limit=15&offset=0
-    public MestSete getMestSete(MestSete mestSete, Programdata programdata, JSONArray jsonArray) throws JSONException {
+    public MestSete getMestSete(MestSete mestSete, Programdata programdata, String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray jsonArray = jsonObject.getJSONArray("Items");
         if(mestSete == null) mestSete = new MestSete();
 
         for(int i = 0; i < jsonArray.length(); i++){

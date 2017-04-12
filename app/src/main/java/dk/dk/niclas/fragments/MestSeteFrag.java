@@ -14,6 +14,10 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import dk.dk.niclas.event.events.MestSeteEvent;
 import dk.dk.niclas.models.MestSete;
 import dk.dk.niclas.utilities.VerticalScrollRecyclerView;
@@ -90,12 +94,16 @@ public class MestSeteFrag extends Basisfragment {
         }
 
         private void initRecyclerView(RecyclerView recyclerView, int position){
-            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-            mRecyclerViewAdapter = new RecyclerViewAdapter();
+            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+            mRecyclerViewAdapter = new RecyclerViewAdapter(getKanalSlugFraPosition(position));
             recyclerView.setAdapter(mRecyclerViewAdapter);
 
             //Remove focus from the RecyclerView so we can intercept the vertical scrolling events
             recyclerView.setNestedScrollingEnabled(false);
+        }
+
+        private String getKanalSlugFraPosition(int position){
+            return App.backend[1].kanaler.get(position).slug;
         }
     }
 
@@ -106,6 +114,7 @@ public class MestSeteFrag extends Basisfragment {
             extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
         private MestSete mestSete = App.data.mestSete;
+        private String kanalSlug;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -119,7 +128,8 @@ public class MestSeteFrag extends Basisfragment {
             }
         }
 
-        private RecyclerViewAdapter() {
+        private RecyclerViewAdapter(String kanalSlug) {
+            this.kanalSlug = kanalSlug;
         }
 
         @Override
@@ -141,18 +151,22 @@ public class MestSeteFrag extends Basisfragment {
         }
 
         private void initImageView(ImageView imageView, int position){
-            Udsendelse udsendelse = mestSete.udsendelser.get(position);
+            if(mestSete.udsendelser.get(kanalSlug) != null) {
+                Udsendelse udsendelse = mestSete.udsendelser.get(kanalSlug).get(position);
 
-            if(udsendelse != null){
-                Picasso.with(imageView.getContext()).load(udsendelse.billedeUrl).into(imageView);
+                if (udsendelse != null) {
+                    Picasso.with(imageView.getContext()).load(udsendelse.billedeUrl).into(imageView);
+                }
             }
         }
 
         private void initTextView(TextView textView, int position){
-            Udsendelse udsendelse = mestSete.udsendelser.get(position);
+            if(mestSete.udsendelser.get(kanalSlug) != null) {
+                Udsendelse udsendelse = mestSete.udsendelser.get(kanalSlug).get(position);
 
-            if(udsendelse != null){
-                textView.setText(udsendelse.beskrivelse);
+                if (udsendelse != null) {
+                    textView.setText(udsendelse.beskrivelse);
+                }
             }
         }
 
@@ -178,6 +192,8 @@ public class MestSeteFrag extends Basisfragment {
     public void MestSeteEvent(MestSeteEvent event){
         if(event.isFraCache()){
             Log.d("Fra cache");
+            //mRecyclerViewAdapter.update();
+            //mRecyclerViewAdapter.notifyDataSetChanged();
         } else
         if(event.isUændret()){
             //TODO stop spinner
@@ -197,11 +213,19 @@ public class MestSeteFrag extends Basisfragment {
 
     private void updateData(){
         for(Kanal kanal : App.backend[1].kanaler)
-        App.networkHelper.tv.getMestSete(kanal.kode, 0, this);
+        App.networkHelper.tv.getMestSete(kanal.slug, 0, this);
     }
 
     private void debugData(){
-        for(Udsendelse udsendelse : App.data.mestSete.udsendelser)
-            Log.d(udsendelse.billedeUrl + " description = " + udsendelse.beskrivelse);
+        HashMap<String, ArrayList<Udsendelse>> map = App.data.mestSete.udsendelser;
+
+        for (Map.Entry<String, ArrayList<Udsendelse>> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Log.d("Key = " + key);
+            ArrayList<Udsendelse> value = entry.getValue();
+            for(Udsendelse udsendelse: value){
+                Log.d("Value navn = " + udsendelse.getNavn());
+            }
+        }
     }
 }

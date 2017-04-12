@@ -185,16 +185,24 @@ public class MuOnlineTVBackend extends Backend {
 
     //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-mostviewed_channel_channelType_limit_offset
     //http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=&channeltype=TV&limit=15&offset=0
-    public MestSete getMestSete(MestSete mestSete, Programdata programdata, String json) throws JSONException {
+    public MestSete getMestSete(MestSete mestSete, Programdata programdata, String json, String slug) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("Items");
-        if(mestSete == null) mestSete = new MestSete();
-
+        Log.d("Backend slug: " + slug);
+        ArrayList<Udsendelse> udsendelser = new ArrayList<>();
         for(int i = 0; i < jsonArray.length(); i++){
             JSONObject programJson = jsonArray.getJSONObject(i);
-            mestSete.udsendelser.add(parseUdsendelse(null, programdata, programJson));
+            udsendelser.add(parseUdsendelse(null, programdata, programJson));
         }
-        programdata.mestSete = mestSete;
+
+        if(mestSete == null) {
+            mestSete = new MestSete();
+            mestSete.udsendelser.put(slug, udsendelser);
+            programdata.mestSete = mestSete;
+        }
+
+        mestSete.udsendelser.put(slug, udsendelser);
+
 
         return mestSete;
     }

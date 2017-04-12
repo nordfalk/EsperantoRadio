@@ -3,7 +3,10 @@ package dk.dk.niclas.utilities;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 
+import java.util.ArrayList;
+
 import dk.dr.radio.akt.Basisfragment;
+import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
@@ -21,25 +24,26 @@ public class NetworkHelper {
     public static class TV {
         private MuOnlineTVBackend backend = (MuOnlineTVBackend) App.backend[1]; //TV Backend
 
-        public void getMestSete(String kanalKode, int offset, final Basisfragment fragment){
+        public void getMestSete(final String slug, int offset, final Basisfragment fragment){
             int limit = 15;
-            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + kanalKode + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + slug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
 
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
                 @Override
                 public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+                    ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelser.get(slug);
                     if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
                         App.event.mestSete(fraCache, uændret);
                         return;
                     }
-                    if (App.data.mestSete.udsendelser.size() != 0 && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                    if (udsendelser != null && udsendelser.size() != 0 && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
                         App.event.mestSete(fraCache, uændret);
                         return;
                     }
 
                     if (json != null && !"null".equals(json)) {
-                        backend.getMestSete(App.data.mestSete, App.data, json);
+                        backend.getMestSete(App.data.mestSete, App.data, json, slug);
                         App.event.mestSete(fraCache, uændret); //Data opdateret
                     } else {
                         sendNetværksFejlEvent();

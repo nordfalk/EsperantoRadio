@@ -29,6 +29,7 @@ public class VerticalScrollRecyclerView extends RecyclerView {
     private int mTouchSlop = vc.getScaledTouchSlop();
     private boolean mIsScrolling;
     private float startY;
+    private float startX;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -38,6 +39,7 @@ public class VerticalScrollRecyclerView extends RecyclerView {
             // Release the scroll.
             mIsScrolling = false;
             startY = ev.getY();
+            startX = ev.getX();
             return super.onInterceptTouchEvent(ev); // Do not intercept touch event, let the child handle it
         }
         switch (action) {
@@ -51,13 +53,23 @@ public class VerticalScrollRecyclerView extends RecyclerView {
                 // If the user has dragged her finger horizontally more than
                 // the touch slop, start the scroll
 
-                final float yDiff = calculateDistanceY(ev.getY());
-                Log.e("yDiff ", ""+yDiff);
+   //             final float yDiff = calculateDistanceY(ev.getY());
+     //           Log.e("yDiff ", ""+yDiff);
                 // Touch slop should be calculated using ViewConfiguration
                 // constants.
-                if (Math.abs(yDiff) > mTouchSlop) {
+                Log.e("touchSlop", ""+mTouchSlop);
+/*                if (Math.abs(yDiff) > mTouchSlop) {
                     // Start scrolling!
                     Log.d(TAG, "Scrolling Vertically");
+                    mIsScrolling = true;
+                    return true;*/
+                final float xDiff = calculateDistanceX(ev.getX());
+                final float yDiff = calculateDistanceY(ev.getY());
+
+                // Touch slop should be calculated using ViewConfiguration
+                // constants.
+                if (yDiff > mTouchSlop &&  yDiff > xDiff) {
+                    // Start scrolling!
                     mIsScrolling = true;
                     return true;
                 }
@@ -67,7 +79,9 @@ public class VerticalScrollRecyclerView extends RecyclerView {
         return super.onInterceptTouchEvent(ev);
     }
 
-
+    public float calculateDistanceX(float endX){
+        return startX - endX;
+    }
     private float calculateDistanceY(float endY) {
         return startY - endY;
     }

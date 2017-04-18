@@ -90,7 +90,7 @@ public class AppOpdatering {
 
           new AlertDialog.Builder(akt).setIcon(R.drawable.appikon_beta).setTitle("Ny version er klar")
                   .setMessage(DateUtils.getRelativeTimeSpanString(tidsstempel) + " kom en ny betaversion af "+
-                          akt.getString(R.string.app_name)+".\n\nVil du opdatere?")
+                          akt.getString(R.string.appnavn)+".\n\nVil du opdatere?")
 //                            "(den kom for er fra "+dateFormat.format(new Date(tidsstempel))+".\n\nVil du opdatere?")
                   .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override

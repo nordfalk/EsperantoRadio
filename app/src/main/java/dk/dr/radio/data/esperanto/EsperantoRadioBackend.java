@@ -283,7 +283,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     }
   }
 
-  public static void eo_opdaterProgramserieFraKanal(EoKanal k) {
+  static void eo_opdaterProgramserieFraKanal(EoKanal k) {
     Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
       ps = new Programserie();

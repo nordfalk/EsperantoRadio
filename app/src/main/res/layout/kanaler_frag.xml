@@ -8,7 +8,8 @@
       android:id="@+id/tabs"
       android:layout_width="match_parent"
       android:layout_height="48dip"
-      android:background="@drawable/elem_hvid_bg"/>
+      android:background="@color/grå10"
+      />
 <!-- DR Radio havas grizan fonon, sed nia estu blanka
       android:background="@drawable/kanalindikator_bg"
 -->

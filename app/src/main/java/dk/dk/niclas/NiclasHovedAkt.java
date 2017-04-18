@@ -1,5 +1,7 @@
 package dk.dk.niclas;
 
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.design.widget.NavigationView;
@@ -13,8 +15,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.CastState;
+import com.google.android.gms.cast.framework.CastStateListener;
+import com.google.android.gms.cast.framework.IntroductoryOverlay;
+import com.google.android.gms.cast.framework.SessionManagerListener;
 
 import org.json.JSONException;
 
@@ -36,7 +47,64 @@ public class NiclasHovedAkt extends AppCompatActivity {
 
     private final String TAG = this.getClass().getName();
 
-    DrawerLayout mDrawerLayout;
+    private CastContext mCastContext;
+    private MenuItem mediaRouteMenuItem;
+    private MenuItem mQueueMenuItem;
+    private IntroductoryOverlay mIntroductoryOverlay;
+    private CastStateListener mCastStateListener;
+    private final SessionManagerListener<CastSession> mSessionManagerListener =
+            new MySessionManagerListener();
+    private CastSession mCastSession;
+
+    private DrawerLayout mDrawerLayout;
+
+    private class MySessionManagerListener implements SessionManagerListener<CastSession> {
+
+        @Override
+        public void onSessionEnded(CastSession session, int error) {
+            if (session == mCastSession) {
+                mCastSession = null;
+            }
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionResumed(CastSession session, boolean wasSuspended) {
+            mCastSession = session;
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionStarted(CastSession session, String sessionId) {
+            mCastSession = session;
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionStarting(CastSession session) {
+        }
+
+        @Override
+        public void onSessionStartFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionEnding(CastSession session) {
+        }
+
+        @Override
+        public void onSessionResuming(CastSession session, String sessionId) {
+        }
+
+        @Override
+        public void onSessionResumeFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionSuspended(CastSession session, int reason) {
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +139,35 @@ public class NiclasHovedAkt extends AppCompatActivity {
         } catch (JSONException | IOException e){
             Log.d(TAG, e.getMessage());
         }
-        //startActivity(new Intent(this, VideoBrowserActivity.class));
+
+        mCastContext = CastContext.getSharedInstance(this);
+
+        mCastStateListener = new CastStateListener() {
+            @Override
+            public void onCastStateChanged(int newState) {
+                if (newState != CastState.NO_DEVICES_AVAILABLE) {
+                    showIntroductoryOverlay();
+                }
+            }
+        };
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.cast_browse, menu);
+        mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu,
+                R.id.media_route_menu_item);
+        mQueueMenuItem = menu.findItem(R.id.action_show_queue);
+        showIntroductoryOverlay();
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_show_queue).setVisible(
+                (mCastSession != null) && mCastSession.isConnected());
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -87,6 +178,36 @@ public class NiclasHovedAkt extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+        return mCastContext.onDispatchVolumeKeyEventBeforeJellyBean(event)
+                || super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    protected void onResume() {
+        mCastContext.addCastStateListener(mCastStateListener);
+        mCastContext.getSessionManager().addSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
+        if (mCastSession == null) {
+            mCastSession = CastContext.getSharedInstance(this).getSessionManager()
+                    .getCurrentCastSession();
+        }
+        if (mQueueMenuItem != null) {
+            mQueueMenuItem.setVisible(
+                    (mCastSession != null) && mCastSession.isConnected());
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mCastContext.removeCastStateListener(mCastStateListener);
+        mCastContext.getSessionManager().removeSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
+        super.onPause();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -140,6 +261,33 @@ public class NiclasHovedAkt extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitles.get(position);
+        }
+    }
+
+    private void showIntroductoryOverlay() {
+        if (mIntroductoryOverlay != null) {
+            mIntroductoryOverlay.remove();
+        }
+        if ((mediaRouteMenuItem != null) && mediaRouteMenuItem.isVisible()) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    mIntroductoryOverlay = new IntroductoryOverlay.Builder(
+                            NiclasHovedAkt.this, mediaRouteMenuItem)
+                            .setTitleText(getString(R.string.introducing_cast))
+                            .setOverlayColor(R.color.primary)
+                            .setSingleTime()
+                            .setOnOverlayDismissedListener(
+                                    new IntroductoryOverlay.OnOverlayDismissedListener() {
+                                        @Override
+                                        public void onOverlayDismissed() {
+                                            mIntroductoryOverlay = null;
+                                        }
+                                    })
+                            .build();
+                    mIntroductoryOverlay.show();
+                }
+            });
         }
     }
 }

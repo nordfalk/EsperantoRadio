@@ -53,16 +53,10 @@ public class VerticalScrollRecyclerView extends RecyclerView {
                 // If the user has dragged her finger horizontally more than
                 // the touch slop, start the scroll
 
-   //             final float yDiff = calculateDistanceY(ev.getY());
-     //           Log.e("yDiff ", ""+yDiff);
                 // Touch slop should be calculated using ViewConfiguration
                 // constants.
                 Log.e("touchSlop", ""+mTouchSlop);
-/*                if (Math.abs(yDiff) > mTouchSlop) {
-                    // Start scrolling!
-                    Log.d(TAG, "Scrolling Vertically");
-                    mIsScrolling = true;
-                    return true;*/
+
                 final float xDiff = calculateDistanceX(ev.getX());
                 final float yDiff = calculateDistanceY(ev.getY());
 

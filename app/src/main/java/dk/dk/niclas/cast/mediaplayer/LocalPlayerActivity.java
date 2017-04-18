@@ -258,21 +258,21 @@ public class LocalPlayerActivity extends AppCompatActivity {
     }
 
     private void play(int position) {
-        startControllersTimer();
-        switch (mLocation) {
-            case LOCAL:
-                mVideoView.seekTo(position);
-                mVideoView.start();
-                break;
-            case REMOTE:
-                mPlaybackState = PlaybackState.BUFFERING;
-                updatePlayButton(mPlaybackState);
-                mCastSession.getRemoteMediaClient().seek(position);
-                break;
-            default:
-                break;
-        }
-        restartTrickplayTimer();
+            startControllersTimer();
+            switch (mLocation) {
+                case LOCAL:
+                    mVideoView.seekTo(position);
+                    mVideoView.start();
+                    break;
+                case REMOTE:
+                    mPlaybackState = PlaybackState.BUFFERING;
+                    updatePlayButton(mPlaybackState);
+                    mCastSession.getRemoteMediaClient().seek(position);
+                    break;
+                default:
+                    break;
+            }
+            restartTrickplayTimer();
     }
 
     private void togglePlayback() {

@@ -1,6 +1,11 @@
 package dk.dk.niclas.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.cast.MediaInfo;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
@@ -18,8 +25,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.event.events.MestSeteEvent;
+import dk.dk.niclas.event.events.NetværksFejlEvent;
+import dk.dk.niclas.event.events.StreamsParsedEvent;
 import dk.dk.niclas.models.MestSete;
+import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dk.niclas.utilities.VerticalScrollRecyclerView;
 import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
@@ -30,6 +41,8 @@ import dk.dr.radio.v3.R;
 
 
 public class MestSeteFrag extends Basisfragment {
+
+    private static boolean fetchingStreams = false;
 
     private static RecyclerViewAdapter mRecyclerViewAdapter;
 
@@ -158,6 +171,7 @@ public class MestSeteFrag extends Basisfragment {
 
                 if (udsendelse != null) {
                     Picasso.with(imageView.getContext()).load(udsendelse.billedeUrl).into(imageView);
+                    setClickListener(imageView, udsendelse);
                 }
             }
         }
@@ -167,7 +181,7 @@ public class MestSeteFrag extends Basisfragment {
                 Udsendelse udsendelse = mestSete.udsendelser.get(kanalSlug).get(position);
 
                 if (udsendelse != null) {
-                    textView.setText(udsendelse.beskrivelse);
+                    textView.setText(udsendelse.titel);
                 }
             }
         }
@@ -175,6 +189,55 @@ public class MestSeteFrag extends Basisfragment {
         public void update(){
             mestSete = App.data.mestSete;
         }
+
+        private void setClickListener(final ImageView imageView, final Udsendelse udsendelse){
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(fetchingStreams) {
+                        return;
+                    }
+
+                    if(udsendelse.harStreams()){
+                        MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
+                        Activity activity = (Activity) imageView.getContext();
+                        Intent intent = new Intent(activity, LocalPlayerActivity.class);
+                        intent.putExtra("media", mediaInfo);
+                        intent.putExtra("shouldStart", false);
+                        activity.startActivity(intent);
+                    } else {
+                        fetchingStreams = true;
+                        App.networkHelper.tv.parseStreamsForUdsendelse(udsendelse);
+                    }
+                }
+            });
+        }
+    }
+
+    @Subscribe
+    public void StreamsParsedEvent(StreamsParsedEvent event){
+        if(event.isFraCache()){
+            Log.d("Fra cache");;
+        } else
+        if(event.isUændret()){
+            Log.d("Uændret");
+            fetchingStreams = false;
+            //Should not end up here
+            startPlayerActivity(event.getUdsendelse());
+        } else { //Data er opdateret.
+            Log.d("Data opdateret");
+            startPlayerActivity(event.getUdsendelse());
+            fetchingStreams = false;
+        }
+    }
+
+    public void startPlayerActivity(Udsendelse udsendelse){
+        MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
+        Activity activity = (Activity) getContext();
+        Intent intent = new Intent(activity, LocalPlayerActivity.class);
+        intent.putExtra("media", mediaInfo);
+        intent.putExtra("shouldStart", false);
+        activity.startActivity(intent);
     }
 
     @Override
@@ -211,6 +274,13 @@ public class MestSeteFrag extends Basisfragment {
             mRecyclerViewAdapter.update();
             mRecyclerViewAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Subscribe
+    public void netværksFejl(NetværksFejlEvent event){
+        fetchingStreams = false;
+        Toast.makeText(getActivity(), R.string.Netværksfejl_prøv_igen_senere,
+                Toast.LENGTH_LONG).show();
     }
 
     private void updateData(){

@@ -203,7 +203,6 @@ public class MuOnlineTVBackend extends Backend {
 
         mestSete.udsendelser.put(slug, udsendelser);
 
-
         return mestSete;
     }
 
@@ -328,7 +327,6 @@ public class MuOnlineTVBackend extends Backend {
 //    http://www.dr.dk/mu-online/api/1.3/manifest/urn:dr:mu:manifest:58acd5e56187a40d68d0d829
     @Override
     public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
-
         ArrayList<Lydstream> lydData = new ArrayList<>();
 
         JSONArray jsonArraySubtitles = jsonobj.optJSONArray("SubtitlesList"); //Forventer den kan være tom

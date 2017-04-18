@@ -211,6 +211,7 @@
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="dk.dk.niclas.cast.CastOptionsProvider"/>
 
+        <activity android:name="dk.dk.niclas.KanalAkt"></activity>
     </application>
 
 </manifest>

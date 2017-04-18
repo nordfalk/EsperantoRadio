@@ -5,14 +5,15 @@
 
     <ImageView
         android:id="@+id/mestsete_kanal_imageview"
-        android:layout_width="@dimen/list_mestsete_image_size"
-        android:layout_height="@dimen/list_mestsete_image_size" />
+        android:layout_width="@dimen/list_kanaler_image_size"
+        android:layout_height="@dimen/list_kanaler_image_size" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/mestsete_udsendelse_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
         android:layout_below="@+id/mestsete_kanal_imageview"/>
 
 </RelativeLayout>

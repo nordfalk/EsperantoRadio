@@ -66,7 +66,10 @@ dependencies {
         transitive = true;
     }
 
-
+    // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
+    //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+    // Joda-time - fylder 450 kb mere !
+    
 
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.devbrackets.android:exomedia:2.4.2'
@@ -79,11 +82,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.0'
     compile 'com.google.android.gms:play-services-cast-framework:9.4.0'
     compile 'com.android.support:mediarouter-v7:25.3.0'
-    // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
-    //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
-    // Joda-time - fylder 450 kb mere !
     compile 'net.danlew:android.joda:2.9.9'
-    testCompile 'org.robolectric:robolectric:3.1'
     compile 'org.greenrobot:eventbus:3.0.0'
-
+    testCompile 'org.robolectric:robolectric:3.1'
 }

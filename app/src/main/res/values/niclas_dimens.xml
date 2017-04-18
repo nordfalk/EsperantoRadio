@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="list_kanaler_image_size">120dp</dimen>
-    <dimen name="list_mestsete_image_size">120dp</dimen>
-    <dimen name="list_mestsete_description_size">12sp</dimen>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="list_kanaler_image_size">40dp</dimen>
+    <dimen name="list_mestsete_image_size_height">112dp</dimen>
+    <dimen name="list_mestsete_image_size_width">199dp</dimen>
+    <dimen name="list_mestsete_description_size">16sp</dimen>
+    <dimen name="list_mestsete_image_margin_bottom">5dp</dimen>
+    <dimen name="card_margin">16dp</dimen>
+    <dimen name="zero_margin" tools:override="true">0dp</dimen>
 </resources>

@@ -21,7 +21,7 @@ public abstract class Lydkilde implements Serializable {
 
   public String urn;   // Bemærk - kan være tom!
   public String slug;  // Bemærk - kan være tom!
-  transient ArrayList<Lydstream> streams;
+  public transient ArrayList<Lydstream> streams;
   public transient Lydstream hentetStream;
   public static final String INDST_lydformat = "lydformat2";
 

@@ -45,6 +45,7 @@ public class MestSeteFrag extends Basisfragment {
     private static boolean fetchingStreams = false;
 
     private static RecyclerViewAdapter mRecyclerViewAdapter;
+    private VerticalScrollRecyclerViewAdapter mVerticalScrollRecyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,7 +59,8 @@ public class MestSeteFrag extends Basisfragment {
 
     private void setupVerticalScrollRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new VerticalScrollRecyclerViewAdapter());
+        mVerticalScrollRecyclerViewAdapter = new VerticalScrollRecyclerViewAdapter();
+        recyclerView.setAdapter(mVerticalScrollRecyclerViewAdapter);
     }
 
 
@@ -266,13 +268,15 @@ public class MestSeteFrag extends Basisfragment {
             Log.d("size = " + App.data.mestSete.udsendelser.size());
             debugData();
             mRecyclerViewAdapter.update();
-            mRecyclerViewAdapter.notifyDataSetChanged();
+            //mRecyclerViewAdapter.notifyDataSetChanged();
+            mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
         } else { //Data er opdateret.
             //TODO stop spinner
             Log.d("Data opdateret");
             debugData();
             mRecyclerViewAdapter.update();
-            mRecyclerViewAdapter.notifyDataSetChanged();
+            //mRecyclerViewAdapter.notifyDataSetChanged();
+            mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
         }
     }
 

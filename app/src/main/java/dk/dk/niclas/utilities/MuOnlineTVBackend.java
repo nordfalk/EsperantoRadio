@@ -72,15 +72,18 @@ public class MuOnlineTVBackend extends Backend {
             if(j.getString("WebChannel").equals("true")){
                 continue;
             }
-
+            Kanal k = new Kanal(this);
             String kanalkode = j.getString(DRJson.SourceUrl.name());
             kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/')+1); // Klampkode til at få alle kanalKoder fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR",
-            Kanal k = grunddata.kanalFraKode.get(kanalkode);
+            k.kode = kanalkode;
+            grunddata.kanalFraKode.put(k.kode, k);
+            /*Kanal k = grunddata.kanalFraKode.get(kanalkode);
             if (k == null) {
                 k = new Kanal(this);
                 k.kode = kanalkode;
                 grunddata.kanalFraKode.put(k.kode, k);
-            }
+            }*/
+
 
             k.navn = j.getString(DRJson.Title.name());
             if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode til DR Ultra og DR K
@@ -135,6 +138,52 @@ public class MuOnlineTVBackend extends Backend {
             }
         return lydData;
     }
+    //http://www.dr.dk/mu-online/api/1.3/schedule/nownext/dr1
+    public ArrayList<Udsendelse> parseNowNextKanal(String json, Kanal kanal, Programdata programdata) throws JSONException {
+        ArrayList<Udsendelse> udsendelser = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(json);
+
+        //Igangværende udsendelse
+        JSONObject jsonNow = jsonObject.optJSONObject("Now");
+        if(jsonNow != null)
+        udsendelser.add(parseNowNextUdsendelse(jsonNow));
+
+        //De næste udsendelser
+        JSONArray jsonNextArray = jsonObject.getJSONArray("Next");
+
+        for(int i = 0; i < jsonNextArray.length(); i++){
+            JSONObject jsonUdsendelse = jsonNextArray.getJSONObject(i);
+            udsendelser.add(parseNowNextUdsendelse(jsonUdsendelse));
+        }
+
+        kanal.udsendelser = udsendelser;
+
+        return udsendelser;
+    }
+
+    private Udsendelse parseNowNextUdsendelse(JSONObject jsonObject) throws JSONException {
+        Udsendelse udsendelse = new Udsendelse();
+
+        udsendelse.titel = jsonObject.getString("Title");
+        //Hent "subTitle" også?
+        udsendelse.beskrivelse = jsonObject.getString("Description");
+
+        udsendelse.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(jsonObject.getString("StartTime"));
+        udsendelse.startTidKl = Datoformater.klokkenformat.format(udsendelse.startTid);
+        udsendelse.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(jsonObject.getString("EndTime"));
+        udsendelse.slutTidKl = Datoformater.klokkenformat.format(udsendelse.slutTid);
+
+        JSONObject programCard = jsonObject.getJSONObject("ProgramCard");
+        udsendelse.sæsonTitel = programCard.optString("SeriesTitle");
+        udsendelse.sæsonSlug = programCard.optString("SeriesSlug");
+        udsendelse.sæsonUrn = programCard.optString("SeriesUrn");
+        udsendelse.slug = programCard.getString("Slug");
+        udsendelse.urn = programCard.getString("Urn");
+        udsendelse.billedeUrl = programCard.getString("PrimaryImageUri");
+
+        return udsendelse;
+    }
+
 //    http://www.dr.dk/mu-online/api/1.3/list/view/season?id=bonderoeven-3&limit=5&offset=0
     public Sæson parseUdsendelserForSæson(Sæson sæson, Programdata programdata, JSONArray jsonArray) throws JSONException {
         ArrayList<Udsendelse> udsendelser = new ArrayList<>();

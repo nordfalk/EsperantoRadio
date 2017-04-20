@@ -1,7 +1,9 @@
 package dk.dk.niclas.fragments;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,11 +13,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.gms.cast.MediaInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
+import dk.dk.niclas.event.events.NowNextKanalEvent;
+import dk.dk.niclas.utilities.CastVideoProvider;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
 public class KanalerFrag extends Fragment {
+
+    private static boolean fetchingSchedule = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -23,6 +36,7 @@ public class KanalerFrag extends Fragment {
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.niclas_kanaler_frag, container, false);
         setupRecyclerView(recyclerView);
+        debugData();
         return recyclerView;
     }
 
@@ -105,9 +119,61 @@ public class KanalerFrag extends Fragment {
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO Start Channel Detail Activity
+                    debugData();
+                    if(!fetchingSchedule && App.backend[1].kanaler.get(position).getUdsendelse() != null){
+                        startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
+                    } else {
+                        fetchingSchedule = true;
+                        App.networkHelper.tv.parseNowNextKanal(App.backend[1].kanaler.get(position));
+                    }
                 }
             });
+        }
+    }
+
+    public static void startPlayerActivity(Kanal kanal, Context context){
+        MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
+        Activity activity = (Activity) context;
+        Intent intent = new Intent(activity, LocalPlayerActivity.class);
+        intent.putExtra("media", mediaInfo);
+        intent.putExtra("shouldStart", false);
+        activity.startActivity(intent);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe
+    public void NowNextKanalEvent(NowNextKanalEvent event){
+        if(event.isFraCache()){
+            Log.d("Fra cache");;
+        } else
+        if(event.isUændret()){
+            Log.d("Uændret");
+            fetchingSchedule = false;
+            //Should not end up here
+            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
+        } else { //Data er opdateret.
+            Log.d("Data opdateret");
+            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
+            fetchingSchedule = false;
+        }
+    }
+
+    private static void debugData() {
+        for (Kanal kanal : App.backend[1].kanaler) {
+            Log.d("Kanal streams size = " + kanal.streams.size());
+            Log.d("Kanal udsendelser size = " + kanal.udsendelser.size());
+            Log.d("Kanal slug =" + kanal.slug + "  " + kanal.kode + "   " + kanal.navn);
         }
     }
 }

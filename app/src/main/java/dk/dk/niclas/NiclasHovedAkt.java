@@ -1,5 +1,6 @@
 package dk.dk.niclas;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.dk.niclas.cast.VideoBrowserActivity;
+import dk.dk.niclas.cast.queue.ui.QueueListViewActivity;
 import dk.dk.niclas.fragments.FavoritterFrag;
 import dk.dk.niclas.fragments.KanalerFrag;
 import dk.dk.niclas.fragments.MestSeteFrag;
@@ -176,6 +179,10 @@ public class NiclasHovedAkt extends AppCompatActivity {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_show_queue:
+                Intent intent = new Intent(NiclasHovedAkt.this, QueueListViewActivity.class);
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -212,7 +219,7 @@ public class NiclasHovedAkt extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new KanalerFrag(), "Kanaler");
+        adapter.addFragment(new KanalerFrag(), "Live");
         adapter.addFragment(new MestSeteFrag(), "Mest Sete");
         adapter.addFragment(new SidsteChanceFrag(), "Sidste Chance");
         adapter.addFragment(new FavoritterFrag(), "Favoritter");

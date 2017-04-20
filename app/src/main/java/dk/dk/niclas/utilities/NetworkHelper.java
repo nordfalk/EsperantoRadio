@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import dk.dr.radio.akt.Basisfragment;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -86,6 +87,41 @@ public class NetworkHelper {
                         udsendelse.setStreams(backend.parsStreams(jsonObject));
                         Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
                         App.event.streamsParsedEvent(fraCache, uændret, udsendelse);
+                    } else {
+                        sendNetværksFejlEvent();
+                    }
+                }
+
+                @Override
+                protected void fikFejl(VolleyError error) {
+                    sendNetværksFejlEvent();
+                }
+            }) {
+                /*public Priority getPriority() {
+                    return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
+                }*/
+            }.setTag(this);
+            App.volleyRequestQueue.add(req);
+        }
+
+        public void parseNowNextKanal(final Kanal kanal){
+            String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext/" + kanal.slug;
+
+            Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+
+                @Override
+                public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+                    if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+                        return;
+                    }
+                    if (kanal.getUdsendelse() != null && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                        return;
+                    }
+
+                    if (json != null && !"null".equals(json)) {
+                        backend.parseNowNextKanal(json, kanal, App.data);
+                        Log.d("NowNext parsed for kanal = " + kanal.slug);//Data opdateret
+                        App.event.nowNextKanalEvent(fraCache, uændret, kanal.slug);
                     } else {
                         sendNetværksFejlEvent();
                     }

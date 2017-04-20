@@ -3,6 +3,7 @@ package dk.dk.niclas.event;
 import org.greenrobot.eventbus.EventBus;
 import dk.dk.niclas.event.events.MestSeteEvent;
 import dk.dk.niclas.event.events.NetværksFejlEvent;
+import dk.dk.niclas.event.events.NowNextKanalEvent;
 import dk.dk.niclas.event.events.StreamsParsedEvent;
 import dk.dr.radio.data.Udsendelse;
 
@@ -22,6 +23,11 @@ public class EventCreator {
 
     public void streamsParsedEvent(boolean fraCache, boolean uændret, Udsendelse udsendelse){
         StreamsParsedEvent event = new StreamsParsedEvent(fraCache, uændret, udsendelse);
+        bus.post(event);
+    }
+
+    public void nowNextKanalEvent(boolean fraCache, boolean uændret, String kanalSlug) {
+        NowNextKanalEvent event = new NowNextKanalEvent(fraCache, uændret, kanalSlug);
         bus.post(event);
     }
 }

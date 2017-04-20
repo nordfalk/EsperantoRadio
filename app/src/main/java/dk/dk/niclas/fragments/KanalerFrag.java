@@ -120,11 +120,13 @@ public class KanalerFrag extends Fragment {
                 @Override
                 public void onClick(View v) {
                     debugData();
-                    if(!fetchingSchedule && App.backend[1].kanaler.get(position).getUdsendelse() != null){
-                        startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
-                    } else {
-                        fetchingSchedule = true;
-                        App.networkHelper.tv.parseNowNextKanal(App.backend[1].kanaler.get(position));
+                    if(!fetchingSchedule) {
+                        if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
+                            startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
+                        } else {
+                            fetchingSchedule = true;
+                            App.networkHelper.tv.parseNowNextKanal(App.backend[1].kanaler.get(position));
+                        }
                     }
                 }
             });

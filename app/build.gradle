@@ -40,8 +40,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         debug {
@@ -49,8 +49,12 @@ android {
         }
     }
     productFlavors {
-        nicklas {
-            applicationId "dk.dit.efternavn.radio"
+        niclas {
+            applicationId "dk.szy.tv"
+            minSdkVersion 10
+            targetSdkVersion 21
+            versionCode 1
+            versionName '1.0.01'
         }
         esperanto {
             applicationId "dk.nordfalk.esperanto.radio"
@@ -63,9 +67,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-
-
-
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.devbrackets.android:exomedia:2.4.2'
     compile 'com.googlecode.android-query:android-query:0.25.9'
@@ -80,10 +81,8 @@ dependencies {
     // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
     //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     // Joda-time - fylder 450 kb mere !
-
     compile 'net.danlew:android.joda:2.9.9'
     testCompile 'org.robolectric:robolectric:3.1'
     // Eventbus gør debug APK'en 150 kb større
     compile 'org.greenrobot:eventbus:3.0.0'
-
 }

@@ -13,16 +13,19 @@
         android:id="@+id/list_kanaler_image_1"
         android:layout_width="@dimen/list_kanaler_image_size"
         android:layout_height="@dimen/list_kanaler_image_size"
+        android:src="@drawable/kanalappendix_ram"
         android:layout_marginRight="40dp"/>
 
     <ImageView
         android:id="@+id/list_kanaler_image_2"
         android:layout_width="@dimen/list_kanaler_image_size"
         android:layout_height="@dimen/list_kanaler_image_size"
+        android:src="@drawable/kanalappendix_p7m"
         android:layout_marginRight="40dp"/>
 
     <ImageView
         android:id="@+id/list_kanaler_image_3"
+        android:src="@drawable/kanalappendix_p1d"
         android:layout_width="@dimen/list_kanaler_image_size"
         android:layout_height="@dimen/list_kanaler_image_size"
         />

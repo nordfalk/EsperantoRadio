@@ -88,7 +88,7 @@ public class AppOpdatering {
           final Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(AppOpdatering.APK_URL));
 //          DateFormat dateFormat = new SimpleDateFormat(); // DateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM, Locale.getDefault());
 
-          new AlertDialog.Builder(akt).setIcon(R.drawable.appikon_beta).setTitle("Ny version er klar")
+          new AlertDialog.Builder(akt).setIcon(R.drawable.appikon).setTitle("Ny version er klar")
                   .setMessage(DateUtils.getRelativeTimeSpanString(tidsstempel) + " kom en ny betaversion af "+
                           akt.getString(R.string.appnavn)+".\n\nVil du opdatere?")
 //                            "(den kom for er fra "+dateFormat.format(new Date(tidsstempel))+".\n\nVil du opdatere?")

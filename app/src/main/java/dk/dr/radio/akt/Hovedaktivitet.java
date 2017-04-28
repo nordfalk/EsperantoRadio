@@ -27,6 +27,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.diverse.Udseende;
+import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import dk.emda.emdah_akt.EmdaHovedAkt;
 
@@ -45,6 +46,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
+    App.langToast(BuildConfig.FLAVOR);
     if (!Udseende.ESPERANTO) {
       if (Udseende.UDS_EMDA) {
         startActivity(new Intent(this, EmdaHovedAkt.class));

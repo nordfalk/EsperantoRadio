@@ -20,11 +20,6 @@ repositories {
 
 
 android {
-    signingConfigs {
-        config {
-            storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
-        }
-    }
     lintOptions {
         abortOnError false
     }
@@ -48,12 +43,25 @@ android {
     productFlavors {
         niclas {
             applicationId "dk.szy.tv"
-            minSdkVersion 10
-            targetSdkVersion 21
             versionCode 1
-            versionName '1.0.01'
+            versionName '1.0.01 Nic'
+        }
+        emda {
+            applicationId "dk.emda.tv"
+            versionCode 1
+            versionName '0.9.01 Emda'
+        }
+        jacob {
+            applicationId "dk.nordfalk.jacob"
+            versionCode 1
+            versionName '0.0.01 Jacob'
         }
         esperanto {
+            signingConfigs {
+                config {
+                    storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
+                }
+            }
             applicationId "dk.nordfalk.esperanto.radio"
             versionCode 42
             versionName '2.0.11'

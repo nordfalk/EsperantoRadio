@@ -35,8 +35,8 @@
         android:name="dk.dr.radio.diverse.ApplicationSingleton"
         android:allowBackup="true"
         android:label="@string/appnavn_beta"
-        android:icon="@drawable/appikon_beta"
-        android:logo="@drawable/appikon_beta"
+        android:icon="@drawable/appikon"
+        android:logo="@drawable/appikon"
         android:theme="@style/Theme.Dr"
         tools:ignore="UnusedAttribute">
         <activity

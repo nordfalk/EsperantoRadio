@@ -59,7 +59,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     setContentView(R.layout.indstillinger_akt);
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon_eo);
+    toolbar.setLogo(!Udseende.ESPERANTO ? R.drawable.dr_logo : R.drawable.appikon);
     toolbar.setTitle(R.string.Indstillinger);
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
     toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);

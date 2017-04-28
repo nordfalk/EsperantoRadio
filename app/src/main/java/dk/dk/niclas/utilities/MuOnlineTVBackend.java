@@ -246,11 +246,11 @@ public class MuOnlineTVBackend extends Backend {
 
         if(mestSete == null) {
             mestSete = new MestSete();
-            mestSete.udsendelser.put(kanalSlug, udsendelser);
+            mestSete.udsendelserFraKanalSlug.put(kanalSlug, udsendelser);
             programdata.mestSete = mestSete;
         }
 
-        mestSete.udsendelser.put(kanalSlug, udsendelser);
+        mestSete.udsendelserFraKanalSlug.put(kanalSlug, udsendelser);
 
         return mestSete;
     }

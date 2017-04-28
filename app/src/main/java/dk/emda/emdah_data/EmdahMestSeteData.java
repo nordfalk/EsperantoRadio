@@ -6,8 +6,8 @@ import java.util.List;
 
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
-import dk.emda.ListItem;
 
 /**
  * Created by Emdadollah on 08-03-2017.
@@ -56,7 +56,7 @@ public class EmdahMestSeteData {
 
     private static final int[] icons ={android.R.drawable.ic_popup_reminder, android.R.drawable.ic_menu_add,
     android.R.drawable.ic_menu_delete};
-
+/*
     public static List<ListItem> getMestSeteListData() {
         List<ListItem> data = new ArrayList<>();
 
@@ -75,5 +75,5 @@ public class EmdahMestSeteData {
         return data;
     }
 
-
+*/
 }

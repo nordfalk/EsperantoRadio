@@ -14,8 +14,7 @@ import android.widget.Button;
 import dk.dr.radio.v3.R;
 import dk.emda.EmdahAdapter;
 import dk.emda.ListItem;
-import dk.emda.emdah_akt.EmdahDetailActivity;
-import dk.emda.emdah_data.EmdahDerpData;
+import dk.emda.emdah_data.EmdahMestSeteData;
 
 import java.util.ArrayList;
 
@@ -23,7 +22,7 @@ import java.util.ArrayList;
  * Created by User on 2/28/2017.
  */
 
-public class EmdahTab1_Frag extends Fragment implements EmdahAdapter.ItemClickCallback {
+public class EmdahTab1MestSete_Frag extends Fragment implements EmdahAdapter.ItemClickCallback {
     private static final String TAG = "Tab1Fragment";
 
     private Button btnTEST;
@@ -42,12 +41,12 @@ public class EmdahTab1_Frag extends Fragment implements EmdahAdapter.ItemClickCa
         //btnTEST = (Button) view.findViewById(R.id.button1);
 
 
-        listData = (ArrayList) EmdahDerpData.getListData();
+        listData = (ArrayList) EmdahMestSeteData.getMestSeteListData();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rec_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL, false));
 
-        adapter = new EmdahAdapter(EmdahDerpData.getListData(),getActivity());
+        adapter = new EmdahAdapter(EmdahMestSeteData.getMestSeteListData(),getActivity());
         recyclerView.setAdapter(adapter);
         adapter.setItemClickCallback(this);
 

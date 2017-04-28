@@ -13,7 +13,7 @@ import dk.emda.ListItem;
  * Created by Emdadollah on 08-03-2017.
  */
 
-public class EmdahDerpData {
+public class EmdahMestSeteData {
 
 
     final Kanal kanal = App.grunddata.kanaler.get(2); // P3
@@ -57,7 +57,7 @@ public class EmdahDerpData {
     private static final int[] icons ={android.R.drawable.ic_popup_reminder, android.R.drawable.ic_menu_add,
     android.R.drawable.ic_menu_delete};
 
-    public static List<ListItem> getListData() {
+    public static List<ListItem> getMestSeteListData() {
         List<ListItem> data = new ArrayList<>();
 
         //Repeat process 4 times, so that we have enough data to demonstrate a scrollable

@@ -289,7 +289,7 @@ public class MestSeteFrag extends Basisfragment {
 
     private void updateData(){
         for(Kanal kanal : App.backend[1].kanaler)
-        App.networkHelper.tv.getMestSete(kanal.slug, 0, this);
+        App.networkHelper.tv.startHentMestSete(kanal.slug, 0, this);
     }
 
     private void debugData(){

@@ -209,7 +209,7 @@ public class MestSeteFrag extends Basisfragment {
                         activity.startActivity(intent);
                     } else {
                         fetchingStreams = true;
-                        App.networkHelper.tv.parseStreamsForUdsendelse(udsendelse);
+                        App.networkHelper.tv.startHentStreamsForUdsendelse(udsendelse);
                     }
                 }
             });

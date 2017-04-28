@@ -30,15 +30,15 @@ public class NetworkHelper {
         private MuOnlineTVBackend backend = (MuOnlineTVBackend) App.backend[1]; //TV Backend
 
 
-        public void getMestSete(final String slug, int offset, final Basisfragment fragment){
+        public void startHentMestSete(final String kanalSlug, int offset, final Basisfragment fragment){
             int limit = 15;
-            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + slug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
 
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
                 @Override
                 public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                    ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelser.get(slug);
+                    ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelser.get(kanalSlug);
                     if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
                         App.event.mestSete(fraCache, uændret);
                         return;
@@ -49,7 +49,7 @@ public class NetworkHelper {
                     }
 
                     if (json != null && !"null".equals(json)) {
-                        backend.getMestSete(App.data.mestSete, App.data, json, slug);
+                        backend.parseMestSete(App.data.mestSete, App.data, json, kanalSlug);
                         App.event.mestSete(fraCache, uændret); //Data opdateret
                     } else {
                         sendNetværksFejlEvent();
@@ -68,7 +68,7 @@ public class NetworkHelper {
             App.volleyRequestQueue.add(req);
         }
 
-        public void parseStreamsForUdsendelse(final Udsendelse udsendelse){
+        public void startHentStreamsForUdsendelse(final Udsendelse udsendelse){
             String url = udsendelse.ny_streamDataUrl;
 
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {

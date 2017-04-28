@@ -32,11 +32,8 @@ android {
     buildToolsVersion '25.0.2'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
-        applicationId "dk.nordfalk.esperanto.radio"
         minSdkVersion 10 // eble fakte 7 ??
         targetSdkVersion 21
-        versionCode 42
-        versionName '2.0.11'
     }
     buildTypes {
         release {
@@ -58,6 +55,8 @@ android {
         }
         esperanto {
             applicationId "dk.nordfalk.esperanto.radio"
+            versionCode 42
+            versionName '2.0.11'
         }
     }
 }

@@ -409,9 +409,9 @@ public class App {
             if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
             Log.d("Vi fik nye grunddata: fraCache=" + fraCache);
             if (!PRODUKTION || App.fejlsøgning) {
-              Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
+              if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
               Log.d("ny="+nyeGrunddata.length()+" "+nyeGrunddata.hashCode()+ " "+nyeGrunddata.replace('\n',' '));
-              Log.d("gl="+gamleGrunddata.substring(gamleGrunddata.length()-20).replace('\n',' ')+"'XX");
+              if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.substring(gamleGrunddata.length()-20).replace('\n',' ')+"'XX");
               Log.d("ny="+nyeGrunddata.substring(nyeGrunddata.length()-20).replace('\n',' ')+"'XX");
               App.kortToast("Vi fik nye grunddata");
             }

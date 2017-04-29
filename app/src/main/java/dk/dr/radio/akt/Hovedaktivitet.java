@@ -46,6 +46,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
+    //String udseende = BuildConfig.FLAVOR;
     App.langToast(BuildConfig.FLAVOR);
     if (!Udseende.ESPERANTO) {
       if (Udseende.UDS_EMDA) {

@@ -30,7 +30,7 @@ public class EoKanal extends Kanal {
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
 
-  public EoKanal(Backend backend) {
+  public EoKanal(EsperantoRadioBackend backend) {
     super(backend);
   }
 

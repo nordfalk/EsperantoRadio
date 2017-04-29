@@ -154,9 +154,12 @@ public class App {
     assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
-    Udseende.ESPERANTO = !App.prefs.getBoolean("ÆGTE_DR", !Udseende.ESPERANTO);
+    if (BuildConfig.FLAVOR.equals("esperanto")) {
+      Udseende.ESPERANTO = true;
+    } else {
+      Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);
+    }
 
-//    backend = App.ÆGTE_DR? new MuOnlineRadioBackend() : new EsperantoRadioBackend();
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
             : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
@@ -180,11 +183,6 @@ public class App {
       System.setProperty("http.keepAlive", "false");
     }
     try {
-      if (!Udseende.ESPERANTO) if ("dk.dr.radio".equals(pakkenavn)) {
-        if (!PRODUKTION) App.langToast("Sæt PRODUKTIONs-flaget");
-      } else {
-        if (PRODUKTION) App.langToast("Testudgave - fjern PRODUKTIONs-flaget");
-      }
       //noinspection ConstantConditions
       PackageInfo pi = ctx.getPackageManager().getPackageInfo(pakkenavn, 0);
       App.versionsnavn = pakkenavn + "/" + pi.versionName;
@@ -328,12 +326,12 @@ public class App {
       boolean færdig = true;
       Log.d("Onlineinitialisering starter efter " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
 
-      if (!Udseende.ESPERANTO && App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
+      if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
           String url = kanal.getBackend().getKanalStreamsUrl(kanal);
           if (url==null) { // EO ŝanĝo
-            Log.rapporterFejl(new IllegalStateException("url er null for "+kanal));
+            Log.d("Ingen direkte streams for "+kanal);
             continue;
           }
           //        Log.d("run()1 " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
@@ -373,12 +371,14 @@ public class App {
       // kan der komme rigtig mange store anomdninger i kø
       //  - det gøres kun én gang, hvilket skulle dække de fleste scenarier
       // TODO den rigtige løsning burde være at svarene for Drama&Bog og A-Å bliver hængende i cachen, tjekket her burde være om de er i cachen eller ej
+      /*
       if (!Udseende.ESPERANTO && færdig && !prefs.getBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, false)) {
         prefs.edit().putBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, true);
         færdig = false;
         data.dramaOgBog.startHentData();
         data.programserierAtilÅ.startHentData();
       }
+      */
       if (færdig) {
         netværk.observatører.remove(this); // Hold ikke mere øje med om vi kommer online
         onlineinitialisering = null;

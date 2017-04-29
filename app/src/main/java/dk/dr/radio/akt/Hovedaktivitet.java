@@ -51,13 +51,17 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
       finish();
       return;
     }
-    if (BuildConfig.FLAVOR.equals("niclas")) {
+    else if (BuildConfig.FLAVOR.equals("esperanto")) {
+      Udseende.ESPERANTO = true;
+    }
+    else if (BuildConfig.FLAVOR.equals("niclas")) {
       startActivity(new Intent(this, NiclasHovedAkt.class));
       finish();
       return;
     }
-    App.langToast(BuildConfig.FLAVOR);
-    if (!Udseende.ESPERANTO) {
+    else {
+      // Jacob
+      App.langToast("BuildConfig.FLAVOR="+BuildConfig.FLAVOR);
       if (Udseende.UDS_EMDA) {
         startActivity(new Intent(this, EmdaHovedAkt.class));
       }

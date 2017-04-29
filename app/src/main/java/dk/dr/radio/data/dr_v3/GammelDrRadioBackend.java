@@ -189,18 +189,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
   }
 
-  /*
-  public String getSøgIUdsendelserUrl(String søgStr) {
-    if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
-    return BASISURL + "/search/programs?q=" + URLEncoder.encode(søgStr) + "&type=radio";
-  }
-
-  public String getSøgISerierUrl(String søgStr) {
-    if (!App.ÆGTE_DR) throw new IllegalStateException("!App.ÆGTE_DR");
-    return BASISURL + "/search/series?q=" + URLEncoder.encode(søgStr) + "&type=radio";
-  }
-  */
-
   @Override
   public String getAlleProgramserierAtilÅUrl() {
     return BASISURL + "/series-list?type=radio";

@@ -388,7 +388,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
           public void run() {
-            App.prefs.edit().putBoolean("ÆGTE_DR", Udseende.ESPERANTO).commit();
+            App.prefs.edit().putBoolean("ESPERANTO", !Udseende.ESPERANTO).commit();
             startActivity(new Intent(getActivity(), GenstartProgrammet.class));
           }
         });

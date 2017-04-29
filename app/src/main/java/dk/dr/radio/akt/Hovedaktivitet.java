@@ -46,7 +46,16 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    //String udseende = BuildConfig.FLAVOR;
+    if (BuildConfig.FLAVOR.equals("emda")) {
+      startActivity(new Intent(this, EmdaHovedAkt.class));
+      finish();
+      return;
+    }
+    if (BuildConfig.FLAVOR.equals("niclas")) {
+      startActivity(new Intent(this, NiclasHovedAkt.class));
+      finish();
+      return;
+    }
     App.langToast(BuildConfig.FLAVOR);
     if (!Udseende.ESPERANTO) {
       if (Udseende.UDS_EMDA) {

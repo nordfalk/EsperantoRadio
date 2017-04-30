@@ -53,8 +53,8 @@ android {
         }
         jacob {
             applicationId "dk.nordfalk.jacob"
-            versionCode 1
-            versionName '0.0.01 Jacob'
+            versionCode 2
+            versionName '0.0.02 Jacob'
         }
         esperanto {
             signingConfigs {

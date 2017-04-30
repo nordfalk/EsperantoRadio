@@ -26,10 +26,11 @@ import dk.dr.radio.v3.R;
  */
 public class AppOpdatering {
 
-  public static final String APK_URL = "http://javabog.dk/privat/EoRadio.apk";
+  public static String APK_URL = "http://javabog.dk/privat/EoRadio.apk";
   public static Date nyApkErTilgængelig;
 
   public static Long findTidsstempelForSenesteAPK() throws Exception {
+    if (APK_URL==null || APK_URL.length()==0) return null;
     /*
     final PackageManager pm = getPackageManager();
     String apkName = "example.apk";

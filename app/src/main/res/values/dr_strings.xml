@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--
-  <string name="appnavn">Radio</string>
-  <string name="appnavn_beta">Radio beta</string>
--->
-  <string name="appnavn">Appnavn</string>
+  <string name="AppOpdatering_APK_URL"></string>
+  <string name="appnavn">Din apps navn her</string>
   <string name="navigation_drawer_open">Åbn venstremenu</string>
   <string name="navigation_drawer_close">Luk venstremenu</string>
   <string name="afspiller">afspiller</string>

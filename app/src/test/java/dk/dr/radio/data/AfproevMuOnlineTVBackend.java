@@ -30,26 +30,22 @@ import static org.junit.Assert.assertTrue;
 @Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevMuOnlineTVBackend.TestApp.class)
 public class AfproevMuOnlineTVBackend {
 
-
   public static class TestApp extends Application {
-    static {
-      App.IKKE_Android_VM = true;
-      Udseende.ESPERANTO = false;
-    }
-
     @Override
     public void onCreate() {
-      Log.d("onCreate " + Build.PRODUCT + Build.MODEL);
+      App.IKKE_Android_VM = true;
+      Udseende.ESPERANTO = false;
       FilCache.init(new File("/tmp/drradio-cache"));
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
       super.onCreate();
       ApplicationSingleton.instans = this;
       App.instans = new App();
-      //App.instans.init(this);
+      //App.instans.init(this); - tager tid vi laver det vigtigste herunder
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
       App.backend = new Backend[] { backend = new MuOnlineTVBackend()};
+      //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
       App.data = new Programdata();
       try {
         String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
@@ -57,6 +53,7 @@ public class AfproevMuOnlineTVBackend {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      App.grunddata.kanaler = backend.kanaler;
       //App.fejlsøgning = true;
     }
   }
@@ -65,6 +62,7 @@ public class AfproevMuOnlineTVBackend {
 
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
+    assertTrue(App.grunddata.kanaler.size()>0);
     System.out.println( "kode \tnavn \tslug \tstreams");
     for (Kanal kanal : App.grunddata.kanaler) {
       System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams);

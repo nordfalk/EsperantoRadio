@@ -19,36 +19,58 @@ import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EoRssParsado;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author j
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = AfproevEsperantoRadioBackend.EoTestApp.class)
+@Config(constants = BuildConfig.class, sdk = 21, application = AfproevEsperantoRadioBackend.TestApp.class)
 public class AfproevEsperantoRadioBackend {
-  public static class EoTestApp extends Application {
-    static {
+
+  public static class TestApp extends Application {
+    @Override
+    public void onCreate() {
       App.IKKE_Android_VM = true;
+      Udseende.ESPERANTO = true;
+      FilCache.init(new File("/tmp/testcache-esperanto"));
+      Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
+      super.onCreate();
+      ApplicationSingleton.instans = this;
+      App.instans = new App();
       App.data = new Programdata();
-      File filcache = new File("testcache-esperanto");
-      FilCache.init(filcache);
-      System.out.println( "Cache-mappe er "+ filcache );
+      super.onCreate();
+      //App.instans.init(this); - tager tid vi laver det vigtigste herunder
+      App.res = getResources();
+      App.assets = getAssets();
+      App.pakkenavn = getPackageName();
+      App.backend = new Backend[] { backend = new EsperantoRadioBackend() };
+      //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
+      App.data = new Programdata();
+      try {
+        String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
+        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      App.grunddata.kanaler = backend.kanaler;
+      //App.fejlsøgning = true;
+
     }
   }
+  static EsperantoRadioBackend backend;
 
   @Test
   public void testLogik() throws Exception {
-    //Date.parse("Mon, 13 Aug 2012 05:25:10 +0000");
-    //Date.parse("Thu, 01 Aug 2013 12:01:01 +02:00");
-    String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
-    App.backend = new Backend[] { new EsperantoRadioBackend() };
-    System.out.println("===================================================================1");
-    App.backend[0].initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+    assertTrue(App.grunddata.kanaler.size()>0);
     Grunddata ĉefdatumoj2 = App.grunddata;
     System.out.println("===================================================================2");
 

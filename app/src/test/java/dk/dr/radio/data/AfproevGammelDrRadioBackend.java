@@ -133,6 +133,7 @@ public class AfproevGammelDrRadioBackend {
 
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
+    assertTrue(App.grunddata.kanaler.size()>0);
     for (Kanal k : App.grunddata.kanaler) {
       if (k.kode.equals("P4F")) continue;
       String url = backend.getKanalStreamsUrl(k);

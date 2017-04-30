@@ -33,27 +33,22 @@ import static org.junit.Assert.assertTrue;
 @Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevMuOnlineRadioBackend.TestApp.class)
 public class AfproevMuOnlineRadioBackend {
 
-
   public static class TestApp extends Application {
-    static {
-      App.IKKE_Android_VM = true;
-      Udseende.ESPERANTO = false;
-    }
-
     @Override
     public void onCreate() {
-      Log.d("onCreate " + Build.PRODUCT + Build.MODEL);
+      App.IKKE_Android_VM = true;
+      Udseende.ESPERANTO = false;
       FilCache.init(new File("/tmp/drradio-cache"));
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
       super.onCreate();
       ApplicationSingleton.instans = this;
       App.instans = new App();
-      //App.instans.init(this);
+      //App.instans.init(this); - tager tid vi laver det vigtigste herunder
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
-      App.backend[0] = backend = new MuOnlineRadioBackend();
-      //App.instans.initData(this);
+      App.backend = new Backend[] { backend = new MuOnlineRadioBackend() };
+      //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
       App.data = new Programdata();
       try {
         String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
@@ -61,6 +56,7 @@ public class AfproevMuOnlineRadioBackend {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      App.grunddata.kanaler = backend.kanaler;
       //App.fejlsøgning = true;
     }
   }
@@ -69,15 +65,11 @@ public class AfproevMuOnlineRadioBackend {
 
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
+    assertTrue(App.grunddata.kanaler.size()>0);
+    System.out.println( "kode \tnavn \tslug \tstreams");
     for (Kanal kanal : App.grunddata.kanaler) {
       if (kanal.kode.equals("P4F")) continue;
-      /* overflødigt - kanal har allerede streams
-      String url = backend.getKanalStreamsUrl(kanal);
-      String data = hentStreng(url);
-      JSONObject o = new JSONObject(data);
-      ArrayList<Lydstream> s = backend.parsStreams(o);
-      kanal.setStreams(s);
-      */
+      System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams);
       assertTrue(kanal.findBedsteStreams(false).size() > 0);
     }
   }

@@ -29,7 +29,7 @@ public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
 
   private void ikkeImplementeret() {
-    Exception x = new Exception("Ikke implementeret i " + getClass().getSimpleName());
+    Exception x = new Exception("Ikke implementeret i " + getClass().getName());
     StackTraceElement[] ss = x.getStackTrace();
     System.err.println(x);
     for (int i=1; i<5; i++)

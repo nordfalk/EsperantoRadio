@@ -1,9 +1,9 @@
 package dk.dk.niclas.fragments;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,37 +12,47 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.cast.MediaInfo;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
-import dk.dk.niclas.event.events.NowNextKanalEvent;
+import dk.dk.niclas.cast.utils.Utils;
+import dk.dk.niclas.event.events.NowNextAlleKanalerEvent;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
-public class KanalerFrag extends Fragment {
+
+public class LiveKanalerFrag extends Fragment {
 
     private static boolean fetchingSchedule = false;
+    private KanalRecyclerViewAdapter recyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        fetchingSchedule = true;
+        App.networkHelper.tv.parseNowNextAlleKanaler();
+
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-                R.layout.niclas_kanaler_frag, container, false);
+                R.layout.niclas_livekanaler_frag, container, false);
         setupRecyclerView(recyclerView);
+
         debugData();
         return recyclerView;
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new KanalRecyclerViewAdapter());
+        recyclerViewAdapter = new KanalRecyclerViewAdapter();
+        recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     private static class KanalRecyclerViewAdapter
@@ -50,21 +60,17 @@ public class KanalerFrag extends Fragment {
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
 
-            private final ImageView mImageView1;
-            private final ImageView mImageView2;
-            private final ImageView mImageView3;
-
-            private int numberOfImageViews;
-            private int modulo;
+            private final ImageView kanalLogoImageView;
+            private final ImageView udsendelseImageView;
+            private final ImageView playButtonImageView;
+            private final TextView udsendelseTextView;
 
             public ViewHolder(View view) {
                 super(view);
-                mImageView1 = (ImageView) view.findViewById(R.id.list_kanaler_image_1);
-                mImageView2 = (ImageView) view.findViewById(R.id.list_kanaler_image_2);
-                mImageView3 = (ImageView) view.findViewById(R.id.list_kanaler_image_3);
-                numberOfImageViews = 3;
-                modulo = App.backend[1].kanaler.size() % 3;
-
+                kanalLogoImageView = (ImageView) view.findViewById(R.id.list_livekanaler_kanallogo);
+                udsendelseImageView = (ImageView) view.findViewById(R.id.list_livekanaler_udsendelseslogo);
+                playButtonImageView = (ImageView) view.findViewById(R.id.list_livekanaler_playbutton);
+                udsendelseTextView = (TextView) view.findViewById(R.id.list_livekanaler_udsendelsestitel);
             }
         }
 
@@ -72,47 +78,37 @@ public class KanalerFrag extends Fragment {
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public KanalRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.niclas_kanaler_list, parent, false);
-            return new ViewHolder(view);
+                    .inflate(R.layout.niclas_livekanaler_list, parent, false);
+            return new KanalRecyclerViewAdapter.ViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final KanalRecyclerViewAdapter.ViewHolder holder, int position) {
+            Picasso.with(holder.kanalLogoImageView.getContext())
+                    .load(App.backend[1].kanaler.get(position).kanallogo_url)
+                    .into(holder.kanalLogoImageView);
 
-            if(position != 0) {
-                position = position * holder.numberOfImageViews;
+            if(!fetchingSchedule){
+                Point displaySize = Utils.getDisplaySize(holder.kanalLogoImageView.getContext());
+                Picasso.with(holder.udsendelseImageView.getContext())
+                        .load(App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl)
+                        .resize(displaySize.x, holder.udsendelseImageView.getHeight())
+                        .into(holder.udsendelseImageView);
+
+
+                holder.udsendelseTextView.setText(App.backend[1].kanaler.get(position).getUdsendelse().titel);
             }
 
-            if (getItemCount() != position) {
-                initImageView(holder.mImageView1, position);
-                initImageView(holder.mImageView2, position+1);
-                initImageView(holder.mImageView3, position+2);
-            } else {
-                initImageView(holder.mImageView1, position);
-                if (holder.modulo != 0) {
-                    initImageView(holder.mImageView2, position+1);
-                    if (holder.modulo == 2) {
-                        initImageView(holder.mImageView2, position+2);
-                    }
-                }
-            }
+            holder.playButtonImageView.setImageResource(R.drawable.afspiller_spil_normal);
+            setClickListener(holder.playButtonImageView, position);
+
         }
 
         @Override
         public int getItemCount() {
-            int size = App.backend[1].kanaler.size();
-
-            if(size % 3 == 0) {
-                return size/3;
-            }
-            return size/3 + 1;
-        }
-
-        private void initImageView(ImageView imageView, int position){
-            imageView.setImageResource(App.grunddata.kanaler.get(position).kanallogo_resid);
-            setClickListener(imageView, position);
+            return App.backend[1].kanaler.size();
         }
 
         private void setClickListener(ImageView imageView, final int position){
@@ -123,9 +119,6 @@ public class KanalerFrag extends Fragment {
                     if(!fetchingSchedule) {
                         if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
                             startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
-                        } else {
-                            fetchingSchedule = true;
-                            App.networkHelper.tv.parseNowNextKanal(App.backend[1].kanaler.get(position));
                         }
                     }
                 }
@@ -155,19 +148,18 @@ public class KanalerFrag extends Fragment {
     }
 
     @Subscribe
-    public void NowNextKanalEvent(NowNextKanalEvent event){
+    public void NowNextAlleKanalerEvent(NowNextAlleKanalerEvent event){
         if(event.isFraCache()){
             Log.d("Fra cache");
         } else
         if(event.isUændret()){
             Log.d("Uændret");
             fetchingSchedule = false;
-            //Should not end up here
-            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
+            recyclerViewAdapter.notifyDataSetChanged();
         } else { //Data er opdateret.
             Log.d("Data opdateret");
-            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
             fetchingSchedule = false;
+            recyclerViewAdapter.notifyDataSetChanged();
         }
     }
 

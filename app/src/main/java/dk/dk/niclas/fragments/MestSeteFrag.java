@@ -3,9 +3,6 @@ package dk.dk.niclas.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -162,14 +159,14 @@ public class MestSeteFrag extends Basisfragment {
 
         @Override
         public int getItemCount() {
-            if(mestSete.udsendelser.get(kanalSlug) != null) {
-                return mestSete.udsendelser.get(kanalSlug).size();
+            if(mestSete.udsendelserFraKanalSlug.get(kanalSlug) != null) {
+                return mestSete.udsendelserFraKanalSlug.get(kanalSlug).size();
             } else return 0;
         }
 
         private void initImageView(ImageView imageView, int position){
-            if(mestSete.udsendelser.get(kanalSlug) != null) {
-                Udsendelse udsendelse = mestSete.udsendelser.get(kanalSlug).get(position);
+            if(mestSete.udsendelserFraKanalSlug.get(kanalSlug) != null) {
+                Udsendelse udsendelse = mestSete.udsendelserFraKanalSlug.get(kanalSlug).get(position);
 
                 if (udsendelse != null) {
                     Picasso.with(imageView.getContext()).load(udsendelse.billedeUrl).into(imageView);
@@ -179,8 +176,8 @@ public class MestSeteFrag extends Basisfragment {
         }
 
         private void initTextView(TextView textView, int position){
-            if(mestSete.udsendelser.get(kanalSlug) != null) {
-                Udsendelse udsendelse = mestSete.udsendelser.get(kanalSlug).get(position);
+            if(mestSete.udsendelserFraKanalSlug.get(kanalSlug) != null) {
+                Udsendelse udsendelse = mestSete.udsendelserFraKanalSlug.get(kanalSlug).get(position);
 
                 if (udsendelse != null) {
                     textView.setText(udsendelse.titel);
@@ -209,7 +206,7 @@ public class MestSeteFrag extends Basisfragment {
                         activity.startActivity(intent);
                     } else {
                         fetchingStreams = true;
-                        App.networkHelper.tv.parseStreamsForUdsendelse(udsendelse);
+                        App.networkHelper.tv.startHentStreamsForUdsendelse(udsendelse);
                     }
                 }
             });
@@ -263,7 +260,7 @@ public class MestSeteFrag extends Basisfragment {
         if(event.isUændret()){
             //TODO stop spinner
             Log.d("Uændret");
-            Log.d("size = " + App.data.mestSete.udsendelser.size());
+            Log.d("size = " + App.data.mestSete.udsendelserFraKanalSlug.size());
             debugData();
             mRecyclerViewAdapter.update();
             mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
@@ -285,11 +282,11 @@ public class MestSeteFrag extends Basisfragment {
 
     private void updateData(){
         for(Kanal kanal : App.backend[1].kanaler)
-        App.networkHelper.tv.getMestSete(kanal.slug, 0, this);
+        App.networkHelper.tv.startHentMestSete(kanal.slug, 0, this);
     }
 
     private void debugData(){
-        HashMap<String, ArrayList<Udsendelse>> map = App.data.mestSete.udsendelser;
+        HashMap<String, ArrayList<Udsendelse>> map = App.data.mestSete.udsendelserFraKanalSlug;
 
         for (Map.Entry<String, ArrayList<Udsendelse>> entry : map.entrySet()) {
             String key = entry.getKey();

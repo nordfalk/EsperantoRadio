@@ -233,7 +233,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     } else if (kanal.kanallogo_eo !=null) {
         kanallogo.setImageBitmap(kanal.kanallogo_eo);
     } else {
-      kanallogo.setImageResource(Udseende.ESPERANTO ? 0 : R.drawable.dr_logo);
+      kanallogo.setImageResource(R.drawable.appikon);
       Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
       Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.kanallogo_eo +")");
     }

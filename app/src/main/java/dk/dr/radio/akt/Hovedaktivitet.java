@@ -27,6 +27,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.diverse.Udseende;
+import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import dk.emda.emdah_akt.EmdaHovedAkt;
 
@@ -45,7 +46,22 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    if (!Udseende.ESPERANTO) {
+    if (BuildConfig.FLAVOR.equals("emda")) {
+      startActivity(new Intent(this, EmdaHovedAkt.class));
+      finish();
+      return;
+    }
+    else if (BuildConfig.FLAVOR.equals("esperanto")) {
+      Udseende.ESPERANTO = true;
+    }
+    else if (BuildConfig.FLAVOR.equals("niclas")) {
+      startActivity(new Intent(this, NiclasHovedAkt.class));
+      finish();
+      return;
+    }
+    else {
+      // Jacob
+      App.langToast("BuildConfig.FLAVOR="+BuildConfig.FLAVOR);
       if (Udseende.UDS_EMDA) {
         startActivity(new Intent(this, EmdaHovedAkt.class));
       }

@@ -19,6 +19,6 @@ public class GenstartProgrammet extends Activity {
       public void run() {
         System.exit(0);
       }
-    }, 500);
+    }, 2500);
   }
 }

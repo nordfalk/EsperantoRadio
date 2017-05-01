@@ -2,6 +2,7 @@ package dk.dk.niclas.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import dk.dr.radio.data.Udsendelse;
 
@@ -10,11 +11,7 @@ import dk.dr.radio.data.Udsendelse;
  */
 
 public class MestSete {
+    public HashMap<String, ArrayList<Udsendelse>> udsendelserFraKanalSlug = new HashMap<>();
 
-    public HashMap<String, ArrayList<Udsendelse>> udsendelser;
-
-    public MestSete(){
-        udsendelser = new HashMap<>();
-    }
-
+    public ArrayList<Runnable> observatører = new ArrayList<>();
 }

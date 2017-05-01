@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.v3.R;
 
 /**
@@ -19,7 +20,7 @@ import dk.dr.radio.v3.R;
 
 public class EmdahAdapter extends RecyclerView.Adapter<EmdahAdapter.DerpHolder>{
 
-    private List<ListItem> listData;
+    private List<Udsendelse> listData;
     private LayoutInflater inflater;
 
     private ItemClickCallback itemClickCallback;
@@ -33,7 +34,7 @@ public class EmdahAdapter extends RecyclerView.Adapter<EmdahAdapter.DerpHolder>{
         this.itemClickCallback = itemClickCallback;
     }
 
-    public EmdahAdapter(List<ListItem> listData, Context c){
+    public EmdahAdapter(List<Udsendelse> listData, Context c){
         inflater = LayoutInflater.from(c);
         this.listData = listData;
     }
@@ -46,9 +47,9 @@ public class EmdahAdapter extends RecyclerView.Adapter<EmdahAdapter.DerpHolder>{
 
     @Override
     public void onBindViewHolder(DerpHolder holder, int position) {
-        ListItem item = listData.get(position);
-        holder.title.setText(item.getTitle());
-        holder.subTitle.setText(item.getSubTitle());
+        Udsendelse item = listData.get(position);
+        holder.title.setText(item.titel);
+        holder.subTitle.setText(item.beskrivelse);
        /* if (item.isFavourite()){
             holder.secondaryIcon.setImageResource(R.drawable.ic_home_black_24dp);
         } else {

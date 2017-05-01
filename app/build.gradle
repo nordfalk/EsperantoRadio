@@ -20,11 +20,6 @@ repositories {
 
 
 android {
-    signingConfigs {
-        config {
-            storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
-        }
-    }
     lintOptions {
         abortOnError false
     }
@@ -32,16 +27,13 @@ android {
     buildToolsVersion '25.0.2'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
-        applicationId "dk.nordfalk.esperanto.radio"
         minSdkVersion 10 // eble fakte 7 ??
         targetSdkVersion 21
-        versionCode 42
-        versionName '2.0.11'
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         debug {
@@ -49,11 +41,30 @@ android {
         }
     }
     productFlavors {
-        nicklas {
-            applicationId "dk.dit.efternavn.radio"
+        niclas {
+            applicationId "dk.szy.tv"
+            versionCode 1
+            versionName '1.0.01 Nic'
+        }
+        emda {
+            applicationId "dk.emda.tv"
+            versionCode 1
+            versionName '0.9.01 Emda'
+        }
+        jacob {
+            applicationId "dk.nordfalk.jacob"
+            versionCode 2
+            versionName '0.0.02 Jacob'
         }
         esperanto {
+            signingConfigs {
+                config {
+                    storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
+                }
+            }
             applicationId "dk.nordfalk.esperanto.radio"
+            versionCode 42
+            versionName '2.0.11'
         }
     }
 }
@@ -63,9 +74,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-
-
-
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.devbrackets.android:exomedia:2.4.2'
     compile 'com.googlecode.android-query:android-query:0.25.9'
@@ -80,10 +88,8 @@ dependencies {
     // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
     //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     // Joda-time - fylder 450 kb mere !
-
     compile 'net.danlew:android.joda:2.9.9'
     testCompile 'org.robolectric:robolectric:3.1'
     // Eventbus gør debug APK'en 150 kb større
     compile 'org.greenrobot:eventbus:3.0.0'
-
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appnavn">Muzaiko beta</string>
+<!--
+scp /home/j/android/esperanto/EsperantoRadio/app/build/outputs/apk/app-esperanto-debug.apk    j:javabog.dk/privat/EoRadio.apk
+-->
+    <string name="AppOpdatering_APK_URL">http://javabog.dk/privat/EoRadio.apk</string>
+</resources>

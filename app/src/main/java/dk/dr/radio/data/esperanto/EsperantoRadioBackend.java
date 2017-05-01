@@ -50,6 +50,9 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     return ctx.getResources().openRawResource(R.raw.esperantoradio_kanaloj_v8);
   }
 
+  public String getKanalStreamsUrl(Kanal kanal) {
+    return null; // Ingen direkte streams for esperanto-kanaler
+  }
 
 
   public void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException {

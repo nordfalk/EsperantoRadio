@@ -26,10 +26,11 @@ import dk.dr.radio.v3.R;
  */
 public class AppOpdatering {
 
-  public static final String APK_URL = "http://javabog.dk/privat/EoRadio.apk";
+  public static String APK_URL = "http://javabog.dk/privat/EoRadio.apk";
   public static Date nyApkErTilgængelig;
 
   public static Long findTidsstempelForSenesteAPK() throws Exception {
+    if (APK_URL==null || APK_URL.length()==0) return null;
     /*
     final PackageManager pm = getPackageManager();
     String apkName = "example.apk";
@@ -88,7 +89,7 @@ public class AppOpdatering {
           final Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(AppOpdatering.APK_URL));
 //          DateFormat dateFormat = new SimpleDateFormat(); // DateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM, Locale.getDefault());
 
-          new AlertDialog.Builder(akt).setIcon(R.drawable.appikon_beta).setTitle("Ny version er klar")
+          new AlertDialog.Builder(akt).setIcon(R.drawable.appikon).setTitle("Ny version er klar")
                   .setMessage(DateUtils.getRelativeTimeSpanString(tidsstempel) + " kom en ny betaversion af "+
                           akt.getString(R.string.appnavn)+".\n\nVil du opdatere?")
 //                            "(den kom for er fra "+dateFormat.format(new Date(tidsstempel))+".\n\nVil du opdatere?")

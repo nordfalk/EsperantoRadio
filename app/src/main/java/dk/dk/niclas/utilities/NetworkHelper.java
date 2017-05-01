@@ -1,5 +1,7 @@
 package dk.dk.niclas.utilities;
 
+import android.support.v4.app.Fragment;
+
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 
@@ -7,10 +9,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.dr_v3.MuOnlineRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Udseende;
@@ -26,20 +26,26 @@ public class NetworkHelper {
 
     public TV tv = Udseende.ESPERANTO ? null : new TV();
 
+
     public static class TV {
         private MuOnlineTVBackend backend = (MuOnlineTVBackend) App.backend[1]; //TV Backend
 
 
 
         public void getMestSete(final String slug, int offset, final Basisfragment fragment){
+        public void startHentMestSete(final String kanalSlug, int offset, final Fragment fragment){
             int limit = 15;
-            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + slug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+            String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+            if (kanalSlug==null) {
+              limit = 150;
+              url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
+            }
 
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
                 @Override
                 public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                    ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelser.get(slug);
+                    ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelserFraKanalSlug.get(kanalSlug);
                     if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
                         App.event.mestSete(fraCache, uændret);
                         return;
@@ -50,7 +56,8 @@ public class NetworkHelper {
                     }
 
                     if (json != null && !"null".equals(json)) {
-                        backend.getMestSete(App.data.mestSete, App.data, json, slug);
+                        backend.parseMestSete(App.data.mestSete, App.data, json, kanalSlug);
+                        App.opdaterObservatører(App.data.mestSete.observatører);
                         App.event.mestSete(fraCache, uændret); //Data opdateret
                     } else {
                         sendNetværksFejlEvent();
@@ -69,7 +76,7 @@ public class NetworkHelper {
             App.volleyRequestQueue.add(req);
         }
 
-        public void parseStreamsForUdsendelse(final Udsendelse udsendelse){
+        public void startHentStreamsForUdsendelse(final Udsendelse udsendelse){
             String url = udsendelse.ny_streamDataUrl;
 
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {

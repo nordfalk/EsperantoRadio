@@ -24,6 +24,7 @@ import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.cast.utils.Utils;
 import dk.dk.niclas.event.events.NowNextAlleKanalerEvent;
 import dk.dk.niclas.utilities.CastVideoProvider;
+import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -92,9 +93,12 @@ public class LiveKanalerFrag extends Fragment {
 
             if(!fetchingSchedule){
                 Point displaySize = Utils.getDisplaySize(holder.kanalLogoImageView.getContext());
+                String billedeUrl = App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl;
+                billedeUrl = Basisfragment.skalérBillede(App.backend[1].kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x*9/16);
+                //Log.d("billedeUrl = "+billedeUrl);
                 Picasso.with(holder.udsendelseImageView.getContext())
-                        .load(App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl)
-                        .resize(displaySize.x, holder.udsendelseImageView.getHeight())
+                        .load(billedeUrl)
+                        .resize(displaySize.x, displaySize.x*9/16)
                         .into(holder.udsendelseImageView);
 
 

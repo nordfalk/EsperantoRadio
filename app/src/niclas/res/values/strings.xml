@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="appnavn">Niclas TV</string>
+<!-- Læg link ind, f.eks. http://javabog.dk/privat/EoRadio.apk -->
+    <string name="AppOpdatering_APK_URL"></string>
 </resources>

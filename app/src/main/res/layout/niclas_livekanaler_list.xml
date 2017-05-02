@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical">
@@ -8,18 +9,21 @@
     <ImageView
         android:id="@+id/list_livekanaler_udsendelseslogo"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/list_livekanaler_udsendelseslogo_height"
-        />
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:srcCompat="@drawable/eksempel_udsendelse"/>
 
     <ImageView
         android:id="@+id/list_livekanaler_kanallogo"
         android:layout_width="@dimen/list_kanaler_image_size"
         android:layout_height="@dimen/list_kanaler_image_size"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/kanalappendix_p5d"/>
 
     <ImageView
         android:id="@+id/list_livekanaler_playbutton"
+        android:src="@drawable/afspiller_spil_normal"
         android:layout_width="@dimen/list_kanaler_image_size"
         android:layout_height="@dimen/list_kanaler_image_size"
         android:layout_below="@id/list_livekanaler_kanallogo"
@@ -30,11 +34,11 @@
         android:id="@+id/list_livekanaler_udsendelsestitel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/list_livekanaler_playbutton"
         android:layout_below="@id/list_livekanaler_kanallogo"
-        android:layout_marginTop="60dp"
         android:layout_marginLeft="3dp"
-        android:textColor="@color/white"
-        />
+        android:layout_marginTop="60dp"
+        android:layout_toRightOf="@id/list_livekanaler_playbutton"
+        android:text="Hun så et mord (162)"
+        android:textColor="@color/white"/>
 
 </RelativeLayout>

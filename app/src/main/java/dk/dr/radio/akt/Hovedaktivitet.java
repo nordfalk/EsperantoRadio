@@ -46,29 +46,28 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
 
-    if (BuildConfig.FLAVOR.equals("emda")) {
-      startActivity(new Intent(this, EmdaHovedAkt.class));
-      finish();
-      return;
-    }
-    else if (BuildConfig.FLAVOR.equals("esperanto")) {
-      Udseende.ESPERANTO = true;
-    }
-    else if (BuildConfig.FLAVOR.equals("niclas")) {
-      startActivity(new Intent(this, NiclasHovedAkt.class));
-      finish();
-      return;
-    }
-    else {
-      // Jacob
-      App.langToast("BuildConfig.FLAVOR="+BuildConfig.FLAVOR);
-      if (Udseende.UDS_EMDA) {
+
+      if (BuildConfig.FLAVOR.equals("emda")) {
         startActivity(new Intent(this, EmdaHovedAkt.class));
-      }
-      if (Udseende.UDS_NICLAS) {
+        finish();
+        return;
+      } else if (BuildConfig.FLAVOR.equals("esperanto")) {
+        Udseende.ESPERANTO = true;
+      } else if (BuildConfig.FLAVOR.equals("niclas")) {
         startActivity(new Intent(this, NiclasHovedAkt.class));
+        finish();
+        return;
+      } else {
+        // Jacob
+        App.langToast("BuildConfig.FLAVOR=" + BuildConfig.FLAVOR);
+        if (Udseende.UDS_EMDA) {
+          startActivity(new Intent(this, EmdaHovedAkt.class));
+        }
+        if (Udseende.UDS_NICLAS) {
+          startActivity(new Intent(this, NiclasHovedAkt.class));
+        }
       }
-    }
+
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

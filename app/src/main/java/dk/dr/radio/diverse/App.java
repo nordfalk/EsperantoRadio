@@ -230,7 +230,6 @@ public class App {
     data = new Programdata();
     event = new EventCreator(); //Implementation af EventBus
     networkHelper = new NetworkHelper(); //Netværks-logik
-
     grunddata = new Grunddata();
     // Indlæsning af grunddata/stamdata.
     // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen

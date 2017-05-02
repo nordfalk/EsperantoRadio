@@ -30,9 +30,6 @@ public class NetworkHelper {
     public static class TV {
         private MuOnlineTVBackend backend = (MuOnlineTVBackend) App.backend[1]; //TV Backend
 
-
-
-        public void getMestSete(final String slug, int offset, final Basisfragment fragment){
         public void startHentMestSete(final String kanalSlug, int offset, final Fragment fragment){
             int limit = 15;
             String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;

@@ -214,20 +214,20 @@ public class MestSeteFrag extends Basisfragment {
     }
 
     @Subscribe
-    public void StreamsParsedEvent(StreamsParsedEvent event){
-        if(event.isFraCache()){
-            Log.d("Fra cache");;
-        } else
-        if(event.isUændret()){
-            Log.d("Uændret");
-            fetchingStreams = false;
-            //Should not end up here
-            startPlayerActivity(event.getUdsendelse());
-        } else { //Data er opdateret.
-            Log.d("Data opdateret");
-            startPlayerActivity(event.getUdsendelse());
-            fetchingStreams = false;
-        }
+        public void StreamsParsedEvent(StreamsParsedEvent event){
+            if(event.isFraCache()){
+                Log.d("Fra cache");;
+            } else
+            if(event.isUændret()){
+                Log.d("Uændret");
+                fetchingStreams = false;
+                //Should not end up here
+                startPlayerActivity(event.getUdsendelse());
+            } else { //Data er opdateret.
+                Log.d("Data opdateret");
+                startPlayerActivity(event.getUdsendelse());
+                fetchingStreams = false;
+            }
     }
 
     public void startPlayerActivity(Udsendelse udsendelse){
@@ -256,8 +256,6 @@ public class MestSeteFrag extends Basisfragment {
     public void MestSeteEvent(MestSeteEvent event){
         if(event.isFraCache()){
             Log.d("Fra cache");
-            //mRecyclerViewAdapter.update();
-            //mRecyclerViewAdapter.notifyDataSetChanged();
         } else
         if(event.isUændret()){
             //TODO stop spinner
@@ -265,14 +263,12 @@ public class MestSeteFrag extends Basisfragment {
             Log.d("size = " + App.data.mestSete.udsendelserFraKanalSlug.size());
             debugData();
             mRecyclerViewAdapter.update();
-            //mRecyclerViewAdapter.notifyDataSetChanged();
             mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
         } else { //Data er opdateret.
             //TODO stop spinner
             Log.d("Data opdateret");
             debugData();
             mRecyclerViewAdapter.update();
-            //mRecyclerViewAdapter.notifyDataSetChanged();
             mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
         }
     }

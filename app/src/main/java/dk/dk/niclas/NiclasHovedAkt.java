@@ -35,10 +35,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.dk.niclas.cast.VideoBrowserActivity;
 import dk.dk.niclas.cast.queue.ui.QueueListViewActivity;
 import dk.dk.niclas.fragments.FavoritterFrag;
-import dk.dk.niclas.fragments.KanalerFrag;
+import dk.dk.niclas.fragments.LiveKanalerFrag;
 import dk.dk.niclas.fragments.MestSeteFrag;
 import dk.dk.niclas.fragments.SidsteChanceFrag;
 import dk.dr.radio.diverse.App;
@@ -60,6 +59,7 @@ public class NiclasHovedAkt extends AppCompatActivity {
     private CastSession mCastSession;
 
     private DrawerLayout mDrawerLayout;
+
 
     private class MySessionManagerListener implements SessionManagerListener<CastSession> {
 
@@ -184,6 +184,7 @@ public class NiclasHovedAkt extends AppCompatActivity {
                 startActivity(intent);
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -219,7 +220,7 @@ public class NiclasHovedAkt extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new KanalerFrag(), "Live");
+        adapter.addFragment(new LiveKanalerFrag(), "Live");
         adapter.addFragment(new MestSeteFrag(), "Mest Sete");
         adapter.addFragment(new SidsteChanceFrag(), "Sidste Chance");
         adapter.addFragment(new FavoritterFrag(), "Favoritter");

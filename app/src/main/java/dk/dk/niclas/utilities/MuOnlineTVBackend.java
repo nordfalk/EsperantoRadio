@@ -72,23 +72,17 @@ public class MuOnlineTVBackend extends Backend {
             if(j.getString("WebChannel").equals("true")){
                 continue;
             }
+
             Kanal k = new Kanal(this);
             String kanalkode = j.getString(DRJson.SourceUrl.name());
             kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/')+1); // Klampkode til at få alle kanalKoder fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR",
             k.kode = kanalkode;
             grunddata.kanalFraKode.put(k.kode, k);
-            /*Kanal k = grunddata.kanalFraKode.get(kanalkode);
-            if (k == null) {
-                k = new Kanal(this);
-                k.kode = kanalkode;
-                grunddata.kanalFraKode.put(k.kode, k);
-            }*/
-
-
             k.navn = j.getString(DRJson.Title.name());
             if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode til DR Ultra og DR K
             k.urn = j.getString(DRJson.Urn.name());
             k.slug = j.getString(DRJson.Slug.name());
+            k.kanallogo_url = j.getString("PrimaryImageUri");
             k.ingenPlaylister = true; // aldrig spillelister for TV = ingenPlaylister.contains(k.slug);
             kanaler.add(k);
             grunddata.kanalFraSlug.put(k.slug, k);
@@ -97,7 +91,6 @@ public class MuOnlineTVBackend extends Backend {
         }
     }
 
-    //Kan evt lave det til Video-Streams
     private ArrayList<Lydstream> parseKanalStreams(JSONObject jsonObject) throws JSONException {
         ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
         JSONArray jsonArrayServere = jsonObject.getJSONArray("StreamingServers");
@@ -138,10 +131,22 @@ public class MuOnlineTVBackend extends Backend {
             }
         return lydData;
     }
+
+    //http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels
+    public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException{
+        JSONArray jsonArray = new JSONArray(json);
+
+        for(int i = 0; i < jsonArray.length(); i++){
+            JSONObject jsonKanal = jsonArray.getJSONObject(i);
+            String slug = jsonKanal.getString("ChannelSlug");
+            Kanal kanal = grunddata.kanalFraSlug.get(slug);
+            parseNowNextKanal(jsonKanal, kanal);
+        }
+    }
+
     //http://www.dr.dk/mu-online/api/1.3/schedule/nownext/dr1
-    public ArrayList<Udsendelse> parseNowNextKanal(String json, Kanal kanal, Programdata programdata) throws JSONException {
+    public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
         ArrayList<Udsendelse> udsendelser = new ArrayList<>();
-        JSONObject jsonObject = new JSONObject(json);
 
         //Igangværende udsendelse
         JSONObject jsonNow = jsonObject.optJSONObject("Now");
@@ -323,15 +328,7 @@ public class MuOnlineTVBackend extends Backend {
 
         return u;
     }
-/*
-    public String getProgramserieUrl(Programserie programserie, String programserieSlug, int offset) {
-        return null;
-    }
 
-    public ArrayList<Udsendelse> parseUdsendelserForProgramserie(JSONArray jsonArray, Kanal kanal, Programdata data) throws JSONException {
-        return null;
-    }
-*/
     public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
         return BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
     }
@@ -365,7 +362,6 @@ public class MuOnlineTVBackend extends Backend {
         return uliste;
     }
 
-    //Unødvendig funktion?
     @Override
     public String getUdsendelseStreamsUrl(Udsendelse udsendelse) {
         //if (udsendelse.ny_streamDataUrl==null) Log.e(new IllegalStateException("Ingen streams? " + udsendelse));

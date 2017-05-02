@@ -39,6 +39,7 @@ public class Kanal extends Lydkilde {
   public String navn;
   public transient int kanallogo_resid;
   public transient Bitmap kanallogo_eo; // Bruges pt kun i EsperantoRadio
+  public String kanallogo_url;
 
   public boolean p4underkanal;
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();

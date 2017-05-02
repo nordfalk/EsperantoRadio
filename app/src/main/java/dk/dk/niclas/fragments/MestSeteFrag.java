@@ -111,7 +111,7 @@ public class MestSeteFrag extends Basisfragment {
             recyclerView.setAdapter(mRecyclerViewAdapter);
 
             //Remove focus from the RecyclerView so we can intercept the vertical scrolling events
-            recyclerView.setNestedScrollingEnabled(false);
+            //recyclerView.setNestedScrollingEnabled(false);
         }
 
         private String getKanalSlugFraPosition(int position){

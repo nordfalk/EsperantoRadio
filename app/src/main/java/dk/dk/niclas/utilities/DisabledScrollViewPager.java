@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 
 public class DisabledScrollViewPager extends ViewPager {
         //Hvis false kan man ik scrolle i inner recyclerview.. hmm
-        private boolean scrollEnabled = true;
+        private boolean scrollEnabled = false;
 
         public DisabledScrollViewPager(Context context) {
             super(context);

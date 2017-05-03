@@ -62,7 +62,7 @@ public class VerticalScrollRecyclerView extends RecyclerView {
 
                 // Touch slop should be calculated using ViewConfiguration
                 // constants.
-                if (yDiff > mTouchSlop &&  yDiff > xDiff) {
+                if (yDiff > mTouchSlop && yDiff > xDiff) {
                     // Start scrolling!
                     mIsScrolling = true;
                     return true;

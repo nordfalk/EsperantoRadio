@@ -42,7 +42,7 @@ android {
     }
     productFlavors {
         niclas {
-            applicationId "dk.szy.tv"
+            applicationId "dk.szy.tvappen"
             versionCode 1
             versionName '1.0.01 Nic'
         }

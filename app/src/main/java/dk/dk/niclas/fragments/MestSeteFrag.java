@@ -102,7 +102,10 @@ public class MestSeteFrag extends Basisfragment {
         }
 
         private void initImageView(ImageView imageView, int position){
-            imageView.setImageResource(App.grunddata.kanaler.get(position).kanallogo_resid);
+            //imageView.setImageResource(App.grunddata.kanaler.get(position).kanallogo_resid);
+            Picasso.with(imageView.getContext())
+                    .load(App.backend[1].kanaler.get(position).kanallogo_url)
+                    .into(imageView);
         }
 
         private void initRecyclerView(RecyclerView recyclerView, int position){

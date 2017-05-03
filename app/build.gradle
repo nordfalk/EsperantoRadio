@@ -27,7 +27,7 @@ android {
     buildToolsVersion '25.0.2'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
-        minSdkVersion 10 // eble fakte 7 ??
+        minSdkVersion 11 // eble fakte 7 ??
         targetSdkVersion 21
     }
     buildTypes {
@@ -42,7 +42,8 @@ android {
     }
     productFlavors {
         niclas {
-            applicationId "dk.szy.tvappen"
+//            applicationId "dk.szy.tv" // oprindelig
+            applicationId "dk.szy.dansk.fjernsyn"
             versionCode 1
             versionName '1.0.01 Nic'
         }

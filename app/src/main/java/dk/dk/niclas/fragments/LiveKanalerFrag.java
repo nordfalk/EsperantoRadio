@@ -70,6 +70,7 @@ public class LiveKanalerFrag extends Fragment {
                 super(view);
                 kanalLogoImageView = (ImageView) view.findViewById(R.id.list_livekanaler_kanallogo);
                 udsendelseImageView = (ImageView) view.findViewById(R.id.list_livekanaler_udsendelseslogo);
+                udsendelseImageView.setImageDrawable(null); // vis ikke eksempelbilledet
                 playButtonImageView = (ImageView) view.findViewById(R.id.list_livekanaler_playbutton);
                 udsendelseTextView = (TextView) view.findViewById(R.id.list_livekanaler_udsendelsestitel);
             }
@@ -97,7 +98,7 @@ public class LiveKanalerFrag extends Fragment {
                 billedeUrl = Basisfragment.skalérBillede(App.backend[1].kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x*9/16);
                 //Log.d("billedeUrl = "+billedeUrl);
                 Picasso.with(holder.udsendelseImageView.getContext())
-                        .load(billedeUrl)
+                        .load(billedeUrl).placeholder(null)
                         .resize(displaySize.x, displaySize.x*9/16)
                         .into(holder.udsendelseImageView);
 

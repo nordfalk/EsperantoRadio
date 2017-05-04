@@ -118,7 +118,8 @@ public class NiclasHovedAkt extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_action_venstremenu);
+        //actionBar.setHomeAsUpIndicator(R.drawable.ic_action_venstremenu);
+        actionBar.setHomeAsUpIndicator(R.drawable.appikon);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

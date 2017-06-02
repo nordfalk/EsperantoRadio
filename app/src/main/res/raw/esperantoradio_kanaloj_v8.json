@@ -17,7 +17,7 @@
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"qqdrift_statusmeddelelse": "",
-		"XXXdrift_statusmeddelelse": "17a de aprilo 2016:<br><br>Ni aldonis kanalon 'Spiritisma Voĉo'.<br><br>Kore, Jacob Nordfalk.",
+		"hhhdrift_statusmeddelelse": "1a de junio 2017:<br><br>Bonvenon al nova kanalo 'Radio Scienca'.<br><br>Kore, Jacob Nordfalk.",
 		"drift_statusmeddelelse": ""
 	},
 
@@ -79,6 +79,15 @@
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo": "http://kern.punkto.info/"
+		}
+	,{
+			"kodo": "radioscienca",
+			"nomo": "Radio Scienca",
+			"emblemoUrl": "http://www.radioscienca.com/wp/wp-content/uploads/2017/01/bg-1.jpg",
+			"elsendojRssUrl": "http://www.radioscienca.com/feed/",
+			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": false,
+			"hejmpaĝo": "http://www.radioscienca.com/"
 		}
 	,{
 			"kodo": "polaretradio",

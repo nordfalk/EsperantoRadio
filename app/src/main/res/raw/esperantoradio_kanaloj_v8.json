@@ -17,8 +17,8 @@
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"qqdrift_statusmeddelelse": "",
-		"hhhdrift_statusmeddelelse": "1a de junio 2017:<br><br>Bonvenon al nova kanalo 'Radio Scienca'.<br><br>Kore, Jacob Nordfalk.",
-		"drift_statusmeddelelse": ""
+		"drift_statusmeddelelse": "Aŭgusto 2017:<br><br>Bonvenon al nova kanalo 'Movada Vidpunkto'.<br><br>Se al vi mankas kanalo vi volonte kontaktu min.<br>Kore, Jacob Nordfalk.",
+		"xxxxdrift_statusmeddelelse": ""
 	},
 
 	"sugestoj_por_alarmoj":
@@ -79,6 +79,15 @@
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo": "http://kern.punkto.info/"
+		}
+	,{
+			"kodo": "movada-vidpunkto",
+			"nomo": "Movada Vidpunkto",
+			"emblemoUrl": "https://movada-vid.punkto.info/wp-content/uploads/sites/2/2015/12/logotipo-movada-1.png",
+			"elsendojRssUrl": "https://movada-vid.punkto.info/feed/mp3/",
+			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": true,
+			"hejmpaĝo": "https://movada-vid.punkto.info/"
 		}
 	,{
 			"kodo": "radioscienca",

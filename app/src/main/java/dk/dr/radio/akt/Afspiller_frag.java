@@ -222,6 +222,10 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     if (getActivity()==null) return;
     App.forgrundstråd.postDelayed(opdaterSeekBar, 1000);
     Lydkilde lydkilde = App.afspiller.getLydkilde();
+    if (lydkilde == null) {
+      Log.rapporterFejl(new IllegalStateException("lydkilde er null"));
+      return;
+    }
     Kanal kanal = lydkilde.getKanal();
     if (kanal == null) {
       Log.rapporterFejl(new IllegalStateException("kanal er null for "+lydkilde+ " "+lydkilde.getClass()));

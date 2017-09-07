@@ -40,8 +40,11 @@ android {
             applicationIdSuffix 'beta'
         }
     }
+    flavorDimensions "forfatter"
+
     productFlavors {
         niclas {
+            dimension "forfatter"
 //            applicationId "dk.szy.tv" // oprindelig
             applicationId "dk.szy.niclas.tv"
 //            applicationId "dk.szy.tv2" // Jacobs signatur
@@ -49,16 +52,19 @@ android {
             versionName '1.0'
         }
         emda {
+            dimension "forfatter"
             applicationId "dk.emda.tv"
             versionCode 1
             versionName '0.9.01 Emda'
         }
         jacob {
+            dimension "forfatter"
             applicationId "dk.nordfalk.jacob"
             versionCode 2
             versionName '0.0.02 Jacob'
         }
         esperanto {
+            dimension "forfatter"
             signingConfigs {
                 config {
                     storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')

@@ -112,6 +112,10 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
 
 
     Lydkilde lydkilde = App.afspiller.getLydkilde();
+    if (lydkilde == null) {
+      Log.rapporterFejl(new IllegalStateException("lydkilde er null"));
+      return remoteViews;
+    }
     Kanal kanal = lydkilde.getKanal();
     Udsendelse udsendelse = lydkilde.getUdsendelse();
     if (kanal.kanallogo_resid==0 && kanal.kanallogo_eo ==null) {

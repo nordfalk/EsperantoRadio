@@ -37,8 +37,10 @@ import dk.dr.radio.v3.R;
  * Created by j on 01-03-17.
  */
 
-public class EsperantoRadioBackend extends Backend
-{
+public class EsperantoRadioBackend extends Backend {
+  @Override
+  protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
+
   public String getGrunddataUrl() {
     /*
 scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/

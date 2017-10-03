@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import dk.dr.radio.data.dr_v3.DRJson;
@@ -150,6 +151,11 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   private void hentUdsendelser(final int offset) {
     String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset);
     if (url == null) {
+      if (programserie==null) { // Fix for at TV-kilder ikke kan give en programserie-URL
+        programserie = new Programserie();
+        programserie.slug = startudsendelse.programserieSlug;
+        programserie.tilføjUdsendelser(0, Arrays.asList(startudsendelse));
+      }
       opdaterUdsendelser();
       return;
     }

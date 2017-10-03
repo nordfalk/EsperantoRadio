@@ -398,7 +398,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
             @Override
             public void run() {
-              Udseende.UDS_EMDA = true;
               startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
             }
           });
@@ -407,7 +406,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
             @Override
             public void run() {
-              Udseende.UDS_NICLAS = true;
               startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
             }
           });

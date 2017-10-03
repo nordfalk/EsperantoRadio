@@ -60,12 +60,6 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
       } else {
         // Jacob
         App.langToast("BuildConfig.FLAVOR=" + BuildConfig.FLAVOR);
-        if (Udseende.UDS_EMDA) {
-          startActivity(new Intent(this, EmdaHovedAkt.class));
-        }
-        if (Udseende.UDS_NICLAS) {
-          startActivity(new Intent(this, NiclasHovedAkt.class));
-        }
       }
 
 

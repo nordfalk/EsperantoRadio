@@ -3,6 +3,7 @@ package dk.dr.radio.data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -23,7 +24,7 @@ public class Programserie { //implements Serializable {
   public int antalUdsendelser;
   public String urn; // https://en.wikipedia.org/wiki/Uniform_Resource_Name
   private ArrayList<Udsendelse> udsendelserListe;
-  private TreeMap<Integer, ArrayList<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, ArrayList<Udsendelse>>();
+  private TreeMap<Integer, List<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, List<Udsendelse>>();
   private TreeSet<Udsendelse> udsendelserSorteret;
 
   //tv
@@ -34,7 +35,7 @@ public class Programserie { //implements Serializable {
   }
 
 
-  public void tilføjUdsendelser(int offset, ArrayList<Udsendelse> uds) {
+  public void tilføjUdsendelser(int offset, List<Udsendelse> uds) {
     Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + "  får tilføjet " + (uds == null ? "nul" : uds.size()) + " elementer på offset="+offset);
     if (App.fejlsøgning) Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + " elem liste:\n" + udsendelserListe + "\nfår tilføjet " + (uds == null ? "nul" : uds.size()) + " elem:\n" + uds);
 
@@ -46,7 +47,7 @@ public class Programserie { //implements Serializable {
       udsendelserListe = new ArrayList<Udsendelse>(uds);
     } else {
       udsendelserListe.clear();
-      for (ArrayList<Udsendelse> lx : udsendelserListeFraOffset.values()) {
+      for (List<Udsendelse> lx : udsendelserListeFraOffset.values()) {
         udsendelserListe.addAll(lx);
       }
       udsendelserSorteret.addAll(uds);

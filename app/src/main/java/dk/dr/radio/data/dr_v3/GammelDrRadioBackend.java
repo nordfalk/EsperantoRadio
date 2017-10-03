@@ -34,6 +34,8 @@ import dk.dr.radio.v3.R;
  */
 
 public class GammelDrRadioBackend extends Backend {
+  @Override
+  protected void ikkeImplementeret() { _ikkeImplementeret(); }
 
   public String getGrunddataUrl() {
     // "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";

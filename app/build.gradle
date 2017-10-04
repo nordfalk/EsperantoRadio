@@ -99,5 +99,5 @@ dependencies {
     compile 'net.danlew:android.joda:2.9.9'
     testCompile 'org.robolectric:robolectric:3.1'
     // Eventbus gør debug APK'en 150 kb større
-    compile 'org.greenrobot:eventbus:3.0.0'
+    //compile 'org.greenrobot:eventbus:3.0.0'
 }

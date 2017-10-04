@@ -65,7 +65,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-import dk.dk.niclas.event.EventCreator;
+import dk.nordfalk.simpelbus.SimpelBus;
 import dk.dk.niclas.utilities.MuOnlineTVBackend;
 import dk.dk.niclas.utilities.NetworkHelper;
 import dk.dr.radio.afspilning.Afspiller;
@@ -95,7 +95,7 @@ public class App {
   public static Programdata data;
   public static Grunddata grunddata;
   public static Afspiller afspiller;
-  public static EventCreator event; //Vi benytter EventBus til vores projekt
+  public static SimpelBus eventbus; //Vi benytter EventBus til vores projekt
   public static NetworkHelper networkHelper; //Benytter en klasse til håndtering af netværks-logikken
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
@@ -228,7 +228,7 @@ public class App {
 
   public void initData(Application ctx) {
     data = new Programdata();
-    event = new EventCreator(); //Implementation af EventBus
+    eventbus = new SimpelBus(); //Implementation af EventBus
     networkHelper = new NetworkHelper(); //Netværks-logik
     grunddata = new Grunddata();
     // Indlæsning af grunddata/stamdata.

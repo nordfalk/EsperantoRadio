@@ -10,22 +10,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.google.android.gms.cast.MediaInfo;
 import com.squareup.picasso.Picasso;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
-import dk.dk.niclas.event.events.MestSeteEvent;
-import dk.dk.niclas.event.events.NetværksFejlEvent;
-import dk.dk.niclas.event.events.StreamsParsedEvent;
+import dk.dr.radio.net.volley.DrVolleyResonseListener;
+import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dk.niclas.models.MestSete;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dk.niclas.utilities.VerticalScrollRecyclerView;
@@ -65,10 +64,10 @@ public class MestSeteFrag extends Basisfragment {
      * The Adapter that holds the list of channels and their corresponding RecyclerView
      *  containing the most watched episodes for that channel.
      */
-    private static class VerticalScrollRecyclerViewAdapter
+    private class VerticalScrollRecyclerViewAdapter
             extends RecyclerView.Adapter<VerticalScrollRecyclerViewAdapter.ViewHolder> {
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final ImageView mImageView;
             private final RecyclerView mRecyclerView;
@@ -125,13 +124,13 @@ public class MestSeteFrag extends Basisfragment {
     /**
      * The RecyclerViewAdapter that holds the list of most watched episodes for a single channel
      */
-    private static class RecyclerViewAdapter
+    private class RecyclerViewAdapter
             extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
         private MestSete mestSete = App.data.mestSete;
         private String kanalSlug;
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final ImageView mImageView;
             private final TextView mTextView;
@@ -209,28 +208,42 @@ public class MestSeteFrag extends Basisfragment {
                         activity.startActivity(intent);
                     } else {
                         fetchingStreams = true;
-                        App.networkHelper.tv.startHentStreamsForUdsendelse(udsendelse);
+                        String url = udsendelse.ny_streamDataUrl;
+
+                        Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+
+                            @Override
+                            public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+                                if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+                                    return;
+                                }
+                                if (udsendelse.harStreams() && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                                    return;
+                                }
+
+                                if (json != null && !"null".equals(json)) {
+                                    JSONObject jsonObject = new JSONObject(json);
+                                    udsendelse.setStreams(App.networkHelper.tv.backend.parsStreams(jsonObject));
+                                    Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
+                                    fetchingStreams = false;
+                                    startPlayerActivity(udsendelse);
+                                }
+                            }
+
+                            @Override
+                            protected void fikFejl(VolleyError error) {
+                                netværksFejl();
+                            }
+                        }) {
+                            /*public Priority getPriority() {
+                                return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
+                            }*/
+                        }.setTag(this);
+                        App.volleyRequestQueue.add(req);
                     }
                 }
             });
         }
-    }
-
-    @Subscribe
-        public void StreamsParsedEvent(StreamsParsedEvent event){
-            if(event.isFraCache()){
-                Log.d("Fra cache");;
-            } else
-            if(event.isUændret()){
-                Log.d("Uændret");
-                fetchingStreams = false;
-                //Should not end up here
-                startPlayerActivity(event.getUdsendelse());
-            } else { //Data er opdateret.
-                Log.d("Data opdateret");
-                startPlayerActivity(event.getUdsendelse());
-                fetchingStreams = false;
-            }
     }
 
     public void startPlayerActivity(Udsendelse udsendelse){
@@ -245,47 +258,31 @@ public class MestSeteFrag extends Basisfragment {
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
+        App.data.mestSete.observatører.remove(mestSeteObs);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-        updateData();
+        App.data.mestSete.observatører.add(mestSeteObs);
+        for(Kanal kanal : App.backend[1].kanaler) {
+            App.networkHelper.tv.startHentMestSete(kanal.slug, 0, this);
+        }
     }
 
-    @Subscribe
-    public void MestSeteEvent(MestSeteEvent event){
-        if(event.isFraCache()){
-            Log.d("Fra cache");
-        } else
-        if(event.isUændret()){
-            //TODO stop spinner
-            Log.d("Uændret");
+    private Runnable mestSeteObs = new Runnable() {
+        @Override
+        public void run() {
             Log.d("size = " + App.data.mestSete.udsendelserFraKanalSlug.size());
             debugData();
             mRecyclerViewAdapter.update();
             mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
-        } else { //Data er opdateret.
-            //TODO stop spinner
-            Log.d("Data opdateret");
-            debugData();
-            mRecyclerViewAdapter.update();
-            mVerticalScrollRecyclerViewAdapter.notifyDataSetChanged();
         }
-    }
+    };
 
-    @Subscribe
-    public void netværksFejl(NetværksFejlEvent event){
+    public static void netværksFejl(){
         fetchingStreams = false;
-        Toast.makeText(getActivity(), R.string.Netværksfejl_prøv_igen_senere,
-                Toast.LENGTH_LONG).show();
-    }
-
-    private void updateData(){
-        for(Kanal kanal : App.backend[1].kanaler)
-        App.networkHelper.tv.startHentMestSete(kanal.slug, 0, this);
+        App.langToast(R.string.Netværksfejl_prøv_igen_senere);
     }
 
     private void debugData(){

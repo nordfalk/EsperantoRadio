@@ -6,20 +6,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.FilCache;
-import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.Diverse;
-import dk.dr.radio.v3.R;
+import dk.dk.niclas.models.MestSete;
 
 /**
  * Created by j on 27-02-17.
@@ -121,6 +114,20 @@ public abstract class Backend {
   }
 
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
+    ikkeImplementeret();
+    return null;
+  }
+
+  public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException {
+    ikkeImplementeret();
+  }
+
+  public MestSete parseMestSete(MestSete mestSete, Programdata data, String json, String kanalSlug) throws JSONException {
+    ikkeImplementeret();
+    return null;
+  }
+
+  public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
     ikkeImplementeret();
     return null;
   }

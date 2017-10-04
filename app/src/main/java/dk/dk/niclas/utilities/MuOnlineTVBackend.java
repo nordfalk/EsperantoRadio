@@ -136,7 +136,7 @@ public class MuOnlineTVBackend extends Backend {
     }
 
     //http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels
-    public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException{
+    public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException {
         JSONArray jsonArray = new JSONArray(json);
 
         for(int i = 0; i < jsonArray.length(); i++){

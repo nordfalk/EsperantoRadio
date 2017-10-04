@@ -2,7 +2,6 @@ package dk.dk.niclas.fragments;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,13 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.google.android.gms.cast.MediaInfo;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
-import dk.dk.niclas.event.events.NowNextKanalEvent;
+import dk.dr.radio.net.volley.DrVolleyResonseListener;
+import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
@@ -45,10 +46,10 @@ public class KanalerFrag extends Fragment {
         recyclerView.setAdapter(new KanalRecyclerViewAdapter());
     }
 
-    private static class KanalRecyclerViewAdapter
+    private class KanalRecyclerViewAdapter
             extends RecyclerView.Adapter<KanalRecyclerViewAdapter.ViewHolder> {
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final ImageView mImageView1;
             private final ImageView mImageView2;
@@ -122,10 +123,45 @@ public class KanalerFrag extends Fragment {
                     debugData();
                     if(!fetchingSchedule) {
                         if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
-                            startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
+                            startPlayerActivity(App.backend[1].kanaler.get(position));
                         } else {
                             fetchingSchedule = true;
-                            App.networkHelper.tv.parseNowNextKanal(App.backend[1].kanaler.get(position));
+                            final Kanal kanal = App.backend[1].kanaler.get(position);
+                            String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext/" + kanal.slug;
+
+                            Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+
+                                @Override
+                                public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+                                    if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+                                        return;
+                                    }
+                                    if (kanal.getUdsendelse() != null && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                                        return;
+                                    }
+
+                                    if (json != null && !"null".equals(json)) {
+                                        JSONObject jsonObject = new JSONObject(json);
+                                        App.networkHelper.tv.backend.parseNowNextKanal(jsonObject, kanal);
+                                        Log.d("NowNext parsed for kanal = " + kanal.slug);//Data opdateret
+                                        fetchingSchedule = false;
+                                        //Should not end up here
+                                        startPlayerActivity(App.grunddata.kanalFraSlug.get(kanal));
+                                    } else {
+                                        App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+                                    }
+                                }
+
+                                @Override
+                                protected void fikFejl(VolleyError error) {
+                                    App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+                                }
+                            }) {
+                                /*public Priority getPriority() {
+                                    return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
+                                }*/
+                            }.setTag(App.networkHelper.tv);
+                            App.volleyRequestQueue.add(req);
                         }
                     }
                 }
@@ -133,9 +169,9 @@ public class KanalerFrag extends Fragment {
         }
     }
 
-    public static void startPlayerActivity(Kanal kanal, Context context){
+    public void startPlayerActivity(Kanal kanal){
         MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
-        Activity activity = (Activity) context;
+        Activity activity = getActivity();
         Intent intent = new Intent(activity, LocalPlayerActivity.class);
         intent.putExtra("media", mediaInfo);
         intent.putExtra("shouldStart", false);
@@ -145,32 +181,12 @@ public class KanalerFrag extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
     }
-
-    @Subscribe
-    public void NowNextKanalEvent(NowNextKanalEvent event){
-        if(event.isFraCache()){
-            Log.d("Fra cache");
-        } else
-        if(event.isUændret()){
-            Log.d("Uændret");
-            fetchingSchedule = false;
-            //Should not end up here
-            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
-        } else { //Data er opdateret.
-            Log.d("Data opdateret");
-            startPlayerActivity(App.grunddata.kanalFraSlug.get(event.getKanalSlug()), getContext());
-            fetchingSchedule = false;
-        }
-    }
-
     private static void debugData() {
         for (Kanal kanal : App.backend[1].kanaler) {
             Log.d("Kanal streams size = " + kanal.streams.size());

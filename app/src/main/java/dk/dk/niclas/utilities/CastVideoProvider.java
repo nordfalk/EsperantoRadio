@@ -16,6 +16,7 @@ import java.util.List;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.v3.R;
 
 
 public class CastVideoProvider {
@@ -170,7 +171,7 @@ public class CastVideoProvider {
             }
         } catch(ArithmeticException e){
             e.printStackTrace();
-            App.event.netværksFejl();
+            App.langToast(R.string.Netværksfejl_prøv_igen_senere);
         }
         return (int) l;
     }

@@ -14,15 +14,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.google.android.gms.cast.MediaInfo;
 import com.squareup.picasso.Picasso;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.cast.utils.Utils;
-import dk.dk.niclas.event.events.NowNextAlleKanalerEvent;
+import dk.dr.radio.net.volley.DrVolleyResonseListener;
+import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
@@ -40,7 +41,39 @@ public class LiveKanalerFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fetchingSchedule = true;
-        App.networkHelper.tv.parseNowNextAlleKanaler();
+        String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels";
+
+        Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+
+            @Override
+            public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+                if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+                    return;
+                }
+                if (uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                    //TODO Håndter hvis det er uændret
+                }
+
+                if (json != null && !"null".equals(json)) {
+                    App.networkHelper.tv.backend.parseNowNextAlleKanaler(json, App.grunddata);
+                    Log.d("NowNext parsed for alle kanaler");//Data opdateret
+                    fetchingSchedule = false;
+                    recyclerViewAdapter.notifyDataSetChanged();
+                } else {
+                    App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+                }
+            }
+
+            @Override
+            protected void fikFejl(VolleyError error) {
+                App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+            }
+        }) {
+            /*public Priority getPriority() {
+                return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
+            }*/
+        }.setTag(App.networkHelper.tv);
+        App.volleyRequestQueue.add(req);
 
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.niclas_livekanaler_frag, container, false);
@@ -143,29 +176,11 @@ public class LiveKanalerFrag extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Subscribe
-    public void NowNextAlleKanalerEvent(NowNextAlleKanalerEvent event){
-        if(event.isFraCache()){
-            Log.d("Fra cache");
-        } else
-        if(event.isUændret()){
-            Log.d("Uændret");
-            fetchingSchedule = false;
-            recyclerViewAdapter.notifyDataSetChanged();
-        } else { //Data er opdateret.
-            Log.d("Data opdateret");
-            fetchingSchedule = false;
-            recyclerViewAdapter.notifyDataSetChanged();
-        }
     }
 
     private static void debugData() {

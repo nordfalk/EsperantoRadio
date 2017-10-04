@@ -240,7 +240,7 @@ Title: "P4 Bornholm",
   }
 
   @Override
-  public String getNyeProgrammerSiden(String programserieSlug, String dato) {
+  public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
     // return GLBASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
     return UDESTÅR; // UDESTÅR
   }

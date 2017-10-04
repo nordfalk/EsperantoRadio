@@ -207,7 +207,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       http://www.dr.dk/tjenester/mu-apps/new-programs-since/monte-carlo/2014-02-13
      */
   @Override
-  public String getNyeProgrammerSiden(String programserieSlug, String dato) {
+  public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
     return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
   }
 

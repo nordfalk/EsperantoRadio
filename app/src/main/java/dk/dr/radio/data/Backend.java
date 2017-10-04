@@ -37,7 +37,7 @@ public abstract class Backend {
 
   public abstract void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException;
 
-  public String getNyeProgrammerSiden(String programserieSlug, String dato) {
+  public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
     ikkeImplementeret();
     return null;
   }

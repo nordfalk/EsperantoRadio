@@ -100,7 +100,7 @@ public class Favoritter {
   };
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
-    String url = App.backend[0].getNyeProgrammerSiden(programserieSlug, dato);
+    String url = App.backend[0].getFavoritterNyeProgrammerSiden(programserieSlug, dato);
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override
       public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {

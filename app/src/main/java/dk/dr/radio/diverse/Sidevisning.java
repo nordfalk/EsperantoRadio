@@ -11,20 +11,9 @@ import java.util.TreeSet;
 import dk.dr.radio.akt.Afspiller_frag;
 import dk.dr.radio.akt.AlleUdsendelserAtilAA_frag;
 import dk.dr.radio.akt.DramaOgBog_frag;
-import dk.dr.radio.akt.FangBrowseIntent_akt;
+import dk.dr.radio.akt.FangBrowseRadioIntent_akt;
 import dk.dr.radio.akt.Favoritprogrammer_frag;
 import dk.dr.radio.akt.Hentede_udsendelser_frag;
-import dk.dr.radio.akt.Indstillinger_akt;
-import dk.dr.radio.akt.Kanal_frag;
-import dk.dr.radio.akt.Kanaler_frag;
-import dk.dr.radio.akt.Kontakt_info_om_frag;
-import dk.dr.radio.akt.P4kanalvalg_frag;
-import dk.dr.radio.akt.Programserie_frag;
-import dk.dr.radio.akt.Senest_lyttede_frag;
-import dk.dr.radio.akt.Soeg_efter_program_frag;
-import dk.dr.radio.akt.Udsendelse_frag;
-import dk.dr.radio.data.HentedeUdsendelser;
-import dk.dr.radio.v3.R;
 
 /**
  * Created by j on 28-11-14.
@@ -47,7 +36,7 @@ public class Sidevisning {
     m.put(Afspiller_frag.class, "afspiller_popop");
     m.put(AlleUdsendelserAtilAA_frag.class, "alle_udsendelser");
     m.put(DramaOgBog_frag.class, "drama_og_bog");
-    m.put(FangBrowseIntent_akt.class, "fang_browser");
+    m.put(FangBrowseRadioIntent_akt.class, "fang_browser");
     m.put(Favoritprogrammer_frag.class, "favoritter");
     m.put(Hentede_udsendelser_frag.class, "hentede_udsendelser");
   }

@@ -24,7 +24,7 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 
-public class FangBrowseIntent_akt extends Activity {
+public class FangBrowseRadioIntent_akt extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class FangBrowseIntent_akt extends Activity {
     } else try {
       // Ok, der var en URL med i intentet
       Log.d(" viser " + urlFraIntent);
-      Sidevisning.vist(FangBrowseIntent_akt.class, urlFraIntent);
+      Sidevisning.vist(FangBrowseRadioIntent_akt.class, urlFraIntent);
       Log.d("Intent var " + i);
       ProgressBar progressBar = new ProgressBar(this);
       setContentView(progressBar);

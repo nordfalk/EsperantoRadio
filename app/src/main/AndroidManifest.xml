@@ -105,7 +105,7 @@
         </receiver>
 
         <!-- Denne aktivitet fanger browsning af URLer der starter med http://dr.dk/radio/ondemand/ -->
-        <activity android:name="dk.dr.radio.akt.FangBrowseIntent_akt">
+        <activity android:name="dk.dr.radio.akt.FangBrowseRadioIntent_akt">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

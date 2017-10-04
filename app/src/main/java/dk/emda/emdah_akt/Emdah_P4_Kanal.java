@@ -16,23 +16,23 @@ import dk.dr.radio.v3.R;
  */
 
 public class Emdah_P4_Kanal extends Fragment {
-    private static final String TAG = "Tab2Fragment";
+  private static final String TAG = "Tab2Fragment";
 
-    private Button btnTEST;
+  private Button btnTEST;
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.kanalvalg_elem,container,false);
-        btnTEST = (Button) view.findViewById(R.id.button2);
+  @Nullable
+  @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.kanalvalg_elem, container, false);
+    btnTEST = (Button) view.findViewById(R.id.button2);
 
-        btnTEST.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "TESTING BUTTON CLICK 2", Toast.LENGTH_SHORT).show();
-            }
-        });
+    btnTEST.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Toast.makeText(getActivity(), "TESTING BUTTON CLICK 2", Toast.LENGTH_SHORT).show();
+      }
+    });
 
-        return view;
-    }
+    return view;
+  }
 }

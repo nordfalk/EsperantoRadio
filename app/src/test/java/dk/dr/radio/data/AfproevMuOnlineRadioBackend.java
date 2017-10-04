@@ -1,7 +1,6 @@
 package dk.dr.radio.data;
 
 import android.app.Application;
-import android.os.Build;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +25,6 @@ import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
 import static dk.dr.radio.data.AfproevGammelDrRadioBackend.hentStreng;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)

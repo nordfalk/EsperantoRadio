@@ -19,175 +19,174 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.cast.MediaInfo;
 import com.squareup.picasso.Picasso;
 
-
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.cast.utils.Utils;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.volley.DrVolleyResonseListener;
+import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.v3.R;
 
 
 public class LiveKanalerFrag extends Fragment {
 
-    private static boolean fetchingSchedule = false;
-    private KanalRecyclerViewAdapter recyclerViewAdapter;
+  private static boolean fetchingSchedule = false;
+  private KanalRecyclerViewAdapter recyclerViewAdapter;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        fetchingSchedule = true;
-        String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels";
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    fetchingSchedule = true;
+    String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels";
 
-        Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
-            @Override
-            public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
-                    return;
-                }
-                if (uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
-                    //TODO Håndter hvis det er uændret
-                }
+      @Override
+      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+        if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+          return;
+        }
+        if (uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+          //TODO Håndter hvis det er uændret
+        }
 
-                if (json != null && !"null".equals(json)) {
-                    App.networkHelper.tv.backend.parseNowNextAlleKanaler(json, App.grunddata);
-                    Log.d("NowNext parsed for alle kanaler");//Data opdateret
-                    fetchingSchedule = false;
-                    recyclerViewAdapter.notifyDataSetChanged();
-                } else {
-                    App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-                }
-            }
+        if (json != null && !"null".equals(json)) {
+          App.networkHelper.tv.backend.parseNowNextAlleKanaler(json, App.grunddata);
+          Log.d("NowNext parsed for alle kanaler");//Data opdateret
+          fetchingSchedule = false;
+          recyclerViewAdapter.notifyDataSetChanged();
+        } else {
+          App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+        }
+      }
 
-            @Override
-            protected void fikFejl(VolleyError error) {
-                App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-            }
-        }) {
+      @Override
+      protected void fikFejl(VolleyError error) {
+        App.langToast(R.string.Netværksfejl_prøv_igen_senere);
+      }
+    }) {
             /*public Priority getPriority() {
                 return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
             }*/
-        }.setTag(App.networkHelper.tv);
-        App.volleyRequestQueue.add(req);
+    }.setTag(App.networkHelper.tv);
+    App.volleyRequestQueue.add(req);
 
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-                R.layout.niclas_livekanaler_frag, container, false);
-        setupRecyclerView(recyclerView);
+    RecyclerView recyclerView = (RecyclerView) inflater.inflate(
+            R.layout.niclas_livekanaler_frag, container, false);
+    setupRecyclerView(recyclerView);
 
-        debugData();
-        return recyclerView;
+    debugData();
+    return recyclerView;
+  }
+
+  private void setupRecyclerView(RecyclerView recyclerView) {
+    recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+    recyclerViewAdapter = new KanalRecyclerViewAdapter();
+    recyclerView.setAdapter(recyclerViewAdapter);
+  }
+
+  private static class KanalRecyclerViewAdapter
+          extends RecyclerView.Adapter<KanalRecyclerViewAdapter.ViewHolder> {
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+      private final ImageView kanalLogoImageView;
+      private final ImageView udsendelseImageView;
+      private final ImageView playButtonImageView;
+      private final TextView udsendelseTextView;
+
+      public ViewHolder(View view) {
+        super(view);
+        kanalLogoImageView = (ImageView) view.findViewById(R.id.list_livekanaler_kanallogo);
+        udsendelseImageView = (ImageView) view.findViewById(R.id.list_livekanaler_udsendelseslogo);
+        udsendelseImageView.setImageDrawable(null); // vis ikke eksempelbilledet
+        playButtonImageView = (ImageView) view.findViewById(R.id.list_livekanaler_playbutton);
+        udsendelseTextView = (TextView) view.findViewById(R.id.list_livekanaler_udsendelsestitel);
+      }
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerViewAdapter = new KanalRecyclerViewAdapter();
-        recyclerView.setAdapter(recyclerViewAdapter);
-    }
-
-    private static class KanalRecyclerViewAdapter
-            extends RecyclerView.Adapter<KanalRecyclerViewAdapter.ViewHolder> {
-
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-
-            private final ImageView kanalLogoImageView;
-            private final ImageView udsendelseImageView;
-            private final ImageView playButtonImageView;
-            private final TextView udsendelseTextView;
-
-            public ViewHolder(View view) {
-                super(view);
-                kanalLogoImageView = (ImageView) view.findViewById(R.id.list_livekanaler_kanallogo);
-                udsendelseImageView = (ImageView) view.findViewById(R.id.list_livekanaler_udsendelseslogo);
-                udsendelseImageView.setImageDrawable(null); // vis ikke eksempelbilledet
-                playButtonImageView = (ImageView) view.findViewById(R.id.list_livekanaler_playbutton);
-                udsendelseTextView = (TextView) view.findViewById(R.id.list_livekanaler_udsendelsestitel);
-            }
-        }
-
-        private KanalRecyclerViewAdapter() {
-        }
-
-        @Override
-        public KanalRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.niclas_livekanaler_list, parent, false);
-            return new KanalRecyclerViewAdapter.ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final KanalRecyclerViewAdapter.ViewHolder holder, int position) {
-            Picasso.with(holder.kanalLogoImageView.getContext())
-                    .load(App.backend[1].kanaler.get(position).kanallogo_url)
-                    .into(holder.kanalLogoImageView);
-
-            if(!fetchingSchedule){
-                Point displaySize = Utils.getDisplaySize(holder.kanalLogoImageView.getContext());
-                String billedeUrl = App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl;
-                billedeUrl = Basisfragment.skalérBillede(App.backend[1].kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x*9/16);
-                //Log.d("billedeUrl = "+billedeUrl);
-                Picasso.with(holder.udsendelseImageView.getContext())
-                        .load(billedeUrl).placeholder(null)
-                        .resize(displaySize.x, displaySize.x*9/16)
-                        .into(holder.udsendelseImageView);
-
-
-                holder.udsendelseTextView.setText(App.backend[1].kanaler.get(position).getUdsendelse().titel);
-            }
-
-            holder.playButtonImageView.setImageResource(R.drawable.afspiller_spil_normal);
-            setClickListener(holder.playButtonImageView, position);
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return App.backend[1].kanaler.size();
-        }
-
-        private void setClickListener(ImageView imageView, final int position){
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    debugData();
-                    if(!fetchingSchedule) {
-                        if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
-                            startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    public static void startPlayerActivity(Kanal kanal, Context context){
-        MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
-        Activity activity = (Activity) context;
-        Intent intent = new Intent(activity, LocalPlayerActivity.class);
-        intent.putExtra("media", mediaInfo);
-        intent.putExtra("shouldStart", false);
-        activity.startActivity(intent);
+    private KanalRecyclerViewAdapter() {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public KanalRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+      View view = LayoutInflater.from(parent.getContext())
+              .inflate(R.layout.niclas_livekanaler_list, parent, false);
+      return new KanalRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onBindViewHolder(final KanalRecyclerViewAdapter.ViewHolder holder, int position) {
+      Picasso.with(holder.kanalLogoImageView.getContext())
+              .load(App.backend[1].kanaler.get(position).kanallogo_url)
+              .into(holder.kanalLogoImageView);
+
+      if (!fetchingSchedule) {
+        Point displaySize = Utils.getDisplaySize(holder.kanalLogoImageView.getContext());
+        String billedeUrl = App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl;
+        billedeUrl = Basisfragment.skalérBillede(App.backend[1].kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x * 9 / 16);
+        //Log.d("billedeUrl = "+billedeUrl);
+        Picasso.with(holder.udsendelseImageView.getContext())
+                .load(billedeUrl).placeholder(null)
+                .resize(displaySize.x, displaySize.x * 9 / 16)
+                .into(holder.udsendelseImageView);
+
+
+        holder.udsendelseTextView.setText(App.backend[1].kanaler.get(position).getUdsendelse().titel);
+      }
+
+      holder.playButtonImageView.setImageResource(R.drawable.afspiller_spil_normal);
+      setClickListener(holder.playButtonImageView, position);
+
     }
 
-    private static void debugData() {
-        for (Kanal kanal : App.backend[1].kanaler) {
-            Log.d("Kanal streams size = " + kanal.streams.size());
-            Log.d("Kanal udsendelser size = " + kanal.udsendelser.size());
-            Log.d("Kanal slug =" + kanal.slug + "  " + kanal.kode + "   " + kanal.navn);
-        }
+    @Override
+    public int getItemCount() {
+      return App.backend[1].kanaler.size();
     }
+
+    private void setClickListener(ImageView imageView, final int position) {
+      imageView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          debugData();
+          if (!fetchingSchedule) {
+            if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
+              startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
+            }
+          }
+        }
+      });
+    }
+  }
+
+  public static void startPlayerActivity(Kanal kanal, Context context) {
+    MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
+    Activity activity = (Activity) context;
+    Intent intent = new Intent(activity, LocalPlayerActivity.class);
+    intent.putExtra("media", mediaInfo);
+    intent.putExtra("shouldStart", false);
+    activity.startActivity(intent);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+  }
+
+  private static void debugData() {
+    for (Kanal kanal : App.backend[1].kanaler) {
+      Log.d("Kanal streams size = " + kanal.streams.size());
+      Log.d("Kanal udsendelser size = " + kanal.udsendelser.size());
+      Log.d("Kanal slug =" + kanal.slug + "  " + kanal.kode + "   " + kanal.navn);
+    }
+  }
 }

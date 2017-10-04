@@ -29,7 +29,6 @@ import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)

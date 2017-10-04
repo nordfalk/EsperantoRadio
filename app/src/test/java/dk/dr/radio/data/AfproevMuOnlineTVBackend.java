@@ -1,7 +1,6 @@
 package dk.dr.radio.data;
 
 import android.app.Application;
-import android.os.Build;
 
 import org.json.JSONObject;
 import org.junit.Test;

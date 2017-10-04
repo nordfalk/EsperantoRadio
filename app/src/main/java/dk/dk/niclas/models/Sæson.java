@@ -10,12 +10,12 @@ import dk.dr.radio.data.Udsendelse;
 
 public class Sæson {
 
-    public ArrayList<Udsendelse> udsendelser;
-    public String sæsonTitel;
-    public int sæsonNummer;
-    public int sæsonÅr;
-    public String sæsonSlug;
-    public String sæsonUrn;
-    public int totalSize;
+  public ArrayList<Udsendelse> udsendelser;
+  public String sæsonTitel;
+  public int sæsonNummer;
+  public int sæsonÅr;
+  public String sæsonSlug;
+  public String sæsonUrn;
+  public int totalSize;
 
 }

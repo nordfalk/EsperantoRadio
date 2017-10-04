@@ -10,9 +10,9 @@ import dk.dr.radio.data.Udsendelse;
 
 public class SidsteChance {
 
-    public ArrayList<Udsendelse> udsendelser;
+  public ArrayList<Udsendelse> udsendelser;
 
-    public SidsteChance(){
-        udsendelser = new ArrayList<>();
-    }
+  public SidsteChance() {
+    udsendelser = new ArrayList<>();
+  }
 }

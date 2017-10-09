@@ -49,3 +49,10 @@ public class Netvaerksstatus extends BroadcastReceiver {
     }
   }
 }
+
+/*
+UDESTÅR - brug
+https://developer.android.com/reference/android/net/ConnectivityManager.html#requestNetwork(android.net.NetworkRequest, android.net.ConnectivityManager.NetworkCallback)
+
+
+ */

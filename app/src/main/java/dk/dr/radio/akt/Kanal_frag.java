@@ -181,9 +181,9 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         if (kanal.harUdsendelserForDag(datoStr) && fraCache) return; // så er værdierne i RAMen gode nok
         // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
         if (json != null && !"null".equals(json)) {
+          kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
-            kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
             opdaterListe();
           } else {
             // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
@@ -192,7 +192,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
             View v = listView.getChildAt(1);
             int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
 
-            kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
             opdaterListe();
 
             int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);

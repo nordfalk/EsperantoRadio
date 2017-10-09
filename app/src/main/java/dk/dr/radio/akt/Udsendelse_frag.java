@@ -59,6 +59,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class Udsendelse_frag extends Basisfragment implements View.OnClickListener, AdapterView.OnItemClickListener, Runnable {
@@ -87,11 +88,11 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         if (url==null) return; // ikke understøttet af backend
         Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
           @Override
-          public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-            if (uændret) return;
-            Log.d("hentStreams fikSvar(" + fraCache + " " + url);
-            if (json != null && !"null".equals(json)) {
-              JSONObject o = new JSONObject(json);
+          public void fikSvar(Netsvar s) throws Exception {
+            if (s.uændret) return;
+            Log.d("hentStreams fikSvar(" + s.fraCache + " " + url);
+            if (s.json != null && !"null".equals(s.json)) {
+              JSONObject o = new JSONObject(s.json);
               udsendelse.indslag = kanal.getBackend().parsIndslag(o);
               udsendelse.setStreams(kanal.getBackend().parsStreams(o));
               if (!udsendelse.harStreams()) {
@@ -379,14 +380,14 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
       Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getPlaylisteUrl(udsendelse), new DrVolleyResonseListener() {
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          if (App.fejlsøgning) Log.d("fikSvar playliste(" + fraCache + " " + url + "   " + this);
+        public void fikSvar(Netsvar s) throws Exception {
+          if (App.fejlsøgning) Log.d("fikSvar playliste(" + s.fraCache + " " + url + "   " + this);
           // Fix: Senest spillet blev ikke opdateret.
           //if (udsendelse.playliste != null && fraCache) return; // så har vi allerede den nyeste liste i MEM
-          if (udsendelse.playliste != null && uændret) return;
-          if (json == null || "null".equals(json)) return; // fejl
-          Log.d("UDS fikSvar playliste(" + fraCache + uændret + " " + url);
-          ArrayList<Playlisteelement> playliste = kanal.getBackend().parsePlayliste(udsendelse, new JSONArray(json));
+          if (udsendelse.playliste != null && s.uændret) return;
+          if (s.json == null || "null".equals(s.json)) return; // fejl
+          Log.d("UDS fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
+          ArrayList<Playlisteelement> playliste = kanal.getBackend().parsePlayliste(udsendelse, new JSONArray(s.json));
           if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
             // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
             // selvom serveren har ombestemt sig, og siger at listen er tom.

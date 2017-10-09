@@ -65,6 +65,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import dk.dr.radio.net.volley.Netsvar;
+import dk.faelles.model.Netkald;
 import dk.nordfalk.simpelbus.SimpelBus;
 import dk.dk.niclas.utilities.MuOnlineTVBackend;
 import dk.dk.niclas.utilities.NetworkHelper;
@@ -132,6 +134,7 @@ public class App {
   public static RequestQueue volleyRequestQueue;
   private static boolean erInstalleretPåSDKort;
   public static Backend[] backend;
+  public static Netkald netkald = new Netkald();
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
@@ -264,11 +267,11 @@ public class App {
         final Kanal kanal = aktuelKanal;
         Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
           @Override
-          public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-            if (uændret) return; // ingen grund til at parse det igen
-            ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(json));
+          public void fikSvar(Netsvar sv) throws Exception {
+            if (sv.uændret) return; // ingen grund til at parse det igen
+            ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
             kanal.setStreams(s);
-            Log.d("hentStreams akt fraCache=" + fraCache + " => " + kanal);
+            Log.d("hentStreams akt fraCache=" + sv.fraCache + " => " + kanal);
           }
         }) {
           public Priority getPriority() {
@@ -336,11 +339,11 @@ public class App {
           //        Log.d("run()1 " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
           Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
             @Override
-            public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-              if (uændret) return;
-              ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(json));
+            public void fikSvar(Netsvar sv) throws Exception {
+              if (sv.uændret) return;
+              ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
               kanal.setStreams(s);
-              Log.d("hentStreams app fraCache=" + fraCache + " => " + kanal);
+              Log.d("hentStreams app fraCache=" + sv.fraCache + " => " + kanal);
             }
           }) {
             public Priority getPriority() {
@@ -401,12 +404,12 @@ public class App {
         if (backend.getGrunddataUrl()==null) continue;
         Request<?> req = new DrVolleyStringRequest(backend.getGrunddataUrl(), new DrVolleyResonseListener() {
           @Override
-          public void fikSvar(String nyeGrunddata, boolean fraCache, boolean uændret) throws Exception {
-            if (uændret || fraCache) return; // ingen grund til at parse det igen
-            nyeGrunddata = nyeGrunddata.trim();
+          public void fikSvar(Netsvar s) throws Exception {
+            if (s.uændret || s.fraCache || s.fejl) return; // ingen grund til at parse det igen
+            String nyeGrunddata = s.json.trim();
             String gamleGrunddata = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
             if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
-            Log.d("Vi fik nye grunddata: fraCache=" + fraCache);
+            Log.d("Vi fik nye grunddata: fraCache=" + s.fraCache);
             if (!PRODUKTION || App.fejlsøgning) {
               if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
               Log.d("ny="+nyeGrunddata.length()+" "+nyeGrunddata.hashCode()+ " "+nyeGrunddata.replace('\n',' '));

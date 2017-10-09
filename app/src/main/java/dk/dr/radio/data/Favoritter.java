@@ -18,6 +18,7 @@ import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 
 /**
  * Håndtering af favoritter.
@@ -103,9 +104,9 @@ public class Favoritter {
     String url = App.backend[0].getFavoritterNyeProgrammerSiden(programserieSlug, dato);
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (!uændret && json != null && !"null".equals(json)) {
-          JSONObject data = new JSONObject(json);
+      public void fikSvar(Netsvar s) throws Exception {
+        if (!s.uændret && s.json != null && !"null".equals(s.json)) {
+          JSONObject data = new JSONObject(s.json);
           favoritTilAntalDagsdato.put(programserieSlug, data.getInt("TotalPrograms"));
         }
         //Log.d("favoritter fikSvar(" + fraCache + " " + url + " " + json + " så nu er favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);

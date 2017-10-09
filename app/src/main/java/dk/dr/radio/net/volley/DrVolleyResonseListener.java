@@ -29,7 +29,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
   public final void onResponse(String response) {
     try {
       boolean uændret = response != null && response.equals(cachetVærdi);
-      fikSvar(response, false, uændret);
+      fikSvar(new Netsvar(response, false, uændret));
       App.sætErIGang(false, url);
     } catch (Exception e) {
       Log.e(url, e);
@@ -41,29 +41,24 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
   @Override
   public final void onErrorResponse(VolleyError error) {
     App.sætErIGang(false, url);
-    fikFejl(error);
+    Log.e("fikFejl networkResponse='" + error.networkResponse + "' for " + url, error);
+    //error.printStackTrace();
+    if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
+    try {
+      Netsvar s = new Netsvar(null, false, false);
+      s.fejl = true;
+      s.exception = error;
+      fikSvar(s);
+    } catch (Exception e) {
+      Log.e(url, e);
+    }
   }
 
   /**
    * Kaldes med svaret fra cachen (hvis der er et) og igen når svaret fra serveren ankommer
-   * @param response Svaret
-   * @param fraCache Normalt true første gang hvis svaret kommer fra cachen (og eventuelt er forældet).
-   *                 Normalt false anden gang hvor svaret kommer fra serveren.
-   * @param uændret  Serveren svarede med de samme data som der var i cachen
    * @throws Exception Hvis noget går galt i behandlingen - f.eks. ulovligt JSON kaldes fikFejl
    */
-  protected abstract void fikSvar(String response, boolean fraCache, boolean uændret) throws Exception;
-
-  /**
-   * Kaldes af Volley hvis der skete en netværksfejl. Kaldes også hvis behandlingen i #fikSvar gik galt.
-   * @param error Fejlen
-   */
-  protected void fikFejl(VolleyError error) {
-    Log.e("fikFejl networkResponse='" + error.networkResponse + "' for " + url, error);
-    //error.printStackTrace();
-    if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
-  }
-
+  protected abstract void fikSvar(Netsvar s) throws Exception;
   /**
    * Kaldes (fra DrVolleyStringRequest) hvis forespørgslen blev annulleret
    */

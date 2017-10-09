@@ -33,6 +33,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 
@@ -213,26 +214,23 @@ public class MestSeteFrag extends Basisfragment {
             Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
               @Override
-              public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+              public void fikSvar(Netsvar s) throws Exception {
+                if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
                   return;
                 }
-                if (udsendelse.harStreams() && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                if (udsendelse.harStreams() && s.uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
                   return;
                 }
 
-                if (json != null && !"null".equals(json)) {
-                  JSONObject jsonObject = new JSONObject(json);
+                if (s.json != null && !"null".equals(s.json)) {
+                  JSONObject jsonObject = new JSONObject(s.json);
                   udsendelse.setStreams(App.networkHelper.tv.backend.parsStreams(jsonObject));
                   Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
                   fetchingStreams = false;
                   startPlayerActivity(udsendelse);
+                } else {
+                  netværksFejl();
                 }
-              }
-
-              @Override
-              protected void fikFejl(VolleyError error) {
-                netværksFejl();
               }
             }) {
                             /*public Priority getPriority() {

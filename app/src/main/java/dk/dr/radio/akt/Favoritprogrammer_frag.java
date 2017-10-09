@@ -33,6 +33,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class Favoritprogrammer_frag extends Basisfragment implements AdapterView.OnItemClickListener, Runnable {
@@ -95,11 +96,11 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           String url = App.backend[0].getProgramserieUrl(programserie, programserieSlug, offset);
           Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
             @Override
-            public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-              Log.d("favoritter fikSvar(" + fraCache + " " + url);
-              if (uændret) return;
-              if (json != null && !"null".equals(json)) {
-                JSONObject data = new JSONObject(json);
+            public void fikSvar(Netsvar s) throws Exception {
+              Log.d("favoritter fikSvar(" + s.fraCache + " " + url);
+              if (s.uændret || s.fejl) return;
+              if (s.json != null && !"null".equals(s.json)) {
+                JSONObject data = new JSONObject(s.json);
                 Programserie programserie = App.backend[0].parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
                 ArrayList<Udsendelse> udsendelser = App.backend[0].parseUdsendelserForProgramserie(prg, null, App.data);

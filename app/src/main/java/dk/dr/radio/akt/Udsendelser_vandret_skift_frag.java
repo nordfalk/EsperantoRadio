@@ -29,6 +29,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class Udsendelser_vandret_skift_frag extends Basisfragment implements ViewPager.OnPageChangeListener {
@@ -162,11 +163,11 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (uændret) return;
-        Log.d("fikSvar(" + fraCache + " " + url);
-        if (json != null && !"null".equals(json)) {
-          JSONObject data = new JSONObject(json);
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.uændret) return;
+        Log.d("fikSvar(" + s.fraCache + " " + url);
+        if (s.json != null && !"null".equals(s.json)) {
+          JSONObject data = new JSONObject(s.json);
           if (offset == 0) {
             programserie = kanal.getBackend().parsProgramserie(data, programserie);
             App.data.programserieFraSlug.put(startudsendelse.programserieSlug, programserie);

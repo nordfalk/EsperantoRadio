@@ -28,6 +28,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 
@@ -45,16 +46,16 @@ public class LiveKanalerFrag extends Fragment {
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
           return;
         }
-        if (uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+        if (s.uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
           //TODO Håndter hvis det er uændret
         }
 
-        if (json != null && !"null".equals(json)) {
-          App.networkHelper.tv.backend.parseNowNextAlleKanaler(json, App.grunddata);
+        if (s.json != null && !"null".equals(s.json)) {
+          App.networkHelper.tv.backend.parseNowNextAlleKanaler(s.json, App.grunddata);
           Log.d("NowNext parsed for alle kanaler");//Data opdateret
           fetchingSchedule = false;
           recyclerViewAdapter.notifyDataSetChanged();
@@ -62,16 +63,7 @@ public class LiveKanalerFrag extends Fragment {
           App.langToast(R.string.Netværksfejl_prøv_igen_senere);
         }
       }
-
-      @Override
-      protected void fikFejl(VolleyError error) {
-        App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-      }
-    }) {
-            /*public Priority getPriority() {
-                return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
-            }*/
-    }.setTag(App.networkHelper.tv);
+    }).setTag(App.networkHelper.tv);
     App.volleyRequestQueue.add(req);
 
     RecyclerView recyclerView = (RecyclerView) inflater.inflate(

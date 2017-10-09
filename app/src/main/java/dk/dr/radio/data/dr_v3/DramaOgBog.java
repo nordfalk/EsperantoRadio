@@ -16,6 +16,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 
 /**
  * Created by j on 05-10-14.
@@ -81,9 +82,9 @@ public class DramaOgBog {
   public void startHentData() {
     Request<?> req = new DrVolleyStringRequest(App.backend[0].getBogOgDramaUrl(), new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (uændret || json.equals("null")) return;
-        parseBogOgDrama(json);
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.uændret || s.json.equals("null")) return;
+        parseBogOgDrama(s.json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
     }) {

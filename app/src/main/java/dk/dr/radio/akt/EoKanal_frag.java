@@ -48,6 +48,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
@@ -112,20 +113,21 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto)) {
       Request<?> req = new DrVolleyStringRequest(kanal.eo_elsendojRssUrl, new DrVolleyResonseListener() {
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          if (uændret || listView==null || getActivity() == null) return;
-          Log.d("eo RSS por "+kanal+" ="+json);
-          EoRssParsado.ŝarĝiElsendojnDeRssUrl(json, kanal);
+        public void fikSvar(Netsvar s) throws Exception {
+          if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
+          if (s.fejl || s.uændret || listView==null || getActivity() == null) return;
+          Log.d("eo RSS por "+kanal+" ="+s.json);
+          EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
           opdaterListe();
 
           if (kanal.eo_elsendojRssUrl2!=null) {
             final ArrayList<Udsendelse> uds1 = kanal.udsendelser;
             Request<?> req = new DrVolleyStringRequest(kanal.eo_elsendojRssUrl2, new DrVolleyResonseListener() {
               @Override
-              public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                if (uændret || listView == null || getActivity() == null) return;
-                Log.d("eo RSS por " + kanal + " =" + json);
-                EoRssParsado.ŝarĝiElsendojnDeRssUrl(json, kanal);
+              public void fikSvar(Netsvar s) throws Exception {
+                if (s.uændret || listView == null || getActivity() == null) return;
+                Log.d("eo RSS por " + kanal + " =" + s.json);
+                EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
                 kanal.udsendelser.addAll(uds1);
                 Collections.sort(kanal.udsendelser);
                 Collections.reverse(kanal.udsendelser);
@@ -134,11 +136,6 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
             }).setTag(this);
             App.volleyRequestQueue.add(req);
           }
-        }
-
-        @Override
-        protected void fikFejl(VolleyError error) {
-          new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
         }
       }) {
         public Priority getPriority() {
@@ -477,10 +474,10 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     if (u2.rektaElsendaPriskriboUrl==null) return;
     Request<?> req = new DrVolleyStringRequest(u2.rektaElsendaPriskriboUrl, new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + fraCache + uændret + " " + url);
-        if (getActivity() == null || uændret) return;
-        rektaElsendaPriskribo = json.trim();
+      public void fikSvar(Netsvar s) throws Exception {
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
+        if (getActivity() == null || s.uændret) return;
+        rektaElsendaPriskribo = s.json.trim();
         if (rektaElsendaPriskribo.endsWith("<br>")) rektaElsendaPriskribo=rektaElsendaPriskribo.substring(0,rektaElsendaPriskribo.length()-4);
         rektaElsendoKiam = System.currentTimeMillis();
         if (aktuelUdsendelseViewholder == null) return;

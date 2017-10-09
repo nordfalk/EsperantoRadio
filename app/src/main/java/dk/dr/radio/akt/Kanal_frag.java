@@ -48,6 +48,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
@@ -176,12 +177,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (uændret || listView==null || getActivity() == null) return;
-        if (kanal.harUdsendelserForDag(datoStr) && fraCache) return; // så er værdierne i RAMen gode nok
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
+        if (s.fejl || s.uændret || listView==null || getActivity() == null) return;
+        if (kanal.harUdsendelserForDag(datoStr) && s.fraCache) return; // så er værdierne i RAMen gode nok
         // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
-        if (json != null && !"null".equals(json)) {
-          kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(json, kanal, dato, App.data), datoStr);
+        if (s.json != null && !"null".equals(s.json)) {
+          kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
             opdaterListe();
@@ -200,11 +202,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         } else {
           new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
         }
-      }
-
-      @Override
-      protected void fikFejl(VolleyError error) {
-        new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
       }
     }) {
       public Priority getPriority() {
@@ -267,12 +264,12 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
       Request<?> req = new DrVolleyStringRequest(backend.getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          if (uændret) return; // ingen grund til at parse det igen
-          JSONObject o = new JSONObject(json);
+        public void fikSvar(Netsvar sv) throws Exception {
+          if (sv.uændret) return; // ingen grund til at parse det igen
+          JSONObject o = new JSONObject(sv.json);
           ArrayList<Lydstream> s = backend.parsStreams(o);
           kanal.setStreams(s);
-          Log.d("hentStreams Kanal_frag fraCache=" + fraCache + " => " + kanal);
+          Log.d("hentStreams Kanal_frag fraCache=" + sv.fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
       }) {
@@ -568,13 +565,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     }
     Request<?> req = new DrVolleyStringRequest(backend.getPlaylisteUrl(u2), new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + fraCache + uændret + " " + url);
+      public void fikSvar(Netsvar s) throws Exception {
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
         if (getActivity() == null) return;
         // Fix: Senest spillet blev ikke opdateret.
-        if (u2.playliste != null && uændret) return; // så har vi allerede den nyeste liste i MEM
-        if (json != null && !"null".equals(json)) {
-          u2.playliste = backend.parsePlayliste(u2, new JSONArray(json));
+        if (u2.playliste != null && s.uændret) return; // så har vi allerede den nyeste liste i MEM
+        if (s.json != null && !"null".equals(s.json)) {
+          u2.playliste = backend.parsePlayliste(u2, new JSONArray(s.json));
         }
         if (aktuelUdsendelseViewholder == null) return;
         opdaterSenestSpilletViews(aq2, u2);

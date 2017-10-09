@@ -13,6 +13,7 @@ import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 
 /**
  * Created by j on 05-10-14.
@@ -52,10 +53,10 @@ public class ProgramserierAtilAA {
   public void startHentData() {
     Request<?> req = new DrVolleyStringRequest(App.backend[0].getAlleProgramserierAtilÅUrl(), new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
+      public void fikSvar(Netsvar s) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);
-        if (uændret || json.equals("null")) return;
-        parseAlleProgramserierAtilÅ(json);
+        if (s.uændret ||  "null".equals(s.json)) return;
+        parseAlleProgramserierAtilÅ(s.json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
     }) {

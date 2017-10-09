@@ -53,7 +53,7 @@ public class DrVolleyStringRequest extends StringRequest {
 
       // Vi kalder fikSvar i forgrundstråden - og dermed må forespørgsler ikke foretages direkte
       // fra en listeopdatering eller fra getView
-      lytter.fikSvar(listener.cachetVærdi, true, false);
+      lytter.fikSvar(new Netsvar(listener.cachetVærdi, true, false));
     } catch (Exception e) {
       Log.e(e);
       // En fejl i den cachede værdi - smid indholdet af cachen væk, det kan alligevel ikke bruges

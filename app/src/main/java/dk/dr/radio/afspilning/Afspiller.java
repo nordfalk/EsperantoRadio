@@ -61,6 +61,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
 
@@ -165,11 +166,16 @@ public class Afspiller {
       Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          if (uændret) return; // ingen grund til at parse det igen
-          ArrayList<Lydstream> s = App.backend[0].parsStreams(new JSONObject(json));
+        public void fikSvar(Netsvar sv) throws Exception {
+          if (sv.fejl) {
+            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
+            if (vækningIGang) ringDenAlarm();
+            return;
+          }
+          if (sv.uændret) return; // ingen grund til at parse det igen
+          ArrayList<Lydstream> s = App.backend[0].parsStreams(new JSONObject(sv.json));
           lydkilde.setStreams(s);
-          Log.d("hentStreams afsp fraCache=" + fraCache + " => " + lydkilde);
+          Log.d("hentStreams afsp fraCache=" + sv.fraCache + " => " + lydkilde);
           if (onErrorTæller++>2) {
             App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
             //Log.rapporterFejl(new Exception("onErrorTæller++>10, uendelig løkke afværget"), lydkilde);
@@ -177,13 +183,6 @@ public class Afspiller {
           } else {
             startAfspilning(); // Opdatér igen - men kun én gang
           }
-        }
-
-        @Override
-        protected void fikFejl(VolleyError error) {
-          App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
-          if (vækningIGang) ringDenAlarm();
-          super.fikFejl(error);
         }
       }) {
         public Priority getPriority() {

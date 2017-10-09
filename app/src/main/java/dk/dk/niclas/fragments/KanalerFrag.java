@@ -25,6 +25,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class KanalerFrag extends Fragment {
@@ -133,16 +134,16 @@ public class KanalerFrag extends Fragment {
               Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
                 @Override
-                public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-                  if (fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
+                public void fikSvar(Netsvar s) throws Exception {
+                  if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
                     return;
                   }
-                  if (kanal.getUdsendelse() != null && uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
+                  if (kanal.getUdsendelse() != null && s.uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
                     return;
                   }
 
-                  if (json != null && !"null".equals(json)) {
-                    JSONObject jsonObject = new JSONObject(json);
+                  if (s.json != null && !"null".equals(s.json)) {
+                    JSONObject jsonObject = new JSONObject(s.json);
                     App.networkHelper.tv.backend.parseNowNextKanal(jsonObject, kanal);
                     Log.d("NowNext parsed for kanal = " + kanal.slug);//Data opdateret
                     fetchingSchedule = false;
@@ -152,16 +153,7 @@ public class KanalerFrag extends Fragment {
                     App.langToast(R.string.Netværksfejl_prøv_igen_senere);
                   }
                 }
-
-                @Override
-                protected void fikFejl(VolleyError error) {
-                  App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-                }
-              }) {
-                                /*public Priority getPriority() {
-                                    return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
-                                }*/
-              }.setTag(App.networkHelper.tv);
+              }).setTag(App.networkHelper.tv);
               App.volleyRequestQueue.add(req);
             }
           }

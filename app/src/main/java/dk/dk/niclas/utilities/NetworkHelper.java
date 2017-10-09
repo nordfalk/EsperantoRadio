@@ -13,6 +13,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 /**
@@ -39,20 +40,14 @@ public class NetworkHelper {
       Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
 
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          ArrayList<Udsendelse> udsendelser = App.data.mestSete.udsendelserFraKanalSlug.get(kanalSlug);
-          if (uændret) return;
-          if (json != null && !"null".equals(json)) {
-            backend.parseMestSete(App.data.mestSete, App.data, json, kanalSlug);
+        public void fikSvar(Netsvar s) throws Exception {
+          if (s.uændret) return;
+          if (s.json != null && !"null".equals(s.json)) {
+            backend.parseMestSete(App.data.mestSete, App.data, s.json, kanalSlug);
             App.opdaterObservatører(App.data.mestSete.observatører);
           } else {
             App.langToast(R.string.Netværksfejl_prøv_igen_senere);
           }
-        }
-
-        @Override
-        protected void fikFejl(VolleyError error) {
-          App.langToast(R.string.Netværksfejl_prøv_igen_senere);
         }
       }) {
         public Priority getPriority() {

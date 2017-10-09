@@ -23,6 +23,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 
 public class FangBrowseRadioIntent_akt extends Activity {
 
@@ -108,11 +109,15 @@ public class FangBrowseRadioIntent_akt extends Activity {
     } else {
       Request<?> req = new DrVolleyStringRequest(App.backend[0].getUdsendelseUrlFraSlug(udsendelseSlug), new DrVolleyResonseListener() {
         @Override
-        public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-          if (uændret) return;
-          Log.d("hentStreams fikSvar(" + fraCache + " " + url);
-          if (json != null && !"null".equals(json)) {
-            JSONObject o = new JSONObject(json);
+        public void fikSvar(Netsvar sv) throws Exception {
+          if (sv.fejl) {
+            luk();
+            return;
+          }
+          if (sv.uændret) return;
+          Log.d("hentStreams fikSvar(" + sv.fraCache + " " + url);
+          if (sv.json != null && !"null".equals(sv.json)) {
+            JSONObject o = new JSONObject(sv.json);
             Udsendelse udsendelse2 = App.backend[0].parseUdsendelse(null, App.data, o);
             ArrayList<Lydstream> s = App.backend[0].parsStreams(o);
             udsendelse2.setStreams(s);
@@ -121,12 +126,6 @@ public class FangBrowseRadioIntent_akt extends Activity {
 
             visUdsendelseFrag(kanalSlug, udsendelse2, tidsangivelse);
           }
-          luk();
-        }
-
-        @Override
-        protected void fikFejl(VolleyError error) {
-          super.fikFejl(error);
           luk();
         }
       }).setTag(this);

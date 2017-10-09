@@ -35,6 +35,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 public class Programserie_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener {
@@ -91,9 +92,17 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override
-      public void fikSvar(String json, boolean fraCache, boolean uændret) throws Exception {
-        if (uændret) return;
-        JSONObject data = new JSONObject(json);
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.fejl) {
+          if (offset == 0) {
+            aq.id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
+          } else {
+            bygListe(); // for at fjerne evt progressBar
+          }
+          return;
+        }
+        if (s.uændret) return;
+        JSONObject data = new JSONObject(s.json);
         if (offset == 0) {
           programserie = kanal.getBackend().parsProgramserie(data, programserie);
           App.data.programserieFraSlug.put(programserieSlug, programserie);
@@ -101,16 +110,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         ArrayList<Udsendelse> uds = kanal.getBackend().parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, App.data);
         programserie.tilføjUdsendelser(offset, uds);
         bygListe();
-      }
-
-      @Override
-      protected void fikFejl(VolleyError error) {
-        super.fikFejl(error);
-        if (offset == 0) {
-          aq.id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
-        } else {
-          bygListe(); // for at fjerne evt progressBar
-        }
       }
     }).setTag(this);
     App.volleyRequestQueue.add(req);

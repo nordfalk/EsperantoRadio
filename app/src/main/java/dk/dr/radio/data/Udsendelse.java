@@ -1,11 +1,8 @@
 package dk.dr.radio.data;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Date;
 
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 

@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 
 /**

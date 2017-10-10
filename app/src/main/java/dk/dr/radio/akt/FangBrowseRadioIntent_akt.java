@@ -7,22 +7,17 @@ import android.text.util.Linkify;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import dk.dr.radio.data.Lydstream;
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.faelles.model.NetsvarBehander;
 

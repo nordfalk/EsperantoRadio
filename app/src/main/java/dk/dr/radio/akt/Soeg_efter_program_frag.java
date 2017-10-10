@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;

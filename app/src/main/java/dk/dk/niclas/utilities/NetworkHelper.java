@@ -2,17 +2,9 @@ package dk.dk.niclas.utilities;
 
 import android.support.v4.app.Fragment;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-
-import java.util.ArrayList;
-
 import dk.dr.radio.data.Backend;
-import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Udseende;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.faelles.model.NetsvarBehander;

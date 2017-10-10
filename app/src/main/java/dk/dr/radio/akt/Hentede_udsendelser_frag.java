@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentedeUdsendelser;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;

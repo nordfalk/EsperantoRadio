@@ -15,8 +15,6 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.androidquery.AQuery;
 
 import org.json.JSONObject;
@@ -24,19 +22,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Programserie_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -88,9 +85,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
   private void hentUdsendelser(final int offset) {
     String url = kanal.getBackend().getProgramserieUrl(programserie, programserieSlug, offset);
-    if (url==null) return; // ikke understøttet af backend
-
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl) {
@@ -111,8 +106,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         programserie.tilføjUdsendelser(offset, uds);
         bygListe();
       }
-    }).setTag(this);
-    App.volleyRequestQueue.add(req);
+    });
   }
 
   @Override

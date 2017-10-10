@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
-import dk.dr.radio.data.Programserie;
-import dk.dr.radio.diverse.App;
 import dk.dr.radio.akt.diverse.CirclePageIndicator;
-import dk.dr.radio.diverse.Log;
 import dk.dr.radio.akt.diverse.PinnedSectionListView;
+import dk.dr.radio.data.Programserie;
+import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 

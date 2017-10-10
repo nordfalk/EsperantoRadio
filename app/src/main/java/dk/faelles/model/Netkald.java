@@ -1,12 +1,11 @@
 package dk.faelles.model;
 
+import android.support.v4.app.Fragment;
+
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 
 import java.util.Date;
 
-import dk.dr.radio.akt.Kanal_frag;
-import dk.dr.radio.akt.Udsendelser_vandret_skift_frag;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
@@ -30,7 +29,7 @@ public class Netkald {
     final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
     if (App.fejlsøgning) Log.d("startHentUdsendelserPåKanal url=" + url);
 
-    kald(kalder, url, new DrVolleyResonseListener() {
+    kald(kalder, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
@@ -46,10 +45,10 @@ public class Netkald {
   }
 
   public void kald(Object kalder, String url, final NetsvarBehander netsvarBehander) {
-    kald(kalder, url, Request.Priority.NORMAL, netsvarBehander);
+    kald(kalder, url, null, netsvarBehander);
   }
 
-  public void kald(Object kalder, String url, final Request.Priority priority, final NetsvarBehander netsvarBehander) {
+  public void kald(final Object kalder, final String url, final Request.Priority priority, final NetsvarBehander netsvarBehander) {
     if (url==null) return;
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override
@@ -57,11 +56,19 @@ public class Netkald {
         s.url = url;
         netsvarBehander.fikSvar(s);
       }
-      public Request.Priority getPriority() {
-        return priority;
-      }
     }
-    ).setTag(kalder);
+    ) {
+      @Override
+      public Request.Priority getPriority() {
+        Log.d("getPriority "+url);
+        if (priority!=null) return priority;
+        if (kalder instanceof Fragment) {
+          Fragment f = (Fragment) kalder;
+          return f.getUserVisibleHint() ? Request.Priority.NORMAL : Request.Priority.LOW;
+        }
+        return Request.Priority.NORMAL;
+      }
+    }.setTag(kalder);
     App.volleyRequestQueue.add(req);
   }
 }

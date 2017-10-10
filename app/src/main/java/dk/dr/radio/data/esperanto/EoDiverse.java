@@ -18,26 +18,8 @@
 
 package dk.dr.radio.data.esperanto;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import dk.dr.radio.diverse.Log;
 
 
 public class EoDiverse {

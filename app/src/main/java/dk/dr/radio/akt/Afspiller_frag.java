@@ -31,14 +31,13 @@ import com.androidquery.AQuery;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
+import dk.dr.radio.akt.diverse.AnimationAdapter;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.akt.diverse.AnimationAdapter;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class Afspiller_frag extends Basisfragment implements Runnable, View.OnClickListener, SeekBar.OnSeekBarChangeListener {

@@ -19,10 +19,9 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickListener, Runnable {
 
@@ -106,7 +105,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
     App.forgrundstråd.removeCallbacks(this);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
+      App.netkald.kald(this, kanal.getBackend().getKanalStreamsUrl(kanal), Request.Priority.HIGH, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.uændret) return; // ingen grund til at parse det igen
@@ -116,12 +115,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
           Log.d("hentStreams Kanal_nyheder_frag fraCache=" + sv.fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
-      }) {
-        public Priority getPriority() {
-          return fragmentErSynligt ? Priority.HIGH : Priority.NORMAL;
-        }
-      };
-      App.volleyRequestQueue.add(req);
+      });
     }
     boolean spillerDenneKanal = App.afspiller.getAfspillerstatus() != Status.STOPPET && App.afspiller.getLydkilde() == kanal;
     boolean online = App.netværk.erOnline();

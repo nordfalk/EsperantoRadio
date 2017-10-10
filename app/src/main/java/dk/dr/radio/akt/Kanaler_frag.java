@@ -13,11 +13,10 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import dk.dr.radio.akt.diverse.PagerSlidingTabStrip;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.akt.diverse.PagerSlidingTabStrip;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 

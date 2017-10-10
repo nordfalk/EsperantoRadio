@@ -45,22 +45,21 @@ import java.util.List;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Udsendelse_frag extends Basisfragment implements View.OnClickListener, AdapterView.OnItemClickListener, Runnable {
 
@@ -85,12 +84,11 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
         String url = kanal.getBackend().getUdsendelseStreamsUrl(udsendelse);
-        if (url==null) return; // ikke understøttet af backend
-        Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+        App.netkald.kald(null, url, new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar s) throws Exception {
             if (s.uændret) return;
-            Log.d("hentStreams fikSvar(" + s.fraCache + " " + url);
+            Log.d("hentStreams fikSvar(" + s.fraCache + " " + s.url);
             if (s.json != null && !"null".equals(s.json)) {
               JSONObject o = new JSONObject(s.json);
               udsendelse.indslag = kanal.getBackend().parsIndslag(o);
@@ -130,8 +128,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
               adapter.notifyDataSetChanged(); // Opdatér views
             }
           }
-        }).setTag(this);
-        App.volleyRequestQueue.add(req);
+        });
       }
     }
   };
@@ -378,15 +375,15 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed() || kanal.ingenPlaylister) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getPlaylisteUrl(udsendelse), new DrVolleyResonseListener() {
+      App.netkald.kald(this, kanal.getBackend().getPlaylisteUrl(udsendelse), Request.Priority.LOW, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
-          if (App.fejlsøgning) Log.d("fikSvar playliste(" + s.fraCache + " " + url + "   " + this);
+          if (App.fejlsøgning) Log.d("fikSvar playliste(" + s.fraCache + " " + s.url + "   " + this);
           // Fix: Senest spillet blev ikke opdateret.
           //if (udsendelse.playliste != null && fraCache) return; // så har vi allerede den nyeste liste i MEM
           if (udsendelse.playliste != null && s.uændret) return;
           if (s.json == null || "null".equals(s.json)) return; // fejl
-          Log.d("UDS fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
+          Log.d("UDS fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
           ArrayList<Playlisteelement> playliste = kanal.getBackend().parsePlayliste(udsendelse, new JSONArray(s.json));
           if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
             // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
@@ -403,13 +400,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
           bygListe();
         }
-      }) {
-        @Override
-        public Priority getPriority() {
-          return Priority.LOW; // Det vigtigste er at hente streams, spillelisten er knapt så vigtig
-        }
-      }.setTag(Udsendelse_frag.this);
-      App.volleyRequestQueue.add(req);
+      });
       if (aktuelUdsendelsePåKanalen() && getUserVisibleHint()) {
         App.forgrundstråd.postDelayed(opdaterSpillelisteRunnable, App.grunddata.opdaterPlaylisteEfterMs);
       }

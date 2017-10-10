@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.SenestLyttede;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;

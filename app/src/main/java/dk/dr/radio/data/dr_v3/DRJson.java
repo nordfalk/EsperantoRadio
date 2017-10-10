@@ -1,7 +1,5 @@
 package dk.dr.radio.data.dr_v3;
 
-import java.util.TimeZone;
-
 /**
  * Navne for felter der er i DRs JSON-feeds og støttefunktioner til at parse dem
  * Created by j on 19-01-14.

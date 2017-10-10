@@ -3,11 +3,10 @@ package dk.dr.radio.akt;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
-import dk.dr.radio.diverse.Udseende;
 
 /**
  * Oprettet af Jacob Nordfalk den 12-09-15.

@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.google.android.gms.cast.MediaInfo;
 
 import org.json.JSONObject;
@@ -23,8 +21,6 @@ import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.faelles.model.NetsvarBehander;

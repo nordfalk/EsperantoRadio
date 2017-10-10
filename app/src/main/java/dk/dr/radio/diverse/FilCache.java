@@ -11,9 +11,6 @@ import java.net.URL;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
-
 /**
  * @author Jacob Nordfalk
  */

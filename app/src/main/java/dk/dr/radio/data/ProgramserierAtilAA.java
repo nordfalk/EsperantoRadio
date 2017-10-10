@@ -11,9 +11,8 @@ import java.util.List;
 
 import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * Created by j on 05-10-14.
@@ -51,7 +50,7 @@ public class ProgramserierAtilAA {
 
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(App.backend[0].getAlleProgramserierAtilÅUrl(), new DrVolleyResonseListener() {
+    App.netkald.kald(null, App.backend[0].getAlleProgramserierAtilÅUrl(), Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);
@@ -59,11 +58,6 @@ public class ProgramserierAtilAA {
         parseAlleProgramserierAtilÅ(s.json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
-    }) {
-      public Priority getPriority() {
-        return Priority.LOW;
-      }
-    };
-    App.volleyRequestQueue.add(req);
+    });
   }
 }

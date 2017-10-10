@@ -25,8 +25,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.androidquery.AQuery;
 
 import java.text.DateFormat;
@@ -36,18 +34,15 @@ import java.util.Date;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EoRssParsado;
-import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.faelles.model.NetsvarBehander;
@@ -465,24 +460,18 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   }
 
   private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
-    if (u2.rektaElsendaPriskriboUrl==null) return;
-    Request<?> req = new DrVolleyStringRequest(u2.rektaElsendaPriskriboUrl, new DrVolleyResonseListener() {
+    App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
-        if (getActivity() == null || s.uændret) return;
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
+        if (getActivity() == null || s.uændret || s.fejl) return;
         rektaElsendaPriskribo = s.json.trim();
         if (rektaElsendaPriskribo.endsWith("<br>")) rektaElsendaPriskribo=rektaElsendaPriskribo.substring(0,rektaElsendaPriskribo.length()-4);
         rektaElsendoKiam = System.currentTimeMillis();
         if (aktuelUdsendelseViewholder == null) return;
         opdaterSenestSpilletViews(aq2, u2);
       }
-    }) {
-      public Priority getPriority() {
-        return getUserVisibleHint() ? Priority.NORMAL : Priority.LOW;
-      }
-    }.setTag(this);
-    App.volleyRequestQueue.add(req);
+    });
   }
 
 

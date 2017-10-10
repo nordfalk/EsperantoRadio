@@ -4,12 +4,9 @@ import android.os.AsyncTask;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 
-import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.diverse.Log;
 
 /**
  * Bedaŭrinde la rektaj elsendoj de Muzaiko estas nur haveblaj en certaj landoj.

@@ -2,8 +2,6 @@ package dk.dr.radio.diverse;
 
 import android.content.Intent;
 
-// import com.gemius.sdk.MobilePlugin; // EO ŝanĝo
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -14,6 +12,8 @@ import dk.dr.radio.akt.DramaOgBog_frag;
 import dk.dr.radio.akt.FangBrowseRadioIntent_akt;
 import dk.dr.radio.akt.Favoritprogrammer_frag;
 import dk.dr.radio.akt.Hentede_udsendelser_frag;
+
+// import com.gemius.sdk.MobilePlugin; // EO ŝanĝo
 
 /**
  * Created by j on 28-11-14.

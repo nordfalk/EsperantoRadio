@@ -24,7 +24,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.androidquery.AQuery;
 
 import org.json.JSONArray;
@@ -37,17 +36,15 @@ import java.util.List;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Backend;
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.faelles.model.NetsvarBehander;
@@ -175,7 +172,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
     if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + url);
 
-    App.netkald.kald(this, url, getUserVisibleHint() ? Request.Priority.NORMAL : Request.Priority.LOW,  new NetsvarBehander() {
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;
@@ -255,7 +252,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      Request<?> req = new DrVolleyStringRequest(backend.getKanalStreamsUrl(kanal), new DrVolleyResonseListener() {
+      App.netkald.kald(this, backend.getKanalStreamsUrl(kanal), Request.Priority.HIGH, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.uændret) return; // ingen grund til at parse det igen
@@ -265,12 +262,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           Log.d("hentStreams Kanal_frag fraCache=" + sv.fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
-      }) {
-        public Priority getPriority() {
-          return getUserVisibleHint() ? Priority.HIGH : Priority.NORMAL;
-        }
-      };
-      App.volleyRequestQueue.add(req);
+      });
     }
 
     boolean spillerDenneKanal = App.afspiller.getAfspillerstatus() != Status.STOPPET && App.afspiller.getLydkilde() == kanal;
@@ -556,10 +548,10 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterSenestSpilletViews(aq2, u2);
       return;
     }
-    Request<?> req = new DrVolleyStringRequest(backend.getPlaylisteUrl(u2), new DrVolleyResonseListener() {
+    App.netkald.kald(this, backend.getPlaylisteUrl(u2), new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + url);
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
         if (getActivity() == null) return;
         // Fix: Senest spillet blev ikke opdateret.
         if (u2.playliste != null && s.uændret) return; // så har vi allerede den nyeste liste i MEM
@@ -569,12 +561,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         if (aktuelUdsendelseViewholder == null) return;
         opdaterSenestSpilletViews(aq2, u2);
       }
-    }) {
-      public Priority getPriority() {
-        return getUserVisibleHint() ? Priority.NORMAL : Priority.LOW;
-      }
-    }.setTag(this);
-    App.volleyRequestQueue.add(req);
+    });
   }
 
 

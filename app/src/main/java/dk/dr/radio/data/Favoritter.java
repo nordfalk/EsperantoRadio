@@ -16,9 +16,8 @@ import java.util.Set;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * Håndtering af favoritter.
@@ -102,7 +101,7 @@ public class Favoritter {
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
     String url = App.backend[0].getFavoritterNyeProgrammerSiden(programserieSlug, dato);
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    App.netkald.kald(null, url, Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (!s.uændret && s.json != null && !"null".equals(s.json)) {
@@ -112,12 +111,7 @@ public class Favoritter {
         //Log.d("favoritter fikSvar(" + fraCache + " " + url + " " + json + " så nu er favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
         App.forgrundstråd.postDelayed(beregnAntalNyeUdsendelser, 500); // Vent 1/2 sekund på eventuelt andre svar
       }
-    }) {
-      public Priority getPriority() {
-        return Priority.LOW;
-      }
-    };
-    App.volleyRequestQueue.add(req);
+    });
   }
 
   public Runnable beregnAntalNyeUdsendelser = new Runnable() {

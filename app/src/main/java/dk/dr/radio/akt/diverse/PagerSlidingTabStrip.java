@@ -16,7 +16,6 @@
 
 package dk.dr.radio.akt.diverse;
 
-import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -51,7 +50,6 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import dk.dr.radio.akt.Kanal_frag;
-import dk.dr.radio.akt.diverse.AnimationAdapter;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.v3.R;
 

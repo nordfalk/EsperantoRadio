@@ -3,10 +3,10 @@ package dk.dr.radio.data.esperanto;
 import java.text.ParseException;
 import java.util.Date;
 
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 

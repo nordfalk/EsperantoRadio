@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 /**

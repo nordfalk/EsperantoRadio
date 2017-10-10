@@ -1,14 +1,8 @@
 package dk.dr.radio.data.esperanto;
 
-import android.graphics.Bitmap;
-
-import org.json.JSONException;
-
 import java.util.ArrayList;
 
-import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
 
 /**

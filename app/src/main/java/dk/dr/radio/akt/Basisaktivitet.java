@@ -21,7 +21,6 @@ import java.util.Date;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class Basisaktivitet extends AppCompatActivity {

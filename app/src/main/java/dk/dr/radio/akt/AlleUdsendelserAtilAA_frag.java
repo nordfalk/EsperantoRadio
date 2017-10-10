@@ -17,8 +17,8 @@ import com.androidquery.AQuery;
 import java.util.ArrayList;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.data.Programserie;
+import dk.dr.radio.data.dr_v3.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;

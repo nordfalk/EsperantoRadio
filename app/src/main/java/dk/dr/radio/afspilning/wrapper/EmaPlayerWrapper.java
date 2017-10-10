@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.PowerManager;
 
-
 import com.devbrackets.android.exomedia.EMAudioPlayer;
 
 import java.io.IOException;

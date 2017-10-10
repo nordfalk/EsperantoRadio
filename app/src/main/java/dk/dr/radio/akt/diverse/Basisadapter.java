@@ -2,8 +2,6 @@ package dk.dr.radio.akt.diverse;
 
 import android.widget.BaseAdapter;
 
-import dk.dr.radio.akt.diverse.PinnedSectionListView;
-
 /**
  * Created by j on 17-11-13.
  */

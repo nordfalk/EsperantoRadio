@@ -14,9 +14,8 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * Created by j on 05-10-14.
@@ -80,18 +79,13 @@ public class DramaOgBog {
   }
 
   public void startHentData() {
-    Request<?> req = new DrVolleyStringRequest(App.backend[0].getBogOgDramaUrl(), new DrVolleyResonseListener() {
+    App.netkald.kald(null, App.backend[0].getBogOgDramaUrl(), Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || s.json.equals("null")) return;
         parseBogOgDrama(s.json);
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
-    }) {
-      public Priority getPriority() {
-        return Priority.LOW;
-      }
-    };
-    App.volleyRequestQueue.add(req);
+    });
   }
 }

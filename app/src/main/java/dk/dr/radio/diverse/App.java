@@ -65,9 +65,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-import dk.dr.radio.net.volley.Netsvar;
-import dk.faelles.model.Netkald;
-import dk.nordfalk.simpelbus.SimpelBus;
 import dk.dk.niclas.utilities.MuOnlineTVBackend;
 import dk.dk.niclas.utilities.NetworkHelper;
 import dk.dr.radio.afspilning.Afspiller;
@@ -75,10 +72,10 @@ import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
 import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
 import dk.dr.radio.data.Backend;
-import dk.dr.radio.data.Lydstream;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Lydstream;
+import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
@@ -86,10 +83,12 @@ import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
 import dk.dr.radio.net.volley.DrDiskBasedCache;
-import dk.dr.radio.net.volley.DrVolleyResonseListener;
-import dk.dr.radio.net.volley.DrVolleyStringRequest;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.Netkald;
+import dk.faelles.model.NetsvarBehander;
+import dk.nordfalk.simpelbus.SimpelBus;
 import io.fabric.sdk.android.Fabric;
 
 public class App {
@@ -265,7 +264,7 @@ public class App {
 
       if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
         final Kanal kanal = aktuelKanal;
-        Request<?> req = new DrVolleyStringRequest(kanal.getBackend().getKanalStreamsUrl(aktuelKanal), new DrVolleyResonseListener() {
+        App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(aktuelKanal), Request.Priority.HIGH, new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar sv) throws Exception {
             if (sv.uændret) return; // ingen grund til at parse det igen
@@ -273,12 +272,7 @@ public class App {
             kanal.setStreams(s);
             Log.d("hentStreams akt fraCache=" + sv.fraCache + " => " + kanal);
           }
-        }) {
-          public Priority getPriority() {
-            return Priority.HIGH;
-          }
-        };
-        App.volleyRequestQueue.add(req);
+        });
       }
       if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
@@ -331,13 +325,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          String url = kanal.getBackend().getKanalStreamsUrl(kanal);
-          if (url==null) { // EO ŝanĝo
-            Log.d("Ingen direkte streams for "+kanal);
-            continue;
-          }
-          //        Log.d("run()1 " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
-          Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+          App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(kanal), Request.Priority.LOW, new NetsvarBehander() {
             @Override
             public void fikSvar(Netsvar sv) throws Exception {
               if (sv.uændret) return;
@@ -345,12 +333,7 @@ public class App {
               kanal.setStreams(s);
               Log.d("hentStreams app fraCache=" + sv.fraCache + " => " + kanal);
             }
-          }) {
-            public Priority getPriority() {
-              return Priority.LOW;
-            }
-          };
-          App.volleyRequestQueue.add(req);
+          });
         }
       }
 
@@ -401,8 +384,7 @@ public class App {
       sidstTjekket = System.currentTimeMillis();
       Log.d("hentEvtNyeGrunddata " + (sidstTjekket - App.TIDSSTEMPEL_VED_OPSTART));
       for (final Backend backend : App.backend) {
-        if (backend.getGrunddataUrl()==null) continue;
-        Request<?> req = new DrVolleyStringRequest(backend.getGrunddataUrl(), new DrVolleyResonseListener() {
+        App.netkald.kald(null, backend.getGrunddataUrl(), Request.Priority.LOW, new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar s) throws Exception {
             if (s.uændret || s.fraCache || s.fejl) return; // ingen grund til at parse det igen
@@ -427,12 +409,7 @@ public class App {
             // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662
             opdaterObservatører(grunddata.observatører);
           }
-        }) {
-          public Priority getPriority() {
-            return Priority.LOW;
-          }
-        };
-        App.volleyRequestQueue.add(req);
+        });
       }
     }
   };

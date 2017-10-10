@@ -31,6 +31,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Udsendelser_vandret_skift_frag extends Basisfragment implements ViewPager.OnPageChangeListener {
 
@@ -59,7 +60,6 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
     if (startudsendelse == null) { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/805598045
       if (!App.PRODUKTION) { // https://www.bugsense.com/dashboard/project/cd78aa05/errors/822628124
-        App.langToast("startudsendelse==null");
         App.langToast("startudsendelse==null for " + kanal);
       }
       Log.e(new IllegalStateException("startudsendelse==null"));
@@ -150,23 +150,13 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser(final int offset) {
-    String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset);
-    if (url == null) {
-      if (programserie==null) { // Fix for at TV-kilder ikke kan give en programserie-URL
-        programserie = new Programserie();
-        programserie.slug = startudsendelse.programserieSlug;
-        programserie.tilføjUdsendelser(0, Arrays.asList(startudsendelse));
-      }
-      opdaterUdsendelser();
-      return;
-    }
-
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    final String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset);
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;
         Log.d("fikSvar(" + s.fraCache + " " + url);
-        if (s.json != null && !"null".equals(s.json)) {
+        if (s.json != null) {
           JSONObject data = new JSONObject(s.json);
           if (offset == 0) {
             programserie = kanal.getBackend().parsProgramserie(data, programserie);
@@ -175,12 +165,10 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
           JSONArray prg = data.getJSONArray(DRJson.Programs.name());
           ArrayList<Udsendelse> udsendelser = kanal.getBackend().parseUdsendelserForProgramserie(prg, kanal, App.data);
           programserie.tilføjUdsendelser(offset, udsendelser);
-          //programserie.tilføjUdsendelser(Arrays.asList(startudsendelse));
-          opdaterUdsendelser();
         }
+        opdaterUdsendelser();
       }
-    }).setTag(this);
-    App.volleyRequestQueue.add(req);
+    });
   }
 
   @Override

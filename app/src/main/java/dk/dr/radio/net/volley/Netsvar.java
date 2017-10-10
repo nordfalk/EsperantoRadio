@@ -4,6 +4,7 @@ package dk.dr.radio.net.volley;
  */
 
 public class Netsvar {
+  public String url;
   /**
    * Normalt true første gang hvis svaret kommer fra cachen (og eventuelt er forældet).
    * Normalt false anden gang hvor svaret kommer fra serveren.
@@ -19,8 +20,13 @@ public class Netsvar {
   public Exception exception;
 
   public Netsvar(String jsonSvar, boolean fraCache, boolean uændret) {
+    this(jsonSvar, fraCache, uændret, false);
+  }
+
+  public Netsvar(String jsonSvar, boolean fraCache, boolean uændret, boolean fejl) {
     json = jsonSvar;
     this.fraCache = fraCache;
     this.uændret = uændret;
+    this.fejl = fejl;
   }
 }

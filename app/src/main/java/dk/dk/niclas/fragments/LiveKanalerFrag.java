@@ -30,6 +30,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 
 public class LiveKanalerFrag extends Fragment {
@@ -43,8 +44,7 @@ public class LiveKanalerFrag extends Fragment {
     fetchingSchedule = true;
     String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels";
 
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
@@ -54,7 +54,7 @@ public class LiveKanalerFrag extends Fragment {
           //TODO Håndter hvis det er uændret
         }
 
-        if (s.json != null && !"null".equals(s.json)) {
+        if (s.json != null) {
           App.networkHelper.tv.backend.parseNowNextAlleKanaler(s.json, App.grunddata);
           Log.d("NowNext parsed for alle kanaler");//Data opdateret
           fetchingSchedule = false;
@@ -63,8 +63,7 @@ public class LiveKanalerFrag extends Fragment {
           App.langToast(R.string.Netværksfejl_prøv_igen_senere);
         }
       }
-    }).setTag(App.networkHelper.tv);
-    App.volleyRequestQueue.add(req);
+    });
 
     RecyclerView recyclerView = (RecyclerView) inflater.inflate(
             R.layout.niclas_livekanaler_frag, container, false);

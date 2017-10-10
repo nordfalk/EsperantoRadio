@@ -6,6 +6,6 @@ import dk.dr.radio.net.volley.Netsvar;
  * Created by j on 09-10-17.
  */
 
-public abstract class NetsvarBehander {
-  public abstract void fikSvar(Netsvar s) throws Exception;
+public interface NetsvarBehander {
+  void fikSvar(Netsvar s) throws Exception;
 }

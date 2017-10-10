@@ -15,6 +15,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * This class serves as the entry-point to the backend by providing the methods needed
@@ -36,25 +37,18 @@ public class NetworkHelper {
         limit = 150;
         url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
       }
-
-      Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+      App.netkald.kald(this, url, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           if (s.uændret) return;
-          if (s.json != null && !"null".equals(s.json)) {
+          if (s.json != null) {
             backend.parseMestSete(App.data.mestSete, App.data, s.json, kanalSlug);
             App.opdaterObservatører(App.data.mestSete.observatører);
           } else {
             App.langToast(R.string.Netværksfejl_prøv_igen_senere);
           }
         }
-      }) {
-        public Priority getPriority() {
-          return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
-        }
-      }.setTag(this);
-      App.volleyRequestQueue.add(req);
+      });
     }
 
   }

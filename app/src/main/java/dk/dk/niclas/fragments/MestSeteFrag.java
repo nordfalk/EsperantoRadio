@@ -35,6 +35,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 
 public class MestSeteFrag extends Basisfragment {
@@ -211,8 +212,7 @@ public class MestSeteFrag extends Basisfragment {
             fetchingStreams = true;
             String url = udsendelse.ny_streamDataUrl;
 
-            Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+            App.netkald.kald(this, url, new NetsvarBehander() {
               @Override
               public void fikSvar(Netsvar s) throws Exception {
                 if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
@@ -222,7 +222,7 @@ public class MestSeteFrag extends Basisfragment {
                   return;
                 }
 
-                if (s.json != null && !"null".equals(s.json)) {
+                if (s.json != null) {
                   JSONObject jsonObject = new JSONObject(s.json);
                   udsendelse.setStreams(App.networkHelper.tv.backend.parsStreams(jsonObject));
                   Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
@@ -232,12 +232,7 @@ public class MestSeteFrag extends Basisfragment {
                   netværksFejl();
                 }
               }
-            }) {
-                            /*public Priority getPriority() {
-                                return fragment.getUserVisibleHint() ? Priority.NORMAL : Priority.LOW; //TODO Check if it works for lower than API 15
-                            }*/
-            }.setTag(this);
-            App.volleyRequestQueue.add(req);
+            });
           }
         }
       });

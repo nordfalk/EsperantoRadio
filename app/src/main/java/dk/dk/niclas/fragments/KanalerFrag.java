@@ -27,6 +27,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class KanalerFrag extends Fragment {
 
@@ -130,9 +131,7 @@ public class KanalerFrag extends Fragment {
               fetchingSchedule = true;
               final Kanal kanal = App.backend[1].kanaler.get(position);
               String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext/" + kanal.slug;
-
-              Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+              App.netkald.kald(this, url, new NetsvarBehander() {
                 @Override
                 public void fikSvar(Netsvar s) throws Exception {
                   if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
@@ -142,7 +141,7 @@ public class KanalerFrag extends Fragment {
                     return;
                   }
 
-                  if (s.json != null && !"null".equals(s.json)) {
+                  if (s.json != null) {
                     JSONObject jsonObject = new JSONObject(s.json);
                     App.networkHelper.tv.backend.parseNowNextKanal(jsonObject, kanal);
                     Log.d("NowNext parsed for kanal = " + kanal.slug);//Data opdateret
@@ -153,8 +152,7 @@ public class KanalerFrag extends Fragment {
                     App.langToast(R.string.Netværksfejl_prøv_igen_senere);
                   }
                 }
-              }).setTag(App.networkHelper.tv);
-              App.volleyRequestQueue.add(req);
+              });
             }
           }
         }

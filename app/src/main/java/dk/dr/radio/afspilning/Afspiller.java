@@ -64,6 +64,7 @@ import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * @author j
@@ -163,8 +164,7 @@ public class Afspiller {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
       }
-      Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+      App.netkald.kald(this, url, Request.Priority.IMMEDIATE, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.fejl) {
@@ -184,12 +184,7 @@ public class Afspiller {
             startAfspilning(); // Opdatér igen - men kun én gang
           }
         }
-      }) {
-        public Priority getPriority() {
-          return Priority.IMMEDIATE;
-        }
-      };
-      App.volleyRequestQueue.add(req);
+      });
       return;
     }
     Log.d("startAfspilning() " + lydkilde);

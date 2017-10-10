@@ -5,6 +5,7 @@ import com.android.volley.VolleyError;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.faelles.model.NetsvarBehander;
 
 /**
  * DR Radios ResponseListener-klient til Volley.
@@ -12,7 +13,7 @@ import dk.dr.radio.diverse.Log;
  * Håndterer også at signalere over for brugeren når netværskommunikation er påbegyndt eller afsluttet
  * Created by j on 13-03-14.
  */
-public abstract class DrVolleyResonseListener implements Response.Listener<String>, Response.ErrorListener {
+public abstract class DrVolleyResonseListener implements Response.Listener<String>, Response.ErrorListener, NetsvarBehander {
 
   /**
    * URL på anmodningen - rar at have til logning
@@ -29,6 +30,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
   public final void onResponse(String response) {
     try {
       boolean uændret = response != null && response.equals(cachetVærdi);
+      if ("null".equals(response)) response = null;
       fikSvar(new Netsvar(response, false, uændret));
       App.sætErIGang(false, url);
     } catch (Exception e) {
@@ -58,7 +60,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
    * Kaldes med svaret fra cachen (hvis der er et) og igen når svaret fra serveren ankommer
    * @throws Exception Hvis noget går galt i behandlingen - f.eks. ulovligt JSON kaldes fikFejl
    */
-  protected abstract void fikSvar(Netsvar s) throws Exception;
+  public abstract void fikSvar(Netsvar s) throws Exception;
   /**
    * Kaldes (fra DrVolleyStringRequest) hvis forespørgslen blev annulleret
    */

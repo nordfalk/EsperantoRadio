@@ -35,6 +35,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Favoritprogrammer_frag extends Basisfragment implements AdapterView.OnItemClickListener, Runnable {
 
@@ -94,12 +95,12 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
           final int offset = 0;
           String url = App.backend[0].getProgramserieUrl(programserie, programserieSlug, offset);
-          Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+          App.netkald.kald(this, url, new NetsvarBehander() {
             @Override
             public void fikSvar(Netsvar s) throws Exception {
-              Log.d("favoritter fikSvar(" + s.fraCache + " " + url);
+              Log.d("favoritter fikSvar(" + s.fraCache + " " + s.url);
               if (s.uændret || s.fejl) return;
-              if (s.json != null && !"null".equals(s.json)) {
+              if (s.json != null) {
                 JSONObject data = new JSONObject(s.json);
                 Programserie programserie = App.backend[0].parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
@@ -113,7 +114,6 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
               App.forgrundstråd.postDelayed(Favoritprogrammer_frag.this, 250); // Vent 1/4 sekund på eventuelt andre svar
             }
           });
-          App.volleyRequestQueue.add(req);
         }
       }
       Log.d(this + " liste = " + liste);

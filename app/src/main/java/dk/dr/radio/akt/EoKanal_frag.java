@@ -50,6 +50,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
 
@@ -111,7 +112,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + kanal.eo_elsendojRssUrl);
 
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto)) {
-      Request<?> req = new DrVolleyStringRequest(kanal.eo_elsendojRssUrl, new DrVolleyResonseListener() {
+      App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
@@ -122,9 +123,9 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
 
           if (kanal.eo_elsendojRssUrl2!=null) {
             final ArrayList<Udsendelse> uds1 = kanal.udsendelser;
-            Request<?> req = new DrVolleyStringRequest(kanal.eo_elsendojRssUrl2, new DrVolleyResonseListener() {
-              @Override
-              public void fikSvar(Netsvar s) throws Exception {
+            App.netkald.kald(this, kanal.eo_elsendojRssUrl2, new NetsvarBehander() {
+                @Override
+                public void fikSvar(Netsvar s) throws Exception {
                 if (s.uændret || listView == null || getActivity() == null) return;
                 Log.d("eo RSS por " + kanal + " =" + s.json);
                 EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
@@ -133,17 +134,10 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
                 Collections.reverse(kanal.udsendelser);
                 opdaterListe();
               }
-            }).setTag(this);
-            App.volleyRequestQueue.add(req);
+            });
           }
         }
-      }) {
-        public Priority getPriority() {
-          return getUserVisibleHint() ? Priority.NORMAL : Priority.LOW;
-        }
-      }.setTag(this);
-      //Log.d("hentSendeplanForDag 2 " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-      App.volleyRequestQueue.add(req);
+      });
     } else {
       opdaterListe();
     }

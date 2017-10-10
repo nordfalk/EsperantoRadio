@@ -24,6 +24,7 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.faelles.model.NetsvarBehander;
 
 public class FangBrowseRadioIntent_akt extends Activity {
 
@@ -107,7 +108,7 @@ public class FangBrowseRadioIntent_akt extends Activity {
     if (udsendelse != null) {
       visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
     } else {
-      Request<?> req = new DrVolleyStringRequest(App.backend[0].getUdsendelseUrlFraSlug(udsendelseSlug), new DrVolleyResonseListener() {
+      App.netkald.kald(this, App.backend[0].getUdsendelseUrlFraSlug(udsendelseSlug), new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.fejl) {
@@ -115,8 +116,8 @@ public class FangBrowseRadioIntent_akt extends Activity {
             return;
           }
           if (sv.uændret) return;
-          Log.d("hentStreams fikSvar(" + sv.fraCache + " " + url);
-          if (sv.json != null && !"null".equals(sv.json)) {
+          Log.d("hentStreams fikSvar(" + sv.fraCache + " " + sv.url);
+          if (sv.json != null) {
             JSONObject o = new JSONObject(sv.json);
             Udsendelse udsendelse2 = App.backend[0].parseUdsendelse(null, App.data, o);
             ArrayList<Lydstream> s = App.backend[0].parsStreams(o);
@@ -128,8 +129,7 @@ public class FangBrowseRadioIntent_akt extends Activity {
           }
           luk();
         }
-      }).setTag(this);
-      App.volleyRequestQueue.add(req);
+      });
     }
   }
 

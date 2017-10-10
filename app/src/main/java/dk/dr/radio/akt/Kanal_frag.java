@@ -50,6 +50,7 @@ import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.faelles.model.NetsvarBehander;
 
 public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
 
@@ -174,15 +175,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
     if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + url);
 
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
-
+    App.netkald.kald(this, url, getUserVisibleHint() ? Request.Priority.NORMAL : Request.Priority.LOW,  new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
-        if (s.fejl || s.uændret || listView==null || getActivity() == null) return;
+        if (s.uændret || listView==null || getActivity() == null) return;
         if (kanal.harUdsendelserForDag(datoStr) && s.fraCache) return; // så er værdierne i RAMen gode nok
         // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
-        if (s.json != null && !"null".equals(s.json)) {
+        if (s.json != null) {
           kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
@@ -203,13 +202,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
         }
       }
-    }) {
-      public Priority getPriority() {
-        return getUserVisibleHint() ? Priority.NORMAL : Priority.LOW;
-      }
-    }.setTag(this);
-    //Log.d("hentSendeplanForDag 2 " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-    App.volleyRequestQueue.add(req);
+    });
   }
 
   public void rulBlødtTilAktuelUdsendelse() {

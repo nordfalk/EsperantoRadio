@@ -5,6 +5,8 @@ import com.android.volley.VolleyError;
 
 import java.util.Date;
 
+import dk.dr.radio.akt.Kanal_frag;
+import dk.dr.radio.akt.Udsendelser_vandret_skift_frag;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
@@ -28,7 +30,7 @@ public class Netkald {
     final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
     if (App.fejlsøgning) Log.d("startHentUdsendelserPåKanal url=" + url);
 
-    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+    kald(kalder, url, new DrVolleyResonseListener() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
@@ -37,11 +39,29 @@ public class Netkald {
             kanal.setUdsendelserForDag(kanal.getBackend().parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
           }
         }
-        if (kanal.harUdsendelserForDag(datoStr) && s.fraCache) return; // så er værdierne i RAMen gode nok
+        if (kanal.harUdsendelserForDag(datoStr) && s.fraCache)
+          return; // så er værdierne i RAMen gode nok
       }
-    }).setTag(kalder);
-    //Log.d("hentSendeplanForDag 2 " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-    App.volleyRequestQueue.add(req);
+    });
+  }
 
+  public void kald(Object kalder, String url, final NetsvarBehander netsvarBehander) {
+    kald(kalder, url, Request.Priority.NORMAL, netsvarBehander);
+  }
+
+  public void kald(Object kalder, String url, final Request.Priority priority, final NetsvarBehander netsvarBehander) {
+    if (url==null) return;
+    Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        s.url = url;
+        netsvarBehander.fikSvar(s);
+      }
+      public Request.Priority getPriority() {
+        return priority;
+      }
+    }
+    ).setTag(kalder);
+    App.volleyRequestQueue.add(req);
   }
 }

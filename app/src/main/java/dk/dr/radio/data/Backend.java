@@ -118,15 +118,6 @@ public abstract class Backend {
     return null;
   }
 
-  public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException {
-    ikkeImplementeret();
-  }
-
-  public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
-    ikkeImplementeret();
-    return null;
-  }
-
   public String getMestSeteUrl(String kanalSlug, int offset) {
     ikkeImplementeret();
     return null;

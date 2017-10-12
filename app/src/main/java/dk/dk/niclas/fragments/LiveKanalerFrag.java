@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso;
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.cast.utils.Utils;
 import dk.dk.niclas.utilities.CastVideoProvider;
+import dk.dk.niclas.utilities.MuOnlineTVBackend;
 import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
@@ -50,7 +51,7 @@ public class LiveKanalerFrag extends Fragment {
         }
 
         if (s.json != null) {
-          App.networkHelper.tv.backend.parseNowNextAlleKanaler(s.json, App.grunddata);
+          MuOnlineTVBackend.parseNowNextAlleKanaler(s.json, App.grunddata);
           Log.d("NowNext parsed for alle kanaler");//Data opdateret
           fetchingSchedule = false;
           recyclerViewAdapter.notifyDataSetChanged();

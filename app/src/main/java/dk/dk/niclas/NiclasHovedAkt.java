@@ -15,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,20 +27,12 @@ import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 
-import org.json.JSONException;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import dk.dk.niclas.cast.queue.ui.QueueListViewActivity;
-import dk.dk.niclas.fragments.FavoritterFrag;
 import dk.dk.niclas.fragments.LiveKanalerFrag;
 import dk.dk.niclas.fragments.MestSeteFrag;
-import dk.dk.niclas.fragments.SidsteChanceFrag;
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.R;
 
 
@@ -137,13 +128,6 @@ public class NiclasHovedAkt extends AppCompatActivity {
     TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
     tabLayout.setupWithViewPager(viewPager);
 
-    try {
-      String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
-      App.backend[1].initGrunddata(App.grunddata, grunddataStr);
-    } catch (JSONException | IOException e) {
-      Log.d(TAG, e.getMessage());
-    }
-
     mCastContext = CastContext.getSharedInstance(this);
 
     mCastStateListener = new CastStateListener() {
@@ -223,8 +207,8 @@ public class NiclasHovedAkt extends AppCompatActivity {
     Adapter adapter = new Adapter(getSupportFragmentManager());
     adapter.addFragment(new LiveKanalerFrag(), "Live");
     adapter.addFragment(new MestSeteFrag(), "Mest Sete");
-    adapter.addFragment(new SidsteChanceFrag(), "Sidste Chance");
-    adapter.addFragment(new FavoritterFrag(), "Favoritter");
+    adapter.addFragment(new MestSeteFrag(), "Sidste Chance");
+    adapter.addFragment(new MestSeteFrag(), "Favoritter");
     viewPager.setAdapter(adapter);
   }
 

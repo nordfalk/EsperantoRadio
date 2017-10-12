@@ -138,7 +138,7 @@ public class MuOnlineTVBackend extends Backend {
   }
 
   //http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels
-  public void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException {
+  public static void parseNowNextAlleKanaler(String json, Grunddata grunddata) throws JSONException {
     JSONArray jsonArray = new JSONArray(json);
 
     for (int i = 0; i < jsonArray.length(); i++) {
@@ -150,7 +150,7 @@ public class MuOnlineTVBackend extends Backend {
   }
 
   //http://www.dr.dk/mu-online/api/1.3/schedule/nownext/dr1
-  public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
+  private static ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
     ArrayList<Udsendelse> udsendelser = new ArrayList<>();
 
     //Igangværende udsendelse
@@ -171,7 +171,7 @@ public class MuOnlineTVBackend extends Backend {
     return udsendelser;
   }
 
-  private Udsendelse parseNowNextUdsendelse(JSONObject jsonObject) throws JSONException {
+  private static Udsendelse parseNowNextUdsendelse(JSONObject jsonObject) throws JSONException {
     Udsendelse udsendelse = new Udsendelse();
 
     udsendelse.titel = jsonObject.getString("Title");

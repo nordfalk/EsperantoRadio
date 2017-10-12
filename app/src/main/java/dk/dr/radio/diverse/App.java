@@ -66,7 +66,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import dk.dk.niclas.utilities.MuOnlineTVBackend;
-import dk.dk.niclas.utilities.NetworkHelper;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
@@ -97,7 +96,6 @@ public class App {
   public static Grunddata grunddata;
   public static Afspiller afspiller;
   public static SimpelBus eventbus; //Vi benytter EventBus til vores projekt
-  public static NetworkHelper networkHelper; //Benytter en klasse til håndtering af netværks-logikken
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java
@@ -231,7 +229,6 @@ public class App {
   public void initData(Application ctx) {
     data = new Programdata();
     eventbus = new SimpelBus(); //Implementation af EventBus
-    networkHelper = new NetworkHelper(); //Netværks-logik
     grunddata = new Grunddata();
     // Indlæsning af grunddata/stamdata.
     // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen

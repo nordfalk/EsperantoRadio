@@ -198,12 +198,7 @@ public class MestSeteFrag extends Basisfragment {
           }
 
           if (udsendelse.harStreams()) {
-            MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
-            Activity activity = (Activity) imageView.getContext();
-            Intent intent = new Intent(activity, LocalPlayerActivity.class);
-            intent.putExtra("media", mediaInfo);
-            intent.putExtra("shouldStart", false);
-            activity.startActivity(intent);
+            startPlayerActivity(udsendelse);
           } else {
             fetchingStreams = true;
 
@@ -219,7 +214,7 @@ public class MestSeteFrag extends Basisfragment {
 
                 if (s.json != null) {
                   JSONObject jsonObject = new JSONObject(s.json);
-                  udsendelse.setStreams(App.networkHelper.tv.backend.parsStreams(jsonObject));
+                  udsendelse.setStreams(udsendelse.getKanal().getBackend().parsStreams(jsonObject));
                   Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
                   fetchingStreams = false;
                   startPlayerActivity(udsendelse);
@@ -235,12 +230,12 @@ public class MestSeteFrag extends Basisfragment {
   }
 
   public void startPlayerActivity(Udsendelse udsendelse) {
+    if (getActivity()==null) return;
     MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
-    Activity activity = (Activity) getContext();
-    Intent intent = new Intent(activity, LocalPlayerActivity.class);
+    Intent intent = new Intent(getActivity(), LocalPlayerActivity.class);
     intent.putExtra("media", mediaInfo);
     intent.putExtra("shouldStart", false);
-    activity.startActivity(intent);
+    startActivity(intent);
   }
 
   @Override

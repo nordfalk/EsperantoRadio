@@ -35,7 +35,6 @@ public class MuOnlineRadioBackend extends Backend {
   protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
 
   private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
-  private static final String UDESTÅR = "http://javabog.dk/filer/null.json";
 
   public String getGrunddataUrl() {
     return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
@@ -48,7 +47,6 @@ public class MuOnlineRadioBackend extends Backend {
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
-
 
     InputStream is = App.assets.open("apisvar/all-active-dr-radio-channels");
     JSONArray jsonArray = new JSONArray(Diverse.læsStreng(is));
@@ -227,25 +225,6 @@ Title: "P4 Bornholm",
     return BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
   }
 
-  @Override
-  public String getAlleProgramserierAtilÅUrl() {
-    // return GLBASISURL + "/series-list?type=radio";
-    return UDESTÅR; // UDESTÅR
-  }
-
-  @Override
-  public String getBogOgDramaUrl() {
-    // return GLBASISURL + "/radio-drama-adv";
-    return UDESTÅR; // UDESTÅR
-  }
-
-  @Override
-  public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
-    // return GLBASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
-    return UDESTÅR; // UDESTÅR
-  }
-
-
   /**
    * Fjerner http://www.dr.dk i URL'er
    */
@@ -345,29 +324,9 @@ Title: "P4 Bornholm",
   /* -                     Playlister                                             - */
   /* ------------------------------------------------------------------------------ */
 
-  @Override
-  public String getPlaylisteUrl(Udsendelse u) {
-    // return GLBASISURL + "/playlist/" + u.slug + "/0";
-    return UDESTÅR; // UDESTÅR
-  }
-
-  @Override
-  public ArrayList<Playlisteelement> parsePlayliste(Udsendelse udsendelse, JSONArray jsonArray) throws JSONException {
-    // Til GLBASISURL - UDESTÅR
-    ArrayList<Playlisteelement> liste = new ArrayList<Playlisteelement>();
-    return liste;
-  }
-
   /* ------------------------------------------------------------------------------ */
   /* -                     Indslag                                                - */
   /* ------------------------------------------------------------------------------ */
-
-  @Override
-  public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
-    // Til GLBASISURL - UDESTÅR
-    ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
-    return liste;
-  }
 
 
   /* ------------------------------------------------------------------------------ */

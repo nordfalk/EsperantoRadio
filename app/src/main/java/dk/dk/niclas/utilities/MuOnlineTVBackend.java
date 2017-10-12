@@ -31,10 +31,7 @@ import dk.dr.radio.v3.R;
 
 public class MuOnlineTVBackend extends Backend {
   @Override
-  protected void ikkeImplementeret() {
-    _ikkeImplementeret();
-  } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
-
+  protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
 
   private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
 

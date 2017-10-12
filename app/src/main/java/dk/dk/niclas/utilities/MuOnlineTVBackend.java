@@ -243,6 +243,18 @@ public class MuOnlineTVBackend extends Backend {
 
   //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-mostviewed_channel_channelType_limit_offset
   //http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=&channeltype=TV&limit=15&offset=0
+  @Override
+  public String getMestSeteUrl(String kanalSlug, int offset) {
+    int limit = 15;
+    String url = BASISURL+"/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+    if (kanalSlug == null) {
+      limit = 150;
+      url = BASISURL+"/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
+    }
+    return url;
+  }
+
+  @Override
   public MestSete parseMestSete(MestSete mestSete, Programdata programdata, String json, String kanalSlug) throws JSONException {
     JSONObject jsonObject = new JSONObject(json);
     JSONArray jsonArray = jsonObject.getJSONArray("Items");

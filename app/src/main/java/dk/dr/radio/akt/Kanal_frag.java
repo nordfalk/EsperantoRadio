@@ -169,10 +169,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterListe();
     }
 
-    final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
-    if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + url);
-
-    App.netkald.kald(this, url, new NetsvarBehander() {
+    App.netkald.kald(this, kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr), new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;

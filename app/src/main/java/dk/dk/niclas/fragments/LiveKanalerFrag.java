@@ -38,9 +38,8 @@ public class LiveKanalerFrag extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     fetchingSchedule = true;
-    String url = "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels";
 
-    App.netkald.kald(this, url, new NetsvarBehander() {
+    App.netkald.kald(this, "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels", new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.

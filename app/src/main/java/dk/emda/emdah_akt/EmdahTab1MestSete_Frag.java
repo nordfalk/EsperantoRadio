@@ -13,6 +13,8 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 
+import dk.dr.radio.data.Backend;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.v3.R;
@@ -44,7 +46,9 @@ public class EmdahTab1MestSete_Frag extends Fragment implements EmdahAdapter.Ite
     recyclerView = (RecyclerView) view.findViewById(R.id.rec_list);
     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
-    App.networkHelper.tv.startHentMestSete(null, 0, this); // null henter for alle kanaler
+    for (Backend backend : App.backend) {
+      App.netkald.hentMestSete(backend, null, 0);
+    }
     App.data.mestSete.observatører.add(this);
     run();
     return view;

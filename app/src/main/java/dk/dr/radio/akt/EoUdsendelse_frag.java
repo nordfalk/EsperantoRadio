@@ -259,7 +259,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   @Override
   public void onDestroyView() {
-    App.volleyRequestQueue.cancelAll(this);
+    App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
     App.data.favoritter.observatører.remove(opdaterFavoritter);

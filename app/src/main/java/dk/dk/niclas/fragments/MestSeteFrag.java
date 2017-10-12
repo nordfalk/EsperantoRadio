@@ -206,9 +206,8 @@ public class MestSeteFrag extends Basisfragment {
             activity.startActivity(intent);
           } else {
             fetchingStreams = true;
-            String url = udsendelse.ny_streamDataUrl;
 
-            App.netkald.kald(this, url, new NetsvarBehander() {
+            App.netkald.kald(this, udsendelse.ny_streamDataUrl, new NetsvarBehander() {
               @Override
               public void fikSvar(Netsvar s) throws Exception {
                 if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
@@ -254,8 +253,8 @@ public class MestSeteFrag extends Basisfragment {
   public void onStart() {
     super.onStart();
     App.data.mestSete.observatører.add(mestSeteObs);
-    for (Kanal kanal : App.backend[1].kanaler) {
-      App.networkHelper.tv.startHentMestSete(kanal.slug, 0, this);
+    for (Kanal kanal : App.grunddata.kanaler) {
+      App.netkald.hentMestSete(kanal.getBackend(), kanal.slug, 0);
     }
   }
 

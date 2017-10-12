@@ -79,13 +79,12 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
   @Override
   public void onDestroyView() {
-    App.volleyRequestQueue.cancelAll(this);
+    App.netkald.annullerKald(this);
     super.onDestroyView();
   }
 
   private void hentUdsendelser(final int offset) {
-    String url = kanal.getBackend().getProgramserieUrl(programserie, programserieSlug, offset);
-    App.netkald.kald(this, url, new NetsvarBehander() {
+    App.netkald.kald(this, kanal.getBackend().getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl) {

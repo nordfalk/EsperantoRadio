@@ -122,12 +122,17 @@ public abstract class Backend {
     ikkeImplementeret();
   }
 
-  public MestSete parseMestSete(MestSete mestSete, Programdata data, String json, String kanalSlug) throws JSONException {
+  public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
     ikkeImplementeret();
     return null;
   }
 
-  public ArrayList<Udsendelse> parseNowNextKanal(JSONObject jsonObject, Kanal kanal) throws JSONException {
+  public String getMestSeteUrl(String kanalSlug, int offset) {
+    ikkeImplementeret();
+    return null;
+  }
+
+  public MestSete parseMestSete(MestSete mestSete, Programdata data, String json, String kanalSlug) throws JSONException {
     ikkeImplementeret();
     return null;
   }

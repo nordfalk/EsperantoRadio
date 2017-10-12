@@ -154,7 +154,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
   public void onDestroyView() {
     super.onDestroyView();
     // Anullér en eventuel søgning
-    App.volleyRequestQueue.cancelAll(this);
+    App.netkald.annullerKald(this);
     søgelistecache = null;
   }
 

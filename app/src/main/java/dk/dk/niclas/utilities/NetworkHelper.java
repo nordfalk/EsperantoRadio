@@ -21,27 +21,5 @@ public class NetworkHelper {
 
   public static class TV {
     public Backend backend = App.backend[1]; //TV Backend   - MuOnlineTVBackend
-
-    public void startHentMestSete(final String kanalSlug, int offset, final Fragment fragment) {
-      int limit = 15;
-      String url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
-      if (kanalSlug == null) {
-        limit = 150;
-        url = "http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
-      }
-      App.netkald.kald(this, url, new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar s) throws Exception {
-          if (s.uændret) return;
-          if (s.json != null) {
-            backend.parseMestSete(App.data.mestSete, App.data, s.json, kanalSlug);
-            App.opdaterObservatører(App.data.mestSete.observatører);
-          } else {
-            App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-          }
-        }
-      });
-    }
-
   }
 }

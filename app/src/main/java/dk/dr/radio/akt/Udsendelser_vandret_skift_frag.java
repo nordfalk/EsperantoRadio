@@ -145,12 +145,11 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser(final int offset) {
-    final String url = kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset);
-    App.netkald.kald(this, url, new NetsvarBehander() {
+    App.netkald.kald(this, kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset), new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;
-        Log.d("fikSvar(" + s.fraCache + " " + url);
+        Log.d("fikSvar(" + s.fraCache + " " + kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset));
         if (s.json != null) {
           JSONObject data = new JSONObject(s.json);
           if (offset == 0) {

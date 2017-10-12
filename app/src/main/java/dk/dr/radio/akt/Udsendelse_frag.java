@@ -83,8 +83,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        String url = kanal.getBackend().getUdsendelseStreamsUrl(udsendelse);
-        App.netkald.kald(null, url, new NetsvarBehander() {
+        App.netkald.kald(null, kanal.getBackend().getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar s) throws Exception {
             if (s.uændret) return;
@@ -410,7 +409,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   @Override
   public void onDestroyView() {
-    App.volleyRequestQueue.cancelAll(this);
+    App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
     App.data.favoritter.observatører.remove(opdaterFavoritter);

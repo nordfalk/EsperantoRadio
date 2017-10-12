@@ -90,9 +90,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
         else {
           if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
-          final int offset = 0;
-          String url = App.backend[0].getProgramserieUrl(programserie, programserieSlug, offset);
-          App.netkald.kald(this, url, new NetsvarBehander() {
+          App.netkald.kald(this, App.backend[0].getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
             @Override
             public void fikSvar(Netsvar s) throws Exception {
               Log.d("favoritter fikSvar(" + s.fraCache + " " + s.url);
@@ -102,7 +100,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
                 Programserie programserie = App.backend[0].parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
                 ArrayList<Udsendelse> udsendelser = App.backend[0].parseUdsendelserForProgramserie(prg, null, App.data);
-                programserie.tilføjUdsendelser(offset, udsendelser);
+                programserie.tilføjUdsendelser(0, udsendelser);
                 App.data.programserieFraSlug.put(programserieSlug, programserie);
               } else {
                 App.data.programserieSlugFindesIkke.add(programserieSlug);

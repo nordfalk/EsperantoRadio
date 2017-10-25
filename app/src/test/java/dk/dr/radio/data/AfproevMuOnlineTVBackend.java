@@ -71,6 +71,10 @@ public class AfproevMuOnlineTVBackend {
 
   @Test
   public void tjekAktuelleUdsendelser() throws Exception {
+
+    System.out.println("java egenskaber "+System.getenv());
+    System.out.println("java egenskaber "+System.getProperties());
+
     Programdata i = App.data;// = new DRData();
     Date dato = new Date(System.currentTimeMillis()-1000*60*60*12);
     String datoStr = Datoformater.apiDatoFormat.format(dato);

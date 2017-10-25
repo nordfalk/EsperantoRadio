@@ -119,6 +119,12 @@ public class FilCache {
           log("Netværksfejl, men der er cachet kopi i " + cacheFilnavn);
           return cacheFilnavn;
         }
+        if (responseCode == 301) {
+          httpForb.disconnect();
+          url = httpForb.getHeaderField("Location");
+          log("Omdirigering til " + url);
+          continue;
+        }
         if (responseCode == 304) {
           httpForb.disconnect();
           log("Der er cachet kopi i " + cacheFilnavn);

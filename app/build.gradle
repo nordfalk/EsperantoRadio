@@ -104,4 +104,6 @@ dependencies {
     // Eventbus gør debug APK'en 150 kb større
     //compile 'org.greenrobot:eventbus:3.0.0'
     testCompile 'org.robolectric:robolectric:3.1'
+    //testImplementation 'org.robolectric:robolectric:3.4'
+    //testImplementation 'org.bouncycastle:bcprov-jdk15on:1.57'
 }

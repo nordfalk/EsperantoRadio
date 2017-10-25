@@ -1,4 +1,4 @@
-package dk.dr.radio.data;
+package dk.radiotv.backend;
 
 import android.content.Context;
 
@@ -13,6 +13,14 @@ import java.util.Date;
 import java.util.List;
 
 import dk.dk.niclas.models.MestSete;
+import dk.dr.radio.data.Grunddata;
+import dk.dr.radio.data.Indslaglisteelement;
+import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Lydstream;
+import dk.dr.radio.data.Playlisteelement;
+import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.Programserie;
+import dk.dr.radio.data.Udsendelse;
 
 /**
  * Created by j on 27-02-17.

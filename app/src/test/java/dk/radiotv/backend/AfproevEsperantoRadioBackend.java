@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dk.dr.radio.data;
+package dk.radiotv.backend;
 
 import android.app.Application;
 
@@ -15,9 +15,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
+import dk.dr.radio.data.Grunddata;
+import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
-import dk.dr.radio.data.esperanto.EoRssParsado;
-import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;

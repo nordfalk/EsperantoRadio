@@ -5,7 +5,7 @@ import com.android.volley.VolleyError;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 /**
  * DR Radios ResponseListener-klient til Volley.

@@ -1,4 +1,4 @@
-package dk.dr.radio.data.esperanto;
+package dk.radiotv.backend;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,13 +20,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 
-import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;

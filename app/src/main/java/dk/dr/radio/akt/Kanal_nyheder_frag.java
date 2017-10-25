@@ -21,7 +21,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickListener, Runnable {
 

@@ -1,6 +1,6 @@
 package dk.dr.radio.data;
 
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.radiotv.backend.DRJson;
 
 /**
  * Created by j on 08-02-14.

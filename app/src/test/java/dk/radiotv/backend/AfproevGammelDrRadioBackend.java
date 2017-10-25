@@ -1,4 +1,4 @@
-package dk.dr.radio.data;
+package dk.radiotv.backend;
 
 
 import android.os.Build;
@@ -17,9 +17,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dk.dr.radio.data.dr_v3.DRBackendTidsformater;
-import dk.dr.radio.data.dr_v3.DRJson;
-import dk.dr.radio.data.dr_v3.GammelDrRadioBackend;
+import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Kanal;
+import dk.dr.radio.data.Lydstream;
+import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.Programserie;
+import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;

@@ -20,14 +20,14 @@ import com.squareup.picasso.Picasso;
 import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.cast.utils.Utils;
 import dk.dk.niclas.utilities.CastVideoProvider;
-import dk.dk.niclas.utilities.MuOnlineTVBackend;
+import dk.radiotv.backend.MuOnlineTVBackend;
 import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 
 public class LiveKanalerFrag extends Fragment {

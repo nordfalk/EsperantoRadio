@@ -1,4 +1,4 @@
-package dk.dr.radio.data.esperanto;
+package dk.radiotv.backend;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoDiverse;
+import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.Log;
 
 

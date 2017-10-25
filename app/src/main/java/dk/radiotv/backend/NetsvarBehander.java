@@ -1,4 +1,4 @@
-package dk.faelles.model;
+package dk.radiotv.backend;
 
 import dk.dr.radio.net.volley.Netsvar;
 

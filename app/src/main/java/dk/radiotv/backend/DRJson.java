@@ -1,4 +1,4 @@
-package dk.dr.radio.data.dr_v3;
+package dk.radiotv.backend;
 
 /**
  * Navne for felter der er i DRs JSON-feeds og støttefunktioner til at parse dem

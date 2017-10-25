@@ -1,4 +1,4 @@
-package dk.faelles.model;
+package dk.radiotv.backend;
 
 import android.support.v4.app.Fragment;
 
@@ -6,8 +6,6 @@ import com.android.volley.Request;
 
 import java.util.Date;
 
-import dk.dr.radio.akt.EoUdsendelse_frag;
-import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;

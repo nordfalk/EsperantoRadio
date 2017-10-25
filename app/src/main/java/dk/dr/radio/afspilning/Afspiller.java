@@ -53,7 +53,7 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
-import dk.dr.radio.data.esperanto.EsperantoRadioBackend;
+import dk.radiotv.backend.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -61,7 +61,7 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 /**
  * @author j

@@ -17,7 +17,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 /**
  * Håndtering af favoritter.

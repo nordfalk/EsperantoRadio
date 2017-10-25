@@ -9,10 +9,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.dr.radio.data.dr_v3.DRJson;
+import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.Netsvar;
-import dk.faelles.model.NetsvarBehander;
+import dk.radiotv.backend.NetsvarBehander;
 
 /**
  * Created by j on 05-10-14.
@@ -26,7 +26,7 @@ public class ProgramserierAtilAA {
    * @param json
    * @throws JSONException
    */
-  void parseAlleProgramserierAtilÅ(String json) throws JSONException {
+  public void parseAlleProgramserierAtilÅ(String json) throws JSONException {
     JSONArray jsonArray = new JSONArray(json);
     ArrayList<Programserie> res = new ArrayList<Programserie>();
     for (int n = 0; n < jsonArray.length(); n++) {

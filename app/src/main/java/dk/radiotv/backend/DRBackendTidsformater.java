@@ -1,4 +1,4 @@
-package dk.dr.radio.data.dr_v3;
+package dk.radiotv.backend;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;

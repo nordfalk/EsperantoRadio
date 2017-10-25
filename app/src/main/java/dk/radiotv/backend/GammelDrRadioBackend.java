@@ -1,4 +1,4 @@
-package dk.dr.radio.data.dr_v3;
+package dk.radiotv.backend;
 
 import android.content.Context;
 
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import dk.dr.radio.data.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Indslaglisteelement;

@@ -13,8 +13,7 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 
-import dk.dr.radio.data.Backend;
-import dk.dr.radio.data.Kanal;
+import dk.radiotv.backend.Backend;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.v3.R;

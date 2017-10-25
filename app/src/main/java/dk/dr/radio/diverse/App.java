@@ -163,7 +163,8 @@ public class App {
 
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
 //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+//            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");

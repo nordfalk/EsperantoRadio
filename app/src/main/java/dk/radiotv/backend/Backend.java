@@ -45,11 +45,6 @@ public abstract class Backend {
 
   public abstract void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException;
 
-  public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
-    ikkeImplementeret();
-    return null;
-  }
-
   public Programserie parsProgramserie(JSONObject programserieJson, Programserie programserie) throws JSONException{
     ikkeImplementeret();
     return programserie;

@@ -98,7 +98,9 @@ public class AfproevGammelDrRadioBackend {
   @Test
   public void tjek_hent_podcast() throws Exception {
     System.out.println("tjek_hent_podcast");
-    App.data.dramaOgBog.parseBogOgDrama(hentStreng(backend.getBogOgDramaUrl()));
+    String dat = hentStreng(backend.getBogOgDramaUrl());
+    System.out.println("tjek_hent_podcast data = "+ dat);
+    App.data.dramaOgBog.parseBogOgDrama(dat);
     // assertThat(i.dramaOgBog.karusel, hasSize(greaterThan(0)));
     assertNotSame(new ArrayList<Udsendelse>(), App.data.dramaOgBog.karusel);
 

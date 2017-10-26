@@ -121,6 +121,7 @@ public class AfproevMuOnlineRadioBackend {
         } catch (Exception e) {
           e.printStackTrace();
         }
+        if (antalUdsendelser++>20) break;
       }
     }
   }

@@ -205,7 +205,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       … den kan også bruges med slug:
       http://www.dr.dk/tjenester/mu-apps/new-programs-since/monte-carlo/2014-02-13
      */
-  @Override
+  //@Override
   public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
     return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
   }

@@ -40,7 +40,7 @@ public class LiveKanalerFrag extends Fragment {
                            Bundle savedInstanceState) {
     fetchingSchedule = true;
 
-    App.netkald.kald(this, "http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels", new NetsvarBehander() {
+    App.netkald.kald(this, "https://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels", new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.

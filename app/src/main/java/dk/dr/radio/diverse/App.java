@@ -163,8 +163,8 @@ public class App {
 
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
 //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-//            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -356,13 +356,13 @@ public class App {
       // kan der komme rigtig mange store anomdninger i kø
       //  - det gøres kun én gang, hvilket skulle dække de fleste scenarier
       // TODO den rigtige løsning burde være at svarene for Drama&Bog og A-Å bliver hængende i cachen, tjekket her burde være om de er i cachen eller ej
+      /*
       if (!Udseende.ESPERANTO && færdig && !prefs.getBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, false)) {
         prefs.edit().putBoolean(DRAMA_OG_BOG__A_Å_INDLÆST, true);
         færdig = false;
         data.dramaOgBog.startHentData();
         data.programserierAtilÅ.startHentData();
       }
-      /*
       */
       if (færdig) {
         netværk.observatører.remove(this); // Hold ikke mere øje med om vi kommer online

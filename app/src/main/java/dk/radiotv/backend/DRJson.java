@@ -68,28 +68,12 @@ public enum DRJson {
   }
 
 
-  public enum StreamKind {
-    Audio,
-    Video;
-    static StreamKind[] v = values();
-  }
-
   public enum StreamQuality {
     High,     // 0
     Medium,   // 1
     Low,      // 2
     Variable; // 3
     static StreamQuality[] v = values();
-  }
-
-  public enum StreamConnection {
-    Wifi,
-    Mobile;
-    static StreamConnection[] v = values();
-  }
-
-  public enum TVKanaler{
-
   }
 
   /*

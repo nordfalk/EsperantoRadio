@@ -8,7 +8,6 @@ import dk.radiotv.backend.DRJson;
 public class Lydstream implements Comparable<Lydstream> {
   public String url;
   public DRJson.StreamType type;
-  public DRJson.StreamKind kind;
   public DRJson.StreamQuality kvalitet;
   public String format;
   public int score;

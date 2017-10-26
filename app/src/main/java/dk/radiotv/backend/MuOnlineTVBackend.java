@@ -65,7 +65,6 @@ public class MuOnlineTVBackend extends Backend {
   }
 
   private void parseKanaler(Grunddata grunddata, JSONArray jsonArray) throws JSONException {
-    String ingenPlaylister = grunddata.json.optString("ingenPlaylister");
     int antal = jsonArray.length();
     for (int i = 0; i < antal; i++) {
       JSONObject j = jsonArray.getJSONObject(i);
@@ -78,11 +77,14 @@ public class MuOnlineTVBackend extends Backend {
         continue;
       }
 
-      Kanal k = new Kanal(this);
       String kanalkode = j.getString(DRJson.SourceUrl.name());
       kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/') + 1); // Klampkode til at få alle kanalKoder fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR",
-      k.kode = kanalkode;
-      grunddata.kanalFraKode.put(k.kode, k);
+      Kanal k = grunddata.kanalFraKode.get(kanalkode);
+      if (k == null) {
+        k = new Kanal(this);
+        k.kode = kanalkode;
+        grunddata.kanalFraKode.put(k.kode, k);
+      }
       k.navn = j.getString(DRJson.Title.name());
       if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode til DR Ultra og DR K
       k.urn = j.getString(DRJson.Urn.name());
@@ -105,7 +107,8 @@ public class MuOnlineTVBackend extends Backend {
         String vLinkType = jsonServer.getString("LinkType");
         if (vLinkType.equals("HDS")) continue;
         DRJson.StreamType streamType = DRJson.StreamType.Ukendt;
-        if (vLinkType.equals("HLS")) streamType = DRJson.StreamType.HLS_fra_Akamai;
+        if (vLinkType.equals("ICY")) streamType = DRJson.StreamType.Shoutcast;
+        else if (vLinkType.equals("HLS")) streamType = DRJson.StreamType.HLS_fra_Akamai;
 
 
         String vServer = jsonServer.getString("Server");
@@ -122,7 +125,6 @@ public class MuOnlineTVBackend extends Backend {
 
             if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
             Lydstream l = new Lydstream();
-            l.kind = DRJson.StreamKind.Video;
             l.url = vServer + "/" + jsonStream.getString("Stream");
             l.type = streamType;
             l.kbps = vKbps;
@@ -295,20 +297,6 @@ public class MuOnlineTVBackend extends Backend {
     return programserie;
   }
 
-  private static final boolean BRUG_URN = true;
-  private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
-  private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
-
-  /**
-   * Fjerner http://www.dr.dk i URL'er
-   */
-  private static String fjernHttpWwwDrDk(String url) {
-    if (url != null && url.startsWith(HTTP_WWW_DR_DK)) {
-      return url.substring(HTTP_WWW_DR_DK_lgd);
-    }
-    return url;
-  }
-
   //Programcard
   public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject udsendelseJson) throws JSONException {
     Udsendelse u = new Udsendelse();
@@ -390,9 +378,8 @@ public class MuOnlineTVBackend extends Backend {
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
     ArrayList<Lydstream> lydData = new ArrayList<>();
 
-    JSONArray jsonArraySubtitles = jsonobj.optJSONArray("SubtitlesList"); //Forventer den kan være tom
     String subtitles = null;
-
+    JSONArray jsonArraySubtitles = jsonobj.optJSONArray("SubtitlesList"); //Forventer den kan være tom
     if (jsonArraySubtitles != null) {
       //Antagelse: Vil altid kun være 1 subtitle, på dansk. Dog tjekkes det i et for-loop og leder efter dansk, hvis nu antagelsen er forkert.
       for (int i = 0; i < jsonArraySubtitles.length(); i++) {
@@ -407,13 +394,9 @@ public class MuOnlineTVBackend extends Backend {
     for (int k = 0; k < jsonArrayStreams.length(); k++) {
       JSONObject jsonStream = jsonArrayStreams.getJSONObject(k);
       String type = jsonStream.getString("Target");
-      if ("HDS".equals(type))
-        continue; // HDS (HTTP Dynamic Streaming fra Adobe) kan ikke afspilles på Android
+      if ("HDS".equals(type)) continue; // HDS (HTTP Dynamic Streaming fra Adobe) kan ikke afspilles på Android
 
       Lydstream l = new Lydstream();
-      l.kind = DRJson.StreamKind.Video;
-      if (subtitles != null)
-        l.subtitlesUrl = subtitles;
       l.url = jsonStream.getString("Uri");
 
       if ("Download".equals(type)) {
@@ -423,6 +406,7 @@ public class MuOnlineTVBackend extends Backend {
         l.type = DRJson.StreamType.HLS_fra_Akamai;
       }
       l.kvalitet = DRJson.StreamQuality.Variable;
+      l.subtitlesUrl = subtitles;
       lydData.add(l);
     }
     return lydData;

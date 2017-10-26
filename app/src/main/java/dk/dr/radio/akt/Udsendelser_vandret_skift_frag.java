@@ -149,7 +149,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;
-        Log.d("fikSvar(" + s.fraCache + " " + kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset));
+        Log.d("fikSvar(" + s.fraCache + " " + s.url);
         if (s.json != null) {
           JSONObject data = new JSONObject(s.json);
           if (offset == 0) {

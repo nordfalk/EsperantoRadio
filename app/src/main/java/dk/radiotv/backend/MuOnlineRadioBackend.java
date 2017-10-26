@@ -140,13 +140,14 @@ https://www.dr.dk/mu-online/api/1.3/bar/helper/get-image-for-programcard/urn:dr:
   private static final String BASISURL = "http://www.dr.dk/mu-online/api/1.3";
 
   public String getGrunddataUrl() {
-    return "http://javabog.dk/privat/esperantoradio_kanaloj_v8.json";
+    return null;
   }
 
   public InputStream getLokaleGrunddata(Context ctx) {
     return ctx.getResources().openRawResource(R.raw.grunddata);
   }
 
+  @Override
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
@@ -185,14 +186,6 @@ https://www.dr.dk/mu-online/api/1.3/bar/helper/get-image-for-programcard/urn:dr:
         k.kode = kanalkode;
         grunddata.kanalFraKode.put(k.kode, k);
       }
-      /*
-    "title": "P1",
-    "title": "P4",
-      "title": "P4 Bornholm",
-
-Title: "DR P2",
-Title: "P4 Bornholm",
-       */
       k.navn = j.getString(DRJson.Title.name());
       if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode
       k.urn = j.getString(DRJson.Urn.name());
@@ -203,7 +196,6 @@ Title: "P4 Bornholm",
       kanaler.add(k);
       grunddata.kanalFraSlug.put(k.slug, k);
       if (k.navn.equals("P3")) grunddata.forvalgtKanal = k;
-
 
       k.setStreams(parsKanalStreams(j));
     }
@@ -240,12 +232,12 @@ Title: "P4 Bornholm",
             l.url = vServer + "/" + jsonStream.getString("Stream");
             l.type = streamType;
             l.kbps = vKbps;
-            l.kvalitet = vKbps==-1?DRJson.StreamQuality.Variable: vKbps>100?DRJson.StreamQuality.High : DRJson.StreamQuality.Medium ;
+            l.kvalitet = vKbps == -1 ? DRJson.StreamQuality.Variable : vKbps > 100 ? DRJson.StreamQuality.High : DRJson.StreamQuality.Medium;
             lydData.add(l);
             if (App.fejlsøgning) Log.d("lydstream=" + l);
           }
         }
-      } catch (Exception e){
+      } catch (Exception e) {
         Log.rapporterFejl(e);
       }
     return lydData;
@@ -253,7 +245,6 @@ Title: "P4 Bornholm",
 
 
 
-  private static final String GLBASISURL = "http://www.dr.dk/tjenester/mu-apps";
   private static final boolean BRUG_URN = true;
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
@@ -284,20 +275,10 @@ Title: "P4 Bornholm",
   }
 
 
-  /**
-   * Parse en stream.
-   * F.eks. Streams-objekt fra
-   * http://www.dr.dk/tjenester/mu-apps/channel?urn=urn:dr:mu:bundle:4f3b8926860d9a33ccfdafb9&includeStreams=true
-   * http://www.dr.dk/tjenester/mu-apps/program?includeStreams=true&urn=urn:dr:mu:programcard:531520836187a20f086b5bf9
-   * @param jsonobj
-   * @return
-   * @throws JSONException
-   */
-
   @Override
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
 
-    ArrayList<Lydstream> lydData = new ArrayList<>();
+      ArrayList<Lydstream> lydData = new ArrayList<>();
     JSONArray jsonArrayStreams = jsonobj.getJSONArray("Links");
     for (int k = 0; k < jsonArrayStreams.length(); k++) {
       JSONObject jsonStream = jsonArrayStreams.getJSONObject(k);
@@ -305,14 +286,14 @@ Title: "P4 Bornholm",
       if ("HDS".equals(type)) continue; // HDS (HTTP Dynamic Streaming fra Adobe) kan ikke afspilles på Android
 
       //if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
-        Lydstream l = new Lydstream();
+      Lydstream l = new Lydstream();
       l.url = jsonStream.getString("Uri");
       l.type = DRJson.StreamType.HLS_fra_Akamai;
       l.kbps = -1;
       l.kvalitet = DRJson.StreamQuality.Variable;
-        lydData.add(l);
+      lydData.add(l);
       //if (App.fejlsøgning) Log.d("lydstream=" + l);
-      }
+    }
     return lydData;
   }
 
@@ -420,50 +401,5 @@ Title: "P4 Bornholm",
     u.berigtigelseTekst = o.optString(DRJson.RectificationText.name(), null);
 
     return u;
-  }
-
-
-  /* ------------------------------------------------------------------------------ */
-  /* -                     Playlister                                             - */
-  /* ------------------------------------------------------------------------------ */
-
-  /* ------------------------------------------------------------------------------ */
-  /* -                     Indslag                                                - */
-  /* ------------------------------------------------------------------------------ */
-
-
-  /* ------------------------------------------------------------------------------ */
-  /* -                     Programserier                                          - */
-  /* ------------------------------------------------------------------------------ */
-
-  @Override
-  public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
-    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
-    // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true&includeStreams=true
-    if (BRUG_URN && ps != null)
-      return GLBASISURL + "/series?urn=" + ps.urn + "&type=radio&includePrograms=true&offset="+offset;
-    return GLBASISURL + "/series/" + programserieSlug + "?type=radio&includePrograms=true&offset="+offset;
-    // http://www.dr.dk/mu/programcard?Relations.Slug=%22laagsus%22
-  }
-
-  /**
-   * Parser et Programserie-objekt
-   * @param o  JSON
-   * @param ps et eksisterende objekt, der skal opdateres, eller null
-   * @return objektet
-   * @throws JSONException
-   */
-  @Override
-  public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
-    // Til GLBASISURL
-    if (ps == null) ps = new Programserie();
-    ps.titel = o.getString(DRJson.Title.name());
-    ps.undertitel = o.optString(DRJson.Subtitle.name(), ps.undertitel);
-    ps.beskrivelse = o.optString(DRJson.Description.name());
-    ps.billedeUrl = fjernHttpWwwDrDk(o.optString(DRJson.ImageUrl.name(), ps.billedeUrl));
-    ps.slug = o.getString(DRJson.Slug.name());
-    ps.urn = o.optString(DRJson.Urn.name());
-    ps.antalUdsendelser = o.optInt(DRJson.TotalPrograms.name(), ps.antalUdsendelser);
-    return ps;
   }
 }

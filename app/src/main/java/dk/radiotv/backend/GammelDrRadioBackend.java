@@ -173,7 +173,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
         l.type = type < 0 ? DRJson.StreamType.Ukendt : DRJson.StreamType.values()[type];
         if (l.type == DRJson.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
         //if (l.type == StreamType.IOS) continue; // Gamle HLS streams der ikke virker på Android
-        if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
+        //if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
         l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
         l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
         l.kbps = o.getInt(DRJson.Kbps.name());

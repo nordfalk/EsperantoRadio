@@ -33,6 +33,12 @@ import dk.dr.radio.v3.R;
  */
 
 public class GammelDrRadioBackend extends Backend {
+  public static GammelDrRadioBackend instans;
+
+  public GammelDrRadioBackend() {
+    instans = this;
+  }
+
   @Override
   protected void ikkeImplementeret() { _ikkeImplementeret(); }
 

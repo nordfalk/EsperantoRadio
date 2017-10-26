@@ -19,6 +19,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 public class FangBrowseRadioIntent_akt extends Activity {
@@ -103,7 +104,7 @@ public class FangBrowseRadioIntent_akt extends Activity {
     if (udsendelse != null) {
       visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
     } else {
-      App.netkald.kald(this, App.backend[0].getUdsendelseUrlFraSlug(udsendelseSlug), new NetsvarBehander() {
+      App.netkald.kald(this, GammelDrRadioBackend.instans.getUdsendelseUrlFraSlug(udsendelseSlug), new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.fejl) {
@@ -114,10 +115,10 @@ public class FangBrowseRadioIntent_akt extends Activity {
           Log.d("hentStreams fikSvar(" + sv.fraCache + " " + sv.url);
           if (sv.json != null) {
             JSONObject o = new JSONObject(sv.json);
-            Udsendelse udsendelse2 = App.backend[0].parseUdsendelse(null, App.data, o);
-            ArrayList<Lydstream> s = App.backend[0].parsStreams(o);
+            Udsendelse udsendelse2 = GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, o);
+            ArrayList<Lydstream> s = GammelDrRadioBackend.instans.parsStreams(o);
             udsendelse2.setStreams(s);
-            udsendelse2.indslag = App.backend[0].parsIndslag(o);
+            udsendelse2.indslag = GammelDrRadioBackend.instans.parsIndslag(o);
             udsendelse2.shareLink = o.optString(DRJson.ShareLink.name());
 
             visUdsendelseFrag(kanalSlug, udsendelse2, tidsangivelse);

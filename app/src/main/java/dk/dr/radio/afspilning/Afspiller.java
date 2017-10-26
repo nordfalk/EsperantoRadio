@@ -61,6 +61,7 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
+import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 /**
@@ -170,7 +171,7 @@ public class Afspiller {
             return;
           }
           if (sv.uændret) return; // ingen grund til at parse det igen
-          ArrayList<Lydstream> s = App.backend[0].parsStreams(new JSONObject(sv.json));
+          ArrayList<Lydstream> s = GammelDrRadioBackend.instans.parsStreams(new JSONObject(sv.json));
           lydkilde.setStreams(s);
           Log.d("hentStreams afsp fraCache=" + sv.fraCache + " => " + lydkilde);
           if (onErrorTæller++>2) {

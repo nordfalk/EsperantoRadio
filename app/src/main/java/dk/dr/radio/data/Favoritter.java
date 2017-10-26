@@ -100,7 +100,7 @@ public class Favoritter {
   };
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
-    String url = null;// UDESTÅR App.backend[0].getFavoritterNyeProgrammerSiden(programserieSlug, dato);
+    String url = null;// UDESTÅR GammelDrRadioBackend.instans.getFavoritterNyeProgrammerSiden(programserieSlug, dato);
     App.netkald.kald(null, url, Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {

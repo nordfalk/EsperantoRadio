@@ -64,7 +64,7 @@ public class AfproevGammelDrRadioBackend {
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
       DRBackendTidsformater.servertidsformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); // +01:00 springes over da kolon i +01:00 er ikke-standard Java
       super.onCreate();
-      backend = (GammelDrRadioBackend) App.backend[0];
+      backend = GammelDrRadioBackend.instans;
     }
   }
 

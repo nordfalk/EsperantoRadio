@@ -34,6 +34,7 @@ public class LiveKanalerFrag extends Fragment {
 
   private static boolean fetchingSchedule = false;
   private KanalRecyclerViewAdapter recyclerViewAdapter;
+  private static MuOnlineTVBackend backend = MuOnlineTVBackend.instans;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -108,13 +109,13 @@ public class LiveKanalerFrag extends Fragment {
     @Override
     public void onBindViewHolder(final KanalRecyclerViewAdapter.ViewHolder holder, int position) {
       Picasso.with(holder.kanalLogoImageView.getContext())
-              .load(App.backend[1].kanaler.get(position).kanallogo_url)
+              .load(backend.kanaler.get(position).kanallogo_url)
               .into(holder.kanalLogoImageView);
 
       if (!fetchingSchedule) {
         Point displaySize = Utils.getDisplaySize(holder.kanalLogoImageView.getContext());
-        String billedeUrl = App.backend[1].kanaler.get(position).getUdsendelse().billedeUrl;
-        billedeUrl = Basisfragment.skalérBillede(App.backend[1].kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x * 9 / 16);
+        String billedeUrl;
+        billedeUrl = Basisfragment.skalérBillede(backend.kanaler.get(position).getUdsendelse(), displaySize.x, displaySize.x * 9 / 16);
         //Log.d("billedeUrl = "+billedeUrl);
         Picasso.with(holder.udsendelseImageView.getContext())
                 .load(billedeUrl).placeholder(null)
@@ -122,7 +123,7 @@ public class LiveKanalerFrag extends Fragment {
                 .into(holder.udsendelseImageView);
 
 
-        holder.udsendelseTextView.setText(App.backend[1].kanaler.get(position).getUdsendelse().titel);
+        holder.udsendelseTextView.setText(backend.kanaler.get(position).getUdsendelse().titel);
       }
 
       holder.playButtonImageView.setImageResource(R.drawable.afspiller_spil_normal);
@@ -132,7 +133,7 @@ public class LiveKanalerFrag extends Fragment {
 
     @Override
     public int getItemCount() {
-      return App.backend[1].kanaler.size();
+      return backend.kanaler.size();
     }
 
     private void setClickListener(ImageView imageView, final int position) {
@@ -141,8 +142,8 @@ public class LiveKanalerFrag extends Fragment {
         public void onClick(View v) {
           debugData();
           if (!fetchingSchedule) {
-            if (App.backend[1].kanaler.get(position).getUdsendelse() != null) {
-              startPlayerActivity(App.backend[1].kanaler.get(position), v.getContext());
+            if (backend.kanaler.get(position).getUdsendelse() != null) {
+              startPlayerActivity(backend.kanaler.get(position), v.getContext());
             }
           }
         }
@@ -170,7 +171,7 @@ public class LiveKanalerFrag extends Fragment {
   }
 
   private static void debugData() {
-    for (Kanal kanal : App.backend[1].kanaler) {
+    for (Kanal kanal : backend.kanaler) {
       Log.d("Kanal streams size = " + kanal.streams.size());
       Log.d("Kanal udsendelser size = " + kanal.udsendelser.size());
       Log.d("Kanal slug =" + kanal.slug + "  " + kanal.kode + "   " + kanal.navn);

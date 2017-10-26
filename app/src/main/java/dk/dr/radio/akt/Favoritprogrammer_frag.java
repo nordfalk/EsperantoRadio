@@ -32,6 +32,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 public class Favoritprogrammer_frag extends Basisfragment implements AdapterView.OnItemClickListener, Runnable {
@@ -90,16 +91,16 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
         else {
           if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
-          App.netkald.kald(this, App.backend[0].getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
+          App.netkald.kald(this, GammelDrRadioBackend.instans.getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
             @Override
             public void fikSvar(Netsvar s) throws Exception {
               Log.d("favoritter fikSvar(" + s.fraCache + " " + s.url);
               if (s.uændret || s.fejl) return;
               if (s.json != null) {
                 JSONObject data = new JSONObject(s.json);
-                Programserie programserie = App.backend[0].parsProgramserie(data, null);
+                Programserie programserie = GammelDrRadioBackend.instans.parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-                ArrayList<Udsendelse> udsendelser = App.backend[0].parseUdsendelserForProgramserie(prg, null, App.data);
+                ArrayList<Udsendelse> udsendelser = GammelDrRadioBackend.instans.parseUdsendelserForProgramserie(prg, null, App.data);
                 programserie.tilføjUdsendelser(0, udsendelser);
                 App.data.programserieFraSlug.put(programserieSlug, programserie);
               } else {

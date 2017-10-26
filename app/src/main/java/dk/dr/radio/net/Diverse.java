@@ -103,6 +103,7 @@ public class Diverse {
     HttpURLConnection urlConnection = (HttpURLConnection) u.openConnection();
     urlConnection.setConnectTimeout(15000);
     urlConnection.setReadTimeout(90 * 1000);   // 1 1/2 minut
+    urlConnection.setInstanceFollowRedirects(true);
     urlConnection.connect(); // http://stackoverflow.com/questions/8179658/urlconnection-getcontent-return-null
     InputStream is = urlConnection.getInputStream();
     Log.d("åbnGETURLConnection url.length()=" + url.length() + "  is=" + is + "  is.available()=" + is.available());

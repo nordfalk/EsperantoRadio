@@ -15,6 +15,7 @@ import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 import dk.radiotv.backend.DRJson;
 
@@ -46,11 +47,11 @@ public class DramaOgBog {
       if (karuselJson!=null) for (int n = 0; n < karuselJson.length(); n++) try {
         JSONObject udsendelseJson = karuselJson.getJSONObject(n);
         // TODO mangler
-        Udsendelse u = App.backend[0].parseUdsendelse(null, App.data, udsendelseJson);
+        Udsendelse u = GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, udsendelseJson);
         karusel.add(u);
         karuselSerieSlug.add(u.programserieSlug);
       } catch (JSONException je) {
-        Log.d("Fejl i "+ App.backend[0].getBogOgDramaUrl() +" element nr +"+n+ ": " + je);
+        Log.d("Fejl i "+ GammelDrRadioBackend.instans.getBogOgDramaUrl() +" element nr +"+n+ ": " + je);
         Log.d(karuselJson.getJSONObject(n));
         Log.e(je);
       }
@@ -68,7 +69,7 @@ public class DramaOgBog {
           programserie = new Programserie();
           App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
-        res.add(App.backend[0].parsProgramserie(programserieJson, programserie));
+        res.add(GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie));
 //            Log.d("DramaOgBogD "+sektionsnummer+" "+n+programserie+" "+programserie.antalUdsendelser+" "+programserie.billedeUrl);
       }
       if (!res.isEmpty()) {
@@ -80,7 +81,7 @@ public class DramaOgBog {
   }
 
   public void startHentData() {
-    App.netkald.kald(null, App.backend[0].getBogOgDramaUrl(), Request.Priority.LOW, new NetsvarBehander() {
+    App.netkald.kald(null, GammelDrRadioBackend.instans.getBogOgDramaUrl(), Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || s.json.equals("null")) return;

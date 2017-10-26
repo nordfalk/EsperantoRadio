@@ -30,6 +30,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
+import dk.radiotv.backend.MuOnlineTVBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 
@@ -39,6 +40,7 @@ public class MestSeteFrag extends Basisfragment {
 
   private static RecyclerViewAdapter mRecyclerViewAdapter;
   private VerticalScrollRecyclerViewAdapter mVerticalScrollRecyclerViewAdapter;
+  private static MuOnlineTVBackend backend = MuOnlineTVBackend.instans;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,13 +96,13 @@ public class MestSeteFrag extends Basisfragment {
 
     @Override
     public int getItemCount() {
-      return App.backend[1].kanaler.size();
+      return backend.kanaler.size();
     }
 
     private void initImageView(ImageView imageView, int position) {
       //imageView.setImageResource(App.grunddata.kanaler.get(position).kanallogo_resid);
       Picasso.with(imageView.getContext())
-              .load(App.backend[1].kanaler.get(position).kanallogo_url)
+              .load(backend.kanaler.get(position).kanallogo_url)
               .into(imageView);
     }
 
@@ -114,7 +116,7 @@ public class MestSeteFrag extends Basisfragment {
     }
 
     private String getKanalSlugFraPosition(int position) {
-      return App.backend[1].kanaler.get(position).slug;
+      return backend.kanaler.get(position).slug;
     }
   }
 

@@ -20,8 +20,13 @@ import dk.dr.radio.diverse.Udseende;
 public class DrVolleyStringRequest extends StringRequest {
   private final DrVolleyResonseListener lytter;
 
+  private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
+  private static final String HTTPS_WWW_DR_DK = "https://www.dr.dk";
+
   public DrVolleyStringRequest(String url, final DrVolleyResonseListener listener) {
-    super(url, listener, listener);
+    //super(url, listener, listener);
+    // DR omdirigerer alt til HTTPS - så omskriv URLerne på forhånd
+    super(url = url.startsWith(HTTP_WWW_DR_DK)?HTTPS_WWW_DR_DK+url.substring(HTTP_WWW_DR_DK.length()):url, listener, listener);
     lytter = listener;
     if (url==null) {
       // Der er ikke noget at gøre her - vi crasher alligevel i en følgefejl, så hellere crashe med det samme

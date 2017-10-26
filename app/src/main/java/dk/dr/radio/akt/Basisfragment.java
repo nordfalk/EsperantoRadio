@@ -179,7 +179,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
     if (url == null || url.length() == 0 || "null".equals(url)) return null;
     try {
       URL u = new URL(url);
-      String skaleretUrl = "http://asset.dr.dk/drdkimagescale/?server=www.dr.dk&amp;w=" + bredde + "&amp;h=" + højde +
+      String skaleretUrl = "https://asset.dr.dk/drdkimagescale/?server=www.dr.dk&amp;w=" + bredde + "&amp;h=" + højde +
           "&amp;file=" + URLEncoder.encode(u.getPath(), "UTF-8") + "&amp;scaleAfter=crop";
 
       Log.d("skalérDrDkBilledeUrl url1 = " + url);
@@ -197,7 +197,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
    * Billedeskalering af billeder ud fra en slug
    */
   private static String skalérBilledeFraSlug(String slug, int bredde, int højde) {
-    String res = "http://asset.dr.dk/imagescaler/?file=/mu/programcard/imageuri/" + slug + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
+    String res = "https://asset.dr.dk/imagescaler/?file=/mu/programcard/imageuri/" + slug + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
     if (App.fejlsøgning) Log.d("skalérBilledeFraSlug " + slug + " " + bredde + "x" + højde + " giver: " + res);
     return res;
   }
@@ -208,7 +208,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
    */
   private static String skalérBilledeFraUrl(String url, int bredde, int højde) {
     if (Udseende.ESPERANTO) return url;
-    String res = "http://asset.dr.dk/imagescaler/?file=" + url + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
+    String res = "https://asset.dr.dk/imagescaler/?file=" + url + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
     if (App.fejlsøgning) Log.d("skalérBilledeFraUrl " + url + " " + bredde + "x" + højde + " giver: " + res);
     return res;
   }
@@ -254,7 +254,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
       URL u = new URL(url);
       //String skaleretUrl = "http://asset.dr.dk/discoImages/?discoserver=" + u.getHost() + ";w=" + bredde16 + "&amp;h=" + højde9 +
       //    "&amp;file=" + URLEncoder.encode(u.getPath(), "UTF-8") + "&amp;scaleAfter=crop&amp;quality=85";
-      String skaleretUrl = "http://asset.dr.dk/discoImages/?discoserver=" + u.getHost() + "&w=" + bredde + "&h=" + højde +
+      String skaleretUrl = "https://asset.dr.dk/discoImages/?discoserver=" + u.getHost() + "&w=" + bredde + "&h=" + højde +
           "&file=" + u.getPath() + "&scaleAfter=crop&quality=85";
 
       //Log.d("skalérDiscoBilledeUrl url2 = " + u);

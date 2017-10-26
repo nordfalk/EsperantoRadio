@@ -12,6 +12,7 @@ import java.util.List;
 import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 /**
@@ -37,7 +38,7 @@ public class ProgramserierAtilAA {
       if (programserie == null) {
         // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
         programserie = new Programserie();
-        App.backend[0].parsProgramserie(programserieJson, programserie);
+        GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie);
         App.data.programserieFraSlug.put(programserieSlug, programserie);
       }
       res.add(programserie);
@@ -50,7 +51,7 @@ public class ProgramserierAtilAA {
 
 
   public void startHentData() {
-    App.netkald.kald(null, App.backend[0].getAlleProgramserierAtilÅUrl(), Request.Priority.LOW, new NetsvarBehander() {
+    App.netkald.kald(null, GammelDrRadioBackend.instans.getAlleProgramserierAtilÅUrl(), Request.Priority.LOW, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);

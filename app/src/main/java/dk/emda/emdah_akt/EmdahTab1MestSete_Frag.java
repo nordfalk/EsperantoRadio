@@ -18,6 +18,7 @@ import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.v3.R;
 import dk.emda.EmdahAdapter;
+import dk.radiotv.backend.MuOnlineTVBackend;
 
 /**
  * Created by User on 2/28/2017.
@@ -45,9 +46,7 @@ public class EmdahTab1MestSete_Frag extends Fragment implements EmdahAdapter.Ite
     recyclerView = (RecyclerView) view.findViewById(R.id.rec_list);
     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
-    for (Backend backend : App.backend) {
-      App.netkald.hentMestSete(backend, null, 0);
-    }
+    MuOnlineTVBackend.instans.hentMestSete(null, 0);
     App.data.mestSete.observatører.add(this);
     run();
     return view;

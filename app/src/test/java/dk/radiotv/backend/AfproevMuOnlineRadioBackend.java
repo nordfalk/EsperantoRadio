@@ -53,7 +53,7 @@ public class AfproevMuOnlineRadioBackend {
       //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
       App.data = new Programdata();
       try {
-        String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json"));
+        String grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(this));
         backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
       } catch (Exception e) {
         e.printStackTrace();

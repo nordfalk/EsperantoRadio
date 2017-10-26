@@ -312,7 +312,6 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
         a = vh.aq = new AQuery(v);
         vh.starttid = a.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
         //a.id(R.id.højttalerikon).clicked(new UdsendelseClickListener(vh));
-        a.id(R.id.slutttid).typeface(App.skrift_gibson);
         if (type == TIDLIGERE_SENERE) {
           vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
         } else if (type == DAGSOVERSKRIFT) {
@@ -405,7 +404,6 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
           aktuelUdsendelseViewholder = vh;
           udsendelse.beskrivelse = rektaElsendaPriskribo;
           vh.starttid.setText(udsendelse.startTidKl);
-          a.id(R.id.slutttid).text(udsendelse.slutTidKl);
 
           if (udsendelse.rektaElsendaPriskriboUrl!=null && rektaElsendaPriskribo==null) {
             opdaterSenestSpillet(vh.aq, udsendelse);

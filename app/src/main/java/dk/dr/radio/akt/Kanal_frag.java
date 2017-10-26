@@ -296,7 +296,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 //      ArrayList<Udsendelse> nyuliste = kanal.udsendelser;
       if (App.fejlsøgning) Log.d(kanal + " opdaterListe " + kanal.udsendelser.size());
       tidligere.startTid = new Date(kanal.udsendelser.get(0).startTid.getTime() - 12 * 60 * 60 * 1000); // Døgnet starter kl 5, så vi er på den sikre side med 12 timer
-      senere.startTid = new Date(kanal.udsendelser.get(kanal.udsendelser.size() - 1).slutTid.getTime() + 12 * 60 * 60 * 1000); // Til tider rækker udsendelserne ikke ind i det næste døgn, så vi lægger 12 timer til
+      senere.startTid = new Date(kanal.udsendelser.get(kanal.udsendelser.size() - 1).startTid.getTime() + 12 * 60 * 60 * 1000); // Til tider rækker udsendelserne ikke ind i det næste døgn, så vi lægger 12 timer til
       ArrayList<Object> nyListe = new ArrayList<Object>(kanal.udsendelser.size() + 5);
       nyListe.add(tidligere);
       String forrigeDagsbeskrivelse = null;
@@ -422,7 +422,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         a = vh.aq = new AQuery(v);
         vh.startid = a.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
         //a.id(R.id.højttalerikon).clicked(new UdsendelseClickListener(vh));
-        a.id(R.id.slutttid).typeface(App.skrift_gibson);
         if (type == TIDLIGERE_SENERE) {
           vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
         } else if (type == DAGSOVERSKRIFT) {
@@ -465,7 +464,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         case AKTUEL:
           aktuelUdsendelseViewholder = vh;
           vh.startid.setText(udsendelse.startTidKl);
-          a.id(R.id.slutttid).text(udsendelse.slutTidKl);
           vh.titel.setText(udsendelse.titel);
 
 

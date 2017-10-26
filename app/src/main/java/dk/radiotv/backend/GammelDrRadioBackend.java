@@ -176,7 +176,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
         //if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
         l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
         l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
-        l.kbps = o.getInt(DRJson.Kbps.name());
+        l.kbps_ubrugt = o.getInt(DRJson.Kbps.name());
         lydData.add(l);
         if (App.fejlsøgning) Log.d("lydstream=" + l);
       } catch (Exception e) {
@@ -196,12 +196,10 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
   }
 
-  @Override
   public String getAlleProgramserierAtilÅUrl() {
     return BASISURL + "/series-list?type=radio";
   }
 
-  @Override
   public String getBogOgDramaUrl() {
     return BASISURL + "/radio-drama-adv";
   }
@@ -259,6 +257,8 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
       u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
+      u.varighedMs = u.slutTid.getTime() - u.startTid.getTime();
+
       u.dagsbeskrivelse = dagsbeskrivelse;
 /*
       if (datoStr.equals(iDagDatoStr)) ; // ingen ting
@@ -284,14 +284,14 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return uliste;
   }
 
-  @Override
   public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
     Udsendelse u = opretUdsendelse(programdata, o);
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
     u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.BroadcastStartTime.name()));
     u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-    u.slutTid = new Date(u.startTid.getTime() + o.getInt(DRJson.DurationInSeconds.name()) * 1000);
+    u.varighedMs = 1000*o.getInt(DRJson.DurationInSeconds.name());
+    u.slutTid = new Date(u.startTid.getTime() + u.varighedMs);
 
     if (!App.PRODUKTION && (!o.has(DRJson.Playable.name()) || !o.has(DRJson.Playable.name())))
       Log.rapporterFejl(new IllegalStateException("Mangler Playable eller Downloadable"), o.toString());

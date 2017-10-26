@@ -18,15 +18,12 @@ public class Netsvar {
   public String json;
   public boolean fejl;
   public Exception exception;
+  /** Om dette svar helt sikkert efterfølges af et endeligt svar */
+  //public boolean foreløbigtSvar;
 
   public Netsvar(String jsonSvar, boolean fraCache, boolean uændret) {
-    this(jsonSvar, fraCache, uændret, false);
-  }
-
-  public Netsvar(String jsonSvar, boolean fraCache, boolean uændret, boolean fejl) {
     json = jsonSvar;
     this.fraCache = fraCache;
     this.uændret = uændret;
-    this.fejl = fejl;
   }
 }

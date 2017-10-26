@@ -45,7 +45,7 @@ public class CastVideoProvider {
     //Optional subTitle?
     String subTitle = udsendelse.beskrivelse;
     //DURATION
-    int duration = safeLongToInt((udsendelse.slutTid.getTime() - udsendelse.startTid.getTime()) / 1000); //Duration in seconds
+    int duration = (int) (udsendelse.varighedMs / 1000); //Duration in seconds
     Log.d(TAG, " duration = " + duration);
     //TYPE
     String mimeType;

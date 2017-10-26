@@ -188,6 +188,7 @@ public class MestSeteFrag extends Basisfragment {
 
     public void update() {
       mestSete = App.data.mestSete;
+      notifyDataSetChanged();
     }
 
     private void setClickListener(final ImageView imageView, final Udsendelse udsendelse) {
@@ -202,26 +203,13 @@ public class MestSeteFrag extends Basisfragment {
             startPlayerActivity(udsendelse);
           } else {
             fetchingStreams = true;
-
-            App.netkald.kald(this, udsendelse.ny_streamDataUrl, new NetsvarBehander() {
+            backend.hentStreams(udsendelse, new NetsvarBehander() {
               @Override
               public void fikSvar(Netsvar s) throws Exception {
-                if (s.fraCache) { // Første kald vil have fraCache = true hvis der er noget i cache.
-                  return;
-                }
-                if (udsendelse.harStreams() && s.uændret) { // Andet kald vil have uændret = true hvis dataen er uændret i forhold til cache.
-                  return;
-                }
-
-                if (s.json != null) {
-                  JSONObject jsonObject = new JSONObject(s.json);
-                  udsendelse.setStreams(udsendelse.getKanal().getBackend().parsStreams(jsonObject));
-                  Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
-                  fetchingStreams = false;
-                  startPlayerActivity(udsendelse);
-                } else {
-                  netværksFejl();
-                }
+                if (!fetchingStreams) return;
+                if (s.fejl) netværksFejl();
+                else startPlayerActivity(udsendelse);
+                fetchingStreams = false;
               }
             });
           }
@@ -249,8 +237,8 @@ public class MestSeteFrag extends Basisfragment {
   public void onStart() {
     super.onStart();
     App.data.mestSete.observatører.add(mestSeteObs);
-    for (Kanal kanal : App.grunddata.kanaler) {
-      App.netkald.hentMestSete(kanal.getBackend(), kanal.slug, 0);
+    for (Kanal kanal : MuOnlineTVBackend.instans.kanaler) {
+      MuOnlineTVBackend.instans.hentMestSete(kanal.slug, 0);
     }
   }
 

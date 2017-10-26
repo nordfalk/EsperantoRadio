@@ -40,7 +40,7 @@ public abstract class Backend {
 
   public abstract String getGrunddataUrl();
 
-  public abstract InputStream getLokaleGrunddata(Context ctx);
+  public abstract InputStream getLokaleGrunddata(Context ctx) throws IOException;
 
 
   public abstract void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException;
@@ -48,21 +48,6 @@ public abstract class Backend {
   public Programserie parsProgramserie(JSONObject programserieJson, Programserie programserie) throws JSONException{
     ikkeImplementeret();
     return programserie;
-  }
-
-  public String getAlleProgramserierAtilÅUrl() {
-    ikkeImplementeret();
-    return null;
-  }
-
-  public String getBogOgDramaUrl() {
-    ikkeImplementeret();
-    return null;
-  }
-
-  public Udsendelse parseUdsendelse(Kanal kanal, Programdata data, JSONObject udsendelseJson) throws JSONException {
-    ikkeImplementeret();
-    return null;
   }
 
   public String getProgramserieUrl(Programserie programserie, String programserieSlug, int offset) {
@@ -117,16 +102,6 @@ public abstract class Backend {
   }
 
   public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
-    ikkeImplementeret();
-    return null;
-  }
-
-  public String getMestSeteUrl(String kanalSlug, int offset) {
-    ikkeImplementeret();
-    return null;
-  }
-
-  public MestSete parseMestSete(MestSete mestSete, Programdata data, String json, String kanalSlug) throws JSONException {
     ikkeImplementeret();
     return null;
   }

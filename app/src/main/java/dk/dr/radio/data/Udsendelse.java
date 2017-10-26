@@ -59,6 +59,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public String sæsonSlug;
   public String sæsonUrn;
   public String sæsonTitel;
+  public long varighedMs;
 
   public Udsendelse(String s) {
     titel = s;

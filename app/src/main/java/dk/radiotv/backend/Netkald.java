@@ -76,21 +76,4 @@ public class Netkald {
       }
     });
   }
-
-
-  public void hentMestSete(final Backend backend, final String kanalSlug, int offset) {
-    App.netkald.kald(this, backend.getMestSeteUrl(kanalSlug, offset), new NetsvarBehander() {
-      @Override
-      public void fikSvar(Netsvar s) throws Exception {
-        if (s.uændret) return;
-        if (s.json != null) {
-          backend.parseMestSete(App.data.mestSete, App.data, s.json, kanalSlug);
-          App.opdaterObservatører(App.data.mestSete.observatører);
-        } else {
-          App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-        }
-      }
-    });
-  }
-
 }

@@ -56,8 +56,6 @@ import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
 import com.crashlytics.android.Crashlytics;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -73,7 +71,6 @@ import dk.dr.radio.akt.diverse.EgenTypefaceSpan;
 import dk.radiotv.backend.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.MuOnlineRadioBackend;
@@ -88,7 +85,6 @@ import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import dk.radiotv.backend.Netkald;
 import dk.radiotv.backend.NetsvarBehander;
-import dk.nordfalk.simpelbus.SimpelBus;
 import io.fabric.sdk.android.Fabric;
 
 public class App {
@@ -96,7 +92,6 @@ public class App {
   public static Programdata data;
   public static Grunddata grunddata;
   public static Afspiller afspiller;
-  public static SimpelBus eventbus; //Vi benytter EventBus til vores projekt
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java
@@ -163,8 +158,8 @@ public class App {
 
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
 //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+//            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -231,7 +226,6 @@ public class App {
 
   public void initData(Application ctx) {
     data = new Programdata();
-    eventbus = new SimpelBus(); //Implementation af EventBus
     grunddata = new Grunddata();
     // Indlæsning af grunddata/stamdata.
     // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
@@ -263,16 +257,7 @@ public class App {
       }
 
       if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-        final Kanal kanal = aktuelKanal;
-        App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(aktuelKanal), Request.Priority.HIGH, new NetsvarBehander() {
-          @Override
-          public void fikSvar(Netsvar sv) throws Exception {
-            if (sv.uændret) return; // ingen grund til at parse det igen
-            ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
-            kanal.setStreams(s);
-            Log.d("hentStreams akt fraCache=" + sv.fraCache + " => " + kanal);
-          }
-        });
+        aktuelKanal.getBackend().hentKanalStreams(aktuelKanal, Request.Priority.HIGH, NetsvarBehander.TOM);
       }
       if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
@@ -325,15 +310,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(kanal), Request.Priority.LOW, new NetsvarBehander() {
-            @Override
-            public void fikSvar(Netsvar sv) throws Exception {
-              if (sv.uændret) return;
-              ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
-              kanal.setStreams(s);
-              Log.d("hentStreams app fraCache=" + sv.fraCache + " => " + kanal);
-            }
-          });
+          kanal.getBackend().hentKanalStreams(kanal, Request.Priority.HIGH, NetsvarBehander.TOM);
         }
       }
 
@@ -535,12 +512,7 @@ public class App {
       if (App.fejlsøgning) App.kortToast("kørFørsteGangAppIkkeMereErSynlig");
       final int DAGE = 24 * 60 * 60 * 1000;
       int volleySlettet = volleyCache.sletFilerÆldreEnd(TIDSSTEMPEL_VED_OPSTART-10*DAGE);
-      int aqSlettet = Diverse.sletFilerÆldreEnd(new File(ApplicationSingleton.instans.getCacheDir(), "aquery"), TIDSSTEMPEL_VED_OPSTART-4*DAGE);
-      // Mappe ændret fra standardmappen "volley" til "dr_volley" 19. nov 2014.
-      // Det skyldtes at et hukommelsesdump viste, at Volley indekserede alle filerne i standardmappen,
-      // uden om vores implementation, hvilket gav et unødvendigt overhead på ~ 1MB
-      File gammelVolleyCacheDir = new File(ApplicationSingleton.instans.getCacheDir(), "volley");
-      Diverse.sletFilerÆldreEnd(gammelVolleyCacheDir, TIDSSTEMPEL_VED_OPSTART-7*DAGE);
+      int aqSlettet = Diverse.sletFilerÆldreEnd(new File(ApplicationSingleton.instans.getCacheDir(), "aquery"), TIDSSTEMPEL_VED_OPSTART-10*DAGE);
 
       if (fejlsøgning) {
         App.kortToast("volleyCache: " + volleySlettet / 1000 + " kb frigivet");

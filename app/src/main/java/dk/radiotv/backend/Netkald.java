@@ -51,29 +51,4 @@ public class Netkald {
   public void annullerKald(Object kalder) {
     App.volleyRequestQueue.cancelAll(kalder);
   }
-
-
-  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final NetsvarBehander svarBehander) {
-    final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    //if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
-    //xxx svarBehander.fikSvar(new Svar());//opdaterListe();
-    //}
-
-    final String url = kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr);
-    if (App.fejlsøgning) Log.d("startHentUdsendelserPåKanal url=" + url);
-
-    kald(kalder, url, new NetsvarBehander() {
-      @Override
-      public void fikSvar(Netsvar s) throws Exception {
-        // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
-        if (!s.uændret) {
-          if (s.json != null && !"null".equals(s.json)) {
-            kanal.setUdsendelserForDag(kanal.getBackend().parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
-          }
-        }
-        if (kanal.harUdsendelserForDag(datoStr) && s.fraCache)
-          return; // så er værdierne i RAMen gode nok
-      }
-    });
-  }
 }

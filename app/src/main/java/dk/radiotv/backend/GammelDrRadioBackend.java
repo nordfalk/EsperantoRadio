@@ -26,6 +26,7 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 /**
@@ -134,14 +135,13 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   }
 
   /** Bruges kun fra FangBrowseIntent */
-  @Override
   public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
     return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
   }
 
 
   @Override
-  public String getKanalStreamsUrl(Kanal kanal) {
+  String getKanalStreamsUrl(Kanal kanal) {
     //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
     return BASISURL + "/channel/" + kanal.slug + "?includeStreams=true";
   }
@@ -267,19 +267,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       else u.startTidKl += " - " + datoStr;
 */
       uliste.add(u);
-    }
-    return uliste;
-  }
-
-  /**
-   * Parser udsendelser for programserie.
-   * A la http://www.dr.dk/tjenester/mu-apps/series/sprogminuttet?type=radio&includePrograms=true
-   */
-  @Override
-  public ArrayList<Udsendelse> parseUdsendelserForProgramserie(JSONArray jsonArray, Kanal kanal, Programdata programdata) throws JSONException {
-    ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
-    for (int n = 0; n < jsonArray.length(); n++) {
-      uliste.add(parseUdsendelse(kanal, programdata, jsonArray.getJSONObject(n)));
     }
     return uliste;
   }
@@ -432,18 +419,27 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
 
 
-  /*
-  public static void main(String[] a) throws ParseException {
-    System.out.println(servertidsformat.format(new Date()));
-    System.out.println(servertidsformat.parse("2014-01-16T09:04:00+01:00"));
-  }
-*/
+  public void hentUdsendelseStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(this, getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          udsendelse.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
 
-    /*
-     * Kald
-		 * http://www.dr.dk/tjenester/mu-apps/search/programs?q=monte&type=radio
-		 * vil kun returnere radio programmer
-		 * http://www.dr.dk/tjenester/mu-apps/search/series?q=monte&type=radio
-		 * vil kun returnere radio serier
-		 */
+          // egentlig kun GammelDrRadioBackend
+          udsendelse.indslag = parsIndslag(o);
+          udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
+          // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
+          // der ikke er en programserie, og videre navigering derfor skal slås fra
+          if (!o.has(DRJson.SeriesSlug.name())) {
+            App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
+          }
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
 }

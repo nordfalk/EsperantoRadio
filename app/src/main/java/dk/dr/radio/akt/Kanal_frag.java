@@ -164,19 +164,12 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
 
   private void hentSendeplanForDag(final Date dato) {
-    final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
-      opdaterListe();
-    }
-
-    App.netkald.kald(this, kanal.getBackend().getUdsendelserPåKanalUrl(kanal, datoStr), new NetsvarBehander() {
+    backend.hentUdsendelserPåKanal(this, kanal, dato, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;
-        if (kanal.harUdsendelserForDag(datoStr) && s.fraCache) return; // så er værdierne i RAMen gode nok
-        // Log.d(kanal + " hentSendeplanForDag fikSvar for url " + url + " fraCache=" + fraCache+":\n"+json);
-        if (s.json != null) {
-          kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
+        if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
+        else {
           int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
           if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
             opdaterListe();
@@ -186,14 +179,10 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
             //Log.d("næstøversteSynlig = " + næstøversteSynlig);
             View v = listView.getChildAt(1);
             int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
-
             opdaterListe();
-
             int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
             listView.setSelectionFromTop(næstøversteSynligNytIndex, næstøversteSynligOffset);
           }
-        } else {
-          new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
         }
       }
     });
@@ -249,14 +238,10 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      App.netkald.kald(this, backend.getKanalStreamsUrl(kanal), Request.Priority.HIGH, new NetsvarBehander() {
+      backend.hentKanalStreams(kanal, Request.Priority.HIGH, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.uændret) return; // ingen grund til at parse det igen
-          JSONObject o = new JSONObject(sv.json);
-          ArrayList<Lydstream> s = backend.parsStreams(o);
-          kanal.setStreams(s);
-          Log.d("hentStreams Kanal_frag fraCache=" + sv.fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
       });

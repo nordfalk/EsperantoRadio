@@ -39,8 +39,6 @@ import android.telephony.TelephonyManager;
 
 import com.android.volley.Request;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +51,6 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
-import dk.radiotv.backend.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -61,7 +58,7 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
-import dk.radiotv.backend.GammelDrRadioBackend;
+import dk.radiotv.backend.EsperantoRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
 /**
@@ -151,17 +148,33 @@ public class Afspiller {
       };
     }
     if (!lydkilde.harStreams()) {
-      String url = null;
-      if (lydkilde instanceof Kanal) {
-        url = lydkilde.getBackend().getKanalStreamsUrl((Kanal) lydkilde);
-      } else if (lydkilde instanceof Udsendelse) {
-        url = lydkilde.getBackend().getUdsendelseStreamsUrl((Udsendelse) lydkilde);
+      NetsvarBehander netsvarBehander = new NetsvarBehander() {
+        @Override
+        public void fikSvar(Netsvar sv) throws Exception {
+          if (sv.fejl) {
+            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
+            if (vækningIGang) ringDenAlarm();
+            return;
+          }
+          if (sv.uændret) return; // ingen grund til at parse det igen
+          Log.d("hentStreams afsp fraCache=" + sv.fraCache + " => " + lydkilde);
+          if (onErrorTæller++>2) {
+            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
+            if (vækningIGang) ringDenAlarm();
+          } else {
+            startAfspilning(); // Opdatér igen - men kun én gang
+          }
+        }
       };
-
-      if (url==null) {
+      if (lydkilde instanceof Kanal) {
+        lydkilde.getBackend().hentKanalStreams((Kanal) lydkilde, Request.Priority.IMMEDIATE, netsvarBehander);
+      } else if (lydkilde instanceof Udsendelse) {
+        lydkilde.getBackend().hentUdsendelseStreams((Udsendelse) lydkilde, netsvarBehander);
+      } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
       }
+      /*
       App.netkald.kald(this, url, Request.Priority.IMMEDIATE, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
@@ -183,6 +196,7 @@ public class Afspiller {
           }
         }
       });
+      */
       return;
     }
     Log.d("startAfspilning() " + lydkilde);

@@ -84,30 +84,17 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    App.netkald.kald(this, kanal.getBackend().getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
+    kanal.getBackend().hentProgramserie(programserie, programserieSlug, kanal, offset, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        if (s.fejl) {
-          if (offset == 0) {
-            aq.id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
-          } else {
-            bygListe(); // for at fjerne evt progressBar
-          }
+        if (s.fejl && offset == 0) {
+          aq.id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
           return;
         }
-        if (s.uændret) return;
-        JSONObject data = new JSONObject(s.json);
-        if (offset == 0) {
-          programserie = kanal.getBackend().parsProgramserie(data, programserie);
-          App.data.programserieFraSlug.put(programserieSlug, programserie);
-        }
-        ArrayList<Udsendelse> uds = kanal.getBackend().parseUdsendelserForProgramserie(data.getJSONArray(DRJson.Programs.name()), kanal, App.data);
-        programserie.tilføjUdsendelser(offset, uds);
         bygListe();
       }
     });
   }
-
   @Override
   public void onClick(View v) {
     if (v.getId()==R.id.favorit) {
@@ -280,7 +267,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
         //String txt = u.getKanal().navn + ", " + ((u.slutTid.getTime() - u.startTid.getTime())/1000/60 + " MIN");
         String txt = ""; //u.getKanal().navn;
-        int varighed = (int) ((u.slutTid.getTime() - u.startTid.getTime()) / 1000 / 60);
+        int varighed = (int) (u.varighedMs / 1000 / 60);
         if (varighed > 0) {
           //txt += ", ";
           int timer = varighed / 60;

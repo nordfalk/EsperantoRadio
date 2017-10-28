@@ -13,8 +13,6 @@ import android.widget.TextView;
 import com.google.android.gms.cast.MediaInfo;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -203,7 +201,7 @@ public class MestSeteFrag extends Basisfragment {
             startPlayerActivity(udsendelse);
           } else {
             fetchingStreams = true;
-            backend.hentStreams(udsendelse, new NetsvarBehander() {
+            backend.hentUdsendelseStreams(udsendelse, new NetsvarBehander() {
               @Override
               public void fikSvar(Netsvar s) throws Exception {
                 if (!fetchingStreams) return;

@@ -67,7 +67,6 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       ft.commit();
       return rod;
     }
-    programserie = App.data.programserieFraSlug.get(startudsendelse.programserieSlug);
     Log.d("onCreateView " + this + " viser " + " / " + startudsendelse);
 
 
@@ -112,6 +111,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   private HashSet<Integer> alledeForsøgtHentet = new HashSet<>(); // forsøg ikke at hente det samme offset flere gange
   private void opdaterUdsendelser() {
     if (viewPager == null) return;
+    if (programserie==null) programserie = App.data.programserieFraSlug.get(startudsendelse.programserieSlug);
+
     Udsendelse udsFør = udsendelser.size()>viewPager.getCurrentItem() ? udsendelser.get(viewPager.getCurrentItem()) : null;
     udsendelser = new ArrayList<Udsendelse>();
     udsendelser.addAll(programserie.getUdsendelser());
@@ -145,21 +146,10 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser(final int offset) {
-    App.netkald.kald(this, kanal.getBackend().getProgramserieUrl(programserie, startudsendelse.programserieSlug, offset), new NetsvarBehander() {
+    kanal.getBackend().hentProgramserie(programserie, startudsendelse.programserieSlug, kanal, offset, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;
-        Log.d("fikSvar(" + s.fraCache + " " + s.url);
-        if (s.json != null) {
-          JSONObject data = new JSONObject(s.json);
-          if (offset == 0) {
-            programserie = kanal.getBackend().parsProgramserie(data, programserie);
-            App.data.programserieFraSlug.put(startudsendelse.programserieSlug, programserie);
-          }
-          JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-          ArrayList<Udsendelse> udsendelser = kanal.getBackend().parseUdsendelserForProgramserie(prg, kanal, App.data);
-          programserie.tilføjUdsendelser(offset, udsendelser);
-        }
         opdaterUdsendelser();
       }
     });
@@ -250,7 +240,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
         Log.rapporterFejl(new IllegalStateException("u.startTid==null for "+u.slug));
         return getString(R.string.i_dag);
       }
-      if (u.startTidKl.equals("REKTA")) return u.startTidKl;
+      if ("REKTA".equals(u.startTidKl)) return u.startTidKl;
       String dato = Datoformater.datoformat.format(u.startTid);
       if (dato.equals(Datoformater.iDagDatoStr)) dato = getString(R.string.i_dag);
       else if (dato.equals(Datoformater.iMorgenDatoStr)) dato = getString(R.string.i_morgen);

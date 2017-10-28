@@ -13,6 +13,7 @@ import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -130,12 +131,11 @@ abstract class MuOnlineBackend extends Backend {
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     // http://www.dr.dk/mu-online/api/1.3/programcard/dokumania-37-tavse-vidner
     // return BASISURL + "/programcard/" + u.slug;
-    if (u.ny_streamDataUrl==null) Log.e(new IllegalStateException("Ingen streams? " + u));
+    if (u.ny_streamDataUrl==null) Log.d("getUdsendelseStreamsUrl: Ingen streams for " + u);
     return u.ny_streamDataUrl;
   }
 
   /** Bruges kun fra FangBrowseIntent */
-  @Override
   public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
     return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
     // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
@@ -239,22 +239,59 @@ abstract class MuOnlineBackend extends Backend {
     u.sæsonSlug = o.optString("SeasonSlug");
     u.sæsonUrn = o.optString("SeasonUrn");
     u.sæsonTitel = o.optString("SeasonTitle");
+    u.shareLink = o.optString("PresentationUri");
 
     return u;
   }
 
-  public void hentStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
-    App.netkald.kald(this, udsendelse.ny_streamDataUrl, new NetsvarBehander() {
+  private static final boolean BRUG_URN = true;
+
+  @Override
+  public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
+    if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
+    // https://www.dr.dk/mu-online/api/1.4/list/den-roede-trad?limit=60
+    if (BRUG_URN && ps != null)
+      return BASISURL + "/list/" + ps.urn + "?limit=30&offset="+offset;
+    return BASISURL + "/list/" + programserieSlug + "?limit=30&offset="+offset;
+  }
+
+
+  /**
+   * Parser et Programserie-objekt
+   * @param o  JSON
+   * @param ps et eksisterende objekt, der skal opdateres, eller null
+   * @return objektet
+   * @throws JSONException
+   */
+  @Override
+  public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
+    if (ps == null) ps = new Programserie();
+    ps.titel = o.getString(DRJson.Title.name());
+    return ps;
+  }
+
+  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(this, getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
+        Log.d("fikSvar(" + s.fraCache + " " + s.url);
         if (s.json != null && !s.uændret) {
-          JSONObject jsonObject = new JSONObject(s.json);
-          udsendelse.setStreams(udsendelse.getKanal().getBackend().parsStreams(jsonObject));
-          Log.d("Streams parsed for = " + udsendelse.ny_streamDataUrl);//Data opdateret
+          JSONObject data = new JSONObject(s.json);
+          Programserie ps = programserie;
+          if (offset == 0) {
+            ps = parsProgramserie(data, ps);
+            ps.slug = programserieSlug;
+            App.data.programserieFraSlug.put(programserieSlug, ps);
+          }
+          JSONArray prg = data.getJSONArray("Items");
+          ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
+          for (int n = 0; n < prg.length(); n++) {
+            udsendelser.add(parseUdsendelse(null, App.data, prg.getJSONObject(n)));
+          }
+          ps.tilføjUdsendelser(offset, udsendelser);
         }
         netsvarBehander.fikSvar(s);
       }
     });
-
   }
 }

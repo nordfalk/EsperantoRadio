@@ -174,7 +174,6 @@ public class EmdaHovedAkt extends AppCompatActivity {
     adapter.addFragment(new EmdahTab1MestSete_Frag(), "home");
     adapter.addFragment(new EmdahTab2_Frag(), "favourite");
     adapter.addFragment(new EmdahTab3_Frag(), "TAB3");
-    adapter.addFragment(new EmdahTab4_Frag(), "TAB4");
     viewPager.setAdapter(adapter);
   }
 

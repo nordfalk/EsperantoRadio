@@ -105,14 +105,10 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
     App.forgrundstråd.removeCallbacks(this);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      App.netkald.kald(this, kanal.getBackend().getKanalStreamsUrl(kanal), Request.Priority.HIGH, new NetsvarBehander() {
+      kanal.getBackend().hentKanalStreams(kanal, Request.Priority.HIGH, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.uændret) return; // ingen grund til at parse det igen
-          JSONObject o = new JSONObject(sv.json);
-          ArrayList<Lydstream> s = kanal.getBackend().parsStreams(o);
-          kanal.setStreams(s);
-          Log.d("hentStreams Kanal_nyheder_frag fraCache=" + sv.fraCache + " => " + kanal);
           run(); // Opdatér igen
         }
       });

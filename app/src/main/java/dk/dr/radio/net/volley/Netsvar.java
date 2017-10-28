@@ -26,4 +26,9 @@ public class Netsvar {
     this.fraCache = fraCache;
     this.uændret = uændret;
   }
+
+  @Override
+  public String toString() {
+    return "Netsvar "+url;
+  }
 }

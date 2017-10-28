@@ -82,7 +82,23 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   private Runnable hentStreams = new Runnable() {
     @Override
     public void run() {
-      if (!udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
+      kanal.getBackend().hentUdsendelseStreams(udsendelse, new NetsvarBehander() {
+        @Override
+        public void fikSvar(Netsvar s) throws Exception {
+          // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
+          // der ikke er en programserie, og videre navigering derfor skal slås fra
+          if (!blokerVidereNavigering && App.data.programserieSlugFindesIkke.contains(udsendelse.programserieSlug)) {
+            blokerVidereNavigering = true;
+            bygListe();
+          }
+          if (getUserVisibleHint() && udsendelse.streamsKlar() && afspiller.getAfspillerstatus() == Status.STOPPET) {
+            afspiller.setLydkilde(udsendelse);
+          }
+          adapter.notifyDataSetChanged(); // Opdatér views
+        }
+      });
+/*
+      if (false && !udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
         App.netkald.kald(null, kanal.getBackend().getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar s) throws Exception {
@@ -99,13 +115,11 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
                 App.forgrundstråd.postDelayed(hentStreams, 5000);
               } else if (streamsVarTom.containsKey(udsendelse)) {
                 long t0 = streamsVarTom.get(udsendelse);
-                /*
                 if (!App.PRODUKTION) {
                   App.langToast("Serveren har ombestemt sig, nu er streams ikke mere tom for " + udsendelse.slug);
                   App.langToast("Tidsforskel mellem de to svar: " + (System.currentTimeMillis() - t0) / 1000 + " sek");
                   Log.rapporterFejl(new Exception("Server ombestemte sig, der var streams alligevel"), udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
                 }
-                */
                 Log.d("Server ombestemte sig, der var streams alligevel: "+ udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
                 streamsVarTom.remove(udsendelse);
               }
@@ -129,6 +143,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           }
         });
       }
+*/
     }
   };
 
@@ -184,49 +199,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
     App.data.favoritter.observatører.add(opdaterFavoritter);
-    /*
-    ListViewScrollObserver listViewScrollObserver = new ListViewScrollObserver(listView);
-    listViewScrollObserver.setOnScrollUpAndDownListener(new ListViewScrollObserver.OnListViewScrollListener() {
-      boolean actionBarSkjult = false;
-      @Override
-      public void onScrollUpDownChanged(int delta, int scrollPosition, boolean exact) {
-        Log.d("scrollPosition="+scrollPosition + " delta="+delta);
-        boolean nyActionBarSkjult = scrollPosition>0;
-        if (actionBarSkjult == nyActionBarSkjult) return;
-        actionBarSkjult = nyActionBarSkjult;
-        if (actionBarSkjult) {
-          ((Basisaktivitet) getActivity()).getSupportActionBar().hide();
-        } else {
-          ((Basisaktivitet) getActivity()).getSupportActionBar().show();
-        }
-      }
-
-      @Override
-      public void onScrollIdle() {
-
-      }
-    });
-    listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-      boolean actionBarSkjult = false;
-      @Override
-      public void onScrollStateChanged(AbsListView view, int scrollState) {
-        Log.d("onScrollStateChanged "+scrollState);
-      }
-
-      @Override
-      public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        Log.d("onScroll " + firstVisibleItem+ " " +visibleItemCount+ " " +totalItemCount);
-        boolean nyActionBarSkjult = firstVisibleItem>0;
-        if (actionBarSkjult == nyActionBarSkjult) return;
-        actionBarSkjult = nyActionBarSkjult;
-        if (actionBarSkjult) {
-          ((Basisaktivitet) getActivity()).getSupportActionBar().hide();;
-        } else {
-          ((Basisaktivitet) getActivity()).getSupportActionBar().show();
-        }
-      }
-    });
-    */
     run();
     return rod;
   }
@@ -239,9 +211,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     String burl = Basisfragment.skalérBillede(udsendelse);
     aq.id(R.id.billede).width(billedeBr, false).height(billedeHø, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
     aq.id(R.id.info).typeface(App.skrift_gibson);
-    //Log.d("kanal JPER " + kanal.p4underkanal);
     if (kanal.p4underkanal) {
-      //Log.d("kanal JPER1 " + kanal.slug.substring(0, 2));
       aq.id(R.id.kanallogo).image(R.drawable.kanalappendix_p4f);
       aq.id(R.id.p4navn).text(kanal.navn.replace("P4", "")).typeface(App.skrift_gibson_fed);
     } else {
@@ -265,12 +235,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   private void opdaterTop() {
     AQuery aq = (AQuery) topView.getTag();
-    //aq.id(R.id.højttalerikon).visibility(streams ? View.VISIBLE : View.GONE);
-    /*
-    boolean lydkildeErDenneUds = udsendelse.equals(afspiller.getLydkilde());
-    boolean lydkildeErDenneKanal = kanal == afspiller.getLydkilde().getKanal();
-    boolean aktuelUdsendelsePåKanalen = udsendelse.equals(udsendelse.getKanal().getUdsendelse());
-    */
     boolean spiller = afspiller.getAfspillerstatus() == Status.SPILLER;
     boolean forbinder = afspiller.getAfspillerstatus() == Status.FORBINDER;
     boolean erOnline = App.netværk.erOnline();
@@ -278,23 +242,16 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     boolean udsendelsenSpillerNu = udsendelse.equals(afspiller.getLydkilde().getUdsendelse()) && (spiller||forbinder);
     boolean udsendelsenErAktuelPåKanalen = udsendelse.equals(udsendelse.getKanal().getUdsendelse());
 
-    /* Muligheder
-    Udsendelsen spiller lige nu
-
-     */
     ImageView hør_ikon = aq.id(R.id.hør).getImageView();
     TextView hør_tekst = aq.id(R.id.hør_tekst).getTextView();
-    if (false);
-    else if (udsendelsenSpillerNu) { // Afspiller / forbinder denne udsendelse
+    if (udsendelsenSpillerNu) { // Afspiller / forbinder denne udsendelse
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(spiller ? R.string.AFSPILLER : R.string.FORBINDER);
-    }
-    else if (udsendelse.hentetStream != null) {// Hentet udsendelse
+    } else if (udsendelse.hentetStream != null) {// Hentet udsendelse
       hør_ikon.setVisibility(View.VISIBLE);
       hør_tekst.setVisibility(View.GONE);
-    }
-    else if (!erOnline) {                     // Ej online
+    } else if (!erOnline) {                     // Ej online
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(R.string.INTERNETFORBINDELSE_MANGLER);
@@ -306,9 +263,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       hør_ikon.setVisibility(View.VISIBLE);
       hør_tekst.setVisibility(View.GONE);
     }
-    /* skrald
-    aq.id(R.id.hent).text("SPILLER " + kanal.navn.toUpperCase() + " LIVE");
-*/
 
     aq.id(R.id.hent);
     HentetStatus hs;
@@ -336,7 +290,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   @Override
   public void setUserVisibleHint(boolean isVisibleToUser) {
     super.setUserVisibleHint(isVisibleToUser);
-    //Log.d(" QQQ setUserVisibleHint " + isVisibleToUser + "  " + this);
     if (!isVisibleToUser || !isResumed()) return;
     App.forgrundstråd.post(tjekFragmentSynligt);
   }
@@ -829,9 +782,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   @Override
   public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
     if (position == 0) return;
-    //startActivity(new Intent(getActivity(), VisFragment_akt.class).putExtras(getArguments())  // Kanalkode + slug
-    //    .putExtra(VisFragment_akt.KLASSE, Programserie_frag.class.getName()).putExtra(DRJson.SeriesSlug.name(), udsendelse.programserieSlug));
-
     int type = adapter.getItemViewType(position);
 
     if (type == PLAYLISTEELEM || type == PLAYLISTEELEM_NU) {

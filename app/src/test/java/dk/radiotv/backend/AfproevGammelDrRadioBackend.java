@@ -85,7 +85,11 @@ public class AfproevGammelDrRadioBackend {
       ps = backend.parsProgramserie(data, ps);
       App.data.programserieFraSlug.put(ps.slug, ps);
       JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-      ArrayList<Udsendelse> udsendelser = backend.parseUdsendelserForProgramserie(prg, null, App.data);
+      ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+      for (int n = 0; n < prg.length(); n++) {
+        uliste.add(backend.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
+      }
+      ArrayList<Udsendelse> udsendelser = uliste;
 
       System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
       assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+url, ps.antalUdsendelser>= udsendelser.size());
@@ -117,7 +121,11 @@ public class AfproevGammelDrRadioBackend {
         ps = backend.parsProgramserie(data, ps);
         App.data.programserieFraSlug.put(ps.slug, ps);
         JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-        ArrayList<Udsendelse> udsendelser = backend.parseUdsendelserForProgramserie(prg, null, App.data);
+        ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+        for (int n1 = 0; n1 < prg.length(); n1++) {
+          uliste.add(backend.parseUdsendelse(null, App.data, prg.getJSONObject(n1)));
+        }
+        ArrayList<Udsendelse> udsendelser = uliste;
 
         System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
         assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+url, ps.antalUdsendelser>= udsendelser.size());
@@ -198,7 +206,11 @@ public class AfproevGammelDrRadioBackend {
             JSONObject data = new JSONObject(str);
             ps = backend.parsProgramserie(data, null);
             JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-            ArrayList<Udsendelse> udsendelser = backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
+            ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+            for (int n = 0; n < prg.length(); n++) {
+              uliste.add(backend.parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
+            }
+            ArrayList<Udsendelse> udsendelser = uliste;
             ps.tilføjUdsendelser(0, udsendelser);
             i.programserieFraSlug.put(u.programserieSlug, ps);
           }

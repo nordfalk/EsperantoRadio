@@ -2,6 +2,8 @@ package dk.radiotv.backend;
 
 import android.content.Context;
 
+import com.android.volley.Request;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import dk.dk.niclas.models.MestSete;
+import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
@@ -21,6 +23,9 @@ import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.volley.Netsvar;
 
 /**
  * Created by j on 27-02-17.
@@ -60,7 +65,7 @@ public abstract class Backend {
     return null;
   }
 
-  public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
+  String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
     ikkeImplementeret();
     return null;
   }
@@ -75,34 +80,103 @@ public abstract class Backend {
     return null;
   }
 
-  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
+  String getUdsendelseUrlFraSlug(String udsendelseSlug) {
     ikkeImplementeret();
     return null;
   }
 
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata data) throws JSONException {
+  ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata data) throws JSONException {
     ikkeImplementeret();
     return null;
   }
 
-  public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
+  ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
     ikkeImplementeret();
     return null;
   }
 
 
-  public String getKanalStreamsUrl(Kanal kanal) {
+  String getKanalStreamsUrl(Kanal kanal) {
     ikkeImplementeret();
     return null;
   }
 
-  public String getUdsendelseStreamsUrl(Udsendelse udsendelse) {
+  String getUdsendelseStreamsUrl(Udsendelse udsendelse) {
     ikkeImplementeret();
     return null;
   }
 
-  public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
+  ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
     ikkeImplementeret();
     return null;
+  }
+
+  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final NetsvarBehander netsvarBehander) {
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
+    if (kanal.harUdsendelserForDag(datoStr)) try { // brug værdier i RAMen
+      netsvarBehander.fikSvar(new Netsvar(null, true, false));
+      return;
+    } catch (Exception e) { Log.rapporterFejl(e); }
+
+    App.netkald.kald(kalder, getUdsendelserPåKanalUrl(kanal, datoStr), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(kanal + "Backend hentSendeplanForDag fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          kanal.setUdsendelserForDag(parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
+  public void hentKanalStreams(final Kanal kanal, Request.Priority priority, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(null, getKanalStreamsUrl(kanal), priority, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          kanal.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
+
+  public void hentUdsendelseStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(null, getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          udsendelse.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
+  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(this, getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d("fikSvar(" + s.fraCache + " " + s.url);
+        if (s.json != null && !s.uændret) {
+          JSONObject data = new JSONObject(s.json);
+          Programserie ps = programserie;
+          if (offset == 0) {
+            ps = parsProgramserie(data, ps);
+            App.data.programserieFraSlug.put(programserieSlug, ps);
+          }
+          JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+          ArrayList<Udsendelse> udsendelser = parseUdsendelserForProgramserie(prg, kanal, App.data);
+          ps.tilføjUdsendelser(offset, udsendelser);
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
   }
 }

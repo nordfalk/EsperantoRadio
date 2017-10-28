@@ -7,5 +7,12 @@ import dk.dr.radio.net.volley.Netsvar;
  */
 
 public interface NetsvarBehander {
+  NetsvarBehander TOM = new NetsvarBehander() {
+    @Override
+    public void fikSvar(Netsvar s) throws Exception {
+      // tom - gør intet
+    }
+  };
+
   void fikSvar(Netsvar s) throws Exception;
 }

@@ -100,7 +100,11 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
                 JSONObject data = new JSONObject(s.json);
                 Programserie programserie = GammelDrRadioBackend.instans.parsProgramserie(data, null);
                 JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-                ArrayList<Udsendelse> udsendelser = GammelDrRadioBackend.instans.parseUdsendelserForProgramserie(prg, null, App.data);
+                ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+                for (int n = 0; n < prg.length(); n++) {
+                  uliste.add(GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
+                }
+                ArrayList<Udsendelse> udsendelser = uliste;
                 programserie.tilføjUdsendelser(0, udsendelser);
                 App.data.programserieFraSlug.put(programserieSlug, programserie);
               } else {

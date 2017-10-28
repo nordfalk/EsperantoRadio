@@ -263,16 +263,7 @@ public class App {
       }
 
       if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-        final Kanal kanal = aktuelKanal;
-        App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(aktuelKanal), Request.Priority.HIGH, new NetsvarBehander() {
-          @Override
-          public void fikSvar(Netsvar sv) throws Exception {
-            if (sv.uændret) return; // ingen grund til at parse det igen
-            ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
-            kanal.setStreams(s);
-            Log.d("hentStreams akt fraCache=" + sv.fraCache + " => " + kanal);
-          }
-        });
+        aktuelKanal.getBackend().hentKanalStreams(aktuelKanal, Request.Priority.HIGH, NetsvarBehander.TOM);
       }
       if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
@@ -325,15 +316,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          App.netkald.kald(null, kanal.getBackend().getKanalStreamsUrl(kanal), Request.Priority.LOW, new NetsvarBehander() {
-            @Override
-            public void fikSvar(Netsvar sv) throws Exception {
-              if (sv.uændret) return;
-              ArrayList<Lydstream> s = kanal.getBackend().parsStreams(new JSONObject(sv.json));
-              kanal.setStreams(s);
-              Log.d("hentStreams app fraCache=" + sv.fraCache + " => " + kanal);
-            }
-          });
+          kanal.getBackend().hentKanalStreams(kanal, Request.Priority.HIGH, NetsvarBehander.TOM);
         }
       }
 

@@ -33,7 +33,7 @@ public class AfproevMuOnlineRadioBackend extends BasisAfprøvning {
     for (Kanal kanal : App.grunddata.kanaler) {
       if (kanal.kode.equals("P4F")) continue;
       System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams);
-      assertTrue(kanal.findBedsteStreams(false).size() > 0);
+      assertTrue("Mangler streams for " + kanal , kanal.findBedsteStreams(false).size() > 0);
     }
   }
 

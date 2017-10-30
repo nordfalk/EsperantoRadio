@@ -121,17 +121,6 @@
 			"hejmpaĝoButono": "http://melburno.org.au/3ZZZradio/"
 		}
 	,{
-			"problemo": "2017 25okt: ne funkcias??",
-			"kodo": "radiohavanokubo",
-			"nomo": "Radio Havano Kubo",
-			"emblemoUrl": "http://www.ameriko.org/files/images/rhc-large.160_160.png",
-			"elsendojRssUrl": "http://www.ameriko.org/eo/radiokubo/feed",
-			"elsendojRssIgnoruTitolon": false,
-			// http://radiohc.cu/eo/kontaktu-nin.html
-			//			"retpoŝto": "",
-			"hejmpaĝoButono": "http://radiohc.cu/eo/"
-		}
-	,{
 			"kodo": "radiovatikana",
 			"nomo": "Radio Vatikana",
 			"XXemblemoUrl": "http://eo.radiovaticana.va/img/h_02.gif",
@@ -182,6 +171,17 @@
 			"elsendojRssUrl_HAVAS_ERARON": "radioaktiva.esperanto.org.uy/feed/podcast/",
 			"elsendojRssIgnoruTitolon": false,
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
+		}
+	,{
+			"problemo": "2017 25okt: ne funkcias??",
+			"kodo": "radiohavanokubo",
+			"nomo": "Radio Havano Kubo",
+			"emblemoUrl": "http://www.ameriko.org/files/images/rhc-large.160_160.png",
+			"elsendojRssUrl": "http://www.ameriko.org/eo/radiokubo/feed",
+			"elsendojRssIgnoruTitolon": false,
+			// http://radiohc.cu/eo/kontaktu-nin.html
+			//			"retpoŝto": "",
+			"hejmpaĝoButono": "http://radiohc.cu/eo/"
 		}
 	,{
 			"kodo": "radioverda",

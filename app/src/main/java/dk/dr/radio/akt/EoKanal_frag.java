@@ -55,7 +55,6 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   private EoKanal kanal;
   protected View rod;
   private boolean brugerHarNavigeret;
-  private int antalHentedeSendeplaner;
   public static EoKanal_frag senesteSynligeFragment;
 
   @Override

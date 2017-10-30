@@ -1,7 +1,9 @@
 package dk.radiotv.backend;
 
 import android.app.Application;
+import android.os.Handler;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -9,6 +11,7 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 
 import dk.dr.radio.data.Grunddata;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
@@ -16,6 +19,8 @@ import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by j on 30-10-17.
@@ -36,6 +41,7 @@ public class BasisAfprøvning {
       App.instans = new App();
       App.res = getResources();
       App.assets = getAssets();
+      App.forgrundstråd = new Handler();
       App.pakkenavn = getPackageName();
       App.data = new Programdata();
     }

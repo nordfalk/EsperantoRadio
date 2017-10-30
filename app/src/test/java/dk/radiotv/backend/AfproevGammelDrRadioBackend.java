@@ -38,6 +38,21 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
 
   private static GammelDrRadioBackend backend;
 
+  @Test
+  public void tjekDirekteUdsendelser() throws Exception {
+    assertTrue(App.grunddata.kanaler.size()>0);
+    for (Kanal k : App.grunddata.kanaler) {
+      if (k.kode.equals("P4F")) continue;
+      String url = backend.getKanalStreamsUrl(k);
+      String data = Netkald.hentStreng(url);
+      JSONObject o = new JSONObject(data);
+      ArrayList<Lydstream> s = backend.parsStreams(o);
+      k.setStreams(s);
+      assertTrue(k.findBedsteStreams(false).size() > 0);
+    }
+    //Log.d("DRData.instans.grunddata.kanalFraSlug=" + DRData.instans.grunddata.kanalFraSlug);
+    //assertTrue(Robolectric.setupActivity(Hovedaktivitet.class) != null);
+  }
 
 
   @Test
@@ -114,21 +129,6 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
     System.out.println("tjek_hent_podcast slut");
   }
 
-  @Test
-  public void tjekDirekteUdsendelser() throws Exception {
-    assertTrue(App.grunddata.kanaler.size()>0);
-    for (Kanal k : App.grunddata.kanaler) {
-      if (k.kode.equals("P4F")) continue;
-      String url = backend.getKanalStreamsUrl(k);
-      String data = Netkald.hentStreng(url);
-      JSONObject o = new JSONObject(data);
-      ArrayList<Lydstream> s = backend.parsStreams(o);
-      k.setStreams(s);
-      assertTrue(k.findBedsteStreams(false).size() > 0);
-    }
-    //Log.d("DRData.instans.grunddata.kanalFraSlug=" + DRData.instans.grunddata.kanalFraSlug);
-    //assertTrue(Robolectric.setupActivity(Hovedaktivitet.class) != null);
-  }
 
 
   @Test

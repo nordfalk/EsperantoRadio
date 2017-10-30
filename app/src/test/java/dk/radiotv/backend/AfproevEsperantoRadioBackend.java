@@ -41,6 +41,16 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
   static EsperantoRadioBackend backend;
 
   @Test
+  public void tjekDirekteUdsendelser() throws Exception {
+    assertTrue(App.grunddata.kanaler.size()>0);
+    System.out.println( "kode \tnavn \tslug \tstreams");
+    for (Kanal kanal : App.grunddata.kanaler) {
+      System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams+ " \t" + kanal.getUdsendelse());
+      //assertTrue("Mangler streams for " + kanal , kanal.getUdsendelse().findBedsteStreams(false).size() > 0);
+    }
+  }
+
+  @Test
   public void testLogik() throws Exception {
     assertTrue(App.grunddata.kanaler.size()>0);
     Grunddata ĉefdatumoj2 = App.grunddata;

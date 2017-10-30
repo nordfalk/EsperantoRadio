@@ -114,7 +114,7 @@ public abstract class Backend {
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final NetsvarBehander netsvarBehander) {
     final String datoStr = Datoformater.apiDatoFormat.format(dato);
     if (kanal.harUdsendelserForDag(datoStr)) try { // brug værdier i RAMen
-      netsvarBehander.fikSvar(new Netsvar(null, true, false));
+      netsvarBehander.fikSvar(new Netsvar(null, null, true, false));
       return;
     } catch (Exception e) { Log.rapporterFejl(e); }
 

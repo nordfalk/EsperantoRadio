@@ -9,7 +9,6 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -23,41 +22,14 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevMuOnlineTVBackend.TestApp.class)
-public class AfproevMuOnlineTVBackend {
-
-  public static class TestApp extends Application {
-    @Override
-    public void onCreate() {
-      App.IKKE_Android_VM = true;
-      FilCache.init(new File("/tmp/drradio-cache"));
-      Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
-      super.onCreate();
-      ApplicationSingleton.instans = this;
-      App.instans = new App();
-      App.res = getResources();
-      App.assets = getAssets();
-      App.pakkenavn = getPackageName();
-      App.data = new Programdata();
-
-      App.backend = new Backend[] { backend = new MuOnlineTVBackend()};
-      try {
-        String grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(this));
-        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      App.grunddata.kanaler = backend.kanaler;
-      //App.fejlsøgning = true;
-    }
-  }
+public class AfproevMuOnlineTVBackend extends BasisAfprøvning {
+  public AfproevMuOnlineTVBackend() { super(backend = new MuOnlineTVBackend()); }
 
   static MuOnlineTVBackend backend;
 
@@ -85,14 +57,14 @@ public class AfproevMuOnlineTVBackend {
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
       String url = backend.getUdsendelserPåKanalUrl(kanal, datoStr);
-      String udsPKstr = AfproevGammelDrRadioBackend.hentStreng(url);
+      String udsPKstr = Netkald.hentStreng(url);
       kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(udsPKstr, kanal, dato, App.data), datoStr);
 
       for (Udsendelse u : kanal.udsendelser) {
         url = backend.getUdsendelseStreamsUrl(u);
         Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+u+ "    "+url);
         if (url != null) {
-          JSONObject obj = new JSONObject(AfproevGammelDrRadioBackend.hentStreng(url));
+          JSONObject obj = new JSONObject(Netkald.hentStreng(url));
           Log.d(kanal.navn + ": " + u.startTidKl + " " + u.titel + " " + obj);
           ArrayList<Lydstream> s = backend.parsStreams(obj);
           u.setStreams(s);

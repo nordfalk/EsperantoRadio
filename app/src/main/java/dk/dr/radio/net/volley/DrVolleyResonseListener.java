@@ -31,7 +31,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
     try {
       boolean uændret = response != null && response.equals(cachetVærdi);
       if ("null".equals(response)) response = null;
-      fikSvar(new Netsvar(response, false, uændret));
+      fikSvar(new Netsvar(url, response, false, uændret));
       App.sætErIGang(false, url);
     } catch (Exception e) {
       Log.e(url, e);
@@ -47,7 +47,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
     //error.printStackTrace();
     if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
     try {
-      Netsvar s = new Netsvar(null, false, false);
+      Netsvar s = new Netsvar(url, null, false, false);
       s.fejl = true;
       s.exception = error;
       fikSvar(s);

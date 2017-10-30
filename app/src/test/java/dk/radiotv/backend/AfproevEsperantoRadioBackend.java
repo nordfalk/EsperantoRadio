@@ -35,36 +35,9 @@ import static org.junit.Assert.assertTrue;
  * @author j
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = AfproevEsperantoRadioBackend.TestApp.class)
-public class AfproevEsperantoRadioBackend {
+public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
+  public AfproevEsperantoRadioBackend() { super(backend = new EsperantoRadioBackend()); }
 
-  public static class TestApp extends Application {
-    @Override
-    public void onCreate() {
-      App.IKKE_Android_VM = true;
-      FilCache.init(new File("/tmp/testcache-esperanto"));
-      Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
-      super.onCreate();
-      ApplicationSingleton.instans = this;
-      App.instans = new App();
-      App.data = new Programdata();
-      App.res = getResources();
-      App.assets = getAssets();
-      App.pakkenavn = getPackageName();
-
-      App.backend = new Backend[] { backend = new EsperantoRadioBackend() };
-      App.data = new Programdata();
-      try {
-        String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));
-        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      App.grunddata.kanaler = backend.kanaler;
-      //App.fejlsøgning = true;
-
-    }
-  }
   static EsperantoRadioBackend backend;
 
   @Test

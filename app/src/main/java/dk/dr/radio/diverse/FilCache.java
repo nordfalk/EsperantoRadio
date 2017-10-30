@@ -99,6 +99,7 @@ public class FilCache {
           httpForb.connect();
         } catch (IOException e) {
           if (!cacheFil.exists()) {
+            log("Netværksfejl, for url " + url);
             throw e; // netværksfejl - og vi har ikke en lokal kopi
           }
           log("Netværksfejl, men der er cachet kopi i " + cacheFilnavn);

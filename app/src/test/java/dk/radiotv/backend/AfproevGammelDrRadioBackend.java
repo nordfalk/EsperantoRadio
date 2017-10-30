@@ -2,7 +2,6 @@ package dk.radiotv.backend;
 
 
 import android.app.Application;
-import android.os.Build;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,9 +11,6 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -29,62 +25,25 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
+
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(packageName = "dk.dr.radio.v3", constants = BuildConfig.class, sdk = 21, application = AfproevGammelDrRadioBackend.TestApp.class)
-public class AfproevGammelDrRadioBackend {
-
-  static String hentStreng(String url) throws IOException {
-    //String data = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(url, false, true, 1000 * 60 * 60 * 24 * 7)));
-    if (url==null) return null;
-    url = url.replaceAll("Ø", "%C3%98");
-    url = url.replaceAll("Å", "%C3%85");
-    String fil = FilCache.hentFil(url, true, true, 12 * 1000 * 60 * 60);
-    //Log.d(url + "    -> "+fil);
-    String data = Diverse.læsStreng(new FileInputStream(fil));
-    //Log.d(data);
-    return data;
-  }
-
-  public static class TestApp extends Application {
-    @Override
-    public void onCreate() {
-      App.IKKE_Android_VM = true;
-      FilCache.init(new File("/tmp/drradio-cache"));
-      Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
-      super.onCreate();
-      ApplicationSingleton.instans = this;
-      App.instans = new App();
-      App.res = getResources();
-      App.assets = getAssets();
-      App.pakkenavn = getPackageName();
-      App.data = new Programdata();
-
-      App.backend = new Backend[] { backend = new GammelDrRadioBackend() };
-      try {
-        String grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(this));
-        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      App.grunddata.kanaler = backend.kanaler;
-      //App.fejlsøgning = true;
-    }
-  }
-
+public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
+  public AfproevGammelDrRadioBackend() { super(backend = new GammelDrRadioBackend()); }
 
   private static GammelDrRadioBackend backend;
+
+
 
   @Test
   public void tjek_hent_a_til_å() throws Exception {
     System.out.println("tjek_hent_a_til_å");
-    App.data.programserierAtilÅ.parseAlleProgramserierAtilÅ(hentStreng(backend.getAlleProgramserierAtilÅUrl()));
+    App.data.programserierAtilÅ.parseAlleProgramserierAtilÅ(Netkald.hentStreng(backend.getAlleProgramserierAtilÅUrl()));
     assertTrue(App.data.programserierAtilÅ.liste.size()>0);
 
     int samletAntalUdsendelser = 0;
@@ -92,7 +51,7 @@ public class AfproevGammelDrRadioBackend {
     // Tjek kun nummer 50 til nummer 100
     for (Programserie ps : App.data.programserierAtilÅ.liste.subList(50, 60)) {
       String url = backend.getProgramserieUrl(ps, ps.slug, 0);
-      JSONObject data = new JSONObject(hentStreng(url));
+      JSONObject data = new JSONObject(Netkald.hentStreng(url));
       ps = backend.parsProgramserie(data, ps);
       App.data.programserieFraSlug.put(ps.slug, ps);
       JSONArray prg = data.getJSONArray(DRJson.Programs.name());
@@ -113,7 +72,7 @@ public class AfproevGammelDrRadioBackend {
   @Test
   public void tjek_hent_podcast() throws Exception {
     System.out.println("tjek_hent_podcast");
-    String dat = hentStreng(backend.getBogOgDramaUrl());
+    String dat = Netkald.hentStreng(backend.getBogOgDramaUrl());
     System.out.println("tjek_hent_podcast data = "+ dat);
     App.data.dramaOgBog.parseBogOgDrama(dat);
     // assertThat(i.dramaOgBog.karusel, hasSize(greaterThan(0)));
@@ -128,7 +87,7 @@ public class AfproevGammelDrRadioBackend {
         if (n++ > 3) break; // Tjek kun de første 3.
 
         String url = backend.getProgramserieUrl(ps, ps.slug, 0);
-        JSONObject data = new JSONObject(hentStreng(url));
+        JSONObject data = new JSONObject(Netkald.hentStreng(url));
         ps = backend.parsProgramserie(data, ps);
         App.data.programserieFraSlug.put(ps.slug, ps);
         JSONArray prg = data.getJSONArray(DRJson.Programs.name());
@@ -144,14 +103,14 @@ public class AfproevGammelDrRadioBackend {
         int m = 0;
         for (Udsendelse u : udsendelser) {
           if (m++ > 5) break; // Tjek kun de første 5.
-          ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(hentStreng(backend.getUdsendelseStreamsUrl(u))));
+          ArrayList<Lydstream> s = backend.parsStreams(new JSONObject(Netkald.hentStreng(backend.getUdsendelseStreamsUrl(u))));
           u.setStreams(s);
           assertTrue(u+" kan ikke høres ", u.kanHentes);
         }
       }
       sektionsnummer++;
     }
-    assertTrue("Kun "+sektionsnummer+" sektioenr!", sektionsnummer>3);
+    assertTrue("Kun "+sektionsnummer+" sektioenr!", sektionsnummer>=2);
     System.out.println("tjek_hent_podcast slut");
   }
 
@@ -161,7 +120,7 @@ public class AfproevGammelDrRadioBackend {
     for (Kanal k : App.grunddata.kanaler) {
       if (k.kode.equals("P4F")) continue;
       String url = backend.getKanalStreamsUrl(k);
-      String data = hentStreng(url);
+      String data = Netkald.hentStreng(url);
       JSONObject o = new JSONObject(data);
       ArrayList<Lydstream> s = backend.parsStreams(o);
       k.setStreams(s);
@@ -188,14 +147,14 @@ public class AfproevGammelDrRadioBackend {
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
       String datoStr = Datoformater.apiDatoFormat.format(new Date());
-      kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(hentStreng(backend.getUdsendelserPåKanalUrl(kanal, datoStr)), kanal, new Date(), App.data), "0");
+      kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(Netkald.hentStreng(backend.getUdsendelserPåKanalUrl(kanal, datoStr)), kanal, new Date(), App.data), "0");
       int antalUdsendelser = 0;
       int antalUdsendelserMedPlaylister = 0;
       int antalUdsendelserMedLydstreams = 0;
       for (Udsendelse u : kanal.udsendelser) {
         Log.d("\nudsendelse = " + u);
-        if (antalUdsendelser++>10) break;
-        JSONObject obj = new JSONObject(hentStreng(backend.getUdsendelseStreamsUrl(u)));
+        if (antalUdsendelser++>5) break;
+        JSONObject obj = new JSONObject(Netkald.hentStreng(backend.getUdsendelseStreamsUrl(u)));
         //Log.d(obj.toString(2));
         boolean MANGLER_SeriesSlug = !obj.has(DRJson.SeriesSlug.name());
         ArrayList<Lydstream> s = backend.parsStreams(obj);
@@ -203,7 +162,7 @@ public class AfproevGammelDrRadioBackend {
         if (!u.kanHøres) Log.d("Ingen lydstreams!!");
         else antalUdsendelserMedLydstreams++;
 
-        u.playliste = backend.parsePlayliste(u, new JSONArray(hentStreng(backend.getPlaylisteUrl(u))));
+        u.playliste = backend.parsePlayliste(u, new JSONArray(Netkald.hentStreng(backend.getPlaylisteUrl(u))));
         if (u.playliste.size() > 0) {
           antalUdsendelserMedPlaylister++;
           Log.d("u.playliste= " + u.playliste);
@@ -212,14 +171,14 @@ public class AfproevGammelDrRadioBackend {
         boolean gavNull = false;
         Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
         if (ps == null) try {
-          String str = hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
+          String str = Netkald.hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
           if ("null".equals(str)) gavNull = true;
           else {
             JSONObject data = new JSONObject(str);
             ps = backend.parsProgramserie(data, null);
             JSONArray prg = data.getJSONArray(DRJson.Programs.name());
             ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
-            for (int n = 0; n < prg.length(); n++) {
+            for (int n = 0; n < Math.min(10, prg.length()); n++) {
               uliste.add(backend.parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
             }
             ArrayList<Udsendelse> udsendelser = uliste;

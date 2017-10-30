@@ -21,7 +21,8 @@ public class Netsvar {
   /** Om dette svar helt sikkert efterfølges af et endeligt svar */
   //public boolean foreløbigtSvar;
 
-  public Netsvar(String jsonSvar, boolean fraCache, boolean uændret) {
+  public Netsvar(String url, String jsonSvar, boolean fraCache, boolean uændret) {
+    this.url = url;
     json = jsonSvar;
     this.fraCache = fraCache;
     this.uændret = uændret;

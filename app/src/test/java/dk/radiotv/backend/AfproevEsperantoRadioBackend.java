@@ -42,20 +42,17 @@ public class AfproevEsperantoRadioBackend {
     @Override
     public void onCreate() {
       App.IKKE_Android_VM = true;
-      Udseende.ESPERANTO = true;
       FilCache.init(new File("/tmp/testcache-esperanto"));
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
       super.onCreate();
       ApplicationSingleton.instans = this;
       App.instans = new App();
       App.data = new Programdata();
-      super.onCreate();
-      //App.instans.init(this); - tager tid vi laver det vigtigste herunder
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
+
       App.backend = new Backend[] { backend = new EsperantoRadioBackend() };
-      //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
       App.data = new Programdata();
       try {
         String grunddataStr = Diverse.læsStreng(new FileInputStream("src/main/res/raw/esperantoradio_kanaloj_v8.json"));

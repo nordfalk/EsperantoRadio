@@ -1,6 +1,7 @@
 package dk.radiotv.backend;
 
 
+import android.app.Application;
 import android.os.Build;
 
 import org.json.JSONArray;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
@@ -50,23 +52,32 @@ public class AfproevGammelDrRadioBackend {
     return data;
   }
 
-  public static class TestApp extends ApplicationSingleton {
-    static {
-      App.IKKE_Android_VM = true;
-      Udseende.ESPERANTO = false;
-    }
-
-
+  public static class TestApp extends Application {
     @Override
     public void onCreate() {
-      Log.d("onCreate " + Build.PRODUCT + Build.MODEL);
+      App.IKKE_Android_VM = true;
       FilCache.init(new File("/tmp/drradio-cache"));
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
-      DRBackendTidsformater.servertidsformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); // +01:00 springes over da kolon i +01:00 er ikke-standard Java
       super.onCreate();
-      backend = GammelDrRadioBackend.instans;
+      ApplicationSingleton.instans = this;
+      App.instans = new App();
+      App.res = getResources();
+      App.assets = getAssets();
+      App.pakkenavn = getPackageName();
+      App.data = new Programdata();
+
+      App.backend = new Backend[] { backend = new GammelDrRadioBackend() };
+      try {
+        String grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(this));
+        backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      App.grunddata.kanaler = backend.kanaler;
+      //App.fejlsøgning = true;
     }
   }
+
 
   private static GammelDrRadioBackend backend;
 
@@ -95,7 +106,7 @@ public class AfproevGammelDrRadioBackend {
       assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+url, ps.antalUdsendelser>= udsendelser.size());
       samletAntalUdsendelser += udsendelser.size();
     }
-    //assertTrue("Kun "+samletAntalUdsendelser+" udsendelser!", samletAntalUdsendelser>100);
+    assertTrue("Kun "+samletAntalUdsendelser+" udsendelser!", samletAntalUdsendelser>100);
 
   }
 
@@ -140,6 +151,7 @@ public class AfproevGammelDrRadioBackend {
       }
       sektionsnummer++;
     }
+    assertTrue("Kun "+sektionsnummer+" sektioenr!", sektionsnummer>3);
     System.out.println("tjek_hent_podcast slut");
   }
 
@@ -182,7 +194,7 @@ public class AfproevGammelDrRadioBackend {
       int antalUdsendelserMedLydstreams = 0;
       for (Udsendelse u : kanal.udsendelser) {
         Log.d("\nudsendelse = " + u);
-        antalUdsendelser++;
+        if (antalUdsendelser++>10) break;
         JSONObject obj = new JSONObject(hentStreng(backend.getUdsendelseStreamsUrl(u)));
         //Log.d(obj.toString(2));
         boolean MANGLER_SeriesSlug = !obj.has(DRJson.SeriesSlug.name());

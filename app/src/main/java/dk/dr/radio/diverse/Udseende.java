@@ -5,7 +5,5 @@ package dk.dr.radio.diverse;
  */
 
 public class Udseende {
-    public static boolean UDS_EMDA = false;
-    public static boolean UDS_NICLAS = false;
     public static boolean ESPERANTO = false;
 }

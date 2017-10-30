@@ -39,19 +39,17 @@ public class AfproevMuOnlineRadioBackend {
     @Override
     public void onCreate() {
       App.IKKE_Android_VM = true;
-      Udseende.ESPERANTO = false;
       FilCache.init(new File("/tmp/drradio-cache"));
       Log.d("arbejdsmappe = " + new File(".").getAbsolutePath());
       super.onCreate();
       ApplicationSingleton.instans = this;
       App.instans = new App();
-      //App.instans.init(this); - tager tid vi laver det vigtigste herunder
       App.res = getResources();
       App.assets = getAssets();
       App.pakkenavn = getPackageName();
-      App.backend = new Backend[] { backend = new MuOnlineRadioBackend() };
-      //App.instans.initData(this); - tager tid vi laver det vigtigste herunder
       App.data = new Programdata();
+
+      App.backend = new Backend[] { backend = new MuOnlineRadioBackend() };
       try {
         String grunddataStr = Diverse.læsStreng(backend.getLokaleGrunddata(this));
         backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);

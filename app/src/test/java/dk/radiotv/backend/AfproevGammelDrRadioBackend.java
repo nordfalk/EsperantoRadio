@@ -56,6 +56,75 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
 
 
   @Test
+  public void tjekAktuelleUdsendelser() throws Exception {
+    System.out.println("tjekAktuelleUdsendelser");
+    Programdata i = App.data;// = new DRData();
+    //i.grunddata = new Grunddata();
+    //i.grunddata.parseFællesGrunddata(Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json")));
+
+    //hentSupplerendeData(i.grunddata);
+    //System.exit(0);
+
+    for (Kanal kanal : App.grunddata.kanaler) {
+      Log.d("\n\n===========================================\n\nkanal = " + kanal);
+      if (Kanal.P4kode.equals(kanal.kode)) continue;
+      if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
+
+      String datoStr = Datoformater.apiDatoFormat.format(new Date());
+      kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(Netkald.hentStreng(backend.getUdsendelserPåKanalUrl(kanal, datoStr)), kanal, new Date(), App.data), "0");
+      int antalUdsendelser = 0;
+      int antalUdsendelserMedPlaylister = 0;
+      int antalUdsendelserMedLydstreams = 0;
+      for (Udsendelse u : kanal.udsendelser) {
+        Log.d("\nudsendelse = " + u);
+        if (antalUdsendelser++>5) break;
+        JSONObject obj = new JSONObject(Netkald.hentStreng(backend.getUdsendelseStreamsUrl(u)));
+        //Log.d(obj.toString(2));
+        boolean MANGLER_SeriesSlug = !obj.has(DRJson.SeriesSlug.name());
+        ArrayList<Lydstream> s = backend.parsStreams(obj);
+        u.setStreams(s);
+        if (!u.kanHøres) Log.d("Ingen lydstreams!!");
+        else antalUdsendelserMedLydstreams++;
+
+        u.playliste = backend.parsePlayliste(u, new JSONArray(Netkald.hentStreng(backend.getPlaylisteUrl(u))));
+        if (u.playliste.size() > 0) {
+          antalUdsendelserMedPlaylister++;
+          Log.d("u.playliste= " + u.playliste);
+        }
+
+        boolean gavNull = false;
+        Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
+        if (ps == null) try {
+          String str = Netkald.hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
+          if ("null".equals(str)) gavNull = true;
+          else {
+            JSONObject data = new JSONObject(str);
+            ps = backend.parsProgramserie(data, null);
+            JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+            ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+            for (int n = 0; n < Math.min(10, prg.length()); n++) {
+              uliste.add(backend.parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
+            }
+            ArrayList<Udsendelse> udsendelser = uliste;
+            ps.tilføjUdsendelser(0, udsendelser);
+            i.programserieFraSlug.put(u.programserieSlug, ps);
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        if (MANGLER_SeriesSlug)
+          Log.d("MANGLER_SeriesSlug " + u + " gavNull=" + gavNull + "  fra dagsprogram =" + u.programserieSlug);
+      }
+      assertTrue("Kun " + antalUdsendelserMedLydstreams + " ud af " + antalUdsendelser + " udsendelser kan høres på " + kanal,
+              antalUdsendelserMedLydstreams * 10 > antalUdsendelser);
+      if (!"P1D".contains(kanal.navn)) {
+        assertTrue("Kun " + antalUdsendelserMedPlaylister + " ud af " + antalUdsendelser + " udsendelser har playlister på " + kanal,
+                antalUdsendelserMedPlaylister * 10 > antalUdsendelser);
+      }
+    }
+  }
+
+  @Test
   public void tjek_hent_a_til_å() throws Exception {
     System.out.println("tjek_hent_a_til_å");
     App.data.programserierAtilÅ.parseAlleProgramserierAtilÅ(Netkald.hentStreng(backend.getAlleProgramserierAtilÅUrl()));
@@ -127,76 +196,5 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
     }
     assertTrue("Kun "+sektionsnummer+" sektioenr!", sektionsnummer>=2);
     System.out.println("tjek_hent_podcast slut");
-  }
-
-
-
-  @Test
-  public void tjekAktuelleUdsendelser() throws Exception {
-    System.out.println("tjekAktuelleUdsendelser");
-    Programdata i = App.data;// = new DRData();
-    //i.grunddata = new Grunddata();
-    //i.grunddata.parseFællesGrunddata(Diverse.læsStreng(new FileInputStream("src/main/res/raw/grunddata.json")));
-
-    //hentSupplerendeData(i.grunddata);
-    //System.exit(0);
-
-    for (Kanal kanal : App.grunddata.kanaler) {
-      Log.d("\n\n===========================================\n\nkanal = " + kanal);
-      if (Kanal.P4kode.equals(kanal.kode)) continue;
-      if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
-
-      String datoStr = Datoformater.apiDatoFormat.format(new Date());
-      kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(Netkald.hentStreng(backend.getUdsendelserPåKanalUrl(kanal, datoStr)), kanal, new Date(), App.data), "0");
-      int antalUdsendelser = 0;
-      int antalUdsendelserMedPlaylister = 0;
-      int antalUdsendelserMedLydstreams = 0;
-      for (Udsendelse u : kanal.udsendelser) {
-        Log.d("\nudsendelse = " + u);
-        if (antalUdsendelser++>5) break;
-        JSONObject obj = new JSONObject(Netkald.hentStreng(backend.getUdsendelseStreamsUrl(u)));
-        //Log.d(obj.toString(2));
-        boolean MANGLER_SeriesSlug = !obj.has(DRJson.SeriesSlug.name());
-        ArrayList<Lydstream> s = backend.parsStreams(obj);
-        u.setStreams(s);
-        if (!u.kanHøres) Log.d("Ingen lydstreams!!");
-        else antalUdsendelserMedLydstreams++;
-
-        u.playliste = backend.parsePlayliste(u, new JSONArray(Netkald.hentStreng(backend.getPlaylisteUrl(u))));
-        if (u.playliste.size() > 0) {
-          antalUdsendelserMedPlaylister++;
-          Log.d("u.playliste= " + u.playliste);
-        }
-
-        boolean gavNull = false;
-        Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
-        if (ps == null) try {
-          String str = Netkald.hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
-          if ("null".equals(str)) gavNull = true;
-          else {
-            JSONObject data = new JSONObject(str);
-            ps = backend.parsProgramserie(data, null);
-            JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-            ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
-            for (int n = 0; n < Math.min(10, prg.length()); n++) {
-              uliste.add(backend.parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
-            }
-            ArrayList<Udsendelse> udsendelser = uliste;
-            ps.tilføjUdsendelser(0, udsendelser);
-            i.programserieFraSlug.put(u.programserieSlug, ps);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-        if (MANGLER_SeriesSlug)
-          Log.d("MANGLER_SeriesSlug " + u + " gavNull=" + gavNull + "  fra dagsprogram =" + u.programserieSlug);
-      }
-      assertTrue("Kun " + antalUdsendelserMedLydstreams + " ud af " + antalUdsendelser + " udsendelser kan høres på " + kanal,
-              antalUdsendelserMedLydstreams * 10 > antalUdsendelser);
-      if (!"P1D".contains(kanal.navn)) {
-        assertTrue("Kun " + antalUdsendelserMedPlaylister + " ud af " + antalUdsendelser + " udsendelser har playlister på " + kanal,
-                antalUdsendelserMedPlaylister * 10 > antalUdsendelser);
-      }
-    }
   }
 }

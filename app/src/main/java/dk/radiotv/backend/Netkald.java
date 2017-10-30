@@ -49,6 +49,7 @@ public class Netkald {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      return;
     }
     Request<?> req = new DrVolleyStringRequest(url, new DrVolleyResonseListener() {
       @Override

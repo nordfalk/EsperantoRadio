@@ -17,6 +17,7 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.volley.Netsvar;
 
 import static org.junit.Assert.assertTrue;
 
@@ -41,28 +42,17 @@ public class AfproevMuOnlineRadioBackend extends BasisAfprøvning {
   public void tjekAktuelleUdsendelser() throws Exception {
     Programdata i = App.data;// = new DRData();
     Date dato = new Date(System.currentTimeMillis()-1000*60*60*12);
-    String datoStr = Datoformater.apiDatoFormat.format(dato);
     for (Kanal kanal : App.grunddata.kanaler) {
       if (kanal.kode.equals("P4F")) continue;
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
-      String url = backend.getUdsendelserPåKanalUrl(kanal, datoStr);
-      String udsPKstr = Netkald.hentStreng(url);
-      kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(udsPKstr, kanal, dato, App.data), datoStr);
+      backend.hentUdsendelserPåKanal(this, kanal, dato, NetsvarBehander.TOM);
       int antalUdsendelser = 0;
       int antalUdsendelserMedPlaylister = 0;
       int antalUdsendelserMedLydstreams = 0;
 
       for (Udsendelse u : kanal.udsendelser) {
-        url = backend.getUdsendelseStreamsUrl(u);
-        Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+u+ "    "+url);
-        if (url != null) {
-          JSONObject obj = new JSONObject(Netkald.hentStreng(url));
-          Log.d(kanal.navn + ": " + u.startTidKl + " " + u.titel + " " + obj);
-          ArrayList<Lydstream> s = backend.parsStreams(obj);
-          u.setStreams(s);
-          if (!u.kanHøres) Log.d("Ingen lydstreams!!");
-        }
+        kanal.getBackend().hentUdsendelseStreams(u, NetsvarBehander.TOM);
 
 
         boolean gavNull = false;

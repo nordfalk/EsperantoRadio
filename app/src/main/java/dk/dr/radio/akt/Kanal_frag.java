@@ -164,28 +164,35 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
 
   private void hentSendeplanForDag(final Date dato) {
-    backend.hentUdsendelserPåKanal(this, kanal, dato, new NetsvarBehander() {
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
+    if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
+      opdaterListeMedSendeplanForDag();
+      return;
+    }
+    backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;
         if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
-        else {
-          int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
-          if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
-            opdaterListe();
-          } else {
-            // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
-            Object næstøversteSynlig = liste.get(næstøversteSynligPos);
-            //Log.d("næstøversteSynlig = " + næstøversteSynlig);
-            View v = listView.getChildAt(1);
-            int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
-            opdaterListe();
-            int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
-            listView.setSelectionFromTop(næstøversteSynligNytIndex, næstøversteSynligOffset);
-          }
-        }
+        opdaterListeMedSendeplanForDag();
       }
     });
+  }
+
+  private void opdaterListeMedSendeplanForDag() {
+    int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
+    if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
+      opdaterListe();
+    } else {
+      // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
+      Object næstøversteSynlig = liste.get(næstøversteSynligPos);
+      //Log.d("næstøversteSynlig = " + næstøversteSynlig);
+      View v = listView.getChildAt(1);
+      int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
+      opdaterListe();
+      int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
+      listView.setSelectionFromTop(næstøversteSynligNytIndex, næstøversteSynligOffset);
+    }
   }
 
   public void rulBlødtTilAktuelUdsendelse() {
@@ -528,17 +535,10 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       opdaterSenestSpilletViews(aq2, u2);
       return;
     }
-    App.netkald.kald(this, backend.getPlaylisteUrl(u2), new NetsvarBehander() {
+    backend.hentPlayliste(u2, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
-        if (getActivity() == null) return;
-        // Fix: Senest spillet blev ikke opdateret.
-        if (u2.playliste != null && s.uændret) return; // så har vi allerede den nyeste liste i MEM
-        if (s.json != null && !"null".equals(s.json)) {
-          u2.playliste = backend.parsePlayliste(u2, new JSONArray(s.json));
-        }
-        if (aktuelUdsendelseViewholder == null) return;
+        if (getActivity() == null || aktuelUdsendelseViewholder == null || s.uændret || s.fejl) return;
         opdaterSenestSpilletViews(aq2, u2);
       }
     });

@@ -37,7 +37,7 @@ public class ProgramserierAtilAA {
       Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
       if (programserie == null) {
         // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
-        programserie = new Programserie();
+        programserie = new Programserie(GammelDrRadioBackend.instans);
         GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie);
         App.data.programserieFraSlug.put(programserieSlug, programserie);
       }

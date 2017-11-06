@@ -1,29 +1,16 @@
 package dk.radiotv.backend;
 
-import android.app.Application;
-
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.ApplicationSingleton;
-import dk.dr.radio.diverse.FilCache;
-import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.Diverse;
-import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertTrue;
 
@@ -56,21 +43,10 @@ public class AfproevMuOnlineTVBackend extends BasisAfprøvning {
       if (kanal.kode.equals("P4F")) continue;
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
-      //String url = backend.getUdsendelserPåKanalUrl(kanal, datoStr);
-      //String udsPKstr = Netkald.hentStreng(url);
-      //kanal.setUdsendelserForDag(backend.parseUdsendelserForKanal(udsPKstr, kanal, dato, App.data), datoStr);
-      backend.hentUdsendelserPåKanal(this, kanal, dato, NetsvarBehander.TOM);
+      backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, NetsvarBehander.TOM);
 
       for (Udsendelse u : kanal.udsendelser) {
-        String url = backend.getUdsendelseStreamsUrl(u);
-        Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+u+ "    "+url);
-        if (url != null) {
-          JSONObject obj = new JSONObject(Netkald.hentStreng(url));
-          Log.d(kanal.navn + ": " + u.startTidKl + " " + u.titel + " " + obj);
-          ArrayList<Lydstream> s = backend.parsStreams(obj);
-          u.setStreams(s);
-          if (!u.kanHøres) Log.d("Ingen lydstreams!!");
-        }
+        backend.hentUdsendelseStreams(u, NetsvarBehander.TOM);
       }
     }
   }

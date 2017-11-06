@@ -44,7 +44,6 @@ public class Programdata {
   public HashSet<String> programserieSlugFindesIkke = new HashSet<>();
 
   public SenestLyttede senestLyttede = new SenestLyttede();
-  public Favoritter favoritter = !Udseende.ESPERANTO ? new Favoritter() : new EoFavoritter();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
   public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
   public DramaOgBog dramaOgBog = new DramaOgBog();

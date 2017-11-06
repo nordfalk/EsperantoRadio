@@ -31,11 +31,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
 import com.androidquery.AQuery;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -152,7 +148,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     public void run() {
       if (topView == null) return;
       CheckBox fav = (CheckBox) topView.findViewById(R.id.favorit);
-      fav.setChecked(App.data.favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(udsendelse.getBackend().data.favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
 
@@ -198,7 +194,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
-    App.data.favoritter.observatører.add(opdaterFavoritter);
+    udsendelse.getBackend().data.favoritter.observatører.add(opdaterFavoritter);
     run();
     return rod;
   }
@@ -227,7 +223,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.data.favoritter.erFavorit(udsendelse.programserieSlug));
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(udsendelse.getBackend().data.favoritter.erFavorit(udsendelse.programserieSlug));
     if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
@@ -327,29 +323,10 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed() || kanal.ingenPlaylister) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      App.netkald.kald(this, kanal.getBackend().getPlaylisteUrl(udsendelse), Request.Priority.LOW, new NetsvarBehander() {
+      kanal.getBackend().hentPlayliste(udsendelse, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
-          if (App.fejlsøgning) Log.d("fikSvar playliste(" + s.fraCache + " " + s.url + "   " + this);
-          // Fix: Senest spillet blev ikke opdateret.
-          //if (udsendelse.playliste != null && fraCache) return; // så har vi allerede den nyeste liste i MEM
-          if (udsendelse.playliste != null && s.uændret) return;
-          if (s.json == null || "null".equals(s.json)) return; // fejl
-          Log.d("UDS fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
-          ArrayList<Playlisteelement> playliste = kanal.getBackend().parsePlayliste(udsendelse, new JSONArray(s.json));
-          if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
-            // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
-            // selvom serveren har ombestemt sig, og siger at listen er tom.
-            // Desværre caches den tomme værdi, men der må være grænser for hvor langt vi går
-            Log.d("Server-API gik fra spilleliste med "+udsendelse.playliste.size()+" til tom liste - det ignorerer vi");
-            return;
-          }
-          udsendelse.playliste = playliste;
-//          Log.d("UDS fikSvar playliste: " + json);
-          if (!aktuelUdsendelsePåKanalen()) { // Aktuel udsendelse skal have senest spillet nummer øverst
-            Collections.reverse(udsendelse.playliste); // andre udsendelser skal have stigende tid nedad
-          }
-
+          if (getActivity() == null || s.uændret || s.fejl) return;
           bygListe();
         }
       });
@@ -365,7 +342,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    App.data.favoritter.observatører.remove(opdaterFavoritter);
+    udsendelse.getBackend().data.favoritter.observatører.remove(opdaterFavoritter);
     App.forgrundstråd.removeCallbacks(this);
     super.onDestroyView();
   }
@@ -443,12 +420,18 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         liste.addAll(udsendelse.indslag);
       } else if (udsendelse.playliste != null && udsendelse.playliste.size() > 0) {
         liste.add(OVERSKRIFT_PLAYLISTE_INFO);
-        if (aktuelUdsendelsePåKanalen()) playlisteElemDerSpillerNu = udsendelse.playliste.get(0);
+        ArrayList<Playlisteelement> playliste = udsendelse.playliste;
+        if (aktuelUdsendelsePåKanalen()) playlisteElemDerSpillerNu = playliste.get(0);
+        else { //if (!aktuelUdsendelsePåKanalen()) { // Aktuel udsendelse skal have senest spillet nummer øverst
+          playliste = new ArrayList<Playlisteelement>(playliste);
+          Collections.reverse(playliste); // andre udsendelser skal have stigende tid nedad
+        }
+
         if (visHelePlaylisten) {
-          liste.addAll(udsendelse.playliste);
+          liste.addAll(playliste);
         } else {
-          for (int i = 0; i < udsendelse.playliste.size(); i++) {
-            Playlisteelement e = udsendelse.playliste.get(i);
+          for (int i = 0; i < playliste.size(); i++) {
+            Playlisteelement e = playliste.get(i);
             liste.add(e);
             if (i >= 4) {
               liste.add(VIS_HELE_PLAYLISTEN_KNAP);
@@ -656,7 +639,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       bygListe();
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      App.data.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      udsendelse.getBackend().data.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
       Log.registrérTestet("Valg af favoritprogram", udsendelse.programserieSlug);
     } else {

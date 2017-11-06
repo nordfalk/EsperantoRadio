@@ -11,13 +11,11 @@ import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 
 import static org.junit.Assert.assertTrue;
 
@@ -42,36 +40,21 @@ public class AfproevMuOnlineRadioBackend extends BasisAfprøvning {
   public void tjekAktuelleUdsendelser() throws Exception {
     Programdata i = App.data;// = new DRData();
     Date dato = new Date(System.currentTimeMillis()-1000*60*60*12);
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
     for (Kanal kanal : App.grunddata.kanaler) {
       if (kanal.kode.equals("P4F")) continue;
       if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
 
-      backend.hentUdsendelserPåKanal(this, kanal, dato, NetsvarBehander.TOM);
+      backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, NetsvarBehander.TOM);
       int antalUdsendelser = 0;
       int antalUdsendelserMedPlaylister = 0;
       int antalUdsendelserMedLydstreams = 0;
 
       for (Udsendelse u : kanal.udsendelser) {
         kanal.getBackend().hentUdsendelseStreams(u, NetsvarBehander.TOM);
-
-
         boolean gavNull = false;
         Programserie ps = i.programserieFraSlug.get(u.programserieSlug);
-        if (ps == null) try {
-          String str = Netkald.hentStreng(backend.getProgramserieUrl(null, u.programserieSlug, 0));
-          if ("null".equals(str)) gavNull = true;
-          else {
-            JSONObject data = new JSONObject(str);
-            Log.d(kanal.navn + ": " + u.startTidKl + " "+ u.titel+" "+ps);
-            ps = backend.parsProgramserie(data, null);
-            JSONArray prg = data.getJSONArray(DRJson.Programs.name());
-            ArrayList<Udsendelse> udsendelser = backend.parseUdsendelserForProgramserie(prg, kanal, App.data);
-            ps.tilføjUdsendelser(0, udsendelser);
-            i.programserieFraSlug.put(u.programserieSlug, ps);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        backend.hentProgramserie(ps, u.programserieSlug, kanal, 0, NetsvarBehander.TOM);
         if (antalUdsendelser++>20) break;
       }
     }

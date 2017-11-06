@@ -157,9 +157,9 @@ public class App {
     }
 
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
-//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 //            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -314,9 +314,9 @@ public class App {
         }
       }
 
-      if (data.favoritter.getAntalNyeUdsendelser() < 0) {
+      for (Backend b : App.backend) if (b.data.favoritter.getAntalNyeUdsendelser() < 0) {
         færdig = false;
-        data.favoritter.startOpdaterAntalNyeUdsendelser.run();
+        b.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
       }
 
 
@@ -368,13 +368,13 @@ public class App {
             String nyeGrunddata = s.json.trim();
             String gamleGrunddata = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
             if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
-            Log.d("Vi fik nye grunddata: fraCache=" + s.fraCache);
+            Log.d("Vi fik nye grunddata for "+backend+" : fraCache=" + s.fraCache);
             if (!PRODUKTION || App.fejlsøgning) {
               if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
               Log.d("ny="+nyeGrunddata.length()+" "+nyeGrunddata.hashCode()+ " "+nyeGrunddata.replace('\n',' '));
               if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.substring(gamleGrunddata.length()-20).replace('\n',' ')+"'XX");
               Log.d("ny="+nyeGrunddata.substring(nyeGrunddata.length()-20).replace('\n',' ')+"'XX");
-              App.kortToast("Vi fik nye grunddata");
+              App.kortToast("Vi fik nye grunddata for\n"+backend);
             }
             try {
               backend.initGrunddata(grunddata, nyeGrunddata);

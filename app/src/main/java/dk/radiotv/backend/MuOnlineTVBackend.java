@@ -147,7 +147,7 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
   }
 
   public Programserie parseAlleAfsnitAfProgramserie(String programserieSlug, Programserie programserie) {
-    if (programserie == null) programserie = new Programserie();
+    if (programserie == null) programserie = new Programserie(this);
     return programserie;
   }
 

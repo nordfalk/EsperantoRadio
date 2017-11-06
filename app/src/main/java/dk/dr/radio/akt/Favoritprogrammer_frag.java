@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.radiotv.backend.Backend;
 import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -40,7 +42,6 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   private ListView listView;
   private ArrayList<Object> liste = new ArrayList<Object>(); // Indeholder både udsendelser og -serier
   protected View rod;
-  Favoritter favoritter = App.data.favoritter;
   private static long sidstOpdateretAntalNyeUdsendelser;
 
   @Override
@@ -59,12 +60,16 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
 
     aq.id(R.id.overskrift).typeface(App.skrift_gibson_fed).text(getString(R.string.Dine_favoritter)).getTextView();
 
-    favoritter.observatører.add(this);
-    run();
-    if (favoritter.getAntalNyeUdsendelser() < 0 || sidstOpdateretAntalNyeUdsendelser > System.currentTimeMillis() + 1000 * 60 * 10) {
-      // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
-      App.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
-      sidstOpdateretAntalNyeUdsendelser = System.currentTimeMillis();
+    boolean opdater = sidstOpdateretAntalNyeUdsendelser > System.currentTimeMillis() + 1000 * 60 * 10;
+    if (opdater) sidstOpdateretAntalNyeUdsendelser = System.currentTimeMillis();
+
+    for (Backend b : App.backend) {
+      b.data.favoritter.observatører.add(this);
+      run();
+      if (b.data.favoritter.getAntalNyeUdsendelser() < 0 || opdater) {
+        // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
+        b.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
+      }
     }
 
     return rod;
@@ -72,7 +77,9 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
 
   @Override
   public void onDestroyView() {
-    favoritter.observatører.remove(this);
+    for (Backend b : App.backend) {
+      b.data.favoritter.observatører.remove(this);
+    }
     super.onDestroyView();
   }
 
@@ -81,13 +88,14 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   public void run() {
     App.forgrundstråd.removeCallbacks(this); // Ingen gentagne kald
     liste.clear();
-    try {
-      ArrayList<String> pss = new ArrayList<String>(favoritter.getProgramserieSlugSæt());
+    for (Backend b : App.backend) try {
+      if (!(b instanceof GammelDrRadioBackend)) continue; // fix for nu
+      ArrayList<String> pss = new ArrayList<>(b.data.favoritter.getProgramserieSlugSæt());
       Collections.sort(pss);
-      Log.d(this + " psss = " + pss);
+      Log.d(this + " "+b +" psss = " + pss);
       for (final String programserieSlug : pss) {
         Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
-        if (programserie != null) liste.add(programserie);
+        if (programserie != null) liste.add(new Pair(b, programserie));
         else {
           if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
           Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
@@ -134,14 +142,15 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
     @Override
     public View getView(int position, View v, ViewGroup parent) {
       try {
-        if (v == null) v = getLayoutInflater(null).inflate(R.layout.listeelem_2linjer, parent, false);
+        if (v == null) v = getActivity().getLayoutInflater().inflate(R.layout.listeelem_2linjer, parent, false);
         AQuery aq = new AQuery(v);
-
-        Object obj = liste.get(position);
+        Pair elem = (Pair) liste.get(position);
+        Backend b = (Backend) elem.first;
+        Object obj = elem.second;
         if (obj instanceof Programserie) {
           Programserie ps = (Programserie) obj;
           aq.id(R.id.linje1).text(ps.titel).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
-          int n = favoritter.getAntalNyeUdsendelser(ps.slug);
+          int n = b.data.favoritter.getAntalNyeUdsendelser(ps.slug);
           String txt = (n == 1 ? n + getString(R.string._ny_udsendelse) : n + getString(R.string._nye_udsendelser));
           aq.id(R.id.linje2).text(txt).typeface(App.skrift_gibson);
           aq.id(R.id.stiplet_linje).visibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
@@ -164,7 +173,9 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
 
   @Override
   public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
-    Object obj = liste.get(position);
+    Pair elem = (Pair) liste.get(position);
+    Backend b = (Backend) elem.first;
+    Object obj = elem.second;
     if (obj instanceof Programserie) {
       Programserie programserie = (Programserie) obj;
       Fragment f = new Programserie_frag();

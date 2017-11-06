@@ -30,6 +30,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
+import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 
 /**
@@ -37,6 +38,10 @@ import dk.dr.radio.v3.R;
  */
 
 public class EsperantoRadioBackend extends Backend {
+  private static EsperantoRadioBackend instans;
+
+  public EsperantoRadioBackend() { instans = this; }
+
   @Override
   protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
 
@@ -290,7 +295,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   static void eo_opdaterProgramserieFraKanal(EoKanal k) {
     Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
-      ps = new Programserie();
+      ps = new Programserie(instans);
       ps.billedeUrl = k.eo_emblemoUrl;
       ps.beskrivelse = k.getNavn();
       ps.slug = k.slug;
@@ -303,4 +308,11 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     ps.antalUdsendelser = k.udsendelser.size();
   }
 
+  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
+    try {
+      netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

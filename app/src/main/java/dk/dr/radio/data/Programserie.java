@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.radiotv.backend.Backend;
 
 /**
  * Created by j on 01-03-14.
@@ -26,9 +27,18 @@ public class Programserie { //implements Serializable {
   private ArrayList<Udsendelse> udsendelserListe;
   private TreeMap<Integer, List<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, List<Udsendelse>>();
   private TreeSet<Udsendelse> udsendelserSorteret;
+  public final Backend backend;
 
   //tv
   public HashMap<String, Sæson> sæsoner;
+
+  public Programserie(Backend backend) {
+    this.backend = backend;
+  }
+
+  public Backend getBackend() {
+    return backend;
+  }
 
   public ArrayList<Udsendelse> getUdsendelser() {
     return udsendelserListe;
@@ -81,6 +91,6 @@ public class Programserie { //implements Serializable {
 
   @Override
   public String toString() {
-    return "ps:" + slug;
+    return "ps:" + slug+ " (uds: "+getUdsendelser()+")";
   }
 }

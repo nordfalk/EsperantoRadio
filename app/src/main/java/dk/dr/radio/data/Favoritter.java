@@ -2,10 +2,7 @@ package dk.dr.radio.data;
 
 import android.content.SharedPreferences;
 
-import com.android.volley.Request;
-
-import org.json.JSONObject;
-
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,8 +13,7 @@ import java.util.Set;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.radiotv.backend.Backend;
 
 /**
  * Håndtering af favoritter.
@@ -26,9 +22,9 @@ import dk.radiotv.backend.NetsvarBehander;
 public class Favoritter {
   private static final String PREF_NØGLE = "favorit til startdato";
   private HashMap<String, String> favoritTilStartdato;
-  public HashMap<String, Integer> favoritTilAntalDagsdato = new HashMap<String, Integer>();
+  protected HashMap<String, Integer> favoritTilAntalDagsdato = new HashMap<>();
   private int antalNyeUdsendelser = -1;
-  public List<Runnable> observatører = new ArrayList<Runnable>();
+  public List<Runnable> observatører = new ArrayList<>();
   private SharedPreferences prefs;
 
 
@@ -45,7 +41,7 @@ public class Favoritter {
   private void gem() {
     String str = mapTilStreng(favoritTilStartdato);
     Log.d("Favoritter: gemmer " + str);
-    prefs.edit().putString(PREF_NØGLE, str).commit();
+    prefs.edit().putString(PREF_NØGLE, str).apply();;
   }
 
   public void sætFavorit(String programserieSlug, boolean checked) {
@@ -90,7 +86,6 @@ public class Favoritter {
     @Override
     public void run() {
       tjekDataOprettet();
-      //if (dd.equals(dato) && favoritTilAntalDagsdato.keySet().equals(favoritTilStartdato.keySet())) return;
       Log.d("Favoritter: Opdaterer favoritTilStartdato=" + favoritTilStartdato + "  favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
       for (final String programserieSlug : favoritTilStartdato.keySet()) {
         String dato = favoritTilStartdato.get(programserieSlug);
@@ -100,21 +95,38 @@ public class Favoritter {
   };
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
-    String url = null;// UDESTÅR GammelDrRadioBackend.instans.getFavoritterNyeProgrammerSiden(programserieSlug, dato);
-    App.netkald.kald(null, url, Request.Priority.LOW, new NetsvarBehander() {
-      @Override
-      public void fikSvar(Netsvar s) throws Exception {
-        if (!s.uændret && s.json != null && !"null".equals(s.json)) {
-          JSONObject data = new JSONObject(s.json);
-          favoritTilAntalDagsdato.put(programserieSlug, data.getInt("TotalPrograms"));
-        }
-        //Log.d("favoritter fikSvar(" + fraCache + " " + url + " " + json + " så nu er favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
-        App.forgrundstråd.postDelayed(beregnAntalNyeUdsendelser, 500); // Vent 1/2 sekund på eventuelt andre svar
+    Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
+    if (ps==null) return; // Kial / kiel okazas?
+    int antal = 0;
+    try {
+      Date ekde = Datoformater.apiDatoFormat.parse(dato);
+      for (Udsendelse u : ps.getUdsendelser()) {
+        if (u.startTid.after(ekde)) antal++;
       }
-    });
+    } catch (ParseException e) {
+      Log.rapporterFejl(e);
+    }
+    favoritTilAntalDagsdato.put(programserieSlug, antal);
+    App.forgrundstråd.postDelayed(beregnAntalNyeUdsendelser, 50); // Vent 1/2 sekund på eventuelt andre svar
   }
 
-  public Runnable beregnAntalNyeUdsendelser = new Runnable() {
+/* GammelDrRadioBackend
+  protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
+    String url = GammelDrRadioBackend.instans.getFavoritterNyeProgrammerSiden(programserieSlug, dato);
+        App.netkald.kald(null, url, Request.Priority.LOW, new NetsvarBehander() {
+          @Override
+          public void fikSvar(Netsvar s) throws Exception {
+            if (!s.uændret && s.json != null && !"null".equals(s.json)) {
+              JSONObject data = new JSONObject(s.json);
+              favoritTilAntalDagsdato.put(programserieSlug, data.getInt("TotalPrograms"));
+            }
+            //Log.d("favoritter fikSvar(" + fraCache + " " + url + " " + json + " så nu er favoritTilAntalDagsdato=" + favoritTilAntalDagsdato);
+            App.forgrundstråd.postDelayed(beregnAntalNyeUdsendelser, 500); // Vent 1/2 sekund på eventuelt andre svar
+          }
+        });
+      }
+   */
+  protected Runnable beregnAntalNyeUdsendelser = new Runnable() {
     @Override
     public void run() {
       App.forgrundstråd.removeCallbacks(this);
@@ -129,7 +141,7 @@ public class Favoritter {
         Log.d("Favoritter: Ny favoritTilStartdato=" + favoritTilStartdato);
         Log.d("Favoritter: Fortæller observatører at antalNyeUdsendelser er ændret fra " + antalNyeUdsendelser + " til " + antalNyeIAlt);
         antalNyeUdsendelser = antalNyeIAlt;
-        for (Runnable r : new ArrayList<Runnable>(observatører)) r.run();  // Informér observatører - i forgrundstråden
+        for (Runnable r : observatører) r.run();  // Informér observatører - i forgrundstråden
       }
     }
   };
@@ -147,7 +159,7 @@ public class Favoritter {
   /*
 <string name="favorit til startdato">,p1-radioavis 2014-09-25,p3-nyheder 2014-09-25,pressen 2014-09-25</string>
    */
-  public static HashMap<String, String> strengTilMap(String str) {
+  private static HashMap<String, String> strengTilMap(String str) {
     HashMap<String, String> map = new HashMap<String, String>();
     for (String linje : str.split(",")) try {
       if (linje.length() == 0) continue;
@@ -157,7 +169,7 @@ public class Favoritter {
     return map;
   }
 
-  public static String mapTilStreng(HashMap<String, String> map) {
+  private static String mapTilStreng(HashMap<String, String> map) {
     StringBuilder sb = new StringBuilder(map.size() * 64);
     for (Map.Entry<String, String> e : map.entrySet()) {
       sb.append(',').append(e.getKey()).append(' ').append(e.getValue());

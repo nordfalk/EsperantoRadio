@@ -100,11 +100,11 @@ public class FangBrowseRadioIntent_akt extends Activity {
     final int tidsangivelse = tidsangivelse0;
 
 
-    final Udsendelse udsendelse = App.data.udsendelseFraSlug.get(udsendelseSlug);
+    Udsendelse udsendelse = App.data.udsendelseFraSlug.get(udsendelseSlug);
     if (udsendelse != null) {
       visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
     } else {
-      App.netkald.kald(this, GammelDrRadioBackend.instans.getUdsendelseUrlFraSlug(udsendelseSlug), new NetsvarBehander() {
+      GammelDrRadioBackend.instans.hentUdsendelseStreamsFraSlug(udsendelseSlug, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.fejl) {
@@ -114,14 +114,8 @@ public class FangBrowseRadioIntent_akt extends Activity {
           if (sv.uændret) return;
           Log.d("hentStreams fikSvar(" + sv.fraCache + " " + sv.url);
           if (sv.json != null) {
-            JSONObject o = new JSONObject(sv.json);
-            Udsendelse udsendelse2 = GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, o);
-            ArrayList<Lydstream> s = GammelDrRadioBackend.instans.parsStreams(o);
-            udsendelse2.setStreams(s);
-            udsendelse2.indslag = GammelDrRadioBackend.instans.parsIndslag(o);
-            udsendelse2.shareLink = o.optString(DRJson.ShareLink.name());
-
-            visUdsendelseFrag(kanalSlug, udsendelse2, tidsangivelse);
+            Udsendelse udsendelse = App.data.udsendelseFraSlug.get(udsendelseSlug);
+            visUdsendelseFrag(kanalSlug, udsendelse, tidsangivelse);
           }
           luk();
         }

@@ -6,10 +6,7 @@ import com.android.volley.Request;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
 
-import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
@@ -17,7 +14,6 @@ import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;
 import dk.dr.radio.net.volley.DrVolleyStringRequest;
 import dk.dr.radio.net.volley.Netsvar;
-import dk.dr.radio.v3.R;
 
 /**
  * Created by j on 09-10-17.
@@ -41,6 +37,7 @@ public class Netkald {
   }
 
   public void kald(final Object kalder, final String url, final Request.Priority priority, final NetsvarBehander netsvarBehander) {
+    Log.d("Netkald "+url);
     if (url==null) return;
     if (App.IKKE_Android_VM) {
       try {
@@ -61,7 +58,6 @@ public class Netkald {
     ) {
       @Override
       public Request.Priority getPriority() {
-        Log.d("getPriority "+url);
         if (priority!=null) return priority;
         if (kalder instanceof Fragment) {
           Fragment f = (Fragment) kalder;

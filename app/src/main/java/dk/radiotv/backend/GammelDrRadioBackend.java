@@ -2,6 +2,8 @@ package dk.radiotv.backend;
 
 import android.content.Context;
 
+import com.android.volley.Request;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +45,7 @@ public class GammelDrRadioBackend extends Backend {
   @Override
   protected void ikkeImplementeret() { _ikkeImplementeret(); }
 
+  @Override
   public String getGrunddataUrl() {
     // "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";
     if (App.PRODUKTION) return "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.drxml";
@@ -52,12 +55,14 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     else return "http://android.lundogbendsen.dk/drradiov3_grunddata.json";
   }
 
+  @Override
   public InputStream getLokaleGrunddata(Context ctx) {
     return ctx.getResources().openRawResource(R.raw.grunddata);
   }
 
   private static boolean serverapi_ret_forkerte_offsets_i_playliste;
 
+  @Override
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     JSONObject android_json = grunddata.android_json = grunddata.json.getJSONObject("android");
@@ -128,24 +133,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   private static final String HTTP_WWW_DR_DK = "http://www.dr.dk";
   private static final int HTTP_WWW_DR_DK_lgd = HTTP_WWW_DR_DK.length();
 
-  @Override
-  public String getUdsendelseStreamsUrl(Udsendelse u) {
-    // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
-    return BASISURL + "/program?includeStreams=true&urn=" + u.urn;
-  }
-
-  /** Bruges kun fra FangBrowseIntent */
-  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
-    return BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
-  }
-
-
-  @Override
-  String getKanalStreamsUrl(Kanal kanal) {
-    //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
-    return BASISURL + "/channel/" + kanal.slug + "?includeStreams=true";
-  }
-
 
   /**
    * Parse en stream.
@@ -157,8 +144,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
    * @throws JSONException
    */
 
-  @Override
-  public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
+  private ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
     JSONArray jsonArray = jsonobj.getJSONArray(DRJson.Streams.name());
     ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
     for (int n = 0; n < jsonArray.length(); n++)
@@ -185,6 +171,22 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return lydData;
   }
 
+  @Override
+  public void hentKanalStreams(final Kanal kanal, Request.Priority priority, final NetsvarBehander netsvarBehander) {
+    //return BASISURL + "/channel?includeStreams=true&urn=" + urn;
+    App.netkald.kald(null, BASISURL + "/channel/" + kanal.slug + "?includeStreams=true", priority, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          kanal.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
 
 
   /* ------------------------------------------------------------------------------ */
@@ -192,8 +194,18 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   /* ------------------------------------------------------------------------------ */
 
   @Override
-  public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
-    return BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
+  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+    String url = BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
+    App.netkald.kald(kalder, url, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(kanal + "Backend hentSendeplanForDag fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          kanal.setUdsendelserForDag(parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
   }
 
   public String getAlleProgramserierAtilÅUrl() {
@@ -208,11 +220,10 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       http://www.dr.dk/tjenester/mu-apps/new-programs-since/2014-02-13?urn=urn:dr:mu:bundle:4f3b8b29860d9a33ccfdb775
       … den kan også bruges med slug:
       http://www.dr.dk/tjenester/mu-apps/new-programs-since/monte-carlo/2014-02-13
-     */
-  //@Override
   public String getFavoritterNyeProgrammerSiden(String programserieSlug, String dato) {
     return BASISURL + "/new-programs-since/" + programserieSlug + "/" + dato;
   }
+     */
 
 
   /**
@@ -225,11 +236,11 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return url;
   }
 
-  private static Udsendelse opretUdsendelse(Programdata programdata, JSONObject o) throws JSONException {
+  private static Udsendelse opretUdsendelse(Programdata data, JSONObject o) throws JSONException {
     String slug = o.optString(DRJson.Slug.name());  // Bemærk - kan være tom!
     Udsendelse u = new Udsendelse();
     u.slug = slug;
-    programdata.udsendelseFraSlug.put(u.slug, u);
+    data.udsendelseFraSlug.put(u.slug, u);
     u.titel = o.getString(DRJson.Title.name());
     u.beskrivelse = o.getString(DRJson.Description.name());
     u.billedeUrl = fjernHttpWwwDrDk(o.optString(DRJson.ImageUrl.name(), null));
@@ -242,8 +253,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   /**
    * Parser udsendelser for getKanal. A la http://www.dr.dk/tjenester/mu-apps/schedule/P3/0
    */
-  @Override
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+  private ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
     String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
     JSONArray jsonArray = new JSONArray(jsonStr);
 
@@ -271,8 +281,8 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return uliste;
   }
 
-  public Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
-    Udsendelse u = opretUdsendelse(programdata, o);
+  public Udsendelse parseUdsendelse(Kanal kanal, Programdata data, JSONObject o) throws JSONException {
+    Udsendelse u = opretUdsendelse(data, o);
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
     u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.BroadcastStartTime.name()));
@@ -295,9 +305,27 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   /* -                     Playlister                                             - */
   /* ------------------------------------------------------------------------------ */
 
-  @Override
-  public String getPlaylisteUrl(Udsendelse u) {
-    return BASISURL + "/playlist/" + u.slug + "/0";
+  public void hentPlayliste(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
+    String url = BASISURL + "/playlist/" + udsendelse.slug + "/0";
+    App.netkald.kald(this, url, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
+        if (!s.uændret && !s.fejl && s.json != null && !"null".equals(s.json)) {
+          ArrayList<Playlisteelement> playliste = parsePlayliste(udsendelse, new JSONArray(s.json));
+          if (playliste.size()==0 && udsendelse.playliste!=null && udsendelse.playliste.size()>0) {
+            // Server-API er desværre ikke så stabilt - behold derfor en spilleliste med elementer,
+            // selvom serveren har ombestemt sig, og siger at listen er tom.
+            // Desværre caches den tomme værdi, men der må være grænser for hvor langt vi går
+            Log.d("Server-API gik fra spilleliste med "+udsendelse.playliste.size()+" til tom liste - det ignorerer vi");
+            return;
+          }
+          udsendelse.playliste = playliste;
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+
   }
 
   /*
@@ -309,8 +337,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     Played: "2014-02-06T15:58:33",
     OffsetMs: 6873000
      */
-  @Override
-  public ArrayList<Playlisteelement> parsePlayliste(Udsendelse udsendelse, JSONArray jsonArray) throws JSONException {
+  private ArrayList<Playlisteelement> parsePlayliste(Udsendelse udsendelse, JSONArray jsonArray) throws JSONException {
     ArrayList<Playlisteelement> liste = new ArrayList<Playlisteelement>();
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
@@ -346,7 +373,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     }
   }
 
-
   /* ------------------------------------------------------------------------------ */
   /* -                     Indslag                                                - */
   /* ------------------------------------------------------------------------------ */
@@ -366,8 +392,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   OffsetMs: 1096360
   },
      */
-  @Override
-  public ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
+  private ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
     JSONArray jsonArray = jsonObj.optJSONArray(DRJson.Chapters.name());
     if (jsonArray == null) return liste;
@@ -387,7 +412,6 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   /* -                     Programserier                                          - */
   /* ------------------------------------------------------------------------------ */
 
-  @Override
   public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
     if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
     // http://www.dr.dk/tjenester/mu-apps/series/monte-carlo?type=radio&includePrograms=true
@@ -404,9 +428,8 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
    * @return objektet
    * @throws JSONException
    */
-  @Override
   public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
-    if (ps == null) ps = new Programserie();
+    if (ps == null) ps = new Programserie(this);
     ps.titel = o.getString(DRJson.Title.name());
     ps.undertitel = o.optString(DRJson.Subtitle.name(), ps.undertitel);
     ps.beskrivelse = o.optString(DRJson.Description.name());
@@ -417,10 +440,61 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     return ps;
   }
 
+  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(this, getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d("fikSvar(" + s.fraCache + " " + s.url);
+        if (s.json != null && !s.uændret) {
+          JSONObject data = new JSONObject(s.json);
+          Programserie ps = programserie;
+          if (offset == 0) {
+            ps = parsProgramserie(data, ps);
+            App.data.programserieFraSlug.put(programserieSlug, ps);
+          }
+          JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+          ArrayList<Udsendelse> uliste = new ArrayList<>();
+          for (int n = 0; n < Math.min(10, prg.length()); n++) {
+            uliste.add(parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
+          }
+          ArrayList<Udsendelse> udsendelser = uliste;
+          ps.tilføjUdsendelser(0, udsendelser);
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
+  /** Bruges kun fra FangBrowseIntent */
+  public void hentUdsendelseStreamsFraSlug(String udsendelseSlug, final NetsvarBehander netsvarBehander) {
+    String url = BASISURL + "/program/" + udsendelseSlug + "?type=radio&includeStreams=true";
+    App.netkald.kald(this, url, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          Udsendelse udsendelse = parseUdsendelse(null, App.data, o);
+          udsendelse.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
+
+          udsendelse.indslag = parsIndslag(o);
+          udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
+          // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
+          // der ikke er en programserie, og videre navigering derfor skal slås fra
+          if (!o.has(DRJson.SeriesSlug.name())) {
+            App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
+          }
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
 
 
   public void hentUdsendelseStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
-    App.netkald.kald(this, getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
+    // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
+    String url = BASISURL + "/program?includeStreams=true&urn=" + udsendelse.urn;
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.json != null && !s.uændret) {

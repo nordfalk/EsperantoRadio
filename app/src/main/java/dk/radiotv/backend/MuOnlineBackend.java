@@ -74,13 +74,6 @@ abstract class MuOnlineBackend extends Backend {
       k.setStreams(parseKanalStreams(j));
     }
   }
-/*
-  @Override
-  public String getKanalStreamsUrl(Kanal kanal) {
-    //return null; // ikke nødvendigt - vi har det fra grunddata
-    return BASISURL + "/channel/" + kanal.slug;
-  }
-*/
 
 
   private ArrayList<Lydstream> parseKanalStreams(JSONObject jsonObject) throws JSONException {
@@ -125,28 +118,28 @@ abstract class MuOnlineBackend extends Backend {
   }
 
 
-
-  @Override
-  public String getUdsendelseStreamsUrl(Udsendelse u) {
+  public void hentUdsendelseStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     // http://www.dr.dk/mu-online/api/1.3/programcard/dokumania-37-tavse-vidner
     // return BASISURL + "/programcard/" + u.slug;
-    if (u.ny_streamDataUrl==null) Log.d("getUdsendelseStreamsUrl: Ingen streams for " + u);
-    return u.ny_streamDataUrl;
+    if (udsendelse.ny_streamDataUrl==null) Log.d("getUdsendelseStreamsUrl: Ingen streams for " + udsendelse);
+    App.netkald.kald(null, udsendelse.ny_streamDataUrl, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.json != null && !s.uændret) {
+          JSONObject o = new JSONObject(s.json);
+          udsendelse.setStreams(parsStreams(o));
+          Log.d("Streams parset for = " + s.url);//Data opdateret
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
   }
 
-  /** Bruges kun fra FangBrowseIntent */
-  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
-    return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
-    // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
-    // http://www.dr.dk/mu-online/api/1.3/programcard/lagsus-2017-03-14
-    // http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=urn:dr:mu:bundle:57d7b0c86187a40ef406898b
-  }
 
   //Fra primary asset
 //    http://www.dr.dk/mu-online/api/1.3/manifest/urn:dr:mu:manifest:58acd5e56187a40d68d0d829
-  @Override
-  public ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
+  ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
     ArrayList<Lydstream> lydData = new ArrayList<>();
 
     String subtitles = null;
@@ -184,15 +177,31 @@ abstract class MuOnlineBackend extends Backend {
     return lydData;
   }
 
-  @Override
-  public String getUdsendelserPåKanalUrl(Kanal kanal, String datoStr) {
-    // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
-    return BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
+  /** Bruges kun fra FangBrowseIntent */
+  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
+    return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
+    // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
+    // http://www.dr.dk/mu-online/api/1.3/programcard/lagsus-2017-03-14
+    // http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=urn:dr:mu:bundle:57d7b0c86187a40ef406898b
   }
 
+  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+    // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
+    String url = BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
+    App.netkald.kald(kalder, url, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(kanal + "Backend hentSendeplanForDag fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          kanal.setUdsendelserForDag(parseUdsendelserForKanal(s.json, kanal, dato, App.data), datoStr);
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
 
   //    http://www.dr.dk/mu-online/api/1.3/schedule/dr1?broadcastdate=2017-03-13%2022:27:13
-  public ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
+  private ArrayList<Udsendelse> parseUdsendelserForKanal(String jsonStr, Kanal kanal, Date dato, Programdata programdata) throws JSONException {
     String dagsbeskrivelse = Datoformater.getDagsbeskrivelse(dato);
     JSONArray jsonArray = new JSONObject(jsonStr).getJSONArray("Broadcasts");
 
@@ -246,40 +255,24 @@ abstract class MuOnlineBackend extends Backend {
 
   private static final boolean BRUG_URN = true;
 
-  @Override
-  public String getProgramserieUrl(Programserie ps, String programserieSlug, int offset) {
-    if (App.TJEK_ANTAGELSER && ps!=null && !programserieSlug.equals(ps.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps.slug);
+
+  public void hentProgramserie(final Programserie ps0, final String programserieSlug, final Kanal kanal_ubrugt, final int offset, final NetsvarBehander netsvarBehander) {
+    if (App.TJEK_ANTAGELSER && ps0!=null && !programserieSlug.equals(ps0.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps0.slug);
     // https://www.dr.dk/mu-online/api/1.4/list/den-roede-trad?limit=60
-    if (BRUG_URN && ps != null)
-      return BASISURL + "/list/" + ps.urn + "?limit=30&offset="+offset;
-    return BASISURL + "/list/" + programserieSlug + "?limit=30&offset="+offset;
-  }
+    String url = (BRUG_URN && ps0 != null && ps0.urn!=null)?
+            BASISURL + "/list/" + ps0.urn + "?limit=30&offset="+offset :
+            BASISURL + "/list/" + programserieSlug + "?limit=30&offset="+offset;
 
-
-  /**
-   * Parser et Programserie-objekt
-   * @param o  JSON
-   * @param ps et eksisterende objekt, der skal opdateres, eller null
-   * @return objektet
-   * @throws JSONException
-   */
-  @Override
-  public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
-    if (ps == null) ps = new Programserie();
-    ps.titel = o.getString(DRJson.Title.name());
-    return ps;
-  }
-
-  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
-    App.netkald.kald(this, getProgramserieUrl(programserie, programserieSlug, offset), new NetsvarBehander() {
+    App.netkald.kald(this, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         Log.d("fikSvar(" + s.fraCache + " " + s.url);
         if (s.json != null && !s.uændret) {
           JSONObject data = new JSONObject(s.json);
-          Programserie ps = programserie;
+          Programserie ps = ps0;
           if (offset == 0) {
-            ps = parsProgramserie(data, ps);
+            if (ps == null) ps = new Programserie(MuOnlineBackend.this);
+            ps.titel = data.getString(DRJson.Title.name());
             ps.slug = programserieSlug;
             App.data.programserieFraSlug.put(programserieSlug, ps);
           }

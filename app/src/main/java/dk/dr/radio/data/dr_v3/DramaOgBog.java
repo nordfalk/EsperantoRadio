@@ -66,7 +66,7 @@ public class DramaOgBog {
         //Log.d("\n DramaOgBog =========================================== programserieSlug = " + programserieSlug);
         Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
         if (programserie == null) {
-          programserie = new Programserie();
+          programserie = new Programserie(GammelDrRadioBackend.instans);
           App.data.programserieFraSlug.put(programserieSlug, programserie);
         }
         res.add(GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie));

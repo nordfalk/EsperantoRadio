@@ -30,18 +30,11 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
 
   private static GammelDrRadioBackend backend;
 
+
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
-    assertTrue(App.grunddata.kanaler.size()>0);
-    for (Kanal k : App.grunddata.kanaler) {
-      if (k.kode.equals("P4F")) continue;
-      backend.hentKanalStreams(k, null, NetsvarBehander.TOM);
-      assertTrue(k.findBedsteStreams(false).size() > 0);
-    }
-    //Log.d("DRData.instans.grunddata.kanalFraSlug=" + DRData.instans.grunddata.kanalFraSlug);
-    //assertTrue(Robolectric.setupActivity(Hovedaktivitet.class) != null);
+    super.tjekDirekteUdsendelser();
   }
-
 
   @Test
   public void tjekAktuelleUdsendelser() throws Exception {

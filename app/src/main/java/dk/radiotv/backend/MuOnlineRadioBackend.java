@@ -25,8 +25,6 @@ import dk.dr.radio.diverse.Log;
  */
 
 public class MuOnlineRadioBackend extends MuOnlineBackend {
-
-
   @Override
   protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
 
@@ -40,6 +38,11 @@ public class MuOnlineRadioBackend extends MuOnlineBackend {
   }
 
 
+
+  @Override
+  public void hentPlayliste(Udsendelse udsendelse, NetsvarBehander netsvarBehander) {
+    super.hentPlayliste(udsendelse, netsvarBehander);
+  }
 }
 
 
@@ -92,7 +95,7 @@ title: "Podcast til efteråret"
 
 
 P6 BEAT efterår: Vidundergrunden
-https://www.dr.dk//mu-psapi/radio/pages/discover/sections/urn:dr:mu:bundle:59c4f154a11f9f352853472c
+https://www.dr.dk/mu-psapi/radio/pages/discover/sections/urn:dr:mu:bundle:59c4f154a11f9f352853472c
 
 
 ------------

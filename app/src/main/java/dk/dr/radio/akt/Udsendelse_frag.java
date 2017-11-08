@@ -78,7 +78,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   private Runnable hentStreams = new Runnable() {
     @Override
     public void run() {
-      kanal.getBackend().hentUdsendelseStreams(udsendelse, new NetsvarBehander() {
+      udsendelse.getBackend().hentUdsendelseStreams(udsendelse, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
@@ -323,7 +323,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed() || kanal.ingenPlaylister) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      kanal.getBackend().hentPlayliste(udsendelse, new NetsvarBehander() {
+      udsendelse.getBackend().hentPlayliste(udsendelse, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           if (getActivity() == null || s.uændret || s.fejl) return;

@@ -146,7 +146,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser(final int offset) {
-    kanal.getBackend().hentProgramserie(programserie, startudsendelse.programserieSlug, kanal, offset, new NetsvarBehander() {
+    startudsendelse.getBackend().hentProgramserie(programserie, startudsendelse.programserieSlug, kanal, offset, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;

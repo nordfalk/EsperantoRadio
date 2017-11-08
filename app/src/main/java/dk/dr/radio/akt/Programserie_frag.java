@@ -56,9 +56,18 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
     kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
     rod = inflater.inflate(R.layout.udsendelse_frag, container, false);
     aq = new AQuery(rod);
+    listView = aq.id(R.id.listView).adapter(adapter).getListView();
+    listView.setEmptyView(aq.id(R.id.tom).typeface(App.skrift_gibson).getView());
+    listView.setOnItemClickListener(this);
 
     programserie = App.data.programserieFraSlug.get(programserieSlug);
-    if (programserie == null || programserie.getUdsendelser()==null) {
+    if (programserie == null) {
+      Exception ex = new Exception(programserieSlug + " fandtes ikke i " + App.data.programserieFraSlug.keySet());
+      Log.rapporterFejl(ex);
+      aq.id(R.id.tom).text("Der skete en fejl:\n"+ex.getMessage());
+      return rod;
+    }
+    if (programserie.getUdsendelser()==null) {
       hentUdsendelser(0); // hent kun en frisk udgave hvis vi ikke allerede har en
     } else if (programserie.getUdsendelser().size()==0 && programserie.antalUdsendelser>0) {
       Log.d("Har ingen udsendelser for "+programserieSlug+ ", så den hentes igen. Der burde være "+programserie.antalUdsendelser );
@@ -67,9 +76,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
     }
     bygListe();
 
-    listView = aq.id(R.id.listView).adapter(adapter).getListView();
-    listView.setEmptyView(aq.id(R.id.tom).typeface(App.skrift_gibson).getView());
-    listView.setOnItemClickListener(this);
 
     Log.registrérTestet("Visning af programserie", "ja");
     return rod;
@@ -82,7 +88,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    kanal.getBackend().hentProgramserie(programserie, programserieSlug, kanal, offset, new NetsvarBehander() {
+    programserie.getBackend().hentProgramserie(programserie, programserieSlug, kanal, offset, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl && offset == 0) {

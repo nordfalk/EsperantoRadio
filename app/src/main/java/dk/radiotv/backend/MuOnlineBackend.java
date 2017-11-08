@@ -53,6 +53,7 @@ abstract class MuOnlineBackend extends Backend {
 
       String kanalkode = j.getString(DRJson.SourceUrl.name());
       kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/') + 1); // Klampkode til at få alle kanalKoder f.eks. TVR fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR" og få P1D, P2D, KH4, etc
+      if ("RAM".equals(kanalkode)) continue; // Ignorér Ramasjang som stadig er listet
       Kanal k = grunddata.kanalFraKode.get(kanalkode);
       if (k == null) {
         k = new Kanal(this);
@@ -253,7 +254,7 @@ abstract class MuOnlineBackend extends Backend {
     return u;
   }
 
-  private static final boolean BRUG_URN = true;
+  private static final boolean BRUG_URN = false;
 
 
   public void hentProgramserie(final Programserie ps0, final String programserieSlug, final Kanal kanal_ubrugt, final int offset, final NetsvarBehander netsvarBehander) {

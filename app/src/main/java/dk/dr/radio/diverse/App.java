@@ -92,6 +92,7 @@ public class App {
   public static Programdata data;
   public static Grunddata grunddata;
   public static Afspiller afspiller;
+  public static Talesyntese talesyntese;
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java
@@ -157,8 +158,8 @@ public class App {
     }
 
     backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
-            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-//            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
@@ -266,6 +267,7 @@ public class App {
 
       afspiller.setLydkilde(aktuelKanal);
 
+      talesyntese.init(ctx);
     } catch (Exception ex) {
       Log.rapporterFejl(ex);
     }

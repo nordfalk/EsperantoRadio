@@ -579,6 +579,7 @@ public class Afspiller {
         k = App.grunddata.kanalFraKode.get(App.tjekP4OgVælgUnderkanal(Kanal.P4kode));
       }
       setLydkilde(k);
+      App.talesyntese.tal("Skifter til "+k.getNavn());
       return;
     }
     Udsendelse u = lydkilde.getUdsendelse();
@@ -615,6 +616,7 @@ public class Afspiller {
         return;
       }
       setLydkilde(k);
+      App.talesyntese.tal("Skifter til "+k.getNavn());
       return;
     }
     Udsendelse u = lydkilde.getUdsendelse();

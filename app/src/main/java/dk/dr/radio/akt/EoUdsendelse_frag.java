@@ -304,13 +304,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   }
 
   static final int TOP = 0;
-  static final int OVERSKRIFT_PLAYLISTE_INFO = 1;
-  static final int PLAYLISTEELEM_NU = 2;
-  static final int PLAYLISTEELEM = 3;
-  static final int OVERSKRIFT_INDSLAG_INFO = 4;
-  static final int INDSLAGLISTEELEM = 5;
   static final int INFOTEKST = 6;
-  static final int VIS_HELE_PLAYLISTEN_KNAP = 7;
   static final int ALLE_UDSENDELSER = 8;
 
   static final int[] layoutFraType = {
@@ -380,22 +374,12 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     @Override
     public int getItemViewType(int position) {
       Object obj = liste.get(position);
-      if (obj instanceof Integer) return (Integer) obj;
-      if (obj instanceof Indslaglisteelement) return INDSLAGLISTEELEM;
-      // Så må det være et playlisteelement
-      Playlisteelement pl = (Playlisteelement) obj;
-      return pl == playlisteElemDerSpillerNu ? PLAYLISTEELEM_NU : PLAYLISTEELEM;
+      return (Integer) obj;
     }
-/*
-    @Override
-    public boolean isItemViewTypePinned(int viewType) {
-      return viewType==TOP;
-    }
-*/
     @Override
     public boolean isEnabled(int position) {
       int type = getItemViewType(position);
-      return type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM || type == ALLE_UDSENDELSER || type == INDSLAGLISTEELEM;
+      return type == ALLE_UDSENDELSER;
     }
 
     @Override
@@ -426,10 +410,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
         aq = vh.aq = new AQuery(v);
         v.setTag(vh);
         vh.startid = aq.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
-        if (type == OVERSKRIFT_PLAYLISTE_INFO || type == OVERSKRIFT_INDSLAG_INFO) {
-          aq.id(R.id.playliste).clicked(EoUdsendelse_frag.this).typeface(App.skrift_gibson);
-          aq.id(R.id.info).clicked(EoUdsendelse_frag.this).typeface(App.skrift_gibson);
-        } else if (type == INFOTEKST) {
+        if (type == INFOTEKST) {
           String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
           Log.d("EoUdsendelse_frag hp="+hp);
           if (udsendelse.beskrivelse==null) {
@@ -459,13 +440,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
                           */
                   , "text/html", "utf-8", "");
 
-        } else if (type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM) {
-          vh.titel = aq.id(R.id.titel_og_kunstner).typeface(App.skrift_gibson).getTextView();
-        } else if (type == INDSLAGLISTEELEM) {
-          vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
-          aq.id(R.id.beskrivelse).typeface(App.skrift_gibson).getTextView();
-        } else if (type == VIS_HELE_PLAYLISTEN_KNAP) {
-          aq.id(R.id.vis_hele_playlisten).clicked(EoUdsendelse_frag.this).typeface(App.skrift_gibson);
         } else if (type == ALLE_UDSENDELSER) {
           aq.id(R.id.titel).typeface(App.skrift_gibson_fed);
         }
@@ -476,21 +450,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
           throw new IllegalStateException("Liste ej konsistent, der er nok sket ændringer i den fra f.eks. getView()");
       }
 
-      // Opdatér viewholderens data
-      if (type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM) {
-        Playlisteelement ple = (Playlisteelement) liste.get(position);
-        vh.titel.setText(lavFedSkriftTil(ple.titel + " | " + ple.kunstner, ple.titel.length()));
-        vh.titel.setContentDescription(ple.titel + " af " + ple.kunstner);
-        vh.startid.setText(ple.startTidKl);
-        if (type == PLAYLISTEELEM_NU) {
-          ImageView im = aq.id(R.id.senest_spillet_kunstnerbillede).getImageView();
-          aq.image(ple.billedeUrl);
-        } else {
-          boolean topseparator = (adapter.getItemViewType(position - 1) == PLAYLISTEELEM_NU);
-          vh.aq.id(R.id.stiplet_linje).visibility(topseparator?View.INVISIBLE:View.VISIBLE);
-        }
-        aq.id(R.id.hør).visibility(udsendelse.kanHøres && ple.offsetMs >= 0 ? View.VISIBLE : View.GONE);
-      }
       return v;
     }
   };
@@ -636,24 +595,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
     int type = adapter.getItemViewType(position);
 
-    if (type == PLAYLISTEELEM || type == PLAYLISTEELEM_NU) {
-      if (!udsendelse.streamsKlar() || !udsendelse.kanHøres)
-        return;
-      // Det må være et playlisteelement
-      final Playlisteelement pl = (Playlisteelement) liste.get(position);
-      if (udsendelse.equals(afspiller.getLydkilde()) && afspiller.getAfspillerstatus() == Status.SPILLER) {
-        afspiller.seekTo(pl.offsetMs);
-      } else {
-        App.data.senestLyttede.registrérLytning(udsendelse);
-        App.data.senestLyttede.sætStartposition(udsendelse, pl.offsetMs);
-        afspiller.setLydkilde(udsendelse);
-        afspiller.startAfspilning();
-      }
-      playlisteElemDerSpillerNu = pl;
-      playlisteElemDerSpillerNuIndex = udsendelse.playliste.indexOf(pl);
-      adapter.notifyDataSetChanged();
-      Log.registrérTestet("Valg af playlisteelement", "ja");
-    } else if (type == ALLE_UDSENDELSER) {
+    if (type == ALLE_UDSENDELSER) {
 
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()

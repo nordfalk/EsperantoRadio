@@ -2,8 +2,9 @@ package dk.radiotv.backend;
 
 import android.content.Context;
 
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -12,13 +13,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Grunddata;
-import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
-import dk.dr.radio.data.Programdata;
+import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.net.volley.Netsvar;
 
 /**
  * Created by j on 26-02-17.
@@ -34,15 +33,59 @@ public class MuOnlineRadioBackend extends MuOnlineBackend {
 
   @Override
   public String getGrunddataUrl() {
-    return BASISURL+"/channel/all-active-dr-radio-channels";
+    return BASISURL +"/channel/all-active-dr-radio-channels";
   }
 
 
 
+/*
+
+Spilleliste for udsendelse
+
+https://www.dr.dk/mu-psapi/mediaelement/urn:dr:mu:programcard:59e3df56a11f9f13a4447d4c
+
+
+https://en.wikipedia.org/wiki/ISO_8601#Durations
+   */
+
+  private static final String BASISURL2 = "https://www.dr.dk/mu-psapi";
   @Override
-  public void hentPlayliste(Udsendelse udsendelse, NetsvarBehander netsvarBehander) {
-    super.hentPlayliste(udsendelse, netsvarBehander);
+  public void hentPlayliste(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
+    final String url = BASISURL2 + "/mediaelement/" + udsendelse.urn;
+    App.netkald.kald(null, url, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(this + " hentPlayliste "+s.url+ "  fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          JSONArray arr = new JSONObject(s.json).optJSONArray("shortIndexPoints");
+          ArrayList<Playlisteelement> playliste = new ArrayList<>();
+
+          for (JSONObject o : new JSONArrayIterator(arr)) try {
+            Playlisteelement e = new Playlisteelement();
+            e.titel = o.getString("title");
+            int kolonPos = e.titel.indexOf(':');
+            if (kolonPos>0) {
+              e.kunstner = e.titel.substring(0,kolonPos);
+              e.titel = e.titel.substring(kolonPos+1).trim();
+            }
+            String tid = o.getString("startPoint");
+            if (tid.startsWith("-")) e.offsetMs = 0;
+            else {
+              e.offsetMs = ISOPeriodFormat.standard().parsePeriod(tid).toStandardSeconds().getSeconds()*1000;
+              //e.kunstner = tid + " -> "+(e.offsetMs/1000/6)/10.0;
+            }
+            e.startTid = new Date(udsendelse.startTid.getTime() + e.offsetMs);
+            e.startTidKl = Datoformater.klokkenformat.format(e.startTid);
+            playliste.add(e);
+          } catch (Exception e) { Log.e(e); }
+          Log.d(this+ " "+ s.url+" gav playliste="+playliste);
+          udsendelse.playliste = playliste;
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
   }
+
 }
 
 
@@ -122,12 +165,6 @@ category: "Musik"
 },
 
 
-
-Spilleliste for udsendelse
-
-https://www.dr.dk/mu-psapi/mediaelement/urn:dr:mu:programcard:59e3df56a11f9f13a4447d4c
-
-
 {
 downloadables: [
 {
@@ -141,10 +178,6 @@ bitRate: 192
 }
 }
 ],
-
-https://en.wikipedia.org/wiki/ISO_8601#Durations
-
-
 
 
 

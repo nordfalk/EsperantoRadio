@@ -65,7 +65,7 @@ abstract class MuOnlineBackend extends Backend {
       k.urn = j.getString(DRJson.Urn.name());
       k.slug = j.getString(DRJson.Slug.name());
       k.kanallogo_url = j.getString("PrimaryImageUri");
-      k.ingenPlaylister = true; // som udgangspunkt aldrig spillelister (især ikke for TV)
+      k.ingenPlaylister = false; // som udgangspunkt aldrig spillelister (især ikke for TV)
       k.p4underkanal = j.getString(DRJson.Url.name()).startsWith("http://www.dr.dk/P4");  // Klampkode
       if (k.p4underkanal) grunddata.p4koder.add(k.kode);
 

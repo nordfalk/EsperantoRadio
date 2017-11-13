@@ -10,13 +10,8 @@ import android.view.ViewGroup;
 import com.android.volley.Request;
 import com.androidquery.AQuery;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
@@ -38,7 +33,7 @@ public class Kanal_nyheder_frag extends Basisfragment implements View.OnClickLis
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-    String kanalkode = getArguments().getString(P_kode);
+    String kanalkode = getArguments().getString(P_KANALKODE);
     kanal = App.grunddata.kanalFraKode.get(kanalkode);
     rod = inflater.inflate(R.layout.kanal_nyheder_frag, container, false);
     aq = new AQuery(rod);

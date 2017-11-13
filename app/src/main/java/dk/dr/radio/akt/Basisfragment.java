@@ -24,10 +24,11 @@ import dk.dr.radio.diverse.Udseende;
 /**
  * @author j
  */
-//public class BasisFragment extends DialogFragment {
 public class Basisfragment extends Fragment {
 
-  public static String P_kode = "kanal.kode";
+  public static final String P_KANALKODE = "kanal";
+  public static final String P_UDSENDELSE = "udsendelse";
+  public static final String P_PROGRAMSERIE = "programserie";
 
 
   static final boolean LOG_LIVSCYKLUS = false;
@@ -206,7 +207,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
    * Billedeskalering af billeder på DRs servere, ud fra en URL.
    * F.eks. http://asset.dr.dk/imagescaler/?file=http://www.dr.dk/mu/bar/544e40f7a11f9d16c4c96db7&w=620&h=349
    */
-  private static String skalérBilledeFraUrl(String url, int bredde, int højde) {
+  public static String skalérBilledeFraUrl(String url, int bredde, int højde) {
     if (Udseende.ESPERANTO) return url;
     String res = "https://asset.dr.dk/imagescaler/?file=" + url + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
     if (App.fejlsøgning) Log.d("skalérBilledeFraUrl " + url + " " + bredde + "x" + højde + " giver: " + res);
@@ -216,7 +217,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
   public static String skalérBillede(Udsendelse u, int bredde, int højde) {
     if (Udseende.ESPERANTO) {
       if (u.billedeUrl != null) return u.billedeUrl;
-      return ((EoKanal) u.getKanal()).eo_emblemoUrl;
+      return ((EoKanal) u.getKanal()).kanallogo_url;
     }
 //    u.billedeUrl = null;
     return u.billedeUrl==null

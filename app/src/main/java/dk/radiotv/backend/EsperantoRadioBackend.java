@@ -42,9 +42,6 @@ public class EsperantoRadioBackend extends Backend {
 
   public EsperantoRadioBackend() { instans = this; }
 
-  @Override
-  protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
-
   public String getGrunddataUrl() {
     /*
 scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/
@@ -82,7 +79,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       k.eo_hejmpaĝoEkrane = kJs.optString("hejmpaĝoEkrane", null);
       k.eo_hejmpaĝoButono = kJs.optString("hejmpaĝoButono", null);
       k.eo_retpoŝto = kJs.optString("retpoŝto", null);
-      k.eo_emblemoUrl = kJs.optString("emblemoUrl", null);
+      k.kanallogo_url = kJs.optString("emblemoUrl", null);
       k.eo_elsendojRssUrl = kJs.optString("elsendojRssUrl", null);
       k.eo_elsendojRssUrl2 = kJs.optString("elsendojRssUrl2", null);
       k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
@@ -106,8 +103,8 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         streams.add(ls);
         k.setStreams(streams);
         ls.url = rektaElsendaSonoUrl;
-        ls.type = DRJson.StreamType.Shoutcast;
-        ls.kvalitet = DRJson.StreamQuality.Medium;
+        ls.type = Lydstream.StreamType.Shoutcast;
+        ls.kvalitet = Lydstream.StreamKvalitet.Medium;
         //k.udsendelser.add(el);
       }
     }
@@ -161,11 +158,11 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     for (Kanal k0 : new ArrayList<>(kanaler)) {
       EoKanal k = (EoKanal) k0;
 
-      if (k.eo_emblemoUrl != null && k.kanallogo_eo == null) try {
-        String dosiero = FilCache.findLokaltFilnavn(k.eo_emblemoUrl);
+      if (k.kanallogo_url != null && k.kanallogo_eo == null) try {
+        String dosiero = FilCache.findLokaltFilnavn(k.kanallogo_url);
         if (dosiero == null) continue;
         if (nurLokajn && !new File(dosiero).exists()) continue;
-        FilCache.hentFil(k.eo_emblemoUrl, true);
+        FilCache.hentFil(k.kanallogo_url, true);
         /*
            int kiomDaDpAlta = 50; // 50 dp
            // Convert the dps to pixels
@@ -207,9 +204,9 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   public static ArrayList<Lydstream> lavSimpelLydstreamFraUrl(String url) {
     Lydstream ls = new Lydstream();
     ls.url = url;
-    ls.type = DRJson.StreamType.HTTP_Download;
+    ls.type = Lydstream.StreamType.HTTP_Download;
     ls.format = "mp3";
-    ls.kvalitet = DRJson.StreamQuality.High;
+    ls.kvalitet = Lydstream.StreamKvalitet.Høj;
 
     ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
     streams.add(ls);
@@ -296,7 +293,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
       ps = new Programserie(instans);
-      ps.billedeUrl = k.eo_emblemoUrl;
+      ps.billedeUrl = k.kanallogo_url;
       ps.beskrivelse = k.getNavn();
       ps.slug = k.slug;
       ps.titel = k.getNavn();

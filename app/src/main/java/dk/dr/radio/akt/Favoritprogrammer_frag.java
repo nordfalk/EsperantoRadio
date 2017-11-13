@@ -24,11 +24,9 @@ import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.radiotv.backend.Backend;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -107,7 +105,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
               if (s.json != null) {
                 JSONObject data = new JSONObject(s.json);
                 Programserie programserie = GammelDrRadioBackend.instans.parsProgramserie(data, null);
-                JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+                JSONArray prg = data.getJSONArray("Programs");
                 ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
                 for (int n = 0; n < prg.length(); n++) {
                   uliste.add(GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
@@ -180,7 +178,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
       Programserie programserie = (Programserie) obj;
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-          .putExtra(DRJson.SeriesSlug.name(), programserie.slug)
+          .putExtra(P_PROGRAMSERIE, programserie.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

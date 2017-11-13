@@ -17,7 +17,6 @@ public class EoKanal extends Kanal {
   public String eo_hejmpaĝoButono;
   public String eo_retpoŝto;
   public Udsendelse eo_rektaElsendo;
-  public String eo_emblemoUrl;
   public String eo_datumFonto;
   public ArrayList<Udsendelse> eo_udsendelserFraRadioTxt; // Provizora variablo - por kontroli ĉu ni maltrafas ion dum parsado de RSS
   public String eo_elsendojRssUrl;

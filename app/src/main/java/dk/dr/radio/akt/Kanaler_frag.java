@@ -1,6 +1,5 @@
 package dk.dr.radio.akt;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -182,8 +181,10 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     }
 
     @Override
-    public Bitmap getPageIconBitmap(int position) {
-      return kanaler2.get(position).kanallogo_eo;
+    public String getPageIconUrl(int position) {
+      Kanal k = kanaler2.get(position);
+
+      return k.getBackend().getSkaleretBilledeUrl(k.kanallogo_url, bredde16*10, højde9*10);
     }
 
     @Override

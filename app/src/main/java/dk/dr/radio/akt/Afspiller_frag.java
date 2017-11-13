@@ -458,7 +458,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         Udsendelse udsendelse = lydkilde.getUdsendelse();
 
         Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
-        f.getArguments().putString(P_kode, lydkilde.getKanal().kode);
+        f.getArguments().putString(P_KANALKODE, lydkilde.getKanal().kode);
 
         getActivity().getSupportFragmentManager().beginTransaction()
             .replace(R.id.indhold_frag, f)

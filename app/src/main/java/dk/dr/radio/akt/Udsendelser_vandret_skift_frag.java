@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -20,7 +17,6 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -51,8 +47,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
     View rod = inflater.inflate(R.layout.udsendelser_vandret_skift_frag, container, false);
 
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
-    startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (startudsendelse == null) { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/805598045
       if (!App.PRODUKTION) { // https://www.bugsense.com/dashboard/project/cd78aa05/errors/822628124
         App.langToast("startudsendelse==null for " + kanal);
@@ -192,7 +188,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       //if (App.EMULATOR) Log.d("getItem() liste2.size() = "+liste2.size());
       Udsendelse u = liste2.get(position);
       Fragment f = Fragmentfabrikering.udsendelse(u);
-      f.getArguments().putString(Kanal_frag.P_kode, kanal.kode);
+      f.getArguments().putString(P_KANALKODE, kanal.kode);
       f.getArguments().putString(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, getArguments().getString(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG));
       return f;
     }
@@ -216,7 +212,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
      return POSITION_NONE;
      }
      Bundle arg = ((Fragment) object).getArguments();
-     String slug = arg.getString(DRJson.Slug.name());
+     String slug = arg.getString(P_UDSENDELSE);
      if (slug==null) {
      Log.rapporterFejl(new Exception("getItemPosition gav fragment uden slug!??!"), ""+arg);
      return POSITION_NONE;

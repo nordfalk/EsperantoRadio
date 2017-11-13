@@ -97,7 +97,7 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
       JSONObject data = new JSONObject(Netkald.hentStreng(url));
       ps = backend.parsProgramserie(data, ps);
       App.data.programserieFraSlug.put(ps.slug, ps);
-      JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+      JSONArray prg = data.getJSONArray("Programs");
       ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
       for (int n = 0; n < prg.length(); n++) {
         uliste.add(backend.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
@@ -132,7 +132,7 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
         JSONObject data = new JSONObject(Netkald.hentStreng(url));
         ps = backend.parsProgramserie(data, ps);
         App.data.programserieFraSlug.put(ps.slug, ps);
-        JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+        JSONArray prg = data.getJSONArray("Programs");
         ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
         for (int n1 = 0; n1 < prg.length(); n1++) {
           uliste.add(backend.parseUdsendelse(null, App.data, prg.getJSONObject(n1)));

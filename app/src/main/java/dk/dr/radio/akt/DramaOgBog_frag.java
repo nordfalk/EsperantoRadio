@@ -24,7 +24,6 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.akt.diverse.CirclePageIndicator;
 import dk.dr.radio.akt.diverse.PinnedSectionListView;
 import dk.dr.radio.data.Programserie;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -147,7 +146,7 @@ public class DramaOgBog_frag extends Basisfragment implements Runnable, AdapterV
     public Basisfragment getItem(int position) {
       Basisfragment f = new KarruselFrag();
       Bundle b = new Bundle();
-      b.putString(DRJson.SeriesSlug.name(), karruselListe.get(position).slug);
+      b.putString(P_PROGRAMSERIE, karruselListe.get(position).slug);
       f.setArguments(b);
       return f;
     }
@@ -159,7 +158,7 @@ public class DramaOgBog_frag extends Basisfragment implements Runnable, AdapterV
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      programserieSlug = getArguments().getString(DRJson.SeriesSlug.name());
+      programserieSlug = getArguments().getString(P_PROGRAMSERIE);
       View rod = inflater.inflate(R.layout.kanal_elem0_inkl_billede_titel, container, false);
       programserie = App.data.programserieFraSlug.get(programserieSlug);
       if (programserie==null) {
@@ -260,7 +259,7 @@ public class DramaOgBog_frag extends Basisfragment implements Runnable, AdapterV
   private static void åbn(Basisfragment ths, Programserie programserie) {
     Fragment f = new Programserie_frag();
     f.setArguments(new Intent()
-        .putExtra(DRJson.SeriesSlug.name(), programserie.slug)
+        .putExtra(P_PROGRAMSERIE, programserie.slug)
         .getExtras());
     ths.getActivity().getSupportFragmentManager().beginTransaction()
         .replace(R.id.indhold_frag, f)

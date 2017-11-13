@@ -7,20 +7,16 @@ import android.text.util.Linkify;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
+
+import static dk.dr.radio.akt.Basisfragment.P_UDSENDELSE;
 
 public class FangBrowseRadioIntent_akt extends Activity {
 
@@ -129,8 +125,8 @@ public class FangBrowseRadioIntent_akt extends Activity {
     App.afspiller.setLydkilde(udsendelse);
     App.afspiller.startAfspilning();
     Intent intent = new Intent(this, Hovedaktivitet.class)
-        .putExtra(Kanal_frag.P_kode, kanalSlug)
-        .putExtra(DRJson.Slug.name(), udsendelse.slug)
+        .putExtra(Kanal_frag.P_KANALKODE, kanalSlug)
+        .putExtra(P_UDSENDELSE, udsendelse.slug)
         .putExtra(Hovedaktivitet.VIS_FRAGMENT_KLASSE, Udsendelse_frag.class.getName())
         .putExtra(Hovedaktivitet.SPØRG_OM_STOP, false);
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

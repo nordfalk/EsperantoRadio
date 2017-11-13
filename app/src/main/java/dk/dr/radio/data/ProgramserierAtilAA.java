@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.radiotv.backend.GammelDrRadioBackend;
@@ -32,7 +31,7 @@ public class ProgramserierAtilAA {
     ArrayList<Programserie> res = new ArrayList<Programserie>();
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject programserieJson = jsonArray.getJSONObject(n);
-      String programserieSlug = programserieJson.getString(DRJson.Slug.name());
+      String programserieSlug = programserieJson.getString("Slug");
       //Log.d("\n=========================================== programserieSlug = " + programserieSlug);
       Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
       if (programserie == null) {

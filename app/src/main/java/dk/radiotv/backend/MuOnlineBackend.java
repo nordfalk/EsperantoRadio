@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import dk.dr.radio.akt.Basisfragment;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
@@ -42,7 +43,7 @@ abstract class MuOnlineBackend extends Backend {
     int antal = jsonArray.length();
     for (int i = 0; i < antal; i++) {
       JSONObject j = jsonArray.getJSONObject(i);
-      if (!"Channel".equals(j.getString(DRJson.Type.name()))) {
+      if (!"Channel".equals(j.getString("Type"))) {
         Log.d("parseKanaler: Ukendt type: " + j);
         continue;
       }
@@ -51,7 +52,7 @@ abstract class MuOnlineBackend extends Backend {
         continue;
       }
 
-      String kanalkode = j.getString(DRJson.SourceUrl.name());
+      String kanalkode = j.getString("SourceUrl");
       kanalkode = kanalkode.substring(kanalkode.lastIndexOf('/') + 1); // Klampkode til at få alle kanalKoder f.eks. TVR fra f.eks. SourceUrl: "dr.dk/mas/whatson/channel/TVR" og få P1D, P2D, KH4, etc
       if ("RAM".equals(kanalkode)) continue; // Ignorér Ramasjang som stadig er listet
       Kanal k = grunddata.kanalFraKode.get(kanalkode);
@@ -60,13 +61,13 @@ abstract class MuOnlineBackend extends Backend {
         k.kode = kanalkode;
         grunddata.kanalFraKode.put(k.kode, k);
       }
-      k.navn = j.getString(DRJson.Title.name());
+      k.navn = j.getString("Title");
       if (k.navn.startsWith("DR ")) k.navn = k.navn.substring(3);  // Klampkode til f.eks. DR Ultra og DR K
-      k.urn = j.getString(DRJson.Urn.name());
-      k.slug = j.getString(DRJson.Slug.name());
+      k.urn = j.getString("Urn");
+      k.slug = j.getString("Slug");
       k.kanallogo_url = j.getString("PrimaryImageUri");
       k.ingenPlaylister = false; // som udgangspunkt aldrig spillelister (især ikke for TV)
-      k.p4underkanal = j.getString(DRJson.Url.name()).startsWith("http://www.dr.dk/P4");  // Klampkode
+      k.p4underkanal = j.getString("Url").startsWith("http://www.dr.dk/P4");  // Klampkode
       if (k.p4underkanal) grunddata.p4koder.add(k.kode);
 
       kanaler.add(k);
@@ -85,9 +86,9 @@ abstract class MuOnlineBackend extends Backend {
         JSONObject jsonServer = jsonArrayServere.getJSONObject(i);
         String vLinkType = jsonServer.getString("LinkType");
         if (vLinkType.equals("HDS")) continue;
-        DRJson.StreamType streamType = DRJson.StreamType.Ukendt;
-        if (vLinkType.equals("ICY")) streamType = DRJson.StreamType.Shoutcast;
-        else if (vLinkType.equals("HLS")) streamType = DRJson.StreamType.HLS_fra_Akamai;
+        Lydstream.StreamType streamType = Lydstream.StreamType.Ukendt;
+        if (vLinkType.equals("ICY")) streamType = Lydstream.StreamType.Shoutcast;
+        else if (vLinkType.equals("HLS")) streamType = Lydstream.StreamType.HLS_fra_Akamai;
 
 
         String vServer = jsonServer.getString("Server");
@@ -107,7 +108,7 @@ abstract class MuOnlineBackend extends Backend {
             l.url = vServer + "/" + jsonStream.getString("Stream");
             l.type = streamType;
             l.kbps_ubrugt = vKbps;
-            l.kvalitet = vKbps == -1 ? DRJson.StreamQuality.Variable : vKbps > 100 ? DRJson.StreamQuality.High : DRJson.StreamQuality.Medium;
+            l.kvalitet = vKbps == -1 ? Lydstream.StreamKvalitet.Variabel : vKbps > 100 ? Lydstream.StreamKvalitet.Høj : Lydstream.StreamKvalitet.Medium;
             lydData.add(l);
             if (App.fejlsøgning) Log.d("lydstream=" + l);
           }
@@ -166,12 +167,12 @@ abstract class MuOnlineBackend extends Backend {
       l.url = jsonStream.getString("Uri");
 
       if ("Download".equals(type)) {
-        l.type = DRJson.StreamType.HTTP_Download;
+        l.type = Lydstream.StreamType.HTTP_Download;
         l.bitrate_ubrugt = jsonStream.getInt("Bitrate");
       } else {
-        l.type = DRJson.StreamType.HLS_fra_Akamai;
+        l.type = Lydstream.StreamType.HLS_fra_Akamai;
       }
-      l.kvalitet = DRJson.StreamQuality.Variable;
+      l.kvalitet = Lydstream.StreamKvalitet.Variabel;
       l.subtitlesUrl = subtitles;
       lydData.add(l);
     }
@@ -212,10 +213,10 @@ abstract class MuOnlineBackend extends Backend {
       JSONObject udsJson = o.optJSONObject("ProgramCard");
       Udsendelse u = parseUdsendelse(kanal, programdata, udsJson);
       u.dagsbeskrivelse = dagsbeskrivelse;
-      u.beskrivelse = o.getString(DRJson.Description.name());
-      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
+      u.beskrivelse = o.getString("Description");
+      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("StartTime"));
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-      u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
+      u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("EndTime"));
       u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
       uliste.add(u);
     }
@@ -224,14 +225,14 @@ abstract class MuOnlineBackend extends Backend {
 
   Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
     Udsendelse u = new Udsendelse();
-    u.slug = o.getString(DRJson.Slug.name()); // Bemærk - kan være tom?
-    u.urn = o.getString(DRJson.Urn.name());  // Bemærk - kan være tom?
+    u.slug = o.getString("Slug"); // Bemærk - kan være tom?
+    u.urn = o.getString("Urn");  // Bemærk - kan være tom?
     programdata.udsendelseFraSlug.put(u.slug, u);
-    u.titel = o.getString(DRJson.Title.name());
+    u.titel = o.getString("Title");
     u.billedeUrl = o.getString("PrimaryImageUri"); // http://www.dr.dk/mu-online/api/1.3/Bar/524a5b6b6187a2141c5e3511
-    u.programserieSlug = o.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom?
+    u.programserieSlug = o.optString("SeriesSlug");  // Bemærk - kan være tom?
 
-    u.episodeIProgramserie = o.optInt(DRJson.ProductionNumber.name()); // ?   før Episode
+    u.episodeIProgramserie = o.optInt("ProductionNumber"); // ?   før Episode
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
     else u.kanalSlug = o.optString("PrimaryChannelSlug");
 
@@ -245,7 +246,7 @@ abstract class MuOnlineBackend extends Backend {
     } else {
       Log.d("parseUdsendelse: Ingen streams for " + u);
     }
-    u.kanHøres = udsData!=null; //o.getBoolean(DRJson.Watchable.name());
+    u.kanHøres = udsData!=null;
     u.sæsonSlug = o.optString("SeasonSlug");
     u.sæsonUrn = o.optString("SeasonUrn");
     u.sæsonTitel = o.optString("SeasonTitle");
@@ -273,7 +274,7 @@ abstract class MuOnlineBackend extends Backend {
           Programserie ps = ps0;
           if (offset == 0) {
             if (ps == null) ps = new Programserie(MuOnlineBackend.this);
-            ps.titel = data.getString(DRJson.Title.name());
+            ps.titel = data.getString("Title");
             ps.slug = programserieSlug;
             App.data.programserieFraSlug.put(programserieSlug, ps);
           }
@@ -288,4 +289,9 @@ abstract class MuOnlineBackend extends Backend {
       }
     });
   }
+
+  public String getSkaleretBilledeUrl(String logo_url, int bredde, int højde) {
+    return Basisfragment.skalérBilledeFraUrl(logo_url, bredde, højde);
+  }
+
 }

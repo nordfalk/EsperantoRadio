@@ -38,13 +38,11 @@ import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
-import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.radiotv.backend.Backend;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
@@ -83,9 +81,9 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
     if (kanalx instanceof EoKanal) kanal = (EoKanal) kanalx;
-    udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
+    udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
         Log.rapporterFejl(new IllegalStateException("afbrydManglerData " + getArguments().toString()));
@@ -131,7 +129,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
           .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
     } else {
       String emblemo = udsendelse.billedeUrl;
-      if (emblemo==null || emblemo.length()==0) emblemo = kanal.eo_emblemoUrl;
+      if (emblemo==null || emblemo.length()==0) emblemo = kanal.kanallogo_url;
       aq.id(R.id.billede).image(emblemo)
           .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
@@ -591,7 +589,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
     if (position == 0) return;
     //startActivity(new Intent(getActivity(), VisFragment_akt.class).putExtras(getArguments())  // Kanalkode + slug
-    //    .putExtra(VisFragment_akt.KLASSE, Programserie_frag.class.getName()).putExtra(DRJson.SeriesSlug.name(), udsendelse.programserieSlug));
+    //    .putExtra(VisFragment_akt.KLASSE, Programserie_frag.class.getName()).putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug));
 
     int type = adapter.getItemViewType(position);
 
@@ -599,9 +597,9 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-              .putExtra(P_kode, kanal.kode)
-              .putExtra(DRJson.Slug.name(), udsendelse.slug)
-              .putExtra(DRJson.SeriesSlug.name(), udsendelse.programserieSlug)
+              .putExtra(P_KANALKODE, kanal.kode)
+              .putExtra(P_UDSENDELSE, udsendelse.slug)
+              .putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug)
               .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
               .replace(R.id.indhold_frag, f)

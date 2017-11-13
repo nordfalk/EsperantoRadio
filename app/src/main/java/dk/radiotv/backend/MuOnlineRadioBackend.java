@@ -24,8 +24,6 @@ import dk.dr.radio.net.volley.Netsvar;
  */
 
 public class MuOnlineRadioBackend extends MuOnlineBackend {
-  @Override
-  protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
 
   public InputStream getLokaleGrunddata(Context ctx) throws IOException {
     return App.assets.open("apisvar/all-active-dr-radio-channels");
@@ -183,5 +181,11 @@ bitRate: 192
 
 Grafik
 https://www.dr.dk/mu-online/api/1.3/bar/helper/get-image-for-programcard/urn:dr:mu:programcard:59e3df56a11f9f13a4447d4c
+
+
+https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/59cb5f466187a423b40d4564%2525253Fraw=True&w=240&h=100&scaleAfter=crop&quality=75
+https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/532c32f16187a216b8e80a78%2525253Fraw=True&w=240&h=100&scaleAfter=crop&quality=75
+https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/5975ee68a11f9f10e81cb97b%2525253Fraw=True&w=240&h=100&scaleAfter=crop&quality=75
+https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/52d3f5e66187a2077cbac70c%2525253Fraw=True&w=240&h=129&scaleAfter=crop&quality=75
 
    */

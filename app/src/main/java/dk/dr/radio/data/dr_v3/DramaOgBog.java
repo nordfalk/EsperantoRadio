@@ -17,7 +17,6 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
-import dk.radiotv.backend.DRJson;
 
 /**
  * Created by j on 05-10-14.
@@ -43,7 +42,7 @@ public class DramaOgBog {
     karuselSerieSlug.clear();
     for (int i=0; i<jsonArray.length(); i++) {
       JSONObject jsonObject = jsonArray.getJSONObject(i);
-      JSONArray karuselJson = jsonObject.optJSONArray(DRJson.Spots.name());
+      JSONArray karuselJson = jsonObject.optJSONArray("Spots");
       if (karuselJson!=null) for (int n = 0; n < karuselJson.length(); n++) try {
         JSONObject udsendelseJson = karuselJson.getJSONObject(n);
         // TODO mangler
@@ -56,13 +55,13 @@ public class DramaOgBog {
         Log.e(je);
       }
 
-      String titel = jsonObject.optString(DRJson.Title.name());
-      JSONArray jsonArray2 = jsonObject.optJSONArray(DRJson.Series.name());
+      String titel = jsonObject.optString("Title");
+      JSONArray jsonArray2 = jsonObject.optJSONArray("Series");
       ArrayList<Programserie> res = new ArrayList<Programserie>();
 
       if (jsonArray2!=null) for (int n = 0; n < jsonArray2.length(); n++) {
         JSONObject programserieJson = jsonArray2.getJSONObject(n);
-        String programserieSlug = programserieJson.getString(DRJson.Slug.name());
+        String programserieSlug = programserieJson.getString("Slug");
         //Log.d("\n DramaOgBog =========================================== programserieSlug = " + programserieSlug);
         Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
         if (programserie == null) {

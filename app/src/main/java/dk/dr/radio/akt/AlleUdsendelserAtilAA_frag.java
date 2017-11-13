@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Programserie;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -119,7 +118,7 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
     Programserie programserie = liste.get(position);
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-          .putExtra(DRJson.SeriesSlug.name(), programserie.slug)
+          .putExtra(P_PROGRAMSERIE, programserie.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

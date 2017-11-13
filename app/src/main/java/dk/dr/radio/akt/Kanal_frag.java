@@ -26,9 +26,6 @@ import android.widget.TextView;
 import com.android.volley.Request;
 import com.androidquery.AQuery;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +38,6 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -75,7 +71,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-    String kanalkode = getArguments().getString(P_kode);
+    String kanalkode = getArguments().getString(P_KANALKODE);
     boolean p4 = Kanal.P4kode.equals(kanalkode);
     rod = null;
 
@@ -512,7 +508,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     if (App.fejlsøgning) Log.d("DDDDD opdaterSenestSpilletViews " + u.playliste);
     if (u.playliste != null && u.playliste.size() > 0) {
       aq.id(R.id.senest_spillet_container).visible();
-      Playlisteelement elem = u.playliste.get(0);
+      Playlisteelement elem = u.playliste.get(u.playliste.size()-1);
 //      aq.id(R.id.titel_og_kunstner).text(Html.fromHtml("<b>" + elem.titel + "</b> &nbsp; | &nbsp;" + elem.kunstner));
 
       aq.id(R.id.titel_og_kunstner)
@@ -600,8 +596,8 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       v.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
     } else {
       //startActivity(new Intent(getActivity(), VisFragment_akt.class)
-      //    .putExtra(P_kode, getKanal.kode)
-      //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(DRJson.Slug.name(), u.slug)); // Udsenselses-ID
+      //    .putExtra(P_KANALKODE, getKanal.kode)
+      //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(P_UDSENDELSE, u.slug)); // Udsenselses-ID
       String aktuelUdsendelseSlug = aktuelUdsendelseIndex > 0 ? ((Udsendelse) liste.get(aktuelUdsendelseIndex)).slug : "";
 
       // Vis normalt et Udsendelser_vandret_skift_frag med flere udsendelser
@@ -610,9 +606,9 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           App.accessibilityManager.isEnabled() || !App.prefs.getBoolean("udsendelser_bladr", true) ? Fragmentfabrikering.udsendelse(u) :
               new Udsendelser_vandret_skift_frag();
       f.setArguments(new Intent()
-          .putExtra(P_kode, kanal.kode)
+          .putExtra(P_KANALKODE, kanal.kode)
           .putExtra(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, aktuelUdsendelseSlug)
-          .putExtra(DRJson.Slug.name(), u.slug)
+          .putExtra(P_UDSENDELSE, u.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

@@ -173,12 +173,6 @@ public class HentedeUdsendelser {
     if (new File(FILNAVN).exists()) try {
       data = (Data) Serialisering.hent(FILNAVN);
 
-      if (data.hentetStatusFraSlug == null) { // Feltet data.udsendelser kom med 26. dec 2015 - tjek kan slettes efter sommer 2016
-        data.hentetStatusFraSlug = new LinkedHashMap<>();
-      }
-      if (data.udsendelser == null) { // Feltet data.udsendelser kom med 2. okt 2014 - tjek kan slettes efter sommer 2015
-        data.udsendelser = new ArrayList<Udsendelse>(data.udsendelseFraDownloadId.values());
-      }
       // Sæt korrekt hentetStream på alle hentede udsendelser
       for (Udsendelse serialiseretUds : data.udsendelser) {
         Udsendelse u = App.data.udsendelseFraSlug.get(serialiseretUds.slug);

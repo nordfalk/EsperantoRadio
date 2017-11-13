@@ -43,9 +43,6 @@ public class GammelDrRadioBackend extends Backend {
   }
 
   @Override
-  protected void ikkeImplementeret() { _ikkeImplementeret(); }
-
-  @Override
   public String getGrunddataUrl() {
     // "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.json";
     if (App.PRODUKTION) return "http://www.dr.dk/tjenester/iphone/radio/settings/iphone200d.drxml";
@@ -145,7 +142,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
    */
 
   private ArrayList<Lydstream> parsStreams(JSONObject jsonobj) throws JSONException {
-    JSONArray jsonArray = jsonobj.getJSONArray(DRJson.Streams.name());
+    JSONArray jsonArray = jsonobj.getJSONArray("Streams");
     ArrayList<Lydstream> lydData = new ArrayList<Lydstream>();
     for (int n = 0; n < jsonArray.length(); n++)
       try {
@@ -153,16 +150,16 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
         //Log.d("streamjson=" + o.toString());
         Lydstream l = new Lydstream();
         //if (o.getInt("FileSize")!=0) { Log.d("streamjson=" + o.toString(2)); System.exit(0); }
-        l.url = o.getString(DRJson.Uri.name());
+        l.url = o.getString("Uri");
         if (l.url.startsWith("rtmp:")) continue; // Skip Adobe Real-Time Messaging Protocol til Flash
-        int type = o.getInt(DRJson.Type.name());
-        l.type = type < 0 ? DRJson.StreamType.Ukendt : DRJson.StreamType.values()[type];
-        if (l.type == DRJson.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
+        int type = o.getInt("Type");
+        l.type = type < 0 ? Lydstream.StreamType.Ukendt : Lydstream.StreamType.values()[type];
+        if (l.type == Lydstream.StreamType.HDS) continue; // Skip Adobe HDS - HTTP Dynamic Streaming
         //if (l.type == StreamType.IOS) continue; // Gamle HLS streams der ikke virker på Android
-        //if (o.getInt(DRJson.Kind.name()) != DRJson.StreamKind.Audio.ordinal()) continue;
-        l.kvalitet = DRJson.StreamQuality.values()[o.getInt(DRJson.Quality.name())];
-        l.format = o.optString(DRJson.Format.name()); // null for direkte udsendelser
-        l.kbps_ubrugt = o.getInt(DRJson.Kbps.name());
+        //if (o.getInt("Kind") != DRJson.StreamKind.Audio.ordinal()) continue;
+        l.kvalitet = Lydstream.StreamKvalitet.values()[o.getInt("Quality")];
+        l.format = o.optString("Format"); // null for direkte udsendelser
+        l.kbps_ubrugt = o.getInt("Kbps");
         lydData.add(l);
         if (App.fejlsøgning) Log.d("lydstream=" + l);
       } catch (Exception e) {
@@ -237,16 +234,16 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   }
 
   private static Udsendelse opretUdsendelse(Programdata data, JSONObject o) throws JSONException {
-    String slug = o.optString(DRJson.Slug.name());  // Bemærk - kan være tom!
+    String slug = o.optString("Slug");  // Bemærk - kan være tom!
     Udsendelse u = new Udsendelse();
     u.slug = slug;
     data.udsendelseFraSlug.put(u.slug, u);
-    u.titel = o.getString(DRJson.Title.name());
-    u.beskrivelse = o.getString(DRJson.Description.name());
-    u.billedeUrl = fjernHttpWwwDrDk(o.optString(DRJson.ImageUrl.name(), null));
-    u.programserieSlug = o.optString(DRJson.SeriesSlug.name());  // Bemærk - kan være tom!
-    u.episodeIProgramserie = o.optInt(DRJson.Episode.name());
-    u.urn = o.optString(DRJson.Urn.name());  // Bemærk - kan være tom!
+    u.titel = o.getString("Title");
+    u.beskrivelse = o.getString("Description");
+    u.billedeUrl = fjernHttpWwwDrDk(o.optString("ImageUrl", null));
+    u.programserieSlug = o.optString("SeriesSlug");  // Bemærk - kan være tom!
+    u.episodeIProgramserie = o.optInt("Episode");
+    u.urn = o.optString("Urn");  // Bemærk - kan være tom!
     return u;
   }
 
@@ -261,11 +258,11 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
       Udsendelse u = opretUdsendelse(programdata, o);
-      u.kanalSlug = kanal.slug;// o.optString(DRJson.ChannelSlug.name(), kanal.slug);  // Bemærk - kan være tom.
-      u.kanHøres = o.getBoolean(DRJson.Watchable.name());
-      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.StartTime.name()));
+      u.kanalSlug = kanal.slug;// o.optString("ChannelSlug", kanal.slug);  // Bemærk - kan være tom.
+      u.kanHøres = o.getBoolean("Watchable");
+      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("StartTime"));
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-      u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.EndTime.name()));
+      u.slutTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("EndTime"));
       u.slutTidKl = Datoformater.klokkenformat.format(u.slutTid);
       u.varighedMs = u.slutTid.getTime() - u.startTid.getTime();
 
@@ -284,18 +281,16 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
   public Udsendelse parseUdsendelse(Kanal kanal, Programdata data, JSONObject o) throws JSONException {
     Udsendelse u = opretUdsendelse(data, o);
     if (kanal != null && kanal.slug.length() > 0) u.kanalSlug = kanal.slug;
-    else u.kanalSlug = o.optString(DRJson.ChannelSlug.name());  // Bemærk - kan være tom.
-    u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString(DRJson.BroadcastStartTime.name()));
+    else u.kanalSlug = o.optString("ChannelSlug");  // Bemærk - kan være tom.
+    u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("BroadcastStartTime"));
     u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
-    u.varighedMs = 1000*o.getInt(DRJson.DurationInSeconds.name());
+    u.varighedMs = 1000*o.getInt("DurationInSeconds");
     u.slutTid = new Date(u.startTid.getTime() + u.varighedMs);
 
-    if (!App.PRODUKTION && (!o.has(DRJson.Playable.name()) || !o.has(DRJson.Playable.name())))
-      Log.rapporterFejl(new IllegalStateException("Mangler Playable eller Downloadable"), o.toString());
-    u.kanHøres = o.optBoolean(DRJson.Playable.name());
-    u.kanHentes = o.optBoolean(DRJson.Downloadable.name());
-    u.berigtigelseTitel = o.optString(DRJson.RectificationTitle.name(), null);
-    u.berigtigelseTekst = o.optString(DRJson.RectificationText.name(), null);
+    u.kanHøres = o.optBoolean("Playable");
+    u.kanHentes = o.optBoolean("Downloadable");
+    u.berigtigelseTitel = o.optString("RectificationTitle", null);
+    u.berigtigelseTekst = o.optString("RectificationText", null);
 
     return u;
   }
@@ -343,13 +338,13 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       JSONObject o = jsonArray.getJSONObject(n);
       if (n==0) Log.d("parsePlayliste "+o);
       Playlisteelement u = new Playlisteelement();
-      u.titel = o.getString(DRJson.Title.name());
-      u.kunstner = o.optString(DRJson.Artist.name());
-      u.billedeUrl = o.optString(DRJson.Image.name(), null);
-      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformatPlayliste(o.getString(DRJson.Played.name()));
+      u.titel = o.getString("Title");
+      u.kunstner = o.optString("Artist");
+      u.billedeUrl = o.optString("Image", null);
+      u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformatPlayliste(o.getString("Played"));
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       if (App.TJEK_ANTAGELSER) ; // TODO fjern OffsetMs hvis det nye navn vitterligt ER OffsetInMs
-      u.offsetMs = o.optInt(DRJson.OffsetMs.name(), o.optInt(DRJson.OffsetInMs.name(), -1));
+      u.offsetMs = o.optInt("OffsetMs", o.optInt("OffsetInMs", -1));
       liste.add(u);
     }
     if (serverapi_ret_forkerte_offsets_i_playliste) retForkerteOffsetsIPlayliste(udsendelse, liste);
@@ -394,14 +389,14 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
      */
   private ArrayList<Indslaglisteelement> parsIndslag(JSONObject jsonObj) throws JSONException {
     ArrayList<Indslaglisteelement> liste = new ArrayList<Indslaglisteelement>();
-    JSONArray jsonArray = jsonObj.optJSONArray(DRJson.Chapters.name());
+    JSONArray jsonArray = jsonObj.optJSONArray("Chapters");
     if (jsonArray == null) return liste;
     for (int n = 0; n < jsonArray.length(); n++) {
       JSONObject o = jsonArray.getJSONObject(n);
       Indslaglisteelement u = new Indslaglisteelement();
-      u.titel = o.getString(DRJson.Title.name());
-      u.beskrivelse = o.getString(DRJson.Description.name());
-      u.offsetMs = o.optInt(DRJson.OffsetMs.name(), -1);
+      u.titel = o.getString("Title");
+      u.beskrivelse = o.getString("Description");
+      u.offsetMs = o.optInt("OffsetMs", -1);
       liste.add(u);
     }
     return liste;
@@ -430,13 +425,13 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
    */
   public Programserie parsProgramserie(JSONObject o, Programserie ps) throws JSONException {
     if (ps == null) ps = new Programserie(this);
-    ps.titel = o.getString(DRJson.Title.name());
-    ps.undertitel = o.optString(DRJson.Subtitle.name(), ps.undertitel);
-    ps.beskrivelse = o.optString(DRJson.Description.name());
-    ps.billedeUrl = fjernHttpWwwDrDk(o.optString(DRJson.ImageUrl.name(), ps.billedeUrl));
-    ps.slug = o.getString(DRJson.Slug.name());
-    ps.urn = o.optString(DRJson.Urn.name());
-    ps.antalUdsendelser = o.optInt(DRJson.TotalPrograms.name(), ps.antalUdsendelser);
+    ps.titel = o.getString("Title");
+    ps.undertitel = o.optString("Subtitle", ps.undertitel);
+    ps.beskrivelse = o.optString("Description");
+    ps.billedeUrl = fjernHttpWwwDrDk(o.optString("ImageUrl", ps.billedeUrl));
+    ps.slug = o.getString("Slug");
+    ps.urn = o.optString("Urn");
+    ps.antalUdsendelser = o.optInt("TotalPrograms", ps.antalUdsendelser);
     return ps;
   }
 
@@ -452,7 +447,7 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
             ps = parsProgramserie(data, ps);
             App.data.programserieFraSlug.put(programserieSlug, ps);
           }
-          JSONArray prg = data.getJSONArray(DRJson.Programs.name());
+          JSONArray prg = data.getJSONArray("Programs");
           ArrayList<Udsendelse> uliste = new ArrayList<>();
           for (int n = 0; n < Math.min(10, prg.length()); n++) {
             uliste.add(parseUdsendelse(kanal, App.data, prg.getJSONObject(n)));
@@ -478,10 +473,10 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
           Log.d("Streams parset for = " + s.url);//Data opdateret
 
           udsendelse.indslag = parsIndslag(o);
-          udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
+          udsendelse.shareLink = o.optString("ShareLink");
           // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
           // der ikke er en programserie, og videre navigering derfor skal slås fra
-          if (!o.has(DRJson.SeriesSlug.name())) {
+          if (!o.has("SeriesSlug")) {
             App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
           }
         }
@@ -504,10 +499,10 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
           // egentlig kun GammelDrRadioBackend
           udsendelse.indslag = parsIndslag(o);
-          udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
+          udsendelse.shareLink = o.optString("ShareLink");
           // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
           // der ikke er en programserie, og videre navigering derfor skal slås fra
-          if (!o.has(DRJson.SeriesSlug.name())) {
+          if (!o.has("SeriesSlug")) {
             App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
           }
         }

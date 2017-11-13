@@ -34,8 +34,7 @@ public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
   public ProgramdataForBackend data = new ProgramdataForBackend();
 
-  protected abstract void ikkeImplementeret();
-  protected void _ikkeImplementeret() {
+  protected void _ikkeImplementeret__UBRUGT() {
     Exception x = new Exception("Ikke implementeret i " + getClass().getName());
     StackTraceElement[] ss = x.getStackTrace();
     System.err.println(x);
@@ -81,5 +80,9 @@ public abstract class Backend {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public String getSkaleretBilledeUrl(String logo_url, int bredde, int højde) {
+    return logo_url; // standardimplementationen skalerer ikke billederne
   }
 }

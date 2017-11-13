@@ -36,7 +36,6 @@ import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.radiotv.backend.EoRssParsado;
 import dk.dr.radio.diverse.App;
@@ -70,7 +69,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
-    String kanalkode = getArguments().getString(P_kode);
+    String kanalkode = getArguments().getString(P_KANALKODE);
     rod = null;
     kanal = (EoKanal) App.grunddata.kanalFraKode.get(kanalkode);
     //Log.d(this + " onCreateView 2 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
@@ -500,8 +499,8 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     Udsendelse u = (Udsendelse) o;
     Log.d("MONTRAS ELSENDON "+u.slug);
     //startActivity(new Intent(getActivity(), VisFragment_akt.class)
-    //    .putExtra(P_kode, getKanal.kode)
-    //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(DRJson.Slug.name(), u.slug)); // Udsenselses-ID
+    //    .putExtra(P_KANALKODE, getKanal.kode)
+    //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(P_UDSENDELSE, u.slug)); // Udsenselses-ID
     String aktuelUdsendelseSlug = aktuelUdsendelseIndex > 0 ? ((Udsendelse) liste.get(aktuelUdsendelseIndex)).slug : "";
 
     // Vis normalt et Udsendelser_vandret_skift_frag med flere udsendelser
@@ -510,9 +509,9 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
         App.accessibilityManager.isEnabled() || !App.prefs.getBoolean("udsendelser_bladr", true) ? Fragmentfabrikering.udsendelse(u) :
             new Udsendelser_vandret_skift_frag();
     f.setArguments(new Intent()
-        .putExtra(P_kode, kanal.kode)
+        .putExtra(P_KANALKODE, kanal.kode)
         .putExtra(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, aktuelUdsendelseSlug)
-        .putExtra(DRJson.Slug.name(), u.slug)
+        .putExtra(P_UDSENDELSE, u.slug)
         .getExtras());
     getActivity().getSupportFragmentManager().beginTransaction()
         .replace(R.id.indhold_frag, f)

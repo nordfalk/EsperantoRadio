@@ -33,9 +33,6 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
     instans = this;
   }
 
-  @Override
-  protected void ikkeImplementeret() { _ikkeImplementeret(); } // Udelukkende lavet sådan her for at få denne klasse med i staksporet
-
   public InputStream getLokaleGrunddata(Context ctx) throws IOException {
     return App.assets.open("apisvar/all-active-dr-tv-channels");
   }

@@ -48,7 +48,6 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -119,10 +118,10 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
                 Log.d("Server ombestemte sig, der var streams alligevel: "+ udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
                 streamsVarTom.remove(udsendelse);
               }
-              udsendelse.shareLink = o.optString(DRJson.ShareLink.name());
+              udsendelse.shareLink = o.optString("ShareLink");
               // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
               // der ikke er en programserie, og videre navigering derfor skal slås fra
-              if (!o.has(DRJson.SeriesSlug.name())) {
+              if (!o.has("SeriesSlug")) {
                 if (!App.data.programserieSlugFindesIkke.contains(udsendelse.programserieSlug)) {
                   App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
                 }
@@ -159,8 +158,8 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
-    udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(DRJson.Slug.name()));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
         Log.rapporterFejl(new IllegalStateException("afbrydManglerData " + getArguments().toString()));
@@ -421,10 +420,10 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       } else if (udsendelse.playliste != null && udsendelse.playliste.size() > 0) {
         liste.add(OVERSKRIFT_PLAYLISTE_INFO);
         ArrayList<Playlisteelement> playliste = udsendelse.playliste;
-        if (aktuelUdsendelsePåKanalen()) playlisteElemDerSpillerNu = playliste.get(0);
-        else { //if (!aktuelUdsendelsePåKanalen()) { // Aktuel udsendelse skal have senest spillet nummer øverst
+        if (aktuelUdsendelsePåKanalen()) {
           playliste = new ArrayList<Playlisteelement>(playliste);
-          Collections.reverse(playliste); // andre udsendelser skal have stigende tid nedad
+          Collections.reverse(playliste); // Aktuel udsendelse skal have senest spillet nummer øverst
+          playlisteElemDerSpillerNu = playliste.get(0);
         }
 
         if (visHelePlaylisten) {
@@ -808,9 +807,9 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-          .putExtra(P_kode, kanal.kode)
-          .putExtra(DRJson.Slug.name(), udsendelse.slug)
-          .putExtra(DRJson.SeriesSlug.name(), udsendelse.programserieSlug)
+          .putExtra(P_KANALKODE, kanal.kode)
+          .putExtra(P_UDSENDELSE, udsendelse.slug)
+          .putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

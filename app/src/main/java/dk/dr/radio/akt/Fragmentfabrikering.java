@@ -5,8 +5,10 @@ import android.support.v4.app.Fragment;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.radiotv.backend.EsperantoRadioBackend;
+
+import static dk.dr.radio.akt.Basisfragment.P_KANALKODE;
+import static dk.dr.radio.akt.Basisfragment.P_UDSENDELSE;
 
 /**
  * Oprettet af Jacob Nordfalk den 12-09-15.
@@ -21,7 +23,7 @@ public class Fragmentfabrikering {
       fragment = new Udsendelse_frag();
     }
     Bundle args = new Bundle();
-    args.putString(DRJson.Slug.name(), udsendelse.slug);
+    args.putString(P_UDSENDELSE, udsendelse.slug);
     fragment.setArguments(args);
     return fragment;
   }
@@ -34,7 +36,7 @@ public class Fragmentfabrikering {
       f = k.kode.equals("DRN") ? new Kanal_nyheder_frag() :  new Kanal_frag();
     }
     Bundle b = new Bundle();
-    b.putString(Kanal_frag.P_kode, k.kode);
+    b.putString(P_KANALKODE, k.kode);
     f.setArguments(b);
     return f;
   }

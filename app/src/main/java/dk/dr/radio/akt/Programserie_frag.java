@@ -24,7 +24,6 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -51,9 +50,9 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    programserieSlug = getArguments().getString(DRJson.SeriesSlug.name());
+    programserieSlug = getArguments().getString(P_PROGRAMSERIE);
     Log.d("onCreateView " + this + " viser " + programserieSlug);
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(Kanal_frag.P_kode));
+    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
     rod = inflater.inflate(R.layout.udsendelse_frag, container, false);
     aq = new AQuery(rod);
     listView = aq.id(R.id.listView).adapter(adapter).getListView();
@@ -321,8 +320,8 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
                   new Udsendelser_vandret_skift_frag(); // standard
       f.setArguments(new Intent()
           .putExtra(Udsendelse_frag.BLOKER_VIDERE_NAVIGERING, true)
-          .putExtra(P_kode, kanal == null ? null : kanal.kode)
-          .putExtra(DRJson.Slug.name(), udsendelse.slug)
+          .putExtra(P_KANALKODE, kanal == null ? null : kanal.kode)
+          .putExtra(P_UDSENDELSE, udsendelse.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

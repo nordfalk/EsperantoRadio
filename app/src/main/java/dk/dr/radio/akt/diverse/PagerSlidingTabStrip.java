@@ -47,10 +47,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import java.util.Locale;
 
 import dk.dr.radio.akt.Kanal_frag;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
 
@@ -63,10 +65,8 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
   private static final boolean TEKST_DER_FADER_OVER_I_IKONER = true;
   public interface IconTabProvider {
     public int getPageIconResId(int position);
-
     public String getPageContentDescription(int position);
-
-    public Bitmap getPageIconBitmap(int position);
+    public String getPageIconUrl(int position);
   }
 
   // @formatter:off
@@ -222,10 +222,13 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
       if (adapter instanceof IconTabProvider) {
         IconTabProvider ipa = ((IconTabProvider) adapter);
         if (TEKST_DER_FADER_OVER_I_IKONER) {
-          Bitmap bitmap = ipa.getPageIconBitmap(i);
           int resId = ipa.getPageIconResId(i);
-          if (resId!=0 || bitmap!=null) addIconTabBådeTekstOgBillede(i, resId, bitmap, ipa.getPageContentDescription(i));
-          else addTextTab(i, adapter.getPageTitle(i).toString());
+          if (resId!=0) addIconTabBådeTekstOgBillede(i, resId, null, ipa.getPageContentDescription(i));
+          else {
+            String url = ipa.getPageIconUrl(i);
+            if (url!=null) addIconTabBådeTekstOgBillede(i, resId, url, ipa.getPageContentDescription(i));
+            else addTextTab(i, adapter.getPageTitle(i).toString());
+          }
         } else {
           addIconTab(i, ipa.getPageIconResId(i), ipa.getPageContentDescription(i));
         }
@@ -281,12 +284,16 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
   }
 
   // EO ŝanĝo
-  private void addIconTabBådeTekstOgBillede(final int position, int resId, Bitmap res, String title) {
+  private void addIconTabBådeTekstOgBillede(final int position, int resId, String url, String title) {
     FrameLayout tabfl = new FrameLayout(getContext());
     ImageView tabi = new ImageView(getContext());
     tabi.setContentDescription(title);
-    if (res!=null) {
-      tabi.setImageBitmap(res);
+    Log.d(title+" "+resId + " Kanallogo URL="+url);
+    if (resId==0) {
+      Picasso.with(tabi.getContext())
+              .load(url).placeholder(null)
+              .into(tabi);
+
       tabi.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
       tabi.setAdjustViewBounds(true);
       tabi.setVisibility(View.GONE);

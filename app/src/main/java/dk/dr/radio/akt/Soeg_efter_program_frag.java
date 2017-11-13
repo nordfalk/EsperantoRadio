@@ -33,7 +33,6 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.DRJson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
@@ -216,7 +215,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
       Programserie programserie = (Programserie) obj;
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-          .putExtra(DRJson.SeriesSlug.name(), programserie.slug)
+          .putExtra(P_PROGRAMSERIE, programserie.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, f)

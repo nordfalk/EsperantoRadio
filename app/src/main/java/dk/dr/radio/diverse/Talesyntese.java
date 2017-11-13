@@ -1,8 +1,9 @@
 package dk.dr.radio.diverse;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
-import android.view.inputmethod.InputMethodManager;
 
 import java.util.Locale;
 
@@ -13,8 +14,19 @@ import java.util.Locale;
 public class Talesyntese {
   private TextToSpeech tts;
   private boolean initialiseret;
+  private SharedPreferences prefs;
+  private boolean talesynteseAktiv;
+  private int antalSætninger;
+  private int talesynteseHjælpAntal;
+
+  public void prefsÆndret() {
+    talesynteseAktiv = prefs.getBoolean("talesynteseAktiv", true);
+    talesynteseHjælpAntal = prefs.getInt("talesynteseHjælpAntal", 0);
+  }
 
   public void init(Context ctx) {
+    prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+    prefsÆndret();
     tts = new TextToSpeech(ctx, new TextToSpeech.OnInitListener() {
       @Override
       public void onInit(int status) {
@@ -31,18 +43,20 @@ public class Talesyntese {
             }
           }
 
-
-          if (initialiseret) {
-            Locale sprog = tts.getLanguage();
-            tts.speak("Tekst til tale initialiseret for sproget " + sprog.getDisplayLanguage(sprog), TextToSpeech.QUEUE_ADD, null);
-          }
+//          udtal("Tekst til tale initialiseret for sproget " + tts.getLanguage().getDisplayLanguage(tts.getLanguage()));
         }
       }
     });
   }
 
-  public void tal(String tekst) {
-    if (!initialiseret) return;
+  public void udtal(String tekst) {
+    if (!initialiseret || !talesynteseAktiv) return;
     tts.speak(tekst, TextToSpeech.QUEUE_ADD, null);
+    antalSætninger++;
+    if (antalSætninger%5==0 && talesynteseHjælpAntal<3) {
+      tts.speak("Du kan slå talesyntese fra i indstillingerne", TextToSpeech.QUEUE_ADD, null);
+      talesynteseHjælpAntal++;
+      prefs.edit().putInt("talesynteseHjælpAntal", talesynteseHjælpAntal).apply();
+    }
   }
 }

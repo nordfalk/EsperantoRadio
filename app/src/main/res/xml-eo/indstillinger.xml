@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <!--
-      <CheckBoxPreference
-              android:key="Filtrér akamai"
-              android:title="Filtrér akamai"
-              android:defaultValue="true"
-              android:summaryOn="Filtrér Akamai for døde servere (TEST AF NY KODE)"
-              android:summaryOff="Filtrér ikke Akamai for døde servere"
-              />
-  -->
   <PreferenceCategory android:title="@string/Brugergrænseflade">
     <CheckBoxPreference
         android:key="startAfspilningMedDetSammme"
@@ -26,24 +17,7 @@
 
   </PreferenceCategory>
 
-<!--
-  <PreferenceCategory android:title="Lyd">
-    <ListPreference
-        android:key="lydkvalitet"
-        android:title="Lydkvalitet"
-        android:defaultValue="auto"
-        android:summary="Standard er 96kbps og bruger ca. 45 MB data per time, mens høj kvalitet bruger ca. 90 MB/time"
-        android:entries="@array/lydkvalitet_tekst"
-        android:entryValues="@array/lydkvalitet_kode"/>
-    <ListPreference
-        android:key="lydformat2"
-        android:title="Lydformat"
-        android:summary="Hvis du ikke kan få lyd så prøv at vælge MP3 (Shoutcast) her"
-        android:defaultValue="auto"
-        android:entries="@array/lydformat_tekst"
-        android:entryValues="@array/lydformat_kode"/>
-  </PreferenceCategory>
--->
+
   <PreferenceCategory android:title="@string/Hentede_udsendelser">
 
     <CheckBoxPreference
@@ -61,40 +35,6 @@
       />
 
   </PreferenceCategory>
-
-  <!--
-
-
-<PreferenceCategory android:title="Andet">
-
-  <CheckBoxPreference
-    android:key="fjernbetjening" android:title="Fjernbetjening"
-    android:defaultValue="true"
-    android:summaryOff="Ingen betjening fra Bluetooth og ændrer ikke baggrunden på låseskærmen"
-    android:summaryOn="Betjening fra Bluetooth headset og låseskærmen på Android 4.\nLåseskærmens baggrund viser grafik fra udsendelsen, der afspilles."
-    />
-</PreferenceCategory>
-
-
-
-<PreferenceScreen android:title="@string/Avanceret"
-                    android:summary="@string/strømbesparende_funktioner_og_andet">
-
-        <PreferenceCategory android:title="Strømforbrug">
-          <CheckBoxPreference
-              android:key="wifilås" android:title="Hold wifi tændt"
-              android:defaultValue="true"
-              android:summaryOn="Hold wifi tændt under afspilning.\nHakker afspilningen alligevel, så tjek telefonens generelle indstillinger til strømbesparelse."
-              android:summaryOff="Tillad enheden at skrue ned for wifi.\nKan forårsage at afspilningen hakker."/>
-
-          <CheckBoxPreference
-              android:key="cpulås" android:title="Hold CPU tændt"
-              android:defaultValue="true"
-              android:summaryOn="Hold CPU aktiv under afspilning"
-              android:summaryOff="Tillad enheden at skrue ned for CPU.\nKan forårsage at afspilningen hakker."/>
-
-        </PreferenceCategory>
-  -->
 
       <PreferenceCategory android:title="@string/Kun_til_udviklere">
 

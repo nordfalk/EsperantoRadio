@@ -65,6 +65,12 @@
 
 
   <PreferenceCategory android:title="Andet">
+    <CheckBoxPreference
+        android:key="talesynteseAktiv" android:title="Talesyntese"
+        android:defaultValue="true"
+        android:summaryOn="Udtal kanalens navn når der skiftes kanal v.hj.a. fjernbetjening fra f.eks. Bluetooth headset"
+        android:summaryOff="Ingen talesyntese"
+        />
 
     <CheckBoxPreference
       android:key="fjernbetjening" android:title="Fjernbetjening"

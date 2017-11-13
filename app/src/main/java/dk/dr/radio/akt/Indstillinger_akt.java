@@ -165,6 +165,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     App.fejlsøgning = App.prefs.getBoolean("fejlsøgning", false);
     Wrapperfabrikering.nulstilWrapper();
     Wrapperfabrikering.opret();
+    App.talesyntese.prefsÆndret();
   }
 
   @Override

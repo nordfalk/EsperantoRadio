@@ -92,7 +92,7 @@ public class App {
   public static Programdata data;
   public static Grunddata grunddata;
   public static Afspiller afspiller;
-  public static Talesyntese talesyntese;
+  public static final Talesyntese talesyntese = new Talesyntese();
 
   public static final boolean PRODUKTION = !BuildConfig.DEBUG;
   public static boolean EMULATOR = true; // Sæt i onCreate(), ellers virker det ikke i std Java

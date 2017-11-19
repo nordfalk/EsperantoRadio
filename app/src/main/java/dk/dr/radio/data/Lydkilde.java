@@ -20,8 +20,12 @@ public abstract class Lydkilde implements Serializable {
   // Se også http://stackoverflow.com/questions/16210831/serialization-deserialization-proguard
   private static final long serialVersionUID = 6061992240626233386L;
 
-  public String urn;   // Bemærk - kan være tom! unik ID - se https://en.wikipedia.org/wiki/Uniform_Resource_Name
-  public String slug;  // Bemærk - kan være tom! unik genkendelig ID for en udsendelse eller kanal - https://en.wikipedia.org/wiki/Slug_(publishing)
+  /** Unik ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
+  public String urn;
+  /** Unik menneskelig læselig ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
+  public String slug;
+  /** Om mediekilden har video eller kun er ren lyd */
+  public boolean erVideo;
   public transient ArrayList<Lydstream> streams;
   public transient Lydstream hentetStream;
   public static final String INDST_lydformat = "lydformat2";

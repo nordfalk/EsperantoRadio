@@ -60,7 +60,7 @@ public class Kanal extends Lydkilde {
 
   @Override
   public String toString() {
-    return kode;// + "/" + navn + "/" + logoUrl;
+    return kode+"/"+slug;// + "/" + navn + "/" + logoUrl;
   }
 
   public boolean harUdsendelserForDag(String dato) {

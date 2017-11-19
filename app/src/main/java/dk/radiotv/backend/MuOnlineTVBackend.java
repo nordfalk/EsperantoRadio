@@ -42,6 +42,19 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
     return BASISURL+"/channel/all-active-dr-tv-channels";
   }
 
+  @Override
+  public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
+    super.initGrunddata(grunddata, grunddataStr);
+    for (Kanal k : kanaler) k.erVideo = true;
+  }
+
+
+  @Override
+  Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
+    Udsendelse u = super.parseUdsendelse(kanal, programdata, o);
+    u.erVideo = true;
+    return u;
+  }
 
 
 
@@ -82,6 +95,7 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
 
   private static Udsendelse parseNowNextUdsendelse(JSONObject jsonObject) throws JSONException {
     Udsendelse udsendelse = new Udsendelse();
+    udsendelse.erVideo = true;
 
     udsendelse.titel = jsonObject.getString("Title");
     //Hent "subTitle" også?

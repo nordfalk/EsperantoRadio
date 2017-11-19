@@ -32,12 +32,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.google.android.gms.cast.MediaInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
+import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
@@ -727,6 +730,15 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.data.hentedeUdsendelser.hent(udsendelse);
   }
 
+  public void startPlayerActivity(Udsendelse udsendelse) {
+    if (getActivity()==null) return;
+    MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
+    Intent intent = new Intent(getActivity(), LocalPlayerActivity.class);
+    intent.putExtra("media", mediaInfo);
+    intent.putExtra("shouldStart", true);
+    startActivity(intent);
+  }
+
   private void hør() {
     try {
       if (!udsendelse.kanHøres) {
@@ -735,6 +747,10 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           Kanal_frag.hør(kanal, getActivity());
           Log.registrérTestet("Åbne aktuel udsendelse og høre den", kanal.kode);
         }
+        return;
+      }
+      if (kanal.erVideo) {
+        startPlayerActivity(udsendelse);
         return;
       }
       //if (App.fejlsøgning) App.kortToast("kanal.streams=" + kanal.streams);

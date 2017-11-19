@@ -2,6 +2,7 @@ package dk.dr.radio.akt;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,11 +26,14 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.androidquery.AQuery;
+import com.google.android.gms.cast.MediaInfo;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
+import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.radiotv.backend.Backend;
@@ -564,7 +568,19 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     }
   }
 
+  public static void startPlayerActivity(Kanal kanal, Context context) {
+    MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
+    Activity activity = (Activity) context;
+    Intent intent = new Intent(activity, LocalPlayerActivity.class);
+    intent.putExtra("media", mediaInfo);
+    intent.putExtra("shouldStart", true);
+    activity.startActivity(intent);
+  }
   public static void hør(final Kanal kanal, Activity akt) {
+    if (kanal.erVideo) {
+      startPlayerActivity(kanal, akt);
+      return;
+    }
     //if (App.fejlsøgning) App.kortToast("kanal=" + kanal);
     if (App.prefs.getBoolean("manuelStreamvalg", false)) {
       kanal.nulstilForetrukkenStream();

@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import dk.dr.radio.akt.Basisfragment;
@@ -31,15 +33,6 @@ abstract class MuOnlineBackend extends Backend {
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     JSONArray jsonArray = new JSONArray(grunddataStr);
     kanaler.clear();
-    parseKanaler(grunddata, jsonArray);
-    Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
-
-    for (final Kanal k : kanaler) {
-      k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
-    }
-  }
-
-  private void parseKanaler(Grunddata grunddata, JSONArray jsonArray) throws JSONException {
     int antal = jsonArray.length();
     for (int i = 0; i < antal; i++) {
       JSONObject j = jsonArray.getJSONObject(i);
@@ -74,6 +67,19 @@ abstract class MuOnlineBackend extends Backend {
       grunddata.kanalFraSlug.put(k.slug, k);
 
       k.setStreams(parseKanalStreams(j));
+    }
+
+    Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
+    Collections.sort(kanaler, new Comparator<Kanal>() {
+      @Override
+      public int compare(Kanal o1, Kanal o2) {
+        return o1.slug.compareTo(o2.slug);
+      }
+    });
+    Log.d("parseKanaler gav " + kanaler + " UDESTÅR ordentlig sortering!");
+
+    for (Kanal k : kanaler) {
+      k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
     }
   }
 

@@ -370,7 +370,7 @@ public class App {
             String nyeGrunddata = s.json.trim();
             String gamleGrunddata = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
             if (nyeGrunddata.equals(gamleGrunddata)) return; // Det samme som var i prefs
-            Log.d("Vi fik nye grunddata for "+backend+" : fraCache=" + s.fraCache);
+            Log.d("Vi fik nye grunddata for "+backend+" : fraCache=" + s.fraCache+"\n"+s.url);
             if (!PRODUKTION || App.fejlsøgning) {
               if (gamleGrunddata!=null) Log.d("gl="+gamleGrunddata.length()+" "+gamleGrunddata.hashCode()+ " "+gamleGrunddata.replace('\n',' '));
               Log.d("ny="+nyeGrunddata.length()+" "+nyeGrunddata.hashCode()+ " "+nyeGrunddata.replace('\n',' '));

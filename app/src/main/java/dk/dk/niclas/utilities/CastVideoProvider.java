@@ -162,17 +162,4 @@ public class CastVideoProvider {
             .setContentId(contentId)
             .setLanguage(language).build();
   }
-
-  private static int safeLongToInt(long l) {
-    try {
-      if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-        throw new ArithmeticException
-                (l + " cannot be cast to int without changing its value.");
-      }
-    } catch (ArithmeticException e) {
-      e.printStackTrace();
-      App.langToast(R.string.Netværksfejl_prøv_igen_senere);
-    }
-    return (int) l;
-  }
 }

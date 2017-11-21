@@ -354,21 +354,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       return liste.size();
     }
 
-    /*
-    public boolean hasStableIds() {
-      return true;
-    }
-
-    @Override
-    public Object getItem(int position) {
-      return liste.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-      return position+getItemViewType(position)*1000;
-    }
-    */
     @Override
     public int getViewTypeCount() {
       return 4;
@@ -390,7 +375,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     public boolean isItemViewTypePinned(int viewType) {
       return viewType == DAGSOVERSKRIFT;
     }
-//    public boolean isItemViewTypePinned(int viewType) { return false; }
 
     static final int NORMAL = 0;
     static final int AKTUEL = 1;

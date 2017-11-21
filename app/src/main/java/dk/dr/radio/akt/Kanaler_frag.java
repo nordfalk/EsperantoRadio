@@ -64,12 +64,25 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     Log.d("onCreateView " + this);
     View rod = inflater.inflate(R.layout.kanaler_frag, container, false);
-
     run();
     adapter = new KanalAdapter(getChildFragmentManager());
     adapter.kanaler2 = kanaler;
     viewPager = (ViewPager) rod.findViewById(R.id.pager);
     viewPager.setAdapter(adapter);
+    /*
+    viewPager.setClipChildren(false);
+    viewPager.setOffscreenPageLimit(2);
+    rod.post(new Runnable() {
+      @Override
+      public void run() {
+        float ønsketBredde = getResources().getDisplayMetrics().density * 320; // 320 dp
+        int d = (int) (viewPager.getWidth() - ønsketBredde);
+
+        //viewPager.setPadding(w/16, 0, w/16, 0);
+        viewPager.setPageMargin(-d/2);
+      }
+    });
+    */
 
     venstremenuFrag = (Venstremenu_frag) getFragmentManager().findFragmentById(R.id.venstremenu_frag);
 

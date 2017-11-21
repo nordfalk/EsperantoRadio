@@ -248,9 +248,9 @@ abstract class MuOnlineBackend extends Backend {
       u.kanHentes = udsData.getBoolean("Downloadable");
       u.varighedMs = udsData.getLong("DurationInMilliseconds");
       u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(udsData.getString("StartPublish"));
-      Log.d("parseUdsendelse: Der var streams for " + u);
+      //Log.d("parseUdsendelse: Der var streams for " + u);
     } else {
-      Log.d("parseUdsendelse: Ingen streams for " + u);
+      //Log.d("parseUdsendelse: Ingen streams for " + u);
     }
     u.kanHøres = udsData!=null;
     u.sæsonSlug = o.optString("SeasonSlug");

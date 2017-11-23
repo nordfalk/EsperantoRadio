@@ -7,10 +7,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.Netsvar;
+import dk.radiotv.backend.Backend;
 import dk.radiotv.backend.GammelDrRadioBackend;
 import dk.radiotv.backend.NetsvarBehander;
 
@@ -18,44 +21,29 @@ import dk.radiotv.backend.NetsvarBehander;
  * Created by j on 05-10-14.
  */
 public class ProgramserierAtilAA {
-  public ArrayList<Programserie> liste;
-  public List<Runnable> observatører = new ArrayList<Runnable>();
+  private ArrayList<Programserie> liste = new ArrayList<>();
 
-  /**
-   * Parser JSON-svar og opdaterer data derefter. Bør ikke kaldes udefra, udover i afprøvningsøjemed
-   * @param json
-   * @throws JSONException
-   */
-  public void parseAlleProgramserierAtilÅ(String json) throws JSONException {
-    JSONArray jsonArray = new JSONArray(json);
-    ArrayList<Programserie> res = new ArrayList<Programserie>();
-    for (int n = 0; n < jsonArray.length(); n++) {
-      JSONObject programserieJson = jsonArray.getJSONObject(n);
-      String programserieSlug = programserieJson.getString("Slug");
-      //Log.d("\n=========================================== programserieSlug = " + programserieSlug);
-      Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
-      if (programserie == null) {
-        // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
-        programserie = new Programserie(GammelDrRadioBackend.instans);
-        GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie);
-        App.data.programserieFraSlug.put(programserieSlug, programserie);
+  public ArrayList<Programserie> getListe() {
+    liste.clear();
+    liste.addAll(App.data.programserieFraSlug.values());
+    Collections.sort(liste, new Comparator<Programserie>() {
+      @Override
+      public int compare(Programserie o1, Programserie o2) {
+        return o1.titel.compareTo(o2.titel);
       }
-      res.add(programserie);
-    }
-    //Log.d("programserierAtilÅ res=" + res);
-    //Log.d("programserierAtilÅ jsonArray.length()=" + jsonArray.length());
-    //Log.d("programserierAtilÅ res.size()=" + res.size());
-    liste = res;
+    });
+    return liste;
   }
-
+  public List<Runnable> observatører = new ArrayList<Runnable>();
+  public boolean indlæst;
 
   public void startHentData() {
-    App.netkald.kald(null, GammelDrRadioBackend.instans.getAlleProgramserierAtilÅUrl(), Request.Priority.LOW, new NetsvarBehander() {
+    if (indlæst) return;
+    indlæst = true;
+    for (Backend b : App.backend) b.hentAlleProgramserierAtilÅ(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
-        //Log.d("programserierAtilÅ fikSvar " + fraCache+uændret+json);
-        if (s.uændret ||  "null".equals(s.json)) return;
-        parseAlleProgramserierAtilÅ(s.json);
+        if (s.fejl || s.uændret) return;
         for (Runnable r : observatører) r.run(); // Informér observatører
       }
     });

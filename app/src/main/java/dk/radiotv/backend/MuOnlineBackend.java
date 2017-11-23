@@ -282,6 +282,7 @@ abstract class MuOnlineBackend extends Backend {
             if (ps == null) ps = new Programserie(MuOnlineBackend.this);
             ps.titel = data.getString("Title");
             ps.slug = programserieSlug;
+            ps.antalUdsendelser = data.getInt("TotalSize");
             App.data.programserieFraSlug.put(programserieSlug, ps);
           }
           JSONArray prg = data.getJSONArray("Items");

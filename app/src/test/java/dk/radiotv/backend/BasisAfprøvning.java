@@ -9,6 +9,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
@@ -101,4 +102,24 @@ public class BasisAfprøvning {
     }
   }
 
+  public void tjek_hent_a_til_å() throws Exception {
+    System.out.println("tjek_hent_a_til_å");
+    backend.hentAlleProgramserierAtilÅ(NetsvarBehander.TOM);
+    ArrayList<Programserie> liste = App.data.programserierAtilÅ.getListe();
+    System.out.println("tjek_hent_a_til_å liste="+liste.size());
+    assertTrue(liste.size()>0);
+
+    int samletAntalUdsendelser = 0;
+
+    // Tjek kun nummer 50 til nummer 100
+    for (Programserie ps : liste.subList(50, 65)) {
+      backend.hentProgramserie(ps, ps.slug, null, 0, NetsvarBehander.TOM);
+      ArrayList<Udsendelse> udsendelser = ps.getUdsendelser();
+
+      System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
+      assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+ps.titel, ps.antalUdsendelser>= udsendelser.size());
+      samletAntalUdsendelser += udsendelser.size();
+    }
+    assertTrue("Kun "+samletAntalUdsendelser+" udsendelser!", samletAntalUdsendelser>10);
+  }
 }

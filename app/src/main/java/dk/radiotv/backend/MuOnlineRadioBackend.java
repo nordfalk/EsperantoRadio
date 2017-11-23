@@ -3,7 +3,6 @@ package dk.radiotv.backend;
 import android.content.Context;
 
 import org.joda.time.format.ISOPeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,6 +13,7 @@ import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Playlisteelement;
+import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
@@ -46,10 +46,9 @@ https://www.dr.dk/mu-psapi/mediaelement/urn:dr:mu:programcard:59e3df56a11f9f13a4
 https://en.wikipedia.org/wiki/ISO_8601#Durations
    */
 
-  private static final String BASISURL2 = "https://www.dr.dk/mu-psapi";
   @Override
   public void hentPlayliste(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
-    final String url = BASISURL2 + "/mediaelement/" + udsendelse.urn;
+    final String url = "https://www.dr.dk/mu-psapi/mediaelement/" + udsendelse.urn;
     App.netkald.kald(null, url, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
@@ -83,6 +82,37 @@ https://en.wikipedia.org/wiki/ISO_8601#Durations
       }
     });
   }
+
+  @Override
+  public void hentAlleProgramserierAtilÅ(final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(null, "https://www.dr.dk/mu-psapi/medium/radio/indexelements", new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(this + " hentAlleProgramserierAtilÅ "+s.url+ "  fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          JSONArray arr = new JSONArray(s.json);
+
+          JSONObject problemObj = null;
+          for (JSONObject o : new JSONArrayIterator(arr)) try {
+            problemObj = o;
+            String programserieUrn = o.getString("id");
+            Programserie ps = App.data.programserieFraSlug.get(programserieUrn);
+            if (ps == null) {
+              ps = new Programserie(MuOnlineRadioBackend.this);
+              ps.urn = programserieUrn;
+              App.data.programserieFraSlug.put(programserieUrn, ps);
+              ps.slug = programserieUrn; // ØV! Den kommer ikke med :-| TODO!!!
+            }
+            ps.titel = o.getString("title");
+            ps.beskrivelse = o.optString("description"); // opt - f.eks. "id":"urn:dr:mu:bundle:5a0a3b456187a4148c986b54","title":"P4 Valgekstra","sortLetter":"P","hasOndemandRights":true,"sourceMedium":2,"image":{"webImages":[{"imageUrl":"https:\/\/www.dr.dk\/mu-online\/api\/1.3\/bar\/helper\/get-image-for-bundle\/urn:dr:mu:bundle:5a0a3b456187a4148c986b54","pixelWidth":960}]},"type":"series","isGeoBlocked":false}
+            ps.billedeUrl = o.getJSONObject("image").getJSONArray("webImages").getJSONObject(0).getString("imageUrl");
+          } catch (Exception e) { Log.e(o.toString(), e); }
+        }
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
 
 }
 
@@ -188,4 +218,7 @@ https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/532c32f16187a216b
 https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/5975ee68a11f9f10e81cb97b%2525253Fraw=True&w=240&h=100&scaleAfter=crop&quality=75
 https://asset.dr.dk/ImageScaler/?file=/mu-online/api/1.3/asset/52d3f5e66187a2077cbac70c%2525253Fraw=True&w=240&h=129&scaleAfter=crop&quality=75
 
+
+'Vi anbefaler'
+http://www.dr.dk//mu-psapi/medium/radio/plugs?maxnumber=10
    */

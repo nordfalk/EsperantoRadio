@@ -511,4 +511,40 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
     });
   }
 
+  @Override
+  public void hentAlleProgramserierAtilÅ(final NetsvarBehander netsvarBehander) {
+    App.netkald.kald(null, getAlleProgramserierAtilÅUrl(), new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        parseAlleProgramserierAtilÅ(s.json);
+        netsvarBehander.fikSvar(s);
+      }
+    });
+  }
+
+  /**
+   * Parser JSON-svar og opdaterer data derefter. Bør ikke kaldes udefra, udover i afprøvningsøjemed
+   * @param json
+   * @throws JSONException
+   */
+  private void parseAlleProgramserierAtilÅ(String json) throws JSONException {
+    JSONArray jsonArray = new JSONArray(json);
+    ArrayList<Programserie> res = new ArrayList<Programserie>();
+    for (int n = 0; n < jsonArray.length(); n++) {
+      JSONObject programserieJson = jsonArray.getJSONObject(n);
+      String programserieSlug = programserieJson.getString("Slug");
+      //Log.d("\n=========================================== programserieSlug = " + programserieSlug);
+      Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
+      if (programserie == null) {
+        // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
+        programserie = new Programserie(GammelDrRadioBackend.instans);
+        GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie);
+        App.data.programserieFraSlug.put(programserieSlug, programserie);
+      }
+      res.add(programserie);
+    }
+    //Log.d("programserierAtilÅ res=" + res);
+    //Log.d("programserierAtilÅ jsonArray.length()=" + jsonArray.length());
+    //Log.d("programserierAtilÅ res.size()=" + res.size());
+  }
 }

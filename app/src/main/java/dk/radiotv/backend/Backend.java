@@ -85,4 +85,12 @@ public abstract class Backend {
   public String getSkaleretBilledeUrl(String logo_url, int bredde, int højde) {
     return logo_url; // standardimplementationen skalerer ikke billederne
   }
+
+  public void hentAlleProgramserierAtilÅ(NetsvarBehander netsvarBehander) {
+    try {
+      netsvarBehander.fikSvar(Netsvar.IKKE_UNDERSTØTTET);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

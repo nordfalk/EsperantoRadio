@@ -31,4 +31,8 @@ public class AfproevMuOnlineTVBackend extends BasisAfprøvning {
     super.tjekAktuelleUdsendelser();
   }
 
+  @Test
+  public void tjek_hent_a_til_å() throws Exception {
+    super.tjek_hent_a_til_å();
+  }
 }

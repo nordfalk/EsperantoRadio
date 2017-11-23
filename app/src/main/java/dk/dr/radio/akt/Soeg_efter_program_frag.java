@@ -84,21 +84,15 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     tomStr = aq.id(R.id.tom).getTextView();
 
     søgFelt.addTextChangedListener(new TextWatcher() {
-
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
-        Log.d("JPER text changed");
-
         if (søgFelt.getText().toString().length() > 0) {
-
           søgKnap.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-
         } else {
           liste.clear();
           adapter.notifyDataSetChanged();
           søgKnap.setImageResource(R.drawable.dri_soeg_blaa);
         }
-
       }
 
       @Override
@@ -107,15 +101,11 @@ public class Soeg_efter_program_frag extends Basisfragment implements
 
       @Override
       public void afterTextChanged(Editable s) {
-
         if (søgFelt.getText().length() > 0) {
           søg();
         } else {
           tomStr.setText("");
-
         }
-
-
       }
     });
 
@@ -124,7 +114,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
       @Override
       public boolean onEditorAction(TextView v, int actionId,
                                     KeyEvent event) {
-        Log.d("actionId=" + actionId);
         søg();
         return true;
       }
@@ -143,7 +132,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     });
 
     // Indlæs A-Å-liste hvis den ikke allerede er det, så vi har en komplet programliste
-    if (!Udseende.ESPERANTO && App.data.programserierAtilÅ.liste == null) {
+    if (!App.data.programserierAtilÅ.indlæst) {
       App.data.programserierAtilÅ.startHentData();
     }
     return rod;

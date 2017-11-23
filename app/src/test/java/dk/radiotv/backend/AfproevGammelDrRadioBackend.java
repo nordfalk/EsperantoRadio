@@ -85,14 +85,12 @@ public class AfproevGammelDrRadioBackend extends BasisAfprøvning {
 
   @Test
   public void tjek_hent_a_til_å() throws Exception {
-    System.out.println("tjek_hent_a_til_å");
-    App.data.programserierAtilÅ.parseAlleProgramserierAtilÅ(Netkald.hentStreng(backend.getAlleProgramserierAtilÅUrl()));
-    assertTrue(App.data.programserierAtilÅ.liste.size()>0);
+    super.tjek_hent_a_til_å();
+    ArrayList<Programserie> liste = App.data.programserierAtilÅ.getListe();
 
     int samletAntalUdsendelser = 0;
-
     // Tjek kun nummer 50 til nummer 100
-    for (Programserie ps : App.data.programserierAtilÅ.liste.subList(50, 60)) {
+    for (Programserie ps : liste.subList(50, 65)) {
       String url = backend.getProgramserieUrl(ps, ps.slug, 0);
       JSONObject data = new JSONObject(Netkald.hentStreng(url));
       ps = backend.parsProgramserie(data, ps);

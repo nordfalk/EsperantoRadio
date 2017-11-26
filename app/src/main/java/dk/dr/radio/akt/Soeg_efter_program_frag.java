@@ -255,7 +255,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
         SoegElement se = new SoegElement();
         se.programserie = ps;
         se.titel = " "+ps.titel.toLowerCase() + " " + ps.undertitel.toLowerCase();
-        se.beskrivelse = " "+ps.beskrivelse.toLowerCase();
+        se.beskrivelse = (ps.beskrivelse==null ? "" : " "+ps.beskrivelse.toLowerCase());
         søgelistecache.add(se);
       }
       else for (Udsendelse ps : App.data.udsendelseFraSlug.values()) {  // EO ŝanĝo

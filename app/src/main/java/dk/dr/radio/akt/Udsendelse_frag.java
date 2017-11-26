@@ -749,7 +749,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         }
         return;
       }
-      if (kanal.erVideo) {
+      if (udsendelse.erVideo) {
         startPlayerActivity(udsendelse);
         return;
       }

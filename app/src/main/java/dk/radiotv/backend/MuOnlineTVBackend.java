@@ -39,7 +39,7 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
 
   @Override
   public String getGrunddataUrl() {
-    return BASISURL+"/channel/all-active-dr-tv-channels";
+    return BASISURL + "/channel/all-active-dr-tv-channels";
   }
 
   @Override
@@ -55,8 +55,6 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
     u.erVideo = true;
     return u;
   }
-
-
 
 
   //http://www.dr.dk/mu-online/api/1.3/schedule/nownext-for-all-active-dr-tv-channels
@@ -166,10 +164,10 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
   //http://www.dr.dk/mu-online/api/1.3/list/view/mostviewed?channel=&channeltype=TV&limit=15&offset=0
   String getMestSeteUrl(String kanalSlug, int offset) {
     int limit = 15;
-    String url = BASISURL+"/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
+    String url = BASISURL + "/list/view/mostviewed?channel=" + kanalSlug + "&channeltype=TV&limit=" + limit + "&offset=" + offset;
     if (kanalSlug == null) {
       limit = 150;
-      url = BASISURL+"/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
+      url = BASISURL + "/list/view/mostviewed?&channeltype=TV&limit=" + limit + "&offset=" + offset;
     }
     return url;
   }
@@ -182,8 +180,8 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
     for (int i = 0; i < jsonArray.length(); i++) {
       JSONObject o = jsonArray.getJSONObject(i);
       Udsendelse u = parseUdsendelse(null, programdata, o);
-      if (u.startTid==null && o.has("SortDateTime" )) {
-        u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("SortDateTime" ));
+      if (u.startTid == null && o.has("SortDateTime")) {
+        u.startTid = DRBackendTidsformater.parseUpålideigtServertidsformat(o.getString("SortDateTime"));
       }
       u.startTidKl = Datoformater.klokkenformat.format(u.startTid);
       u.slutTid = new Date(u.startTid.getTime() + u.varighedMs);
@@ -220,7 +218,6 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
   }
 
 
-
   //http://www.dr.dk/mu-online/Help/1.3/Api/GET-api-1.3-list-view-lastchance_limit_offset_channel
   public SidsteChance getSidstechance(SidsteChance sidstechance, Programdata programdata, JSONArray jsonArray) throws JSONException {
     if (sidstechance == null) sidstechance = new SidsteChance();
@@ -239,4 +236,41 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
   public Programserie parseProgramserie(JSONObject programserieJson, Programserie programserie) throws JSONException {
     return programserie;
   }
+
+/** Alle programserier - kun TV
+ */
+@Override
+public void hentAlleProgramserierAtilÅ(final NetsvarBehander netsvarBehander) {
+  String url = "https://www.dr.dk/mu-online/api/1.4/search/tv/programcards-latest-episode-with-asset/series-title-starts-with/?offset=0&limit=75";
+  App.netkald.kald(null, url, new NetsvarBehander() {
+    @Override
+    public void fikSvar(Netsvar s) throws Exception {
+      Log.d(this + " hentAlleProgramserierAtilÅ "+s.url+ "  fikSvar " + s.toString());
+      if (!s.uændret && s.json != null) {
+        JSONObject jsonObject = new JSONObject(s.json);
+        JSONArray arr = jsonObject.getJSONArray("Items");
+
+        JSONObject problemObj = null;
+        for (JSONObject o : new JSONArrayIterator(arr)) try {
+          problemObj = o;
+          String programserieUrn = o.getString("SeriesUrn");
+          String programserieSlug = o.getString("SeriesSlug");
+          Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
+          if (ps == null) ps = App.data.programserieFraSlug.get(programserieUrn);
+          if (ps == null) {
+            ps = new Programserie(MuOnlineTVBackend.this);
+            ps.urn = programserieUrn;
+            ps.slug = programserieSlug;
+            App.data.programserieFraSlug.put(programserieUrn, ps);
+            App.data.programserieFraSlug.put(programserieSlug, ps);
+            ps.titel = o.getString("SeriesTitle");
+          }
+          ps.billedeUrl = o.getString("PrimaryImageUri");
+        } catch (Exception e) { Log.e(o.toString(), e); }
+      }
+      netsvarBehander.fikSvar(s);
+    }
+  });
+}
+
 }

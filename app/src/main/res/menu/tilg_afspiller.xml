@@ -19,6 +19,6 @@
       android:id="@+id/startStopKnap"
       android:title="@string/Start"
       android:orderInCategory="1"
-      android:icon="@drawable/dri_radio_spil_graa40"
+      android:icon="@drawable/dri_lyd_graa40"
       app:showAsAction="always"/>
 </menu>

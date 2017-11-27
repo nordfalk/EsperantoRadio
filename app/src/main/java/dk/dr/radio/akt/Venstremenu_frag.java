@@ -385,40 +385,8 @@ public class Venstremenu_frag extends Fragment implements Runnable {
     public VenstremenuAdapter(final Context themedContext) {
       layoutInflater = (LayoutInflater) themedContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-      if (!App.PRODUKTION) {
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            App.prefs.edit().putBoolean("ESPERANTO", !Udseende.ESPERANTO).commit();
-            startActivity(new Intent(getActivity(), GenstartProgrammet.class));
-          }
-        });
-        aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
-
-        if (!Udseende.ESPERANTO) {
-          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-            @Override
-            public void run() {
-              startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
-            }
-          });
-          aq.id(R.id.tekst).text("Vis Emda").typeface(App.skrift_gibson_fed);
-
-          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-            @Override
-            public void run() {
-              startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
-            }
-          });
-          aq.id(R.id.tekst).text("Vis Niclas").typeface(App.skrift_gibson_fed);
-        }
-
-        tilføj(R.layout.venstremenu_elem_adskiller_tynd);
-      }
-
       tilføj(R.layout.venstremenu_elem_overskrift, Senest_lyttede_frag.class);
       aq.id(R.id.tekst).text(R.string.Senest_lyttede).typeface(App.skrift_gibson_fed);
-
 
       tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_favoritprogrammer, null), null, Favoritprogrammer_frag.class) {
         @Override
@@ -502,9 +470,36 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         aq.id(R.id.tekst).text("Vælg P4-område").typeface(App.skrift_gibson_fed);
       }
 
-
-
       if (!App.PRODUKTION) {
+        tilføj(R.layout.venstremenu_elem_adskiller_tynd);
+
+        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+          @Override
+          public void run() {
+            App.prefs.edit().putBoolean("ESPERANTO", !Udseende.ESPERANTO).commit();
+            startActivity(new Intent(getActivity(), GenstartProgrammet.class));
+          }
+        });
+        aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
+
+        if (!Udseende.ESPERANTO) {
+          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+            @Override
+            public void run() {
+              startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
+            }
+          });
+          aq.id(R.id.tekst).text("Vis Emda").typeface(App.skrift_gibson_fed);
+
+          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
+            @Override
+            public void run() {
+              startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
+            }
+          });
+          aq.id(R.id.tekst).text("Vis Niclas").typeface(App.skrift_gibson_fed);
+        }
+
         tilføj(R.layout.venstremenu_elem_adskiller_tynd);
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override

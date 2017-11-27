@@ -138,7 +138,7 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
 
       HentetStatus hs = hentedeUdsendelser.getHentetStatus(udsendelse);
       if (hs == null) {
-        aq.id(R.id.startStopKnap).visible().image(R.drawable.dri_radio_spil_graa40);
+        aq.id(R.id.startStopKnap).visible().image(R.drawable.dri_lyd_graa40);
         aq.id(R.id.progressBar).gone();
         aq.id(R.id.linje1).text(udsendelse.titel).textColor(App.color.grå40);
         aq.id(R.id.linje2).text(Datoformater.datoformat.format(udsendelse.startTid) + " - Ikke hentet");

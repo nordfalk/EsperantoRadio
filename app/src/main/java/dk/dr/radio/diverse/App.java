@@ -56,6 +56,8 @@ import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
 import com.crashlytics.android.Crashlytics;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -153,14 +155,16 @@ public class App {
 
     if (BuildConfig.FLAVOR.equals("esperanto")) {
       Udseende.ESPERANTO = true;
+      backend = new Backend[] { new EsperantoRadioBackend() };
+    } else if (BuildConfig.FLAVOR.equals("detErTv")) {
+      backend = new Backend[] { new MuOnlineTVBackend(),  };
     } else {
       Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);
+      backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
+  //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+              : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
+  //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
     }
-
-    backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
-//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-            : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-//            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -244,6 +248,9 @@ public class App {
       }
       grunddata.kanaler.addAll(backend.kanaler);
     } catch (Exception e) { Log.e(""+backend, e); }
+    // undgå crash
+    if (grunddata.json == null) grunddata.json = new JSONObject();
+    if (grunddata.android_json == null) grunddata.android_json = new JSONObject();
     if (grunddata.forvalgtKanal == null) grunddata.forvalgtKanal = grunddata.kanaler.get(0); // Muzaiko / P1
 
     try {

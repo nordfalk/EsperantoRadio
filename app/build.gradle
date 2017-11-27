@@ -74,6 +74,17 @@ android {
             versionCode 42
             versionName '2.0.11'
         }
+        detErTv {
+            dimension "forfatter"
+            signingConfigs {
+                config {
+                    storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
+                }
+            }
+            applicationId "dk.nordfalk.det_er_tv"
+            versionCode 1
+            versionName '0.1 Jacob'
+        }
     }
 }
 

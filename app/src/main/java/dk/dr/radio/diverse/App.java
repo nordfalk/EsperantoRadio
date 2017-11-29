@@ -157,6 +157,7 @@ public class App {
       Udseende.ESPERANTO = true;
       backend = new Backend[] { new EsperantoRadioBackend() };
     } else if (BuildConfig.FLAVOR.equals("detErTv")) {
+      Udseende.detErTv = true;
       backend = new Backend[] { new MuOnlineTVBackend(),  };
     } else {
       Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);

@@ -4,14 +4,19 @@ import android.content.Context;
 
 import org.joda.time.format.ISOPeriodFormat;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
+import dk.dr.radio.data.Grunddata;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
@@ -34,6 +39,24 @@ public class MuOnlineRadioBackend extends MuOnlineBackend {
     return BASISURL +"/channel/all-active-dr-radio-channels";
   }
 
+  @Override
+  public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
+    super.initGrunddata(grunddata, grunddataStr);
+
+    // Kanalerne kommer i en tilfældig rækkefølge, sorter dem
+    Log.d("Kanaler før sortering: "+kanaler);
+    // nyhederradio, P1D/p1, P2D/p2, P3/p3, ÅR4/p4aarhus, RØ4/p4bornholm, ES4/p4esbjerg, OD4/p4fyn, KH4/p4kbh, ÅL4/p4nord, NV4/p4sjaelland, ÅB4/p4syd, TR4/p4trekanten, HO4/p4vest, P5D/p5, P6B/p6beat, P7M/p7mix, P8J/p8jazz
+    //
+    final String rækkefølgeOmvendt = "nyhederradio p8jazz p7mix m6beat p5 p4 p3 p2 p1"; // dr-ultra
+    Collections.sort(kanaler, new Comparator<Kanal>() {
+      @Override
+      public int compare(Kanal o1, Kanal o2) {
+        return rækkefølgeOmvendt.indexOf(o2.slug) - rækkefølgeOmvendt.indexOf(o1.slug);
+      }
+    });
+
+    Log.d("Kanaler efter sortering: "+kanaler);
+  }
 
 
 /*

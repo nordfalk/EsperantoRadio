@@ -150,7 +150,7 @@
           <CheckBoxPreference
               android:key="vispager_title_strip"
               android:title="Titel på udsendelser"
-              android:defaultValue="false"
+              android:defaultValue="true"
               android:summary="Vis faneblade med titler for nemmere at bladre mellem udsendelser i en programserie"/>
 
           <CheckBoxPreference

@@ -100,7 +100,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
   private void vispager_title_strip() {
     pager_title_strip.setVisibility(
-        !App.prefs.getBoolean("vispager_title_strip", false) ? View.GONE :
+        !App.prefs.getBoolean("vispager_title_strip", true) ? View.GONE :
             udsendelser.size() > 1 ? View.VISIBLE : View.INVISIBLE);
   }
 

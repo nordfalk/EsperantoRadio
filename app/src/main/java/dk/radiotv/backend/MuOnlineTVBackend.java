@@ -9,7 +9,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import dk.dk.niclas.models.MestSete;
 import dk.dk.niclas.models.SidsteChance;
@@ -45,7 +48,19 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
   @Override
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     super.initGrunddata(grunddata, grunddataStr);
-    for (Kanal k : kanaler) k.erVideo = true;
+    for (Kanal k : kanaler) k.erVideo = k.ingenPlaylister = true;
+
+    // Kanalerne kommer i en tilfældig rækkefølge, sorter dem
+    Log.d("Kanaler før sortering: "+kanaler);
+    final String rækkefølgeOmvendt = "dr-ramasjang dr-k dr3 dr2 dr1"; // dr-ultra
+    Collections.sort(kanaler, new Comparator<Kanal>() {
+      @Override
+      public int compare(Kanal o1, Kanal o2) {
+        return rækkefølgeOmvendt.indexOf(o2.slug) - rækkefølgeOmvendt.indexOf(o1.slug);
+      }
+    });
+
+    Log.d("Kanaler efter sortering: "+kanaler);
   }
 
 

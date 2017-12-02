@@ -125,8 +125,9 @@ https://en.wikipedia.org/wiki/ISO_8601#Durations
               ps.urn = programserieUrn;
               App.data.programserieFraSlug.put(programserieUrn, ps);
               ps.slug = programserieUrn; // ØV! Den kommer ikke med :-| TODO!!!
+              ps.titel = o.getString("title");
+//              Log.d(this+" tilføjer serie "+ps.slug+" "+ps.titel);
             }
-            ps.titel = o.getString("title");
             ps.beskrivelse = o.optString("description"); // opt - f.eks. "id":"urn:dr:mu:bundle:5a0a3b456187a4148c986b54","title":"P4 Valgekstra","sortLetter":"P","hasOndemandRights":true,"sourceMedium":2,"image":{"webImages":[{"imageUrl":"https:\/\/www.dr.dk\/mu-online\/api\/1.3\/bar\/helper\/get-image-for-bundle\/urn:dr:mu:bundle:5a0a3b456187a4148c986b54","pixelWidth":960}]},"type":"series","isGeoBlocked":false}
             ps.billedeUrl = o.getJSONObject("image").getJSONArray("webImages").getJSONObject(0).getString("imageUrl");
           } catch (Exception e) { Log.e(o.toString(), e); }

@@ -10,11 +10,9 @@
   <string name="Dine_favoritprogrammer">Dine favoritprogrammer</string>
   <string name="Downloadede_udsendelser">Downloadede udsendelser</string>
   <string name="Søg_efter_program">Søg efter program</string>
-  <string name="Senest_lyttede">Senest lyttede</string>
-  <string name="Om_D_R_Radio">Om D R Radio</string>
-  <string name="Om_DR_Radio">Om DR Radio</string>
-  <string name="Skriv_meddelelse_til_DR">Skriv meddelelse til DR</string>
-  <string name="Skriv_meddelelse_til_D_R">Skriv meddelelse til D R</string>
+  <string name="Senest_lyttede">Senest afspillet</string>
+  <string name="Om_DR_Radio">Om app\'en</string>
+  <string name="Skriv_meddelelse_til_DR">Skriv meddelelse til udvikleren</string>
   <string name="start_stop">start/stop</string>
   <string name="Luk_D_R_Radio">Luk D R Radio</string>
   <string name="PLAYLISTE">PLAYLISTE</string>
@@ -60,7 +58,7 @@
   <string name="Saml_dine_favoritter_her____">&lt;b>Saml dine favoritter her&lt;/b>&lt;br>&lt;br>Klik på hjertet på dine yndlingsprogrammer. Du får nem adgang til dine favoritter – og du kan hurtigt se, når der er kommet nye udsendelser.</string>
   <string name="_ny_udsendelse">" ny udsendelse"</string>
   <string name="_nye_udsendelser">" nye udsendelser"</string>
-  <string name="Du_har_ingen_downloads___">&lt;b>Du har ingen downloads&lt;/b>&lt;br>&lt;br>Du kan downloade udsendelser og lytte til dem her uden internetforbindelse.</string>
+  <string name="Du_har_ingen_downloads___">&lt;b>Du har ingen downloads&lt;/b>&lt;br>&lt;br>Du kan downloade udsendelser og afspille dem her uden internetforbindelse.</string>
   <string name="Slet_udsendelse">Slet udsendelse</string>
   <string name="Vil_du_slette_denne_udsendele_du_kan_altid_hente_den_igen_">Vil du slette denne udsendele?\nDu kan altid hente den igen.</string>
   <string name="Indstillinger">Indstillinger</string>
@@ -81,8 +79,8 @@
   <string name="_MINUTTER">" MINUTTER"</string>
   <string name="_MINUT">" MINUT"</string>
   <string name="Tidligere">Tidligere</string>
-  <string name="Ingen_senest_lyttede">Ingen senest lyttede</string>
-  <string name="LYTTET_">"LYTTET "</string>
+  <string name="Ingen_senest_lyttede">Ingen senest afspillede</string>
+  <string name="LYTTET_">"SPILLET "</string>
   <string name="_kl_">%1$s kl %2$s</string>
   <string name="Søgningen_gav_intet_resultat">Søgningen gav intet resultat</string>
   <string name="AFSPILLER">AFSPILLER</string>
@@ -129,7 +127,6 @@
   <string name="Vis_ekstra_muligheder_til_udvikling_og_fejlfinding">Vis ekstra muligheder til udvikling og fejlfinding</string>
 
   <string name="HENTEDE_UDS_MAPPENAVN">DR_Radio</string>
-  <string name="URL_TIL_DR_RADIO_BETAVERSION">http://javabog.dk/privat/EoRadio.apk</string>
   <string name="_LIVE">DIREKTE</string>
 
   <string-array name="lydformat_tekst">

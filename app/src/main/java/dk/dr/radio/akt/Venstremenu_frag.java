@@ -416,14 +416,13 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       }
 
 
-      if (!Udseende.ESPERANTO) {
+      if (!Udseende.ESPERANTO && !App.PRODUKTION) {
         tilføj(R.layout.venstremenu_elem_overskrift, DramaOgBog_frag.class);
         aq.id(R.id.tekst).text("DR Podcast").typeface(App.skrift_gibson_fed);
-
-        tilføj(R.layout.venstremenu_elem_overskrift, AlleUdsendelserAtilAA_frag.class);
-        aq.id(R.id.tekst).text("Alle udsendelser A-Å").typeface(App.skrift_gibson_fed);
       }
 
+      tilføj(R.layout.venstremenu_elem_overskrift, AlleUdsendelserAtilAA_frag.class);
+      aq.id(R.id.tekst).text("Alle udsendelser A-Å").typeface(App.skrift_gibson_fed);
 
       tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_favoritprogrammer, null),
           new Runnable() {
@@ -504,7 +503,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
           public void run() {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.URL_TIL_DR_RADIO_BETAVERSION))));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.AppOpdatering_APK_URL))));
           }
         });
         if (!Udseende.ESPERANTO) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);

@@ -252,40 +252,52 @@ public class MuOnlineTVBackend extends MuOnlineBackend {
     return programserie;
   }
 
-/** Alle programserier - kun TV
- */
-@Override
-public void hentAlleProgramserierAtilÅ(final NetsvarBehander netsvarBehander) {
-  String url = "https://www.dr.dk/mu-online/api/1.4/search/tv/programcards-latest-episode-with-asset/series-title-starts-with/?offset=0&limit=75";
-  App.netkald.kald(null, url, new NetsvarBehander() {
-    @Override
-    public void fikSvar(Netsvar s) throws Exception {
-      Log.d(this + " hentAlleProgramserierAtilÅ "+s.url+ "  fikSvar " + s.toString());
-      if (!s.uændret && s.json != null) {
-        JSONObject jsonObject = new JSONObject(s.json);
-        JSONArray arr = jsonObject.getJSONArray("Items");
+  /** Alle programserier - kun TV
+   */
+  @Override
+  public void hentAlleProgramserierAtilÅ(final NetsvarBehander netsvarBehander) {
+    String url = "https://www.dr.dk/mu-online/api/1.4/search/tv/programcards-latest-episode-with-asset/series-title-starts-with/?offset=0&limit=75";
+    hentAlleProgramserierAtilÅRekursion(url, netsvarBehander);
+  }
 
-        JSONObject problemObj = null;
-        for (JSONObject o : new JSONArrayIterator(arr)) try {
-          problemObj = o;
-          String programserieUrn = o.getString("SeriesUrn");
-          String programserieSlug = o.getString("SeriesSlug");
-          Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
-          if (ps == null) ps = App.data.programserieFraSlug.get(programserieUrn);
-          if (ps == null) {
-            ps = new Programserie(MuOnlineTVBackend.this);
-            ps.urn = programserieUrn;
-            ps.slug = programserieSlug;
-            App.data.programserieFraSlug.put(programserieUrn, ps);
-            App.data.programserieFraSlug.put(programserieSlug, ps);
-            ps.titel = o.getString("SeriesTitle");
+  private void hentAlleProgramserierAtilÅRekursion(String url, final NetsvarBehander netsvarBehander) {
+    final NetsvarBehander netsvarBehanderRekursiv = new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        Log.d(this + " hentAlleProgramserierAtilÅ " + s.url + "  fikSvar " + s.toString());
+        if (!s.uændret && s.json != null) {
+          JSONObject jsonObject = new JSONObject(s.json);
+          JSONArray arr = jsonObject.getJSONArray("Items");
+
+          for (JSONObject o : new JSONArrayIterator(arr)) {
+            try {
+              String programserieUrn = o.getString("SeriesUrn");
+              String programserieSlug = o.getString("SeriesSlug");
+              Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
+              //if (ps == null) ps = App.data.programserieFraSlug.get(programserieUrn);
+              if (ps == null) {
+                ps = new Programserie(MuOnlineTVBackend.this);
+                ps.urn = programserieUrn;
+                ps.slug = programserieSlug;
+                //App.data.programserieFraSlug.put(programserieUrn, ps);
+                App.data.programserieFraSlug.put(programserieSlug, ps);
+                ps.titel = o.getString("SeriesTitle");
+//                Log.d(this + " tilføjer serie " + ps.slug + " " + ps.titel);
+              }
+              ps.billedeUrl = o.getString("PrimaryImageUri");
+            } catch (Exception e) {
+              Log.e(o.toString(), e);
+            }
           }
-          ps.billedeUrl = o.getString("PrimaryImageUri");
-        } catch (Exception e) { Log.e(o.toString(), e); }
+          String næsteUrl = jsonObject.getJSONObject("Paging").optString("Next", null);
+          if (næsteUrl!=null) {
+            hentAlleProgramserierAtilÅRekursion(næsteUrl, netsvarBehander);
+          }
+        }
+        netsvarBehander.fikSvar(s);
       }
-      netsvarBehander.fikSvar(s);
-    }
-  });
-}
+    };
+    App.netkald.kald(null, url, netsvarBehanderRekursiv);
 
+  }
 }

@@ -28,7 +28,7 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion 11 // eble fakte 7 ??
-        targetSdkVersion 21
+        targetSdkVersion 23
     }
     buildTypes {
         release {
@@ -41,7 +41,6 @@ android {
         }
     }
     flavorDimensions "forfatter"
-
     productFlavors {
         niclas {
             dimension "forfatter"
@@ -60,8 +59,8 @@ android {
         jacob {
             dimension "forfatter"
             applicationId "dk.nordfalk.jacob"
-            versionCode 3
-            versionName '0.0.03 Jacob'
+            versionCode 8
+            versionName '0.1.8 Marktest'
         }
         esperanto {
             dimension "forfatter"
@@ -97,17 +96,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.googlecode.android-query:android-query:0.25.9'
     compile 'com.squareup.picasso:picasso:2.5.2'
-
     compile 'com.devbrackets.android:exomedia:2.4.2'
-
     //compile 'com.android.support.constraint:constraint-layout:1.0.1'
     compile 'com.android.support:design:25.3.0'
     compile 'com.android.support:recyclerview-v7:25.3.0'
     compile 'com.android.support:cardview-v7:25.3.0'
-
     compile 'com.google.android.gms:play-services-cast-framework:9.4.0'
     compile 'com.android.support:mediarouter-v7:25.3.0'
-
     // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
     //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     // Joda-time - fylder 450 kb mere !

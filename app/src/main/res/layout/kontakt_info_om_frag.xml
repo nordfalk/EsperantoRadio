@@ -12,7 +12,7 @@
       android:textSize="18sp"
       android:padding="16dp"
       android:textStyle="bold"
-      android:contentDescription="@string/Om_D_R_Radio"
+      android:contentDescription="@string/Om_DR_Radio"
       android:text="@string/Om_DR_Radio">
   </TextView>
 
@@ -28,7 +28,6 @@
   <Button
       android:id="@+id/kontakt"
       android:text="@string/Skriv_meddelelse_til_DR"
-      android:contentDescription="@string/Skriv_meddelelse_til_D_R"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:paddingLeft="8dp"

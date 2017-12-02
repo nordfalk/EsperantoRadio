@@ -59,7 +59,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
         return;
       } else {
         // Jacob
-        App.langToast("BuildConfig.FLAVOR=" + BuildConfig.FLAVOR);
+        if (!App.PRODUKTION) App.langToast("BuildConfig.FLAVOR=" + BuildConfig.FLAVOR);
       }
 
 

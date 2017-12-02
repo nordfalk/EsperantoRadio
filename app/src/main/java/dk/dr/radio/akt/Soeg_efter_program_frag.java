@@ -41,7 +41,7 @@ import dk.dr.radio.v3.R;
 
 
 public class Soeg_efter_program_frag extends Basisfragment implements
-    OnClickListener, AdapterView.OnItemClickListener {
+    OnClickListener, AdapterView.OnItemClickListener, Runnable {
 
   private static final boolean SØG_OGSÅ_EFTER_UDSENDELSER = false;
   private ListView listView;
@@ -86,13 +86,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     søgFelt.addTextChangedListener(new TextWatcher() {
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (søgFelt.getText().toString().length() > 0) {
-          søgKnap.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-        } else {
-          liste.clear();
-          adapter.notifyDataSetChanged();
-          søgKnap.setImageResource(R.drawable.dri_soeg_blaa);
-        }
       }
 
       @Override
@@ -101,23 +94,10 @@ public class Soeg_efter_program_frag extends Basisfragment implements
 
       @Override
       public void afterTextChanged(Editable s) {
-        if (søgFelt.getText().length() > 0) {
-          søg();
-        } else {
-          tomStr.setText("");
-        }
+        run();
       }
     });
 
-    /*Lytter efter enter key */
-    søgFelt.setOnEditorActionListener(new OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId,
-                                    KeyEvent event) {
-        søg();
-        return true;
-      }
-    });
     // Skjul softkeyboard når man hopper ud af indtastningsfeltet
     // se http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
     final InputMethodManager imm = (InputMethodManager) (getActivity().getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -133,14 +113,30 @@ public class Soeg_efter_program_frag extends Basisfragment implements
 
     // Indlæs A-Å-liste hvis den ikke allerede er det, så vi har en komplet programliste
     if (!App.data.programserierAtilÅ.indlæst) {
+      App.data.programserierAtilÅ.observatører.add(this);
       App.data.programserierAtilÅ.startHentData();
     }
     return rod;
   }
 
   @Override
+  public void run() {
+    if (søgFelt.getText().length() > 0) {
+      søgKnap.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+      søg();
+    } else {
+      tomStr.setText("");
+      liste.clear();
+      liste.addAll(App.data.programserierAtilÅ.getListe());
+      adapter.notifyDataSetChanged();
+      søgKnap.setImageResource(R.drawable.dri_soeg_blaa);
+    }
+  }
+
+  @Override
   public void onDestroyView() {
     super.onDestroyView();
+    App.data.programserierAtilÅ.observatører.remove(this);
     // Anullér en eventuel søgning
     App.netkald.annullerKald(this);
     søgelistecache = null;

@@ -86,6 +86,12 @@ android {
         }
     }
 }
+/*
+logomakr.com/6oKjBc
+
+Logo made with Logomakr.com
+
+*/
 
 dependencies {
     compile files('libs/volley.jar')

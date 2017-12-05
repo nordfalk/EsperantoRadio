@@ -43,7 +43,20 @@ public class MuOnlineRadioBackend extends MuOnlineBackend {
   public void initGrunddata(Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     super.initGrunddata(grunddata, grunddataStr);
 
-    // Kanalerne kommer i en tilfældig rækkefølge, sorter dem
+    String kanalkode = Kanal.P4kode;
+    Kanal k = grunddata.kanalFraKode.get(kanalkode);
+    if (k == null) {
+      k = new Kanal(this);
+      k.kode = kanalkode;
+      grunddata.kanalFraKode.put(k.kode, k);
+    }
+    k.navn = "P4";
+    k.urn = "urn:dr:mu:bundle:4f3b8920860d9a33ccfdaf7c";
+    k.slug = "p4";
+    k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
+    kanaler.add(k);
+
+            // Kanalerne kommer i en tilfældig rækkefølge, sorter dem
     Log.d("Kanaler før sortering: "+kanaler);
     // nyhederradio, P1D/p1, P2D/p2, P3/p3, ÅR4/p4aarhus, RØ4/p4bornholm, ES4/p4esbjerg, OD4/p4fyn, KH4/p4kbh, ÅL4/p4nord, NV4/p4sjaelland, ÅB4/p4syd, TR4/p4trekanten, HO4/p4vest, P5D/p5, P6B/p6beat, P7M/p7mix, P8J/p8jazz
     //

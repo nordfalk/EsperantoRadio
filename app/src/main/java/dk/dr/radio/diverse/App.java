@@ -324,9 +324,9 @@ public class App {
         }
       }
 
-      for (Backend b : App.backend) if (b.data.favoritter.getAntalNyeUdsendelser() < 0) {
+      for (Backend b : App.backend) if (b.favoritter.getAntalNyeUdsendelser() < 0) {
         færdig = false;
-        b.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
+        b.favoritter.startOpdaterAntalNyeUdsendelser.run();
       }
 
 

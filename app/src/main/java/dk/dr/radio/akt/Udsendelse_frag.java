@@ -150,7 +150,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     public void run() {
       if (topView == null) return;
       CheckBox fav = (CheckBox) topView.findViewById(R.id.favorit);
-      fav.setChecked(udsendelse.getBackend().data.favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
 
@@ -196,7 +196,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
-    udsendelse.getBackend().data.favoritter.observatører.add(opdaterFavoritter);
+    udsendelse.getBackend().favoritter.observatører.add(opdaterFavoritter);
     run();
     return rod;
   }
@@ -225,7 +225,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(udsendelse.getBackend().data.favoritter.erFavorit(udsendelse.programserieSlug));
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
     if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
@@ -347,7 +347,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    udsendelse.getBackend().data.favoritter.observatører.remove(opdaterFavoritter);
+    udsendelse.getBackend().favoritter.observatører.remove(opdaterFavoritter);
     App.forgrundstråd.removeCallbacks(this);
     super.onDestroyView();
   }
@@ -644,7 +644,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       bygListe();
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      udsendelse.getBackend().data.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      udsendelse.getBackend().favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
       Log.registrérTestet("Valg af favoritprogram", udsendelse.programserieSlug);
     } else {

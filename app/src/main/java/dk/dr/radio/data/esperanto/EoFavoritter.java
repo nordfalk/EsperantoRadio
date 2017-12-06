@@ -9,11 +9,16 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.radiotv.backend.EsperantoRadioBackend;
 
 /**
  * Created by j on 13-09-15.
  */
 public class EoFavoritter extends Favoritter {
+
+  public EoFavoritter(EsperantoRadioBackend esperantoRadioBackend) {
+    super(esperantoRadioBackend);
+  }
 
   @Override
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {

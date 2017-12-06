@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import dk.dr.radio.data.Favoritter;
+
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
@@ -22,8 +24,10 @@ import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.ProgramdataForBackend;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.volley.Netsvar;
 
 /**
@@ -33,6 +37,7 @@ import dk.dr.radio.net.volley.Netsvar;
 public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
   public ProgramdataForBackend data = new ProgramdataForBackend();
+  public Favoritter favoritter = new Favoritter(this);
 
   protected void _ikkeImplementeret__UBRUGT() {
     Exception x = new Exception("Ikke implementeret i " + getClass().getName());

@@ -8,5 +8,4 @@ import dk.dr.radio.diverse.Udseende;
  */
 
 public class ProgramdataForBackend {
-  public Favoritter favoritter = !Udseende.ESPERANTO ? new Favoritter() : new EoFavoritter();
 }

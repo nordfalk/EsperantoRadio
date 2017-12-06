@@ -102,7 +102,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   public void onClick(View v) {
     if (v.getId()==R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      programserie.getBackend().data.favoritter.sætFavorit(programserieSlug, favorit.isChecked());
+      programserie.getBackend().favoritter.sætFavorit(programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(getString(R.string.Programserien_er_føjet_til_favoritter));
       Log.registrérTestet("Valg af favoritprogram", programserieSlug);
     } else {
@@ -232,7 +232,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           aq.id(R.id.alle_udsendelser).typeface(App.skrift_gibson);
           aq.id(R.id.beskrivelse).text(programserie.beskrivelse).typeface(App.skrift_georgia);
           Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES | Linkify.PHONE_NUMBERS);
-          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(programserie.getBackend().data.favoritter.erFavorit(programserieSlug));
+          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(programserie.getBackend().favoritter.erFavorit(programserieSlug));
         } else { // if (type == UDSENDELSE eller TIDLIGERE) {
           vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
           vh.dato = aq.id(R.id.dato).typeface(App.skrift_gibson).getTextView();

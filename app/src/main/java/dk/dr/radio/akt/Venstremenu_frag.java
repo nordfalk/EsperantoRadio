@@ -122,7 +122,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
     venstremenuAdapter = new VenstremenuAdapter(getActivity());
     listView.setAdapter(venstremenuAdapter);
     listView.setItemChecked(mCurrentSelectedPosition, true);
-    for (Backend b : App.backend) b.data.favoritter.observatører.add(this);
+    for (Backend b : App.backend) b.favoritter.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
     Alarms.setNextAlert(getActivity());
     return listView;
@@ -130,7 +130,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
 
   @Override
   public void onDestroyView() {
-    for (Backend b : App.backend) b.data.favoritter.observatører.remove(this);
+    for (Backend b : App.backend) b.favoritter.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
     super.onDestroyView();
   }
@@ -393,7 +393,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         public View getView() {
           TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
           int antal = 0;
-          for (Backend b : App.backend) antal+= b.data.favoritter.getAntalNyeUdsendelser();
+          for (Backend b : App.backend) antal+= b.favoritter.getAntalNyeUdsendelser();
           tekst2.setText(
               antal < 0 ? "" : // i gang med at indlæse
               getString(antal==0? R.string._ingen_nye_udsendelser_: antal==1? R.string._1_ny_udsendelse_ : R.string.___nye_udsendelser_, antal));

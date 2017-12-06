@@ -62,13 +62,13 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
     if (opdater) sidstOpdateretAntalNyeUdsendelser = System.currentTimeMillis();
 
     for (Backend b : App.backend) {
-      b.data.favoritter.observatører.add(this);
-      run();
-      if (b.data.favoritter.getAntalNyeUdsendelser() < 0 || opdater) {
+      b.favoritter.observatører.add(this);
+      if (b.favoritter.getAntalNyeUdsendelser() < 0 || opdater) {
         // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
-        b.data.favoritter.startOpdaterAntalNyeUdsendelser.run();
+        b.favoritter.startOpdaterAntalNyeUdsendelser.run();
       }
     }
+    run();
 
     return rod;
   }
@@ -76,7 +76,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   @Override
   public void onDestroyView() {
     for (Backend b : App.backend) {
-      b.data.favoritter.observatører.remove(this);
+      b.favoritter.observatører.remove(this);
     }
     super.onDestroyView();
   }
@@ -88,7 +88,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
     liste.clear();
     for (Backend b : App.backend) try {
       if (!(b instanceof GammelDrRadioBackend)) continue; // fix for nu
-      ArrayList<String> pss = new ArrayList<>(b.data.favoritter.getProgramserieSlugSæt());
+      ArrayList<String> pss = new ArrayList<>(b.favoritter.getProgramserieSlugSæt());
       Collections.sort(pss);
       Log.d(this + " "+b +" psss = " + pss);
       for (final String programserieSlug : pss) {
@@ -148,7 +148,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
         if (obj instanceof Programserie) {
           Programserie ps = (Programserie) obj;
           aq.id(R.id.linje1).text(ps.titel).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
-          int n = b.data.favoritter.getAntalNyeUdsendelser(ps.slug);
+          int n = b.favoritter.getAntalNyeUdsendelser(ps.slug);
           String txt = (n == 1 ? n + getString(R.string._ny_udsendelse) : n + getString(R.string._nye_udsendelser));
           aq.id(R.id.linje2).text(txt).typeface(App.skrift_gibson);
           aq.id(R.id.stiplet_linje).visibility(position == 0 ? View.INVISIBLE : View.VISIBLE);

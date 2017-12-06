@@ -237,8 +237,8 @@ public class Afspiller {
     // Hvis det er en favorit så opdater favoritter så der ikke mere optræder nye udsendelser i denne programserie
     if (lydkilde instanceof Udsendelse) {
       String programserieSlug = ((Udsendelse) lydkilde).programserieSlug;
-      if (lydkilde.getBackend().data.favoritter.erFavorit(programserieSlug)) {
-        lydkilde.getBackend().data.favoritter.sætFavorit(programserieSlug, true);
+      if (lydkilde.getBackend().favoritter.erFavorit(programserieSlug)) {
+        lydkilde.getBackend().favoritter.sætFavorit(programserieSlug, true);
       }
     }
 

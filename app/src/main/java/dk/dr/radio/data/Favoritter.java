@@ -21,11 +21,16 @@ import dk.radiotv.backend.Backend;
  */
 public class Favoritter {
   private static final String PREF_NØGLE = "favorit til startdato";
+  final Backend backend;
   private HashMap<String, String> favoritTilStartdato;
   protected HashMap<String, Integer> favoritTilAntalDagsdato = new HashMap<>();
   private int antalNyeUdsendelser = -1;
   public List<Runnable> observatører = new ArrayList<>();
   private SharedPreferences prefs;
+
+  public Favoritter(Backend backend) {
+    this.backend = backend;
+  }
 
 
   private void tjekDataOprettet() {

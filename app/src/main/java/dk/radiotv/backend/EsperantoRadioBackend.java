@@ -25,6 +25,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
@@ -40,7 +41,10 @@ import dk.dr.radio.v3.R;
 public class EsperantoRadioBackend extends Backend {
   private static EsperantoRadioBackend instans;
 
-  public EsperantoRadioBackend() { instans = this; }
+  public EsperantoRadioBackend() {
+    instans = this;
+    favoritter = new EoFavoritter(this);
+  }
 
   public String getGrunddataUrl() {
     /*

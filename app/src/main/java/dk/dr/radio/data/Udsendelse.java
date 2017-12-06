@@ -79,7 +79,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public Kanal getKanal() {
     Kanal k = App.grunddata.kanalFraSlug.get(kanalSlug);
     if (k == null) {
-      Log.d(kanalSlug + " manglede i grunddata.kanalFraSlug");
+      Log.e(new IllegalStateException(kanalSlug + " manglede i grunddata.kanalFraSlug"));
       return Grunddata.ukendtKanal;
     }
     //if (Kanal.P4kode.equals(k.kode)) {

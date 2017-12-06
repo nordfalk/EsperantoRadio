@@ -288,7 +288,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
     FrameLayout tabfl = new FrameLayout(getContext());
     ImageView tabi = new ImageView(getContext());
     tabi.setContentDescription(title);
-    Log.d(title+" "+resId + " Kanallogo URL="+url);
+    //Log.d(title+" "+resId + " Kanallogo URL="+url);
     if (resId==0) {
       Picasso.with(tabi.getContext())
               .load(url).placeholder(null)

@@ -126,10 +126,33 @@ abstract class MuOnlineBackend extends Backend {
   }
 
 
+  /** Skal evt bruges fra FangBrowseIntent */
+  private String getUdsendelseUrlFraSlug(String udsendelseSlug) {
+    return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
+    // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
+    // http://www.dr.dk/mu-online/api/1.3/programcard/lagsus-2017-03-14
+    // http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=urn:dr:mu:bundle:57d7b0c86187a40ef406898b
+  }
+
   public void hentUdsendelseStreams(final Udsendelse udsendelse, final NetsvarBehander netsvarBehander) {
+    // Vi mangler måske beskrivelsen af den enkelte udsendelse
+    // http://www.dr.dk/mu-online/api/1.4/programcard/dokumania-37-tavse-vidner
+    if (udsendelse.beskrivelse==null) {
+      App.netkald.kald(null, getUdsendelseUrlFraSlug(udsendelse.slug), new NetsvarBehander() {
+        @Override
+        public void fikSvar(Netsvar s) throws Exception {
+          if (s.json != null && !s.uændret) {
+            JSONObject o = new JSONObject(s.json);
+            udsendelse.beskrivelse = o.getString("Description");
+            Log.d("Udsendelses beskrivelse fundet med " + s.url);
+          }
+          netsvarBehander.fikSvar(s);
+        }
+      });
+    }
+
     // http://www.dr.dk/tjenester/mu-apps/program?urn=urn:dr:mu:programcard:52e6fa58a11f9d1588de9c49&includeStreams=true
     // http://www.dr.dk/mu-online/api/1.3/programcard/dokumania-37-tavse-vidner
-    // return BASISURL + "/programcard/" + u.slug;
     if (udsendelse.ny_streamDataUrl==null) Log.d("getUdsendelseStreamsUrl: Ingen streams for " + udsendelse);
     App.netkald.kald(null, udsendelse.ny_streamDataUrl, new NetsvarBehander() {
       @Override
@@ -185,14 +208,6 @@ abstract class MuOnlineBackend extends Backend {
     return lydData;
   }
 
-  /** Bruges kun fra FangBrowseIntent */
-  public String getUdsendelseUrlFraSlug(String udsendelseSlug) {
-    return BASISURL + "/programcard/" + udsendelseSlug; // Mgl afprøvning
-    // http://www.dr.dk/mu-online/api/1.3/programcard/mgp-2017
-    // http://www.dr.dk/mu-online/api/1.3/programcard/lagsus-2017-03-14
-    // http://www.dr.dk/mu-online/api/1.3/list/view/seasons?id=urn:dr:mu:bundle:57d7b0c86187a40ef406898b
-  }
-
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
     // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
     String url = BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
@@ -229,12 +244,20 @@ abstract class MuOnlineBackend extends Backend {
     return uliste;
   }
 
+  // https://www.dr.dk/mu-online/api/1.4/programcard/dokumania-37-tavse-vidner
+  // https://www.dr.dk/mu-online/api/1.4/programcard/jultra-2015
+  // https://www.dr.dk/mu-online/api/1.4/list/jultra-2015?limit=30&offset=0
+  // https://www.dr.dk/mu-online/api/1.4/list/view/season?id=jultra-2015-2&limit=75&offset=0
   Udsendelse parseUdsendelse(Kanal kanal, Programdata programdata, JSONObject o) throws JSONException {
-    Udsendelse u = new Udsendelse();
-    u.slug = o.getString("Slug"); // Bemærk - kan være tom?
-    u.urn = o.getString("Urn");  // Bemærk - kan være tom?
-    programdata.udsendelseFraSlug.put(u.slug, u);
-    u.titel = o.getString("Title");
+    String slug = o.getString("Slug"); // Bemærk - kan være tom?
+    Udsendelse u = programdata.udsendelseFraSlug.get(slug);
+    if (u==null) {
+      u = new Udsendelse();
+      u.slug = o.getString("Slug");
+      u.urn = o.getString("Urn");
+      programdata.udsendelseFraSlug.put(u.slug, u);
+      u.titel = o.getString("Title");
+    }
     u.billedeUrl = o.getString("PrimaryImageUri"); // http://www.dr.dk/mu-online/api/1.3/Bar/524a5b6b6187a2141c5e3511
     u.programserieSlug = o.optString("SeriesSlug");  // Bemærk - kan være tom?
 

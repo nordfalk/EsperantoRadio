@@ -265,18 +265,21 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.hent);
     HentetStatus hs;
 
-    if (!App.data.hentedeUdsendelser.virker()) {
+    if (!App.data.hentedeUdsendelser.virker() || !udsendelse.kanHentes) {
       aq.gone();
+      return;
     }
-    else if (null!=(hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse))) {
+    else aq.visible();
+
+    if (null!=(hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse))) {
       if (hs.status != DownloadManager.STATUS_SUCCESSFUL && hs.status != DownloadManager.STATUS_FAILED) {
         App.forgrundstråd.removeCallbacks(this);
         App.forgrundstråd.postDelayed(this, 5000);
       }
       String statustekst = hs.statustekst;
       aq.text(statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
-    } else if (!udsendelse.kanHentes) {
-      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
+//    } else if (!udsendelse.kanHentes) {
+//      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
     } else if (!udsendelse.streamsKlar()) {
       aq.text("").enabled(false).textColor(R.color.grå40);
     } else {
@@ -553,21 +556,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         if (type == OVERSKRIFT_PLAYLISTE_INFO || type == OVERSKRIFT_INDSLAG_INFO) {
           aq.id(R.id.playliste).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
           aq.id(R.id.info).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
-        } else if (type == INFOTEKST) {
-          aq.id(R.id.titel).typeface(App.skrift_georgia);
-          String forkortInfoStr = udsendelse.beskrivelse;
-          if (forkortInfoStr!=null && forkortInfoStr.length() > 110) {
-            forkortInfoStr = forkortInfoStr.substring(0, 110);
-            String vis_mere = getString(R.string.___vis_mere_);
-            forkortInfoStr += vis_mere;
-            SpannableString spannable = new SpannableString(forkortInfoStr);
-            spannable.setSpan(new ForegroundColorSpan(App.color.blå), forkortInfoStr.length() - vis_mere.length(), forkortInfoStr.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            aq.clicked(Udsendelse_frag.this).text(spannable/*forkortInfoStr*/);
-          } else {
-            aq.text(forkortInfoStr);
-            Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS);
-          }
-          aq.getView().setContentDescription(udsendelse.beskrivelse);
         } else if (type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM) {
           vh.titel = aq.id(R.id.titel_og_kunstner).typeface(App.skrift_gibson).getTextView();
         } else if (type == INDSLAGLISTEELEM) {
@@ -603,6 +591,21 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           vh.aq.id(R.id.stiplet_linje).visibility(topseparator?View.INVISIBLE:View.VISIBLE);
         }
         aq.id(R.id.hør).visibility(udsendelse.kanHøres && ple.offsetMs >= 0 ? View.VISIBLE : View.GONE);
+      } else if (type == INFOTEKST) {
+        aq.id(R.id.titel).typeface(App.skrift_georgia);
+        String forkortInfoStr = udsendelse.beskrivelse;
+        if (forkortInfoStr!=null && forkortInfoStr.length() > 110) {
+          forkortInfoStr = forkortInfoStr.substring(0, 110);
+          String vis_mere = getString(R.string.___vis_mere_);
+          forkortInfoStr += vis_mere;
+          SpannableString spannable = new SpannableString(forkortInfoStr);
+          spannable.setSpan(new ForegroundColorSpan(App.color.blå), forkortInfoStr.length() - vis_mere.length(), forkortInfoStr.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+          aq.clicked(Udsendelse_frag.this).text(spannable/*forkortInfoStr*/);
+        } else {
+          aq.text(forkortInfoStr);
+          Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS);
+        }
+        aq.getView().setContentDescription(udsendelse.beskrivelse);
       } else if (type == INDSLAGLISTEELEM) {
         Indslaglisteelement ple = (Indslaglisteelement) liste.get(position);
         vh.titel.setText(ple.titel);

@@ -8,7 +8,7 @@
   <string name="Søg">Søg</string>
   <string name="Del">Del</string>
   <string name="Dine_favoritprogrammer">Dine favoritprogrammer</string>
-  <string name="Downloadede_udsendelser">Downloadede udsendelser</string>
+  <string name="Downloadede_udsendelser">Hentede udsendelser</string>
   <string name="Søg_efter_program">Søg efter program</string>
   <string name="Senest_lyttede">Senest afspillet</string>
   <string name="Om_DR_Radio">Om app\'en</string>
@@ -18,7 +18,7 @@
   <string name="PLAYLISTE">PLAYLISTE</string>
   <string name="INDSLAG">INDSLAG</string>
   <string name="indslag">indslag</string>
-  <string name="DOWNLOAD">DOWNLOAD</string>
+  <string name="DOWNLOAD">HENT</string>
   <string name="playliste">playliste</string>
   <string name="Start">Start</string>
   <string name="hent_udsendelse">hent udsendelse</string>
@@ -58,7 +58,7 @@
   <string name="Saml_dine_favoritter_her____">&lt;b>Saml dine favoritter her&lt;/b>&lt;br>&lt;br>Klik på hjertet på dine yndlingsprogrammer. Du får nem adgang til dine favoritter – og du kan hurtigt se, når der er kommet nye udsendelser.</string>
   <string name="_ny_udsendelse">" ny udsendelse"</string>
   <string name="_nye_udsendelser">" nye udsendelser"</string>
-  <string name="Du_har_ingen_downloads___">&lt;b>Du har ingen downloads&lt;/b>&lt;br>&lt;br>Du kan downloade udsendelser og afspille dem her uden internetforbindelse.</string>
+  <string name="Du_har_ingen_downloads___">&lt;b>Du har ingen downloads&lt;/b>&lt;br>&lt;br>Du kan hente udsendelser og afspille dem her uden internetforbindelse.</string>
   <string name="Slet_udsendelse">Slet udsendelse</string>
   <string name="Vil_du_slette_denne_udsendele_du_kan_altid_hente_den_igen_">Vil du slette denne udsendele?\nDu kan altid hente den igen.</string>
   <string name="Indstillinger">Indstillinger</string>

@@ -48,19 +48,20 @@ public class MuOnlineRadioBackend extends MuOnlineBackend {
     if (k == null) {
       k = new Kanal(this);
       k.kode = kanalkode;
+      k.navn = "P4";
+      k.urn = "urn:dr:mu:bundle:4f3b8920860d9a33ccfdaf7c";
+      k.slug = "p4";
+      k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
       grunddata.kanalFraKode.put(k.kode, k);
+      grunddata.kanalFraSlug.put(k.slug, k);
     }
-    k.navn = "P4";
-    k.urn = "urn:dr:mu:bundle:4f3b8920860d9a33ccfdaf7c";
-    k.slug = "p4";
-    k.kanallogo_resid = App.res.getIdentifier("kanalappendix_" + k.kode.toLowerCase().replace('ø', 'o').replace('å', 'a'), "drawable", App.pakkenavn);
     kanaler.add(k);
 
             // Kanalerne kommer i en tilfældig rækkefølge, sorter dem
     Log.d("Kanaler før sortering: "+kanaler);
     // nyhederradio, P1D/p1, P2D/p2, P3/p3, ÅR4/p4aarhus, RØ4/p4bornholm, ES4/p4esbjerg, OD4/p4fyn, KH4/p4kbh, ÅL4/p4nord, NV4/p4sjaelland, ÅB4/p4syd, TR4/p4trekanten, HO4/p4vest, P5D/p5, P6B/p6beat, P7M/p7mix, P8J/p8jazz
     //
-    final String rækkefølgeOmvendt = "nyhederradio p8jazz p7mix m6beat p5 p4 p3 p2 p1"; // dr-ultra
+    final String rækkefølgeOmvendt = "nyhederradio p8jazz p7mix m6beat p5 p4 p3 p2 p1"; // dr-ultra til sidst
     Collections.sort(kanaler, new Comparator<Kanal>() {
       @Override
       public int compare(Kanal o1, Kanal o2) {

@@ -164,6 +164,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
 
   private void hentSendeplanForDag(final Date dato) {
+    if (getActivity()==null) return; // fragmentet er blevet lukket
     final String datoStr = Datoformater.apiDatoFormat.format(dato);
     if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
       opdaterListeMedSendeplanForDag();

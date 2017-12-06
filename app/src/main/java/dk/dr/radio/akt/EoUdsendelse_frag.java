@@ -207,8 +207,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
         App.forgrundstråd.postDelayed(this, 5000);
       }
       String statustekst = hs.statustekst;
-
-      aq.text(statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
+      aq.text(" "+statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
     } else if (!udsendelse.kanHentes) {
       aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
     } else if (!udsendelse.streamsKlar()) {

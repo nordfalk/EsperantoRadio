@@ -4,7 +4,7 @@
   <string name="appnavn">Din apps navn her</string>
   <string name="navigation_drawer_open">Åbn venstremenu</string>
   <string name="navigation_drawer_close">Luk venstremenu</string>
-  <string name="afspiller">afspiller</string>
+  <string name="afspiller">spiller</string>
   <string name="Søg">Søg</string>
   <string name="Del">Del</string>
   <string name="Dine_favoritprogrammer">Dine favoritprogrammer</string>
@@ -18,7 +18,7 @@
   <string name="PLAYLISTE">PLAYLISTE</string>
   <string name="INDSLAG">INDSLAG</string>
   <string name="indslag">indslag</string>
-  <string name="DOWNLOAD">HENT</string>
+  <string name="DOWNLOAD">&#160;HENT</string>
   <string name="playliste">playliste</string>
   <string name="Start">Start</string>
   <string name="hent_udsendelse">hent udsendelse</string>
@@ -83,11 +83,11 @@
   <string name="LYTTET_">"SPILLET "</string>
   <string name="_kl_">%1$s kl %2$s</string>
   <string name="Søgningen_gav_intet_resultat">Søgningen gav intet resultat</string>
-  <string name="AFSPILLER">AFSPILLER</string>
+  <string name="AFSPILLER">SPILLER</string>
   <string name="FORBINDER">FORBINDER</string>
   <string name="INTERNETFORBINDELSE_MANGLER">INTERNETFORBINDELSE\nMANGLER</string>
   <string name="KAN_IKKE_AFSPILLES">KAN IKKE\nAFSPILLES</string>
-  <string name="KAN_IKKE_HENTES">KAN IKKE HENTES</string>
+  <string name="KAN_IKKE_HENTES"> KAN IKKE HENTES</string>
   <string name="___vis_mere_">…(VIS MERE)</string>
   <string name="Udsendelsen_kan_ikke_hentes">Udsendelsen kan ikke hentes</string>
   <string name="i_dag">i dag</string>

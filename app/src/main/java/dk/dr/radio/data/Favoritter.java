@@ -35,9 +35,9 @@ public class Favoritter {
 
   private void tjekDataOprettet() {
     if (favoritTilStartdato != null) return;
-    prefs = ApplicationSingleton.instans.getSharedPreferences(PREF_NØGLE, 0);
+    prefs = ApplicationSingleton.instans.getSharedPreferences( "favoritter_"+backend.getClass().getSimpleName(), 0);
     String str = prefs.getString(PREF_NØGLE, "");
-    Log.d("Favoritter: læst " + str);
+    Log.d("Favoritter "+backend.getClass().getSimpleName()+": læst " + str);
     favoritTilStartdato = strengTilMap(str);
     if (favoritTilStartdato.isEmpty()) antalNyeUdsendelser = 0;
   }
@@ -45,8 +45,8 @@ public class Favoritter {
 
   private void gem() {
     String str = mapTilStreng(favoritTilStartdato);
-    Log.d("Favoritter: gemmer " + str);
-    prefs.edit().putString(PREF_NØGLE, str).apply();;
+    prefs.edit().putString(PREF_NØGLE, str).apply();
+    Log.d("Favoritter "+backend.getClass().getSimpleName()+": gemt " + str);
   }
 
   public void sætFavorit(String programserieSlug, boolean checked) {
@@ -101,6 +101,8 @@ public class Favoritter {
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
     Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
+    //if (ps!=null && ps.getUdsendelser()!=null) {
+
     if (ps==null || ps.getUdsendelser()==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {

@@ -23,7 +23,7 @@ public class EoFavoritter extends Favoritter {
   @Override
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
     Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
-    if (ps==null) return; // Kial / kiel okazas?
+    if (ps==null || ps.getUdsendelser()==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {
       Date ekde = Datoformater.apiDatoFormat.parse(dato);

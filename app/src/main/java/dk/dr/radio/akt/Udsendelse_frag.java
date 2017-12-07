@@ -347,7 +347,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    udsendelse.getBackend().favoritter.observatører.remove(opdaterFavoritter);
+    if (udsendelse!=null) udsendelse.getBackend().favoritter.observatører.remove(opdaterFavoritter);
     App.forgrundstråd.removeCallbacks(this);
     super.onDestroyView();
   }

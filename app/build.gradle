@@ -59,8 +59,8 @@ android {
         jacob {
             dimension "forfatter"
             applicationId "dk.nordfalk.jacob"
-            versionCode 8
-            versionName '0.1.8 Marktest'
+            versionCode 9
+            versionName '0.1.9 Marktest'
         }
         esperanto {
             dimension "forfatter"

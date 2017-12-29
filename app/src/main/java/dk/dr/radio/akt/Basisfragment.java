@@ -20,6 +20,7 @@ import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Udseende;
+import dk.radiotv.backend.EsperantoRadioBackend;
 
 /**
  * @author j
@@ -215,7 +216,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
   }
 
   public static String skalérBillede(Udsendelse u, int bredde, int højde) {
-    if (Udseende.ESPERANTO) {
+    if (u.getBackend() instanceof EsperantoRadioBackend) {
       if (u.billedeUrl != null) return u.billedeUrl;
       return ((EoKanal) u.getKanal()).kanallogo_url;
     }

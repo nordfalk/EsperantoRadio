@@ -195,7 +195,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     opdaterSenestSpillet(vh.aq, vh.udsendelse);
 
     //MediaPlayer mp = DRData.instans.afspiller.getMediaPlayer();
-    //Log.d("mp pos="+mp.getCurrentPosition() + "  af "+mp.getDuration());
+    //Log.d("mp pos=  "+mp.getCurrentPosition() + "  af "+mp.getDuration());
   }
 
   private void opdaterListe() {
@@ -214,7 +214,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
           if (u.dagsbeskrivelse == Datoformater.I_DAG) nyListe.add("");
         }
         nyListe.add(u);
-        EoGeoblokaDetektilo.esploruĈuEstasBlokata(u);
+        //EoGeoblokaDetektilo.esploruĈuEstasBlokata(u);
       }
       int nyAktuelUdsendelseIndex = kanal.slug.equals("muzaiko") ? 0 : -1; //kanal.udsendelser.size()-1 : -1;
 

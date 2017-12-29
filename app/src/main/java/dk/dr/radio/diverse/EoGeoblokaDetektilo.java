@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
 
+import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
 
 /**
@@ -19,32 +20,34 @@ public class EoGeoblokaDetektilo {
   private static final HashSet<String> esploritajUrl = new HashSet<>();
   private static final HashSet<String> blokitajUrl = new HashSet<>();
 
-  public static void esploruĈuEstasBlokata(final Udsendelse udsendelse) {
+  public static void esploruĈuEstasBlokata(final Udsendelse udsendelse, final String alternativaUrl) {
     if (udsendelse.rektaElsendaPriskriboUrl == null) return;
     if (udsendelse.berigtigelseTekst != null) return;
 
     udsendelse.berigtigelseTekst = NE_BLOKITA;
 
     try {
-      final String url = udsendelse.findBedsteStreams(false).get(0).url;
-      if (blokitajUrl.contains(url)) {
+      final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
+      if (blokitajUrl.contains(stream.url)) {
         udsendelse.berigtigelseTekst = BLOKITA;
       }
-      if (!esploritajUrl.contains(url)) {
-        esploritajUrl.add(url);
+      if (!esploritajUrl.contains(stream.url)) {
+        esploritajUrl.add(stream.url);
         new AsyncTask() {
           @Override
           protected Object doInBackground(Object[] params) {
             try {
-              HttpURLConnection uc = (HttpURLConnection) new URL(url).openConnection();
+              HttpURLConnection uc = (HttpURLConnection) new URL(stream.url).openConnection();
               uc.setInstanceFollowRedirects(false);
               uc.connect();
               if (uc.getResponseMessage().contains("oved")  // 302 Temporarily Moved
                       && (uc.getHeaderFields().toString().contains("geoblock"))) {
                 //  [HTTP/1.0 302 Temporarily Moved], Content-Type=[text/html], Location=[http://streaming.radionomy.com/geoblocking.mp3?mount=Muzaiko],
+                blokitajUrl.add(stream.url);
+                if (alternativaUrl!=null && !alternativaUrl.isEmpty())
                 udsendelse.berigtigelseTekst = BLOKITA;
-                blokitajUrl.add(url);
               }
+              uc.disconnect();
             } catch (Exception e) { Log.rapporterFejl(e); }
             return null;
           }

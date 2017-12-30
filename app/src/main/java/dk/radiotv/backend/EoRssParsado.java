@@ -77,7 +77,8 @@ public class EoRssParsado {
       } else if ("image".equals(tag)) {
         e.billedeUrl = p.nextText();
       } else if ("enclosure".equals(tag)) {
-        if ("audio/mpeg".equals(p.getAttributeValue(null, "type"))) {
+        String sontipo = p.getAttributeValue(null, "type");
+        if (sontipo.startsWith("audio/mpeg")) { // audio/mpeg aŭ audio/mpeg3
           e.sonoUrl.add(p.getAttributeValue(null, "url"));
         }
       } else if ("link".equals(tag)) {

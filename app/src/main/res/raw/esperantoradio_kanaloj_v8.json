@@ -161,18 +161,6 @@
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo": "http://radiofrei.de/index.php?iid=podcast&ssuchtext=esperanto"
 		}
-	,{
-			"kodo": "peranto",
-			"nomo": "Esperanta Retradio",
-			"emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
-			//    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
-			//    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
-			//			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
-			"elsendojRssUrl": "http://esperantaretradio.blogspot.co.at/feeds/posts/default",
-			"xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
-			"retpoŝto": "retradio@aldone.de",
-			"hejmpaĝoButono": "http://aldone.de/retradio"
-		}
 	],
 	//,
 
@@ -185,6 +173,18 @@
 			"elsendojRssIgnoruTitolon": false,
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
 		}
+    ,{
+        "kodo": "peranto",
+        "nomo": "Esperanta Retradio",
+        "emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
+        //    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
+        //    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
+        //			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
+        "elsendojRssUrl": "http://esperantaretradio.blogspot.co.at/feeds/posts/default",
+        "xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
+        "retpoŝto": "retradio@aldone.de",
+        "hejmpaĝoButono": "http://aldone.de/retradio"
+      }
 	,{
 			"problemo": "2017 25okt: ne funkcias??",
 			"kodo": "radiohavanokubo",

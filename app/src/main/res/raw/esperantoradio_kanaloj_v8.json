@@ -100,12 +100,14 @@
 			"hejmpaĝo": "http://www.radioscienca.com/"
 		}
 	,{
-			"kodo": "amindaradio",
+			"kodo": "amindaradioesperanto",
 			"nomo": "Aminda Radio",
 			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
+			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias - do la fonto estas radio.txt ĝis eldoniĝos novan version de la apo",
 			"elsendojRssUrl": "http://feeds.djpod.com/amindaesperanto",
-			"montruTitolojn": "true",
-			"uziWebViewPorElsendo": true,
+			"montruTitolojn": "false",
+			"uziWebViewPorElsendo": false,
+			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
 			"hejmpaĝo": "https://amindaradio.wordpress.com/"
 		}
 

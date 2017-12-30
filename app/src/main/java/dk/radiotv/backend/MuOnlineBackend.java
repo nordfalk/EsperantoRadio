@@ -210,6 +210,14 @@ abstract class MuOnlineBackend extends Backend {
 
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
     // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
+    if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
+      try {
+        netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
+      } catch (Exception e) {
+        Log.rapporterFejl(e);
+      }
+      return;
+    }
     String url = BASISURL + "/schedule/" + kanal.slug + "?broadcastdate=" + datoStr;
     App.netkald.kald(kalder, url, new NetsvarBehander() {
       @Override

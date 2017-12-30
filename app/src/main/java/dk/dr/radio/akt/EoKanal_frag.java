@@ -37,7 +37,7 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
-import dk.radiotv.backend.EoRssParsado;
+import dk.radiotv.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
@@ -52,6 +52,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   private ArrayList<Object> liste = new ArrayList<Object>();
   private int aktuelUdsendelseIndex = -1;
   private EoKanal kanal;
+  Backend backend;
   protected View rod;
   private boolean brugerHarNavigeret;
   public static EoKanal_frag senesteSynligeFragment;
@@ -80,6 +81,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
       afbrydManglerData();
       return rod;
     }
+    backend = kanal.getBackend();
 
     App.data.senestLyttede.getListe();
 
@@ -101,39 +103,9 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     // Klikker man på den hvide baggrund rulles til aktuel udsendelse
     aq.id(R.id.rulTilAktuelUdsendelse).clicked(this).gone();
 
-
-    if (App.fejlsøgning) Log.d("hentSendeplanForDag url=" + kanal.eo_elsendojRssUrl);
-
-    if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto)) {
-      App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar s) throws Exception {
-          if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
-          if (s.fejl || s.uændret || listView==null || getActivity() == null) return;
-          Log.d("eo RSS por "+kanal+" ="+s.json);
-          EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
-          opdaterListe();
-
-          if (kanal.eo_elsendojRssUrl2!=null) {
-            final ArrayList<Udsendelse> uds1 = kanal.udsendelser;
-            App.netkald.kald(this, kanal.eo_elsendojRssUrl2, new NetsvarBehander() {
-                @Override
-                public void fikSvar(Netsvar s) throws Exception {
-                if (s.uændret || listView == null || getActivity() == null) return;
-                Log.d("eo RSS por " + kanal + " =" + s.json);
-                EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
-                kanal.udsendelser.addAll(uds1);
-                Collections.sort(kanal.udsendelser);
-                Collections.reverse(kanal.udsendelser);
-                opdaterListe();
-              }
-            });
-          }
-        }
-      });
-    } else {
-      opdaterListe();
-    }
+    //Log.d(this + " onCreateView 3 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
+    // Hent sendeplan for den pågældende dag. Døgnskifte sker kl 5, så det kan være dagen før
+    hentSendeplanForDag(new Date(App.serverCurrentTimeMillis() - 5 * 60 * 60 * 1000));
 
     //Log.d(this + " onCreateView 4 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     App.afspiller.observatører.add(this);
@@ -152,6 +124,37 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     if (listView!=null) listView.setAdapter(null); // Fix hukommelseslæk
     rod = null; listView = null; aktuelUdsendelseViewholder = null;
   }
+
+
+  private void hentSendeplanForDag(final Date dato) {
+    if (getActivity()==null) return; // fragmentet er blevet lukket
+    final String datoStr = Datoformater.apiDatoFormat.format(dato);
+    backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, new NetsvarBehander() {
+      @Override
+      public void fikSvar(Netsvar s) throws Exception {
+        if (s.uændret || listView==null || getActivity() == null) return;
+        if (s.fejl) new AQuery(rod).id(R.id.tom).text(R.string.Netværksfejl_prøv_igen_senere);
+        opdaterListeMedSendeplanForDag();
+      }
+    });
+  }
+
+  private void opdaterListeMedSendeplanForDag() {
+    int næstøversteSynligPos = listView.getFirstVisiblePosition() + 1;
+    if (!brugerHarNavigeret || næstøversteSynligPos >= liste.size()) {
+      opdaterListe();
+    } else {
+      // Nu ændres der i listen for at vise en dag før eller efter - sørg for at det synlige indhold ikke rykker sig
+      Object næstøversteSynlig = liste.get(næstøversteSynligPos);
+      //Log.d("næstøversteSynlig = " + næstøversteSynlig);
+      View v = listView.getChildAt(1);
+      int næstøversteSynligOffset = (v == null) ? 0 : v.getTop();
+      opdaterListe();
+      int næstøversteSynligNytIndex = liste.indexOf(næstøversteSynlig);
+      listView.setSelectionFromTop(næstøversteSynligNytIndex, næstøversteSynligOffset);
+    }
+  }
+
 
   @Override
   public void setUserVisibleHint(boolean isVisibleToUser) {

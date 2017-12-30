@@ -192,6 +192,15 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
 
   @Override
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+    if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
+      try {
+        netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
+      } catch (Exception e) {
+        Log.rapporterFejl(e);
+      }
+      return;
+    }
+
     String url = BASISURL + "/schedule/" + URLEncoder.encode(kanal.kode) + "/date/" + datoStr;
     App.netkald.kald(kalder, url, new NetsvarBehander() {
       @Override

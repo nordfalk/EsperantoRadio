@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
@@ -310,6 +311,43 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     ps.tilføjUdsendelser(0, k.udsendelser);
     ps.antalUdsendelser = k.udsendelser.size();
   }
+
+
+  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanalx, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+    final EoKanal kanal = (EoKanal) kanalx;
+    if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto) && !kanal.harUdsendelserForDag(datoStr)) {
+      App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
+        @Override
+        public void fikSvar(Netsvar s) throws Exception {
+          Log.d("eo RSS por "+kanal+" ="+s.json);
+          EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+          netsvarBehander.fikSvar(s);
+
+          if (kanal.eo_elsendojRssUrl2!=null) {
+            final ArrayList<Udsendelse> uds1 = kanal.udsendelser;
+            App.netkald.kald(this, kanal.eo_elsendojRssUrl2, new NetsvarBehander() {
+              @Override
+              public void fikSvar(Netsvar s) throws Exception {
+                Log.d("eo RSS2 por " + kanal + " =" + s.json);
+                EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+                kanal.udsendelser.addAll(uds1);
+                Collections.sort(kanal.udsendelser);
+                Collections.reverse(kanal.udsendelser);
+                netsvarBehander.fikSvar(s);
+              }
+            });
+          }
+        }
+      });
+    } else {
+      try {
+        netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
+      } catch (Exception e) {
+        Log.rapporterFejl(e);
+      }
+    }
+  }
+
 
   public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
     try {

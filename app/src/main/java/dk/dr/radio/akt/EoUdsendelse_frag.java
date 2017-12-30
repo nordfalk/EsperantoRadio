@@ -112,7 +112,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
-    for (Backend b : App.backend) b.favoritter.observatører.add(this);
+    for (Backend b : App.backend) b.favoritter.observatører.add(opdaterFavoritter);
     return rod;
   }
 
@@ -260,7 +260,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    for (Backend b : App.backend) b.favoritter.observatører.remove(this);
+    for (Backend b : App.backend) b.favoritter.observatører.remove(opdaterFavoritter);
     super.onDestroyView();
   }
 

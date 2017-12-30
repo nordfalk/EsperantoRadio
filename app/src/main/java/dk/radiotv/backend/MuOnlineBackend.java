@@ -208,6 +208,7 @@ abstract class MuOnlineBackend extends Backend {
     return lydData;
   }
 
+  @Override
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
     // http://www.dr.dk/mu-online/api/1.3/schedule/p1?broadcastdate=2017-03-03
     if (kanal.harUdsendelserForDag(datoStr)) { // brug værdier i RAMen
@@ -295,6 +296,7 @@ abstract class MuOnlineBackend extends Backend {
   private static final boolean BRUG_URN = false;
 
 
+  @Override
   public void hentProgramserie(final Programserie ps0, final String programserieSlug, final Kanal kanal_ubrugt, final int offset, final NetsvarBehander netsvarBehander) {
     if (App.TJEK_ANTAGELSER && ps0!=null && !programserieSlug.equals(ps0.slug)) Log.fejlantagelse(programserieSlug + " !=" + ps0.slug);
     // https://www.dr.dk/mu-online/api/1.4/list/den-roede-trad?limit=60

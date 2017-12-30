@@ -86,47 +86,58 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   public void run() {
     App.forgrundstråd.removeCallbacks(this); // Ingen gentagne kald
     liste.clear();
-    for (Backend b : App.backend) try {
-      if (!(b instanceof GammelDrRadioBackend)) continue; // fix for nu
+    for (final Backend b : App.backend) try {
       ArrayList<String> pss = new ArrayList<>(b.favoritter.getProgramserieSlugSæt());
       Collections.sort(pss);
       Log.d(this + " "+b +" psss = " + pss);
       for (final String programserieSlug : pss) {
         Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
-        if (programserie != null) liste.add(new Pair(b, programserie));
-        else {
-          if (App.data.programserieSlugFindesIkke.contains(programserieSlug)) continue;
-          Log.d("programserieSlug gav ingen værdi, henter for " + programserieSlug);
-          App.netkald.kald(this, GammelDrRadioBackend.instans.getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
+        if (programserie != null) {
+          liste.add(new Pair(b, programserie));
+          adapter.notifyDataSetChanged();
+        } else {
+          b.hentProgramserie(null, programserieSlug, null, 0, new NetsvarBehander() {
             @Override
-            public void fikSvar(Netsvar s) throws Exception {
-              Log.d("favoritter fikSvar(" + s.fraCache + " " + s.url);
+            public void fikSvar(Netsvar s) {
               if (s.uændret || s.fejl) return;
-              if (s.json != null) {
-                JSONObject data = new JSONObject(s.json);
-                Programserie programserie = GammelDrRadioBackend.instans.parsProgramserie(data, null);
-                JSONArray prg = data.getJSONArray("Programs");
-                ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
-                for (int n = 0; n < prg.length(); n++) {
-                  uliste.add(GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
-                }
-                ArrayList<Udsendelse> udsendelser = uliste;
-                programserie.tilføjUdsendelser(0, udsendelser);
-                App.data.programserieFraSlug.put(programserieSlug, programserie);
-              } else {
-                App.data.programserieSlugFindesIkke.add(programserieSlug);
-                Log.d("programserieSlugFindesIkke for " + programserieSlug);
+              Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
+              if (programserie != null) {
+                liste.add(new Pair(b, programserie));
+                adapter.notifyDataSetChanged();
               }
-              App.forgrundstråd.postDelayed(Favoritprogrammer_frag.this, 250); // Vent 1/4 sekund på eventuelt andre svar
             }
           });
         }
+/*
+        App.netkald.kald(this, GammelDrRadioBackend.instans.getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
+          @Override
+          public void fikSvar(Netsvar s) throws Exception {
+            Log.d("favoritter fikSvar(" + s.fraCache + " " + s.url);
+            if (s.uændret || s.fejl) return;
+            if (s.json != null) {
+              JSONObject data = new JSONObject(s.json);
+              Programserie programserie = GammelDrRadioBackend.instans.parsProgramserie(data, null);
+              JSONArray prg = data.getJSONArray("Programs");
+              ArrayList<Udsendelse> uliste = new ArrayList<Udsendelse>();
+              for (int n = 0; n < prg.length(); n++) {
+                uliste.add(GammelDrRadioBackend.instans.parseUdsendelse(null, App.data, prg.getJSONObject(n)));
+              }
+              ArrayList<Udsendelse> udsendelser = uliste;
+              programserie.tilføjUdsendelser(0, udsendelser);
+              App.data.programserieFraSlug.put(programserieSlug, programserie);
+            } else {
+              App.data.programserieSlugFindesIkke.add(programserieSlug);
+              Log.d("programserieSlugFindesIkke for " + programserieSlug);
+            }
+            App.forgrundstråd.postDelayed(Favoritprogrammer_frag.this, 250); // Vent 1/4 sekund på eventuelt andre svar
+          }
+        });
+        */
       }
       Log.d(this + " liste = " + liste);
     } catch (Exception e1) {
       Log.rapporterFejl(e1);
     }
-    adapter.notifyDataSetChanged();
   }
 
 

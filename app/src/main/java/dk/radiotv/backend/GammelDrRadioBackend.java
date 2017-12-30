@@ -546,8 +546,8 @@ scp /home/j/android/dr-radio-android/DRRadiov35/app/src/main/res/raw/grunddata_u
       Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
       if (programserie == null) {
         // Hvis der allerede er et programserie-element fra anden side indeholder den mere information end denne her
-        programserie = new Programserie(GammelDrRadioBackend.instans);
-        GammelDrRadioBackend.instans.parsProgramserie(programserieJson, programserie);
+        programserie = new Programserie(this);
+        parsProgramserie(programserieJson, programserie);
         App.data.programserieFraSlug.put(programserieSlug, programserie);
       }
       res.add(programserie);

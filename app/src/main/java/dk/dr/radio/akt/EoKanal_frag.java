@@ -461,7 +461,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
     App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, new NetsvarBehander() {
       @Override
-      public void fikSvar(Netsvar s) throws Exception {
+      public void fikSvar(Netsvar s) {
         if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
         if (getActivity() == null || s.uændret || s.fejl) return;
         rektaElsendaPriskribo = s.json.trim();

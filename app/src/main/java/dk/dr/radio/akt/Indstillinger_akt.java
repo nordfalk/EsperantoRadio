@@ -28,6 +28,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
 import android.view.MenuItem;
@@ -129,6 +131,18 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
               }
             } else {
               lp.setEnabled(false);
+              /*
+              if (ContextCompat.checkSelfPermission(Indstillinger_akt.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                  Toast.makeText(this, "Her skal vises et rationale/forklaring: ...", Toast.LENGTH_LONG).show();
+                  Toast.makeText(this, "Giv tilladelse for at eksemplet virker :-)", Toast.LENGTH_LONG).show();
+                }
+                ActivityCompat.requestPermissions(Indstillinger_akt.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123456);
+              } else {
+                startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nummer)));
+              }
+              */
+
               int tilladelse = ApplicationSingleton.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ApplicationSingleton.instans.getPackageName());
               if (tilladelse != PackageManager.PERMISSION_GRANTED) {
                 lp.setSummary(lp.getSummary() + " Du skal give app'en tilladelse til eksternt lager");

@@ -348,7 +348,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     }
   }
 
-
+  @Override
   public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);

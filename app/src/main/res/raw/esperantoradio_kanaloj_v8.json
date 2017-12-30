@@ -100,6 +100,16 @@
 			"hejmpaĝo": "http://www.radioscienca.com/"
 		}
 	,{
+			"kodo": "amindaradio",
+			"nomo": "Aminda Radio",
+			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
+			"elsendojRssUrl": "http://feeds.djpod.com/amindaesperanto",
+			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": true,
+			"hejmpaĝo": "https://amindaradio.wordpress.com/"
+		}
+
+	,{
 			"kodo": "polaretradio",
 			"nomo": "Pola Retradio",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",

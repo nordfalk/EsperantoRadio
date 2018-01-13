@@ -69,6 +69,7 @@ import dk.dk.niclas.cast.browser.VideoProvider;
 import dk.dk.niclas.cast.expandedcontrols.ExpandedControlsActivity;
 import dk.dk.niclas.cast.queue.ui.QueueListViewActivity;
 import dk.dk.niclas.cast.utils.Utils;
+import dk.dr.radio.diverse.App;
 import dk.dr.radio.v3.R;
 
 /**
@@ -123,7 +124,14 @@ public class LocalPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.cast_player_activity);
+        try {
+            setContentView(R.layout.cast_player_activity);
+        } catch (Exception e) {
+            App.langToast("Beklager, der skete en intern fejl");
+            dk.dr.radio.diverse.Log.rapporterFejl(e);
+            finish();
+            return;
+        }
         mAquery = new AQuery(this);
         loadViews();
         setupControlsCallbacks();

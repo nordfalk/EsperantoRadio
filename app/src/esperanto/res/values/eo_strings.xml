@@ -18,7 +18,7 @@
     <string name="PLAYLISTE">"LUDLISTO"</string>
     <string name="INDSLAG">"PROGRAMEROJ"</string>
     <string name="indslag">"programeroj"</string>
-    <string name="DOWNLOAD">"ELŜUTI"</string>
+    <string name="DOWNLOAD">"&#160;ELŜUTI"</string>
     <string name="playliste">"ludlisto"</string>
     <string name="Start">"Ludi"</string>
     <string name="hent_udsendelse">"elŝuti elsendon"</string>

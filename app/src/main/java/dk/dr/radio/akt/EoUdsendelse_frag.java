@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -504,15 +506,20 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
   private void hent() {
     try {
-      int tilladelse = ApplicationSingleton.instans.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ApplicationSingleton.instans.getPackageName());
+      int tilladelse = ContextCompat.checkSelfPermission(ApplicationSingleton.instans, Manifest.permission.WRITE_EXTERNAL_STORAGE);
       if (tilladelse != PackageManager.PERMISSION_GRANTED) {
         AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-        ab.setTitle("Tilladelse mangler");
-        ab.setMessage("Du kan give tilladelse til eksternt lager ved at opgradere til den seneste version");
-        ab.setPositiveButton("OK, opgrader", new AlertDialog.OnClickListener() {
+        ab.setTitle("Permeso mankas");
+        ab.setMessage("Vi devas permesi aliron al eksterna stokejo (SD-karto) por povi konservi la elsendon.");
+        ab.setPositiveButton("OK", new AlertDialog.OnClickListener() {
           public void onClick(DialogInterface arg0, int arg1) {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=dk.dr.radio"));
-            startActivity(i);
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+              ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 117);
+            } else{
+              Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+              intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+              startActivity(intent);
+            }
           }
         });
         ab.setNegativeButton("Nej tak", null);
@@ -524,9 +531,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Log.rapporterFejl(e);
     }
 
-    HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse);
-    if (hs != null) {
-      // Skift til Hentede_frag
+    if (App.data.hentedeUdsendelser.getHentetStatus(udsendelse)!=null) {
       try {
         FragmentManager fm = getActivity().getSupportFragmentManager();
         // Fjern IKKE backstak - vi skal kunne hoppe tilbage hertil

@@ -60,7 +60,7 @@ public class DrVolleyStringRequest extends StringRequest {
       // fra en listeopdatering eller fra getView
       lytter.fikSvar(new Netsvar(url, listener.cachetVærdi, true, false));
     } catch (Exception e) {
-      Log.e(e);
+      Log.e(url, e);
       // En fejl i den cachede værdi - smid indholdet af cachen væk, det kan alligevel ikke bruges
       App.volleyRequestQueue.getCache().remove(url);
       return;

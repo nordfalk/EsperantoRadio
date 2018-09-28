@@ -1,8 +1,7 @@
 {
-	// ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per
-	// http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'
-	//
-	// scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/
+	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
+	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
+	"rim3" : "scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
 
 
 	"intervals": {
@@ -10,14 +9,14 @@
 		"settings": 1800
 	},
 	"android" : {
-		"kontakt_url": "https://github.com/nordfalk/esperanto-telefono/blob/wiki/EsperantoRadio.md",
+		"kontakt_url": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 		"kontakt_modtagere": ["jacob.nordfalk@gmail.com" ],
 		"kontakt_titel": "Pri la Esperanto-radio",
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
-		"drift_statusmeddelelse": "",
-		"ggdrift_statusmeddelelse": "Aŭgusto 2017:<br><br>Bonvenon al nova kanalo 'Movada Vidpunkto'.<br><br>Se al vi mankas kanalo vi volonte kontaktu min.<br>Kore, Jacob Nordfalk.",
+		"qqqdrift_statusmeddelelsexxx": "",
+		"drift_statusmeddelelse": "Septembro 2018:<br><br>Estas problemoj kun kanaloj Movada Vidpunto, Varsovia Vento kaj La Bona Renkontiĝo.<br><br>Mi prilaboras ke vi denove povas aŭskulti tiujn kanalojn.<br><br>Kore, Jacob Nordfalk.",
 		"xxxxdrift_statusmeddelelse": ""
 	},
 
@@ -31,8 +30,8 @@
 ",
 
 
-	"hejmpaĝo": "https://github.com/nordfalk/esperanto-telefono/blob/wiki/EsperantoRadio.md",
-	"elsendojUrl": "http://esperanto-radio.com/radio.txt",
+	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
+	"elsendojUrl": "https://esperanto-radio.com/radio.txt",
 	"komenca_kanalo": "muzaiko",
 
 	"kanaloj": [
@@ -44,7 +43,7 @@
 			"rektaElsendaPriskriboUrl": "http://muzaiko.info/public/datumoj/aktuala_kanto.html",
 			"XXemblemoUrl": "http://muzaiko.info/images/emblemo.png",
 			"XXemblemoUrl": "http://muzaiko.info/reklambendoj/rb2.png",
-			"emblemoUrl": "http://esperanto-radio.com/_muzaiko.png",
+			"emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",
 			//"elsendojRssUrl": "http://muzaiko.info/podkasto/podkasto.rss",
 			"elsendojRssUrl": "http://muzaiko.info/public/podkasto/podkasto.rss",
 			// RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
@@ -61,7 +60,7 @@
 			"emblemoUrl": "http://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
-			"hejmpaĝoButono": "http://podkasto.net/"
+			"hejmpaĝoButono": "https://podkasto.net/"
 		}
 	,{
 			"kodo": "vinilkosmo",
@@ -70,16 +69,16 @@
 			"elsendojRssUrl": "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": true,
-			"hejmpaĝo": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
+			"hejmpaĝoButono": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
 		}
 	,{
 			"kodo": "kernpunkto",
 			"nomo": "Kernpunkto",
-			"emblemoUrl": "http://esperanto-radio.com/_kernpunkto.png",
-			"elsendojRssUrl": "http://kern.punkto.info/feed/mp3",
+			"emblemoUrl": "https://esperanto-radio.com/_kernpunkto.png",
+			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝo": "http://kern.punkto.info/"
+			"hejmpaĝoButono": "https://kern.punkto.info/"
 		}
 	,{
 			"kodo": "movada-vidpunkto",
@@ -97,7 +96,7 @@
 			"elsendojRssUrl": "http://www.radioscienca.com/feed/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝo": "http://www.radioscienca.com/"
+			"hejmpaĝoButono": "http://www.radioscienca.com/"
 		}
 	,{
 			"kodo": "amindaradioesperanto",
@@ -108,14 +107,14 @@
 			"montruTitolojn": "false",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
-			"hejmpaĝo": "https://amindaradio.wordpress.com/"
+			"hejmpaĝoButono": "https://amindaradio.wordpress.com/"
 		}
 
 	,{
 			"kodo": "polaretradio",
 			"nomo": "Pola Retradio",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
-			"emblemoUrl": "http://esperanto-radio.com/_polaretradio.png",
+			"emblemoUrl": "https://esperanto-radio.com/_polaretradio.png",
 			"elsendojRssUrl": "http://pola-retradio.org/feed/",
 			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
 			"elsendojRssIgnoruTitolon": true,
@@ -127,39 +126,37 @@
 			"nomo": "3ZZZ en Esperanto",
 			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
 			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
-			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
+			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
 			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
 			"retpoŝto": "leslie@heldzingen.com",
-			"hejmpaĝoButono": "http://melburno.org.au/3ZZZradio/"
+			"hejmpaĝoButono": "https://melburno.org.au/3ZZZradio/"
 		}
 	,{
 			"kodo": "radiovatikana",
 			"nomo": "Radio Vatikana",
 			"XXemblemoUrl": "http://eo.radiovaticana.va/img/h_02.gif",
-			"emblemoUrl": "http://esperanto-radio.com/_radiovatikana.png",
+			"emblemoUrl": "https://esperanto-radio.com/_radiovatikana.png",
 			"elsendojRssUrl": "http://media01.vatiradio.va/podmaker/podcaster.aspx?c=esperanto_1",
 			"elsendojRssUrl2": "http://media01.vatiradio.va/podmaker/podcaster.aspx?c=esperanto_2",
-			"elsendojRssIgnoruTitolon": false,
 			"retpoŝto": "esperanto@vatiradio.va",
-			"hejmpaĝoButono": "http://www.radiovaticana.org/esp/on_demand.asp"
+			"hejmpaĝoButono": "http://www.radiovaticana.va/"
 		}
 	,{
 			"kodo": "spiritismavocxo",
 			"nomo": "Spiritisma Voĉo",
 			"emblemoUrl": "https://d1bm3dmew779uf.cloudfront.net/large/8baa9d2b387b75be75a1356240351e09.jpg",
 			"elsendojRssUrl": "https://www.spreaker.com/user/8650988/episodes/feed",
-			"elsendojRssIgnoruTitolon": false,
 			"retpoŝto": "leo.cassanho@yahoo.com.br",
 			"hejmpaĝoButono": "https://www.spreaker.com/user/8650988"
 		}
 	,{
 			"kodo": "radiofrei",
 			"nomo": "Radio Frei",
-			"emblemoUrl": "http://esperanto-radio.com/_radiofrei.png",
+			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
 			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝo": "http://radiofrei.de/index.php?iid=podcast&ssuchtext=esperanto"
+			"hejmpaĝoButono": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto"
 		}
 	],
 	//,
@@ -170,8 +167,19 @@
 			"nomo": "Radio Aktiva",
 			"emblemoUrl": "http://www.ameriko.org/files/images/radioaktiva_emblemo.160_160.png",
 			"elsendojRssUrl_HAVAS_ERARON": "radioaktiva.esperanto.org.uy/feed/podcast/",
-			"elsendojRssIgnoruTitolon": false,
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
+        }
+    ,{
+        "kodo": "laboren.org",
+        "nomo": "La Bona Renkontiĝo",
+        //			"emblemoUrl": "https://laboren.org/static/img/surbandigo.jpg",
+        //			"emblemoUrl": "https://pbs.twimg.com/card_img/948578127806156800/RigNJw6w?format=png&name=144x144_2",
+        "emblemoUrl": "https://laboren.org/static/img/laboren-3000x1687.jpg",
+        "elsendojRssUrl": "https://laboren.org/rss/",
+        "montruTitolojn": "true",
+        "uziWebViewPorElsendo": false,
+        "retpoŝto": "stela@laboren.org",
+        "hejmpaĝoButono": "https://laboren.org"
 		}
     ,{
         "kodo": "peranto",
@@ -191,7 +199,6 @@
 			"nomo": "Radio Havano Kubo",
 			"emblemoUrl": "http://www.ameriko.org/files/images/rhc-large.160_160.png",
 			"elsendojRssUrl": "http://www.ameriko.org/eo/radiokubo/feed",
-			"elsendojRssIgnoruTitolon": false,
 			// http://radiohc.cu/eo/kontaktu-nin.html
 			//			"retpoŝto": "",
 			"hejmpaĝoButono": "http://radiohc.cu/eo/"

@@ -91,6 +91,7 @@
           android:textStyle="bold"
           android:paddingLeft="4dp"
           android:paddingRight="4dp"
+          android:maxLines="2"
           tools:ignore="HardcodedText"/>
 
       <TextView

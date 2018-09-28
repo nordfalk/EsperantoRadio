@@ -319,6 +319,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
+          if (s.uændret) return;
           Log.d("eo RSS por "+kanal+" ="+s.json);
           EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
           netsvarBehander.fikSvar(s);

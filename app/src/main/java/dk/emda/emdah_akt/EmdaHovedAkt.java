@@ -117,7 +117,7 @@ public class EmdaHovedAkt extends AppCompatActivity {
     tabLayout.getTabAt(0).setIcon(R.drawable.hjem);
     tabLayout.getTabAt(1).setIcon(R.drawable.favourite);
     tabLayout.getTabAt(2).setIcon(R.drawable.kanalertab);
-    tabLayout.getTabAt(3).setIcon(R.drawable.dr_logo);
+    //tabLayout.getTabAt(3).setIcon(R.drawable.dr_logo);
     // fra vælger swipe funktionalitet
     mViewPager.beginFakeDrag();
 

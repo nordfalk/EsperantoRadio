@@ -75,7 +75,9 @@ public class EoRssParsado {
         e.startTidKl = EsperantoRadioBackend.datoformato.format(e.startTid);
         e.slug = k.slug+":"+e.startTidKl;
       } else if ("image".equals(tag)) {
-        do {} while (p.next()!=XmlPullParser.TEXT); // transsaltu <url> en ekz. <image><url>http://laboren.org/static/img/laboren-3000x1687.jpg</url>...
+        if (k.kode.startsWith("laboren")) {
+          do {} while (p.next()!=XmlPullParser.TEXT); // transsaltu <url> en ekz. <image><url>http://laboren.org/static/img/laboren-3000x1687.jpg</url>...
+        }
         e.billedeUrl = p.getText();
       } else if ("enclosure".equals(tag)) {
         String sontipo = p.getAttributeValue(null, "type");

@@ -16,7 +16,7 @@
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"qqqdrift_statusmeddelelsexxx": "",
-		"drift_statusmeddelelse": "Septembro 2018:<br><br>Estas problemoj kun kanaloj Movada Vidpunto, Varsovia Vento kaj La Bona Renkontiĝo.<br><br>Mi prilaboras ke vi denove povas aŭskulti tiujn kanalojn.<br><br>Kore, Jacob Nordfalk.",
+		"drift_statusmeddelelse": "Septembro 2018:<br><br>Estas problemoj kun kanaloj Movada Vidpunto, Varsovia Vento kaj La Bona Renkontiĝo.<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti tiujn kanalojn.<br><br>Bonvolu viziti https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio<br><br>Kore, Jacob Nordfalk.",
 		"xxxxdrift_statusmeddelelse": ""
 	},
 
@@ -56,8 +56,8 @@
 			"kodo": "varsoviavento",
 			"nomo": "Varsovia Vento",
 			"emblemoUrl": "",
-			"elsendojRssUrl": "http://www.podkasto.net/feed/",
-			"emblemoUrl": "http://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
+			"elsendojRssUrl": "https://www.podkasto.net/feed/",
+			"emblemoUrl": "https://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
 			"hejmpaĝoButono": "https://podkasto.net/"
@@ -87,7 +87,7 @@
 			"elsendojRssUrl": "https://movada-vid.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": true,
-			"hejmpaĝo": "https://movada-vid.punkto.info/"
+			"hejmpaĝoButono": "https://movada-vid.punkto.info/"
 		}
 	,{
 			"kodo": "radioscienca",
@@ -151,6 +151,18 @@
 			"hejmpaĝoButono": "https://www.spreaker.com/user/8650988"
 		}
 	,{
+			"kodo": "laboren.org",
+			"nomo": "La Bona Renkontiĝo",
+			//			"emblemoUrl": "https://laboren.org/static/img/surbandigo.jpg",
+			//			"emblemoUrl": "https://pbs.twimg.com/card_img/948578127806156800/RigNJw6w?format=png&name=144x144_2",
+			"emblemoUrl": "https://laboren.org/static/img/laboren-3000x1687.jpg",
+			"elsendojRssUrl": "https://laboren.org/rss/",
+			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": false,
+			"retpoŝto": "stela@laboren.org",
+			"hejmpaĝoButono": "https://laboren.org"
+		}
+	,{
 			"kodo": "radiofrei",
 			"nomo": "Radio Frei",
 			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
@@ -169,18 +181,6 @@
 			"elsendojRssUrl_HAVAS_ERARON": "radioaktiva.esperanto.org.uy/feed/podcast/",
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
         }
-    ,{
-        "kodo": "laboren.org",
-        "nomo": "La Bona Renkontiĝo",
-        //			"emblemoUrl": "https://laboren.org/static/img/surbandigo.jpg",
-        //			"emblemoUrl": "https://pbs.twimg.com/card_img/948578127806156800/RigNJw6w?format=png&name=144x144_2",
-        "emblemoUrl": "https://laboren.org/static/img/laboren-3000x1687.jpg",
-        "elsendojRssUrl": "https://laboren.org/rss/",
-        "montruTitolojn": "true",
-        "uziWebViewPorElsendo": false,
-        "retpoŝto": "stela@laboren.org",
-        "hejmpaĝoButono": "https://laboren.org"
-		}
     ,{
         "kodo": "peranto",
         "nomo": "Esperanta Retradio",

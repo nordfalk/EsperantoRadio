@@ -8,7 +8,7 @@ import android.app.Application;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author j
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
   public AfproevEsperantoRadioBackend() { super(backend = new EsperantoRadioBackend()); }
 

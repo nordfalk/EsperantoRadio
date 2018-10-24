@@ -70,8 +70,8 @@ android {
                 }
             }
             applicationId "dk.nordfalk.esperanto.radio"
-            versionCode 44
-            versionName '2.0.12b'
+            versionCode 45
+            versionName '2.0.12c'
         }
         detErTv {
             dimension "forfatter"
@@ -83,6 +83,12 @@ android {
             applicationId "dk.nordfalk.det_er_tv"
             versionCode 1
             versionName '0.1 Marktest'
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
         }
     }
 }
@@ -116,8 +122,9 @@ dependencies {
     implementation 'net.danlew:android.joda:2.9.9'
     // Eventbus gør debug APK'en 150 kb større
     //compile 'org.greenrobot:eventbus:3.0.0'
-    testImplementation 'org.robolectric:robolectric:3.1'
+    testImplementation 'org.robolectric:robolectric:3.5'
     // Fix for javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Algorithm constraints check failed on signature algorithm: SHA256WithRSAEncryption
     // Se også https://github.com/robolectric/robolectric/issues/3288
     testImplementation 'org.bouncycastle:bcprov-jdk15on:1.57'
+    testImplementation 'junit:junit:4.12'
 }

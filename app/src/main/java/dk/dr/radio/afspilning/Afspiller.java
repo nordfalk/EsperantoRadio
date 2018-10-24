@@ -209,7 +209,12 @@ public class Afspiller {
       //opdaterNotification();
       // Start afspillerservicen så programmet ikke bliver lukket
       // når det kører i baggrunden under afspilning
-      ApplicationSingleton.instans.startService(new Intent(ApplicationSingleton.instans, HoldAppIHukommelsenService.class));
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // https://developer.android.com/about/versions/oreo/background
+        ApplicationSingleton.instans.startForegroundService(new Intent(ApplicationSingleton.instans, HoldAppIHukommelsenService.class));
+      } else {
+        ApplicationSingleton.instans.startService(new Intent(ApplicationSingleton.instans, HoldAppIHukommelsenService.class));
+      }
       if (App.prefs.getBoolean("wifilås", true) && wifilock != null) {
         wifilock.acquire();
       }

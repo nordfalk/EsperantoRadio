@@ -87,12 +87,12 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     venstremenuFrag = (Venstremenu_frag) getFragmentManager().findFragmentById(R.id.venstremenu_frag);
 
 
-    if (savedInstanceState == null) {
+    if (savedInstanceState == null) try {
       int kanalindex = kanaler.indexOf(App.afspiller.getLydkilde().getKanal());
       if (kanalindex == -1) kanalindex = 3; // Hvis vi ikke rammer nogen af de overordnede kanaler, så er det P4
       viewPager.setCurrentItem(kanalindex);
       Sidevisning.vist(Kanal_frag.class, kanaler.get(kanalindex).slug);
-    }
+    } catch (Exception e) { Log.rapporterFejl(e); }
     kanalfaneblade = (PagerSlidingTabStrip) rod.findViewById(R.id.tabs);
     kanalfaneblade.setTextSize(getResources().getDimensionPixelSize(R.dimen.metainfo_skrifstørrelse));
     kanalfaneblade.setViewPager(viewPager);

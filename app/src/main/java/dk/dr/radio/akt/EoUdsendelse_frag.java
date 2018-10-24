@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,8 +133,13 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     } else {
       String emblemo = udsendelse.billedeUrl;
       if (emblemo==null || emblemo.length()==0) emblemo = kanal.kanallogo_url;
-      aq.id(R.id.billede).image(emblemo)
-          .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
+//      aq.id(R.id.billede).image(emblemo)
+//      aq.id(R.id.billede)
+//          .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
+      Picasso.with(getActivity())
+              .load(emblemo).placeholder(null)
+              .into(aq.getImageView());
+      Log.d("emblemo="+emblemo);
     }
 
 //    aq.id(R.id.udsendelse_baggrundsgradient).gone();

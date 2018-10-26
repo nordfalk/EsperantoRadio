@@ -179,7 +179,15 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
            */
         Bitmap res = BitmapFactory.decodeFile(dosiero);
 
-        if (res != null) ioEstisSxargxita = true;
+        if (res != null) {
+          ioEstisSxargxita = true;
+          int nedskaler = 1;
+          while (res.getHeight()/nedskaler>300) nedskaler *= 2;
+          if (nedskaler>1) {
+            new Exception("Bitmap.createScaledBitmap "+k.kanallogo_url+" "+ res.getHeight() + " / " + nedskaler ).printStackTrace();
+            res = Bitmap.createScaledBitmap(res, res.getWidth()/nedskaler, res.getHeight()/nedskaler, true);
+          }
+        }
         k.kanallogo_eo = res;
       } catch (Exception ex) {
         Log.e(ex);

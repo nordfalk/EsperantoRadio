@@ -138,7 +138,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 //          .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
       Picasso.with(getActivity())
               .load(emblemo).placeholder(null)
-              .into(aq.getImageView());
+              .into(aq.id(R.id.billede).getImageView());
       Log.d("emblemo="+emblemo);
     }
 

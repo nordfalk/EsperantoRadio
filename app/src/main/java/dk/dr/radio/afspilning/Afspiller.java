@@ -136,6 +136,10 @@ public class Afspiller {
 
   public void startAfspilning() {
     if (App.fejlsøgning) App.kortToast("startAfspilning() "+mediaPlayer);
+    if (lydkilde == null) {
+      Log.rapporterFejl(new IllegalStateException("setLydkilde(null"));
+      return;
+    }
     if (lydkilde.hentetStream == null && !App.erOnline()) {
       App.kortToast(R.string.Internetforbindelse_mangler);
       if (vækningIGang) ringDenAlarm();

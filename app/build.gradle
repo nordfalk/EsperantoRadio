@@ -71,7 +71,7 @@ android {
             }
             applicationId "dk.nordfalk.esperanto.radio"
             versionCode 47
-            versionName '2.0.12e'
+            versionName '2.0.12f'
         }
         detErTv {
             dimension "forfatter"

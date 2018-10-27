@@ -184,7 +184,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           int nedskaler = 1;
           while (res.getHeight()/nedskaler>300) nedskaler *= 2;
           if (nedskaler>1) {
-            new Exception("Bitmap.createScaledBitmap "+k.kanallogo_url+" "+ res.getHeight() + " / " + nedskaler ).printStackTrace();
+            Log.d("Bitmap.createScaledBitmap "+k.kanallogo_url+"  "+ res.getHeight() + "/" + nedskaler );
             res = Bitmap.createScaledBitmap(res, res.getWidth()/nedskaler, res.getHeight()/nedskaler, true);
           }
         }

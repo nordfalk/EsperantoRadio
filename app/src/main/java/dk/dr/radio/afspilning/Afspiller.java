@@ -460,27 +460,29 @@ public class Afspiller {
 
 
   public void setLydkilde(Lydkilde lydkilde) {
-    Log.d("setLydkilde(" + lydkilde);
-    if (lydkilde instanceof EoKanal) lydkilde = lydkilde.getUdsendelse();
-    if (lydkilde == this.lydkilde) return;
-    if (lydkilde == null) {
-      Log.rapporterFejl(new IllegalStateException("setLydkilde(null"));
-      return;
-    }
-    // Tjek om der er en hentet udsendelse - det sker også i brugergrænsefladen men det kan være den ikke har været i spil
-    if (lydkilde.hentetStream==null && lydkilde instanceof Udsendelse) {
-      App.data.hentedeUdsendelser.tjekOmHentet((Udsendelse) lydkilde);
-    }
+    try {
+      Log.d("setLydkilde(" + lydkilde);
+      if (lydkilde instanceof EoKanal) lydkilde = lydkilde.getUdsendelse();
+      if (lydkilde == this.lydkilde) return;
+      if (lydkilde == null) {
+        Log.rapporterFejl(new IllegalStateException("setLydkilde(null"));
+        return;
+      }
+      // Tjek om der er en hentet udsendelse - det sker også i brugergrænsefladen men det kan være den ikke har været i spil
+      if (lydkilde.hentetStream == null && lydkilde instanceof Udsendelse) {
+        App.data.hentedeUdsendelser.tjekOmHentet((Udsendelse) lydkilde);
+      }
 
 
-    if ((afspillerstatus == Status.SPILLER) || (afspillerstatus == Status.FORBINDER)) {
-      pauseAfspilning(); // gemmer lydkildens position
-      this.lydkilde = lydkilde;
-      startAfspilning(); // sætter afspilleren til den nye lydkildes position
-    } else {
-      this.lydkilde = lydkilde;
-    }
-    opdaterObservatører();
+      if ((afspillerstatus == Status.SPILLER) || (afspillerstatus == Status.FORBINDER)) {
+        pauseAfspilning(); // gemmer lydkildens position
+        this.lydkilde = lydkilde;
+        startAfspilning(); // sætter afspilleren til den nye lydkildes position
+      } else {
+        this.lydkilde = lydkilde;
+      }
+      opdaterObservatører();
+    } catch (Exception e) { Log.rapporterFejl(e, lydkilde); }
   }
 
 

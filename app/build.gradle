@@ -70,7 +70,7 @@ android {
                 }
             }
             applicationId "dk.nordfalk.esperanto.radio"
-            versionCode 47
+            versionCode 50
             versionName '2.0.12f'
         }
         detErTv {

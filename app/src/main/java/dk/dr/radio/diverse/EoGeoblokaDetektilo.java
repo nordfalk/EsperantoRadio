@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoKanal;
 
 /**
  * Bedaŭrinde la rektaj elsendoj de Muzaiko estas nur haveblaj en certaj landoj.
@@ -20,7 +21,7 @@ public class EoGeoblokaDetektilo {
   private static final HashSet<String> esploritajUrl = new HashSet<>();
   private static final HashSet<String> blokitajUrl = new HashSet<>();
 
-  public static void esploruĈuEstasBlokata(final Udsendelse udsendelse, final String alternativaUrl) {
+  public static void esploruĈuEstasBlokata(EoKanal kanal, final Udsendelse udsendelse, final String alternativaUrl) {
     if (udsendelse.rektaElsendaPriskriboUrl == null) return;
     if (udsendelse.berigtigelseTekst != null) return;
 
@@ -28,6 +29,7 @@ public class EoGeoblokaDetektilo {
 
     try {
       final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
+      final Lydstream stream1 = kanal.findBedsteStreams(false).get(0);
       if (blokitajUrl.contains(stream.url)) {
         udsendelse.berigtigelseTekst = BLOKITA;
       }
@@ -44,8 +46,13 @@ public class EoGeoblokaDetektilo {
                       && (uc.getHeaderFields().toString().contains("geoblock"))) {
                 //  [HTTP/1.0 302 Temporarily Moved], Content-Type=[text/html], Location=[http://streaming.radionomy.com/geoblocking.mp3?mount=Muzaiko],
                 blokitajUrl.add(stream.url);
-                if (alternativaUrl!=null && !alternativaUrl.isEmpty())
-                udsendelse.berigtigelseTekst = BLOKITA;
+                if (alternativaUrl!=null && !alternativaUrl.isEmpty()) {
+                  stream.url = alternativaUrl;
+                  stream1.url = alternativaUrl;
+                } else {
+                  udsendelse.berigtigelseTekst = BLOKITA;
+                }
+                esploritajUrl.add(stream.url);
               }
               uc.disconnect();
             } catch (Exception e) { Log.rapporterFejl(e); }

@@ -104,6 +104,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         rektaElsendo.slug = k.slug + "_rekta";
         eoElsendoAlDaUdsendelse(rektaElsendo, k);
         k.eo_rektaElsendo = rektaElsendo;
+        /*
         ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
         Lydstream ls = new Lydstream();
         streams.add(ls);
@@ -111,7 +112,9 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         ls.url = rektaElsendaSonoUrl;
         ls.type = Lydstream.StreamType.Shoutcast;
         ls.kvalitet = Lydstream.StreamKvalitet.Medium;
-        EoGeoblokaDetektilo.esploruĈuEstasBlokata(rektaElsendo, kJs.optString("rektaElsendaSonoUrlSenGeobloko"));
+        */
+        k.setStreams(rektaElsendo.streams);
+        EoGeoblokaDetektilo.esploruĈuEstasBlokata(k, rektaElsendo, kJs.optString("rektaElsendaSonoUrlSenGeobloko"));
         //k.udsendelser.add(el);
       }
     }

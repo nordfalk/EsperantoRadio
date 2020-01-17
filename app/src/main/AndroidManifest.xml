@@ -163,10 +163,6 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="4981f42254f5c456be5e9aac886a9c0aea0c4420" />
-
         <activity android:name="dk.dk.niclas.NiclasHovedAkt"
             android:theme="@style/Theme.CastVideosDark"/>
 

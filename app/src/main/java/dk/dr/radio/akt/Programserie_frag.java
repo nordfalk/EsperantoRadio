@@ -210,7 +210,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           Log.rapporterFejl(new IllegalStateException(fejl));
           return new TextView(ApplicationSingleton.instans); // skal aldrig vises
         }
-        v = getLayoutInflater(null).inflate(layoutFraType[type], parent, false);
+        v = getActivity().getLayoutInflater().inflate(layoutFraType[type], parent, false);
         vh = new Viewholder();
         vh.itemViewType = type;
         AQuery aq = vh.aq = new AQuery(v);

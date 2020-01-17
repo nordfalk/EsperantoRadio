@@ -385,7 +385,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       AQuery a;
       int type = getItemViewType(position);
       if (v == null) {
-        v = getLayoutInflater(null).inflate(
+        v = getActivity().getLayoutInflater().inflate(
             type == AKTUEL ? R.layout.kanal_elem0_aktuel_udsendelse :  // Visning af den aktuelle udsendelse
                 type == NORMAL ? R.layout.kanal_elem1_udsendelse :  // De andre udsendelser
                     type == DAGSOVERSKRIFT ? R.layout.kanal_elem3_i_dag_i_morgen  // Dagens overskrift

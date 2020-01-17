@@ -203,7 +203,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
 
   private View opretTopView() {
-    View v = getLayoutInflater(null).inflate(R.layout.udsendelse_elem0_top, listView, false);
+    View v = getActivity().getLayoutInflater().inflate(R.layout.udsendelse_elem0_top, listView, false);
     AQuery aq = new AQuery(v);
     v.setTag(aq);
     String burl = Basisfragment.skalérBillede(udsendelse);
@@ -547,7 +547,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       }
 
       if (v == null) {
-        v = getLayoutInflater(null).inflate(layoutFraType[type], parent, false);
+        v = getActivity().getLayoutInflater().inflate(layoutFraType[type], parent, false);
         vh = new Viewholder();
         vh.itemViewType = type;
         aq = vh.aq = new AQuery(v);

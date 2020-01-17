@@ -121,7 +121,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
 
   private View opretTopView() {
-    View v = getLayoutInflater(null).inflate(R.layout.udsendelse_elem0_top, listView, false);
+    View v = getActivity().getLayoutInflater().inflate(R.layout.udsendelse_elem0_top, listView, false);
     AQuery aq = new AQuery(v);
     v.setTag(aq);
 //    aq.id(R.id.billede).width(billedeBr, false).height(billedeBr, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
@@ -409,7 +409,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       }
 
       if (v == null) {
-        v = getLayoutInflater(null).inflate(layoutFraType[type], parent, false);
+        v = getActivity().getLayoutInflater().inflate(layoutFraType[type], parent, false);
         vh = new Viewholder();
         vh.itemViewType = type;
         aq = vh.aq = new AQuery(v);

@@ -233,7 +233,7 @@ public class DramaOgBog_frag extends Basisfragment implements Runnable, AdapterV
     public View getView(int position, View v, ViewGroup parent) {
       int type = getItemViewType(position);
       if (v == null) {
-        v = getLayoutInflater(null).inflate(layoutFraType[type], parent, false);
+        v = getActivity().getLayoutInflater().inflate(layoutFraType[type], parent, false);
       }
       AQuery aq = new AQuery(v);
       switch (type) {

@@ -91,7 +91,7 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
     @Override
     public View getView(int position, View v, ViewGroup parent) {
       try {
-        if (v == null) v = getLayoutInflater(null).inflate(R.layout.listeelem_2linjer, parent, false);
+        if (v == null) v = getActivity().getLayoutInflater().inflate(R.layout.listeelem_2linjer, parent, false);
         AQuery aq = new AQuery(v);
 
         Programserie ps = liste.get(position);

@@ -93,7 +93,7 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
       String kanalkode = kanalkoder.get(position);
       Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
       //View view = mInflater.inflate(R.layout.kanalvalg_elem, null);
-      View view = getLayoutInflater(null).inflate(R.layout.kanalvalg_elem, null, false);
+      View view = getActivity().getLayoutInflater().inflate(R.layout.kanalvalg_elem, null, false);
       AQuery aq = new AQuery(view);
 
       AQuery ikon = aq.id(R.id.ikon);

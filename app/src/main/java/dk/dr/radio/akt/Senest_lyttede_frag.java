@@ -114,7 +114,7 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
       SenestLyttede.SenestLyttet sl = liste.get(position);
 
       if (v == null) {
-        v = getLayoutInflater(null).inflate(R.layout.programserie_elem2_udsendelse, parent, false);
+        v = getActivity().getLayoutInflater().inflate(R.layout.programserie_elem2_udsendelse, parent, false);
 
         vh = new Viewholder();
         AQuery a = vh.aq = new AQuery(v);

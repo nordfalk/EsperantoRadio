@@ -118,7 +118,7 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
       Udsendelse udsendelse = liste.get(position);
       AQuery aq;
       if (v == null) {
-        v = getLayoutInflater(null).inflate(R.layout.hentede_udsendelser_listeelem_2linjer, parent, false);
+        v = getActivity().getLayoutInflater().inflate(R.layout.hentede_udsendelser_listeelem_2linjer, parent, false);
         v.setBackgroundResource(0);
         aq = new AQuery(v);
         aq.id(R.id.startStopKnap).clicked(Hentede_udsendelser_frag.this);

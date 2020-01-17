@@ -29,7 +29,6 @@ import com.androidquery.AQuery;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 import dk.dr.radio.afspilning.Status;
@@ -303,7 +302,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
       AQuery a;
       int type = getItemViewType(position);
       if (v == null) {
-        v = getLayoutInflater(null).inflate(
+        v = getActivity().getLayoutInflater().inflate(
             type == AKTUEL ? R.layout.kanal_elem1_udsendelse_eo :  // Visning af den aktuelle udsendelse
                 type == NORMAL ? R.layout.kanal_elem1_udsendelse_eo :  // De andre udsendelser
                     type == DAGSOVERSKRIFT ? R.layout.kanal_elem3_i_dag_i_morgen  // Dagens overskrift
@@ -478,9 +477,10 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   public void onClick(View v) {
     Viewholder vh = (Viewholder) v.getTag();
     Udsendelse udsendelse = vh.udsendelse;
-    App.afspiller.setLydkilde(udsendelse);
 
-    if (EoGeoblokaDetektilo.estasBlokata(udsendelse)) {
+    boolean blokita = EoGeoblokaDetektilo.estasBlokataKajNeEblasMalbloki(udsendelse);
+    App.afspiller.setLydkilde(udsendelse);
+    if (blokita) {
       new AlertDialog.Builder(getActivity())
               .setTitle("Elsendo blokata")
               .setMessage("Ŝajnas ke tiu ĉi elsendo ne estas havebla en via lando")

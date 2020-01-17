@@ -4,7 +4,10 @@ import android.os.AsyncTask;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
@@ -16,23 +19,37 @@ import dk.dr.radio.data.esperanto.EoKanal;
  */
 
 public class EoGeoblokaDetektilo {
-  private static final String NE_BLOKITA = "NE_BLOKITA";
-  private static final String BLOKITA = "BLOKITA";
   private static final HashSet<String> esploritajUrl = new HashSet<>();
   private static final HashSet<String> blokitajUrl = new HashSet<>();
+  private static final HashMap<String,String> blokitajAlMalblokitajUrl = new HashMap<>();
+
+  public static boolean estasBlokataKajNeEblasMalbloki(Udsendelse udsendelse) {
+    final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
+    if (!esploritajUrl.contains(stream.url)) {
+      Log.d(udsendelse + " kun "+stream.url + " ne estis esplorita");
+      return false;
+    }
+
+    if (!blokitajUrl.contains(stream.url)) {
+      Log.d(udsendelse + " kun " + stream.url + " ne estis blokita");
+      return false;
+    }
+
+    Log.d(udsendelse + " kun "+stream.url + " estas blokita");
+    String alternativaUrl = blokitajAlMalblokitajUrl.get(stream.url);
+    if (alternativaUrl == null) {
+      Log.d("Ne estis alternativaUrl");
+      return true;
+    }
+    Log.d("Estas alternativaUrl "+alternativaUrl);
+    stream.url = alternativaUrl;
+    return false;
+  }
 
   public static void esploruĈuEstasBlokata(EoKanal kanal, final Udsendelse udsendelse, final String alternativaUrl) {
-    if (udsendelse.rektaElsendaPriskriboUrl == null) return;
-    if (udsendelse.berigtigelseTekst != null) return;
-
-    udsendelse.berigtigelseTekst = NE_BLOKITA;
 
     try {
       final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
-      final Lydstream stream1 = kanal.findBedsteStreams(false).get(0);
-      if (blokitajUrl.contains(stream.url)) {
-        udsendelse.berigtigelseTekst = BLOKITA;
-      }
       if (!esploritajUrl.contains(stream.url)) {
         esploritajUrl.add(stream.url);
         new AsyncTask() {
@@ -42,15 +59,17 @@ public class EoGeoblokaDetektilo {
               HttpURLConnection uc = (HttpURLConnection) new URL(stream.url).openConnection();
               uc.setInstanceFollowRedirects(false);
               uc.connect();
-              if (uc.getResponseMessage().contains("oved")  // 302 Temporarily Moved
-                      && (uc.getHeaderFields().toString().contains("geoblock"))) {
+              String responseMessage = uc.getResponseMessage();
+              Map<String, List<String>> headerFields = uc.getHeaderFields();
+              Log.d(udsendelse + " kun "+stream.url + " donas "+responseMessage + " " + headerFields);
+              if (responseMessage.contains("oved")  // 302 Temporarily Moved
+                      && (headerFields.toString().contains("geoblock"))) {
                 //  [HTTP/1.0 302 Temporarily Moved], Content-Type=[text/html], Location=[http://streaming.radionomy.com/geoblocking.mp3?mount=Muzaiko],
                 blokitajUrl.add(stream.url);
+                Log.d( udsendelse + " kun "+stream.url + " estas blokita. alternativaUrl="+alternativaUrl);
                 if (alternativaUrl!=null && !alternativaUrl.isEmpty()) {
+                  blokitajAlMalblokitajUrl.put(stream.url, alternativaUrl);
                   stream.url = alternativaUrl;
-                  stream1.url = alternativaUrl;
-                } else {
-                  udsendelse.berigtigelseTekst = BLOKITA;
                 }
                 esploritajUrl.add(stream.url);
               }
@@ -61,11 +80,5 @@ public class EoGeoblokaDetektilo {
         }.execute();
       }
     } catch (Exception e) { Log.rapporterFejl(e); return; }
-
   }
-
-  public static boolean estasBlokata(Udsendelse udsendelse) {
-    return BLOKITA.equals(udsendelse.berigtigelseTekst);
-  }
-
 }

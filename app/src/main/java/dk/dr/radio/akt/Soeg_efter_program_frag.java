@@ -151,7 +151,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
 
     @Override
     public View getView(int position, View v, ViewGroup parent) {
-        if (v == null) v = getLayoutInflater(null).inflate(R.layout.listeelem_2linjer, parent, false);
+        if (v == null) v = getActivity().getLayoutInflater().inflate(R.layout.listeelem_2linjer, parent, false);
         AQuery aq = new AQuery(v);
         Object obj = liste.get(position);
 //        Log.d(position +  " AA  "+obj);

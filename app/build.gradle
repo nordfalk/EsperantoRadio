@@ -86,7 +86,7 @@ Logo made with Logomakr.com
 */
 
 dependencies {
-    implementation files('libs/volley.jar')
+    implementation 'com.android.volley:volley:1.1.1'
     implementation 'io.sentry:sentry:1.7.27'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'

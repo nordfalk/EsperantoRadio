@@ -17,7 +17,7 @@
 package dk.dk.niclas.cast.browser;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,7 +96,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.View
     }
 
     /**
-     * A {@link android.support.v7.widget.RecyclerView.ViewHolder} that displays a single video in
+     * A {@link RecyclerView.ViewHolder} that displays a single video in
      * the video list.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {

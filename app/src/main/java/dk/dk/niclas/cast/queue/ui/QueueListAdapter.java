@@ -17,10 +17,10 @@
 package dk.dk.niclas.cast.queue.ui;
 
 import android.content.Context;
-import android.support.annotation.IntDef;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.IntDef;
+import androidx.core.view.MotionEventCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -296,7 +296,7 @@ public class QueueListAdapter extends RecyclerView.Adapter<QueueListAdapter.Queu
 
     /**
      * Interface to notify an item ViewHolder of relevant callbacks from {@link
-     * android.support.v7.widget.helper.ItemTouchHelper.Callback}.
+     * androidx.recyclerview.widget.ItemTouchHelper.Callback}.
      */
     public interface ItemTouchHelperViewHolder {
 

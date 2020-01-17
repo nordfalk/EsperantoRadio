@@ -20,6 +20,8 @@ package dk.dr.radio.afspilning;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -28,7 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -175,11 +177,25 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
   }
 
 
+  private static String KANALID;
+  public static String opretNotifKanal(Context ctx) {
+    if (KANALID == null) {
+      KANALID = "kanal_id";
+      // Fra API 26 skal man bruge en NotificationChannel
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        NotificationChannel kanal = new NotificationChannel(KANALID, "kanalnavn", NotificationManager.IMPORTANCE_DEFAULT);
+        kanal.setDescription("En notifikationskanal for AndroidElementer (setDescription)");
+        ctx.getSystemService(NotificationManager.class).createNotificationChannel(kanal);
+      }
+    }
+    return KANALID;
+  }
+
   @SuppressLint("NewApi")
   public static Notification lavNotification(Context ctx) {
     String kanalNavn = App.afspiller.getLydkilde().getKanal().navn;
 
-    NotificationCompat.Builder b = new NotificationCompat.Builder(ctx)
+    NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, opretNotifKanal(ctx))
         .setSmallIcon(R.drawable.dr_notifikation)
         .setContentTitle(ctx.getString(R.string.appnavn))
         .setContentText(kanalNavn)

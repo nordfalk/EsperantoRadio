@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.dk.dr.radio.akt.Hovedaktivitet">
 
-  <android.support.v7.widget.Toolbar
+  <androidx.appcompat.widget.Toolbar
       xmlns:android="http://schemas.android.com/apk/res/android"
       android:id="@+id/toolbar"
       android:layout_height="?attr/actionBarSize"
@@ -22,11 +22,11 @@
         android:indeterminate="true"
         android:visibility="visible" />
 
-  </android.support.v7.widget.Toolbar>
+  </androidx.appcompat.widget.Toolbar>
 
 
 <!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
-<android.support.v4.widget.DrawerLayout
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
@@ -103,5 +103,5 @@
       android:name="dk.dr.radio.akt.Venstremenu_frag"
       tools:layout="@layout/venstremenu_frag"/>
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
 </LinearLayout>

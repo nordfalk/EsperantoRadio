@@ -194,6 +194,9 @@ abstract class MuOnlineBackend extends Backend {
       //if (App.fejlsøgning) Log.d("streamjson=" + jsonStream);
       Lydstream l = new Lydstream();
       l.url = jsonStream.getString("Uri");
+      if (l.url==null || "null".equals(l.url)) {
+        l.url = dekrypterUrl(jsonStream.getString("EncryptedUri"));
+      }
 
       if ("Download".equals(type)) {
         l.type = Lydstream.StreamType.HTTP_Download;
@@ -206,6 +209,17 @@ abstract class MuOnlineBackend extends Backend {
       lydData.add(l);
     }
     return lydData;
+  }
+
+  private static String dekrypterUrl(String encryptedUri) {
+    // UDESTÅR - se hvordan afkodningen skal ske, på
+    // https://github.com/sgh/drdk-dl/commit/eb725ad53cad16cc85c8bc70af2ad0fecdbb2e3b
+    // https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/drtv.py#L214
+    //
+    Log.d("dekrypterUrl( "+encryptedUri);
+    String res = DrDecryption.decrypt(encryptedUri);
+    Log.d("dekrypterUrl: "+res);
+    return res;
   }
 
   @Override

@@ -26,11 +26,11 @@ import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.os.Build;
 
-import com.crashlytics.android.Crashlytics;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.LinkedHashSet;
+
+import io.sentry.Sentry;
 
 /**
  * Loggerklasse
@@ -54,7 +54,7 @@ public class Log {
    */
   private static synchronized void logappend(String s) {
     if (!App.EMULATOR) {
-      Crashlytics.log(s);
+      //Crashlytics.log(s);
     }
     if (log.length() > 57500) {
       log.delete(0, 10000);
@@ -107,7 +107,7 @@ public class Log {
     Log.e(e);
     if (fejlRapporteret++ > 2) return; // rapportér ikke mere end 2 fejl per kørsel
     if (!App.EMULATOR) {
-      Crashlytics.logException(e);
+      Sentry.capture(e);
       //Mint.logException(e);
       if (!App.PRODUKTION && App.instans!=null) App.langToast("fejl: " + e);
     }
@@ -117,9 +117,8 @@ public class Log {
     Log.e("" + f, e);
     if (fejlRapporteret++ > 2) return; // rapportér ikke mere end 2 fejl per kørsel
     if (!App.EMULATOR) {
-      Crashlytics.log("fejl " + f);
-      Crashlytics.logException(e);
-      //Mint.logExceptionMessage("fejl", "" + f, e);
+      Sentry.capture("fejl " + f);
+      Sentry.capture(e);
     }
     if (!App.PRODUKTION && App.instans!=null) App.langToast("Fejl: " + f);
   }
@@ -127,8 +126,7 @@ public class Log {
 
   public static void rapporterOgvisFejl(final Activity akt, final Exception e) {
     if (!App.EMULATOR) {
-      Crashlytics.logException(e);
-      //Mint.logException(e);
+      Sentry.capture(e);
     }
     Log.e(e);
 

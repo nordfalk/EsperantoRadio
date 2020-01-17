@@ -43,7 +43,6 @@ import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmClock_akt;
 import dk.dr.radio.vaekning.Alarms;
-import dk.emda.emdah_akt.EmdaHovedAkt;
 import dk.radiotv.backend.Backend;
 
 
@@ -482,14 +481,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
 
         if (!Udseende.ESPERANTO) {
-          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-            @Override
-            public void run() {
-              startActivity(new Intent(getActivity(), EmdaHovedAkt.class));
-            }
-          });
-          aq.id(R.id.tekst).text("Vis Emda").typeface(App.skrift_gibson_fed);
-
           tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
             @Override
             public void run() {

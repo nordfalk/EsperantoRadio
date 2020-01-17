@@ -54,7 +54,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
-import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONObject;
 
@@ -87,7 +86,7 @@ import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import dk.radiotv.backend.Netkald;
 import dk.radiotv.backend.NetsvarBehander;
-import io.fabric.sdk.android.Fabric;
+import io.sentry.Sentry;
 
 public class App {
   public static App instans;
@@ -175,17 +174,13 @@ public class App {
 
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
-      Fabric.with(ctx, new Crashlytics());
-      Log.d("Crashlytics startet");
+      Sentry.init("https://f1f630e48080494c98fbfc2a37702c6b@sentry.io/1858274");
+      Log.d("Sentry startet");
     }
 
     //com.jakewharton.threetenabp.AndroidThreeTen.init(ctx);
     net.danlew.android.joda.JodaTimeAndroid.init(ctx);
 
-    // HTTP-forbindelser havde en fejl præ froyo, men jeg har også set problemet på Xperia Play, der er 2.3.4 (!)
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-      System.setProperty("http.keepAlive", "false");
-    }
     try {
       //noinspection ConstantConditions
       PackageInfo pi = ctx.getPackageManager().getPackageInfo(pakkenavn, 0);

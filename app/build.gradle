@@ -50,12 +50,6 @@ android {
             versionCode 3
             versionName '1.0'
         }
-        emda {
-            dimension "forfatter"
-            applicationId "dk.emda.tv"
-            versionCode 1
-            versionName '0.9.01 Emda'
-        }
         jacob {
             dimension "forfatter"
             applicationId "dk.nordfalk.jacob"
@@ -101,9 +95,7 @@ Logo made with Logomakr.com
 
 dependencies {
     implementation files('libs/volley.jar')
-    implementation('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-        transitive = true;
-    }
+    implementation 'io.sentry:sentry:1.7.27'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'

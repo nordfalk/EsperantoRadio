@@ -29,7 +29,6 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
-import dk.emda.emdah_akt.EmdaHovedAkt;
 
 public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 
@@ -47,11 +46,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     super.onCreate(savedInstanceState);
 
 
-      if (BuildConfig.FLAVOR.equals("emda")) {
-        startActivity(new Intent(this, EmdaHovedAkt.class));
-        finish();
-        return;
-      } else if (BuildConfig.FLAVOR.equals("esperanto")) {
+      if (BuildConfig.FLAVOR.equals("esperanto")) {
         Udseende.ESPERANTO = true;
       } else if (BuildConfig.FLAVOR.equals("niclas")) {
         startActivity(new Intent(this, NiclasHovedAkt.class));

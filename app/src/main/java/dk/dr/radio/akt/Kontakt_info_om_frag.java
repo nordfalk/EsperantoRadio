@@ -40,7 +40,7 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View rod = inflater.inflate(R.layout.kontakt_info_om_frag, container, false);
 
-    String url = App.grunddata.android_json.optString("kontakt_url", "http://dr.dk");
+    String url = App.grunddata.android_json.optString("kontakt_url", "https://dr.dk");
 
     WebView webview = (WebView) rod.findViewById(R.id.webview);
 

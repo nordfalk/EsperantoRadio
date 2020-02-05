@@ -14,6 +14,9 @@
     <!-- For at kunne gemme podcasts på eksternt lager -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- For at kunne starte en forgrundsservice på Android P (29) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <!-- For at kunne afbryde afspilningen ved et telefonopkald -->
     <uses-permission
         android:name="android.permission.READ_PHONE_STATE"
@@ -38,6 +41,7 @@
         android:icon="@drawable/appikon"
         android:logo="@drawable/appikon"
         android:theme="@style/Theme.Dr"
+        android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
         <activity
             android:name="dk.dr.radio.akt.Hovedaktivitet"
@@ -208,6 +212,11 @@
             android:value="dk.dk.niclas.cast.CastOptionsProvider"/>
 
         <activity android:name="dk.dk.niclas.KanalAkt"/>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
     </application>
 
 </manifest>

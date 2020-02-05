@@ -60,7 +60,7 @@ abstract class MuOnlineBackend extends Backend {
       k.slug = j.getString("Slug");
       k.kanallogo_url = j.getString("PrimaryImageUri");
       k.ingenPlaylister = false; // som udgangspunkt aldrig spillelister (især ikke for TV)
-      k.p4underkanal = j.getString("Url").startsWith("http://www.dr.dk/P4");  // Klampkode
+      k.p4underkanal = j.getString("Url").contains("dr.dk/P4");  // Klampkode
       if (k.p4underkanal) grunddata.p4koder.add(k.kode);
 
       kanaler.add(k);

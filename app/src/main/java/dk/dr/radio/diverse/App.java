@@ -87,6 +87,7 @@ import dk.dr.radio.v3.R;
 import dk.radiotv.backend.Netkald;
 import dk.radiotv.backend.NetsvarBehander;
 import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
 
 public class App {
   public static App instans;
@@ -174,8 +175,16 @@ public class App {
 
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
-      Sentry.init("https://f1f630e48080494c98fbfc2a37702c6b@sentry.io/1858274");
-      Log.d("Sentry startet");
+      Sentry.init("https://a251d3860be54aa5a7ebd02084a91a9a@sentry.io/1886051", new AndroidSentryClientFactory(ctx));
+      io.sentry.context.Context sc = Sentry.getContext();
+      /*
+      sc.addTag("xFLAVOR", BuildConfig.FLAVOR );
+      sc.addTag("xBUILD_TYPE", BuildConfig.BUILD_TYPE );
+      sc.addTag("xAPPLICATION_ID", BuildConfig.APPLICATION_ID);
+      sc.addTag("xMODEL", Build.MODEL);
+
+       */
+      Log.d("Sentry startet mod "+sc.getHttp());
     }
 
     //com.jakewharton.threetenabp.AndroidThreeTen.init(ctx);

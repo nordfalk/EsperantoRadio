@@ -29,7 +29,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         debug {
-            applicationIdSuffix 'beta'
+            applicationIdSuffix '.beta'
         }
     }
     flavorDimensions "forfatter"
@@ -45,8 +45,8 @@ android {
         jacob {
             dimension "forfatter"
             applicationId "dk.nordfalk.jacob"
-            versionCode 10
-            versionName '0.1.10 favoritter oma'
+            versionCode 11
+            versionName '0.2.0 TV-udsendelser virker igen'
         }
         esperanto {
             dimension "forfatter"
@@ -87,7 +87,7 @@ Logo made with Logomakr.com
 
 dependencies {
     implementation 'com.android.volley:volley:1.1.1'
-    implementation 'io.sentry:sentry:1.7.27'
+    implementation 'io.sentry:sentry-android:1.7.27'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'

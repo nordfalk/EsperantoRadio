@@ -81,7 +81,7 @@ public class EoRssParsado {
         e.billedeUrl = p.getText();
       } else if ("enclosure".equals(tag)) {
         String sontipo = p.getAttributeValue(null, "type");
-        if (sontipo.startsWith("audio/mpeg")) { // audio/mpeg aŭ audio/mpeg3
+        if (sontipo.startsWith("audio/")) { // audio/mpeg, audio/mpeg3 aŭ audio/mp3
           e.sonoUrl.add(p.getAttributeValue(null, "url"));
         }
       } else if ("link".equals(tag)) {

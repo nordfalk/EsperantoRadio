@@ -56,8 +56,8 @@ android {
                 }
             }
             applicationId "dk.nordfalk.esperanto.radio"
-            versionCode 51
-            versionName '2.1 b1 Muzaiko'
+            versionCode 52
+            versionName '2.2 Enkodigo'
         }
         detErTv {
             dimension "forfatter"

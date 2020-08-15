@@ -4,10 +4,6 @@
 	"rim3" : "scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
 
 
-	"intervals": {
-		"playlist": 30,
-		"settings": 1800
-	},
 	"android" : {
 		"kontakt_url": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 		"kontakt_modtagere": ["jacob.nordfalk@gmail.com" ],
@@ -15,9 +11,9 @@
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
-		"dasarift_statusmeddelelse": "",
+		"drift_statusmeddelelse": "",
 		"x1drift_statusmeddelelse": "Septembro 2018:<br><br>Estas problemoj kun kanaloj Movada Vidpunto, Varsovia Vento kaj La Bona Renkontiĝo.<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti tiujn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu<br><br>Kore, Jacob Nordfalk.",
-		"drift_statusmeddelelse": "5a de februaro 2020:<br><br><b>Rektaj elsendoj de Muzaiko</b> funcias nun, en la tuta mondo!<br><br>Tuj provu (vi devas eble restarte la apon).<br>Bv. raporti al la grupo en Telegramo <a href=\"https://t.me/joinchat/DQax3EEuJHS-O4SQfq1Ltw\">muzaiko.telegramo.org</a> se vi havas problemojn - au kontaktu min<br><br>Kore,<br> Jacob Nordfalk.",
+		"xxxdrift_statusmeddelelse": "Aŭgusto 2020:<br><br><b>Rektaj elsendoj de Muzaiko</b> funcias nun, en la tuta mondo!<br><br>Tuj provu (vi devas eble restarte la apon).<br>Bv. raporti al la grupo en Telegramo <a href=\"https://t.me/joinchat/DQax3EEuJHS-O4SQfq1Ltw\">muzaiko.telegramo.org</a> se vi havas problemojn - au kontaktu min<br><br>Kore,<br> Jacob Nordfalk.",
 		"ysy12drift_statusmeddelelse": ""
 	},
 
@@ -30,6 +26,10 @@
 10003/0/21/0/8/0/=radiovatikana/=Radio+Vatikana%0A%C4%B4a%C5%ADde/\
 ",
 
+	"intervals": {
+		"playlist": 30,
+		"settings": 1800
+	},
 
 	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 	"elsendojUrl": "https://esperanto-radio.com/radio.txt",
@@ -64,13 +64,26 @@
 			"hejmpaĝoButono": "https://podkasto.net/"
 		}
 	,{
-			"kodo": "vinilkosmo",
-			"nomo": "Vinilkosmo",
-			"emblemoUrl": "http://www.vinilkosmo-mp3.com/images/banniere_300.jpg",
-			"elsendojRssUrl": "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
-			"montruTitolojn": "true",
-			"uziWebViewPorElsendo": true,
-			"hejmpaĝoButono": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
+			"kodo": "3zzzenesperanto",
+			"nomo": "3ZZZ en Esperanto",
+			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
+			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
+			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
+			"elsendojRssIgnoruTitolon": true,
+			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
+			"retpoŝto": "leslie@heldzingen.com",
+			"hejmpaĝoButono": "https://melburno.org.au/3ZZZradio/"
+		}
+	,{
+			"kodo": "polaretradio",
+			"nomo": "Pola Retradio",
+			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
+			"emblemoUrl": "https://esperanto-radio.com/_polaretradio.png",
+			"elsendojRssUrl": "http://pola-retradio.org/feed/",
+			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
+			"elsendojRssIgnoruTitolon": true,
+			"retpoŝto": "retradio.esperanto@gmail.com",
+			"hejmpaĝoButono": "http://pola-retradio.org/"
 		}
 	,{
 			"kodo": "kernpunkto",
@@ -100,48 +113,12 @@
 			"hejmpaĝoButono": "http://www.radioscienca.com/"
 		}
 	,{
-			"kodo": "amindaradioesperanto",
-			"nomo": "Aminda Radio",
-			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
-			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias - do la fonto estas radio.txt ĝis eldoniĝos novan version de la apo",
-			"elsendojRssUrl": "http://feeds.djpod.com/amindaesperanto",
-			"montruTitolojn": "false",
-			"uziWebViewPorElsendo": false,
-			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
-			"hejmpaĝoButono": "https://amindaradio.wordpress.com/"
-		}
-
-	,{
-			"kodo": "polaretradio",
-			"nomo": "Pola Retradio",
-			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
-			"emblemoUrl": "https://esperanto-radio.com/_polaretradio.png",
-			"elsendojRssUrl": "http://pola-retradio.org/feed/",
-			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
-			"elsendojRssIgnoruTitolon": true,
-			"retpoŝto": "retradio.esperanto@gmail.com",
-			"hejmpaĝoButono": "http://pola-retradio.org/"
-		}
-	,{
-			"kodo": "3zzzenesperanto",
-			"nomo": "3ZZZ en Esperanto",
-			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
-			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
-			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
-			"elsendojRssIgnoruTitolon": true,
-			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
-			"retpoŝto": "leslie@heldzingen.com",
-			"hejmpaĝoButono": "https://melburno.org.au/3ZZZradio/"
-		}
-	,{
 			"kodo": "radiovatikana",
 			"nomo": "Radio Vatikana",
-			"XXemblemoUrl": "http://eo.radiovaticana.va/img/h_02.gif",
 			"emblemoUrl": "https://esperanto-radio.com/_radiovatikana.png",
-			"elsendojRssUrl": "http://media01.vatiradio.va/podmaker/podcaster.aspx?c=esperanto_1",
-			"elsendojRssUrl2": "http://media01.vatiradio.va/podmaker/podcaster.aspx?c=esperanto_2",
-			"retpoŝto": "esperanto@vatiradio.va",
-			"hejmpaĝoButono": "http://www.radiovaticana.va/"
+			"elsendojRssUrl": "https://www.vaticannews.va/eo/podcast/esperanto-programo.podcast.xml",
+			"retpoŝto": "info@vaticannews.va",
+			"hejmpaĝoButono": "https://www.radio-vatikana-esperanto.org"
 		}
 	,{
 			"kodo": "spiritismavocxo",
@@ -152,16 +129,23 @@
 			"hejmpaĝoButono": "https://www.spreaker.com/user/8650988"
 		}
 	,{
-			"kodo": "laboren.org",
-			"nomo": "La Bona Renkontiĝo",
-			//			"emblemoUrl": "https://laboren.org/static/img/surbandigo.jpg",
-			//			"emblemoUrl": "https://pbs.twimg.com/card_img/948578127806156800/RigNJw6w?format=png&name=144x144_2",
-			"emblemoUrl": "https://laboren.org/static/img/laboren-3000x1687.jpg",
-			"elsendojRssUrl": "https://laboren.org/rss/",
+			"kodo": "vinilkosmo",
+			"nomo": "Vinilkosmo",
+			"emblemoUrl": "http://www.vinilkosmo-mp3.com/images/banniere_300.jpg",
+			"elsendojRssUrl": "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
 			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": true,
+			"hejmpaĝoButono": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
+		}
+	,{
+			"kodo": "sano",
+			"nomo": "Pri Sano",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/6998773/6998773-1593998832730-95ad6d8e45a0a.jpg",
+			"elsendojRssUrl": "https://anchor.fm/s/2a4fde34/podcast/rss",
+			"montruTitolojn": "false",
 			"uziWebViewPorElsendo": false,
-			"retpoŝto": "stela@laboren.org",
-			"hejmpaĝoButono": "https://laboren.org"
+			"retpoŝto": "1822daniel@gmail.com",
+			"hejmpaĝoButono": "https://anchor.fm/miapodkastoprisano"
 		}
 	,{
 			"kodo": "radiofrei",
@@ -170,6 +154,17 @@
 			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto"
+		}
+	,{
+			"kodo": "amindaradioesperanto",
+			"nomo": "Aminda Radio",
+			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
+			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias - do la fonto estas radio.txt ĝis eldoniĝos novan version de la apo",
+			"elsendojRssUrl": "http://feeds.djpod.com/amindaesperanto",
+			"montruTitolojn": "false",
+			"uziWebViewPorElsendo": false,
+			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
+			"hejmpaĝoButono": "https://amindaradio.wordpress.com/"
 		}
 	],
 	//,
@@ -182,6 +177,18 @@
 			"elsendojRssUrl_HAVAS_ERARON": "radioaktiva.esperanto.org.uy/feed/podcast/",
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
         }
+	,{
+			"kodo": "laboren.org",
+			"nomo": "La Bona Renkontiĝo",
+			//			"emblemoUrl": "https://laboren.org/static/img/surbandigo.jpg",
+			//			"emblemoUrl": "https://pbs.twimg.com/card_img/948578127806156800/RigNJw6w?format=png&name=144x144_2",
+			"emblemoUrl": "https://www.laboren.org/img/laboren-logo.svg",
+			"elsendojRssUrl": "https://laboren.org/rss/",
+			"montruTitolojn": "true",
+			"uziWebViewPorElsendo": false,
+			"retpoŝto": "stela@laboren.org",
+			"hejmpaĝoButono": "https://laboren.org"
+		}
     ,{
         "kodo": "peranto",
         "nomo": "Esperanta Retradio",

@@ -7,6 +7,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class DrVolleyStringRequest extends StringRequest {
       // Fix: Det er set at Volley ikke husker contentType, og dermed går tegnsættet tabt. Gæt på UTF-8 hvis det sker
       //String charset = contentType==null?HTTP.UTF_8:HttpHeaderParser.parseCharset(response.responseHeaders);
       //lytter.cachetVærdi = new String(response.data, charset);
-      lytter.cachetVærdi = new String(response.data, HttpHeaderParser.parseCharset(response.responseHeaders));
+      lytter.cachetVærdi = new String(response.data, HttpHeaderParser.parseCharset(response.responseHeaders, "UTF-8"));
 
       // Vi kalder fikSvar i forgrundstråden - og dermed må forespørgsler ikke foretages direkte
       // fra en listeopdatering eller fra getView
@@ -83,10 +84,20 @@ public class DrVolleyStringRequest extends StringRequest {
     lytter.annulleret();
   }
 
-  @Override
   protected Response<String> parseNetworkResponse(NetworkResponse response) {
     // ignorér forbud mod caching -  i vores tilfælde er en gammel værdi er altid bedre at have liggende end ingen
     response.headers.remove("Cache-Control");
-    return super.parseNetworkResponse(response);
+    // izu ĉiam UTF-8 se enkodigo ne estas konata
+    //return super.parseNetworkResponse(response);
+    String parsed;
+    try {
+        parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+        // Since minSdkVersion = 8, we can't call
+        // new String(response.data, Charset.defaultCharset())
+        // So suppress the warning instead.
+        parsed = new String(response.data);
+    }
+    return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
   }
 }

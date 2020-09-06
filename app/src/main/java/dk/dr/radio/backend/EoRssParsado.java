@@ -1,4 +1,4 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;

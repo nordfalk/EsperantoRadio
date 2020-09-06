@@ -30,7 +30,7 @@ import java.util.TreeMap;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 
 public class Kanal extends Lydkilde {
   private static final long serialVersionUID = 1L;

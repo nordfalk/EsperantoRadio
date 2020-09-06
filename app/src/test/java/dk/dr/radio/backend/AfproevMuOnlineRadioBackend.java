@@ -1,21 +1,8 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-
-import java.util.ArrayList;
-import java.util.Date;
-
-import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Programdata;
-import dk.dr.radio.data.Programserie;
-import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
 
 import static org.junit.Assert.assertTrue;
 

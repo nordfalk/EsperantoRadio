@@ -28,8 +28,8 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.radiotv.backend.MuOnlineTVBackend;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.MuOnlineTVBackend;
+import dk.dr.radio.backend.NetsvarBehander;
 
 
 public class MestSeteFrag extends Basisfragment {

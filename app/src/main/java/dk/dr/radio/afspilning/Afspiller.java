@@ -58,8 +58,8 @@ import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
-import dk.radiotv.backend.EsperantoRadioBackend;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.EsperantoRadioBackend;
+import dk.dr.radio.backend.NetsvarBehander;
 
 /**
  * @author j

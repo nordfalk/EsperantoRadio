@@ -18,7 +18,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 
 public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChangeListener, Runnable {
 

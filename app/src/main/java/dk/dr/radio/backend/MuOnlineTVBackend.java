@@ -1,4 +1,4 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 import android.content.Context;
 
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import dk.dk.niclas.models.MestSete;
 import dk.dk.niclas.models.SidsteChance;
@@ -20,7 +19,6 @@ import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;

@@ -36,14 +36,14 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.NetsvarBehander;
 
 public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
 

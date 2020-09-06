@@ -1,4 +1,4 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 
 import org.json.JSONArray;
@@ -12,13 +12,11 @@ import java.util.Date;
 
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;

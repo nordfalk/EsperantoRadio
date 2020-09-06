@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

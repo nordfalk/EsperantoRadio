@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 
 /**
  * Created by j on 01-03-14.

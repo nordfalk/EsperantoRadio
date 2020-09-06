@@ -9,7 +9,7 @@ import java.util.List;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Netvaerksstatus;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 
 /**
  * En lydkilde der kan spilles af afspilleren

@@ -36,7 +36,7 @@ import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
 import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
@@ -47,7 +47,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.NetsvarBehander;
 
 public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener, Runnable {
 

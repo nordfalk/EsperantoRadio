@@ -13,8 +13,8 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
-import dk.radiotv.backend.GammelDrRadioBackend;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.GammelDrRadioBackend;
+import dk.dr.radio.backend.NetsvarBehander;
 
 import static dk.dr.radio.akt.Basisfragment.P_UDSENDELSE;
 

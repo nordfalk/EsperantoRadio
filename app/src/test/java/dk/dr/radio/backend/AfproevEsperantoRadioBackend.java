@@ -2,14 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dk.radiotv.backend;
-
-import android.app.Application;
+package dk.dr.radio.backend;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,16 +14,12 @@ import java.util.Iterator;
 
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.Diverse;
-import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertTrue;
 

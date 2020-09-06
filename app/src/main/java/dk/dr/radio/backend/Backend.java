@@ -1,12 +1,10 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 import android.content.Context;
 
 import com.android.volley.Request;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,17 +15,10 @@ import java.util.List;
 import dk.dr.radio.data.Favoritter;
 
 import dk.dr.radio.data.Grunddata;
-import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Playlisteelement;
-import dk.dr.radio.data.Programdata;
 import dk.dr.radio.data.ProgramdataForBackend;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoFavoritter;
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.net.volley.Netsvar;
 
 /**

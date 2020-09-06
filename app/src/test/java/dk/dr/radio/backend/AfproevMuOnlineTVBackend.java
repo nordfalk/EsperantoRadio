@@ -1,4 +1,4 @@
-package dk.radiotv.backend;
+package dk.dr.radio.backend;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

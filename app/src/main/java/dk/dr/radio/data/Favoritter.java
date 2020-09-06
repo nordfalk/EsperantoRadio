@@ -13,7 +13,7 @@ import java.util.Set;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 
 /**
  * Håndtering af favoritter.

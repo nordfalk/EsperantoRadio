@@ -9,7 +9,7 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.radiotv.backend.EsperantoRadioBackend;
+import dk.dr.radio.backend.EsperantoRadioBackend;
 
 /**
  * Created by j on 13-09-15.

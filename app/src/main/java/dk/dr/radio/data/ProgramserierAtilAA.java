@@ -1,11 +1,5 @@
 package dk.dr.radio.data;
 
-import com.android.volley.Request;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,9 +7,8 @@ import java.util.List;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.net.volley.Netsvar;
-import dk.radiotv.backend.Backend;
-import dk.radiotv.backend.GammelDrRadioBackend;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.Backend;
+import dk.dr.radio.backend.NetsvarBehander;
 
 /**
  * Created by j on 05-10-14.

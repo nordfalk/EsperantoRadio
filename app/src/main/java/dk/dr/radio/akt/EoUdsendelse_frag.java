@@ -45,7 +45,7 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.Backend;
+import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.radiotv.backend.EsperantoRadioBackend;
+import dk.dr.radio.backend.EsperantoRadioBackend;
 
 /**
  * Created by j on 03-10-15.

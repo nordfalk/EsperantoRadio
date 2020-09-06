@@ -30,7 +30,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.radiotv.backend.NetsvarBehander;
+import dk.dr.radio.backend.NetsvarBehander;
 
 public class Programserie_frag extends Basisfragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 

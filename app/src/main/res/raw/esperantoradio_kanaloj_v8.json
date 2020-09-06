@@ -12,7 +12,7 @@
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"drift_statusmeddelelse": "",
-		"x1drift_statusmeddelelse": "Septembro 2018:<br><br>Estas problemoj kun kanaloj Movada Vidpunto, Varsovia Vento kaj La Bona Renkontiĝo.<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti tiujn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu<br><br>Kore, Jacob Nordfalk.",
+		"sdsddrift_statusmeddelelse": "Aŭgusto 2020:<br><br>Nova versio kiu korektis kelkajn eraretojn<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti kelkajn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu :-)<br><br>Kore, Jacob Nordfalk.",
 		"xxxdrift_statusmeddelelse": "Aŭgusto 2020:<br><br><b>Rektaj elsendoj de Muzaiko</b> funcias nun, en la tuta mondo!<br><br>Tuj provu (vi devas eble restarte la apon).<br>Bv. raporti al la grupo en Telegramo <a href=\"https://t.me/joinchat/DQax3EEuJHS-O4SQfq1Ltw\">muzaiko.telegramo.org</a> se vi havas problemojn - au kontaktu min<br><br>Kore,<br> Jacob Nordfalk.",
 		"ysy12drift_statusmeddelelse": ""
 	},
@@ -160,14 +160,13 @@
 			"nomo": "Aminda Radio",
 			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
 			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias - do la fonto estas radio.txt ĝis eldoniĝos novan version de la apo",
-			"elsendojRssUrl": "http://feeds.djpod.com/amindaesperanto",
+			"elsendojRssUrl_ne_plu": "http://feeds.djpod.com/amindaesperanto",
 			"montruTitolojn": "false",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
 			"hejmpaĝoButono": "https://amindaradio.wordpress.com/"
 		}
 	],
-	//,
 
 	"FORPRENITAJ_KANALOJ" : [
 		{
@@ -177,6 +176,18 @@
 			"elsendojRssUrl_HAVAS_ERARON": "radioaktiva.esperanto.org.uy/feed/podcast/",
 			"hejmpaĝoButono": "http://www.ameriko.org/eo/radioaktiva"
         }
+	,{
+			"kodo": "peranto",
+			"nomo": "Esperanta Retradio",
+			"emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
+			//    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
+			//    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
+			//			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
+			"xxyelsendojRssUrl": "http://esperantaretradio.blogspot.co.at/feeds/posts/default",
+			"xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
+			"retpoŝto": "retradio@aldone.de",
+			"hejmpaĝoButono": "http://aldone.de/retradio"
+		}
 	,{
 			"kodo": "laboren.org",
 			"nomo": "La Bona Renkontiĝo",
@@ -189,18 +200,6 @@
 			"retpoŝto": "stela@laboren.org",
 			"hejmpaĝoButono": "https://laboren.org"
 		}
-    ,{
-        "kodo": "peranto",
-        "nomo": "Esperanta Retradio",
-        "emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
-        //    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
-        //    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
-        //			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
-        "elsendojRssUrl": "http://esperantaretradio.blogspot.co.at/feeds/posts/default",
-        "xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
-        "retpoŝto": "retradio@aldone.de",
-        "hejmpaĝoButono": "http://aldone.de/retradio"
-      }
 	,{
 			"problemo": "2017 25okt: ne funkcias??",
 			"kodo": "radiohavanokubo",

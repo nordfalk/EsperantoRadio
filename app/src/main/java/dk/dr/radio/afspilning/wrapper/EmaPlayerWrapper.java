@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.PowerManager;
 
-import com.devbrackets.android.exomedia.EMAudioPlayer;
+import com.devbrackets.android.exomedia.AudioPlayer;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import dk.dr.radio.diverse.ApplicationSingleton;
 /**
  * @author Jacob Nordfalk 28-11-14.
  */
-public class EmaPlayerWrapper extends EMAudioPlayer implements  MediaPlayerWrapper {
+public class EmaPlayerWrapper extends AudioPlayer implements  MediaPlayerWrapper {
   private PowerManager.WakeLock mWakeLock = null;
 
   public EmaPlayerWrapper() {
@@ -24,7 +24,7 @@ public class EmaPlayerWrapper extends EMAudioPlayer implements  MediaPlayerWrapp
   @Override
   public void setDataSource(final String url) throws IOException {
     //App.kortToast("EmaPlayerWrapper setDataSource\n" + url);
-    super.setDataSource(ApplicationSingleton.instans, Uri.parse(url));
+    super.setDataSource(Uri.parse(url));
   }
 
   @Override
@@ -112,7 +112,7 @@ public class EmaPlayerWrapper extends EMAudioPlayer implements  MediaPlayerWrapp
     }
 
     PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-    mWakeLock = pm.newWakeLock(mode|PowerManager.ON_AFTER_RELEASE, "EmaPlayer");
+    mWakeLock = pm.newWakeLock(mode|PowerManager.ON_AFTER_RELEASE, "EmaPlayer:wrapper");
     mWakeLock.setReferenceCounted(false);
     if (washeld) {
       mWakeLock.acquire();
@@ -135,7 +135,7 @@ public class EmaPlayerWrapper extends EMAudioPlayer implements  MediaPlayerWrapp
     setOnCompletionListener(lytter);
     setOnErrorListener(lytter);
     setOnPreparedListener(lytter);
-    setOnBufferingUpdateListener(lytter);
+    setOnBufferUpdateListener(lytter);
     //setOnSeekCompleteListener(lytter);
   }
 

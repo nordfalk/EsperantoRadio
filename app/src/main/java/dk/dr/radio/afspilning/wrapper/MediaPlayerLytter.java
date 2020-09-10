@@ -1,14 +1,14 @@
 package dk.dr.radio.afspilning.wrapper;
 
-import android.media.MediaPlayer;
+import com.devbrackets.android.exomedia.listener.*;
 
 /**
  * Created by j on 25-03-14.
  */
 public interface MediaPlayerLytter extends
-    MediaPlayer.OnPreparedListener,
-    MediaPlayer.OnSeekCompleteListener,
-    MediaPlayer.OnCompletionListener,
-    MediaPlayer.OnErrorListener,
-    MediaPlayer.OnBufferingUpdateListener {
+    OnPreparedListener,
+    OnSeekCompletionListener,
+    OnCompletionListener,
+    OnErrorListener,
+    OnBufferUpdateListener {
 }

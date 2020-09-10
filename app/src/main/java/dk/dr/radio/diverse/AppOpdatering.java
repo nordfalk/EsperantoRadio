@@ -22,6 +22,7 @@ import dk.dr.radio.v3.R;
 /**
  * Hjælpeklasse, der tjekker om der er kommet en ny version af APK'en.
  * Bruges til udvikling - kald ignoreres i produktion
+ * scp  /home/j/android/esperanto/EsperantoRadio/app/build/outputs/apk/esperanto/debug/app-esperanto-debug.apk    j:javabog.dk/privat/EoRadio.apk
  * Created by j on 07-12-15.
  */
 public class AppOpdatering {

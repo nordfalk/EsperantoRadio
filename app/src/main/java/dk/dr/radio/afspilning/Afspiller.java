@@ -363,14 +363,14 @@ public class Afspiller {
           //Log.d("mediaPlayer.setDataSource() slut  " + mpTils());
           mediaPlayer.prepare();
           Log.d("mediaPlayer.prepare() slut  " + mpTils());
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
           if (!App.PRODUKTION) Log.rapporterFejl(ex);
           else Log.e("Fejl for lyd-stream " + lydstream, ex);
           //ex = new Exception("spiller "+kanalNavn+" "+lydUrl, ex);
           //Log.kritiskFejlStille(ex);
           handler.post(new Runnable() {
             public void run() { // Stop afspilleren fra forgrundstråden. Jacob 14/11
-              lytter.onError(null, 42, 42); // kalder stopAfspilning(); og forsøger igen senere og melder fejl til bruger efter 10 forsøg
+              lytter.onError(ex); // kalder stopAfspilning(); og forsøger igen senere og melder fejl til bruger efter 10 forsøg
             }
           });
         }
@@ -650,37 +650,29 @@ public class Afspiller {
   //    TILBAGEKALD FRA MEDIAPLAYER
   //
   class MediaPlayerLytterImpl implements MediaPlayerLytter {
-    public void onPrepared(MediaPlayer mp) {
+    @Override
+    public void onPrepared() {
       Log.d("onPrepared " + mpTils());
       afspillerstatus = Status.SPILLER; //No longer buffering
       opdaterObservatører();
-      // Det ser ud til kaldet til start() kan tage lang tid på Android 4.1 Jelly Bean
-      // (i hvert fald på Samsung Galaxy S III), så vi kalder det i baggrunden
-      new Thread() {
-        public void run() {
-          try { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/825188032
-            Log.d("mediaPlayer.start() " + mpTils());
-            int startposition = App.data.senestLyttede.getStartposition(lydkilde);
-            long varighed = mediaPlayer.getDuration();
-            Log.d("mediaPlayer genoptager afspilning ved " + startposition + " varighed="+varighed);
-            if (varighed>0 && startposition>0.95*varighed) {
-              Log.d("mediaPlayer nej, det er for langt henne, starter ved starten");
-              startposition = 0;
-            }
-            if (startposition > 0) {
-              mediaPlayer.seekTo(startposition);
-            }
-            mediaPlayer.start();
-            if (afspillerlyde) afspillerlyd.spiller.start();
-            Log.d("mediaPlayer.start() slut " + mpTils());
-          } catch (Exception e) {
-            Log.rapporterFejl(e);
-          }
-        }
-      }.start();
+      Log.d("mediaPlayer.start() " + mpTils());
+      int startposition = App.data.senestLyttede.getStartposition(lydkilde);
+      long varighed = mediaPlayer.getDuration();
+      Log.d("mediaPlayer genoptager afspilning ved " + startposition + " varighed="+varighed);
+      if (varighed>0 && startposition>0.95*varighed) {
+        Log.d("mediaPlayer nej, det er for langt henne, starter ved starten");
+        startposition = 0;
+      }
+      if (startposition > 0) {
+        mediaPlayer.seekTo(startposition);
+      }
+      mediaPlayer.start();
+      if (afspillerlyde) afspillerlyd.spiller.start();
+      Log.d("mediaPlayer.start() slut " + mpTils());
     }
 
-    public void onCompletion(MediaPlayer mp_UBRUGT) {
+    @Override
+    public void onCompletion() {
       Log.d("AfspillerService onCompletion!");
       // Hvis forbindelsen mistes kommer der en onCompletion() og vi er derfor
       // nødt til at genstarte, medmindre brugeren trykkede stop
@@ -716,19 +708,13 @@ public class Afspiller {
       }
     }
 
-    public boolean onError(MediaPlayer mp_UBRUGT, int hvad, int extra) {
+    @Override
+    public boolean onError(Exception e) {
       //Log.d("onError(" + MedieafspillerInfo.fejlkodeTilStreng(hvad) + "(" + hvad + ") " + extra+ " onErrorTæller="+onErrorTæller);
-      Log.d("onError(" + hvad + ") " + extra + " onErrorTæller=" + onErrorTæller);
+      Log.d("onError(" + e + ") onErrorTæller=" + onErrorTæller);
 
       if (vækningIGang) {
         ringDenAlarm();
-        return true;
-      }
-
-      if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN && hvad == MediaPlayer.MEDIA_ERROR_UNKNOWN
-          && "GT-I9300".equals(Build.MODEL) && mediaPlayer.isPlaying()) {
-        // Ignorer, da Samsung Galaxy SIII på Android 4.1 Jelly Bean
-        // sender denne fejl (onError(1) -110) men i øvrigt spiller fint videre!
         return true;
       }
 
@@ -774,15 +760,18 @@ public class Afspiller {
       return true;
     }
 
-    public void onBufferingUpdate(MediaPlayer mp, int procent) {
+
+    @Override
+    public void onBufferingUpdate(int procent) {
       if (App.fejlsøgning) Log.d("Afspiller onBufferingUpdate : " + procent + " " + mpTils());
       Log.d("Afspiller onBufferingUpdate : " + procent);
-      if (procent < -100) procent = -1; // Ignorér vilde tal
+      //if (procent < -100) procent = -1; // Ignorér vilde tal
 
       sendOnAfspilningForbinder(procent);
     }
 
-    public void onSeekComplete(MediaPlayer mp) {
+    @Override
+    public void onSeekComplete() {
       Log.d("AfspillerService onSeekComplete");
       //opdaterObservatører();
     }

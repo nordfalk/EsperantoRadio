@@ -17,6 +17,11 @@ android {
     }
     compileSdkVersion 29
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion 14 // eble fakte 7 ??
@@ -93,7 +98,7 @@ dependencies {
     implementation 'com.googlecode.android-query:android-query:0.25.9'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 //    compile 'com.devbrackets.android:exomedia:2.4.2'
-    implementation 'com.devbrackets.android:exomedia:2.5.6'
+    implementation 'com.devbrackets.android:exomedia:4.3.0'
 //    //compile 'com.android.support.constraint:constraint-layout:1.0.1'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'

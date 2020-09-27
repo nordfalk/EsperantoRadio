@@ -550,6 +550,11 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   public static void startPlayerActivity(Kanal kanal, Context context) {
+    if (kanal.getUdsendelse()==null) {
+      App.langToast("Kan ikke spille denne kanal");
+      return;
+    }
+
     MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
     Activity activity = (Activity) context;
     Intent intent = new Intent(activity, LocalPlayerActivity.class);

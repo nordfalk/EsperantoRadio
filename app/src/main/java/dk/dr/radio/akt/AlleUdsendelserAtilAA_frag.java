@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.androidquery.AQuery;
 
 import java.util.ArrayList;
 
@@ -33,9 +33,12 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     rod = inflater.inflate(R.layout.senest_lyttede, container, false);
 
-    AQuery aq = new AQuery(rod);
-    listView = aq.id(R.id.listView).adapter(adapter).itemClicked(this).getListView();
-    listView.setEmptyView(aq.id(R.id.tom).typeface(App.skrift_gibson).getView());
+    listView = rod.findViewById(R.id.listView);
+    listView.setAdapter(adapter);
+    listView.setOnItemClickListener(this);
+    TextView tom = rod.findViewById(R.id.tom);
+    listView.setEmptyView(tom);
+    tom.setTypeface(App.skrift_gibson);
     listView.setFastScrollEnabled(true);
     /*.text(
 //        "Ingen favoritter\nGå ind på en programserie og tryk på hjertet for at gøre det til en favorit"
@@ -46,7 +49,9 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
     */
     listView.setCacheColorHint(Color.WHITE);
 
-    aq.id(R.id.overskrift).typeface(App.skrift_gibson_fed).text("Alle udsendelser").getTextView();
+    TextView overskrift = rod.findViewById(R.id.overskrift);
+    overskrift.setTypeface(App.skrift_gibson_fed);
+    overskrift.setText("Alle udsendelser");
 
     App.data.programserierAtilÅ.observatører.add(this);
     run();
@@ -92,14 +97,19 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
     public View getView(int position, View v, ViewGroup parent) {
       try {
         if (v == null) v = getActivity().getLayoutInflater().inflate(R.layout.listeelem_2linjer, parent, false);
-        AQuery aq = new AQuery(v);
 
         Programserie ps = liste.get(position);
-        aq.id(R.id.linje1).text(ps.titel).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
+        TextView linje1 = v.findViewById(R.id.linje1);
+        linje1.setText(ps.titel);
+        linje1.setTypeface(App.skrift_gibson_fed);
+        linje1.setTextColor(Color.BLACK);
         int n = ps.antalUdsendelser;
         String txt = n==0 ? "" : n==1 ? n + " udsendelse" : n + " udsendelser";
-        aq.id(R.id.linje2).text(txt).typeface(App.skrift_gibson);
-        aq.id(R.id.stiplet_linje).visibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
+
+        TextView linje2 = v.findViewById(R.id.linje2);
+        linje2.setText(txt);
+        linje2.setTypeface(App.skrift_gibson);
+        v.findViewById(R.id.stiplet_linje).setVisibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
         v.setBackgroundResource(0);
 
 
@@ -114,18 +124,19 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
   @Override
   public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
     Programserie programserie = liste.get(position);
-      Fragment f = new Programserie_frag();
-      f.setArguments(new Intent()
-          .putExtra(P_PROGRAMSERIE, programserie.slug)
-          .getExtras());
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commit();
+
+    Fragment f = new Programserie_frag();
+    f.setArguments(new Intent()
+        .putExtra(P_PROGRAMSERIE, programserie.slug)
+        .getExtras());
+    getActivity().getSupportFragmentManager().beginTransaction()
+        .replace(R.id.indhold_frag, f)
+        .addToBackStack(null)
+        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        .commit();
+
     Sidevisning.vist(Programserie_frag.class, programserie.slug);
 
   }
-
 }
 

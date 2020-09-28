@@ -152,14 +152,14 @@ public class App {
     assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
+    Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);
     if (BuildConfig.FLAVOR.equals("esperanto")) {
       Udseende.ESPERANTO = true;
       backend = new Backend[] { new EsperantoRadioBackend() };
-    } else if (BuildConfig.FLAVOR.equals("detErTv")) {
+    } else if (!Udseende.ESPERANTO && BuildConfig.FLAVOR.equals("detErTv")) {
       Udseende.detErTv = true;
       backend = new Backend[] { new MuOnlineTVBackend(),  };
     } else {
-      Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);
       backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
   //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
               : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };

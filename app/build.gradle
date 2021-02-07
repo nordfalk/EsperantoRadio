@@ -113,7 +113,7 @@ dependencies {
     implementation 'net.danlew:android.joda:2.9.9'
     // Eventbus gør debug APK'en 150 kb større
     //compile 'org.greenrobot:eventbus:3.0.0'
-    testImplementation 'org.robolectric:robolectric:3.5'
+    testImplementation 'org.robolectric:robolectric:4.3'
     // Fix for javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Algorithm constraints check failed on signature algorithm: SHA256WithRSAEncryption
     // Se også https://github.com/robolectric/robolectric/issues/3288
     testImplementation 'org.bouncycastle:bcprov-jdk15on:1.57'

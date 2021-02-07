@@ -39,20 +39,6 @@ android {
     }
     flavorDimensions "forfatter"
     productFlavors {
-        niclas {
-            dimension "forfatter"
-//            applicationId "dk.szy.tv" // oprindelig
-            applicationId "dk.szy.niclas.tv"
-//            applicationId "dk.szy.tv2" // Jacobs signatur
-            versionCode 3
-            versionName '1.0'
-        }
-        jacob {
-            dimension "forfatter"
-            applicationId "dk.nordfalk.jacob"
-            versionCode 11
-            versionName '0.2.0 TV-udsendelser virker igen'
-        }
         esperanto {
             dimension "forfatter"
             signingConfigs {
@@ -63,6 +49,21 @@ android {
             applicationId "dk.nordfalk.esperanto.radio"
             versionCode 52
             versionName '2.2 Enkodigo'
+        }
+        jacob {
+            dimension "forfatter"
+            applicationId "dk.nordfalk.jacob"
+            versionCode 11
+            versionName '0.2.0 TV-udsendelser virker igen'
+        }
+        /*
+        niclas {
+            dimension "forfatter"
+//            applicationId "dk.szy.tv" // oprindelig
+            applicationId "dk.szy.niclas.tv"
+//            applicationId "dk.szy.tv2" // Jacobs signatur
+            versionCode 3
+            versionName '1.0'
         }
         detErTv {
             dimension "forfatter"
@@ -75,6 +76,7 @@ android {
             versionCode 1
             versionName '0.1 Marktest'
         }
+         */
     }
 
     testOptions {

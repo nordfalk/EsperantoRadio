@@ -466,6 +466,9 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       if (!Udseende.ESPERANTO) {
         tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
         aq.id(R.id.tekst).text("Vælg P4-område").typeface(App.skrift_gibson_fed);
+      } else {
+        tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
+        aq.id(R.id.tekst).text("Elektu kanalon").typeface(App.skrift_gibson_fed);
       }
 
       if (!App.PRODUKTION) {

@@ -26,7 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.androidquery.AQuery;
 
@@ -35,7 +37,9 @@ import java.util.List;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Sidevisning;
+import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnItemClickListener {
@@ -48,7 +52,13 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 
-    kanalkoder = new ArrayList<String>(App.grunddata.p4koder);
+    if (!Udseende.ESPERANTO) {
+      kanalkoder = new ArrayList<String>(App.grunddata.p4koder);
+    } else {
+      kanalkoder = new ArrayList<String>();
+      for (Kanal k : App.grunddata.kanaler) kanalkoder.add(k.kode);
+      Log.d("kanalkoder "+kanalkoder);
+    }
 
     for (String k : kanalkoder) {
       if (App.grunddata.kanalFraKode.get(k) == null) {
@@ -96,32 +106,25 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
       View view = getActivity().getLayoutInflater().inflate(R.layout.kanalvalg_elem, null, false);
       AQuery aq = new AQuery(view);
 
-      AQuery ikon = aq.id(R.id.ikon);
-      AQuery textView = aq.id(R.id.tekst);
+      ImageView ikon = aq.id(R.id.ikon).getImageView();
+      TextView textView = aq.id(R.id.tekst).typeface(App.skrift_gibson_fed).textColor(Color.BLACK).getTextView();
 
-      textView.text(kanal.navn.replace("P4", "")).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
+      Log.d("xxx" + kanal.navn + " " + kanal.kode);
+      textView.setText(kanal.navn.replace("P4", ""));
       //Log.d("billedebilledebilledebillede"+billede+ikon+textView);
       // Sæt åbne/luk-ikon for P4 og højttalerikon for getKanal
       if (App.afspiller.getLydkilde().getKanal().kode.equals(kanalkode)) {
-        ikon.image(R.drawable.dri_lyd_blaa);
+        ikon.setImageResource(R.drawable.dri_lyd_blaa);
         //ikon.blindetekst = "Spiller nu";
       } else {
 
       }
 
+      AQuery billede = aq.id(R.id.billede);
       if (kanal.kanallogo_resid != 0) {
-        // Element med billede
-        //billede.visibility(View.VISIBLE);
-
-        //billede.blindetekst = getKanal.navn;
-        //textView.visibility(View.GONE);
+        billede.image(kanal.kanallogo_resid);
       } else {
-        // Element uden billede - P4
-        //billede.setVisibility(View.GONE);
-        //billede.setVisibility(View.VISIBLE);
-        //billede.setImageResource(R.drawable.kanalappendix_p4f);
-        //textView.visibility(View.VISIBLE);
-
+        billede.image(kanal.kanallogo_eo);
       }
 
       return view;

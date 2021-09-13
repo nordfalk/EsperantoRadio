@@ -1,7 +1,7 @@
 {
 	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
 	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
-	"rim3" : "scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
+	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
 
 
 	"android" : {
@@ -11,6 +11,7 @@
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
 		"xxdrift_statusmeddelelse": "Nova multe pli bona provversio denove venis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
 		"yydrift_statusmeddelelse": "Finfine la nova versio eldoniĝis!<br> Elŝutu <a href='http://javabog.dk/privat/EoRadio.apk'>ĉi tie</a>.",
+		"malfamdrift_statusmeddelelse": "Ĵus aldoniĝis 'La malfamuloj'<br> Bonan aŭskultadon :-)",
 		"drift_statusmeddelelse": "",
 		"sdsddrift_statusmeddelelse": "Aŭgusto 2020:<br><br>Nova versio kiu korektis kelkajn eraretojn<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti kelkajn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu :-)<br><br>Kore, Jacob Nordfalk.",
 		"xxxdrift_statusmeddelelse": "Aŭgusto 2020:<br><br><b>Rektaj elsendoj de Muzaiko</b> funcias nun, en la tuta mondo!<br><br>Tuj provu (vi devas eble restarte la apon).<br>Bv. raporti al la grupo en Telegramo <a href=\"https://t.me/joinchat/DQax3EEuJHS-O4SQfq1Ltw\">muzaiko.telegramo.org</a> se vi havas problemojn - au kontaktu min<br><br>Kore,<br> Jacob Nordfalk.",
@@ -56,12 +57,20 @@
 	,{
 			"kodo": "varsoviavento",
 			"nomo": "Varsovia Vento",
-			"emblemoUrl": "",
 			"elsendojRssUrl": "https://www.podkasto.net/feed/",
 			"emblemoUrl": "https://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
 			"hejmpaĝoButono": "https://podkasto.net/"
+		}
+	,{
+			"kodo": "lamalfamuloj",
+			"nomo": "La Malfamuloj",
+			"elsendojRssUrl": "https://anchor.fm/s/1e1d5f38/podcast/rss",
+			"emblemoUrl": "https://s3-sa-east-1.amazonaws.com/loja2/d5ebcb3ceacc9f19599445f66e28caaa.png",
+			"montruTitolojn": "true",
+			"retpoŝto": "malkongreso@gmail.com",
+			"hejmpaĝoButono": "https://www.patreon.com/malfamuloj"
 		}
 	,{
 			"kodo": "3zzzenesperanto",

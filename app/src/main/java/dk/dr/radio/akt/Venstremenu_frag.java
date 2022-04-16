@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import dk.dk.niclas.NiclasHovedAkt;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.akt.diverse.GenstartProgrammet;
 import dk.dr.radio.data.Datoformater;
@@ -390,7 +389,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_favoritprogrammer, null), null, Favoritprogrammer_frag.class) {
         @Override
         public View getView() {
-          TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
+          TextView tekst2 = view.findViewById(R.id.tekst2);
           int antal = 0;
           for (Backend b : App.backend) antal+= b.favoritter.getAntalNyeUdsendelser();
           tekst2.setText(
@@ -405,7 +404,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_hentede_udsendendelser, null), null, Hentede_udsendelser_frag.class) {
           @Override
           public View getView() {
-            TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
+            TextView tekst2 = view.findViewById(R.id.tekst2);
             int antal = App.data.hentedeUdsendelser.getUdsendelser().size();
             tekst2.setText(" (" + antal + ")");
             return view;
@@ -414,11 +413,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         aq.id(R.id.tekst).typeface(App.skrift_gibson_fed).id(R.id.tekst2).typeface(App.skrift_gibson);
       }
 
-
-      if (!Udseende.ESPERANTO && !App.PRODUKTION) {
-        tilføj(R.layout.venstremenu_elem_overskrift, DramaOgBog_frag.class);
-        aq.id(R.id.tekst).text("DR Podcast").typeface(App.skrift_gibson_fed);
-      }
 
       tilføj(R.layout.venstremenu_elem_overskrift, AlleUdsendelserAtilAA_frag.class);
       aq.id(R.id.tekst).text("Alle udsendelser A-Å").typeface(App.skrift_gibson_fed);
@@ -433,7 +427,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           , null) {
         @Override
         public View getView() {
-          TextView tekst2 = (TextView) view.findViewById(R.id.tekst2);
+          TextView tekst2 = view.findViewById(R.id.tekst2);
           if (Alarms.næsteAktiveAlarm==0) tekst2.setVisibility(View.GONE);
           else {
             tekst2.setVisibility(View.VISIBLE);
@@ -482,16 +476,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
           }
         });
         aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
-
-        if (!Udseende.ESPERANTO) {
-          tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-            @Override
-            public void run() {
-              startActivity(new Intent(getActivity(), NiclasHovedAkt.class));
-            }
-          });
-          aq.id(R.id.tekst).text("Vis Niclas").typeface(App.skrift_gibson_fed);
-        }
 
         tilføj(R.layout.venstremenu_elem_adskiller_tynd);
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {

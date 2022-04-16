@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
-import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.backend.Backend;
@@ -549,25 +547,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     }
   }
 
-  public static void startPlayerActivity(Kanal kanal, Context context) {
-    if (kanal.getUdsendelse()==null) {
-      App.langToast("Kan ikke spille denne kanal");
-      return;
-    }
-
-    MediaInfo mediaInfo = CastVideoProvider.buildMedia(kanal.getUdsendelse(), kanal);
-    Activity activity = (Activity) context;
-    Intent intent = new Intent(activity, LocalPlayerActivity.class);
-    intent.putExtra("media", mediaInfo);
-    intent.putExtra("shouldStart", true);
-    activity.startActivity(intent);
-  }
   public static void hør(final Kanal kanal, Activity akt) {
-    if (kanal.erVideo) {
-      startPlayerActivity(kanal, akt);
-      return;
-    }
-    //if (App.fejlsøgning) App.kortToast("kanal=" + kanal);
     if (App.prefs.getBoolean("manuelStreamvalg", false)) {
       kanal.nulstilForetrukkenStream();
       final List<Lydstream> lydstreamList = kanal.findBedsteStreams(false);

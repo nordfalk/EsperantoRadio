@@ -8,8 +8,6 @@ import java.util.TreeSet;
 
 import dk.dr.radio.akt.Afspiller_frag;
 import dk.dr.radio.akt.AlleUdsendelserAtilAA_frag;
-import dk.dr.radio.akt.DramaOgBog_frag;
-import dk.dr.radio.akt.FangBrowseRadioIntent_akt;
 import dk.dr.radio.akt.Favoritprogrammer_frag;
 import dk.dr.radio.akt.Hentede_udsendelser_frag;
 
@@ -35,8 +33,6 @@ public class Sidevisning {
   static {
     m.put(Afspiller_frag.class, "afspiller_popop");
     m.put(AlleUdsendelserAtilAA_frag.class, "alle_udsendelser");
-    m.put(DramaOgBog_frag.class, "drama_og_bog");
-    m.put(FangBrowseRadioIntent_akt.class, "fang_browser");
     m.put(Favoritprogrammer_frag.class, "favoritter");
     m.put(Hentede_udsendelser_frag.class, "hentede_udsendelser");
   }

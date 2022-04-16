@@ -38,7 +38,6 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     kanaler = new ArrayList<>(50);
     ArrayList<Kanal> kanalerEjFavorit = new ArrayList<>(50);
     for (Kanal k : App.grunddata.kanaler) {
-      if (k.p4underkanal) continue;
       if (k.getBackend().favoritter.erFavorit(k.slug)) {
         kanaler.add(k);  // Favoritkanaler kommer først i listen
       } else {
@@ -67,7 +66,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     run();
     adapter = new KanalAdapter(getChildFragmentManager());
     adapter.kanaler2 = kanaler;
-    viewPager = (ViewPager) rod.findViewById(R.id.pager);
+    viewPager = rod.findViewById(R.id.pager);
     viewPager.setAdapter(adapter);
     /*
     viewPager.setClipChildren(false);
@@ -93,7 +92,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
       viewPager.setCurrentItem(kanalindex);
       Sidevisning.vist(Kanal_frag.class, kanaler.get(kanalindex).slug);
     } catch (Exception e) { Log.rapporterFejl(e); }
-    kanalfaneblade = (PagerSlidingTabStrip) rod.findViewById(R.id.tabs);
+    kanalfaneblade = rod.findViewById(R.id.tabs);
     kanalfaneblade.setTextSize(getResources().getDimensionPixelSize(R.dimen.metainfo_skrifstørrelse));
     kanalfaneblade.setViewPager(viewPager);
     kanalfaneblade.setOnPageChangeListener(this);

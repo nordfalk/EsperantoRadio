@@ -15,7 +15,7 @@ android {
     lintOptions {
         abortOnError false
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     compileOptions {
         sourceCompatibility 1.8
@@ -25,7 +25,15 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion 14 // eble fakte 7 ??
-        targetSdkVersion 29
+        targetSdkVersion 30
+        signingConfigs {
+            config {
+                storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
+            }
+        }
+        applicationId "dk.nordfalk.esperanto.radio"
+        versionCode 52
+        versionName '2.2 Enkodigo'
     }
     buildTypes {
         release {
@@ -36,47 +44,6 @@ android {
         debug {
             applicationIdSuffix '.beta'
         }
-    }
-    flavorDimensions "forfatter"
-    productFlavors {
-        esperanto {
-            dimension "forfatter"
-            signingConfigs {
-                config {
-                    storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
-                }
-            }
-            applicationId "dk.nordfalk.esperanto.radio"
-            versionCode 52
-            versionName '2.2 Enkodigo'
-        }
-        jacob {
-            dimension "forfatter"
-            applicationId "dk.nordfalk.jacob"
-            versionCode 11
-            versionName '0.2.0 TV-udsendelser virker igen'
-        }
-        /*
-        niclas {
-            dimension "forfatter"
-//            applicationId "dk.szy.tv" // oprindelig
-            applicationId "dk.szy.niclas.tv"
-//            applicationId "dk.szy.tv2" // Jacobs signatur
-            versionCode 3
-            versionName '1.0'
-        }
-        detErTv {
-            dimension "forfatter"
-            signingConfigs {
-                config {
-                    storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
-                }
-            }
-            applicationId "dk.nordfalk.det_er_tv"
-            versionCode 1
-            versionName '0.1 Marktest'
-        }
-         */
     }
 
     testOptions {

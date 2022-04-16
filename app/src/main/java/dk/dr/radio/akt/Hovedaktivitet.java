@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import dk.dk.niclas.NiclasHovedAkt;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
@@ -46,17 +45,6 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     super.onCreate(savedInstanceState);
 
 
-      if (BuildConfig.FLAVOR.equals("esperanto")) {
-        Udseende.ESPERANTO = true;
-      } else if (BuildConfig.FLAVOR.equals("niclas")) {
-        startActivity(new Intent(this, NiclasHovedAkt.class));
-        finish();
-        return;
-      } else {
-        // Jacob
-        if (!App.PRODUKTION) App.langToast("BuildConfig.FLAVOR=" + BuildConfig.FLAVOR);
-      }
-
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -69,7 +57,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     venstremenuFrag = (Venstremenu_frag) getSupportFragmentManager().findFragmentById(R.id.venstremenu_frag);
 
     // Set up the drawer.
-    venstremenuFrag.setUp(R.id.venstremenu_frag, (DrawerLayout) findViewById(R.id.drawer_layout));
+    venstremenuFrag.setUp(R.id.venstremenu_frag, findViewById(R.id.drawer_layout));
 
     afspillerFrag = (Afspiller_frag) getSupportFragmentManager().findFragmentById(R.id.afspiller_frag);
     afspillerFrag.setIndholdOverskygge(findViewById(R.id.indhold_overskygge));
@@ -166,7 +154,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
     @Override
     public void run() {
       if (ingen_forbindelse==null) {
-        ingen_forbindelse = (TextView) findViewById(R.id.ingen_forbindelse);
+        ingen_forbindelse = findViewById(R.id.ingen_forbindelse);
         ingen_forbindelse.setTypeface(App.skrift_gibson);
       }
 
@@ -260,7 +248,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if ((keyCode==KeyEvent.KEYCODE_VOLUME_UP || keyCode==KeyEvent.KEYCODE_VOLUME_UP) && afspillerFrag.viserUdvidetOmråde()) {
+    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) && afspillerFrag.viserUdvidetOmråde()) {
       // Opdatér 10 gange i sekundet mens knapperne bruges
       App.forgrundstråd.postDelayed(afspillerFrag.lydstyrke, 100);
       afspillerFrag.lydstyrke.opdateringshastighed = 100;
@@ -270,7 +258,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
-    if ((keyCode==KeyEvent.KEYCODE_VOLUME_UP || keyCode==KeyEvent.KEYCODE_VOLUME_UP) && afspillerFrag.viserUdvidetOmråde()) {
+    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) && afspillerFrag.viserUdvidetOmråde()) {
       // Opdatér en enkelt gange om 1/10-del sekund
       App.forgrundstråd.postDelayed(afspillerFrag.lydstyrke, 100);
       afspillerFrag.lydstyrke.opdateringshastighed = 1000;

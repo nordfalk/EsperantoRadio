@@ -42,7 +42,7 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
 
     String url = App.grunddata.android_json.optString("kontakt_url", "https://dr.dk");
 
-    WebView webview = (WebView) rod.findViewById(R.id.webview);
+    WebView webview = rod.findViewById(R.id.webview);
 
     // Jacob: Fix for 'syg' webview-cache - se http://code.google.com/p/android/issues/detail?id=10789
     WebViewDatabase webViewDB = WebViewDatabase.getInstance(getActivity());
@@ -57,10 +57,10 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
       startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
 
-    TextView titel = (TextView) rod.findViewById(R.id.titel);
+    TextView titel = rod.findViewById(R.id.titel);
     titel.setTypeface(App.skrift_gibson_fed);
 
-    TextView version = (TextView) rod.findViewById(R.id.version);
+    TextView version = rod.findViewById(R.id.version);
     version.setTypeface(App.skrift_gibson);
     version.setText(App.versionsnavn);
     version.setContentDescription("\u00A0");  // SLUK for højtlæsning ... det virker ikke

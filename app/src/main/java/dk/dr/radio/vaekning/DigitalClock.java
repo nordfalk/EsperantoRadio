@@ -70,7 +70,7 @@ public class DigitalClock extends RelativeLayout {
     private String mAmString, mPmString;
 
     AmPm(View parent) {
-      mAmPm = (TextView) parent.findViewById(R.id.am_pm);
+      mAmPm = parent.findViewById(R.id.am_pm);
       mAmPm.setTypeface(App.skrift_gibson);
 
       String[] ampm = new DateFormatSymbols().getAmPmStrings();
@@ -111,7 +111,7 @@ public class DigitalClock extends RelativeLayout {
   protected void onFinishInflate() {
     super.onFinishInflate();
 
-    mTimeDisplay = (TextView) findViewById(R.id.timeDisplay);
+    mTimeDisplay = findViewById(R.id.timeDisplay);
     mAmPm = new AmPm(this);
     mCalendar = Calendar.getInstance();
 

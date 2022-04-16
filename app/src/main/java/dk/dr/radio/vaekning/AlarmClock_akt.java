@@ -83,7 +83,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
       view = mFactory.inflate(R.layout.deskclock_alarm_time_elemento, parent, false);
 
       DigitalClock digitalClock =
-          (DigitalClock) view.findViewById(R.id.digitalClock);
+        view.findViewById(R.id.digitalClock);
       digitalClock.setLive(false);
 
       final Alarm alarm = Alarms.alarmer.get(position);
@@ -92,7 +92,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
 
       // Set the initial state of the clock "checkbox"
       final CheckBox clockOnOff =
-          (CheckBox) indicator.findViewById(R.id.clock_onoff);
+        indicator.findViewById(R.id.clock_onoff);
       clockOnOff.setChecked(alarm.enabled);
       clockOnOff.setTypeface(App.skrift_gibson);
 
@@ -113,7 +113,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
 
       // Set the repeat text or leave it blank if it does not repeat.
       TextView daysOfWeekView =
-          (TextView) digitalClock.findViewById(R.id.daysOfWeek);
+        digitalClock.findViewById(R.id.daysOfWeek);
       daysOfWeekView.setTypeface(App.skrift_gibson);
       final String daysOfWeekStr =
           alarm.daysOfWeek.toString(AlarmClock_akt.this, false);
@@ -126,7 +126,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
 
       // Display the label
       TextView labelView =
-          (TextView) view.findViewById(R.id.label);
+        view.findViewById(R.id.label);
       labelView.setTypeface(App.skrift_gibson);
       if (alarm.label != null && alarm.label.length() != 0) {
         labelView.setText(alarm.label);
@@ -145,7 +145,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
   public boolean onContextItemSelected(final MenuItem item) {
     final AdapterContextMenuInfo info =
         (AdapterContextMenuInfo) item.getMenuInfo();
-    final int pos = (int) info.position;
+    final int pos = info.position;
     // Error check just in case.
     if (pos == -1) {
       return super.onContextItemSelected(item);
@@ -201,7 +201,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
 
   private void updateLayout() {
     setContentView(R.layout.deskclock_alarm_clock);
-    mAlarmsList = (ListView) findViewById(R.id.alarms_list);
+    mAlarmsList = findViewById(R.id.alarms_list);
     adapter = new AlarmTimeAdapter();
     mAlarmsList.setAdapter(adapter);
     mAlarmsList.setVerticalScrollBarEnabled(true);
@@ -220,7 +220,7 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
         v.setSelected(hasFocus);
       }
     });
-    Button doneButton = (Button) findViewById(R.id.done);
+    Button doneButton = findViewById(R.id.done);
     if (doneButton != null) {
       doneButton.setOnClickListener(new OnClickListener() {
         public void onClick(View v) {
@@ -267,10 +267,10 @@ public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListene
 
     // Inflate the custom view and set each TextView's text.
     final View v = mFactory.inflate(R.layout.deskclock_context_menu_header, null);
-    TextView textView = (TextView) v.findViewById(R.id.header_time);
+    TextView textView = v.findViewById(R.id.header_time);
     textView.setTypeface(App.skrift_gibson);
     textView.setText(time);
-    textView = (TextView) v.findViewById(R.id.header_label);
+    textView = v.findViewById(R.id.header_label);
     textView.setText(alarm.label);
     textView.setTypeface(App.skrift_gibson);
 

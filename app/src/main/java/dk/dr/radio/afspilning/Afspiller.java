@@ -582,13 +582,9 @@ public class Afspiller {
     if (lydkilde.erDirekte()) {
       Kanal k = lydkilde.getKanal();
       // Skift til forrige kanal
-      if (k.p4underkanal) k = App.grunddata.kanalFraKode.get(Kanal.P4kode); // P4 overkanal
       int index = App.grunddata.kanaler.indexOf(k) - 1;
       if (index < 0) index = App.grunddata.kanaler.size() - 1;
       k = App.grunddata.kanaler.get(index);
-      if (k.p4underkanal) { // Vi er kommet til P4 - vælg brugerens foretrukne underkanal
-        k = App.grunddata.kanalFraKode.get(App.tjekP4OgVælgUnderkanal(Kanal.P4kode));
-      }
       setLydkilde(k);
       App.talesyntese.udtal("Skifter til "+k.getNavn());
       return;
@@ -616,7 +612,6 @@ public class Afspiller {
       Kanal k = lydkilde.getKanal();
       int index = App.grunddata.kanaler.indexOf(k) + 1;
       if (index == App.grunddata.kanaler.size()) index = 0;
-      while (k.p4underkanal && App.grunddata.kanaler.get(index).p4underkanal) index++; // skip underkanaler
       k = App.grunddata.kanaler.get(index);
       // Tjek om vi er kommet til P4 - vælg brugerens foretrukne underkanal
       String kanalkode = App.tjekP4OgVælgUnderkanal(k.kode);

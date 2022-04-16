@@ -42,7 +42,6 @@ public class Kanal extends Lydkilde {
   public transient Bitmap kanallogo_eo; // Bruges pt kun i EsperantoRadio
   public String kanallogo_url;
 
-  public boolean p4underkanal;
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
   public transient SortedMap<String, ArrayList<Udsendelse>> udsendelserPerDag = new TreeMap<String, ArrayList<Udsendelse>>();
   /** P1 har ingen senest spillet og der er aldrig playlister på denne kanal */

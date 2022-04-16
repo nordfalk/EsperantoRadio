@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import dk.dk.niclas.models.Sæson;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.backend.Backend;
@@ -28,9 +27,6 @@ public class Programserie { //implements Serializable {
   private TreeMap<Integer, List<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, List<Udsendelse>>();
   private TreeSet<Udsendelse> udsendelserSorteret;
   public final Backend backend;
-
-  //tv
-  public HashMap<String, Sæson> sæsoner;
 
   public Programserie(Backend backend) {
     this.backend = backend;

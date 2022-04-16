@@ -39,8 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import dk.dk.niclas.cast.mediaplayer.LocalPlayerActivity;
-import dk.dk.niclas.utilities.CastVideoProvider;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
@@ -149,7 +147,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       if (topView == null) return;
-      CheckBox fav = (CheckBox) topView.findViewById(R.id.favorit);
+      CheckBox fav = topView.findViewById(R.id.favorit);
       fav.setChecked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
@@ -209,13 +207,8 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     String burl = Basisfragment.skalérBillede(udsendelse);
     aq.id(R.id.billede).width(billedeBr, false).height(billedeHø, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
     aq.id(R.id.info).typeface(App.skrift_gibson);
-    if (kanal.p4underkanal) {
-      aq.id(R.id.kanallogo).image(R.drawable.kanalappendix_p4f);
-      aq.id(R.id.p4navn).text(kanal.navn.replace("P4", "")).typeface(App.skrift_gibson_fed);
-    } else {
-      aq.id(R.id.kanallogo).image(kanal.kanallogo_resid);
-      aq.id(R.id.p4navn).text("");
-    }
+    aq.id(R.id.kanallogo).image(kanal.kanallogo_resid);
+    aq.id(R.id.p4navn).text("");
 
     aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(udsendelse.titel)
         .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
@@ -733,15 +726,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.data.hentedeUdsendelser.hent(udsendelse);
   }
 
-  public void startPlayerActivity(Udsendelse udsendelse) {
-    if (getActivity()==null) return;
-    MediaInfo mediaInfo = CastVideoProvider.buildMedia(udsendelse);
-    Intent intent = new Intent(getActivity(), LocalPlayerActivity.class);
-    intent.putExtra("media", mediaInfo);
-    intent.putExtra("shouldStart", true);
-    startActivity(intent);
-  }
-
   private void hør() {
     try {
       if (!udsendelse.kanHøres) {
@@ -750,10 +734,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           Kanal_frag.hør(kanal, getActivity());
           Log.registrérTestet("Åbne aktuel udsendelse og høre den", kanal.kode);
         }
-        return;
-      }
-      if (udsendelse.erVideo) {
-        startPlayerActivity(udsendelse);
         return;
       }
       //if (App.fejlsøgning) App.kortToast("kanal.streams=" + kanal.streams);

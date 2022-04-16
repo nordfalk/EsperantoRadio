@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="appnavn">Jacobs TV/Radio</string>
-<!--
-scp /home/j/android/esperanto/EsperantoRadio/app/build/outputs/apk/jacob/debug/app-jacob-debug.apk  j:javabog.dk/privat/app-jacob-debug.apk
--->
-    <string name="AppOpdatering_APK_URL">http://javabog.dk/privat/app-jacob-debug.apk</string>
-</resources>

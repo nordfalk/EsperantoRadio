@@ -24,11 +24,10 @@ public abstract class Lydkilde implements Serializable {
   public String urn;
   /** Unik menneskelig læselig ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
   public String slug;
-  /** Om mediekilden har video eller kun er ren lyd */
-  public boolean erVideo;
   public transient ArrayList<Lydstream> streams;
   public transient Lydstream hentetStream;
   public static final String INDST_lydformat = "lydformat2";
+  public final boolean erVideo = false;
 
   @Override
   public boolean equals(Object o) {

@@ -58,7 +58,7 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     super.onCreate(savedInstanceState);
     setContentView(R.layout.indstillinger_akt);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     toolbar.setLogo(R.drawable.appikon);
     toolbar.setTitle(R.string.Indstillinger);
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
@@ -151,10 +151,6 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
         }
       }.execute();
     }
-
-    // Statistik må ikke kunne slås fra i produktion
-    findPreference("Rapportér statistik").setEnabled(!App.PRODUKTION);
-
   }
 
   @Override

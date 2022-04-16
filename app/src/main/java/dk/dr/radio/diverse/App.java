@@ -64,7 +64,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-import dk.dr.radio.backend.MuOnlineTVBackend;
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
 import dk.dr.radio.akt.Basisaktivitet;
@@ -73,7 +72,6 @@ import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
-import dk.dr.radio.backend.MuOnlineRadioBackend;
 import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.backend.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
@@ -152,16 +150,7 @@ public class App {
     assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
-    Udseende.ESPERANTO = App.prefs.getBoolean("ESPERANTO", Udseende.ESPERANTO);
-    if (BuildConfig.FLAVOR.equals("esperanto")) {
-      Udseende.ESPERANTO = true;
-      backend = new Backend[] { new EsperantoRadioBackend() };
-    } else {
-      backend = Udseende.ESPERANTO ? new Backend[] { new EsperantoRadioBackend() }
-  //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-              : new Backend[] { new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-  //            : new Backend[] { new GammelDrRadioBackend(), new MuOnlineRadioBackend(), new MuOnlineTVBackend(), new EsperantoRadioBackend(),  };
-    }
+    backend = new Backend[] { new EsperantoRadioBackend() };
 
     sprogKonfig = new Configuration();
     sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
@@ -173,13 +162,6 @@ public class App {
     if (!EMULATOR) {
       Sentry.init("https://a251d3860be54aa5a7ebd02084a91a9a@sentry.io/1886051", new AndroidSentryClientFactory(ctx));
       io.sentry.context.Context sc = Sentry.getContext();
-      /*
-      sc.addTag("xFLAVOR", BuildConfig.FLAVOR );
-      sc.addTag("xBUILD_TYPE", BuildConfig.BUILD_TYPE );
-      sc.addTag("xAPPLICATION_ID", BuildConfig.APPLICATION_ID);
-      sc.addTag("xMODEL", Build.MODEL);
-
-       */
       Log.d("Sentry startet mod "+sc.getHttp());
     }
 

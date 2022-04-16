@@ -17,11 +17,7 @@ public class Fragmentfabrikering {
 
   public static Fragment udsendelse(Udsendelse udsendelse) {
     Fragment fragment;
-    if (udsendelse.getBackend() instanceof EsperantoRadioBackend) {
       fragment = new EoUdsendelse_frag();
-    } else {
-      fragment = new Udsendelse_frag();
-    }
     Bundle args = new Bundle();
     args.putString(P_UDSENDELSE, udsendelse.slug);
     fragment.setArguments(args);
@@ -30,11 +26,7 @@ public class Fragmentfabrikering {
 
   public static Fragment kanal(Kanal k) {
     Fragment f;
-    if (k.getBackend() instanceof EsperantoRadioBackend) {
       f = new EoKanal_frag();
-    } else {
-      f = k.kode.equals("DRN") ? new Kanal_nyheder_frag() :  new Kanal_frag();
-    }
     Bundle b = new Bundle();
     b.putString(P_KANALKODE, k.kode);
     f.setArguments(b);

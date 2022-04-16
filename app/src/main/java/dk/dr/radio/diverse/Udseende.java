@@ -5,5 +5,5 @@ package dk.dr.radio.diverse;
  */
 
 public class Udseende {
-    public static boolean ESPERANTO = false;
+    public static final boolean ESPERANTO = true;
 }

@@ -72,7 +72,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     @Override
     public void run() {
       if (topView == null) return;
-      CheckBox fav = (CheckBox) topView.findViewById(R.id.favorit);
+      CheckBox fav = topView.findViewById(R.id.favorit);
       fav.setChecked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };

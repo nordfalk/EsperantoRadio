@@ -21,12 +21,6 @@ package dk.dr.radio.data;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import dk.dk.niclas.models.MestSete;
-import dk.dk.niclas.models.SidsteChance;
-import dk.dk.niclas.models.Sæson;
-import dk.dr.radio.data.dr_v3.DramaOgBog;
-import dk.dr.radio.data.esperanto.EoFavoritter;
-import dk.dr.radio.diverse.Udseende;
 
 /**
  * Det centrale objekt som alt andet bruger til
@@ -35,7 +29,6 @@ public class Programdata {
 
   public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<>();
   public HashMap<String, Programserie> programserieFraSlug = new HashMap<>();
-  public HashMap<String, Sæson> sæsonFraSlug = new HashMap<>();
   /**
    * Manglende 'SeriesSlug' (i andre kald end det for dagsprogrammet for en kanal!)
    * betyder at der ikke er en programserie, og videre navigering derfor skal slås fra.
@@ -46,7 +39,4 @@ public class Programdata {
   public SenestLyttede senestLyttede = new SenestLyttede();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
   public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
-  public DramaOgBog dramaOgBog = new DramaOgBog();
-  public MestSete mestSete = new MestSete();
-  public SidsteChance sidsteChance = new SidsteChance();
 }

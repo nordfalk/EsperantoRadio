@@ -69,7 +69,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
 
     // Override the default content view.
     setContentView(R.layout.deskclock_set_alarm);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     toolbar.setLogo(R.drawable.appikon);
     toolbar.setTitle(getString(R.string.Angiv_vækning));
 // SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
@@ -83,7 +83,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
 
     EditText label = (EditText) getLayoutInflater().inflate(R.layout.deskclock_alarm_label, null);
 
-    ListView list = (ListView) findViewById(android.R.id.list);
+    ListView list = findViewById(android.R.id.list);
     list.addFooterView(label);
     addPreferencesFromResource(R.xml.deskclock_alarm_prefs);
 
@@ -131,7 +131,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
     getListView().setItemsCanFocus(true);
 
     // Attach actions to each button.
-    Button b = (Button) findViewById(R.id.alarm_save);
+    Button b = findViewById(R.id.alarm_save);
     b.setTypeface(App.skrift_gibson);
     b.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
@@ -142,7 +142,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
         finish();
       }
     });
-    Button revert = (Button) findViewById(R.id.alarm_revert);
+    Button revert = findViewById(R.id.alarm_revert);
     revert.setTypeface(App.skrift_gibson);
     revert.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
@@ -150,7 +150,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
         finish();
       }
     });
-    b = (Button) findViewById(R.id.alarm_delete);
+    b = findViewById(R.id.alarm_delete);
     b.setTypeface(App.skrift_gibson);
     if (mId == Alarm.INVALID_ALARM_ID) {
       b.setEnabled(false);

@@ -160,9 +160,6 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
 
 
     Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
-    if (kanal.p4underkanal) {
-      App.prefs.edit().putString(App.P4_FORETRUKKEN_AF_BRUGER, kanalkode).commit();
-    }
     App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanalkode).commit();
     // Ny getKanal valgt - send valg til afspiller
     App.afspiller.setLydkilde(kanal);

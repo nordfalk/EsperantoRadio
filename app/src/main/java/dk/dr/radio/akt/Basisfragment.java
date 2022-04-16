@@ -218,7 +218,7 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
   public static String skalérBillede(Udsendelse u, int bredde, int højde) {
     if (u.getBackend() instanceof EsperantoRadioBackend) {
       if (u.billedeUrl != null) return u.billedeUrl;
-      return ((EoKanal) u.getKanal()).kanallogo_url;
+      return u.getKanal().kanallogo_url;
     }
 //    u.billedeUrl = null;
     return u.billedeUrl==null

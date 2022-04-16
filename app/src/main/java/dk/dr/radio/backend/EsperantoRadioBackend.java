@@ -326,6 +326,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
   public void hentUdsendelserPåKanal(Object kalder, final Kanal kanalx, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
     final EoKanal kanal = (EoKanal) kanalx;
+    Log.d("eo RSS por "+kanal+" ="+kanal.eo_elsendojRssUrl);
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto) && !kanal.harUdsendelserForDag(datoStr)) {
       App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
         @Override

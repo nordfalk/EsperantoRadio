@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import dk.dr.radio.afspilning.wrapper.Wrapperfabrikering;
 import dk.dr.radio.data.HentedeUdsendelser;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Programdata;
@@ -61,16 +60,10 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
     Toolbar toolbar = findViewById(R.id.toolbar);
     toolbar.setLogo(R.drawable.appikon);
     toolbar.setTitle(R.string.Indstillinger);
-// SdkVersion 24 og frem: toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
     toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
-    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        finish();
-      }
-    });
+    toolbar.setNavigationOnClickListener(v -> finish());
 
-    App.prefs.edit().putBoolean("fejlsøgning", App.fejlsøgning);
+    App.prefs.edit().putBoolean("fejlsøgning", App.fejlsøgning).commit();
     addPreferencesFromResource(R.xml.indstillinger);
 
     // Find lydformat
@@ -80,10 +73,6 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
       aktueltLydformat = lydformatlp.getValue();
     }
 
-    // Fix for crash på Android 2.1 - se https://www.bugsense.com/dashboard/project/cd78aa05/errors/1474018028
-    if (!App.data.hentedeUdsendelser.virker()) {
-      findPreference(HentedeUdsendelser.NØGLE_placeringAfHentedeFiler).setEnabled(false);
-    } else {
       new AsyncTask() {
         public String[] visVærdi;
         public String[] værdi;
@@ -150,7 +139,6 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
             }
         }
       }.execute();
-    }
   }
 
   @Override
@@ -171,8 +159,6 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
   protected void onDestroy() {
     super.onDestroy();
     App.fejlsøgning = App.prefs.getBoolean("fejlsøgning", false);
-    Wrapperfabrikering.nulstilWrapper();
-    Wrapperfabrikering.opret();
     App.talesyntese.prefsÆndret();
   }
 

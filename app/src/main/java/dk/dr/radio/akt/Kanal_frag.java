@@ -2,7 +2,6 @@ package dk.dr.radio.akt;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -26,7 +25,6 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.androidquery.AQuery;
-import com.google.android.gms.cast.MediaInfo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -510,10 +508,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
-    if (kanal.ingenPlaylister) { // P1s programmer har aldrig "senest spillet" info
-      opdaterSenestSpilletViews(aq2, u2);
-      return;
-    }
     backend.hentPlayliste(u2, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {

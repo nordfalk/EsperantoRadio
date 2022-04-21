@@ -44,8 +44,18 @@ public class Kanal extends Lydkilde {
 
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
   public transient SortedMap<String, ArrayList<Udsendelse>> udsendelserPerDag = new TreeMap<String, ArrayList<Udsendelse>>();
-  /** P1 har ingen senest spillet og der er aldrig playlister på denne kanal */
-  public boolean ingenPlaylister;
+
+  //// EO
+  public String eo_hejmpaĝoEkrane;
+  public String eo_hejmpaĝoButono;
+  public String eo_retpoŝto;
+  public Udsendelse eo_rektaElsendo;
+  public String eo_datumFonto;
+  public ArrayList<Udsendelse> eo_udsendelserFraRadioTxt; // Provizora variablo - por kontroli ĉu ni maltrafas ion dum parsado de RSS
+  public String eo_elsendojRssUrl;
+  public String eo_elsendojRssUrl2;
+  public boolean eo_elsendojRssIgnoruTitolon;
+  public boolean eo_montruTitolojn;
 
   private transient Backend backend;
 
@@ -66,13 +76,6 @@ public class Kanal extends Lydkilde {
     return udsendelserPerDag.containsKey(dato);
   }
 
-  public void setUdsendelserForDag(ArrayList<Udsendelse> uliste, String dato) throws JSONException, ParseException {
-    udsendelserPerDag.put(dato, uliste);
-    udsendelser.clear();
-    for (ArrayList<Udsendelse> ul : udsendelserPerDag.values()) udsendelser.addAll(ul);
-  }
-
-
   @Override
   public Kanal getKanal() {
     return this;
@@ -80,26 +83,19 @@ public class Kanal extends Lydkilde {
 
   @Override
   public boolean erDirekte() {
-    return true;
+    return eo_rektaElsendo!=null;
+  }
+
+  @Override
+  public boolean harStreams() {
+    return udsendelser.size()>0;
   }
 
   /** Finder den aktuelle udsendelse på kanalen */
   @Override
   public Udsendelse getUdsendelse() {
     if (udsendelser==null || udsendelser.size() == 0) return null;
-    Date nu = new Date(App.serverCurrentTimeMillis()); // Kompenseret for forskelle mellem telefonens ur og serverens ur
-    // Nicolai: "jeg løber listen igennem fra bunden og op,
-    // og så finder jeg den første der har starttid >= nuværende tid + sluttid <= nuværende tid."
-    for (int n = udsendelser.size() - 1; n >= 0; n--) {
-      Udsendelse u = udsendelser.get(n);
-      //Log.d(n + " " + nu.after(u.startTid) + u.slutTid.before(nu) + "  " + u);
-      if (u.startTid.before(nu)) { // && nu.before(u.slutTid)) {
-        return u;
-      }
-    }
-    Log.e(new IllegalStateException("Ingen aktuel udsendelse fundet!"));
-    if (nu.before(udsendelser.get(0).slutTid)) return udsendelser.get(0);
-    return null;
+    return udsendelser.get(0);
   }
 
   @Override

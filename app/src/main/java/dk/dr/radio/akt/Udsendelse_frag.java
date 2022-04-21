@@ -32,7 +32,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.google.android.gms.cast.MediaInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -319,7 +318,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public void run() {
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
-      if (!getUserVisibleHint() || !isResumed() || kanal.ingenPlaylister) return;
+      if (!getUserVisibleHint() || !isResumed()) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
       udsendelse.getBackend().hentPlayliste(udsendelse, new NetsvarBehander() {
         @Override

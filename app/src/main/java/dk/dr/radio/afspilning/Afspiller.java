@@ -42,9 +42,9 @@ import com.android.volley.Request;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.dr.radio.afspilning.wrapper.EmaPlayerWrapper;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerLytter;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerWrapper;
-import dk.dr.radio.afspilning.wrapper.Wrapperfabrikering;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Lydstream;
@@ -116,7 +116,7 @@ public class Afspiller {
    * Forudsætter DRData er initialiseret
    */
   public Afspiller() {
-    mediaPlayer = Wrapperfabrikering.opret();
+    mediaPlayer = new EmaPlayerWrapper();
 
     sætMediaPlayerLytter(mediaPlayer, this.lytter);
     wifilock = ((WifiManager) ApplicationSingleton.instans.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "DR Radio");
@@ -402,7 +402,7 @@ public class Afspiller {
       }
     }.start();
 
-    mediaPlayer = Wrapperfabrikering.opret();
+    mediaPlayer = new EmaPlayerWrapper();
     sætMediaPlayerLytter(mediaPlayer, this.lytter); // registrér lyttere på den nye instans
 
     afspillerstatus = Status.STOPPET;
@@ -692,7 +692,7 @@ public class Afspiller {
 
         if (lydkilde.erDirekte()) {
           Log.d("Genstarter afspilning!");
-          mediaPlayer = Wrapperfabrikering.opret();
+          mediaPlayer = new EmaPlayerWrapper();
           sætMediaPlayerLytter(mediaPlayer, this); // registrér lyttere på den nye instans
           startAfspilningIntern();
           if (afspillerlyde) afspillerlyd.forbinder.start();

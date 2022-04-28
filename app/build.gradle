@@ -33,7 +33,7 @@ android {
         }
         applicationId "dk.nordfalk.esperanto.radio"
         versionCode 52
-        versionName '2.2 Enkodigo'
+        versionName '2.3 Ordigado'
     }
     buildTypes {
         release {

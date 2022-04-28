@@ -10,9 +10,9 @@
 		"kontakt_titel": "Pri la Esperanto-radio",
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
 		"malfamdrift_statusmeddelelse": "Ĵus aldoniĝis 'La malfamuloj'<br> Bonan aŭskultadon :-)",
-		"drift_statusmeddelelse": "",
+		"qqdrift_statusmeddelelse": "",
 		"sdsddrift_statusmeddelelse": "Aŭgusto 2020:<br><br>Nova versio kiu korektis kelkajn eraretojn<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti kelkajn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu :-)<br><br>Kore, Jacob Nordfalk.",
-		"xxxdrift_statusmeddelelse": "Aŭgusto 2020:<br><br><b>Rektaj elsendoj de Muzaiko</b> funcias nun, en la tuta mondo!<br><br>Tuj provu (vi devas eble restarte la apon).<br>Bv. raporti al la grupo en Telegramo <a href=\"https://t.me/joinchat/DQax3EEuJHS-O4SQfq1Ltw\">muzaiko.telegramo.org</a> se vi havas problemojn - au kontaktu min<br><br>Kore,<br> Jacob Nordfalk.",
+		"drift_statusmeddelelse": "Aprilo 2022:<br><br>Bedaŭrinde la <b>rektaj elsendoj de Muzaiko</b> ne plu funkcias.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"ysy12drift_statusmeddelelse": ""
 	},
 
@@ -38,9 +38,9 @@
 		{
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
-			"rektaElsendaSonoUrl": "https://streamingv2.shoutcast.com/Muzaiko",
-			"rektaElsendaSonoUrlSenGeobloko" : "https://muzaiko.saluton.dk/Muzaiko",
-			"rektaElsendaPriskriboUrl": "http://muzaiko.info/public/datumoj/aktuala_kanto.html",
+			"xxrektaElsendaSonoUrl": "https://streamingv2.shoutcast.com/Muzaiko",
+			"xxrektaElsendaSonoUrlSenGeobloko" : "https://muzaiko.saluton.dk/Muzaiko",
+			"xxrektaElsendaPriskriboUrl": "http://muzaiko.info/public/datumoj/aktuala_kanto.html",
 			"XXemblemoUrl": "http://muzaiko.info/images/emblemo.png",
 			"XXemblemoUrl": "http://muzaiko.info/reklambendoj/rb2.png",
 			"emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",

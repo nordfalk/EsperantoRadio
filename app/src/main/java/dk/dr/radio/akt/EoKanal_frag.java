@@ -218,7 +218,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
         nyListe.add(u);
         //EoGeoblokaDetektilo.esploruĈuEstasBlokata(u);
       }
-      int nyAktuelUdsendelseIndex = kanal.slug.equals("muzaiko") ? 0 : -1; //kanal.udsendelser.size()-1 : -1;
+      int nyAktuelUdsendelseIndex = kanal.eo_rektaElsendo != null ? 0 : -1; //kanal.udsendelser.size()-1 : -1;
 
       // Hvis listen er uændret så hop ud - forhindrer en uendelig løkke
       // af opdateringer i tilfælde af, at sendeplanen for dags dato ikke kan hentes

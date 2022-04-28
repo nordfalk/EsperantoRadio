@@ -477,6 +477,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         });
         aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
 
+        /*
         tilføj(R.layout.venstremenu_elem_adskiller_tynd);
         tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
           @Override
@@ -487,6 +488,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         if (!Udseende.ESPERANTO) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);
         else aq.id(R.id.tekst).text("Elŝuti plej novan provversion.\n\nNuna versio:\n" + App.versionsnavn);
         aq.typeface(App.skrift_gibson).textSize(12);
+         */
       }
     }
 

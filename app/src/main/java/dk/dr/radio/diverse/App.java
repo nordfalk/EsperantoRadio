@@ -416,8 +416,10 @@ public class App {
     skrift_georgia = Typeface.SERIF;
     skrift_gibson_fed_span = new EgenTypefaceSpan("Gibson fed", App.skrift_gibson_fed);
 
+    /*
     AppOpdatering.APK_URL = res.getString(R.string.AppOpdatering_APK_URL);
     if (!EMULATOR) AppOpdatering.tjekForNyAPK(ctx);
+     */
     Log.d("onCreate tog " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
   }
 

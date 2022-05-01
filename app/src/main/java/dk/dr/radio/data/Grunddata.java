@@ -50,7 +50,6 @@ public class Grunddata {
     ukendtKanal.navn = "";
     ukendtKanal.slug = "";
     ukendtKanal.kode = "";
-    ukendtKanal.urn = "";
     kanalFraKode.put(null, ukendtKanal);
     kanalFraKode.put("", ukendtKanal);
     kanalFraSlug.put(null, ukendtKanal);

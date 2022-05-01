@@ -46,11 +46,6 @@ import dk.dr.radio.v3.R;
  */
 public class AlarmClock_akt extends Basisaktivitet implements OnItemClickListener {
   static final String PREFERENCES = "AlarmClock";
-  /**
-   * This must be false for production.  If true, turns on logging,
-   * test code, etc.
-   */
-  static final boolean DEBUG = false;
   private LayoutInflater mFactory;
   private ListView mAlarmsList;
   private AlarmTimeAdapter adapter;

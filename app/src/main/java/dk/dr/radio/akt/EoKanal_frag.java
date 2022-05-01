@@ -40,7 +40,6 @@ import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -128,7 +127,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   private void hentSendeplanForDag(final Date dato) {
     if (getActivity()==null) return; // fragmentet er blevet lukket
     final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, new NetsvarBehander() {
+    backend.hentUdsendelserPåKanal(kanal, datoStr, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;
@@ -194,7 +193,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     if (aktuelUdsendelseViewholder == null) return;
     Viewholder vh = aktuelUdsendelseViewholder;
     if (!getUserVisibleHint() || !isResumed()) return;
-    opdaterSenestSpillet(vh.aq, vh.udsendelse);
+    opdaterSenestSpillet(vh.udsendelse);
 
     //MediaPlayer mp = DRData.instans.afspiller.getMediaPlayer();
     //Log.d("mp pos=  "+mp.getCurrentPosition() + "  af "+mp.getDuration());
@@ -202,21 +201,11 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
 
   private void opdaterListe() {
     try {
-//      ArrayList<Udsendelse> nyuliste = kanal.udsendelser;
       if (App.fejlsøgning) Log.d(kanal + " opdaterListe " + kanal.udsendelser.size());
       ArrayList<Object> nyListe = new ArrayList<Object>(kanal.udsendelser.size() + 5);
       String forrigeDagsbeskrivelse = null;
       for (Udsendelse u : kanal.udsendelser) {
-        // Tilføj dagsoverskrifter hvis dagen er skiftet
-        if (u.dagsbeskrivelse!=null && !u.dagsbeskrivelse.equals(forrigeDagsbeskrivelse)) {
-          forrigeDagsbeskrivelse = u.dagsbeskrivelse;
-          nyListe.add(u.dagsbeskrivelse);
-          // Overskriften I DAG skal ikke 'blive hængende' øverst,
-          // det løses ved at tilføje en tom overskrift lige under den
-          if (u.dagsbeskrivelse == Datoformater.I_DAG) nyListe.add("");
-        }
         nyListe.add(u);
-        //EoGeoblokaDetektilo.esploruĈuEstasBlokata(u);
       }
       int nyAktuelUdsendelseIndex = kanal.eo_rektaElsendo != null ? 0 : -1; //kanal.udsendelser.size()-1 : -1;
 
@@ -406,9 +395,9 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
           vh.starttid.setText(udsendelse.startTidKl);
 
           if (udsendelse.rektaElsendaPriskriboUrl!=null && rektaElsendaPriskribo==null) {
-            opdaterSenestSpillet(vh.aq, udsendelse);
+            opdaterSenestSpillet(udsendelse);
           } else {
-            opdaterSenestSpilletViews(vh.aq, udsendelse);
+            opdaterSenestSpilletViews(udsendelse);
           }
 
           break;
@@ -446,7 +435,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
   String rektaElsendaPriskribo = null;
   private long rektaElsendoKiam;
   DateFormat klokkenformat = DateFormat.getTimeInstance(DateFormat.SHORT);
-  private void opdaterSenestSpilletViews(AQuery a, Udsendelse udsendelse) {
+  private void opdaterSenestSpilletViews(Udsendelse udsendelse) {
     Viewholder vh = aktuelUdsendelseViewholder;
 
     if (rektaElsendaPriskribo != null) {
@@ -457,7 +446,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
     }
   }
 
-  private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
+  private void opdaterSenestSpillet(final Udsendelse u2) {
     App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) {
@@ -467,7 +456,7 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
         if (rektaElsendaPriskribo.endsWith("<br>")) rektaElsendaPriskribo=rektaElsendaPriskribo.substring(0,rektaElsendaPriskribo.length()-4);
         rektaElsendoKiam = System.currentTimeMillis();
         if (aktuelUdsendelseViewholder == null) return;
-        opdaterSenestSpilletViews(aq2, u2);
+        opdaterSenestSpilletViews(u2);
       }
     });
   }
@@ -521,7 +510,6 @@ public class EoKanal_frag extends Basisfragment implements AdapterView.OnItemCli
         .addToBackStack(null)
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         .commitAllowingStateLoss(); // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/830038058
-    Sidevisning.vist(Udsendelse_frag.class, u.slug);
   }
 }
 

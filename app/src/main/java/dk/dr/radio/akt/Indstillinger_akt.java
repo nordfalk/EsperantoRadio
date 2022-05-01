@@ -31,7 +31,6 @@ import android.preference.PreferenceActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.text.format.Formatter;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,14 +42,9 @@ import dk.dr.radio.data.Programdata;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
-public class Indstillinger_akt extends PreferenceActivity implements OnPreferenceChangeListener, Runnable {
-  public static final String åbn_formatindstilling = "åbn_formatindstilling";
-  private String aktueltLydformat;
-  private ListPreference lydformatlp;
-  Handler handler = new Handler();
+public class Indstillinger_akt extends PreferenceActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +59,6 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
 
     App.prefs.edit().putBoolean("fejlsøgning", App.fejlsøgning).commit();
     addPreferencesFromResource(R.xml.indstillinger);
-
-    // Find lydformat
-    if (!Udseende.ESPERANTO) {
-      lydformatlp = (ListPreference) findPreference(Lydkilde.INDST_lydformat);
-      lydformatlp.setOnPreferenceChangeListener(this);
-      aktueltLydformat = lydformatlp.getValue();
-    }
 
       new AsyncTask() {
         public String[] visVærdi;
@@ -168,27 +155,5 @@ public class Indstillinger_akt extends PreferenceActivity implements OnPreferenc
       finish();
     }
     return super.onOptionsItemSelected(item);
-  }
-
-  public boolean onPreferenceChange(Preference preference, Object newValue) {
-    // På dette tidspunkt er indstillingen ikke gemt endnu, det bliver den
-    // først når metoden har returneret true.
-    // Vi venter derfor med at opdatere afspilleren med det nye lydformat
-    // indtil GUI-tråden er færdig med kaldet til onPreferenceChange() og
-    // klar igen
-    handler.post(this);
-    return true;
-  }
-
-  public void run() {
-    if (Udseende.ESPERANTO) return;
-    String nytLydformat = lydformatlp.getValue();
-    if (nytLydformat.equals(aktueltLydformat)) return;
-
-    Log.d("Lydformatet blev ændret fra " + aktueltLydformat + " til " + nytLydformat);
-    aktueltLydformat = nytLydformat;
-    Programdata drdata = App.data;
-    //String url = drdata.findKanalUrlFraKode(drdata.aktuelKanal);
-    App.afspiller.setLydkilde(App.afspiller.getLydkilde());
   }
 }

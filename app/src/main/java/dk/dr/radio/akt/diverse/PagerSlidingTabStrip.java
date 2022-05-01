@@ -61,7 +61,6 @@ import dk.dr.radio.v3.R;
 
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
-  private static final boolean TEKST_DER_FADER_OVER_I_IKONER = true;
   public interface IconTabProvider {
     public int getPageIconResId(int position);
     public String getPageContentDescription(int position);
@@ -220,16 +219,12 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
       if (adapter instanceof IconTabProvider) {
         IconTabProvider ipa = ((IconTabProvider) adapter);
-        if (TEKST_DER_FADER_OVER_I_IKONER) {
-          int resId = ipa.getPageIconResId(i);
-          if (resId!=0) addIconTabBådeTekstOgBillede(i, resId, null, ipa.getPageContentDescription(i));
-          else {
-            String url = ipa.getPageIconUrl(i);
-            if (url!=null) addIconTabBådeTekstOgBillede(i, resId, url, ipa.getPageContentDescription(i));
-            else addTextTab(i, adapter.getPageTitle(i).toString());
-          }
-        } else {
-          addIconTab(i, ipa.getPageIconResId(i), ipa.getPageContentDescription(i));
+        int resId = ipa.getPageIconResId(i);
+        if (resId!=0) addIconTabBådeTekstOgBillede(i, resId, null, ipa.getPageContentDescription(i));
+        else {
+          String url = ipa.getPageIconUrl(i);
+          if (url!=null) addIconTabBådeTekstOgBillede(i, resId, url, ipa.getPageContentDescription(i));
+          else addTextTab(i, adapter.getPageTitle(i).toString());
         }
       } else {
         addTextTab(i, adapter.getPageTitle(i).toString());
@@ -240,8 +235,6 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
     updateTabStyles();
 
     getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-
-      @SuppressWarnings("deprecation")
       @SuppressLint("NewApi")
       @Override
       public void onGlobalLayout() {
@@ -258,9 +251,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         } catch (Exception e) { Log.rapporterFejl(e); }
       }
     });
-    if (TEKST_DER_FADER_OVER_I_IKONER) {
-      fadeTekstOgIkoner(currentPosition);
-    }
+    fadeTekstOgIkoner(currentPosition);
   }
 
   private void addTextTab(final int position, String title) {
@@ -329,10 +320,6 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
       @Override
       public void onClick(View v) {
         pager.setCurrentItem(position);
-        // XXX INDSAT TIL DR RADIO: “Nulstil” visning, når der tappes på kanalikon i toppen, så man kommer tilbage til NU-visning (belejligt hvis man har scrollet op el. ned i epg liste)
-        //if (delegatePageListener != null && delegatePageListener instanceof Kanaler_frag) {
-        //  ((Kanaler_frag) delegatePageListener).klikPåFane(position);
-        //}
         // Grimt hack, men desværre umuligt at gøre på en anden måde
         if (Kanal_frag.senesteSynligeFragment != null) {
           Kanal_frag.senesteSynligeFragment.rulBlødtTilAktuelUdsendelse();
@@ -475,9 +462,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
       if (delegatePageListener != null) {
         delegatePageListener.onPageSelected(position);
       }
-      if (TEKST_DER_FADER_OVER_I_IKONER) {
-        fadeTekstOgIkoner(position);
-      }
+      fadeTekstOgIkoner(position);
     }
 
   }

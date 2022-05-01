@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -34,7 +33,6 @@ import com.androidquery.AQuery;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
@@ -42,7 +40,6 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
@@ -51,7 +48,6 @@ import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 
 public class EoUdsendelse_frag extends Basisfragment implements View.OnClickListener, AdapterView.OnItemClickListener, Runnable {
@@ -60,8 +56,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   private EoKanal kanal;
   protected View rod;
   private Udsendelse udsendelse;
-  private Playlisteelement playlisteElemDerSpillerNu;
-  private int playlisteElemDerSpillerNuIndex = -1;
 
   private ArrayList<Object> liste = new ArrayList<Object>();
   Afspiller afspiller = App.afspiller;
@@ -303,8 +297,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
    */
   private static class Viewholder {
     public AQuery aq;
-    public TextView titel;
-    public TextView startid;
     public int itemViewType;
   }
 
@@ -338,18 +330,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     if (udsendelse == null) return; // fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/834728045 ???
     App.forgrundstråd.removeCallbacks(this);
 
-    int spillerNuIndexNy = -1;
-    if (udsendelse.equals(App.afspiller.getLydkilde().getUdsendelse()))
-    {
-      // Find og fremhævet nummeret der spilles lige nu
-      long pos = App.afspiller.getCurrentPosition();
-      spillerNuIndexNy = udsendelse.findPlaylisteElemTilTid(pos, playlisteElemDerSpillerNuIndex);
-      App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
-    }
-    if (playlisteElemDerSpillerNuIndex != spillerNuIndexNy) {
-      playlisteElemDerSpillerNuIndex = spillerNuIndexNy;
-      playlisteElemDerSpillerNu = playlisteElemDerSpillerNuIndex < 0 ? null : udsendelse.playliste.get(playlisteElemDerSpillerNuIndex);
-    }
     App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
     adapter.notifyDataSetChanged(); // Opdater knapper etc
   }
@@ -414,7 +394,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
         vh.itemViewType = type;
         aq = vh.aq = new AQuery(v);
         v.setTag(vh);
-        vh.startid = aq.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
         if (type == INFOTEKST) {
           String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
           Log.d("EoUdsendelse_frag hp="+hp);
@@ -476,7 +455,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       CheckBox favorit = (CheckBox) v;
       udsendelse.getBackend().favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
-      Log.registrérTestet("Valg af favoritprogram", udsendelse.programserieSlug);
     } else {
       App.langToast("fejl");
     }
@@ -504,7 +482,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Log.d(i.toString());
 
       startActivity(i);
-      Sidevisning.i().vist(Sidevisning.DEL, udsendelse.slug);
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -546,7 +523,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
         ft.replace(R.id.indhold_frag, new Hentede_udsendelser_frag());
         ft.addToBackStack(null);
         ft.commit();
-        Sidevisning.vist(Hentede_udsendelser_frag.class);
       } catch (Exception e1) {
         Log.rapporterFejl(e1);
       }
@@ -566,29 +542,12 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       if (!udsendelse.kanHøres) {
         if (aktuelUdsendelsePåKanalen()) {
           // Så skal man lytte til livestreamet
-          Kanal_frag.hør(kanal, getActivity());
-          Log.registrérTestet("Åbne aktuel udsendelse og høre den", kanal.kode);
+          Kanal_frag.hør(kanal);
         }
         return;
       }
-      //if (App.fejlsøgning) App.kortToast("kanal.streams=" + kanal.streams);
-      Log.registrérTestet("Afspilning af gammel udsendelse", udsendelse.slug);
-      if (App.prefs.getBoolean("manuelStreamvalg", false)) {
-        udsendelse.nulstilForetrukkenStream();
-        final List<Lydstream> lydstreamList = udsendelse.findBedsteStreams(false);
-        new AlertDialog.Builder(getActivity())
-                .setAdapter(new ArrayAdapter(getActivity(), R.layout.skrald_vaelg_streamtype, lydstreamList), new DialogInterface.OnClickListener() {
-                  @Override
-                  public void onClick(DialogInterface dialog, int which) {
-                    lydstreamList.get(which).foretrukken = true;
-                    App.afspiller.setLydkilde(udsendelse);
-                    App.afspiller.startAfspilning();
-                  }
-            }).show();
-      } else {
-        App.afspiller.setLydkilde(udsendelse);
-        App.afspiller.startAfspilning();
-      }
+      App.afspiller.setLydkilde(udsendelse);
+      App.afspiller.startAfspilning();
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -616,7 +575,6 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
               .addToBackStack(null)
               .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
-      Sidevisning.vist(Programserie_frag.class, udsendelse.programserieSlug);
     }
   }
 }

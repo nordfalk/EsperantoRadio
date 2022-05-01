@@ -72,13 +72,6 @@ public final class Alarm {
     daysOfWeek = new DaysOfWeek(0);
   }
 
-  public String getLabelOrDefault(Context context) {
-    if (label == null || label.length() == 0) {
-      return context.getString(R.string.default_label);
-    }
-    return label;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Alarm)) return false;

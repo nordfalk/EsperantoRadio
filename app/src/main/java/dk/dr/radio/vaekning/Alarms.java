@@ -57,7 +57,6 @@ public class Alarms {
   // AlarmManagerService to avoid a ClassNotFoundException when filling in
   // the Intent extras.
   public static final String ALARM_RAW_DATA = "intent.extra.alarm_raw";
-  private final static String DM12 = "E h:mm aa";
   private final static String DM24 = "E kk:mm";
   private final static String M12 = "h:mm aa";
   // Shared with DigitalClock

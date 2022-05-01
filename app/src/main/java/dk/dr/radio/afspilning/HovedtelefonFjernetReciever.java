@@ -43,7 +43,7 @@ public class HovedtelefonFjernetReciever extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     App.langToast("HovedtelefonFjernetReciever "+intent);
 
-    if (App.prefs.getBoolean("Stop når hovedtelefoner fjernes", true)==false) return;
+    if (!App.prefs.getBoolean("Stop når hovedtelefoner fjernes", true)) return;
     if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
       if (App.afspiller.getAfspillerstatus() != Status.STOPPET) {
         App.afspiller.pauseAfspilning();

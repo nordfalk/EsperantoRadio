@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -35,8 +34,6 @@ import com.androidquery.AQuery;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
@@ -45,13 +42,11 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -72,12 +67,10 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   Afspiller afspiller = App.afspiller;
   private View topView;
 
-  private static HashMap<Udsendelse, Long> streamsVarTom = new HashMap<Udsendelse, Long>();
-  private int antalGangeForsøgtHentet;
   private Runnable hentStreams = new Runnable() {
     @Override
     public void run() {
-      udsendelse.getBackend().hentUdsendelseStreams(udsendelse, new NetsvarBehander() {
+      udsendelse.getBackend().hentUdsendelseStreams(new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
@@ -92,53 +85,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           adapter.notifyDataSetChanged(); // Opdatér views
         }
       });
-/*
-      if (false && !udsendelse.harStreams() && antalGangeForsøgtHentet++ < 1) {
-        App.netkald.kald(null, kanal.getBackend().getUdsendelseStreamsUrl(udsendelse), new NetsvarBehander() {
-          @Override
-          public void fikSvar(Netsvar s) throws Exception {
-            if (s.uændret) return;
-            Log.d("hentStreams fikSvar(" + s.fraCache + " " + s.url);
-            if (s.json != null && !"null".equals(s.json)) {
-              JSONObject o = new JSONObject(s.json);
-              udsendelse.indslag = kanal.getBackend().parsIndslag(o);
-              udsendelse.setStreams(kanal.getBackend().parsStreams(o));
-              if (!udsendelse.harStreams()) {
-                if (App.fejlsøgning) Log.d("SSSSS TOMME STREAMS ... men det passer måske ikke! for " + udsendelse.slug + " " + kanal.getBackend().getUdsendelseStreamsUrl(udsendelse));
-                streamsVarTom.put(udsendelse, System.currentTimeMillis());
-                //App.volleyRequestQueue.getCache().remove(url);
-                App.forgrundstråd.postDelayed(hentStreams, 5000);
-              } else if (streamsVarTom.containsKey(udsendelse)) {
-                long t0 = streamsVarTom.get(udsendelse);
-                if (!App.PRODUKTION) {
-                  App.langToast("Serveren har ombestemt sig, nu er streams ikke mere tom for " + udsendelse.slug);
-                  App.langToast("Tidsforskel mellem de to svar: " + (System.currentTimeMillis() - t0) / 1000 + " sek");
-                  Log.rapporterFejl(new Exception("Server ombestemte sig, der var streams alligevel"), udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
-                }
-                Log.d("Server ombestemte sig, der var streams alligevel: "+ udsendelse.slug + "  dt=" + (System.currentTimeMillis() - t0));
-                streamsVarTom.remove(udsendelse);
-              }
-              udsendelse.shareLink = o.optString("ShareLink");
-              // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
-              // der ikke er en programserie, og videre navigering derfor skal slås fra
-              if (!o.has("SeriesSlug")) {
-                if (!App.data.programserieSlugFindesIkke.contains(udsendelse.programserieSlug)) {
-                  App.data.programserieSlugFindesIkke.add(udsendelse.programserieSlug);
-                }
-                if (!blokerVidereNavigering) {
-                  blokerVidereNavigering = true;
-                  bygListe();
-                }
-              }
-              if (getUserVisibleHint() && udsendelse.streamsKlar() && afspiller.getAfspillerstatus() == Status.STOPPET) {
-                afspiller.setLydkilde(udsendelse);
-              }
-              adapter.notifyDataSetChanged(); // Opdatér views
-            }
-          }
-        });
-      }
-*/
     }
   };
 
@@ -203,10 +149,9 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     View v = getActivity().getLayoutInflater().inflate(R.layout.udsendelse_elem0_top, listView, false);
     AQuery aq = new AQuery(v);
     v.setTag(aq);
-    String burl = Basisfragment.skalérBillede(udsendelse);
+    String burl = skalérBillede(udsendelse);
     aq.id(R.id.billede).width(billedeBr, false).height(billedeHø, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
     aq.id(R.id.info).typeface(App.skrift_gibson);
-    aq.id(R.id.kanallogo).image(kanal.kanallogo_resid);
     aq.id(R.id.p4navn).text("");
 
     aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(udsendelse.titel)
@@ -320,7 +265,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed()) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      udsendelse.getBackend().hentPlayliste(udsendelse, new NetsvarBehander() {
+      udsendelse.getBackend().hentPlayliste(new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           if (getActivity() == null || s.uændret || s.fejl) return;
@@ -375,7 +320,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   }
 
   static final int TOP = 0;
-  static final int BERIGTIGELSE = 1;
   static final int OVERSKRIFT_PLAYLISTE_INFO = 2;
   static final int PLAYLISTEELEM_NU = 3;
   static final int PLAYLISTEELEM = 4;
@@ -405,9 +349,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     Log.d("Udsendelse_frag bygListe "+liste.size() + " -> "+udsendelse.playliste);
     liste.clear();
     liste.add(TOP);
-    if (udsendelse.berigtigelseTitel!=null) {
-      liste.add(BERIGTIGELSE);
-    }
     if (visInfo) {
       liste.add(OVERSKRIFT_PLAYLISTE_INFO);
       liste.add(INFOTEKST);
@@ -557,10 +498,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           aq.id(R.id.vis_hele_playlisten).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
         } else if (type == ALLE_UDSENDELSER) {
           aq.id(R.id.titel).typeface(App.skrift_gibson_fed);
-        } else if (type == BERIGTIGELSE) {
-          aq.id(R.id.titel).visible().typeface(App.skrift_gibson).getTextView()
-              .setText(lavFedSkriftTil(udsendelse.berigtigelseTitel + "\n" + udsendelse.berigtigelseTekst, udsendelse.berigtigelseTitel.length()));
-//          .setText(lavFedSkriftTil("BEKLAGER\nDenne udsendelse er desværre ikke tilgængelig. For yderligere oplysninger se dr.dk/programetik", 8));
         }
       } else {
         vh = (Viewholder) v.getTag();
@@ -638,7 +575,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       CheckBox favorit = (CheckBox) v;
       udsendelse.getBackend().favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
-      Log.registrérTestet("Valg af favoritprogram", udsendelse.programserieSlug);
     } else {
       App.langToast("fejl");
     }
@@ -668,7 +604,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       intent.putExtra(Intent.EXTRA_TEXT, tekst);
 
       startActivity(intent);
-      Sidevisning.i().vist(Sidevisning.DEL, udsendelse.slug);
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -710,7 +645,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         ft.replace(R.id.indhold_frag, new Hentede_udsendelser_frag());
         ft.addToBackStack(null);
         ft.commit();
-        Sidevisning.vist(Hentede_udsendelser_frag.class);
       } catch (Exception e1) {
         Log.rapporterFejl(e1);
       }
@@ -730,29 +664,12 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       if (!udsendelse.kanHøres) {
         if (aktuelUdsendelsePåKanalen()) {
           // Så skal man lytte til livestreamet
-          Kanal_frag.hør(kanal, getActivity());
-          Log.registrérTestet("Åbne aktuel udsendelse og høre den", kanal.kode);
+          Kanal_frag.hør(kanal);
         }
         return;
       }
-      //if (App.fejlsøgning) App.kortToast("kanal.streams=" + kanal.streams);
-      Log.registrérTestet("Afspilning af gammel udsendelse", udsendelse.slug);
-      if (App.prefs.getBoolean("manuelStreamvalg", false)) {
-        udsendelse.nulstilForetrukkenStream();
-        final List<Lydstream> lydstreamList = udsendelse.findBedsteStreams(false);
-        new AlertDialog.Builder(getActivity())
-            .setAdapter(new ArrayAdapter(getActivity(), R.layout.skrald_vaelg_streamtype, lydstreamList), new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialog, int which) {
-                lydstreamList.get(which).foretrukken = true;
-                App.afspiller.setLydkilde(udsendelse);
-                App.afspiller.startAfspilning();
-              }
-            }).show();
-      } else {
-        App.afspiller.setLydkilde(udsendelse);
-        App.afspiller.startAfspilning();
-      }
+      App.afspiller.setLydkilde(udsendelse);
+      App.afspiller.startAfspilning();
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -780,7 +697,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       playlisteElemDerSpillerNu = pl;
       playlisteElemDerSpillerNuIndex = udsendelse.playliste.indexOf(pl);
       adapter.notifyDataSetChanged();
-      Log.registrérTestet("Valg af playlisteelement", "ja");
     } else if (type == INDSLAGLISTEELEM) {
       if (!udsendelse.streamsKlar()) return;
       final Indslaglisteelement pl = (Indslaglisteelement) liste.get(position);
@@ -800,7 +716,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           }
         });
       }
-      Log.registrérTestet("Valg af indslag", "ja");
     } else if (type == ALLE_UDSENDELSER) {
 
       Fragment f = new Programserie_frag();
@@ -814,7 +729,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commitAllowingStateLoss(); // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4456778083
-      Sidevisning.vist(Programserie_frag.class, udsendelse.programserieSlug);
     }
   }
 }

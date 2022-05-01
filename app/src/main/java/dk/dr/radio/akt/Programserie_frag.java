@@ -27,7 +27,6 @@ import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -76,7 +75,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
     bygListe();
 
 
-    Log.registrérTestet("Visning af programserie", "ja");
     return rod;
   }
 
@@ -87,7 +85,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    programserie.getBackend().hentProgramserie(programserie, programserieSlug, kanal, offset, new NetsvarBehander() {
+    programserie.getBackend().hentProgramserie(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl && offset == 0) {
@@ -104,7 +102,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
       CheckBox favorit = (CheckBox) v;
       programserie.getBackend().favoritter.sætFavorit(programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(getString(R.string.Programserien_er_føjet_til_favoritter));
-      Log.registrérTestet("Valg af favoritprogram", programserieSlug);
     } else {
       Udsendelse udsendelse = ((Viewholder) v.getTag()).udsendelse;
       App.afspiller.setLydkilde(udsendelse);
@@ -119,7 +116,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   private static class Viewholder {
     public Udsendelse udsendelse;
     public AQuery aq;
-    public View stiplet_linje;
     public TextView titel;
     public TextView varighed;
     public int itemViewType;
@@ -223,11 +219,11 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           aq.width(br, false).height(hø, false).image(burl, true, true, br, AQuery.INVISIBLE, null, AQuery.FADE_IN, (float) højde9 / bredde16);
            */
 
-          String burl = Basisfragment.skalérBillede(programserie);
+          String burl = programserie.billedeUrl;
           aq.id(R.id.billede).width(3*billedeBr/4, false).height(3*billedeHø/4, false).image(burl, true, true, 0, AQuery.INVISIBLE, null, AQuery.FADE_IN, (float) højde9 / bredde16);
 
           if (kanal == null) aq.id(R.id.kanallogo).gone();
-          else aq.id(R.id.kanallogo).image(kanal.kanallogo_resid).getView().setContentDescription(kanal.navn);
+          else aq.id(R.id.kanallogo).getView().setContentDescription(kanal.navn);
           aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(programserie.titel);
           aq.id(R.id.alle_udsendelser).typeface(App.skrift_gibson);
           aq.id(R.id.beskrivelse).text(programserie.beskrivelse).typeface(App.skrift_georgia);
@@ -237,7 +233,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
           vh.dato = aq.id(R.id.dato).typeface(App.skrift_gibson).getTextView();
           vh.varighed = aq.id(R.id.varighed).typeface(App.skrift_gibson).getTextView();
-          vh.stiplet_linje = aq.id(R.id.stiplet_linje).getView();
           vh.hør = aq.id(R.id.hør).tag(vh).clicked(Programserie_frag.this).typeface(App.skrift_gibson).getView();
         }
       } else {
@@ -270,7 +265,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
 
         //String txt = u.getKanal().navn + ", " + ((u.slutTid.getTime() - u.startTid.getTime())/1000/60 + " MIN");
         String txt = ""; //u.getKanal().navn;
-        int varighed = (int) (u.varighedMs / 1000 / 60);
+        int varighed = 0;
         if (varighed > 0) {
           //txt += ", ";
           int timer = varighed / 60;
@@ -328,7 +323,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commitAllowingStateLoss(); // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4061148411
-      Sidevisning.vist(Udsendelse_frag.class, udsendelse.slug);
       return;
     }
 

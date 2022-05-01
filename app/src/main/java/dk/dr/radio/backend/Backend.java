@@ -2,23 +2,16 @@ package dk.dr.radio.backend;
 
 import android.content.Context;
 
-import com.android.volley.Request;
-
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import dk.dr.radio.data.Favoritter;
-
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.ProgramdataForBackend;
-import dk.dr.radio.data.Programserie;
-import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.net.volley.Netsvar;
 
 /**
@@ -27,16 +20,7 @@ import dk.dr.radio.net.volley.Netsvar;
 
 public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
-  public ProgramdataForBackend data = new ProgramdataForBackend();
   public Favoritter favoritter = new Favoritter(this);
-
-  protected void _ikkeImplementeret__UBRUGT() {
-    Exception x = new Exception("Ikke implementeret i " + getClass().getName());
-    StackTraceElement[] ss = x.getStackTrace();
-    System.err.println(x);
-    for (int i=1; i<5; i++)
-      System.err.println("\tat " + ss[i]);
-  }
 
   public abstract String getGrunddataUrl();
 
@@ -44,7 +28,7 @@ public abstract class Backend {
 
   public abstract void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException;
 
-  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanal, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+  public void hentUdsendelserPåKanal(final Kanal kanal, final String datoStr, final NetsvarBehander netsvarBehander) {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
     } catch (Exception e) {
@@ -52,7 +36,7 @@ public abstract class Backend {
     }
   }
 
-  public void hentKanalStreams(final Kanal kanal, Request.Priority priority, final NetsvarBehander netsvarBehander) {
+  public void hentKanalStreams(final NetsvarBehander netsvarBehander) {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
     } catch (Exception e) {
@@ -60,7 +44,7 @@ public abstract class Backend {
     }
   }
 
-  public void hentUdsendelseStreams(Udsendelse udsendelse, NetsvarBehander netsvarBehander) {
+  public void hentUdsendelseStreams(NetsvarBehander netsvarBehander) {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
     } catch (Exception e) {
@@ -68,9 +52,9 @@ public abstract class Backend {
     }
   }
 
-  public abstract void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander);
+  public abstract void hentProgramserie(final NetsvarBehander netsvarBehander);
 
-  public void hentPlayliste(Udsendelse udsendelse, NetsvarBehander netsvarBehander)  {
+  public void hentPlayliste(NetsvarBehander netsvarBehander)  {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_UNDERSTØTTET);
     } catch (Exception e) {
@@ -78,7 +62,7 @@ public abstract class Backend {
     }
   }
 
-  public String getSkaleretBilledeUrl(String logo_url, int bredde, int højde) {
+  public String getSkaleretBilledeUrl(String logo_url) {
     return logo_url; // standardimplementationen skalerer ikke billederne
   }
 

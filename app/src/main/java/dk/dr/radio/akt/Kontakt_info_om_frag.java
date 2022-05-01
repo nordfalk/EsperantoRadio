@@ -31,7 +31,6 @@ import android.widget.TextView;
 
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 
 public class Kontakt_info_om_frag extends Basisfragment implements OnClickListener {
@@ -70,7 +69,6 @@ public class Kontakt_info_om_frag extends Basisfragment implements OnClickListen
   }
 
   public void onClick(View v) {
-    Sidevisning.vist(Sidevisning.KONTAKT_SKRIV);
     String brødtekst = App.grunddata.android_json.optString("kontakt_brugerspørgsmål");
     //brødtekst += "\nkanal: " + DRData.instans.afspiller.kanalNavn + " (" + DRData.instans.afspiller.kanalUrl + ")";
     brødtekst += "\n" + Log.lavKontaktinfo();

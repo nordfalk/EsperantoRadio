@@ -56,13 +56,11 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
   public void onUpdate(Context ctx, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
     Log.d(this + " onUpdate (levende ikon oprettet) - appWidgetIds = " + Arrays.toString(appWidgetIds));
     // for sørge for at vores knapper får tilknyttet intentsne
-    opdaterUdseende(ctx, appWidgetManager, appWidgetIds[0]);
-
-
+    opdaterUdseende(appWidgetManager, appWidgetIds[0]);
   }
 
 
-  public static void opdaterUdseende(Context ctx, AppWidgetManager appWidgetManager, int appWidgetId) {
+  public static void opdaterUdseende(AppWidgetManager appWidgetManager, int appWidgetId) {
     Log.d("AfspillerWidget opdaterUdseende()");
     //App.langToast("AfspillerWidget opdaterUdseende()");
 
@@ -119,15 +117,13 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
     }
     Kanal kanal = lydkilde.getKanal();
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (kanal.kanallogo_resid==0 && kanal.kanallogo_eo ==null) {
+    if (kanal.kanallogo_eo ==null) {
       remoteViews.setViewVisibility(R.id.kanallogo, View.GONE);
     } else {
       remoteViews.setViewVisibility(R.id.kanallogo, View.VISIBLE);
       if (kanal.kanallogo_eo !=null) {
         remoteViews.setImageViewBitmap(R.id.kanallogo, kanal.kanallogo_eo);
-      } else {
-      remoteViews.setImageViewResource(R.id.kanallogo, kanal.kanallogo_resid);
-    }
+      }
     }
     remoteViews.setViewVisibility(R.id.direktetekst, lydkilde.erDirekte()?View.VISIBLE:View.GONE);
     remoteViews.setTextViewText(R.id.metainformation, udsendelse!=null?udsendelse.titel:kanal.navn);

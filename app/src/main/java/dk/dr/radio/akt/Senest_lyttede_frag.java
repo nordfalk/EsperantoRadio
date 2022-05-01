@@ -25,7 +25,6 @@ import dk.dr.radio.data.SenestLyttede;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 
 public class Senest_lyttede_frag extends Basisfragment implements AdapterView.OnItemClickListener, Runnable, View.OnClickListener {
@@ -91,12 +90,10 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
   }
 
   private static class Viewholder {
-    public AQuery aq;
     public TextView titel;
     public TextView dato;
     public TextView varighed;
     public View stiplet_linje;
-    public View hør;
     public SenestLyttede.SenestLyttet sl;
   }
 
@@ -117,12 +114,12 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
         v = getActivity().getLayoutInflater().inflate(R.layout.programserie_elem2_udsendelse, parent, false);
 
         vh = new Viewholder();
-        AQuery a = vh.aq = new AQuery(v);
+        AQuery a = new AQuery(v);
         vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
         vh.dato = a.id(R.id.dato).typeface(App.skrift_gibson).getTextView();
         vh.varighed = a.id(R.id.varighed).typeface(App.skrift_gibson).getTextView();
         vh.stiplet_linje = a.id(R.id.stiplet_linje).getView();
-        vh.hør = a.id(R.id.hør).tag(vh).clicked(Senest_lyttede_frag.this).typeface(App.skrift_gibson).getView();
+        a.id(R.id.hør).tag(vh).clicked(Senest_lyttede_frag.this).typeface(App.skrift_gibson).getView();
         v.setTag(vh);
 
       } else {
@@ -169,7 +166,6 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
         .addToBackStack(null)
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         .commit();
-    Sidevisning.vist(Udsendelse_frag.class, k.slug);
   }
 }
 

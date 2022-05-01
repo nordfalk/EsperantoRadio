@@ -20,7 +20,6 @@ import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
-import dk.dr.radio.v3.BuildConfig;
 
 import static org.junit.Assert.assertTrue;
 
@@ -28,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  * Created by j on 30-10-17.
  */
 
-@Config(packageName = "dk.dr.radio.v3", sdk = 21, application = AfproevMuOnlineRadioBackend.TestApp.class)
+@Config(packageName = "dk.dr.radio.v3", sdk = 21, application = BasisAfprøvning.TestApp.class)
 public class BasisAfprøvning {
 
   static {
@@ -49,7 +48,6 @@ public class BasisAfprøvning {
       net.danlew.android.joda.JodaTimeAndroid.init(this);
       App.instans = new App();
       App.res = getResources();
-      App.assets = getAssets();
       App.forgrundstråd = new Handler();
       App.pakkenavn = getPackageName();
       App.data = new Programdata();
@@ -76,8 +74,8 @@ public class BasisAfprøvning {
     for (Kanal kanal : backend.kanaler) {
       if (kanal.kode.equals("P4F")) continue;
       System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams);
-      backend.hentKanalStreams(kanal, null, NetsvarBehander.TOM);
-      assertTrue("Mangler streams for " + kanal , kanal.findBedsteStreams(false).size() > 0);
+      backend.hentKanalStreams(NetsvarBehander.TOM);
+      assertTrue("Mangler streams for " + kanal , kanal.findBedsteStreams(false) != null);
     }
   }
 
@@ -85,18 +83,14 @@ public class BasisAfprøvning {
     Date dato = new Date(System.currentTimeMillis()-1000*60*60*12);
     String datoStr = Datoformater.apiDatoFormat.format(dato);
     for (Kanal kanal : backend.kanaler) {
-      if (kanal.kode.equals("P4F")) continue;
-      if ("DRN".equals(kanal.kode)) continue; // ikke DR Nyheder
-      if ("RAM".equals(kanal.kode)) continue; // ikke Ramasjang
-
-      backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, NetsvarBehander.TOM);
+      backend.hentUdsendelserPåKanal(kanal, datoStr, NetsvarBehander.TOM);
 
       int antalUdsendelser = 0;
 
       for (Udsendelse u : kanal.udsendelser) {
-        kanal.getBackend().hentUdsendelseStreams(u, NetsvarBehander.TOM);
+        kanal.getBackend().hentUdsendelseStreams(NetsvarBehander.TOM);
         Programserie ps = App.data.programserieFraSlug.get(u.programserieSlug);
-        backend.hentProgramserie(ps, u.programserieSlug, kanal, 0, NetsvarBehander.TOM);
+        backend.hentProgramserie(NetsvarBehander.TOM);
         if (antalUdsendelser++>20) break;
       }
 
@@ -115,7 +109,7 @@ public class BasisAfprøvning {
 
     // Tjek kun nummer 50 til nummer 100
     for (Programserie ps : liste.subList(50, 65)) {
-      backend.hentProgramserie(ps, ps.slug, null, 0, NetsvarBehander.TOM);
+      backend.hentProgramserie(NetsvarBehander.TOM);
       ArrayList<Udsendelse> udsendelser = ps.getUdsendelser();
 
       System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());

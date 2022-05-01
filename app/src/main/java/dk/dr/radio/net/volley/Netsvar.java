@@ -22,7 +22,7 @@ public class Netsvar {
   /** Svaret (som tekst) */
   public String json;
   public boolean fejl;
-  public Exception exception;
+
   /** Om dette svar helt sikkert efterfølges af et endeligt svar */
   //public boolean foreløbigtSvar;
 

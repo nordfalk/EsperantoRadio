@@ -11,7 +11,6 @@ import java.util.Map;
 
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoKanal;
 
 /**
  * Bedaŭrinde la rektaj elsendoj de Muzaiko estas nur haveblaj en certaj landoj.
@@ -24,7 +23,7 @@ public class EoGeoblokaDetektilo {
   private static final HashMap<String,String> blokitajAlMalblokitajUrl = new HashMap<>();
 
   public static boolean estasBlokataKajNeEblasMalbloki(Udsendelse udsendelse) {
-    final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
+    final Lydstream stream = udsendelse.findBedsteStreams(false);
     if (!esploritajUrl.contains(stream.url)) {
       Log.d(udsendelse + " kun "+stream.url + " ne estis esplorita");
       return false;
@@ -46,10 +45,10 @@ public class EoGeoblokaDetektilo {
     return false;
   }
 
-  public static void esploruĈuEstasBlokata(EoKanal kanal, final Udsendelse udsendelse, final String alternativaUrl) {
+  public static void esploruĈuEstasBlokata(final Udsendelse udsendelse, final String alternativaUrl) {
 
     try {
-      final Lydstream stream = udsendelse.findBedsteStreams(false).get(0);
+      final Lydstream stream = udsendelse.findBedsteStreams(false);
       if (!esploritajUrl.contains(stream.url)) {
         esploritajUrl.add(stream.url);
         new AsyncTask() {

@@ -147,17 +147,7 @@ public class Log {
   }
 
 
-  public static void fejlantagelse(String fejl) {
-    IllegalStateException e = new IllegalStateException(fejl);
-    if (!App.PRODUKTION) throw e;
-    else Log.rapporterFejl(e);
-  }
-
   //private static LinkedHashMap<String, String> afprøvedeTing = new LinkedHashMap<String, String>();
-
-  public static final void registrérTestet(String hvad, String res) {
-    return; //afprøvedeTing.put(hvad, res);
-  }
 
   public static String lavKontaktinfo() {
     String ret = "";
@@ -191,8 +181,6 @@ public class Log {
       ret += "\nVersion: "+App.versionsnavn +
           "\nTelefonmodel: " + Build.MODEL + " " + Build.PRODUCT +
           "\nAndroid v" + Build.VERSION.RELEASE + " (sdk: " + Build.VERSION.SDK_INT + ")";
-      ret += "\nFunktioner brugt: "+ Sidevisning.getViste();
-  //    ret += "\nFunktioner ej brugt: "+ Sidevisning.getIkkeViste();
       ret += "\nIndstillinger: "+ App.prefs.getAll();
       ret += "\nAfspiller: "+ App.afspiller.toString();
       ret += "\nUdgange: "+ udgange;

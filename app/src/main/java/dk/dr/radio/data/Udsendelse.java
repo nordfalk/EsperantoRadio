@@ -25,8 +25,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public Date startTid;
   public String startTidKl;
   public Date slutTid;
-  public String slutTidKl;
-  public String dagsbeskrivelse;
 
   public transient ArrayList<Playlisteelement> playliste;
   /** 'Chapters' i API'et, undgå undersættelsen 'kapitler' */
@@ -40,26 +38,10 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   /** Om der er mulighed for at hente udsendelsen ned til offline brug. Opdateret efter at streams er hentet. */
   public boolean kanHentes;
   public String shareLink;
-  //public transient int startposition;// hvis der allerede er lyttet til denne senestLyttet så notér det her så afspilning kan fortsætte herfra
-  public int episodeIProgramserie;
-
-  /** Berigtigelser er noget som sjældent sker, men vi er forpligtiget til at vise en information til brugeren, hvis vi har måtte tage en program af, eller ændre et program.
-   * Bemærk: Normalk null */
-  public String berigtigelseTitel;
-  /** Normalt null */
-  public String berigtigelseTekst;
 
   //// EO
   public ArrayList<String> sonoUrl = new ArrayList<String>();
   public String rektaElsendaPriskriboUrl;
-  //// EO
-  public String ny_streamDataUrl;
-
-  //TV
-  public String sæsonSlug;
-  public String sæsonUrn;
-  public String sæsonTitel;
-  public long varighedMs;
 
   public Udsendelse(String s) {
     titel = s;
@@ -115,9 +97,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
 
   @Override
   public int compareTo(Udsendelse u2) {
-    int e = episodeIProgramserie;
-    int e2 = u2.episodeIProgramserie;
-    if (e != e2) return e2 < e ? -1 : 1;
     if (slug == null) return u2.slug == null ? 0 : 1;
     return slug.compareTo(u2.slug);
   }
@@ -160,8 +139,8 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
       if (kanHøres && !kanHøresNy)
         Log.d("API løj om kanHøres for " + o.optString("Slug")+": "+kanHøres +"->" +kanHøresNy);
     }*/
-    kanHøres = findBedsteStreams(false).size() > 0;
-    kanHentes = findBedsteStreams(true).size() > 0;
+    kanHøres = findBedsteStreams(false) != null;
+    kanHentes = findBedsteStreams(true) != null;
   }
 
   public Udsendelse kopi() {

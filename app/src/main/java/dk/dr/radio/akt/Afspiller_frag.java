@@ -37,7 +37,6 @@ import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 
 public class Afspiller_frag extends Basisfragment implements Runnable, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -83,23 +82,10 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         if (!seekBarBetjenesAktivt) { // Kun hvis vi ikke er i gang med at søge i udsendelsen
 
           if (afspiller.getLydkilde().erDirekte()) {
-            if (u!=null && u.startTid!=null && u.slutTid!=null) {
-              seekBar.setVisibility(View.VISIBLE);
-              seekBar.setEnabled(false);
-              starttid.setVisibility(View.VISIBLE);
-              slutttid.setVisibility(View.VISIBLE);
-              int længdeMs = (int) (u.slutTid.getTime() - u.startTid.getTime());
-              seekBar.setMax(længdeMs);
-              starttid.setText(u.startTidKl);
-              slutttid.setText(u.slutTidKl);
-              seekBar.setProgress((int) (App.serverCurrentTimeMillis() - u.startTid.getTime()));
-            } else {
-              seekBar.setVisibility(View.VISIBLE);
-              seekBar.setEnabled(false);
-              starttid.setVisibility(View.VISIBLE);
-              slutttid.setVisibility(View.VISIBLE);
-            }
-
+            seekBar.setVisibility(View.VISIBLE);
+            seekBar.setEnabled(false);
+            starttid.setVisibility(View.VISIBLE);
+            slutttid.setVisibility(View.VISIBLE);
           } else {
             seekBar.setVisibility(View.VISIBLE);
             seekBar.setEnabled(true);
@@ -231,9 +217,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
       return;
     }
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (kanal.kanallogo_resid != 0) {
-      kanallogo.setImageResource(kanal.kanallogo_resid);
-    } else if (kanal.kanallogo_eo !=null) {
+    if (kanal.kanallogo_eo !=null) {
         kanallogo.setImageBitmap(kanal.kanallogo_eo);
     } else {
       kanallogo.setImageResource(R.drawable.appikon);
@@ -374,7 +358,6 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
 
   public void udvidSkjulOmråde() {
     if (!viserUdvidetOmråde()) {
-      Sidevisning.vist(Afspiller_frag.class);
       indhold_overskygge.setOnTouchListener(indhold_overskygge_onTouchListener);
       int forrigeNæsteSynlighed = App.afspiller.getLydkilde().erDirekte() ? View.GONE : View.VISIBLE;
       aq.id(R.id.forrige).visibility(forrigeNæsteSynlighed).id(R.id.næste).visibility(forrigeNæsteSynlighed);
@@ -453,7 +436,6 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         fm.beginTransaction()
             .replace(R.id.indhold_frag, new Kanaler_frag())
             .commit();
-        Sidevisning.vist(Kanaler_frag.class);
       } else {
         Udsendelse udsendelse = lydkilde.getUdsendelse();
 
@@ -465,7 +447,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
             .addToBackStack(null)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
-        Sidevisning.vist(f.getClass(), udsendelse.slug);
+        f.getClass();
       }
     } catch (Exception e) {
       Log.rapporterFejl(e);

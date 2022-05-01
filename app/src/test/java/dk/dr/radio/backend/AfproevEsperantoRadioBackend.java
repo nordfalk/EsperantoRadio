@@ -38,7 +38,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
     assertTrue(App.grunddata.kanaler.size()>0);
     System.out.println( "kode \tnavn \tslug \tstreams");
     for (Kanal kanal : App.grunddata.kanaler) {
-      System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams+ " \t" + kanal.getUdsendelse());
+      System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams+ " \t" + kanal.getUdsendelse()+ " \t" + kanal.udsendelser.size());
       //assertTrue("Mangler streams for " + kanal , kanal.getUdsendelse().findBedsteStreams(false).size() > 0);
     }
   }

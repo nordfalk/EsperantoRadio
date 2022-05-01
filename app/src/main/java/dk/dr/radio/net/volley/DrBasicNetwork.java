@@ -218,11 +218,6 @@ public class DrBasicNetwork implements Network {
     }
   }
 
-  protected void logError(String what, String url, long start) {
-    long now = SystemClock.elapsedRealtime();
-    VolleyLog.v("HTTP ERROR(%s) %d ms to fetch %s", what, (now - start), url);
-  }
-
   /**
    * Reads the contents of HttpEntity into a byte[].
    */

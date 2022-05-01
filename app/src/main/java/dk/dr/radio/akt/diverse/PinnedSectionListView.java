@@ -116,7 +116,7 @@ public class PinnedSectionListView extends ListView {
         if (sectionView.getTop() == getPaddingTop()) { // view sticks to the top, no need for pinned shadow
           destroyPinnedShadow();
         } else { // section doesn't stick to the top, make sure we have a pinned shadow
-          ensureShadowForFirstItem(firstVisibleItem, firstVisibleItem, visibleItemCount);
+          ensureShadowForFirstItem(firstVisibleItem);
         }
 
       } else { // section is not at the first visible position
@@ -252,7 +252,7 @@ public class PinnedSectionListView extends ListView {
   /**
    * Makes sure we have a pinned header for the first position.
    */
-  void ensureShadowForFirstItem(int sectionPosition, int firstVisibleItem, int visibleItemCount) {
+  void ensureShadowForFirstItem(int sectionPosition) {
     // if the first item is a section, only recreate if getTop() < 0
 
     View sectionView = getChildAt(0);

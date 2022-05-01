@@ -37,8 +37,6 @@ import android.os.Vibrator;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import com.android.volley.Request;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +52,6 @@ import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
@@ -171,9 +168,9 @@ public class Afspiller {
         }
       };
       if (lydkilde instanceof Kanal) {
-        lydkilde.getBackend().hentKanalStreams((Kanal) lydkilde, Request.Priority.IMMEDIATE, netsvarBehander);
+        lydkilde.getBackend().hentKanalStreams(netsvarBehander);
       } else if (lydkilde instanceof Udsendelse) {
-        lydkilde.getBackend().hentUdsendelseStreams((Udsendelse) lydkilde, netsvarBehander);
+        lydkilde.getBackend().hentUdsendelseStreams(netsvarBehander);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
@@ -240,7 +237,6 @@ public class Afspiller {
       // Skru op til 1/5 styrke hvis volumen er lavere end det
       tjekVolumenMindst5tedele(1);
 
-      Sidevisning.i().vist("afspilning_start", lydkilde.slug);
     } else Log.d(" forkert status=" + afspillerstatus);
 
     // Hvis det er en favorit så opdater favoritter så der ikke mere optræder nye udsendelser i denne programserie
@@ -346,14 +342,14 @@ public class Afspiller {
         setDataSourceTid = System.currentTimeMillis();
         setDataSourceLyd = false;
         try {
-          List<Lydstream> bs = lydkilde.findBedsteStreams(false);
+          Lydstream bs = lydkilde.findBedsteStreams(false);
 
-          if (bs.size() == 0) {
+          if (bs == null) {
             Log.rapporterFejl(new IllegalStateException("Ingen passende lydUrl for " + lydkilde));
             App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
             return;
           }
-          lydstream = bs.get(0);
+          lydstream = bs;
           App.data.senestLyttede.registrérLytning(lydkilde);
           Log.d("mediaPlayer.setDataSource( " + lydstream);
 
@@ -443,7 +439,6 @@ public class Afspiller {
 
   synchronized public void stopAfspilning() {
     Log.d("Afspiller stopAfspilning");
-    Sidevisning.vist("afspilning_stop");
     gemPosition();
     pauseAfspilningIntern();
     if (wifilock != null) wifilock.release();
@@ -492,7 +487,7 @@ public class Afspiller {
     int[] appWidgetId = mAppWidgetManager.getAppWidgetIds(new ComponentName(ApplicationSingleton.instans, AfspillerIkonOgNotifikation.class));
 
     for (int id : appWidgetId) {
-      AfspillerIkonOgNotifikation.opdaterUdseende(ApplicationSingleton.instans, mAppWidgetManager, id);
+      AfspillerIkonOgNotifikation.opdaterUdseende(mAppWidgetManager, id);
     }
 
     // Notificér alle i observatørlisen - fra en kopi, sådan at de kan fjerne

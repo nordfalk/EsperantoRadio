@@ -40,8 +40,6 @@ public class AfspillerStartStopReciever extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     Log.d("AfspillerReciever onReceive(" + intent + ") afspillerstatus =" + App.afspiller.afspillerstatus);
     try {
-      Log.registrérTestet("10. Start/stop af afspilning via notifikation", "ja");
-
       if (LUK.equals(intent.getAction())) {
         App.afspiller.stopAfspilning(); // Stopper servicen og lukker notifikationen
         return;

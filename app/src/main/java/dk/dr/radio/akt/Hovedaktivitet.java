@@ -3,14 +3,9 @@ package dk.dr.radio.akt;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.drawerlayout.widget.DrawerLayout;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
@@ -19,14 +14,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.diverse.Udseende;
-import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 
 public class Hovedaktivitet extends Basisaktivitet implements Runnable {
@@ -41,10 +37,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    //com.ensighten.Ensighten.bootstrap(this, "drdk-ensighten", "dr_radio_android", true);
     super.onCreate(savedInstanceState);
-
-
 
     if (App.prefs.getBoolean("tving_lodret_visning", true)) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -93,7 +86,6 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
                 .replace(R.id.indhold_frag, f)
                 .addToBackStack("Udsendelse")
                 .commit();
-            Sidevisning.vist(Udsendelse_frag.class, udsendelse.slug);
             return;
           }
         }
@@ -222,7 +214,6 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
         // Tilbageknappen skal gå til forsiden - undtagen hvis vi ER på forsiden
         ft.addToBackStack("Venstremenu");
         ft.commit();
-        Sidevisning.vist(Soeg_efter_program_frag.class);
         return true;
       }
     } catch (Exception e) { Log.rapporterFejl(e); } // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4020628139

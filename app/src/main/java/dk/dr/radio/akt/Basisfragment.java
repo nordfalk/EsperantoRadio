@@ -16,10 +16,8 @@ import java.net.URLEncoder;
 
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.backend.EsperantoRadioBackend;
 
 /**
@@ -94,8 +92,6 @@ public class Basisfragment extends Fragment {
     super.onActivityCreated(savedInstanceState);
   }
 
-  public static final int LINKFARVE = 0xff00458f;
-
   /*
 SKALERINGSFORHOLD
 Skalering af billeder - 16/9/3
@@ -121,126 +117,9 @@ Forhold 1:1 for playlistebilleder - og de skal være 1/3-del i højden af de sto
     billedeHø = billedeBr * højde9 / bredde16;
   }
 
-
-  /**
-   * Finder bredden som et et velskaleret billede forventes at have
-   * @param rod         listen eller rod-viewet hvor billedet skal vises
-   * @param paddingView containeren der har polstring/padding
-   */
-  /*
-  protected int bestemBilledebredde(View rod, View paddingView, int procent) {
-    //if (!App.PRODUKTION && rod.getWidth() != billedeBr) throw new IllegalStateException(rod.getWidth()+" != "+ billedeBr);
-    //int br = rod.getWidth() * procent / 100;
-    //if (rod.getHeight() < 2 * br / 3) br = br / 2; // Halvbreddebilleder ved liggende visning
-    int br = billedeBr;
-    br = br - paddingView.getPaddingRight() - paddingView.getPaddingLeft();
-    //Log.d("QQQQQ listView.getWidth()=" + rod.getWidth() + " getHeight()=" + rod.getHeight());
-    //Log.d("QQQQQ billedeContainer.getPaddingRight()=" + paddingView.getPaddingRight() + "   .... så br=" + br);
-    return br;
-  }*/
-
-/* Doku fra Nicolai
-Alle billeder der ligger på dr.dk skal igennem "asset.dr.dk/imagescaler<http://asset.dr.dk/imagescaler>".
-
-Artist billeder fra playlister i APIet skal igennem asset.dr.dk/discoImages,
-da den bruger en whitelisted IP hos LastFM og discogs (de har normalt max requests).
-
-Det er begge simple services, og du har ikke brug for andre parametre end dem der kan ses
-her (w = width, h = height -- scaleAfter skal du ikke pille ved):
-
-http://asset.dr.dk/imagescaler/?file=%2Fmu%2Fbar%2F52f8d952a11f9d0c90f8b3e3&w=300&h=169&scaleAfter=crop&server=www.dr.dk
-( bliver til
-http://asset.dr.dk/imagescaler/?file=/mu/programcard/imageuri/radioavis-24907&w=300&h=169&scaleAfter=crop  )
-
-http://asset.dr.dk/discoImages/?discoserver=api.discogs.com&file=%2fimage%2fA-885103-1222266056.jpeg&h=400&w=400&scaleafter=crop&quality=85
-
-Jeg bruger selv følgende macro'er i C til generering af URIs:
-
-#define DRIMAGE(path, width, height) \
-            FORMAT( \
-                @"http://asset.dr.dk/drdkimagescale/?server=www.dr.dk&amp;w=%0.f&amp;h=%0.f&amp;file=%@&amp;scaleAfter=crop", \
-                width * ScreenScale, \
-                height * ScreenScale, \
-                URLENCODE(path) \
-            )
-
-#define DISCOIMAGE(host, path, width, height) \
-            FORMAT( \
-                @"http://asset.dr.dk/discoImages/?discoserver=%@&amp;w=%0.f&amp;h=%0.f&amp;file=%@&amp;scaleAfter=crop&amp;quality=85", \
-                host \
-                width * ScreenScale, \
-                height * ScreenScale, \
-                URLENCODE(path) \
-            )
- */
-
-  /**
-   * Billedeskalering af billeder på DRs servere.
-   */
-  public static String skalérDrDkBilledeUrl(String url, int bredde, int højde) {
-    if (url == null || url.length() == 0 || "null".equals(url)) return null;
-    try {
-      URL u = new URL(url);
-      String skaleretUrl = "https://asset.dr.dk/drdkimagescale/?server=www.dr.dk&amp;w=" + bredde + "&amp;h=" + højde +
-          "&amp;file=" + URLEncoder.encode(u.getPath(), "UTF-8") + "&amp;scaleAfter=crop";
-
-      Log.d("skalérDrDkBilledeUrl url1 = " + url);
-      Log.d("skalérDrDkBilledeUrl url2 = " + u);
-      Log.d("skalérDrDkBilledeUrl url3 = " + skaleretUrl);
-      return skaleretUrl;
-    } catch (Exception e) {
-      Log.e("url=" + url, e);
-      return null;
-    }
-  }
-
-
-  /**
-   * Billedeskalering af billeder ud fra en slug
-   */
-  private static String skalérBilledeFraSlug(String slug, int bredde, int højde) {
-    String res = "https://asset.dr.dk/imagescaler/?file=/mu/programcard/imageuri/" + slug + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
-    if (App.fejlsøgning) Log.d("skalérBilledeFraSlug " + slug + " " + bredde + "x" + højde + " giver: " + res);
-    return res;
-  }
-
-  /**
-   * Billedeskalering af billeder på DRs servere, ud fra en URL.
-   * F.eks. http://asset.dr.dk/imagescaler/?file=http://www.dr.dk/mu/bar/544e40f7a11f9d16c4c96db7&w=620&h=349
-   */
-  public static String skalérBilledeFraUrl(String url, int bredde, int højde) {
-    if (Udseende.ESPERANTO) return url;
-    String res = "https://asset.dr.dk/imagescaler/?file=" + url + "&w=" + bredde + "&h=" + højde + "&scaleAfter=crop";
-    if (App.fejlsøgning) Log.d("skalérBilledeFraUrl " + url + " " + bredde + "x" + højde + " giver: " + res);
-    return res;
-  }
-
-  public static String skalérBillede(Udsendelse u, int bredde, int højde) {
-    if (u.getBackend() instanceof EsperantoRadioBackend) {
-      if (u.billedeUrl != null) return u.billedeUrl;
-      return u.getKanal().kanallogo_url;
-    }
-//    u.billedeUrl = null;
-    return u.billedeUrl==null
-        ? skalérBilledeFraSlug(u.slug, bredde, højde)
-        : skalérBilledeFraUrl(u.billedeUrl, bredde, højde);
-  }
-
-  public static String skalérBillede(Programserie u, int bredde, int højde) {
-//    u.billedeUrl = null;
-    return u.billedeUrl==null
-        ? skalérBilledeFraSlug(u.slug, bredde, højde)
-        : skalérBilledeFraUrl(u.billedeUrl, bredde, højde);
-  }
-
-
   public static String skalérBillede(Udsendelse u) {
-    return skalérBillede(u, billedeBr, billedeHø);
-  }
-
-
-  public static String skalérBillede(Programserie u) {
-    return skalérBillede(u, billedeBr, billedeHø);
+    if (u.billedeUrl != null) return u.billedeUrl;
+    return u.getKanal().kanallogo_url;
   }
 
 
@@ -261,25 +140,6 @@ Jeg bruger selv følgende macro'er i C til generering af URIs:
 
       //Log.d("skalérDiscoBilledeUrl url2 = " + u);
       //Log.d("skalérDiscoBilledeUrl url3 = " + skaleretUrl);
-      return skaleretUrl;
-    } catch (Exception e) {
-      Log.e("url=" + url, e);
-      return null;
-    }
-  }
-
-  /**
-   * Skalering af andre billeder. Denne her virker til begge ovenstående, samt til skalering af andre biller, så den gemmer vi, selvom den ikke bliver brugt p.t.
-   */
-  public static String skalérAndenBilledeUrl(String url, int bredde, int højde) {
-    if (url == null || url.length() == 0 || "null".equals(url)) return null;
-    try {
-      URL u = new URL(url);
-      String skaleretUrl = "http://dr.dk/drdkimagescale/imagescale.drxml?server=" + u.getAuthority() + "&file=" + u.getPath() + "&w=" + bredde + "&h=" + højde + "&scaleafter=crop";
-
-      Log.d("skalérAndenBilledeUrl url1 = " + url);
-      Log.d("skalérAndenBilledeUrl url2 = " + u);
-      Log.d("skalérAndenBilledeUrl url3 = " + skaleretUrl);
       return skaleretUrl;
     } catch (Exception e) {
       Log.e("url=" + url, e);

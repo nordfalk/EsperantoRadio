@@ -26,7 +26,6 @@ import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -92,7 +91,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           liste.add(new Pair(b, programserie));
           adapter.notifyDataSetChanged();
         } else {
-          b.hentProgramserie(null, programserieSlug, null, 0, new NetsvarBehander() {
+          b.hentProgramserie(new NetsvarBehander() {
             @Override
             public void fikSvar(Netsvar s) {
               if (s.uændret || s.fejl) return;
@@ -192,7 +191,6 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
-      Sidevisning.vist(Programserie_frag.class, programserie.slug);
 
     } else {
       Udsendelse udsendelse = (Udsendelse) obj;
@@ -202,7 +200,6 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
-      Sidevisning.vist(Udsendelse_frag.class, udsendelse.slug);
 
     }
 

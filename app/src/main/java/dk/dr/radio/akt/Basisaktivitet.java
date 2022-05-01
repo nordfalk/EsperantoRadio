@@ -24,9 +24,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
 public class Basisaktivitet extends AppCompatActivity {
-  protected final AQuery aq = new AQuery(this);
   private ProgressBar progressBar;
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +67,6 @@ public class Basisaktivitet extends AppCompatActivity {
       menu.add(0, 13643, 0, "Vis servertid");
     }
     return super.onCreateOptionsMenu(menu);
-  }
-
-  public static Bundle putString(Bundle args, String key, String value) {
-    args = new Bundle(args);
-    args.putString(key, value);
-    return args;
   }
 
   @SuppressWarnings("deprecation")

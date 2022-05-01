@@ -86,7 +86,7 @@
 			"nomo": "Pola Retradio",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
 			"emblemoUrl": "https://esperanto-radio.com/_polaretradio.png",
-			"elsendojRssUrl": "http://pola-retradio.org/feed/",
+			"elsendojRssUrl": "https://pola-retradio.org/feed/",
 			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
 			"elsendojRssIgnoruTitolon": true,
 			"retpoŝto": "retradio.esperanto@gmail.com",
@@ -256,7 +256,7 @@
 			"emblemoUrl": "",
 			// Ne havebla: 			"elsendojRssUrl": "",
 			"retpoŝto": "verdastacio@gmail.com",
-			"hejmpaĝoEkrane": "http://m.verdastacio.eu/eo/",
+			// "hejmpaĝoEkrane": "http://m.verdastacio.eu/eo/",
 			"hejmpaĝoButono": "http://www.verdastacio.net"
 		}
 	,{

@@ -22,7 +22,6 @@ public class Programserie { //implements Serializable {
   public String billedeUrl; // Bemærk - kan være tom
   public String slug; // https://en.wikipedia.org/wiki/Slug_(publishing)
   public int antalUdsendelser;
-  public String urn; // https://en.wikipedia.org/wiki/Uniform_Resource_Name
   private ArrayList<Udsendelse> udsendelserListe;
   private TreeMap<Integer, List<Udsendelse>> udsendelserListeFraOffset = new TreeMap<Integer, List<Udsendelse>>();
   private TreeSet<Udsendelse> udsendelserSorteret;

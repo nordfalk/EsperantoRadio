@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
@@ -33,12 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.akt.diverse.GenstartProgrammet;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmClock_akt;
 import dk.dr.radio.vaekning.Alarms;
@@ -270,10 +266,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
     return super.onOptionsItemSelected(item);
   }
 
-  private ActionBar getActionBar() {
-    return ((AppCompatActivity) getActivity()).getSupportActionBar();
-  }
-
   public void visMenu() {
     drawerLayout.openDrawer(fragmentContainerView);
     listView.requestFocus();
@@ -348,12 +340,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       }
     }
 
-
-    private View aq(int layout) {
-      View v = layoutInflater.inflate(layout, null);
-      aq = new AQuery(v);
-      return v;
-    }
 
     private final LayoutInflater layoutInflater;
     private AQuery aq;
@@ -452,43 +438,16 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         @Override
         public void run() {
           startActivity(new Intent(getActivity(), Indstillinger_akt.class));
-          Sidevisning.vist(Indstillinger_akt.class);
         }
       });
       aq.id(R.id.tekst).text(R.string.Indstillinger).typeface(App.skrift_gibson_fed);
 
-      if (!Udseende.ESPERANTO) {
+      if (false) {
         tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
         aq.id(R.id.tekst).text("Vælg P4-område").typeface(App.skrift_gibson_fed);
       } else {
         tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
         aq.id(R.id.tekst).text("Elektu kanalon").typeface(App.skrift_gibson_fed);
-      }
-
-      if (!App.PRODUKTION) {
-        tilføj(R.layout.venstremenu_elem_adskiller_tynd);
-
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            App.prefs.edit().putBoolean("ESPERANTO", !Udseende.ESPERANTO).commit();
-            startActivity(new Intent(getActivity(), GenstartProgrammet.class));
-          }
-        });
-        aq.id(R.id.tekst).text("Skift til "+(Udseende.ESPERANTO?"dansk/fælles":"esperanto")).typeface(App.skrift_gibson_fed);
-
-        /*
-        tilføj(R.layout.venstremenu_elem_adskiller_tynd);
-        tilføj(R.layout.venstremenu_elem_overskrift, new Runnable() {
-          @Override
-          public void run() {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.AppOpdatering_APK_URL))));
-          }
-        });
-        if (!Udseende.ESPERANTO) aq.id(R.id.tekst).text("Hent nyeste udvikler-version.\nNuværende version:\n" + App.versionsnavn);
-        else aq.id(R.id.tekst).text("Elŝuti plej novan provversion.\n\nNuna versio:\n" + App.versionsnavn);
-        aq.typeface(App.skrift_gibson).textSize(12);
-         */
       }
     }
 
@@ -514,7 +473,7 @@ public class Venstremenu_frag extends Fragment implements Runnable {
         ft.replace(R.id.indhold_frag, f);
         ft.addToBackStack("Venstremenu");
         ft.commit();
-        Sidevisning.vist(f.getClass());
+        f.getClass();
       } catch (Exception e1) {
         Log.rapporterFejl(e1);
       }

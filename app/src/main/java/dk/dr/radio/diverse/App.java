@@ -99,8 +99,6 @@ public class App {
 
   /** Sæt sprogvalg til dansk eller esperanto alt efter hvilken version der køres med */
   public static Configuration sprogKonfig;
-  /** Bruges på nye funktioner - for at tjekke om de altid er opfyldt i felten. Fjernes ved næste udgivelser */
-  public static final boolean TJEK_ANTAGELSER = !PRODUKTION;
   public static String versionsnavn = "(ukendt)";
   public static String pakkenavn;
 
@@ -112,7 +110,6 @@ public class App {
   private static SharedPreferences grunddata_prefs;
 
   public static final String P4_FORETRUKKEN_AF_BRUGER = "P4_FORETRUKKEN_AF_BRUGER";
-  private static final String DRAMA_OG_BOG__A_Å_INDLÆST = "DRAMA_OG_BOG__A_Å_INDLÆST";
   public static final String FORETRUKKEN_KANAL = "FORETRUKKEN_kanal";
   private static final String NØGLE_advaretOmInstalleretPåSDKort = "erInstalleretPåSDKort";
   public static SharedPreferences prefs;
@@ -132,7 +129,6 @@ public class App {
   public static EgenTypefaceSpan skrift_gibson_fed_span;
   public static DRFarver color;
   public static Resources res;
-  public static AssetManager assets;
   /** Tidsstempel der kan bruges til at afgøre hvilke filer der faktisk er brugt efter denne opstart */
   private static long TIDSSTEMPEL_VED_OPSTART;
 
@@ -147,16 +143,11 @@ public class App {
     notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
     audioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
     res = ctx.getResources();
-    assets = ctx.getAssets();
     pakkenavn = ctx.getPackageName();
 
     backend = new Backend[] { new EsperantoRadioBackend() };
 
     sprogKonfig = new Configuration();
-    sprogKonfig.locale = new Locale(!Udseende.ESPERANTO ? "da_DK" : "eo");
-    Locale.setDefault(sprogKonfig.locale);
-    res.updateConfiguration(App.sprogKonfig, null);
-
 
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
@@ -169,7 +160,6 @@ public class App {
     net.danlew.android.joda.JodaTimeAndroid.init(ctx);
 
     try {
-      //noinspection ConstantConditions
       PackageInfo pi = ctx.getPackageManager().getPackageInfo(pakkenavn, 0);
       App.versionsnavn = pakkenavn + "/" + pi.versionName;
       if (EMULATOR) App.versionsnavn += " EMU";
@@ -247,9 +237,6 @@ public class App {
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
-      if (!Udseende.ESPERANTO && !aktuelKanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-        aktuelKanal.getBackend().hentKanalStreams(aktuelKanal, Request.Priority.HIGH, NetsvarBehander.TOM);
-      }
       if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
         aktuelKanal = grunddata.kanaler.get(0); // Problemet er at afspiller forventer en udsendelse på kanalen
@@ -302,7 +289,7 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          kanal.getBackend().hentKanalStreams(kanal, Request.Priority.HIGH, NetsvarBehander.TOM);
+          kanal.getBackend().hentKanalStreams(NetsvarBehander.TOM);
         }
       }
 
@@ -424,7 +411,6 @@ public class App {
   }
 
   public static Activity aktivitetIForgrunden = null;
-  public static Activity senesteAktivitetIForgrunden = null;
   private static int erIGang = 0;
 
   private static LinkedHashMap<String, Integer> hvadErIGang = new LinkedHashMap<String, Integer>();
@@ -464,7 +450,7 @@ public class App {
   };
 
   public void aktivitetOnStart(Activity akt) {
-    senesteAktivitetIForgrunden = aktivitetIForgrunden = akt;
+    aktivitetIForgrunden = akt;
     sætProgressbar.run();
     if (onlineinitialisering != null) {
       if (App.erOnline()) {
@@ -491,7 +477,6 @@ public class App {
       boolean synligNu = aktivitetIForgrunden!=null;
       if (sidstSynlig == synligNu) return;
       sidstSynlig = synligNu;
-      Sidevisning.i().synlig(synligNu);
     }
   };
 

@@ -49,7 +49,6 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
     try {
       Netsvar s = new Netsvar(url, null, false, false);
       s.fejl = true;
-      s.exception = error;
       fikSvar(s);
     } catch (Exception e) {
       Log.e(url, e);

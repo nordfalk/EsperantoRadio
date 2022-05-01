@@ -34,7 +34,6 @@ import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Serialisering;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 
 /**
@@ -153,9 +152,7 @@ public class HentedeUdsendelser {
       if (file.exists()) {
         udsendelse.hentetStream = new Lydstream();
         udsendelse.hentetStream.url = hs.destinationFil;
-        udsendelse.hentetStream.score = 500; // Rigtig god!
         udsendelse.kanHøres = true;
-        Log.registrérTestet("Afspille hentet udsendelse", udsendelse.slug);
       } else {
         Log.rapporterFejl(new IllegalStateException("Fil " + file + " hentet, men fandtes ikke alligevel??!"));
       }
@@ -206,13 +203,13 @@ public class HentedeUdsendelser {
   public void hent(Udsendelse udsendelse) {
     tjekDataOprettet();
     try {
-      List<Lydstream> prioriteretListe = udsendelse.findBedsteStreams(true);
-      if (prioriteretListe == null || prioriteretListe.size() < 1) {
+      Lydstream prioriteretListe = udsendelse.findBedsteStreams(true);
+      if (prioriteretListe == null) {
         Log.rapporterFejl(new IllegalStateException("ingen streamurl"), udsendelse.slug);
         App.langToast(R.string.Beklager_udsendelsen_kunne_ikke_hentes);
         return;
       }
-      Uri uri = Uri.parse(prioriteretListe.get(0).url);
+      Uri uri = Uri.parse(prioriteretListe.url);
 
       File dir = findPlaceringAfHentedeFilerFraPrefs();
       Log.d("Hent uri=" + uri +" til "+dir);
@@ -319,7 +316,6 @@ public class HentedeUdsendelser {
           Log.d("HentedeUdsendelser DLS " + c + "  " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
           if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
             App.langToast(App.res.getString(R.string.Udsendelsen___blev_hentet, u.titel));
-            Log.registrérTestet("Hente udsendelse", u.slug);
 
             final HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(u);
             hs.startUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -361,7 +357,6 @@ public class HentedeUdsendelser {
         c.close();
         App.data.hentedeUdsendelser.gemListe();
         for (Runnable obs : new ArrayList<Runnable>(App.data.hentedeUdsendelser.observatører)) obs.run();
-        Sidevisning.vist(HentedeUdsendelser.class, u.slug);
       } catch (Exception e) {
         Log.rapporterFejl(e);
       }
@@ -386,13 +381,6 @@ public class HentedeUdsendelser {
           i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
           context.startActivity(i);
         }
-        Sidevisning.vist(HentedeUdsendelser.class);
-
-/*
-        Intent dm = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-        dm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(dm);
-        */
       }
     }
   }

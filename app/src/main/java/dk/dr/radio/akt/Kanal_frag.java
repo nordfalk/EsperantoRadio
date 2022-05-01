@@ -1,8 +1,5 @@
 package dk.dr.radio.akt;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -16,31 +13,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
 import com.androidquery.AQuery;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -162,7 +154,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   private void hentSendeplanForDag(final Date dato) {
     if (getActivity()==null) return; // fragmentet er blevet lukket
     final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    backend.hentUdsendelserPåKanal(this, kanal, dato, datoStr, new NetsvarBehander() {
+    backend.hentUdsendelserPåKanal(kanal, datoStr, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;
@@ -238,7 +230,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
     if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      backend.hentKanalStreams(kanal, Request.Priority.HIGH, new NetsvarBehander() {
+      backend.hentKanalStreams(new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar sv) throws Exception {
           if (sv.uændret) return; // ingen grund til at parse det igen
@@ -272,46 +264,14 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     //Log.d("mp pos="+mp.getCurrentPosition() + "  af "+mp.getDuration());
   }
 
-  private static final Udsendelse tidligere = new Udsendelse("Tidligere");
-  private static final Udsendelse senere = new Udsendelse("Senere");
-
   private void opdaterListe() {
     try {
       if (kanal.udsendelser.size()==0) return; // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4210518028 oma
 //      ArrayList<Udsendelse> nyuliste = kanal.udsendelser;
       if (App.fejlsøgning) Log.d(kanal + " opdaterListe " + kanal.udsendelser.size());
-      tidligere.startTid = new Date(kanal.udsendelser.get(0).startTid.getTime() - 12 * 60 * 60 * 1000); // Døgnet starter kl 5, så vi er på den sikre side med 12 timer
-      senere.startTid = new Date(kanal.udsendelser.get(kanal.udsendelser.size() - 1).startTid.getTime() + 12 * 60 * 60 * 1000); // Til tider rækker udsendelserne ikke ind i det næste døgn, så vi lægger 12 timer til
-      ArrayList<Object> nyListe = new ArrayList<Object>(kanal.udsendelser.size() + 5);
-      nyListe.add(tidligere);
-      String forrigeDagsbeskrivelse = null;
-      for (Udsendelse u : kanal.udsendelser) {
-        // Tilføj dagsoverskrifter hvis dagen er skiftet
-        if (!u.dagsbeskrivelse.equals(forrigeDagsbeskrivelse)) {
-          forrigeDagsbeskrivelse = u.dagsbeskrivelse;
-          nyListe.add(u.dagsbeskrivelse);
-          // Overskriften I DAG skal ikke 'blive hængende' øverst,
-          // det løses ved at tilføje en tom overskrift lige under den
-          if (u.dagsbeskrivelse == Datoformater.I_DAG) nyListe.add("");
-        }
-        nyListe.add(u);
-      }
-      nyListe.add(senere);
-      int nyAktuelUdsendelseIndex = nyListe.indexOf(kanal.getUdsendelse());
 
-      // Hvis listen er uændret så hop ud - forhindrer en uendelig løkke
-      // af opdateringer i tilfælde af, at sendeplanen for dags dato ikke kan hentes
-      if (nyListe.equals(liste) && nyAktuelUdsendelseIndex == aktuelUdsendelseIndex) {
-        if (App.fejlsøgning) Log.d("opdaterListe: listen er uændret: " + liste);
-        return;
-      } else {
-        if (App.fejlsøgning) Log.d("opdaterListe: ændring fra " + aktuelUdsendelseIndex + liste);
-        if (App.fejlsøgning) Log.d("opdaterListe: ændring til " + nyAktuelUdsendelseIndex + nyListe);
-      }
-
-      aktuelUdsendelseIndex = nyAktuelUdsendelseIndex;
       liste.clear();
-      liste.addAll(nyListe);
+      liste.addAll(kanal.udsendelser);
       aktuelUdsendelseViewholder = null;
       if (App.fejlsøgning) Log.d("opdaterListe " + kanal.kode + "  aktuelUdsendelseIndex=" + aktuelUdsendelseIndex);
       adapter.notifyDataSetChanged();
@@ -436,7 +396,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           vh.titel.setText(udsendelse.titel);
 
 
-          String burl = Basisfragment.skalérBillede(udsendelse);
+          String burl = skalérBillede(udsendelse);
           a.id(R.id.billede).image(burl, true, true, 0, 0, null, AQuery.FADE_IN, (float) højde9 / bredde16);
           vh.titel.setText(udsendelse.titel.toUpperCase());
 
@@ -508,7 +468,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
-    backend.hentPlayliste(u2, new NetsvarBehander() {
+    backend.hentPlayliste(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (getActivity() == null || aktuelUdsendelseViewholder == null || s.uændret || s.fejl) return;
@@ -525,7 +485,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.indhold_frag, new P4kanalvalg_frag())
           .commit();
-      Sidevisning.vist(P4kanalvalg_frag.class);
 
     } else if (v.getId() == R.id.p4_ok) {
       rod.findViewById(R.id.p4_vi_gætter_på_dialog).setVisibility(View.GONE);
@@ -536,28 +495,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       rulBlødtTilAktuelUdsendelse();
     } else {
       // hør_udvidet_klikområde eller hør
-      hør(kanal, getActivity());
-      Log.registrérTestet("Afspilning af direkte udsendelse", kanal.kode);
+      hør(kanal);
     }
   }
 
-  public static void hør(final Kanal kanal, Activity akt) {
-    if (App.prefs.getBoolean("manuelStreamvalg", false)) {
-      kanal.nulstilForetrukkenStream();
-      final List<Lydstream> lydstreamList = kanal.findBedsteStreams(false);
-      new AlertDialog.Builder(akt)
-          .setAdapter(new ArrayAdapter(akt, R.layout.skrald_vaelg_streamtype, lydstreamList), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              lydstreamList.get(which).foretrukken = true;
-              App.afspiller.setLydkilde(kanal);
-              App.afspiller.startAfspilning();
-            }
-          }).show();
-    } else {
-      App.afspiller.setLydkilde(kanal);
-      App.afspiller.startAfspilning();
-    }
+  public static void hør(final Kanal kanal) {
+    App.afspiller.setLydkilde(kanal);
+    App.afspiller.startAfspilning();
   }
 
   @Override
@@ -591,7 +535,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commitAllowingStateLoss(); // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/830038058
-      Sidevisning.vist(Udsendelse_frag.class, u.slug);
     }
   }
 }

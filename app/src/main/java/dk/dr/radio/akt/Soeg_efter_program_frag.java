@@ -34,23 +34,18 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
-import dk.dr.radio.diverse.Udseende;
 import dk.dr.radio.v3.R;
 
 
 public class Soeg_efter_program_frag extends Basisfragment implements
     OnClickListener, AdapterView.OnItemClickListener, Runnable {
 
-  private static final boolean SØG_OGSÅ_EFTER_UDSENDELSER = false;
   private ListView listView;
   private EditText søgFelt;
   private ArrayList<Object> liste = new ArrayList<Object>(); // Indeholder både udsendelser og -serier
   protected View rod;
   private ImageView søgKnap;
   private TextView tomStr;
-  private ArrayList<Udsendelse> udsendelseListe = new ArrayList<Udsendelse>();
-  private ArrayList<Programserie> programserieListe = new ArrayList<Programserie>();
   private int max = 50;
 
   private static class SoegElement {
@@ -206,7 +201,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
-      Sidevisning.vist(Programserie_frag.class, programserie.slug);
 
     } else if (obj instanceof String) {
       max = max*2;
@@ -220,7 +214,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
           .addToBackStack(null)
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
-      Sidevisning.vist(Udsendelse_frag.class, udsendelse.slug);
 
     }
 
@@ -246,7 +239,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     if (søgelistecache == null) {
       søgelistecache = new ArrayList<SoegElement>(App.data.programserieFraSlug.size());
       Log.d("DRData.programdata.programserieFraSlug?=" + App.data.programserieFraSlug);
-      if (!Udseende.ESPERANTO) for (Programserie ps : App.data.programserieFraSlug.values()) {
+      if (false) for (Programserie ps : App.data.programserieFraSlug.values()) {
         SoegElement se = new SoegElement();
         se.programserie = ps;
         se.titel = " "+ps.titel.toLowerCase() + " " + ps.undertitel.toLowerCase();

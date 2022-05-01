@@ -38,15 +38,12 @@ public class Kanal extends Lydkilde {
   public String kode; // P3
   public static final String P4kode = "P4F";
   public String navn;
-  public transient int kanallogo_resid;
   public transient Bitmap kanallogo_eo; // Bruges pt kun i EsperantoRadio
   public String kanallogo_url;
 
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
   public transient SortedMap<String, ArrayList<Udsendelse>> udsendelserPerDag = new TreeMap<String, ArrayList<Udsendelse>>();
 
-  //// EO
-  public String eo_hejmpaĝoEkrane;
   public String eo_hejmpaĝoButono;
   public String eo_retpoŝto;
   public Udsendelse eo_rektaElsendo;

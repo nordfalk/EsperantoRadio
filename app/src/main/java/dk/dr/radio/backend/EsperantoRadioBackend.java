@@ -59,11 +59,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     return ctx.getResources().openRawResource(R.raw.esperantoradio_kanaloj_v8);
   }
 
-  public String getKanalStreamsUrl(Kanal kanal) {
-    return null; // Ingen direkte streams for esperanto-kanaler
-  }
-
-
   public void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
     grunddata.json = new JSONObject(grunddataStr);
     grunddata.android_json = grunddata.json.getJSONObject("android");
@@ -82,7 +77,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       if (k.kode ==null) continue;
       k.navn = kJs.getString("nomo");
       String rektaElsendaSonoUrl = kJs.optString("rektaElsendaSonoUrl", null);
-      k.eo_hejmpaĝoEkrane = kJs.optString("hejmpaĝoEkrane", null);
       k.eo_hejmpaĝoButono = kJs.optString("hejmpaĝoButono", null);
       k.eo_retpoŝto = kJs.optString("retpoŝto", null);
       k.kanallogo_url = kJs.optString("emblemoUrl", null);
@@ -114,7 +108,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         ls.kvalitet = Lydstream.StreamKvalitet.Medium;
         */
         k.setStreams(rektaElsendo.streams);
-        EoGeoblokaDetektilo.esploruĈuEstasBlokata(k, rektaElsendo, kJs.optString("rektaElsendaSonoUrlSenGeobloko"));
+        EoGeoblokaDetektilo.esploruĈuEstasBlokata(rektaElsendo, kJs.optString("rektaElsendaSonoUrlSenGeobloko"));
         //k.udsendelser.add(el);
       }
     }
@@ -124,7 +118,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       grunddata.kanalFraKode.put(k.kode, k);
       grunddata.kanalFraSlug.put(k.slug, k);
     }
-    ŝarĝiKanalEmblemojn(grunddata, true);
+    ŝarĝiKanalEmblemojn(true);
 
     try {
       grunddata.opdaterGrunddataEfterMs = grunddata.json.getJSONObject("intervals").getInt("settings") * 1000;
@@ -142,7 +136,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       @Override
       public void run() {
         try {
-          ŝarĝiKanalEmblemojn(grunddata, false);
+          ŝarĝiKanalEmblemojn(false);
 
           final String radioTxtStr = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(radioTxtUrl, false)));
           App.forgrundstråd.post(new Runnable() {
@@ -150,7 +144,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             public void run() {
               leguRadioTxt(grunddata, radioTxtStr);
               // Povas esti ke la listo de kanaloj ŝanĝiĝis, pro tio denove kontrolu ĉu reŝarĝi bildojn
-              ŝarĝiKanalEmblemojn(grunddata, true);
+              ŝarĝiKanalEmblemojn(true);
               App.opdaterObservatører(grunddata.observatører);
             }
           });
@@ -163,7 +157,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
 
-  private boolean ŝarĝiKanalEmblemojn(Grunddata grunddata, boolean nurLokajn) {
+  private boolean ŝarĝiKanalEmblemojn(boolean nurLokajn) {
     boolean ioEstisSxargxita = false;
     for (Kanal k0 : new ArrayList<>(kanaler)) {
       EoKanal k = (EoKanal) k0;
@@ -215,17 +209,13 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     String url = e.sonoUrl.get(0);
     ArrayList<Lydstream> streams = lavSimpelLydstreamFraUrl(url);
     e.setStreams(streams);
-    assert e.kanHentes == e.kanHøres == true;
+    assert e.kanHentes == e.kanHøres;
   }
 
   @NonNull
   public static ArrayList<Lydstream> lavSimpelLydstreamFraUrl(String url) {
     Lydstream ls = new Lydstream();
     ls.url = url;
-    ls.type = Lydstream.StreamType.HTTP_Download;
-    ls.format = "mp3";
-    ls.kvalitet = Lydstream.StreamKvalitet.Høj;
-
     ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
     streams.add(ls);
     return streams;
@@ -324,7 +314,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
 
-  public void hentUdsendelserPåKanal(Object kalder, final Kanal kanalx, final Date dato, final String datoStr, final NetsvarBehander netsvarBehander) {
+  public void hentUdsendelserPåKanal(final Kanal kanalx, final String datoStr, final NetsvarBehander netsvarBehander) {
     final EoKanal kanal = (EoKanal) kanalx;
     Log.d("eo RSS por "+kanal+" ="+kanal.eo_elsendojRssUrl);
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto) && !kanal.harUdsendelserForDag(datoStr)) {
@@ -362,7 +352,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
   @Override
-  public void hentProgramserie(final Programserie programserie, final String programserieSlug, final Kanal kanal, final int offset, final NetsvarBehander netsvarBehander) {
+  public void hentProgramserie(final NetsvarBehander netsvarBehander) {
     try {
       netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
     } catch (Exception e) {

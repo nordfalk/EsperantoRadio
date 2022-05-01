@@ -19,7 +19,6 @@ import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
@@ -79,7 +78,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     udsendelser.add(startudsendelse);
     adapter.setListe(udsendelser);
     viewPager.setAdapter(adapter);
-    hentUdsendelser(0);
+    hentUdsendelser();
 
     vispager_title_strip();
     viewPager.setOnPageChangeListener(this);
@@ -127,7 +126,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
         App.forgrundstråd.post(new Runnable() {
           @Override
           public void run() {
-            hentUdsendelser(offset);
+            hentUdsendelser();
           }
         });
       }
@@ -140,8 +139,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     vispager_title_strip();
   }
 
-  private void hentUdsendelser(final int offset) {
-    startudsendelse.getBackend().hentProgramserie(programserie, startudsendelse.programserieSlug, kanal, offset, new NetsvarBehander() {
+  private void hentUdsendelser() {
+    startudsendelse.getBackend().hentProgramserie(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;
@@ -157,9 +156,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   @Override
   public void onPageSelected(int position) {
     if (programserie != null && position == udsendelser.size() - 1 && antalHentedeSendeplaner++ < 7) { // Hent flere udsendelser
-      hentUdsendelser(programserie.getUdsendelser() == null ? 0 : programserie.getUdsendelser().size());
+      hentUdsendelser();
     }
-    Sidevisning.vist(Udsendelse_frag.class, udsendelser.get(position).slug);
   }
 
   @Override

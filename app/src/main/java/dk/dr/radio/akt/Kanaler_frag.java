@@ -16,7 +16,6 @@ import dk.dr.radio.akt.diverse.PagerSlidingTabStrip;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.diverse.Sidevisning;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.Backend;
 
@@ -90,7 +89,6 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
       int kanalindex = kanaler.indexOf(App.afspiller.getLydkilde().getKanal());
       if (kanalindex == -1) kanalindex = 3; // Hvis vi ikke rammer nogen af de overordnede kanaler, så er det P4
       viewPager.setCurrentItem(kanalindex);
-      Sidevisning.vist(Kanal_frag.class, kanaler.get(kanalindex).slug);
     } catch (Exception e) { Log.rapporterFejl(e); }
     kanalfaneblade = rod.findViewById(R.id.tabs);
     kanalfaneblade.setTextSize(getResources().getDimensionPixelSize(R.dimen.metainfo_skrifstørrelse));
@@ -130,7 +128,6 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     Log.d("onPageSelected( " + position);
     // Husk foretrukken getKanal
     App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanaler.get(position).kode).commit();
-    Sidevisning.vist(Kanal_frag.class, kanaler.get(position).slug);
   }
 
   @Override
@@ -189,14 +186,14 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
 
     @Override
     public int getPageIconResId(int position) {
-      return kanaler2.get(position).kanallogo_resid;
+      return 0;
     }
 
     @Override
     public String getPageIconUrl(int position) {
       Kanal k = kanaler2.get(position);
 
-      return k.getBackend().getSkaleretBilledeUrl(k.kanallogo_url, bredde16*10, højde9*10);
+      return k.getBackend().getSkaleretBilledeUrl(k.kanallogo_url);
     }
 
     @Override

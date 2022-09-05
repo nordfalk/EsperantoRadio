@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import dk.dr.radio.backend.Backend;
+import dk.dr.radio.diverse.App;
 
 /**
  * En lydkilde der kan spilles af afspilleren
@@ -56,6 +57,6 @@ public abstract class Lydkilde implements Serializable {
   }
 
   public Backend getBackend() {
-    return getKanal().getBackend();
+    return App.backend[0];
   }
 }

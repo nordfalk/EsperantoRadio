@@ -33,7 +33,7 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.backend.Backend;
 
 public class Kanal extends Lydkilde {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2L;
 
   public String kode; // P3
   public static final String P4kode = "P4F";
@@ -54,14 +54,8 @@ public class Kanal extends Lydkilde {
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
 
-  private transient Backend backend;
-
-  public Kanal(Backend backend) {
-    this.backend = backend;
-  }
-
   public Backend getBackend() {
-    return backend;
+    return App.backend[0];
   }
 
   @Override

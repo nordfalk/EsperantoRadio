@@ -74,6 +74,7 @@ public class EoRssParsado {
         e.startTid = new Date(Date.parse(e.startTidKl));
         e.startTidKl = EsperantoRadioBackend.datoformato.format(e.startTid);
         e.slug = k.slug+":"+e.startTidKl;
+        Log.d("xxxxx "+e.slug);
       } else if ("image".equals(tag)) {
         if (k.kode.startsWith("laboren")) {
           do {} while (p.next()!=XmlPullParser.TEXT); // transsaltu <url> en ekz. <image><url>http://laboren.org/static/img/laboren-3000x1687.jpg</url>...

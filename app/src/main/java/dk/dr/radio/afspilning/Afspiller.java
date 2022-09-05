@@ -168,9 +168,9 @@ public class Afspiller {
         }
       };
       if (lydkilde instanceof Kanal) {
-        lydkilde.getBackend().hentKanalStreams(netsvarBehander);
+        App.backend[0].hentKanalStreams(netsvarBehander);
       } else if (lydkilde instanceof Udsendelse) {
-        lydkilde.getBackend().hentUdsendelseStreams(netsvarBehander);
+        App.backend[0].hentUdsendelseStreams(netsvarBehander);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;

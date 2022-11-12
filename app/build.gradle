@@ -12,19 +12,16 @@ repositories {
 
 
 android {
-    lintOptions {
-        abortOnError false
-    }
     compileSdkVersion 30
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility 11
+        targetCompatibility 11
     }
 
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
-        minSdkVersion 14 // eble fakte 7 ??
+        minSdkVersion 21
         targetSdkVersion 30
         signingConfigs {
             config {
@@ -51,6 +48,13 @@ android {
             includeAndroidResources = true
         }
     }
+    lint {
+        abortOnError false
+    }
+
+    packagingOptions {
+        pickFirst 'rome-utils-1.18.0.jar'
+    }
 }
 /*
 logomakr.com/6oKjBc
@@ -60,6 +64,9 @@ Logo made with Logomakr.com
 */
 
 dependencies {
+    implementation project(path: ':data')
+    implementation project(path: ':parse')
+
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'io.sentry:sentry-android:1.7.27'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

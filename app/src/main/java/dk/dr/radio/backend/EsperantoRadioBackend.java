@@ -55,6 +55,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
   public InputStream getLokaleGrunddata(Context ctx) {
+    if (ctx==null) try { return new FileInputStream("/home/j/andet/EspoRadio/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json"); } catch (Exception e) { e.printStackTrace();}
     return ctx.getResources().openRawResource(R.raw.esperantoradio_kanaloj_v8);
   }
 

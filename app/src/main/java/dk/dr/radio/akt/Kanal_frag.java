@@ -7,31 +7,39 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AlertDialog;
+import android.text.Html;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
+import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
@@ -46,9 +54,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   Backend backend;
   protected View rod;
   private boolean brugerHarNavigeret;
-  private int antalHentedeSendeplaner;
   public static Kanal_frag senesteSynligeFragment;
-  private Button hør_live;
 
   @Override
   public String toString() {
@@ -64,34 +70,19 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     String kanalkode = getArguments().getString(P_KANALKODE);
-    boolean p4 = Kanal.P4kode.equals(kanalkode);
     rod = null;
-
-    if (p4) {
-      kanalkode = App.prefs.getString(App.P4_FORETRUKKEN_AF_BRUGER, null);
-      if (kanalkode == null) {
-        kanalkode = "KH4";
-        kanal = App.grunddata.kanalFraKode.get(kanalkode);
-        if (kanal == null) {
-          Log.d("FRAGMENT AFBRYDES " + this + " " + getArguments());
-          return rod;
-        }
-        rod = inflater.inflate(R.layout.kanal_p4_frag, container, false);
-        AQuery aq = new AQuery(rod);
-        aq.id(R.id.p4_vi_gætter_på_tekst).typeface(App.skrift_gibson);
-        aq.id(R.id.p4_kanalnavn).text(kanal.navn).typeface(App.skrift_gibson_fed);
-        aq.id(R.id.p4_skift_distrikt).clicked(this).typeface(App.skrift_gibson);
-        aq.id(R.id.p4_ok).clicked(this).typeface(App.skrift_gibson);
-      }
-    }
-    kanal = App.grunddata.kanalFraKode.get(kanalkode);
+    kanal = (Kanal) App.grunddata.kanalFraKode.get(kanalkode);
     //Log.d(this + " onCreateView 2 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     if (rod == null) rod = inflater.inflate(R.layout.kanal_frag, container, false);
     if (kanal == null) {
-      Log.d("FRAGMENT AFBRYDES " + this + " " + getArguments());
+      if (!App.PRODUKTION)
+        Log.rapporterFejl(new IllegalStateException("afbrydManglerData()"), "for kanal " + kanalkode);
+      afbrydManglerData();
       return rod;
     }
     backend = kanal.getBackend();
+
+    App.data.senestLyttede.getListe();
 
     AQuery aq = new AQuery(rod);
     listView = aq.id(R.id.listView).adapter(adapter).itemClicked(this).getListView();
@@ -108,30 +99,13 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       }
     });
 
-    // Knappen er meget vigtig, og har derfor et udvidet område hvor det også er den man rammer
-    // se http://developer.android.com/reference/android/view/TouchDelegate.html
-    hør_live = aq.id(R.id.hør_live).typeface(App.skrift_gibson).clicked(this).getButton();
-    hør_live.post(new Runnable() {
-      final int udvid = getResources().getDimensionPixelSize(R.dimen.hørknap_udvidet_klikområde);
-
-      @Override
-      public void run() {
-        Rect r = new Rect();
-        hør_live.getHitRect(r);
-        r.top -= udvid;
-        r.bottom += udvid;
-        r.right += udvid;
-        r.left -= udvid;
-        //Log.d("hør_udvidet_klikområde=" + r);
-        ((View) hør_live.getParent()).setTouchDelegate(new TouchDelegate(r, hør_live));
-      }
-    });
     // Klikker man på den hvide baggrund rulles til aktuel udsendelse
-    aq.id(R.id.rulTilAktuelUdsendelse).clicked(this);
+    aq.id(R.id.rulTilAktuelUdsendelse).clicked(this).gone();
 
     //Log.d(this + " onCreateView 3 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     // Hent sendeplan for den pågældende dag. Døgnskifte sker kl 5, så det kan være dagen før
     hentSendeplanForDag(new Date(App.serverCurrentTimeMillis() - 5 * 60 * 60 * 1000));
+
     //Log.d(this + " onCreateView 4 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     App.afspiller.observatører.add(this);
     App.netværk.observatører.add(this);
@@ -210,11 +184,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
-  }
-
-  @Override
   public void onPause() {
     super.onPause();
     App.forgrundstråd.removeCallbacks(this);
@@ -229,58 +198,46 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     if (getActivity()==null) return; // Fragment ikke mere synligt
     App.forgrundstråd.postDelayed(this, App.grunddata.opdaterPlaylisteEfterMs);
 
-    if (!kanal.harStreams()) { // ikke && App.erOnline(), det kan være vi har en cachet udgave
-      backend.hentKanalStreams(new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar sv) throws Exception {
-          if (sv.uændret) return; // ingen grund til at parse det igen
-          run(); // Opdatér igen
-        }
-      });
-    }
-
-    boolean spillerDenneKanal = App.afspiller.getAfspillerstatus() != Status.STOPPET && App.afspiller.getLydkilde() == kanal;
-    boolean online = App.netværk.erOnline();
-
-    hør_live.setEnabled(online && kanal.harStreams() && !spillerDenneKanal);
-    hør_live.setText(!online ? getString(R.string.Internetforbindelse_mangler) :
-            (" " + getString(spillerDenneKanal? R.string.SPILLER : R.string.HØR) + " " + kanal.navn.toUpperCase()));
-    hør_live.setContentDescription(!online ? getString(R.string.Internetforbindelse_mangler) :
-        (" " + getString(spillerDenneKanal? R.string.Spiller : R.string.Hør) + " " + kanal.navn.toUpperCase()));
-
-
     if (aktuelUdsendelseViewholder == null) return;
     Viewholder vh = aktuelUdsendelseViewholder;
     if (!getUserVisibleHint() || !isResumed()) return;
-    opdaterSenestSpillet(vh.aq, vh.udsendelse);
-
-    if (App.serverCurrentTimeMillis() > vh.udsendelse.slutTid.getTime()) {
-      opdaterListe();
-      //if (App.fejlsøgning) App.kortToast("Kanal_frag opdaterListe()");
-      if (vh.startid.isShown()) rulBlødtTilAktuelUdsendelse();
-    }
+    opdaterSenestSpillet(vh.udsendelse);
 
     //MediaPlayer mp = DRData.instans.afspiller.getMediaPlayer();
-    //Log.d("mp pos="+mp.getCurrentPosition() + "  af "+mp.getDuration());
+    //Log.d("mp pos=  "+mp.getCurrentPosition() + "  af "+mp.getDuration());
   }
 
   private void opdaterListe() {
     try {
-      if (kanal.udsendelser.size()==0) return; // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4210518028 oma
-//      ArrayList<Udsendelse> nyuliste = kanal.udsendelser;
       if (App.fejlsøgning) Log.d(kanal + " opdaterListe " + kanal.udsendelser.size());
+      ArrayList<Object> nyListe = new ArrayList<Object>(kanal.udsendelser.size() + 5);
+      String forrigeDagsbeskrivelse = null;
+      for (Udsendelse u : kanal.udsendelser) {
+        nyListe.add(u);
+      }
+      int nyAktuelUdsendelseIndex = kanal.eo_rektaElsendo != null ? 0 : -1; //kanal.udsendelser.size()-1 : -1;
 
+      // Hvis listen er uændret så hop ud - forhindrer en uendelig løkke
+      // af opdateringer i tilfælde af, at sendeplanen for dags dato ikke kan hentes
+      if (nyListe.equals(liste) && nyAktuelUdsendelseIndex == aktuelUdsendelseIndex) {
+        if (App.fejlsøgning) Log.d("opdaterListe: listen er uændret: " + liste);
+        return;
+      } else {
+        if (App.fejlsøgning) Log.d("opdaterListe: ændring fra " + aktuelUdsendelseIndex + liste);
+        if (App.fejlsøgning) Log.d("opdaterListe: ændring til " + nyAktuelUdsendelseIndex + nyListe);
+      }
+
+      aktuelUdsendelseIndex = nyAktuelUdsendelseIndex;
       liste.clear();
-      liste.addAll(kanal.udsendelser);
+      liste.addAll(nyListe);
       aktuelUdsendelseViewholder = null;
       if (App.fejlsøgning) Log.d("opdaterListe " + kanal.kode + "  aktuelUdsendelseIndex=" + aktuelUdsendelseIndex);
       adapter.notifyDataSetChanged();
       if (!brugerHarNavigeret) {
         if (App.fejlsøgning)
           Log.d("hopTilAktuelUdsendelse() aktuelUdsendelseIndex=" + aktuelUdsendelseIndex + " " + this);
-        if (aktuelUdsendelseIndex < 0) return;
         int topmargen = getResources().getDimensionPixelOffset(R.dimen.kanalvisning_aktuelUdsendelse_topmargen);
-        listView.setSelectionFromTop(aktuelUdsendelseIndex, topmargen);
+        listView.setSelectionFromTop(0, topmargen);
       }
     } catch (Exception e1) {
       Log.rapporterFejl(e1, "kanal="+kanal+" med udsendelser "+kanal.udsendelser);
@@ -294,7 +251,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   private static class Viewholder {
     public AQuery aq;
     public TextView titel;
-    public TextView startid;
+    public TextView starttid;
     public Udsendelse udsendelse;
     public int itemViewType;
   }
@@ -314,7 +271,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
     @Override
     public int getItemViewType(int position) {
-      if (position == 0 || position >= liste.size() - 1) return TIDLIGERE_SENERE;  // Workaround for https://mint.splunk.com/dashboard/project/cd78aa05/errors/3004788237 hvor PinnedSectionListView spørger ud over adapterens størrelse
+      //if (position == 0 || position == liste.size() - 1) return TIDLIGERE_SENERE;
       if (position == aktuelUdsendelseIndex) return AKTUEL;
       if (liste.get(position) instanceof Udsendelse) return NORMAL;
       return DAGSOVERSKRIFT;
@@ -328,6 +285,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     public boolean isItemViewTypePinned(int viewType) {
       return viewType == DAGSOVERSKRIFT;
     }
+//    public boolean isItemViewTypePinned(int viewType) { return false; }
 
     static final int NORMAL = 0;
     static final int AKTUEL = 1;
@@ -342,30 +300,83 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       int type = getItemViewType(position);
       if (v == null) {
         v = getActivity().getLayoutInflater().inflate(
-            type == AKTUEL ? R.layout.kanal_elem0_aktuel_udsendelse :  // Visning af den aktuelle udsendelse
-                type == NORMAL ? R.layout.kanal_elem1_udsendelse :  // De andre udsendelser
-                    type == DAGSOVERSKRIFT ? R.layout.kanal_elem3_i_dag_i_morgen  // Dagens overskrift
-                        : R.layout.kanal_elem2_tidligere_senere, parent, false);
+          type == AKTUEL ? R.layout.kanal_elem1_udsendelse_eo :  // Visning af den aktuelle udsendelse
+            type == NORMAL ? R.layout.kanal_elem1_udsendelse_eo :  // De andre udsendelser
+              type == DAGSOVERSKRIFT ? R.layout.kanal_elem3_i_dag_i_morgen  // Dagens overskrift
+                : R.layout.kanal_elem2_tidligere_senere, parent, false);
         vh = new Viewholder();
         vh.itemViewType = type;
         a = vh.aq = new AQuery(v);
-        vh.startid = a.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
+        vh.starttid = a.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
         //a.id(R.id.højttalerikon).clicked(new UdsendelseClickListener(vh));
         if (type == TIDLIGERE_SENERE) {
           vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
         } else if (type == DAGSOVERSKRIFT) {
           vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson).getTextView();
-        } else if (type == AKTUEL) {
-          vh.titel = a.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
-          a.id(R.id.senest_spillet_overskrift).typeface(App.skrift_gibson);
-          a.id(R.id.titel_og_kunstner).typeface(App.skrift_gibson);
-          a.id(R.id.lige_nu).typeface(App.skrift_gibson);
-          a.id(R.id.senest_spillet_container).invisible(); // Start uden 'senest spillet, indtil vi har info
-          int bbr = billedeBr - getResources().getDimensionPixelSize(R.dimen.kanalmargen)*2;
-          a.id(R.id.billede).width(bbr,false).height(bbr*højde9/bredde16,false);
-          a.id(R.id.billedecontainer).width(bbr, false).height(bbr * højde9 / bredde16, false);
-        } else {
-          vh.titel = a.id(R.id.titel_og_kunstner).typeface(App.skrift_gibson_fed).getTextView();
+        } else { // type == NORMAL / AKTUEL
+          vh.starttid.setTextColor(Color.BLACK);
+
+          // Knappen er meget vigtig, og har derfor et udvidet område hvor det også er den man rammer
+          // se http://developer.android.com/reference/android/view/TouchDelegate.html
+          final View hør = a.id(R.id.hør).tag(vh).clicked(Kanal_frag.this).getView();
+          hør.post(new Runnable() {
+            final int udvid = getResources().getDimensionPixelSize(R.dimen.hørknap_udvidet_klikområde);
+
+            @Override
+            public void run() {
+              Rect r = new Rect();
+              hør.getHitRect(r);
+              r.top -= udvid;
+              r.bottom += udvid;
+              r.right += udvid;
+              r.left -= udvid;
+              //Log.d("hør_udvidet_klikområde=" + r);
+              ((View) hør.getParent()).setTouchDelegate(new TouchDelegate(r, hør));
+            }
+          });
+
+
+          if (type==AKTUEL) {
+            vh.starttid.setMaxLines(8);
+            // Anstataŭ setMovementMethod(LinkMovementMethod.getInstance()) - vidu
+            // http://stackoverflow.com/questions/8558732/listview-textview-with-linkmovementmethod-makes-list-item-unclickable
+            vh.starttid.setOnTouchListener(new View.OnTouchListener() {
+              @Override
+              public boolean onTouch(View v, MotionEvent event) {
+                boolean ret = false;
+                CharSequence text = ((TextView) v).getText();
+                Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
+                TextView widget = (TextView) v;
+                int action = event.getAction();
+
+                if (action == MotionEvent.ACTION_UP ||
+                  action == MotionEvent.ACTION_DOWN) {
+                  int x = (int) event.getX();
+                  int y = (int) event.getY();
+
+                  x -= widget.getTotalPaddingLeft();
+                  y -= widget.getTotalPaddingTop();
+
+                  x += widget.getScrollX();
+                  y += widget.getScrollY();
+
+                  Layout layout = widget.getLayout();
+                  int line = layout.getLineForVertical(y);
+                  int off = layout.getOffsetForHorizontal(line, x);
+
+                  ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
+
+                  if (link.length != 0) {
+                    if (action == MotionEvent.ACTION_UP) {
+                      link[0].onClick(widget);
+                    }
+                    ret = true;
+                  }
+                }
+                return ret;
+              }
+            });
+          }
         }
         v.setTag(vh);
       } else {
@@ -375,10 +386,6 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           throw new IllegalStateException("Liste ej konsistent, der er nok sket ændringer i den fra f.eks. getView()");
       }
 
-      if (position>=liste.size()) { // Der er set et crash her
-        Log.rapporterFejl(new IllegalStateException("liste.size()<=position: "+liste.size()+" <= "+position+" for "+kanal));
-        return v;
-      }
       // Opdatér viewholderens data
       Object elem = liste.get(position);
       if (elem instanceof String) {  // Overskrifter
@@ -392,51 +399,39 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       switch (type) {
         case AKTUEL:
           aktuelUdsendelseViewholder = vh;
-          vh.startid.setText(udsendelse.startTidKl);
-          vh.titel.setText(udsendelse.titel);
+          udsendelse.beskrivelse = rektaElsendaPriskribo;
+          vh.starttid.setText(udsendelse.startTidKl);
 
-
-          String burl = skalérBillede(udsendelse);
-          a.id(R.id.billede).image(burl, true, true, 0, 0, null, AQuery.FADE_IN, (float) højde9 / bredde16);
-          vh.titel.setText(udsendelse.titel.toUpperCase());
-
-          if (udsendelse.playliste == null) {
-            opdaterSenestSpillet(vh.aq, udsendelse);
+          if (udsendelse.rektaElsendaPriskriboUrl!=null && rektaElsendaPriskribo==null) {
+            opdaterSenestSpillet(udsendelse);
           } else {
-            opdaterSenestSpilletViews(vh.aq, udsendelse);
+            opdaterSenestSpilletViews(udsendelse);
           }
 
           break;
         case NORMAL:
           // Her kom NullPointerException en sjælden gang imellem - se https://www.bugsense.com/dashboard/project/cd78aa05/errors/836338028
           // det skyldtes at hentSendeplanForDag(), der ændrede i listen, mens ListView var ved at kalde fra getView()
-          vh.startid.setText(udsendelse.startTidKl);
-          vh.titel.setText(udsendelse.titel);
-          // Stiplet linje skal vises mellem udsendelser - men ikke over aktuel udsendelse
-          // og heller ikke hvis det er en overskrift der er nedenunder
+          Spannable spannable;
+          if (udsendelse.titel.equals(udsendelse.beskrivelse)) {
+            spannable = new SpannableString(udsendelse.startTidKl+"  "+udsendelse.titel);
+          } else {
+            spannable = new SpannableString(udsendelse.startTidKl+"  "+udsendelse.titel+"\n"+ Html.fromHtml(udsendelse.beskrivelse.replaceAll("<.+?>", "")));
+          }
+
+          int klPos = udsendelse.startTidKl.length();
+          spannable.setSpan(new ForegroundColorSpan(App.color.grå40), 0, klPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+          spannable.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), klPos+2, klPos+2+udsendelse.titel.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+          vh.starttid.setText(spannable);
+          vh.starttid.setTextColor(App.data.senestLyttede.getStartposition(udsendelse) == 0 ? Color.BLACK : App.color.grå60);
           a.id(R.id.stiplet_linje);
-          if (position == aktuelUdsendelseIndex + 1) a.visibility(View.INVISIBLE);
+          if (position == liste.size() - 1) a.visibility(View.INVISIBLE);
           else if (position > 0 && liste.get(position - 1) instanceof String) a.visibility(View.INVISIBLE);
           else a.visibility(View.VISIBLE);
-          vh.titel.setTextColor(udsendelse.kanHøres ? Color.BLACK : App.color.grå60);
           break;
         case TIDLIGERE_SENERE:
           vh.titel.setText(udsendelse.titel);
-
-          if (antalHentedeSendeplaner++ < 7 && aktuelUdsendelseIndex >= 0) {
-            a.id(R.id.progressBar).visible();   // De første 7 henter vi bare for brugeren
-            vh.titel.setVisibility(View.VISIBLE);
-            final Date dag = udsendelse.startTid; // da hentSendeplanForDag ændrer i listen må kaldet ikke udføres direkte i getView
-            App.forgrundstråd.post(new Runnable() {
-              @Override
-              public void run() {
-                hentSendeplanForDag(dag);
-              }
-            });
-          } else {
-            a.id(R.id.progressBar).invisible(); // Derefter må brugeren gøre det manuelt
-            vh.titel.setVisibility(View.VISIBLE);
-          }
       }
 
 
@@ -445,34 +440,31 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   };
 
 
-  private void opdaterSenestSpilletViews(AQuery aq, Udsendelse u) {
-    if (App.fejlsøgning) Log.d("DDDDD opdaterSenestSpilletViews " + u.playliste);
-    if (u.playliste != null && u.playliste.size() > 0) {
-      aq.id(R.id.senest_spillet_container).visible();
-      Playlisteelement elem = u.playliste.get(u.playliste.size()-1);
-//      aq.id(R.id.titel_og_kunstner).text(Html.fromHtml("<b>" + elem.titel + "</b> &nbsp; | &nbsp;" + elem.kunstner));
+  String rektaElsendaPriskribo = null;
+  private long rektaElsendoKiam;
+  DateFormat klokkenformat = DateFormat.getTimeInstance(DateFormat.SHORT);
+  private void opdaterSenestSpilletViews(Udsendelse udsendelse) {
+    Viewholder vh = aktuelUdsendelseViewholder;
 
-      aq.id(R.id.titel_og_kunstner)
-          .text(lavFedSkriftTil(elem.titel + "  |  " + elem.kunstner, elem.titel.length()))
-          .getView().setContentDescription(elem.titel + "  af  " + elem.kunstner);
-
-      ImageView b = aq.id(R.id.senest_spillet_kunstnerbillede).getImageView();
-      if (elem.billedeUrl==null) {
-        aq.gone();
-      } else {
-        aq.visible().image(skalérDiscoBilledeUrl(elem.billedeUrl, b.getWidth(), b.getHeight()), true, true, b.getWidth(), b.getHeight());
-      }
+    if (rektaElsendaPriskribo != null) {
+      udsendelse.titel = rektaElsendaPriskribo;
+      vh.starttid.setText(Html.fromHtml("<b>NUN LUDAS</b> - "+ klokkenformat.format(new Date(rektaElsendoKiam))  +"<br><br><b>" + rektaElsendaPriskribo+ "<br>"));
     } else {
-      aq.id(R.id.senest_spillet_container).gone();
+      vh.starttid.setText(Html.fromHtml("<b>NUN LUDAS</b><br>(ŝarĝas elsendon, bv atendu)<br><br><br>"));
     }
   }
 
-  private void opdaterSenestSpillet(final AQuery aq2, final Udsendelse u2) {
-    backend.hentPlayliste(new NetsvarBehander() {
+  private void opdaterSenestSpillet(final Udsendelse u2) {
+    App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, new NetsvarBehander() {
       @Override
-      public void fikSvar(Netsvar s) throws Exception {
-        if (getActivity() == null || aktuelUdsendelseViewholder == null || s.uændret || s.fejl) return;
-        opdaterSenestSpilletViews(aq2, u2);
+      public void fikSvar(Netsvar s) {
+        if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);
+        if (getActivity() == null || s.uændret || s.fejl) return;
+        rektaElsendaPriskribo = s.json.trim();
+        if (rektaElsendaPriskribo.endsWith("<br>")) rektaElsendaPriskribo=rektaElsendaPriskribo.substring(0,rektaElsendaPriskribo.length()-4);
+        rektaElsendoKiam = System.currentTimeMillis();
+        if (aktuelUdsendelseViewholder == null) return;
+        opdaterSenestSpilletViews(u2);
       }
     });
   }
@@ -480,22 +472,20 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
   @Override
   public void onClick(View v) {
-    if (v.getId() == R.id.p4_skift_distrikt) {
-      rod.findViewById(R.id.p4_vi_gætter_på_dialog).setVisibility(View.GONE);
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, new P4kanalvalg_frag())
-          .commit();
+    Viewholder vh = (Viewholder) v.getTag();
+    Udsendelse udsendelse = vh.udsendelse;
 
-    } else if (v.getId() == R.id.p4_ok) {
-      rod.findViewById(R.id.p4_vi_gætter_på_dialog).setVisibility(View.GONE);
-      App.prefs.edit().putString(App.P4_FORETRUKKEN_AF_BRUGER, kanal.kode).commit();
-    } else if (!kanal.harStreams()) {
-      Log.rapporterOgvisFejl(getActivity(), new IllegalStateException("kanal.streams er null"));
-    } else if (v.getId() == R.id.rulTilAktuelUdsendelse) {
-      rulBlødtTilAktuelUdsendelse();
+    boolean blokita = EoGeoblokaDetektilo.estasBlokataKajNeEblasMalbloki(udsendelse);
+    App.afspiller.setLydkilde(udsendelse);
+    if (blokita) {
+      new AlertDialog.Builder(getActivity())
+        .setTitle("Elsendo blokata")
+        .setMessage("Ŝajnas ke tiu ĉi elsendo ne estas havebla en via lando")
+        .show();
     } else {
-      // hør_udvidet_klikområde eller hør
-      hør(kanal);
+      App.afspiller.startAfspilning();
+      vh.starttid.setTextColor(App.color.grå60);
+      App.data.senestLyttede.registrérLytning(udsendelse);
     }
   }
 
@@ -505,37 +495,33 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   @Override
-  public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
+  public void onItemClick(AdapterView<?> listViewxx, View vxx, int position, long idxx) {
     Object o = liste.get(position);
+    Kanaler_frag.eoValgtKanal = kanal;
+    Log.d("MONTRAS OBJEKTON "+o);
     // PinnedSectionListView tillader klik på hængende overskrifter, selvom adapteren siger at det skal den ikke
     if (!(o instanceof Udsendelse)) return;
     Udsendelse u = (Udsendelse) o;
-    if (position == 0 || position == liste.size() - 1) {
-      hentSendeplanForDag(u.startTid);
-      v.findViewById(R.id.titel).setVisibility(View.GONE);
-      v.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-    } else {
-      //startActivity(new Intent(getActivity(), VisFragment_akt.class)
-      //    .putExtra(P_KANALKODE, getKanal.kode)
-      //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(P_UDSENDELSE, u.slug)); // Udsenselses-ID
-      String aktuelUdsendelseSlug = aktuelUdsendelseIndex > 0 ? ((Udsendelse) liste.get(aktuelUdsendelseIndex)).slug : "";
+    Log.d("MONTRAS ELSENDON "+u.slug);
+    //startActivity(new Intent(getActivity(), VisFragment_akt.class)
+    //    .putExtra(P_KANALKODE, getKanal.kode)
+    //    .putExtra(VisFragment_akt.KLASSE, Udsendelse_frag.class.getName()).putExtra(P_UDSENDELSE, u.slug)); // Udsenselses-ID
+    String aktuelUdsendelseSlug = aktuelUdsendelseIndex > 0 ? ((Udsendelse) liste.get(aktuelUdsendelseIndex)).slug : "";
 
-      // Vis normalt et Udsendelser_vandret_skift_frag med flere udsendelser
-      // Hvis tilgængelighed er slået til (eller bladring slået fra) vises blot ét Udsendelse_frag
-      Fragment f =
-          App.accessibilityManager.isEnabled() || !App.prefs.getBoolean("udsendelser_bladr", true) ? Fragmentfabrikering.udsendelse(u) :
-              new Udsendelser_vandret_skift_frag();
-      f.setArguments(new Intent()
-          .putExtra(P_KANALKODE, kanal.kode)
-          .putExtra(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, aktuelUdsendelseSlug)
-          .putExtra(P_UDSENDELSE, u.slug)
-          .getExtras());
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commitAllowingStateLoss(); // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/830038058
-    }
+    // Vis normalt et Udsendelser_vandret_skift_frag med flere udsendelser
+    // Hvis tilgængelighed er slået til (eller bladring slået fra) vises blot ét Udsendelse_frag
+    Fragment f =
+      App.accessibilityManager.isEnabled() || !App.prefs.getBoolean("udsendelser_bladr", true) ? Fragmentfabrikering.udsendelse(u) :
+        new Udsendelser_vandret_skift_frag();
+    f.setArguments(new Intent()
+      .putExtra(P_KANALKODE, kanal.kode)
+      .putExtra(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, aktuelUdsendelseSlug)
+      .putExtra(P_UDSENDELSE, u.slug)
+      .getExtras());
+    getActivity().getSupportFragmentManager().beginTransaction()
+      .replace(R.id.indhold_frag, f)
+      .addToBackStack(null)
+      .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+      .commitAllowingStateLoss(); // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/830038058
   }
 }
-

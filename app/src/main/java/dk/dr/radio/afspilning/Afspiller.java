@@ -48,7 +48,6 @@ import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -457,7 +456,7 @@ public class Afspiller {
   public void setLydkilde(Lydkilde lydkilde) {
     try {
       Log.d("setLydkilde(" + lydkilde);
-      if (lydkilde instanceof EoKanal) lydkilde = lydkilde.getUdsendelse();
+      if (lydkilde instanceof Kanal) lydkilde = lydkilde.getUdsendelse();
       if (lydkilde == this.lydkilde) return;
       if (lydkilde == null) {
         Log.rapporterFejl(new IllegalStateException("setLydkilde(null"));

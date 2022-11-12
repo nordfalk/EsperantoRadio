@@ -44,7 +44,6 @@ import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.esperanto.EoDiverse;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -53,7 +52,7 @@ import dk.dr.radio.v3.R;
 public class EoUdsendelse_frag extends Basisfragment implements View.OnClickListener, AdapterView.OnItemClickListener, Runnable {
 
   private ListView listView;
-  private EoKanal kanal;
+  private Kanal kanal;
   protected View rod;
   private Udsendelse udsendelse;
 
@@ -79,7 +78,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
-    if (kanalx instanceof EoKanal) kanal = (EoKanal) kanalx;
+    if (kanalx instanceof Kanal) kanal = (Kanal) kanalx;
     udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
@@ -87,7 +86,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       afbrydManglerData();
       return rod;
     }
-    if (kanal == null || "".equals(kanal.slug)) kanal = (EoKanal) udsendelse.getKanal();
+    if (kanal == null || "".equals(kanal.slug)) kanal = (Kanal) udsendelse.getKanal();
     if ("".equals(kanal.slug)) {
       Log.d("Kender ikke kanalen");
     }

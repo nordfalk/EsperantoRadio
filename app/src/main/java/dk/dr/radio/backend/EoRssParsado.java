@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoDiverse;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.Log;
 
 
@@ -198,7 +197,7 @@ public class EoRssParsado {
   }
 
 
-  public static void ŝarĝiElsendojnDeRssUrl(String xml, EoKanal k) {
+  public static void ŝarĝiElsendojnDeRssUrl(String xml, Kanal k) {
     try {
       Log.d("============ parsas RSS de "+k.kode +" =============");
       ArrayList<Udsendelse> elsendoj;

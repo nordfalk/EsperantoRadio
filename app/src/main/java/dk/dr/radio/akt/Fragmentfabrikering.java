@@ -25,8 +25,7 @@ public class Fragmentfabrikering {
   }
 
   public static Fragment kanal(Kanal k) {
-    Fragment f;
-      f = new EoKanal_frag();
+    Fragment f = new Kanal_frag();
     Bundle b = new Bundle();
     b.putString(P_KANALKODE, k.kode);
     f.setArguments(b);

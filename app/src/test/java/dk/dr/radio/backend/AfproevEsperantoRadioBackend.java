@@ -15,7 +15,6 @@ import java.util.Iterator;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
@@ -72,7 +71,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
 
   public void forprenuMalplenajnKanalojn(Grunddata ĉefdatumoj2) {
     for (Iterator<Kanal> ki = ĉefdatumoj2.kanaler.iterator(); ki.hasNext(); ) {
-      EoKanal k = (EoKanal) ki.next();
+      Kanal k = ki.next();
       if (k.udsendelser.isEmpty()) {
         Log.d("============ FORPRENAS "+k.kode +", ĉar ĝi ne havas elsendojn! "+k.eo_datumFonto);
       }
@@ -82,8 +81,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
 
 
   public void rezumo(Grunddata ĉefdatumoj2) {
-    for (Kanal k0 : ĉefdatumoj2.kanaler) {
-      EoKanal k = (EoKanal) k0;
+    for (Kanal k : ĉefdatumoj2.kanaler) {
       Log.d("============ "+k.kode +" ============= "+k.udsendelser.size()+" "+k.eo_datumFonto);
       int n = 0;
       for (Udsendelse e : k.udsendelser) {
@@ -105,8 +103,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
    * @return true se io estis ŝarĝita
    */
   static void ŝarĝiElsendojnDeRss(Grunddata ĉefdatumoj2, boolean nurLokajn) {
-    for (Kanal k0 : ĉefdatumoj2.kanaler) {
-      EoKanal k = (EoKanal) k0;
+    for (Kanal k : ĉefdatumoj2.kanaler) {
       ŝarĝiElsendojnDeRssUrl(k.eo_elsendojRssUrl, k, nurLokajn);
       //ŝarĝiElsendojnDeRssUrl(k.eo_json.optString("elsendojRssUrl1", null), k, nurLokajn);
       //ŝarĝiElsendojnDeRssUrl(k.json.optString("elsendojRssUrl2", null), k, nurLokajn);
@@ -114,7 +111,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
   }
 
 
-  static void ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, EoKanal k, boolean nurLokajn) {
+  static void ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, Kanal k, boolean nurLokajn) {
     try {
       if (elsendojRssUrl== null) return;
       String dosiero = FilCache.findLokaltFilnavn(elsendojRssUrl);

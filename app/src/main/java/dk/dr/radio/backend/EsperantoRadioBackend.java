@@ -27,7 +27,6 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.data.esperanto.EoFavoritter;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.FilCache;
@@ -72,7 +71,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     int antal = kanalojJs.length();
     for (int i = 0; i < antal; i++) {
       JSONObject kJs = kanalojJs.getJSONObject(i);
-      EoKanal k = new EoKanal();
+      Kanal k = new Kanal();
       k.slug = k.kode = kJs.optString("kodo", null);
       if (k.kode ==null) continue;
       k.navn = kJs.getString("nomo");
@@ -159,8 +158,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
   private boolean ŝarĝiKanalEmblemojn(boolean nurLokajn) {
     boolean ioEstisSxargxita = false;
-    for (Kanal k0 : new ArrayList<>(kanaler)) {
-      EoKanal k = (EoKanal) k0;
+    for (Kanal k : new ArrayList<>(kanaler)) {
 
       if (k.kanallogo_url != null && k.kanallogo_eo == null) try {
         String dosiero = FilCache.findLokaltFilnavn(k.kanallogo_url);
@@ -250,20 +248,20 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           e.sonoUrl.add(x[2]);
           e.titel = e.beskrivelse = x[3];
 
-          EoKanal k = (EoKanal) grunddata.kanalFraSlug.get(e.kanalSlug);
+          Kanal k = grunddata.kanalFraSlug.get(e.kanalSlug);
           // Jen problemo. "Esperanta Retradio" nomiĝas "Peranto" en
           // http://esperanto-radio.com/radio.txt . Ni solvas tion serĉante ankaŭ por la kodo
           // "kodo": "peranto",
           // "nomo": "Esperanta Retradio",
 
           if (k == null) {
-            k = (EoKanal) grunddata.kanalFraKode.get(e.kanalSlug);
+            k = grunddata.kanalFraKode.get(e.kanalSlug);
             if (k != null) e.kanalSlug = k.slug;
           }
 
           if (k == null) {
             Log.d("Nekonata kanalnomo - ALDONAS GXIN: " + e.kanalSlug);
-            k = new EoKanal();
+            k = new Kanal();
             k.kode = k.slug = e.kanalSlug;
             k.navn = x[0];
             k.eo_datumFonto = "radio.txt";
@@ -294,11 +292,11 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     }
 
     for (Kanal k : kanaler) {
-      eo_opdaterProgramserieFraKanal((EoKanal) k);
+      eo_opdaterProgramserieFraKanal((Kanal) k);
     }
   }
 
-  static void eo_opdaterProgramserieFraKanal(EoKanal k) {
+  static void eo_opdaterProgramserieFraKanal(Kanal k) {
     Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
       ps = new Programserie(instans);
@@ -315,8 +313,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
 
-  public void hentUdsendelserPåKanal(final Kanal kanalx, final String datoStr, final NetsvarBehander netsvarBehander) {
-    final EoKanal kanal = (EoKanal) kanalx;
+  public void hentUdsendelserPåKanal(final Kanal kanal, final String datoStr, final NetsvarBehander netsvarBehander) {
     Log.d("eo RSS por "+kanal+" ="+kanal.eo_elsendojRssUrl);
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto) && !kanal.harUdsendelserForDag(datoStr)) {
       App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {

@@ -72,7 +72,6 @@ import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
-import dk.dr.radio.data.esperanto.EoKanal;
 import dk.dr.radio.backend.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
@@ -237,7 +236,7 @@ public class App {
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
-      if (aktuelKanal instanceof EoKanal && aktuelKanal.getUdsendelse()==null) {
+      if (aktuelKanal instanceof Kanal && aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
         aktuelKanal = grunddata.kanaler.get(0); // Problemet er at afspiller forventer en udsendelse på kanalen
       }

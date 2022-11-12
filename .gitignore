@@ -42,3 +42,4 @@ captures/
 # Keystore files
 *.jks
 /.nb-gradle/
+/arkiv/

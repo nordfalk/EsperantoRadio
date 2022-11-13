@@ -28,7 +28,6 @@ import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
@@ -106,7 +105,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         ls.kvalitet = Lydstream.StreamKvalitet.Medium;
         */
         k.setStreams(rektaElsendo.streams);
-        EoGeoblokaDetektilo.esploruĈuEstasBlokata(rektaElsendo, kJs.optString("rektaElsendaSonoUrlSenGeobloko"));
         //k.udsendelser.add(el);
       }
     }

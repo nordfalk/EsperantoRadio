@@ -608,7 +608,7 @@ public class Afspiller {
       if (index == App.grunddata.kanaler.size()) index = 0;
       k = App.grunddata.kanaler.get(index);
       // Tjek om vi er kommet til P4 - vælg brugerens foretrukne underkanal
-      String kanalkode = App.tjekP4OgVælgUnderkanal(k.kode);
+      String kanalkode = k.kode;
       k = App.grunddata.kanalFraKode.get(kanalkode);
       if (k==null) {
         Log.rapporterFejl(new IllegalStateException(

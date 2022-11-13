@@ -170,8 +170,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
     ImageView hør_ikon = aq.id(R.id.hør).getImageView();
     TextView hør_tekst = aq.id(R.id.hør_tekst).getTextView();
-    if (false);
-    else if (udsendelsenSpillerNu) { // Afspiller / forbinder denne udsendelse
+    if (udsendelsenSpillerNu) { // Afspiller / forbinder denne udsendelse
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(spiller ? R.string.AFSPILLER : R.string.FORBINDER);

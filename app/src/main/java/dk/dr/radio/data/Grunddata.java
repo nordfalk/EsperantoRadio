@@ -34,7 +34,6 @@ public class Grunddata {
   public JSONObject android_json;
   public JSONObject json;
 
-  public Set<String> p4koder = new LinkedHashSet<>();
   public List<Kanal> kanaler = new ArrayList<Kanal>();
   public Kanal forvalgtKanal;
   public ArrayList<Runnable> observatører = new ArrayList<Runnable>(); // Om grunddata/stamdata ændrer sig

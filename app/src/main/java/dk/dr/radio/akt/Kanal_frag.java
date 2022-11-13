@@ -39,7 +39,6 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
@@ -475,18 +474,10 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     Viewholder vh = (Viewholder) v.getTag();
     Udsendelse udsendelse = vh.udsendelse;
 
-    boolean blokita = EoGeoblokaDetektilo.estasBlokataKajNeEblasMalbloki(udsendelse);
     App.afspiller.setLydkilde(udsendelse);
-    if (blokita) {
-      new AlertDialog.Builder(getActivity())
-        .setTitle("Elsendo blokata")
-        .setMessage("Ŝajnas ke tiu ĉi elsendo ne estas havebla en via lando")
-        .show();
-    } else {
-      App.afspiller.startAfspilning();
-      vh.starttid.setTextColor(App.color.grå60);
-      App.data.senestLyttede.registrérLytning(udsendelse);
-    }
+    App.afspiller.startAfspilning();
+    vh.starttid.setTextColor(App.color.grå60);
+    App.data.senestLyttede.registrérLytning(udsendelse);
   }
 
   public static void hør(final Kanal kanal) {

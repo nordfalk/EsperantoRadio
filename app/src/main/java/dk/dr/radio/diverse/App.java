@@ -106,7 +106,6 @@ public class App {
 
   private static SharedPreferences grunddata_prefs;
 
-  public static final String P4_FORETRUKKEN_AF_BRUGER = "P4_FORETRUKKEN_AF_BRUGER";
   public static final String FORETRUKKEN_KANAL = "FORETRUKKEN_kanal";
   private static final String NØGLE_advaretOmInstalleretPåSDKort = "erInstalleretPåSDKort";
   public static SharedPreferences prefs;
@@ -225,8 +224,6 @@ public class App {
 
     try {
       String kanalkode = prefs.getString(FORETRUKKEN_KANAL, null);
-      // Hvis brugeren foretrækker P4 er vi nødt til at finde underkanalen
-      kanalkode = tjekP4OgVælgUnderkanal(kanalkode);
 
       Kanal aktuelKanal = grunddata.kanalFraKode.get(kanalkode);
       if (aktuelKanal == null || aktuelKanal == Grunddata.ukendtKanal) {
@@ -245,15 +242,6 @@ public class App {
     } catch (Exception ex) {
       Log.rapporterFejl(ex);
     }
-  }
-
-  public static String tjekP4OgVælgUnderkanal(String kanalkode) {
-    if (Kanal.P4kode.equals(kanalkode)) {
-      kanalkode = App.prefs.getString(App.P4_FORETRUKKEN_AF_BRUGER, null);
-      if (kanalkode == null) kanalkode = "KH4";
-      Log.d("P4 underkanal=" + kanalkode);
-    }
-    return kanalkode;
   }
 
   public static void advarEvtOmAlarmerHvisInstalleretPåSDkort(Activity akt) {
@@ -285,7 +273,7 @@ public class App {
 
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
-          if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
+          if (kanal.harStreams())  continue;
           backend.hentKanalStreams(NetsvarBehander.TOM);
         }
       }

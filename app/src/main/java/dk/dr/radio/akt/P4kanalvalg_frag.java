@@ -50,13 +50,8 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 
-    if (false) {
-      kanalkoder = new ArrayList<String>(App.grunddata.p4koder);
-    } else {
-      kanalkoder = new ArrayList<String>();
-      for (Kanal k : App.grunddata.kanaler) kanalkoder.add(k.kode);
-      Log.d("kanalkoder "+kanalkoder);
-    }
+    kanalkoder = new ArrayList<String>();
+    for (Kanal k : App.grunddata.kanaler) kanalkoder.add(k.kode);
 
     for (String k : kanalkoder) {
       if (App.grunddata.kanalFraKode.get(k) == null) {

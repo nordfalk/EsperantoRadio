@@ -26,7 +26,6 @@ public class Kanal extends Lydkilde {
   private static final long serialVersionUID = 2L;
 
   public String kode; // P3
-  public static final String P4kode = "P4F";
   public String navn;
   public String kanallogo_url;
 

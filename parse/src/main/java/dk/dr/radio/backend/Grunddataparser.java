@@ -1,11 +1,16 @@
 package dk.dr.radio.backend;
 
+import com.example.feed.PodcastRssResponse;
+import com.example.feed.PodcastsFetcher;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import dk.dr.radio.data.Grunddata;
@@ -36,7 +41,6 @@ public class Grunddataparser {
       k.eo_retpoŝto = kJs.optString("retpoŝto", null);
       k.kanallogo_url = kJs.optString("emblemoUrl", null);
       k.eo_elsendojRssUrl = kJs.optString("elsendojRssUrl", null);
-      k.eo_elsendojRssUrl2 = kJs.optString("elsendojRssUrl2", null);
       k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
       k.eo_montruTitolojn = kJs.optBoolean("montruTitolojn", false);
 
@@ -44,7 +48,7 @@ public class Grunddataparser {
 
       if (rektaElsendaSonoUrl != null) {
         Udsendelse rektaElsendo = new Udsendelse(k);
-        rektaElsendo.startTid = rektaElsendo.slutTid = new Date();
+        rektaElsendo.startTid = new Date();
         rektaElsendo.kanalSlug = k.navn;
         rektaElsendo.startTidKl = "REKTA";
         rektaElsendo.titel = "";
@@ -69,9 +73,26 @@ public class Grunddataparser {
     } // Ikke kritisk
   }
 
-  public static void main(String[] args) throws Exception {
+  public static Grunddata getGrunddata() throws JSONException, IOException {
     Grunddata gd = new Grunddata();
-    initGrunddata2(gd, Diverse.læsStreng(new FileInputStream("/home/j/andet/EspoRadio/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v8.json")));
+    initGrunddata2(gd, Diverse.læsStreng(new FileInputStream("app/src/main/res/raw/esperantoradio_kanaloj_v8.json")));
+    return gd;
+  }
+
+
+  public static void main(String[] args) throws Exception {
+    Grunddata gd = getGrunddata();
     System.out.println("gd.kanaler = " + gd.kanaler);
+    for (Kanal k : gd.kanaler) {
+      System.out.println("===================================================================");
+      System.out.println("k = " + k);
+      System.out.println("k.eo_elsendojRssUrl = " + k.eo_elsendojRssUrl);
+      if (k.eo_elsendojRssUrl==null) continue;
+      ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl), k);
+
+      PodcastRssResponse feed = new PodcastsFetcher().fetchPodcast(k.eo_elsendojRssUrl);
+      k.udsendelser = new ArrayList(feed.getUdsendelses());
+      System.out.println("feed = " + feed);
+    }
   }
 }

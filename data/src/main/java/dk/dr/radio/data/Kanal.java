@@ -25,20 +25,19 @@ import java.util.TreeMap;
 public class Kanal extends Lydkilde {
   private static final long serialVersionUID = 2L;
 
-  public String kode; // P3
+  public String kode;
+
   public String navn;
   public String kanallogo_url;
 
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
-  public transient SortedMap<String, ArrayList<Udsendelse>> udsendelserPerDag = new TreeMap<String, ArrayList<Udsendelse>>();
+  public Udsendelse eo_rektaElsendo;
 
   public String eo_hejmpaĝoButono;
   public String eo_retpoŝto;
-  public Udsendelse eo_rektaElsendo;
   public String eo_datumFonto;
   public ArrayList<Udsendelse> eo_udsendelserFraRadioTxt; // Provizora variablo - por kontroli ĉu ni maltrafas ion dum parsado de RSS
   public String eo_elsendojRssUrl;
-  public String eo_elsendojRssUrl2;
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
 
@@ -48,9 +47,6 @@ public class Kanal extends Lydkilde {
     return kode+"/"+slug;// + "/" + navn + "/" + logoUrl;
   }
 
-  public boolean harUdsendelserForDag(String dato) {
-    return udsendelserPerDag.containsKey(dato);
-  }
 
   @Override
   public Kanal getKanal() {

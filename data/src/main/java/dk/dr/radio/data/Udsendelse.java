@@ -20,7 +20,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
 
   public Date startTid;
   public String startTidKl;
-  public Date slutTid;
 
   public transient ArrayList<Playlisteelement> playliste;
   public transient ArrayList<Indslaglisteelement> indslag;

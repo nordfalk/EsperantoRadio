@@ -10,6 +10,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import dk.dr.radio.data.Grunddata;
@@ -28,9 +29,9 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(RobolectricTestRunner.class)
 public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
-  public AfproevEsperantoRadioBackend() { super(backend = new EsperantoRadioBackend()); }
+  public AfproevEsperantoRadioBackend() { super(backend = new Backend()); }
 
-  static EsperantoRadioBackend backend;
+  static Backend backend;
 
   @Test
   public void tjekDirekteUdsendelser() throws Exception {
@@ -104,22 +105,23 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
    */
   static void ŝarĝiElsendojnDeRss(Grunddata ĉefdatumoj2, boolean nurLokajn) {
     for (Kanal k : ĉefdatumoj2.kanaler) {
-      ŝarĝiElsendojnDeRssUrl(k.eo_elsendojRssUrl, k, nurLokajn);
+      k.udsendelser = ŝarĝiElsendojnDeRssUrl(k.eo_elsendojRssUrl, k, nurLokajn);
     }
   }
 
 
-  static void ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, Kanal k, boolean nurLokajn) {
+  static ArrayList<Udsendelse> ŝarĝiElsendojnDeRssUrl(String elsendojRssUrl, Kanal k, boolean nurLokajn) {
     try {
-      if (elsendojRssUrl== null) return;
+      if (elsendojRssUrl== null) return null;
       String dosiero = FilCache.findLokaltFilnavn(elsendojRssUrl);
-      if (nurLokajn && !new File(dosiero).exists()) return;
+      if (nurLokajn && !new File(dosiero).exists()) return null;
       FilCache.hentFil(elsendojRssUrl, false);
       Log.d(" akiris " + elsendojRssUrl);
-      EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.læsStreng(new FileInputStream(dosiero)), k);
+      return EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.læsStreng(new FileInputStream(dosiero)), k);
     } catch (Exception ex) {
       Log.e("Eraro parsante " + k.kode, ex);
     }
+    return null;
   }
 
 }

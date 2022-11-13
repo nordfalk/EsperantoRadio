@@ -43,6 +43,7 @@ import java.util.List;
 import dk.dr.radio.afspilning.wrapper.EmaPlayerWrapper;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerLytter;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerWrapper;
+import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
 import dk.dr.radio.data.Lydstream;
@@ -54,7 +55,6 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
-import dk.dr.radio.backend.EsperantoRadioBackend;
 import dk.dr.radio.backend.NetsvarBehander;
 
 /**
@@ -144,59 +144,11 @@ public class Afspiller {
     if (!lydkilde.harStreams()) {
       if (lydkilde instanceof Udsendelse) {
         Udsendelse u = (Udsendelse) lydkilde;
-        if (u.sonoUrl!=null && u.sonoUrl.size()>0) lydkilde.setStreams(EsperantoRadioBackend.lavSimpelLydstreamFraUrl(u.sonoUrl.get(0)));
+        if (u.sonoUrl!=null && u.sonoUrl.size()>0) lydkilde.setStreams(Backend.lavSimpelLydstreamFraUrl(u.sonoUrl.get(0)));
       };
     }
     if (!lydkilde.harStreams()) {
-      NetsvarBehander netsvarBehander = new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar sv) throws Exception {
-          if (sv.fejl) {
-            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
-            if (vækningIGang) ringDenAlarm();
-            return;
-          }
-          if (sv.uændret) return; // ingen grund til at parse det igen
-          Log.d("hentStreams afsp fraCache=" + sv.fraCache + " => " + lydkilde);
-          if (onErrorTæller++>2) {
-            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
-            if (vækningIGang) ringDenAlarm();
-          } else {
-            startAfspilning(); // Opdatér igen - men kun én gang
-          }
-        }
-      };
-      if (lydkilde instanceof Kanal) {
-        App.backend.hentKanalStreams(netsvarBehander);
-      } else if (lydkilde instanceof Udsendelse) {
-        App.backend.hentUdsendelseStreams(netsvarBehander);
-      } else {
-        Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
-        return;
-      }
-      /*
-      App.netkald.kald(this, url, Request.Priority.IMMEDIATE, new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar sv) throws Exception {
-          if (sv.fejl) {
-            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
-            if (vækningIGang) ringDenAlarm();
-            return;
-          }
-          if (sv.uændret) return; // ingen grund til at parse det igen
-          ArrayList<Lydstream> s = GammelDrRadioBackend.instans.parsStreams(new JSONObject(sv.json));
-          lydkilde.setStreams(s);
-          Log.d("hentStreams afsp fraCache=" + sv.fraCache + " => " + lydkilde);
-          if (onErrorTæller++>2) {
-            App.kortToast(R.string.Kunne_ikke_oprette_forbindelse_til_DR);
-            //Log.rapporterFejl(new Exception("onErrorTæller++>10, uendelig løkke afværget"), lydkilde);
-            if (vækningIGang) ringDenAlarm();
-          } else {
-            startAfspilning(); // Opdatér igen - men kun én gang
-          }
-        }
-      });
-      */
+      Log.e(new IllegalStateException("ingen streams " + lydkilde));
       return;
     }
     Log.d("startAfspilning() " + lydkilde);

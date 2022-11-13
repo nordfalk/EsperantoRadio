@@ -1,11 +1,8 @@
 package dk.dr.radio.data;
 
-import android.os.Handler;
-
 import java.io.File;
 
 import dk.dr.radio.backend.Backend;
-import dk.dr.radio.backend.EsperantoRadioBackend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;
@@ -24,7 +21,7 @@ public class ParseFraJvm {
     //App.forgrundstråd = new Handler();
     App.pakkenavn = "getPackageName()";
     App.data = new Programdata();
-    App.backend = new EsperantoRadioBackend();
+    App.backend = new Backend();
     try {
       String grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ApplicationSingleton.instans));
       App.backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);

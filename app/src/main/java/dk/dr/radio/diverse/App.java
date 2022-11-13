@@ -70,7 +70,6 @@ import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
-import dk.dr.radio.backend.EsperantoRadioBackend;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
@@ -141,7 +140,7 @@ public class App {
     res = ctx.getResources();
     pakkenavn = ctx.getPackageName();
 
-    backend = new EsperantoRadioBackend();
+    backend = new Backend();
 
     sprogKonfig = new Configuration();
 
@@ -274,7 +273,6 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams())  continue;
-          backend.hentKanalStreams(NetsvarBehander.TOM);
         }
       }
 

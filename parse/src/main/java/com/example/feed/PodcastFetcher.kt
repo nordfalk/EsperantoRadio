@@ -18,16 +18,11 @@ package com.example.feed
 
 import com.rometools.modules.itunes.EntryInformation
 import com.rometools.modules.itunes.FeedInformation
-import com.rometools.rome.feed.synd.SyndEntry
-import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedInput
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.LoggingEventListener
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 
 /**
@@ -62,6 +57,12 @@ class PodcastsFetcher() {
         CacheControl.Builder().maxStale(8, TimeUnit.HOURS).build()
     }
 
+    /**
+     * Most feeds use the following DTD to include extra information related to
+     * their podcast. Info such as images, summaries, duration, categories is sometimes only available
+     * via this attributes in this DTD.
+     */
+    private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
     fun fetchPodcast(url: String): PodcastRssResponse {
         val request = Request.Builder()
@@ -70,62 +71,49 @@ class PodcastsFetcher() {
             .build()
 
         val response = okHttpClient.newCall(request).execute()
+        val syndFeed = syndFeedInput.build(response.body!!.charStream())
 
-        // Otherwise we can parse the response using a Rome SyndFeedInput, then map it
-        // to a Podcast instance. We run this on the IO dispatcher since the parser is reading
-        // from a stream.
-        return  syndFeedInput.build(response.body!!.charStream()).toPodcastResponse(url)
+        val udsendelser = syndFeed.entries.map {
+            val entryInformation = it.getModule(PodcastModuleDtd) as? EntryInformation
+            Udsendelse(
+                titel = it.title,
+                summary = entryInformation?.summary ?: it.description?.value,
+                subtitle = entryInformation?.subtitle,
+                published = it.publishedDate.time,
+                duration = entryInformation?.duration?.milliseconds
+            )
+        }
+        val feedInfo = syndFeed.getModule(PodcastModuleDtd) as? FeedInformation
+        val kanal = Kanal(
+            title = syndFeed.title,
+            description = feedInfo?.summary ?: syndFeed.description,
+            copyright = syndFeed.copyright,
+            imageUrl = feedInfo?.imageUri?.toString()
+        )
+        val podcastRssResponse = PodcastRssResponse(kanal, udsendelser)
+
+        return podcastRssResponse
     }
 }
 
+data class Kanal(
+    val title: String,
+    val description: String? = null,
+    val imageUrl: String? = null,
+    val copyright: String? = null
+)
+
+data class Udsendelse(
+    val titel: String,
+    val subtitle: String? = null,
+    val summary: String? = null,
+    val published: Long,
+    val duration: Long? = null
+)
+
 data class PodcastRssResponse(
-        val podcast: Podcast,
-        val episodes: List<Episode>,
-        val categories: Set<Category>
+    val kanal: Kanal,
+    val udsendelses: List<Udsendelse>,
     ) {
 }
 
-private fun SyndFeed.toPodcastResponse(feedUrl: String): PodcastRssResponse {
-    val podcastUri = uri ?: feedUrl
-    val episodes = entries.map { it.toEpisode(podcastUri) }
-
-    val feedInfo = getModule(PodcastModuleDtd) as? FeedInformation
-    val podcast = Podcast(
-        uri = podcastUri,
-        title = title,
-        description = feedInfo?.summary ?: description,
-        author = author,
-        copyright = copyright,
-        imageUrl = feedInfo?.imageUri?.toString()
-    )
-
-    val categories = feedInfo?.categories
-        ?.map { Category(name = it.name) }
-        ?.toSet() ?: emptySet()
-
-    return PodcastRssResponse(podcast, episodes, categories)
-}
-
-/**
- * Map a Rome [SyndEntry] instance to our own [Episode] data class.
- */
-private fun SyndEntry.toEpisode(podcastUri: String): Episode {
-    val entryInformation = getModule(PodcastModuleDtd) as? EntryInformation
-    return Episode(
-        uri = uri,
-        podcastUri = podcastUri,
-        title = title,
-        author = author,
-        summary = entryInformation?.summary ?: description?.value,
-        subtitle = entryInformation?.subtitle,
-        published = Instant.ofEpochMilli(publishedDate.time).atOffset(ZoneOffset.UTC),
-        duration = entryInformation?.duration?.milliseconds?.let { Duration.ofMillis(it) }
-    )
-}
-
-/**
- * Most feeds use the following DTD to include extra information related to
- * their podcast. Info such as images, summaries, duration, categories is sometimes only available
- * via this attributes in this DTD.
- */
-private const val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"

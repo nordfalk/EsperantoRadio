@@ -1,8 +1,5 @@
 package dk.dr.radio.backend;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -15,7 +12,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 
@@ -201,8 +197,7 @@ public class EoRssParsado {
   }
 
 
-  public static void ŝarĝiElsendojnDeRssUrl(String xml, Kanal k) {
-    try {
+  public static ArrayList<Udsendelse> ŝarĝiElsendojnDeRssUrl(String xml, Kanal k) throws Exception {
       System.out.println("============ parsas RSS de "+k.kode +" =============");
       ArrayList<Udsendelse> elsendoj;
       if ("vinilkosmo".equals(k.kode)) {
@@ -218,16 +213,7 @@ public class EoRssParsado {
           if (e.titel.length()>200) e.titel = e.titel.substring(0, 200);
         }
       }
-      if (elsendoj.size() > 0) {
-        k.udsendelser = elsendoj;
-        k.eo_datumFonto = "rss";
-      }
-//      for (Udsendelse e : elsendoj) EsperantoRadioBackend.eoElsendoAlDaUdsendelse(e, k);
-//      EsperantoRadioBackend.eo_opdaterProgramserieFraKanal(k);
       System.out.println(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
-    } catch (Exception ex) {
-      System.err.println("Eraro parsante " + k.kode);
-      ex.printStackTrace();
-    }
+      return elsendoj;
   }
 }

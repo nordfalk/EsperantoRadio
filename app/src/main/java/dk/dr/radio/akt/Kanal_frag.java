@@ -103,7 +103,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
     //Log.d(this + " onCreateView 3 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     // Hent sendeplan for den pågældende dag. Døgnskifte sker kl 5, så det kan være dagen før
-    hentSendeplanForDag(new Date(App.serverCurrentTimeMillis() - 5 * 60 * 60 * 1000));
+    hentSendeplanForDag();
 
     //Log.d(this + " onCreateView 4 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     App.afspiller.observatører.add(this);
@@ -124,10 +124,9 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
 
-  private void hentSendeplanForDag(final Date dato) {
+  private void hentSendeplanForDag() {
     if (getActivity()==null) return; // fragmentet er blevet lukket
-    final String datoStr = Datoformater.apiDatoFormat.format(dato);
-    backend.hentUdsendelserPåKanal(kanal, datoStr, new NetsvarBehander() {
+    backend.hentUdsendelserPåKanal(kanal, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret || listView==null || getActivity() == null) return;

@@ -25,7 +25,7 @@ public abstract class Lydkilde implements Serializable {
   }
 
 
-  public Lydstream findBedsteStreams(boolean tilHentning) {
+  public Lydstream findBedsteStreams() {
     if (hentetStream != null) return hentetStream;
     if (streams == null || streams.isEmpty()) return null;
     return streams.get(0);

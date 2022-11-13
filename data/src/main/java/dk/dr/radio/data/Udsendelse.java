@@ -120,17 +120,8 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   @Override
   public void setStreams(ArrayList<Lydstream> str) {
     super.setStreams(str);
-    /*
-    if (!App.PRODUKTION) {
-      boolean kanHøresNy = findBedsteStreams(false).size() > 0;
-      boolean kanHentesNy = findBedsteStreams(true).size() > 0;
-      if (kanHentes && !kanHentesNy)
-        Log.d("API løj om kanHentes for " + o.optString("Slug")+": "+kanHentes +"->" +kanHentesNy);
-      if (kanHøres && !kanHøresNy)
-        Log.d("API løj om kanHøres for " + o.optString("Slug")+": "+kanHøres +"->" +kanHøresNy);
-    }*/
-    kanHøres = findBedsteStreams(false) != null;
-    kanHentes = findBedsteStreams(true) != null;
+    kanHøres = findBedsteStreams() != null;
+    kanHentes = findBedsteStreams() != null;
   }
 
   public Udsendelse kopi() throws CloneNotSupportedException {

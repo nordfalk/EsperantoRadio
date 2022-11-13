@@ -105,8 +105,6 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
   static void ŝarĝiElsendojnDeRss(Grunddata ĉefdatumoj2, boolean nurLokajn) {
     for (Kanal k : ĉefdatumoj2.kanaler) {
       ŝarĝiElsendojnDeRssUrl(k.eo_elsendojRssUrl, k, nurLokajn);
-      //ŝarĝiElsendojnDeRssUrl(k.eo_json.optString("elsendojRssUrl1", null), k, nurLokajn);
-      //ŝarĝiElsendojnDeRssUrl(k.json.optString("elsendojRssUrl2", null), k, nurLokajn);
     }
   }
 

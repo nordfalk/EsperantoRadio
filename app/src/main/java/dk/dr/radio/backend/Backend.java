@@ -21,7 +21,6 @@ import dk.dr.radio.net.volley.Netsvar;
  */
 
 public abstract class Backend {
-  public List<Kanal> kanaler = new ArrayList<>();
   public Favoritter favoritter = new Favoritter();
   public HashMap<String, Bitmap> kanallogo_eo = new HashMap<>();
 
@@ -67,13 +66,5 @@ public abstract class Backend {
 
   public String getSkaleretBilledeUrl(String logo_url) {
     return logo_url; // standardimplementationen skalerer ikke billederne
-  }
-
-  public void hentAlleProgramserierAtilÅ(NetsvarBehander netsvarBehander) {
-    try {
-      netsvarBehander.fikSvar(Netsvar.IKKE_UNDERSTØTTET);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 }

@@ -70,7 +70,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     String kanalkode = getArguments().getString(P_KANALKODE);
     rod = null;
-    kanal = (Kanal) App.grunddata.kanalFraKode.get(kanalkode);
+    kanal = App.grunddata.kanalFraKode.get(kanalkode);
     //Log.d(this + " onCreateView 2 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     if (rod == null) rod = inflater.inflate(R.layout.kanal_frag, container, false);
     if (kanal == null) {

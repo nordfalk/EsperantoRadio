@@ -577,7 +577,7 @@ public class DrDiskBasedCache implements Cache {
   static Map<String, String> readStringStringMap(InputStream is) throws IOException {
     int size = readInt(is);
     Map<String, String> result = (size == 0)
-        ? Collections.<String, String>emptyMap()
+        ? Collections.emptyMap()
         : new HashMap<String, String>(size);
     for (int i = 0; i < size; i++) {
       String key = readString(is).intern();

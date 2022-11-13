@@ -12,9 +12,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +37,6 @@ import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmClock_akt;
 import dk.dr.radio.vaekning.Alarms;
-import dk.dr.radio.backend.Backend;
 
 
 /**
@@ -442,13 +440,8 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       });
       aq.id(R.id.tekst).text(R.string.Indstillinger).typeface(App.skrift_gibson_fed);
 
-      if (false) {
-        tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
-        aq.id(R.id.tekst).text("Vælg P4-område").typeface(App.skrift_gibson_fed);
-      } else {
-        tilføj(R.layout.venstremenu_elem_overskrift, P4kanalvalg_frag.class);
-        aq.id(R.id.tekst).text("Elektu kanalon").typeface(App.skrift_gibson_fed);
-      }
+      tilføj(R.layout.venstremenu_elem_overskrift, Kanalvalg_frag.class);
+      aq.id(R.id.tekst).text("Elektu kanalon").typeface(App.skrift_gibson_fed);
     }
 
     public void vælgMenu(FragmentActivity akt, int position) {

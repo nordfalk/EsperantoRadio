@@ -1,6 +1,9 @@
 plugins {
     id 'java-library'
 }
+dependencies {
+    implementation 'org.json:json:20220924'
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_7

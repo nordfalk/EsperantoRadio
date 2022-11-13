@@ -40,7 +40,7 @@ import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
 
-public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnItemClickListener {
+public class Kanalvalg_frag extends Basisfragment implements AdapterView.OnItemClickListener {
 
   private KanalAdapter kanaladapter;
   private View[] listeElementer;

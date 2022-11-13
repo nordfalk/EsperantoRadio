@@ -206,11 +206,6 @@ public class EoRssParsado {
       } else {
         elsendoj = EoRssParsado.parsiElsendojnDeRss(new StringReader(xml), k);
       }
-      if (elsendoj.size() > 0) {
-        if (k.eo_rektaElsendo != null) elsendoj.add(0, k.eo_rektaElsendo);
-        k.udsendelser = elsendoj;
-        k.eo_datumFonto = "rss";
-      }
       for (Udsendelse e : elsendoj) {
         if (e.beskrivelse==null) e.beskrivelse="";
         if (k.eo_elsendojRssIgnoruTitolon) {
@@ -218,15 +213,18 @@ public class EoRssParsado {
           e.titel = bes;
           if (e.titel.length()>200) e.titel = e.titel.substring(0, 200);
         }
-
-
-        EsperantoRadioBackend.eoElsendoAlDaUdsendelse(e, k);
       }
+      if (elsendoj.size() > 0) {
+        if (k.eo_rektaElsendo != null) elsendoj.add(0, k.eo_rektaElsendo);
+        k.udsendelser = elsendoj;
+        k.eo_datumFonto = "rss";
+      }
+      for (Udsendelse e : elsendoj) EsperantoRadioBackend.eoElsendoAlDaUdsendelse(e, k);
+      EsperantoRadioBackend.eo_opdaterProgramserieFraKanal(k);
       Log.d(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
     } catch (Exception ex) {
       Log.e("Eraro parsante " + k.kode, ex);
     }
-    EsperantoRadioBackend.eo_opdaterProgramserieFraKanal(k);
   }
 
 }

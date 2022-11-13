@@ -31,7 +31,5 @@ public class ParseFraJvm {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    App.grunddata.kanaler = App.backend.kanaler;
-
   }
 }

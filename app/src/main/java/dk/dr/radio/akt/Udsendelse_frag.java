@@ -13,9 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
+import android.text.Html;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -31,62 +30,37 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
-import dk.dr.radio.data.Indslaglisteelement;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.dr.radio.backend.NetsvarBehander;
 
 public class Udsendelse_frag extends Basisfragment implements View.OnClickListener, AdapterView.OnItemClickListener, Runnable {
 
   public static final String BLOKER_VIDERE_NAVIGERING = "BLOKER_VIDERE_NAVIGERING";
   public static final String AKTUEL_UDSENDELSE_SLUG = "AKTUEL_UDSENDELSE_SLUG";
+
   private ListView listView;
   private Kanal kanal;
   protected View rod;
   private Udsendelse udsendelse;
-  private Playlisteelement playlisteElemDerSpillerNu;
-  private int playlisteElemDerSpillerNuIndex = -1;
 
-  private boolean blokerVidereNavigering;
   private ArrayList<Object> liste = new ArrayList<Object>();
   Afspiller afspiller = App.afspiller;
   private View topView;
 
-  private Runnable hentStreams = new Runnable() {
-    @Override
-    public void run() {
-      App.backend.hentUdsendelseStreams(new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar s) throws Exception {
-          // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
-          // der ikke er en programserie, og videre navigering derfor skal slås fra
-          if (!blokerVidereNavigering && App.data.programserieSlugFindesIkke.contains(udsendelse.programserieSlug)) {
-            blokerVidereNavigering = true;
-            bygListe();
-          }
-          if (getUserVisibleHint() && udsendelse.streamsKlar() && afspiller.getAfspillerstatus() == Status.STOPPET) {
-            afspiller.setLydkilde(udsendelse);
-          }
-          adapter.notifyDataSetChanged(); // Opdatér views
-        }
-      });
-    }
-  };
 
   private Runnable opdaterFavoritter = new Runnable() {
     @Override
@@ -104,7 +78,8 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    if (kanalx instanceof Kanal) kanal = kanalx;
     udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
@@ -112,16 +87,12 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       afbrydManglerData();
       return rod;
     }
-    if (kanal == null) kanal = udsendelse.getKanal();
+    if (kanal == null || "".equals(kanal.slug)) kanal = udsendelse.getKanal();
     if ("".equals(kanal.slug)) {
       Log.d("Kender ikke kanalen");
     }
 
     if (App.fejlsøgning) App.kortToast(udsendelse.programserieSlug);
-    blokerVidereNavigering = getArguments().getBoolean(BLOKER_VIDERE_NAVIGERING);
-    if (App.data.programserieSlugFindesIkke.contains(udsendelse.programserieSlug)) {
-      blokerVidereNavigering = true;
-    }
 
     Log.d("onCreateView " + this);
 
@@ -132,7 +103,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     listView.setOnItemClickListener(this);
     listView.setContentDescription(udsendelse.titel + " - " + (udsendelse.startTid == null ? "" : Datoformater.datoformat.format(udsendelse.startTid)));
     App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
-    hentStreams.run();
 
     setHasOptionsMenu(true);
     bygListe();
@@ -140,7 +110,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
     App.backend.favoritter.observatører.add(opdaterFavoritter);
-    run();
     return rod;
   }
 
@@ -149,13 +118,38 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     View v = getActivity().getLayoutInflater().inflate(R.layout.udsendelse_elem0_top, listView, false);
     AQuery aq = new AQuery(v);
     v.setTag(aq);
-    String burl = skalérBillede(udsendelse);
-    aq.id(R.id.billede).width(billedeBr, false).height(billedeHø, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
+//    aq.id(R.id.billede).width(billedeBr, false).height(billedeBr, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
+//    aq.id(R.id.billede).width(billedeBr, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK);
+
+    if (kanal.kode.equals("radioverda")) {
+      aq.id(R.id.billede).image("http://radioverda.com/storage/bildoj/programbildoj/"+udsendelse.titel+".png")
+          .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
+    } else {
+      String emblemo = udsendelse.billedeUrl;
+      if (emblemo==null || emblemo.length()==0) emblemo = kanal.kanallogo_url;
+//      aq.id(R.id.billede).image(emblemo)
+//      aq.id(R.id.billede)
+//          .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
+      Picasso.with(getActivity())
+              .load(emblemo).placeholder(null)
+              .into(aq.id(R.id.billede).getImageView());
+      Log.d("emblemo="+emblemo);
+    }
+
+//    aq.id(R.id.udsendelse_baggrundsgradient).gone();
+    aq.id(R.id.lige_nu).gone();
     aq.id(R.id.info).typeface(App.skrift_gibson);
+    aq.id(R.id.kanallogo).gone();
     aq.id(R.id.p4navn).text("");
 
-    aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(udsendelse.titel)
-        .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
+    if (kanal.eo_montruTitolojn) {
+      aq.id(R.id.titel).typeface(App.skrift_gibson_fed).text(udsendelse.titel)
+          .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
+    } else {
+      aq.id(R.id.titel).gone();
+    }
+
+//    .textSize(16).getTextView().setMaxLines(5);
     aq.id(R.id.starttid).typeface(App.skrift_gibson)
         .text(udsendelse.startTid == null ? "" : Datoformater.datoformat.format(udsendelse.startTid))
         .getTextView().setContentDescription("\u00A0");  // SLUK for højtlæsning, det varetages af listviewet
@@ -183,10 +177,12 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(spiller ? R.string.AFSPILLER : R.string.FORBINDER);
-    } else if (udsendelse.hentetStream != null) {// Hentet udsendelse
+    }
+    else if (udsendelse.hentetStream != null) {// Hentet udsendelse
       hør_ikon.setVisibility(View.VISIBLE);
       hør_tekst.setVisibility(View.GONE);
-    } else if (!erOnline) {                     // Ej online
+    }
+    else if (!erOnline) {                     // Ej online
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(R.string.INTERNETFORBINDELSE_MANGLER);
@@ -199,24 +195,22 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       hør_tekst.setVisibility(View.GONE);
     }
 
+    HentetStatus hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse);
     aq.id(R.id.hent);
-    HentetStatus hs;
 
-    if (!App.data.hentedeUdsendelser.virker() || !udsendelse.kanHentes) {
+    if (!App.data.hentedeUdsendelser.virker()) {
       aq.gone();
-      return;
     }
-    else aq.visible();
-
-    if (null!=(hs = App.data.hentedeUdsendelser.getHentetStatus(udsendelse))) {
-      if (hs.status != DownloadManager.STATUS_SUCCESSFUL && hs.status != DownloadManager.STATUS_FAILED) {
+    else if (hs != null) {
+      int status = hs.status;
+      if (status != DownloadManager.STATUS_SUCCESSFUL && status != DownloadManager.STATUS_FAILED) {
         App.forgrundstråd.removeCallbacks(this);
         App.forgrundstråd.postDelayed(this, 5000);
       }
       String statustekst = hs.statustekst;
       aq.text(" "+statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
-//    } else if (!udsendelse.kanHentes) {
-//      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
+    } else if (!udsendelse.kanHentes) {
+      aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
     } else if (!udsendelse.streamsKlar()) {
       aq.text("").enabled(false).textColor(R.color.grå40);
     } else {
@@ -228,6 +222,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   @Override
   public void setUserVisibleHint(boolean isVisibleToUser) {
     super.setUserVisibleHint(isVisibleToUser);
+    //Log.d(" QQQ setUserVisibleHint " + isVisibleToUser + "  " + this);
     if (!isVisibleToUser || !isResumed()) return;
     App.forgrundstråd.post(tjekFragmentSynligt);
   }
@@ -245,7 +240,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(tjekFragmentSynligt);
       if (!getUserVisibleHint() || !isResumed() || udsendelse==null) return; // Ekstra tjek
       Log.d("Udsendelse_frag tjekFragmentSynligt ");
-      if (aktuelUdsendelsePåKanalen() || udsendelse.playliste == null) opdaterSpillelisteRunnable.run();
+      //if (aktuelUdsendelsePåKanalen() || udsendelse.playliste == null) opdaterSpillelisteRunnable.run();
       if (udsendelse.kanHøres && afspiller.getAfspillerstatus() == Status.STOPPET) {
         afspiller.setLydkilde(udsendelse);
       }
@@ -259,24 +254,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     return res;
   }
 
-  Runnable opdaterSpillelisteRunnable = new Runnable() {
-    @Override
-    public void run() {
-      App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
-      if (!getUserVisibleHint() || !isResumed()) return;
-      //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      App.backend.hentPlayliste(new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar s) throws Exception {
-          if (getActivity() == null || s.uændret || s.fejl) return;
-          bygListe();
-        }
-      });
-      if (aktuelUdsendelsePåKanalen() && getUserVisibleHint()) {
-        App.forgrundstråd.postDelayed(opdaterSpillelisteRunnable, App.grunddata.opdaterPlaylisteEfterMs);
-      }
-    }
-  };
 
 
   @Override
@@ -284,15 +261,15 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    if (udsendelse!=null) App.backend.favoritter.observatører.remove(opdaterFavoritter);
-    App.forgrundstråd.removeCallbacks(this);
+    App.backend.favoritter.observatører.remove(opdaterFavoritter);
     super.onDestroyView();
   }
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
-    inflater.inflate(R.menu.udsendelse, menu);
+//    inflater.inflate(R.menu.udsendelse, menu);
+    inflater.inflate(R.menu.eo_ludado_menuo, menu);
     //menu.findItem(R.id.hør).setVisible(udsendelse.kanNokHøres).setEnabled(streamsKlar());
     //menu.findItem(R.id.hent).setVisible(DRData.instans.hentedeUdsendelser.virker() && udsendelse.kanNokHøres && udsendelse.hentetStream==null);
   }
@@ -303,8 +280,13 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       hør();
     } else if (item.getItemId() == R.id.hent) {
       hent();
-    } else if (item.getItemId() == R.id.del) {
-      del();
+    } else if (item.getItemId() == R.id.kundividi) {
+      del(new Intent(Intent.ACTION_SEND));
+    } else if (item.getItemId() == R.id.kontakti_kanalon) {
+      del(new Intent(Intent.ACTION_SEND)
+              .putExtra(Intent.EXTRA_EMAIL, kanal.eo_retpoŝto)
+              .putExtra(Intent.EXTRA_CC, "jacob.nordfalk@gmail.com"));
+
     } else return super.onOptionsItemSelected(item);
     return true;
   }
@@ -314,74 +296,30 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
    */
   private static class Viewholder {
     public AQuery aq;
-    public TextView titel;
-    public TextView startid;
     public int itemViewType;
   }
 
   static final int TOP = 0;
-  static final int OVERSKRIFT_PLAYLISTE_INFO = 2;
-  static final int PLAYLISTEELEM_NU = 3;
-  static final int PLAYLISTEELEM = 4;
-  static final int OVERSKRIFT_INDSLAG_INFO = 5;
-  static final int INDSLAGLISTEELEM = 6;
-  static final int INFOTEKST = 7;
-  static final int VIS_HELE_PLAYLISTEN_KNAP = 8;
-  static final int ALLE_UDSENDELSER = 9;
+  static final int INFOTEKST = 6;
+  static final int ALLE_UDSENDELSER = 8;
 
   static final int[] layoutFraType = {
       R.layout.udsendelse_elem0_top,
-      R.layout.udsendelse_elem1_berigtigelse,
       R.layout.udsendelse_elem2_overskrift_playliste_info,
       R.layout.udsendelse_elem3_playlisteelem_nu,
       R.layout.udsendelse_elem4_playlisteelem,
       R.layout.udsendelse_elem5_overskrift_indslag_info,
       R.layout.udsendelse_elem6_indslaglisteelem,
-      R.layout.udsendelse_elem7_infotekst,
+      R.layout.udsendelse_elem6_infotekst_eo,
       R.layout.udsendelse_elem8_vis_hele_playlisten_knap,
       R.layout.udsendelse_elem9_alle_udsendelser,
   };
 
-  boolean visInfo = false;
-  boolean visHelePlaylisten = false;
-
   void bygListe() {
-    Log.d("Udsendelse_frag bygListe "+liste.size() + " -> "+udsendelse.playliste);
+    Log.d("Udsendelse_frag bygListe");
     liste.clear();
     liste.add(TOP);
-    if (visInfo) {
-      liste.add(OVERSKRIFT_PLAYLISTE_INFO);
-      liste.add(INFOTEKST);
-    } else {
-      if (udsendelse.indslag != null && udsendelse.indslag.size() > 0) {
-        liste.add(OVERSKRIFT_INDSLAG_INFO);
-        liste.addAll(udsendelse.indslag);
-      } else if (udsendelse.playliste != null && udsendelse.playliste.size() > 0) {
-        liste.add(OVERSKRIFT_PLAYLISTE_INFO);
-        ArrayList<Playlisteelement> playliste = udsendelse.playliste;
-        if (aktuelUdsendelsePåKanalen()) {
-          playliste = new ArrayList<Playlisteelement>(playliste);
-          Collections.reverse(playliste); // Aktuel udsendelse skal have senest spillet nummer øverst
-          playlisteElemDerSpillerNu = playliste.get(0);
-        }
-
-        if (visHelePlaylisten) {
-          liste.addAll(playliste);
-        } else {
-          for (int i = 0; i < playliste.size(); i++) {
-            Playlisteelement e = playliste.get(i);
-            liste.add(e);
-            if (i >= 4) {
-              liste.add(VIS_HELE_PLAYLISTEN_KNAP);
-              break;
-            }
-          }
-        }
-      } else {
-        liste.add(INFOTEKST);
-      }
-    }
-    if (!blokerVidereNavigering) liste.add(ALLE_UDSENDELSER);
+    liste.add(INFOTEKST);
     adapter.notifyDataSetChanged();
   }
 
@@ -391,26 +329,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     if (udsendelse == null) return; // fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/834728045 ???
     App.forgrundstråd.removeCallbacks(this);
 
-    if (udsendelse.equals(App.afspiller.getLydkilde().getUdsendelse()))
-    {
-      // Find og fremhævet nummeret der spilles lige nu
-      long pos = App.afspiller.getCurrentPosition();
-      int spillerNuIndexNy = udsendelse.findPlaylisteElemTilTid(pos, playlisteElemDerSpillerNuIndex);
-      // Opdatér igen om 10 sekunder hvis musikken spiller, så vi kan markere det punkt på playlisten der spilles nu
-      if (App.afspiller.getAfspillerstatus()!=Status.STOPPET || App.afspiller.getLydkilde().erDirekte()) {
-        App.forgrundstråd.postDelayed(this, 10000);
-      }
-
-      Log.d("spillerNuIndex=" + spillerNuIndexNy + " for pos=" + pos);
-      if (pos > 0 && playlisteElemDerSpillerNuIndex != spillerNuIndexNy) {
-        playlisteElemDerSpillerNuIndex = spillerNuIndexNy;
-        playlisteElemDerSpillerNu = playlisteElemDerSpillerNuIndex < 0 ? null : udsendelse.playliste.get(playlisteElemDerSpillerNuIndex);
-        Log.d("playlisteElemDerSpillerNu="+playlisteElemDerSpillerNu);
-      }
-    } else {
-      playlisteElemDerSpillerNuIndex = -1;
-      playlisteElemDerSpillerNu = null;
-    }
     App.data.hentedeUdsendelser.tjekOmHentet(udsendelse);
     adapter.notifyDataSetChanged(); // Opdater knapper etc
   }
@@ -440,22 +358,12 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     @Override
     public int getItemViewType(int position) {
       Object obj = liste.get(position);
-      if (obj instanceof Integer) return (Integer) obj;
-      if (obj instanceof Indslaglisteelement) return INDSLAGLISTEELEM;
-      // Så må det være et playlisteelement
-      Playlisteelement pl = (Playlisteelement) obj;
-      return pl == playlisteElemDerSpillerNu ? PLAYLISTEELEM_NU : PLAYLISTEELEM;
+      return (Integer) obj;
     }
-/*
-    @Override
-    public boolean isItemViewTypePinned(int viewType) {
-      return viewType==TOP;
-    }
-*/
     @Override
     public boolean isEnabled(int position) {
       int type = getItemViewType(position);
-      return type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM || type == ALLE_UDSENDELSER || type == INDSLAGLISTEELEM;
+      return type == ALLE_UDSENDELSER;
     }
 
     @Override
@@ -485,17 +393,36 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         vh.itemViewType = type;
         aq = vh.aq = new AQuery(v);
         v.setTag(vh);
-        vh.startid = aq.id(R.id.starttid).typeface(App.skrift_gibson).getTextView();
-        if (type == OVERSKRIFT_PLAYLISTE_INFO || type == OVERSKRIFT_INDSLAG_INFO) {
-          aq.id(R.id.playliste).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
-          aq.id(R.id.info).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
-        } else if (type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM) {
-          vh.titel = aq.id(R.id.titel_og_kunstner).typeface(App.skrift_gibson).getTextView();
-        } else if (type == INDSLAGLISTEELEM) {
-          vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
-          aq.id(R.id.beskrivelse).typeface(App.skrift_gibson).getTextView();
-        } else if (type == VIS_HELE_PLAYLISTEN_KNAP) {
-          aq.id(R.id.vis_hele_playlisten).clicked(Udsendelse_frag.this).typeface(App.skrift_gibson);
+        if (type == INFOTEKST) {
+          String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
+          Log.d("EoUdsendelse_frag hp="+hp);
+          if (udsendelse.beskrivelse==null) {
+            aq.id(R.id.titel).getWebView().loadUrl(hp);
+            WebView browser = aq.id(R.id.titel).getWebView();
+            browser.getSettings().setLoadWithOverviewMode(true);
+            browser.getSettings().setUseWideViewPort(true);
+            browser.getSettings().setJavaScriptEnabled(true);
+            browser.getSettings().setBuiltInZoomControls(true);
+          }
+          else aq.id(R.id.titel).getWebView().loadDataWithBaseURL("fake://not/needed",
+                  udsendelse.beskrivelse
+                          + (hp==null||hp.length()==0 ? "" : ""
+                          + "<br><p>Iri al la <a href='"+hp +"'>hejmpaĝo</a></p>"
+                          + "")
+                          /*
+                          + (App.fejlsøgning ? "" : ""
+                          + "<small><br>"
+                          + "<br>slug=" + udsendelse.slug
+                          + "<br>startTidKl=" + udsendelse.startTidKl
+                          + "<br>titel=" + (udsendelse.titel==null?"null":udsendelse.titel.length())
+                          + "<br>beskrivelse=" + udsendelse.beskrivelse.length()
+                          + "<br>billedeUrl=" + udsendelse.billedeUrl
+                          + "<br>shareLink=" + udsendelse.shareLink
+                          + "<br>sonoUrl=" + udsendelse.sonoUrl
+                          + "</small>")
+                          */
+                  , "text/html", "utf-8", "");
+
         } else if (type == ALLE_UDSENDELSER) {
           aq.id(R.id.titel).typeface(App.skrift_gibson_fed);
         }
@@ -506,45 +433,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
           throw new IllegalStateException("Liste ej konsistent, der er nok sket ændringer i den fra f.eks. getView()");
       }
 
-      // Opdatér viewholderens data
-      if (type == PLAYLISTEELEM_NU || type == PLAYLISTEELEM) {
-        Playlisteelement ple = (Playlisteelement) liste.get(position);
-        vh.titel.setText(lavFedSkriftTil(ple.titel + " | " + ple.kunstner, ple.titel.length()));
-        vh.titel.setContentDescription(ple.titel + " af " + ple.kunstner);
-        vh.startid.setText(ple.startTidKl);
-        if (type == PLAYLISTEELEM_NU) {
-          ImageView im = aq.id(R.id.senest_spillet_kunstnerbillede).getImageView();
-          aq.image(skalérDiscoBilledeUrl(ple.billedeUrl, im.getWidth(), im.getHeight()));
-        } else {
-          boolean topseparator = (adapter.getItemViewType(position - 1) == PLAYLISTEELEM_NU);
-          vh.aq.id(R.id.stiplet_linje).visibility(topseparator?View.INVISIBLE:View.VISIBLE);
-        }
-        aq.id(R.id.hør).visibility(udsendelse.kanHøres && ple.offsetMs >= 0 ? View.VISIBLE : View.GONE);
-      } else if (type == INFOTEKST) {
-        aq.id(R.id.titel).typeface(App.skrift_georgia);
-        String forkortInfoStr = udsendelse.beskrivelse;
-        if (forkortInfoStr!=null && forkortInfoStr.length() > 110) {
-          forkortInfoStr = forkortInfoStr.substring(0, 110);
-          String vis_mere = getString(R.string.___vis_mere_);
-          forkortInfoStr += vis_mere;
-          SpannableString spannable = new SpannableString(forkortInfoStr);
-          spannable.setSpan(new ForegroundColorSpan(App.color.blå), forkortInfoStr.length() - vis_mere.length(), forkortInfoStr.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-          aq.clicked(Udsendelse_frag.this).text(spannable/*forkortInfoStr*/);
-        } else {
-          aq.text(forkortInfoStr);
-          Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS);
-        }
-        aq.getView().setContentDescription(udsendelse.beskrivelse);
-      } else if (type == INDSLAGLISTEELEM) {
-        Indslaglisteelement ple = (Indslaglisteelement) liste.get(position);
-        vh.titel.setText(ple.titel);
-        aq.id(R.id.beskrivelse).text(ple.beskrivelse);
-        // v.setBackgroundResource(R.drawable.elem_hvid_bg);
-        aq.id(R.id.hør).visibility(udsendelse.kanHøres && ple.offsetMs >= 0 ? View.VISIBLE : View.GONE);
-      } else if (type == OVERSKRIFT_PLAYLISTE_INFO || type == OVERSKRIFT_INDSLAG_INFO) {
-        aq.id(R.id.playliste).background(visInfo ? R.drawable.knap_graa40_bg : R.drawable.knap_sort_bg);
-        aq.id(R.id.info).background(visInfo ? R.drawable.knap_sort_bg : R.drawable.knap_graa40_bg);
-      }
       return v;
     }
   };
@@ -553,24 +441,15 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   @Override
   public void onClick(View v) {
     if (v.getId() == R.id.del) {
-      del();
+      del(new Intent(Intent.ACTION_SEND));
     } else if (v.getId() == R.id.hør) {
       hør();
     } else if (v.getId() == R.id.hent) {
       hent();
-    } else if (v.getId() == R.id.info) {
-      visInfo = true;
-      bygListe();
     } else if (v.getId() == R.id.titel) {
       TextView titel = (TextView) v;
       titel.setText(udsendelse.beskrivelse);
       Linkify.addLinks(titel, Linkify.WEB_URLS);
-    } else if (v.getId() == R.id.playliste) {
-      visInfo = false;
-      bygListe();
-    } else if (v.getId() == R.id.vis_hele_playlisten) {
-      visHelePlaylisten = true;
-      bygListe();
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
       App.backend.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
@@ -581,29 +460,27 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   }
 
 
-  private void del() {
+  private void del(Intent i) {
 
     Log.d("Udsendelse_frag " + "Del med nogen");
     try {
-      Intent intent = new Intent(Intent.ACTION_SEND);
-      intent.setType("text/plain");
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      intent.putExtra(Intent.EXTRA_SUBJECT, udsendelse.titel);
+      i.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+      i.setType("text/plain");
+      i.putExtra(Intent.EXTRA_SUBJECT, "Elsendo de " + kanal.getNavn());
 
-      String tekst = (udsendelse.titel + "\n\n" + udsendelse.beskrivelse).trim();
-      String url = udsendelse.shareLink != null ? udsendelse.shareLink : "";
+      String titolo = EoDiverse.begrænsLgd(Html.fromHtml(udsendelse.titel).toString());
+      String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
 
-      // Tilføj URL og begræns delingstekst så den passer med Twitter + max 40 tegn (som det er overkommetligt at slette manuelt)
-      // se https://www.version2.dk/artikel/twitter-vil-fremover-ikke-taelle-links-og-fotos-med-i-antal-tegn-766725
-      // "Twitter vil fremover ikke tælle links og fotos med i antal tegn".
-      //if (url.length()>0) {
-      //  if (tekst.length() > 158) tekst = tekst.substring(0, 145) + "…\n\n" + url ;
-      //} else {
-        if (tekst.length() > 180) tekst = tekst.substring(0, 169) + "…";
-      //}
-      intent.putExtra(Intent.EXTRA_TEXT, tekst);
+      String txt = "Mi aŭskultis la elsendon '" + titolo + "' "+udsendelse.startTidKl+".\n"
+              + (hp != null ? hp : "")
+              + "\n\nPS. Mi uzas la Androjdan Esperanto-radion:\n"
+              + "https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\n";
 
-      startActivity(intent);
+      i.putExtra(Intent.EXTRA_TEXT, txt);
+      Log.d(txt);
+      Log.d(i.toString());
+
+      startActivity(i);
     } catch (Exception e) {
       Log.rapporterFejl(e);
     }
@@ -679,56 +556,24 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   @Override
   public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
     if (position == 0) return;
+    //startActivity(new Intent(getActivity(), VisFragment_akt.class).putExtras(getArguments())  // Kanalkode + slug
+    //    .putExtra(VisFragment_akt.KLASSE, Programserie_frag.class.getName()).putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug));
+
     int type = adapter.getItemViewType(position);
 
-    if (type == PLAYLISTEELEM || type == PLAYLISTEELEM_NU) {
-      if (!udsendelse.streamsKlar() || !udsendelse.kanHøres)
-        return;
-      // Det må være et playlisteelement
-      final Playlisteelement pl = (Playlisteelement) liste.get(position);
-      if (udsendelse.equals(afspiller.getLydkilde()) && afspiller.getAfspillerstatus() == Status.SPILLER) {
-        afspiller.seekTo(pl.offsetMs);
-      } else {
-        App.data.senestLyttede.registrérLytning(udsendelse);
-        App.data.senestLyttede.sætStartposition(udsendelse, pl.offsetMs);
-        afspiller.setLydkilde(udsendelse);
-        afspiller.startAfspilning();
-      }
-      playlisteElemDerSpillerNu = pl;
-      playlisteElemDerSpillerNuIndex = udsendelse.playliste.indexOf(pl);
-      adapter.notifyDataSetChanged();
-    } else if (type == INDSLAGLISTEELEM) {
-      if (!udsendelse.streamsKlar()) return;
-      final Indslaglisteelement pl = (Indslaglisteelement) liste.get(position);
-      if (udsendelse.equals(afspiller.getLydkilde()) && afspiller.getAfspillerstatus() == Status.SPILLER) {
-        afspiller.seekTo(pl.offsetMs);
-      } else {
-        afspiller.setLydkilde(udsendelse);
-        afspiller.startAfspilning();
-        afspiller.observatører.add(new Runnable() {
-          @Override
-          public void run() {
-            if (afspiller.getLydkilde() == udsendelse) {
-              if (afspiller.getAfspillerstatus() != Status.SPILLER) return;
-              afspiller.seekTo(pl.offsetMs);
-            }
-            afspiller.observatører.remove(this); // afregistrér
-          }
-        });
-      }
-    } else if (type == ALLE_UDSENDELSER) {
+    if (type == ALLE_UDSENDELSER) {
 
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-          .putExtra(P_KANALKODE, kanal.kode)
-          .putExtra(P_UDSENDELSE, udsendelse.slug)
-          .putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug)
-          .getExtras());
+              .putExtra(P_KANALKODE, kanal.kode)
+              .putExtra(P_UDSENDELSE, udsendelse.slug)
+              .putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug)
+              .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commitAllowingStateLoss(); // Fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/4456778083
+              .replace(R.id.indhold_frag, f)
+              .addToBackStack(null)
+              .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+          .commit();
     }
   }
 }

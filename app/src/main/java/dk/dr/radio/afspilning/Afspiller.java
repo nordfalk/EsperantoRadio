@@ -341,7 +341,7 @@ public class Afspiller {
         setDataSourceTid = System.currentTimeMillis();
         setDataSourceLyd = false;
         try {
-          Lydstream bs = lydkilde.findBedsteStreams(false);
+          Lydstream bs = lydkilde.findBedsteStreams();
 
           if (bs == null) {
             Log.rapporterFejl(new IllegalStateException("Ingen passende lydUrl for " + lydkilde));

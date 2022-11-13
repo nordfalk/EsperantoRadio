@@ -203,7 +203,7 @@ public class HentedeUdsendelser {
   public void hent(Udsendelse udsendelse) {
     tjekDataOprettet();
     try {
-      Lydstream prioriteretListe = udsendelse.findBedsteStreams(true);
+      Lydstream prioriteretListe = udsendelse.findBedsteStreams();
       if (prioriteretListe == null) {
         Log.rapporterFejl(new IllegalStateException("ingen streamurl"), udsendelse.slug);
         App.langToast(R.string.Beklager_udsendelsen_kunne_ikke_hentes);

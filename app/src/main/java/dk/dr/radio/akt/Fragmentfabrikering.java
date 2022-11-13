@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.backend.EsperantoRadioBackend;
 
 import static dk.dr.radio.akt.Basisfragment.P_KANALKODE;
 import static dk.dr.radio.akt.Basisfragment.P_UDSENDELSE;
@@ -16,8 +15,7 @@ import static dk.dr.radio.akt.Basisfragment.P_UDSENDELSE;
 public class Fragmentfabrikering {
 
   public static Fragment udsendelse(Udsendelse udsendelse) {
-    Fragment fragment;
-      fragment = new EoUdsendelse_frag();
+    Fragment fragment = new Udsendelse_frag();
     Bundle args = new Bundle();
     args.putString(P_UDSENDELSE, udsendelse.slug);
     fragment.setArguments(args);

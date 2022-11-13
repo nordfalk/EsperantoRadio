@@ -215,7 +215,7 @@ public class App {
       if (grunddataStr != null) {
         backend.initGrunddata(grunddata, grunddataStr);
       }
-      grunddata.kanaler.addAll(backend.kanaler);
+      grunddata.kanaler.addAll(grunddata.kanaler);
     } catch (Exception e) { Log.e(""+backend, e); }
     // undgå crash
     if (grunddata.json == null) grunddata.json = new JSONObject();
@@ -344,7 +344,7 @@ public class App {
               backend.initGrunddata(grunddata, nyeGrunddata);
               // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
               grunddata.kanaler.clear();
-              grunddata.kanaler.addAll(App.backend.kanaler);
+              grunddata.kanaler.addAll(App.grunddata.kanaler);
               grunddata_prefs.edit().putString(backend.getGrunddataUrl(), nyeGrunddata).commit();
             } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
             // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662

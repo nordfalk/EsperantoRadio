@@ -51,7 +51,6 @@ public class DrVolleyStringRequest extends StringRequest {
       Log.e(url, e);
       // En fejl i den cachede værdi - smid indholdet af cachen væk, det kan alligevel ikke bruges
       App.volleyRequestQueue.getCache().remove(url);
-      return;
     } catch (Throwable e) {
       // Der kom sandsynligvis en OOM! Smid indholdet af cachen væk, det fylder alligevel for meget i RAM
       Log.rapporterFejl(e);

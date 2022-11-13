@@ -33,12 +33,5 @@ public class ProgramserierAtilAA {
   public void startHentData() {
     if (indlæst) return;
     indlæst = true;
-    App.backend.hentAlleProgramserierAtilÅ(new NetsvarBehander() {
-      @Override
-      public void fikSvar(Netsvar s) throws Exception {
-        if (s.fejl || s.uændret) return;
-        for (Runnable r : observatører) r.run(); // Informér observatører
-      }
-    });
   }
 }

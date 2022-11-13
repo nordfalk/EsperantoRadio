@@ -64,7 +64,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
     // Erstat med evt ny værdi
     //radioTxtUrl = json.optString("elsendojUrl", radioTxtUrl);
-    kanaler.clear();
 
     int antal = kanalojJs.length();
     for (int i = 0; i < antal; i++) {
@@ -82,7 +81,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
       k.eo_montruTitolojn = kJs.optBoolean("montruTitolojn", false);
 
-      kanaler.add(k);
+      grunddata.kanaler.add(k);
 
       if (rektaElsendaSonoUrl != null) {
         Udsendelse rektaElsendo = new Udsendelse(k);
@@ -110,7 +109,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     }
 
 
-    for (Kanal k : kanaler) {
+    for (Kanal k : grunddata.kanaler) {
       grunddata.kanalFraKode.put(k.kode, k);
       grunddata.kanalFraSlug.put(k.slug, k);
     }
@@ -149,13 +148,13 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         }
       }
     }.start();
-    Log.d("parseKanaler gav " + kanaler + " for " + this.getClass().getSimpleName());
+    Log.d("parseKanaler gav " + grunddata.kanaler + " for " + this.getClass().getSimpleName());
   }
 
 
   private boolean ŝarĝiKanalEmblemojn(boolean nurLokajn) {
     boolean ioEstisSxargxita = false;
-    for (Kanal k : new ArrayList<>(kanaler)) {
+    for (Kanal k : new ArrayList<>(App.grunddata.kanaler)) {
 
       if (k.kanallogo_url != null && App.backend.kanallogo_eo.get(k.slug) == null) try {
         String dosiero = FilCache.findLokaltFilnavn(k.kanallogo_url);
@@ -218,7 +217,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
 
-  public void leguRadioTxt(Grunddata grunddata, String radioTxt) {
+  public static void leguRadioTxt(Grunddata grunddata, String radioTxt) {
     String kapo = null;
     HashSet<Kanal> kanalojDeRadioTxt = new HashSet<>();
     for (String unuo : radioTxt.split("\n\r?\n")) {
@@ -269,7 +268,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
             grunddata.kanalFraKode.put(k.kode, k);
             grunddata.kanalFraSlug.put(k.slug, k);
-            kanaler.add(k);
+            grunddata.kanaler.add(k);
           }
           e.kanal = k;
           if (!"rss".equals(k.eo_datumFonto)) {
@@ -289,8 +288,8 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       }
     }
 
-    for (Kanal k : kanaler) {
-      eo_opdaterProgramserieFraKanal((Kanal) k);
+    for (Kanal k : grunddata.kanaler) {
+      eo_opdaterProgramserieFraKanal(k);
     }
   }
 

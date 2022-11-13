@@ -41,7 +41,6 @@ import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
@@ -460,6 +459,12 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   }
 
 
+  private static String begrænsLgd(String navn) {
+    if (navn == null) return "";
+    if (navn.length()<80) return navn;
+    return navn.substring(0,80);
+  }
+
   private void del(Intent i) {
 
     Log.d("Udsendelse_frag " + "Del med nogen");
@@ -468,7 +473,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       i.setType("text/plain");
       i.putExtra(Intent.EXTRA_SUBJECT, "Elsendo de " + kanal.getNavn());
 
-      String titolo = EoDiverse.begrænsLgd(Html.fromHtml(udsendelse.titel).toString());
+      String titolo = begrænsLgd(Html.fromHtml(udsendelse.titel).toString());
       String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
 
       String txt = "Mi aŭskultis la elsendon '" + titolo + "' "+udsendelse.startTidKl+".\n"

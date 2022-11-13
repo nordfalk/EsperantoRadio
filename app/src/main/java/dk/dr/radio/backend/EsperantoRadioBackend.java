@@ -57,62 +57,9 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
   public void initGrunddata(final Grunddata grunddata, String grunddataStr) throws JSONException, IOException {
-    grunddata.json = new JSONObject(grunddataStr);
-    grunddata.android_json = grunddata.json.getJSONObject("android");
+    Grunddataparser.initGrunddata2(grunddata, grunddataStr);
 
-    JSONArray kanalojJs = grunddata.json.getJSONArray("kanaloj");
-
-    // Erstat med evt ny værdi
-    //radioTxtUrl = json.optString("elsendojUrl", radioTxtUrl);
-
-    int antal = kanalojJs.length();
-    for (int i = 0; i < antal; i++) {
-      JSONObject kJs = kanalojJs.getJSONObject(i);
-      Kanal k = new Kanal();
-      k.slug = k.kode = kJs.optString("kodo", null);
-      if (k.kode ==null) continue;
-      k.navn = kJs.getString("nomo");
-      String rektaElsendaSonoUrl = kJs.optString("rektaElsendaSonoUrl", null);
-      k.eo_hejmpaĝoButono = kJs.optString("hejmpaĝoButono", null);
-      k.eo_retpoŝto = kJs.optString("retpoŝto", null);
-      k.kanallogo_url = kJs.optString("emblemoUrl", null);
-      k.eo_elsendojRssUrl = kJs.optString("elsendojRssUrl", null);
-      k.eo_elsendojRssUrl2 = kJs.optString("elsendojRssUrl2", null);
-      k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
-      k.eo_montruTitolojn = kJs.optBoolean("montruTitolojn", false);
-
-      grunddata.kanaler.add(k);
-
-      if (rektaElsendaSonoUrl != null) {
-        Udsendelse rektaElsendo = new Udsendelse(k);
-        rektaElsendo.startTid = rektaElsendo.slutTid = new Date();
-        rektaElsendo.kanalSlug = k.navn;
-        rektaElsendo.startTidKl = "REKTA";
-        rektaElsendo.titel = "";
-        rektaElsendo.sonoUrl.add(rektaElsendaSonoUrl);
-        rektaElsendo.rektaElsendaPriskriboUrl = kJs.optString("rektaElsendaPriskriboUrl", null);
-        rektaElsendo.slug = k.slug + "_rekta";
-        eoElsendoAlDaUdsendelse(rektaElsendo, k);
-        k.eo_rektaElsendo = rektaElsendo;
-        k.setStreams(rektaElsendo.streams);
-      }
-    }
-
-
-    for (Kanal k : grunddata.kanaler) {
-      grunddata.kanalFraKode.put(k.kode, k);
-      grunddata.kanalFraSlug.put(k.slug, k);
-    }
     ŝarĝiKanalEmblemojn(true);
-
-    try {
-      grunddata.opdaterGrunddataEfterMs = grunddata.json.getJSONObject("intervals").getInt("settings") * 1000;
-      grunddata.opdaterPlaylisteEfterMs = grunddata.json.getJSONObject("intervals").getInt("playlist") * 1000;
-    } catch (Exception e) {
-      Log.e(e);
-    } // Ikke kritisk
-
-
     File fil = new File(FilCache.findLokaltFilnavn(radioTxtUrl));
     InputStream is = fil.exists() ? new FileInputStream(fil) : App.res.openRawResource(R.raw.radio);
     leguRadioTxt(grunddata, Diverse.læsStreng(is));
@@ -180,9 +127,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
   public String radioTxtUrl = "http://esperanto-radio.com/radio.txt";
 
-  //public static final DateFormat datoformato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-  public static final DateFormat datoformato = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-
 
   public static void eoElsendoAlDaUdsendelse(Udsendelse e, Kanal k) {
     e.programserieSlug = e.kanalSlug = k.slug;
@@ -230,7 +174,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
            */
           e.kanalSlug = x[0].replaceAll(" ","").toLowerCase().replaceAll("ĉ", "cx");
           e.startTidKl = x[1];
-          e.startTid = datoformato.parse(x[1]);
+          e.startTid = EoRssParsado.datoformato.parse(x[1]);
           e.sonoUrl.add(x[2]);
           e.titel = e.beskrivelse = x[3];
 

@@ -35,7 +35,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import dk.dr.radio.diverse.Log;
 
 
 public class Diverse {
@@ -49,8 +48,8 @@ public class Diverse {
     URL u2 = urlConnection.getURL();
     if (!u.getHost().equals(u2.getHost())) {
       // Vi blev omdirigeret
-      Log.d("tjekOmdirigering " + u);
-      Log.d("tjekOmdirigering " + u2);
+      //Log.d("tjekOmdirigering " + u);
+      //Log.d("tjekOmdirigering " + u2);
       //Log.rapporterFejl(omdirigeringsfejl);
       throw new UnknownHostException("Der blev omdirigeret fra " + u.getHost() + " til " + u2.getHost());
     }
@@ -97,7 +96,7 @@ public class Diverse {
 
 
   public static String hentUrlSomStreng(String url) throws IOException {
-    Log.d("hentUrlSomStreng lgd=" + url.length() + "  " + url);
+    //Log.d("hentUrlSomStreng lgd=" + url.length() + "  " + url);
 
     URL u = new URL(url);
     HttpURLConnection urlConnection = (HttpURLConnection) u.openConnection();
@@ -106,7 +105,7 @@ public class Diverse {
     urlConnection.setInstanceFollowRedirects(true);
     urlConnection.connect(); // http://stackoverflow.com/questions/8179658/urlconnection-getcontent-return-null
     InputStream is = urlConnection.getInputStream();
-    Log.d("åbnGETURLConnection url.length()=" + url.length() + "  is=" + is + "  is.available()=" + is.available());
+    //Log.d("åbnGETURLConnection url.length()=" + url.length() + "  is=" + is + "  is.available()=" + is.available());
     if (urlConnection.getResponseCode() != 200)
       throw new IOException("HTTP-svar var " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage() + " for " + u);
 
@@ -150,7 +149,7 @@ public class Diverse {
         }
       }
     }
-    Log.d("sletFilerÆldreEnd: " + mappe.getName() + ": " + antalFilerDerBlevSlettet + " filer blev slettet, og " + antalByteDerBlevSlettet / 1000 + " kb frigivet");
+    //Log.d("sletFilerÆldreEnd: " + mappe.getName() + ": " + antalFilerDerBlevSlettet + " filer blev slettet, og " + antalByteDerBlevSlettet / 1000 + " kb frigivet");
     return antalByteDerBlevSlettet;
   }
 }

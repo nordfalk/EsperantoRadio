@@ -1,26 +1,30 @@
 package dk.dr.radio.backend;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
+import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoDiverse;
-import dk.dr.radio.diverse.Log;
 
 
 /**
- * http://code.google.com/p/feedgoal/
- *
  * @author Jacob Nordfalk
  */
 public class EoRssParsado {
+  public static final DateFormat datoformato = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
   /* posterous poluas la fluon per la sekva, kiun ni forprenu!
    <div class='p_embed_description'>
@@ -71,9 +75,9 @@ public class EoRssParsado {
         e.startTidKl = p.nextText().replaceAll(":00$", "00");// "Thu, 01 Aug 2013 12:01:01 +02:00" -> ..." +0200"
         //Log.d("xxxxx "+e.datoStr);
         e.startTid = new Date(Date.parse(e.startTidKl));
-        e.startTidKl = EsperantoRadioBackend.datoformato.format(e.startTid);
+        e.startTidKl = datoformato.format(e.startTid);
         e.slug = k.slug+":"+e.startTidKl;
-        Log.d("xxxxx "+e.slug);
+        //Log.d("xxxxx "+e.slug);
       } else if ("image".equals(tag)) {
         if (k.kode.startsWith("laboren")) {
           do {} while (p.next()!=XmlPullParser.TEXT); // transsaltu <url> en ekz. <image><url>http://laboren.org/static/img/laboren-3000x1687.jpg</url>...
@@ -87,7 +91,7 @@ public class EoRssParsado {
       } else if ("link".equals(tag)) {
         e.shareLink = p.nextText();
       } else if (ns == null && "title".equals(tag)) {
-        e.titel = EoDiverse.unescapeHtml3(p.nextText());
+        e.titel = UnescapeHtml.unescapeHtml3(p.nextText());
       } else if ("description".equals(tag)) {
         e.beskrivelse = p.nextText().trim();
         //e.beskrivelse = puriguPosterous1.matcher(e.beskrivelse).replaceAll("");
@@ -129,7 +133,7 @@ public class EoRssParsado {
           int ind = u2.beskrivelse.indexOf(parto);
           if (ind>0) u2.beskrivelse = u2.beskrivelse.substring(ind+parto.length());
 
-          Log.d("XXXXXX kopi " + u2.toString() + " de " + u);
+          // Log.d("XXXXXX kopi " + u2.toString() + " de " + u);
           liste2.add(u2);
         }
       }
@@ -166,13 +170,13 @@ public class EoRssParsado {
       } else if (e == null) {
         continue;
       } else if ("title".equals(tag)) {
-        e.titel = EoDiverse.unescapeHtml3(p.nextText());
+        e.titel = UnescapeHtml.unescapeHtml3(p.nextText());
       } else if ("published".equals(tag)) {
         String txt = p.nextText();
         e.startTidKl = txt.split("T")[0];
         //Log.d("e.datoStr="+e.datoStr);
-        e.startTid = EsperantoRadioBackend.datoformato.parse(e.startTidKl);
-        e.startTidKl = EsperantoRadioBackend.datoformato.format(e.startTid);
+        e.startTid = datoformato.parse(e.startTidKl);
+        e.startTidKl = datoformato.format(e.startTid);
         e.slug = "vk:"+txt.split("\\+")[0];
       } else if ("link".equals(tag)) {
         String type = p.getAttributeValue(null, "type");
@@ -199,7 +203,7 @@ public class EoRssParsado {
 
   public static void ŝarĝiElsendojnDeRssUrl(String xml, Kanal k) {
     try {
-      Log.d("============ parsas RSS de "+k.kode +" =============");
+      System.out.println("============ parsas RSS de "+k.kode +" =============");
       ArrayList<Udsendelse> elsendoj;
       if ("vinilkosmo".equals(k.kode)) {
         elsendoj = EoRssParsado.parsiElsendojnDeRssVinilkosmo(new StringReader(xml), k);
@@ -209,7 +213,7 @@ public class EoRssParsado {
       for (Udsendelse e : elsendoj) {
         if (e.beskrivelse==null) e.beskrivelse="";
         if (k.eo_elsendojRssIgnoruTitolon) {
-          String bes = EoDiverse.unescapeHtml3(e.beskrivelse.replaceAll("\\<.*?\\>", "").replace('\n', ' ').trim());
+          String bes = UnescapeHtml.unescapeHtml3(e.beskrivelse.replaceAll("\\<.*?\\>", "").replace('\n', ' ').trim());
           e.titel = bes;
           if (e.titel.length()>200) e.titel = e.titel.substring(0, 200);
         }
@@ -218,12 +222,12 @@ public class EoRssParsado {
         k.udsendelser = elsendoj;
         k.eo_datumFonto = "rss";
       }
-      for (Udsendelse e : elsendoj) EsperantoRadioBackend.eoElsendoAlDaUdsendelse(e, k);
-      EsperantoRadioBackend.eo_opdaterProgramserieFraKanal(k);
-      Log.d(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
+//      for (Udsendelse e : elsendoj) EsperantoRadioBackend.eoElsendoAlDaUdsendelse(e, k);
+//      EsperantoRadioBackend.eo_opdaterProgramserieFraKanal(k);
+      System.out.println(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
     } catch (Exception ex) {
-      Log.e("Eraro parsante " + k.kode, ex);
+      System.err.println("Eraro parsante " + k.kode);
+      ex.printStackTrace();
     }
   }
-
 }

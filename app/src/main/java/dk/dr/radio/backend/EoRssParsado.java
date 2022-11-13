@@ -215,7 +215,6 @@ public class EoRssParsado {
         }
       }
       if (elsendoj.size() > 0) {
-        if (k.eo_rektaElsendo != null) elsendoj.add(0, k.eo_rektaElsendo);
         k.udsendelser = elsendoj;
         k.eo_datumFonto = "rss";
       }

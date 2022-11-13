@@ -94,17 +94,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         rektaElsendo.slug = k.slug + "_rekta";
         eoElsendoAlDaUdsendelse(rektaElsendo, k);
         k.eo_rektaElsendo = rektaElsendo;
-        /*
-        ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
-        Lydstream ls = new Lydstream();
-        streams.add(ls);
-        k.setStreams(streams);
-        ls.url = rektaElsendaSonoUrl;
-        ls.type = Lydstream.StreamType.Shoutcast;
-        ls.kvalitet = Lydstream.StreamKvalitet.Medium;
-        */
         k.setStreams(rektaElsendo.streams);
-        //k.udsendelser.add(el);
       }
     }
 

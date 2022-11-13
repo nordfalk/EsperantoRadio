@@ -228,6 +228,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
 
       aktuelUdsendelseIndex = nyAktuelUdsendelseIndex;
       liste.clear();
+      if (kanal.eo_rektaElsendo != null) liste.add( kanal.eo_rektaElsendo);
       liste.addAll(nyListe);
       aktuelUdsendelseViewholder = null;
       if (App.fejlsøgning) Log.d("opdaterListe " + kanal.kode + "  aktuelUdsendelseIndex=" + aktuelUdsendelseIndex);

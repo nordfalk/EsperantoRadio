@@ -18,19 +18,9 @@
 
 package dk.dr.radio.data;
 
-import android.graphics.Bitmap;
-
-import org.json.JSONException;
-
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
-import dk.dr.radio.backend.Backend;
 
 public class Kanal extends Lydkilde {
   private static final long serialVersionUID = 2L;
@@ -38,7 +28,6 @@ public class Kanal extends Lydkilde {
   public String kode; // P3
   public static final String P4kode = "P4F";
   public String navn;
-  public transient Bitmap kanallogo_eo; // Bruges pt kun i EsperantoRadio
   public String kanallogo_url;
 
   public transient ArrayList<Udsendelse> udsendelser = new ArrayList<Udsendelse>();
@@ -54,9 +43,6 @@ public class Kanal extends Lydkilde {
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
 
-  public Backend getBackend() {
-    return App.backend[0];
-  }
 
   @Override
   public String toString() {

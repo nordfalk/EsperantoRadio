@@ -117,12 +117,12 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
     }
     Kanal kanal = lydkilde.getKanal();
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (kanal.kanallogo_eo ==null) {
+    if (App.backend.kanallogo_eo.get(kanal.slug) ==null) {
       remoteViews.setViewVisibility(R.id.kanallogo, View.GONE);
     } else {
       remoteViews.setViewVisibility(R.id.kanallogo, View.VISIBLE);
-      if (kanal.kanallogo_eo !=null) {
-        remoteViews.setImageViewBitmap(R.id.kanallogo, kanal.kanallogo_eo);
+      if (App.backend.kanallogo_eo.get(kanal.slug) !=null) {
+        remoteViews.setImageViewBitmap(R.id.kanallogo, App.backend.kanallogo_eo.get(kanal.slug));
       }
     }
     remoteViews.setViewVisibility(R.id.direktetekst, lydkilde.erDirekte()?View.VISIBLE:View.GONE);

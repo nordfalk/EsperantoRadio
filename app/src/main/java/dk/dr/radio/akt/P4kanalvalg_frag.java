@@ -119,7 +119,7 @@ public class P4kanalvalg_frag extends Basisfragment implements AdapterView.OnIte
       }
 
       AQuery billede = aq.id(R.id.billede);
-      billede.image(kanal.kanallogo_eo);
+      billede.image(App.backend.kanallogo_eo.get(kanal.slug));
 
       return view;
     }

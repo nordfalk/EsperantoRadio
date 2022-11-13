@@ -70,7 +70,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
   private Runnable hentStreams = new Runnable() {
     @Override
     public void run() {
-      udsendelse.getBackend().hentUdsendelseStreams(new NetsvarBehander() {
+      App.backend.hentUdsendelseStreams(new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           // 9.okt 2014 - Nicolai har forklaret at manglende 'SeriesSlug' betyder at
@@ -93,7 +93,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     public void run() {
       if (topView == null) return;
       CheckBox fav = topView.findViewById(R.id.favorit);
-      fav.setChecked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
 
@@ -139,7 +139,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
-    udsendelse.getBackend().favoritter.observatører.add(opdaterFavoritter);
+    App.backend.favoritter.observatører.add(opdaterFavoritter);
     run();
     return rod;
   }
@@ -162,7 +162,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
     if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
@@ -265,7 +265,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       App.forgrundstråd.removeCallbacks(opdaterSpillelisteRunnable);
       if (!getUserVisibleHint() || !isResumed()) return;
       //new Exception("startOpdaterSpilleliste() for "+this).printStackTrace();
-      udsendelse.getBackend().hentPlayliste(new NetsvarBehander() {
+      App.backend.hentPlayliste(new NetsvarBehander() {
         @Override
         public void fikSvar(Netsvar s) throws Exception {
           if (getActivity() == null || s.uændret || s.fejl) return;
@@ -284,7 +284,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    if (udsendelse!=null) udsendelse.getBackend().favoritter.observatører.remove(opdaterFavoritter);
+    if (udsendelse!=null) App.backend.favoritter.observatører.remove(opdaterFavoritter);
     App.forgrundstråd.removeCallbacks(this);
     super.onDestroyView();
   }
@@ -573,7 +573,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       bygListe();
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      udsendelse.getBackend().favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      App.backend.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
     } else {
       App.langToast("fejl");

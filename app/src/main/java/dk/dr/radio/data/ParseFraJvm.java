@@ -24,14 +24,14 @@ public class ParseFraJvm {
     //App.forgrundstråd = new Handler();
     App.pakkenavn = "getPackageName()";
     App.data = new Programdata();
-    App.backend = new Backend[] { new EsperantoRadioBackend() };
+    App.backend = new EsperantoRadioBackend();
     try {
-      String grunddataStr = Diverse.læsStreng(App.backend[0].getLokaleGrunddata(ApplicationSingleton.instans));
-      App.backend[0].initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+      String grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ApplicationSingleton.instans));
+      App.backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
     } catch (Exception e) {
       e.printStackTrace();
     }
-    App.grunddata.kanaler = App.backend[0].kanaler;
+    App.grunddata.kanaler = App.backend.kanaler;
 
   }
 }

@@ -3,18 +3,14 @@ package dk.dr.radio.data;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.Log;
 
 /**
  * Repræsenterer en udsendelse
  * Created by j on 28-01-14.
  */
 public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Cloneable {
-  // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/1415558087
-  // - at proguard obfuskering havde
-  // Se også http://stackoverflow.com/questions/16210831/serialization-deserialization-proguard
   private static final long serialVersionUID = -9161602458987716481L;
+  public Kanal kanal;
 
   public String titel;
   public String beskrivelse;
@@ -27,7 +23,6 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public Date slutTid;
 
   public transient ArrayList<Playlisteelement> playliste;
-  /** 'Chapters' i API'et, undgå undersættelsen 'kapitler' */
   public transient ArrayList<Indslaglisteelement> indslag;
   /**
    * API'ets udmelding på, om der er en lydstream egnet til direkte afspilning
@@ -43,11 +38,8 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public ArrayList<String> sonoUrl = new ArrayList<String>();
   public String rektaElsendaPriskriboUrl;
 
-  public Udsendelse(String s) {
-    titel = s;
-  }
-
-  public Udsendelse() {
+  public Udsendelse(Kanal k) {
+    kanal = k;
   }
 
   @Override
@@ -59,16 +51,14 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
 
   @Override
   public Kanal getKanal() {
+    return kanal;
+    /*
     Kanal k = App.grunddata.kanalFraSlug.get(kanalSlug);
     if (k == null) {
       Log.e(new IllegalStateException(kanalSlug + " manglede i grunddata.kanalFraSlug"));
       return Grunddata.ukendtKanal;
     }
-    //if (Kanal.P4kode.equals(k.kode)) {
-    //  Log.rapporterFejl(new IllegalStateException("Vi fik P4 overkanalen - ved ikke hvilken underkanal"), kanalSlug);
-    //  return Grunddata.ukendtKanal;
-    //}
-    return k;
+     */
   }
 
   @Override
@@ -121,7 +111,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
 
     // Søg nu fremad til næste nummer er for langt
     while (indeks < playliste.size() - 1 && playliste.get(indeks + 1).offsetMs < offsetMs) {
-      Log.d("findPlaylisteElemTilTid() skip playliste[" + indeks + "].offsetMs=" + playliste.get(indeks).offsetMs);
+      //Log.d("findPlaylisteElemTilTid() skip playliste[" + indeks + "].offsetMs=" + playliste.get(indeks).offsetMs);
       indeks++;
     }
     return indeks;
@@ -143,12 +133,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     kanHentes = findBedsteStreams(true) != null;
   }
 
-  public Udsendelse kopi() {
-    try {
-      return (Udsendelse) this.clone();
-    } catch (Exception e) {
-      Log.rapporterFejl(e);
-    }
-    return this;
+  public Udsendelse kopi() throws CloneNotSupportedException {
+    return (Udsendelse) this.clone();
   }
 }

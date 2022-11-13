@@ -21,23 +21,22 @@ import dk.dr.radio.backend.Backend;
  */
 public class Favoritter {
   private static final String PREF_NØGLE = "favorit til startdato";
-  final Backend backend;
   private HashMap<String, String> favoritTilStartdato;
   protected HashMap<String, Integer> favoritTilAntalDagsdato = new HashMap<>();
   private int antalNyeUdsendelser = -1;
   public List<Runnable> observatører = new ArrayList<>();
   private SharedPreferences prefs;
 
-  public Favoritter(Backend backend) {
-    this.backend = backend;
+  public Favoritter() {
+
   }
 
 
   private void tjekDataOprettet() {
     if (favoritTilStartdato != null) return;
-    prefs = ApplicationSingleton.instans.getSharedPreferences( "favoritter_"+backend.getClass().getSimpleName(), 0);
+    prefs = ApplicationSingleton.instans.getSharedPreferences( "favoritter_"+App.backend.getClass().getSimpleName(), 0);
     String str = prefs.getString(PREF_NØGLE, "");
-    Log.d("Favoritter "+backend.getClass().getSimpleName()+": læst " + str);
+    Log.d("Favoritter "+App.backend.getClass().getSimpleName()+": læst " + str);
     favoritTilStartdato = strengTilMap(str);
     if (favoritTilStartdato.isEmpty()) antalNyeUdsendelser = 0;
   }
@@ -46,7 +45,7 @@ public class Favoritter {
   private void gem() {
     String str = mapTilStreng(favoritTilStartdato);
     prefs.edit().putString(PREF_NØGLE, str).apply();
-    Log.d("Favoritter "+backend.getClass().getSimpleName()+": gemt " + str);
+    Log.d("Favoritter "+App.backend.getClass().getSimpleName()+": gemt " + str);
   }
 
   public void sætFavorit(String programserieSlug, boolean checked) {
@@ -101,13 +100,11 @@ public class Favoritter {
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
     Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
-    //if (ps!=null && ps.getUdsendelser()!=null) {
-
-    if (ps==null || ps.getUdsendelser()==null) return; // Kial / kiel okazas?
+    if (ps==null || ps.udsendelser ==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {
       Date ekde = Datoformater.apiDatoFormat.parse(dato);
-      for (Udsendelse u : ps.getUdsendelser()) {
+      for (Udsendelse u : ps.udsendelser) {
         if (u.startTid.after(ekde)) antal++;
       }
     } catch (ParseException e) {

@@ -35,7 +35,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
@@ -62,7 +61,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 import dk.dr.radio.afspilning.Afspiller;
 import dk.dr.radio.afspilning.Fjernbetjening;
@@ -122,7 +120,7 @@ public class App {
   public static Fjernbetjening fjernbetjening;
   public static RequestQueue volleyRequestQueue;
   private static boolean erInstalleretPåSDKort;
-  public static Backend[] backend;
+  public static Backend backend;
   public static Netkald netkald = new Netkald();
   private DrDiskBasedCache volleyCache;
   public static EgenTypefaceSpan skrift_gibson_fed_span;
@@ -144,7 +142,7 @@ public class App {
     res = ctx.getResources();
     pakkenavn = ctx.getPackageName();
 
-    backend = new Backend[] { new EsperantoRadioBackend() };
+    backend = new EsperantoRadioBackend();
 
     sprogKonfig = new Configuration();
 
@@ -208,7 +206,7 @@ public class App {
     // Først tjekkes om vi har en udgave i prefs, og ellers bruges den i raw-mappen
     // På et senere tidspunkt henter vi nye grunddata
     grunddata_prefs = ctx.getSharedPreferences("grunddata", 0);
-    for (Backend backend : App.backend) try {
+    try {
       Log.d("Initialiserer backend "+backend);
       String grunddataStr = grunddata_prefs.getString(backend.getGrunddataUrl(), null);
 
@@ -288,13 +286,13 @@ public class App {
       if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
         for (final Kanal kanal : grunddata.kanaler) {
           if (kanal.harStreams() || Kanal.P4kode.equals(kanal.kode))  continue;
-          kanal.getBackend().hentKanalStreams(NetsvarBehander.TOM);
+          backend.hentKanalStreams(NetsvarBehander.TOM);
         }
       }
 
-      for (Backend b : App.backend) if (b.favoritter.getAntalNyeUdsendelser() < 0) {
+      if (App.backend.favoritter.getAntalNyeUdsendelser() < 0) {
         færdig = false;
-        b.favoritter.startOpdaterAntalNyeUdsendelser.run();
+        App.backend.favoritter.startOpdaterAntalNyeUdsendelser.run();
       }
 
 
@@ -338,7 +336,7 @@ public class App {
         return;
       sidstTjekket = System.currentTimeMillis();
       Log.d("hentEvtNyeGrunddata " + (sidstTjekket - App.TIDSSTEMPEL_VED_OPSTART));
-      for (final Backend backend : App.backend) {
+      {
         App.netkald.kald(null, backend.getGrunddataUrl(), Request.Priority.LOW, new NetsvarBehander() {
           @Override
           public void fikSvar(Netsvar s) throws Exception {
@@ -358,7 +356,7 @@ public class App {
               backend.initGrunddata(grunddata, nyeGrunddata);
               // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
               grunddata.kanaler.clear();
-              for (Backend b : App.backend) grunddata.kanaler.addAll(b.kanaler);
+              grunddata.kanaler.addAll(App.backend.kanaler);
               grunddata_prefs.edit().putString(backend.getGrunddataUrl(), nyeGrunddata).commit();
             } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
             // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662

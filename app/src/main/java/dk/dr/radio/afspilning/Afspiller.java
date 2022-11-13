@@ -167,9 +167,9 @@ public class Afspiller {
         }
       };
       if (lydkilde instanceof Kanal) {
-        App.backend[0].hentKanalStreams(netsvarBehander);
+        App.backend.hentKanalStreams(netsvarBehander);
       } else if (lydkilde instanceof Udsendelse) {
-        App.backend[0].hentUdsendelseStreams(netsvarBehander);
+        App.backend.hentUdsendelseStreams(netsvarBehander);
       } else {
         Log.rapporterFejl(new IllegalStateException("Ukendt type lydkilde uden streams: "+lydkilde));
         return;
@@ -241,8 +241,8 @@ public class Afspiller {
     // Hvis det er en favorit så opdater favoritter så der ikke mere optræder nye udsendelser i denne programserie
     if (lydkilde instanceof Udsendelse) {
       String programserieSlug = ((Udsendelse) lydkilde).programserieSlug;
-      if (lydkilde.getBackend().favoritter.erFavorit(programserieSlug)) {
-        lydkilde.getBackend().favoritter.sætFavorit(programserieSlug, true);
+      if (App.backend.favoritter.erFavorit(programserieSlug)) {
+        App.backend.favoritter.sætFavorit(programserieSlug, true);
       }
     }
 

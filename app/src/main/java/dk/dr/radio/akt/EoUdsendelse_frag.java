@@ -40,9 +40,7 @@ import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.HentetStatus;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.esperanto.EoDiverse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
@@ -66,7 +64,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     public void run() {
       if (topView == null) return;
       CheckBox fav = topView.findViewById(R.id.favorit);
-      fav.setChecked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
     }
   };
 
@@ -108,7 +106,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
 
     afspiller.observatører.add(this);
     App.data.hentedeUdsendelser.observatører.add(this);
-    for (Backend b : App.backend) b.favoritter.observatører.add(opdaterFavoritter);
+    App.backend.favoritter.observatører.add(opdaterFavoritter);
     return rod;
   }
 
@@ -155,7 +153,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(udsendelse.getBackend().favoritter.erFavorit(udsendelse.programserieSlug));
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
     if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
@@ -261,7 +259,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
     App.netkald.annullerKald(this);
     afspiller.observatører.remove(this);
     App.data.hentedeUdsendelser.observatører.remove(this);
-    for (Backend b : App.backend) b.favoritter.observatører.remove(opdaterFavoritter);
+    App.backend.favoritter.observatører.remove(opdaterFavoritter);
     super.onDestroyView();
   }
 
@@ -452,7 +450,7 @@ public class EoUdsendelse_frag extends Basisfragment implements View.OnClickList
       Linkify.addLinks(titel, Linkify.WEB_URLS);
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      udsendelse.getBackend().favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      App.backend.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
     } else {
       App.langToast("fejl");

@@ -102,7 +102,7 @@ public class AlleUdsendelserAtilAA_frag extends Basisfragment implements Adapter
         linje1.setText(ps.titel);
         linje1.setTypeface(App.skrift_gibson_fed);
         linje1.setTextColor(Color.BLACK);
-        int n = ps.antalUdsendelser;
+        int n = ps.udsendelser.size();
         String txt = n==0 ? "" : n==1 ? n + " udsendelse" : n + " udsendelser";
 
         TextView linje2 = v.findViewById(R.id.linje2);

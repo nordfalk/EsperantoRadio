@@ -80,7 +80,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       afbrydManglerData();
       return rod;
     }
-    backend = kanal.getBackend();
+    backend = App.backend;
 
     App.data.senestLyttede.getListe();
 

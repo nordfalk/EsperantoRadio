@@ -56,12 +56,10 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
     boolean opdater = sidstOpdateretAntalNyeUdsendelser > System.currentTimeMillis() + 1000 * 60 * 10;
     if (opdater) sidstOpdateretAntalNyeUdsendelser = System.currentTimeMillis();
 
-    for (Backend b : App.backend) {
-      b.favoritter.observatører.add(this);
-      if (b.favoritter.getAntalNyeUdsendelser() < 0 || opdater) {
-        // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
-        b.favoritter.startOpdaterAntalNyeUdsendelser.run();
-      }
+    App.backend.favoritter.observatører.add(this);
+    if (App.backend.favoritter.getAntalNyeUdsendelser() < 0 || opdater) {
+      // Opdatering af nye antal udsendelser er ikke sket endnu - eller det er mere end end ti minutter siden.
+      App.backend.favoritter.startOpdaterAntalNyeUdsendelser.run();
     }
     run();
 
@@ -70,9 +68,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
 
   @Override
   public void onDestroyView() {
-    for (Backend b : App.backend) {
-      b.favoritter.observatører.remove(this);
-    }
+    App.backend.favoritter.observatører.remove(this);
     super.onDestroyView();
   }
 
@@ -81,7 +77,8 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   public void run() {
     App.forgrundstråd.removeCallbacks(this); // Ingen gentagne kald
     liste.clear();
-    for (final Backend b : App.backend) try {
+    final Backend b = App.backend;
+    try {
       ArrayList<String> pss = new ArrayList<>(b.favoritter.getProgramserieSlugSæt());
       Collections.sort(pss);
       Log.d(this + " "+b +" psss = " + pss);

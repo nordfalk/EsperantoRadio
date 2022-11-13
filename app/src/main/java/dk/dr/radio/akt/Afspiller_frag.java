@@ -217,12 +217,12 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
       return;
     }
     Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (kanal.kanallogo_eo !=null) {
-        kanallogo.setImageBitmap(kanal.kanallogo_eo);
+    if (App.backend.kanallogo_eo.get(kanal.slug) !=null) {
+      kanallogo.setImageBitmap(App.backend.kanallogo_eo.get(kanal.slug));
     } else {
       kanallogo.setImageResource(R.drawable.appikon);
       Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
-      Log.d("Mankas emblemo por "+kanal+ "  (lk "+lk.kanallogo_eo +")");
+      Log.d("Mankas emblemo por "+kanal+ "  (lk "+ App.backend.kanallogo_eo.get(lk.slug) +")");
     }
 
     direktetekst.setVisibility(lydkilde.erDirekte()?View.VISIBLE:View.GONE);

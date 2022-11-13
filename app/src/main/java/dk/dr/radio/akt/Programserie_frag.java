@@ -65,12 +65,8 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
       aq.id(R.id.tom).text("Der skete en fejl:\n"+ex.getMessage());
       return rod;
     }
-    if (programserie.getUdsendelser()==null) {
+    if (programserie.udsendelser ==null) {
       hentUdsendelser(0); // hent kun en frisk udgave hvis vi ikke allerede har en
-    } else if (programserie.getUdsendelser().size()==0 && programserie.antalUdsendelser>0) {
-      Log.d("Har ingen udsendelser for "+programserieSlug+ ", så den hentes igen. Der burde være "+programserie.antalUdsendelser );
-      if (!App.PRODUKTION) App.kortToast("Har ingen udsendelser for "+programserieSlug+ ", så den hentes igen. Der burde være "+programserie.antalUdsendelser);
-      hentUdsendelser(0);
     }
     bygListe();
 
@@ -85,7 +81,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   }
 
   private void hentUdsendelser(final int offset) {
-    programserie.getBackend().hentProgramserie(new NetsvarBehander() {
+    App.backend.hentProgramserie(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl && offset == 0) {
@@ -100,7 +96,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   public void onClick(View v) {
     if (v.getId()==R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      programserie.getBackend().favoritter.sætFavorit(programserieSlug, favorit.isChecked());
+      App.backend.favoritter.sætFavorit(programserieSlug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(getString(R.string.Programserien_er_føjet_til_favoritter));
     } else {
       Udsendelse udsendelse = ((Viewholder) v.getTag()).udsendelse;
@@ -127,7 +123,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
     liste.clear();
     if (programserie != null) {
       liste.add(TOP);
-      ArrayList<Udsendelse> l = programserie.getUdsendelser();
+      ArrayList<Udsendelse> l = programserie.udsendelser;
       if (l != null) {
         førsteUdsendelseDerKanHøresIndex = 0;
 
@@ -145,8 +141,8 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           liste.add(l.get(n));
         }
         førsteUdsendelseDerKanHøresIndex = 1;
-        if (programserie.getUdsendelser().size() < programserie.antalUdsendelser) {
-          Log.d("bygListe() viser TIDLIGERE: " + programserie.getUdsendelser().size() + " < " + programserie.antalUdsendelser);
+        if (programserie.udsendelser.size() < programserie.udsendelser.size()) {
+          Log.d("bygListe() viser TIDLIGERE: " + programserie.udsendelser.size() + " < " + programserie.udsendelser.size());
           liste.add(TIDLIGERE);  // Vis 'tidligere'-listeelement
         }
       }
@@ -228,7 +224,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           aq.id(R.id.alle_udsendelser).typeface(App.skrift_gibson);
           aq.id(R.id.beskrivelse).text(programserie.beskrivelse).typeface(App.skrift_georgia);
           Linkify.addLinks(aq.getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES | Linkify.PHONE_NUMBERS);
-          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(programserie.getBackend().favoritter.erFavorit(programserieSlug));
+          aq.id(R.id.favorit).clicked(Programserie_frag.this).typeface(App.skrift_gibson).checked(App.backend.favoritter.erFavorit(programserieSlug));
         } else { // if (type == UDSENDELSE eller TIDLIGERE) {
           vh.titel = aq.id(R.id.titel).typeface(App.skrift_gibson_fed).getTextView();
           vh.dato = aq.id(R.id.dato).typeface(App.skrift_gibson).getTextView();
@@ -244,9 +240,9 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
       // Opdatér viewholderens data
       if (type == TOP) {
         vh.aq.id(R.id.alle_udsendelser)
-            .text(getString(R.string.ALLE_UDSENDELSER) + " (" + programserie.antalUdsendelser + ")")
+            .text(getString(R.string.ALLE_UDSENDELSER) + " (" + programserie.udsendelser.size() + ")")
 //            .text(lavFedSkriftTil(tekst + " (" + programserie.antalUdsendelser + ")", tekst.length()))
-            .getView().setContentDescription(programserie.antalUdsendelser + " udsendelser");
+            .getView().setContentDescription(programserie.udsendelser.size() + " udsendelser");
       } else if (type==UDSENDELSE || type==UDSENDELSE_TOP) {
         Udsendelse u = (Udsendelse) liste.get(position);
         vh.udsendelse = u;
@@ -289,7 +285,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
           App.forgrundstråd.post(new Runnable() {
             @Override
             public void run() {
-              hentUdsendelser(programserie.getUdsendelser().size());
+              hentUdsendelser(programserie.udsendelser.size());
             }
           });
         } else {
@@ -326,7 +322,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
       return;
     }
 
-    hentUdsendelser(programserie.getUdsendelser().size());
+    hentUdsendelser(programserie.udsendelser.size());
     v.findViewById(R.id.titel).setVisibility(View.GONE);
     v.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
   }

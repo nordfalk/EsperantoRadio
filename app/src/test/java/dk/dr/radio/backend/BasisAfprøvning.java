@@ -56,7 +56,7 @@ public class BasisAfprøvning {
 
   public BasisAfprøvning(Backend backenden) {
     backend = backenden;
-    App.backend = new Backend[] { backenden };
+    App.backend = backenden;
     try {
       String grunddataStr = Diverse.læsStreng(backenden.getLokaleGrunddata(ApplicationSingleton.instans));
       backenden.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
@@ -88,7 +88,7 @@ public class BasisAfprøvning {
       int antalUdsendelser = 0;
 
       for (Udsendelse u : kanal.udsendelser) {
-        kanal.getBackend().hentUdsendelseStreams(NetsvarBehander.TOM);
+        App.backend.hentUdsendelseStreams(NetsvarBehander.TOM);
         Programserie ps = App.data.programserieFraSlug.get(u.programserieSlug);
         backend.hentProgramserie(NetsvarBehander.TOM);
         if (antalUdsendelser++>20) break;
@@ -110,10 +110,10 @@ public class BasisAfprøvning {
     // Tjek kun nummer 50 til nummer 100
     for (Programserie ps : liste.subList(50, 65)) {
       backend.hentProgramserie(NetsvarBehander.TOM);
-      ArrayList<Udsendelse> udsendelser = ps.getUdsendelser();
+      ArrayList<Udsendelse> udsendelser = ps.udsendelser;
 
-      System.out.println(ps.slug + " " + ps.antalUdsendelser + " " + udsendelser.size());
-      assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+ps.titel, ps.antalUdsendelser>= udsendelser.size());
+      System.out.println(ps.slug + " " + ps.udsendelser.size() + " " + udsendelser.size());
+      assertTrue(ps.slug + " har færre udsendelser end påstået:\n"+ps.titel, ps.udsendelser.size() >= udsendelser.size());
       samletAntalUdsendelser += udsendelser.size();
     }
     assertTrue("Kun "+samletAntalUdsendelser+" udsendelser!", samletAntalUdsendelser>10);

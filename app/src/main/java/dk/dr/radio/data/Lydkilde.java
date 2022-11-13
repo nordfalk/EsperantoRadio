@@ -3,9 +3,6 @@ package dk.dr.radio.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import dk.dr.radio.backend.Backend;
-import dk.dr.radio.diverse.App;
-
 /**
  * En lydkilde der kan spilles af afspilleren
  */
@@ -56,7 +53,4 @@ public abstract class Lydkilde implements Serializable {
     return slug + " str=" + streams;
   }
 
-  public Backend getBackend() {
-    return App.backend[0];
-  }
 }

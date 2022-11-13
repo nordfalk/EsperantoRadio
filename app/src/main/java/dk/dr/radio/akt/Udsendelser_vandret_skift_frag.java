@@ -109,13 +109,13 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
     Udsendelse udsFør = udsendelser.size()>viewPager.getCurrentItem() ? udsendelser.get(viewPager.getCurrentItem()) : null;
     udsendelser = new ArrayList<Udsendelse>();
-    udsendelser.addAll(programserie.getUdsendelser());
+    udsendelser.addAll(programserie.udsendelser);
     int udsIndexFør = Programserie.findUdsendelseIndexFraSlug(udsendelser, startudsendelse.slug);
     if (udsIndexFør < 0) {
       udsendelser.add(0, startudsendelse);
       // hvis startudsendelse ikke er med i listen, så hent nogle flere, i håb om at komme hen til
       // startudsendelsen (hvis vi ikke allerede har forsøgt 7 gange)
-      final int offset = programserie.getUdsendelser().size();
+      final int offset = programserie.udsendelser.size();
       if (alledeForsøgtHentet.add(offset) && antalHentedeSendeplaner++ < 7) {
         // Fix for en lang række crashes, bl.a.:
         // https://mint.splunk.com/dashboard/project/cd78aa05/errors/3004788237
@@ -140,7 +140,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   }
 
   private void hentUdsendelser() {
-    startudsendelse.getBackend().hentProgramserie(new NetsvarBehander() {
+    App.backend.hentProgramserie(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.uændret) return;

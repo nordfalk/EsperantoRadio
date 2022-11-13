@@ -64,7 +64,7 @@ public class EoRssParsado {
 
       if ("item".equals(tag)) {
         if (e != null && e.sonoUrl.size()>0) liste.add(e);
-        e = new Udsendelse();
+        e = new Udsendelse(k);
       } else if (e == null) {
         continue; // Nur sercxu por 'item'
       } else if ("pubDate".equals(tag)) {
@@ -141,7 +141,7 @@ public class EoRssParsado {
   //public static final DateFormat vinilkosmoDatoformato = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ", Locale.US);
 
   /** Parser et youtube RSS feed og returnerer det som en liste at Elsendo-objekter */
-  private static ArrayList<Udsendelse> parsiElsendojnDeRssVinilkosmo(Reader is) throws Exception {
+  private static ArrayList<Udsendelse> parsiElsendojnDeRssVinilkosmo(Reader is, Kanal k) throws Exception {
     XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
     XmlPullParser p = factory.newPullParser();
     p.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
@@ -162,7 +162,7 @@ public class EoRssParsado {
 
       if ("entry".equals(tag)) {
         if (e != null && e.sonoUrl.size()>0) liste.add(e);
-        e = new Udsendelse();
+        e = new Udsendelse(k);
       } else if (e == null) {
         continue;
       } else if ("title".equals(tag)) {
@@ -202,7 +202,7 @@ public class EoRssParsado {
       Log.d("============ parsas RSS de "+k.kode +" =============");
       ArrayList<Udsendelse> elsendoj;
       if ("vinilkosmo".equals(k.kode)) {
-        elsendoj = EoRssParsado.parsiElsendojnDeRssVinilkosmo(new StringReader(xml));
+        elsendoj = EoRssParsado.parsiElsendojnDeRssVinilkosmo(new StringReader(xml), k);
       } else {
         elsendoj = EoRssParsado.parsiElsendojnDeRss(new StringReader(xml), k);
       }

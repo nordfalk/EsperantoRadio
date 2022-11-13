@@ -1,12 +1,14 @@
 package dk.dr.radio.backend;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import dk.dr.radio.data.Favoritter;
@@ -20,7 +22,8 @@ import dk.dr.radio.net.volley.Netsvar;
 
 public abstract class Backend {
   public List<Kanal> kanaler = new ArrayList<>();
-  public Favoritter favoritter = new Favoritter(this);
+  public Favoritter favoritter = new Favoritter();
+  public HashMap<String, Bitmap> kanallogo_eo = new HashMap<>();
 
   public abstract String getGrunddataUrl();
 

@@ -33,7 +33,7 @@ public class ProgramserierAtilAA {
   public void startHentData() {
     if (indlæst) return;
     indlæst = true;
-    for (Backend b : App.backend) b.hentAlleProgramserierAtilÅ(new NetsvarBehander() {
+    App.backend.hentAlleProgramserierAtilÅ(new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) throws Exception {
         if (s.fejl || s.uændret) return;

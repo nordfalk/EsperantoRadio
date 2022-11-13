@@ -21,12 +21,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 
+import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
-import dk.dr.radio.data.esperanto.EoFavoritter;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.EoGeoblokaDetektilo;
 import dk.dr.radio.diverse.FilCache;
@@ -40,11 +40,9 @@ import dk.dr.radio.v3.R;
  */
 
 public class EsperantoRadioBackend extends Backend {
-  private static EsperantoRadioBackend instans;
 
   public EsperantoRadioBackend() {
-    instans = this;
-    favoritter = new EoFavoritter(this);
+    favoritter = new Favoritter();
   }
 
   public String getGrunddataUrl() {
@@ -88,7 +86,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       kanaler.add(k);
 
       if (rektaElsendaSonoUrl != null) {
-        Udsendelse rektaElsendo = new Udsendelse();
+        Udsendelse rektaElsendo = new Udsendelse(k);
         rektaElsendo.startTid = rektaElsendo.slutTid = new Date();
         rektaElsendo.kanalSlug = k.navn;
         rektaElsendo.startTidKl = "REKTA";
@@ -161,7 +159,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     boolean ioEstisSxargxita = false;
     for (Kanal k : new ArrayList<>(kanaler)) {
 
-      if (k.kanallogo_url != null && k.kanallogo_eo == null) try {
+      if (k.kanallogo_url != null && App.backend.kanallogo_eo.get(k.slug) == null) try {
         String dosiero = FilCache.findLokaltFilnavn(k.kanallogo_url);
         if (dosiero == null) continue;
         if (nurLokajn && !new File(dosiero).exists()) continue;
@@ -184,7 +182,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             res = Bitmap.createScaledBitmap(res, res.getWidth()/nedskaler, res.getHeight()/nedskaler, true);
           }
         }
-        k.kanallogo_eo = res;
+        App.backend.kanallogo_eo.put(k.slug, res);
       } catch (Exception ex) {
         Log.e(ex);
       }
@@ -235,7 +233,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         kapo = unuo;
       } else {
         try {
-          Udsendelse e = new Udsendelse();
+          Udsendelse e = new Udsendelse(null);
           String[] x = unuo.split("\n");
           /*
            3ZZZ en Esperanto
@@ -275,13 +273,14 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             grunddata.kanalFraSlug.put(k.slug, k);
             kanaler.add(k);
           }
+          e.kanal = k;
           if (!"rss".equals(k.eo_datumFonto)) {
             k.eo_datumFonto = "radio.txt";
             if (!kanalojDeRadioTxt.contains(k)) {
               kanalojDeRadioTxt.add(k);
               k.udsendelser.clear();
             }
-            //Log.d("Aldonas elsendon "+e.toString());
+            //Log.d("Aldonas elsendon "+e.toStri7ng());
             k.udsendelser.add(e);
             eoElsendoAlDaUdsendelse(e, k);
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
@@ -300,17 +299,24 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   static void eo_opdaterProgramserieFraKanal(Kanal k) {
     Programserie ps = App.data.programserieFraSlug.get(k.slug);
     if (ps==null) {
-      ps = new Programserie(instans);
+      ps = new Programserie();
       ps.billedeUrl = k.kanallogo_url;
       ps.beskrivelse = k.getNavn();
       ps.slug = k.slug;
       ps.titel = k.getNavn();
       App.data.programserieFraSlug.put(k.slug, ps);
     } else {
-      ps.getUdsendelser().clear();
+      ps.udsendelser.clear();
     }
-    ps.tilføjUdsendelser(0, k.udsendelser);
-    ps.antalUdsendelser = k.udsendelser.size();
+    //Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + "  får tilføjet " + (uds == null ? "nul" : uds.size()) + " elementer");
+    //if (App.fejlsøgning) Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + " elem liste:\n" + udsendelserListe + "\nfår tilføjet " + (uds == null ? "nul" : uds.size()) + " elem:\n" + uds);
+
+    if (ps.udsendelser == null) {
+      ps.udsendelser = new ArrayList<Udsendelse>(k.udsendelser);
+    } else {
+      ps.udsendelser.clear();
+      ps.udsendelser.addAll(k.udsendelser);
+    }
   }
 
 

@@ -17,7 +17,6 @@ import dk.dr.radio.data.Kanal;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.v3.R;
-import dk.dr.radio.backend.Backend;
 
 public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChangeListener, Runnable {
 
@@ -37,7 +36,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     kanaler = new ArrayList<>(50);
     ArrayList<Kanal> kanalerEjFavorit = new ArrayList<>(50);
     for (Kanal k : App.grunddata.kanaler) {
-      if (k.getBackend().favoritter.erFavorit(k.slug)) {
+      if (App.backend.favoritter.erFavorit(k.slug)) {
         kanaler.add(k);  // Favoritkanaler kommer først i listen
       } else {
         kanalerEjFavorit.add(k);
@@ -95,7 +94,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     kanalfaneblade.setViewPager(viewPager);
     kanalfaneblade.setOnPageChangeListener(this);
     App.grunddata.observatører.add(this);
-    for (Backend b : App.backend) b.favoritter.observatører.add(this);  // EO ŝanĝo
+    App.backend.favoritter.observatører.add(this);  // EO ŝanĝo
     return rod;
   }
 
@@ -119,7 +118,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     adapter = null;
     kanalfaneblade = null;
     App.grunddata.observatører.remove(this);
-    for (Backend b : App.backend) b.favoritter.observatører.remove(this);  // EO ŝanĝo
+    App.backend.favoritter.observatører.remove(this);  // EO ŝanĝo
     super.onDestroyView();
   }
 
@@ -193,7 +192,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     public String getPageIconUrl(int position) {
       Kanal k = kanaler2.get(position);
 
-      return k.getBackend().getSkaleretBilledeUrl(k.kanallogo_url);
+      return App.backend.getSkaleretBilledeUrl(k.kanallogo_url);
     }
 
     @Override

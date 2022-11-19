@@ -2,6 +2,7 @@ package dk.dr.radio.backend;
 
 import com.example.feed.PodcastRssResponse;
 import com.example.feed.PodcastsFetcher;
+import com.example.feed.Udsendelse2;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
@@ -91,8 +93,17 @@ public class Grunddataparser {
       ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl), k);
 
       PodcastRssResponse feed = new PodcastsFetcher().fetchPodcast(k.eo_elsendojRssUrl);
-      k.udsendelser = new ArrayList(feed.getUdsendelses());
-      System.out.println("feed = " + feed);
+      List<Udsendelse2> udsendelser2 = feed.getUdsendelses();
+
+      // System.out.println("feed = " + feed);
+
+      for (int i=0; i<Math.min(3, udsendelser1.size()); i++) {
+        Udsendelse u1 = udsendelser1.get(i);
+        Udsendelse2 u2 = udsendelser2.get(i);
+        System.out.println(u1);
+        System.out.println(u2);
+        System.out.println();
+      }
     }
   }
 }

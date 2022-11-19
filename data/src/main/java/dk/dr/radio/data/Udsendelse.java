@@ -41,12 +41,23 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     kanal = k;
   }
 
+
   @Override
   public String toString() {
-    // return slug + "/" + episodeIProgramserie;//startTid + "/" + slutTid;
-    return slug + "/" + startTidKl;
-  }
+    // return slug + "/" + startTidKl;
 
+    return "Udsendelse{" +
+      "titel='" + titel + '\'' +
+      ", beskrivelse='" + beskrivelse + '\'' +
+      ", billedeUrl='" + billedeUrl + '\'' +
+      ", kanalSlug='" + kanalSlug + '\'' +
+      ", programserieSlug='" + programserieSlug + '\'' +
+      ", startTid=" + startTid +
+      ", startTidKl='" + startTidKl + '\'' +
+      ", sonoUrl=" + sonoUrl +
+      ", streams=" + streams +
+      '}';
+  }
 
   @Override
   public Kanal getKanal() {

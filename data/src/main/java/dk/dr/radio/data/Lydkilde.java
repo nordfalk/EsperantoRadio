@@ -1,7 +1,6 @@
 package dk.dr.radio.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * En lydkilde der kan spilles af afspilleren
@@ -14,8 +13,8 @@ public abstract class Lydkilde implements Serializable {
 
   /** Unik menneskelig læselig ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
   public String slug;
-  public transient ArrayList<Lydstream> streams;
-  public transient Lydstream hentetStream;
+  public transient String streams;
+  public transient String hentetStream;
 
   @Override
   public boolean equals(Object o) {
@@ -25,10 +24,9 @@ public abstract class Lydkilde implements Serializable {
   }
 
 
-  public Lydstream findBedsteStreams() {
+  public String findBedsteStreams() {
     if (hentetStream != null) return hentetStream;
-    if (streams == null || streams.isEmpty()) return null;
-    return streams.get(0);
+    return streams;
   }
 
   public abstract Kanal getKanal();
@@ -38,15 +36,6 @@ public abstract class Lydkilde implements Serializable {
   public abstract Udsendelse getUdsendelse();
 
   public abstract String getNavn();
-
-  public void setStreams(ArrayList<Lydstream> str) {
-    if (str == null) return;
-    streams = str;
-  }
-
-  public boolean harStreams() {
-    return streams != null || hentetStream != null;
-  }
 
   @Override
   public String toString() {

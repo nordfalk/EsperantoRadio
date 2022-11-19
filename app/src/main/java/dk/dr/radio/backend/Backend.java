@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import androidx.annotation.NonNull;
-
 import org.json.JSONException;
 
 import java.io.File;
@@ -13,15 +11,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
@@ -129,23 +124,8 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
 
   public static void eoElsendoAlDaUdsendelse(Udsendelse e, Kanal k) {
-    e.programserieSlug = e.kanalSlug = k.slug;
-    if (e.slug==null) e.slug = e.kanalSlug + ":" + e.startTidKl;
+    if (e.slug==null) e.slug = k.slug + ":" + e.startTidDato;
     App.data.udsendelseFraSlug.put(e.slug, e);
-
-    String url = e.sonoUrl.get(0);
-    ArrayList<Lydstream> streams = lavSimpelLydstreamFraUrl(url);
-    e.setStreams(streams);
-    assert e.kanHentes == e.kanHøres;
-  }
-
-  @NonNull
-  public static ArrayList<Lydstream> lavSimpelLydstreamFraUrl(String url) {
-    Lydstream ls = new Lydstream();
-    ls.url = url;
-    ArrayList<Lydstream> streams = new ArrayList<Lydstream>();
-    streams.add(ls);
-    return streams;
   }
 
 
@@ -170,27 +150,24 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
            http://www.melburno.org.au/3ZZZradio/mp3/2011-09-26.3ZZZ.radio.mp3
            Anonco : el retmesaĝo de Floréal Martorell « Katastrofo ĉe Vinilkosmo/ Eurokka Kanto : informo pri la kompaktdisko Hiphopa Kompilo 2 « Miela obsedo » Legado: el la verko de Ken Linton Kanako el Kananam ĉapitro 12 « Stranga ĝardeno » Lez el Monato de aŭgusto /septembro « Tantamas ŝtopiĝoj » de Ivo durwael Karlo el Monato » Eksplofas la popola kolero » [...]
            */
-          e.kanalSlug = x[0].replaceAll(" ","").toLowerCase().replaceAll("ĉ", "cx");
-          e.startTidKl = x[1];
+          String kanalslug = x[0].replaceAll(" ","").toLowerCase().replaceAll("ĉ", "cx");
+          e.startTidDato = x[1];
           e.startTid = EoRssParsado.datoformato.parse(x[1]);
-          e.sonoUrl.add(x[2]);
+          e.streams = x[2];
           e.titel = e.beskrivelse = x[3];
 
-          Kanal k = grunddata.kanalFraSlug.get(e.kanalSlug);
+          if (kanalslug.equals("movadavidpunkto")) kanalslug = "movada-vidpunkto";
+
+          Kanal k = grunddata.kanalFraSlug.get(kanalslug);
           // Jen problemo. "Esperanta Retradio" nomiĝas "Peranto" en
           // http://esperanto-radio.com/radio.txt . Ni solvas tion serĉante ankaŭ por la kodo
           // "kodo": "peranto",
           // "nomo": "Esperanta Retradio",
 
           if (k == null) {
-            k = grunddata.kanalFraKode.get(e.kanalSlug);
-            if (k != null) e.kanalSlug = k.slug;
-          }
-
-          if (k == null) {
-            Log.d("Nekonata kanalnomo - ALDONAS GXIN: " + e.kanalSlug);
+            Log.d("Nekonata kanalnomo - ALDONAS GXIN: " + kanalslug);
             k = new Kanal();
-            k.kode = k.slug = e.kanalSlug;
+            k.slug = kanalslug;
             k.navn = x[0];
             k.eo_datumFonto = "radio.txt";
             Log.d("Aldonas elsendon "+e.toString());
@@ -198,8 +175,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             kanalojDeRadioTxt.add(k);
             eoElsendoAlDaUdsendelse(e, k);
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
-            grunddata.kanalFraKode.put(k.kode, k);
-            grunddata.kanalFraSlug.put(k.slug, k);
+            grunddata.kanalFraSlug.put(kanalslug, k);
             grunddata.kanaler.add(k);
           }
           e.kanal = k;
@@ -257,9 +233,12 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         public void fikSvar(Netsvar s) throws Exception {
           if (s.uændret) return;
           Log.d("eo RSS por "+kanal+" ="+s.json);
-          kanal.udsendelser = EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
-          for (Udsendelse e : kanal.udsendelser) eoElsendoAlDaUdsendelse(e, kanal);
-          eo_opdaterProgramserieFraKanal(kanal);
+          ArrayList<Udsendelse> udsendelser = EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+          if (!udsendelser.isEmpty()) {
+            kanal.udsendelser = udsendelser;
+            for (Udsendelse e : kanal.udsendelser) eoElsendoAlDaUdsendelse(e, kanal);
+            eo_opdaterProgramserieFraKanal(kanal);
+          }
           netsvarBehander.fikSvar(s);
         }
       });

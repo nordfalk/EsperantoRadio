@@ -43,19 +43,14 @@ import java.util.List;
 import dk.dr.radio.afspilning.wrapper.EmaPlayerWrapper;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerLytter;
 import dk.dr.radio.afspilning.wrapper.MediaPlayerWrapper;
-import dk.dr.radio.backend.Backend;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
-import dk.dr.radio.data.Lydstream;
-import dk.dr.radio.data.Playlisteelement;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.vaekning.AlarmAlertWakeLock;
-import dk.dr.radio.backend.NetsvarBehander;
 
 /**
  * @author j
@@ -91,7 +86,7 @@ public class Afspiller {
   public List<Runnable> positionsobservatører = new ArrayList<Runnable>();
   private HovedtelefonFjernetReciever hovedtelefonFjernetReciever = new HovedtelefonFjernetReciever();
 
-  private Lydstream lydstream;
+  private String lydstream;
   private int forbinderProcent;
   private Lydkilde lydkilde;
   public boolean vækningIGang;
@@ -141,13 +136,7 @@ public class Afspiller {
       if (vækningIGang) ringDenAlarm();
       return;
     }
-    if (!lydkilde.harStreams()) {
-      if (lydkilde instanceof Udsendelse) {
-        Udsendelse u = (Udsendelse) lydkilde;
-        if (u.sonoUrl!=null && u.sonoUrl.size()>0) lydkilde.setStreams(Backend.lavSimpelLydstreamFraUrl(u.sonoUrl.get(0)));
-      };
-    }
-    if (!lydkilde.harStreams()) {
+    if (lydkilde.streams == null) {
       Log.e(new IllegalStateException("ingen streams " + lydkilde));
       return;
     }
@@ -192,7 +181,7 @@ public class Afspiller {
 
     // Hvis det er en favorit så opdater favoritter så der ikke mere optræder nye udsendelser i denne programserie
     if (lydkilde instanceof Udsendelse) {
-      String programserieSlug = ((Udsendelse) lydkilde).programserieSlug;
+      String programserieSlug = lydkilde.getKanal().slug;
       if (App.backend.favoritter.erFavorit(programserieSlug)) {
         App.backend.favoritter.sætFavorit(programserieSlug, true);
       }
@@ -293,7 +282,7 @@ public class Afspiller {
         setDataSourceTid = System.currentTimeMillis();
         setDataSourceLyd = false;
         try {
-          Lydstream bs = lydkilde.findBedsteStreams();
+          String bs = lydkilde.findBedsteStreams();
 
           if (bs == null) {
             Log.rapporterFejl(new IllegalStateException("Ingen passende lydUrl for " + lydkilde));
@@ -304,7 +293,7 @@ public class Afspiller {
           App.data.senestLyttede.registrérLytning(lydkilde);
           Log.d("mediaPlayer.setDataSource( " + lydstream);
 
-          mediaPlayer.setDataSource(lydstream.url);
+          mediaPlayer.setDataSource(lydstream);
           //Log.d("mediaPlayer.setDataSource() slut");
           mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
           //Log.d("mediaPlayer.setDataSource() slut  " + mpTils());
@@ -538,18 +527,11 @@ public class Afspiller {
     Udsendelse u = lydkilde.getUdsendelse();
     if (u == null) return;
     long posMs = getCurrentPosition(); // spol hen til sang, der var 10 sekunder før denne
-    // TODO hvis posMs<0, skal der så skiftes til forrige udsendelse/lytning?
-    int index = u.findPlaylisteElemTilTid(posMs-10000, 0);
-    if (index < 0) {
-      // Skift 5% af udsendelsens varighed
-      posMs = posMs - getDuration()*5/100;
-      if (posMs<0) posMs=0;
-      seekTo(posMs);
-      return;
-    }
-    Playlisteelement pl = u.playliste.get(index);
-    if (posMs-10000 < pl.offsetMs) seekTo(0); // Før føste sang
-    else seekTo(pl.offsetMs);
+
+    // Skift 5% af udsendelsens varighed
+    posMs = posMs - getDuration()*5/100;
+    if (posMs<0) posMs=0;
+    seekTo(posMs);
   }
 
   public void næste() {
@@ -560,11 +542,11 @@ public class Afspiller {
       if (index == App.grunddata.kanaler.size()) index = 0;
       k = App.grunddata.kanaler.get(index);
       // Tjek om vi er kommet til P4 - vælg brugerens foretrukne underkanal
-      String kanalkode = k.kode;
-      k = App.grunddata.kanalFraKode.get(kanalkode);
+      String kanalkode = k.slug;
+      k = App.grunddata.kanalFraSlug.get(kanalkode);
       if (k==null) {
         Log.rapporterFejl(new IllegalStateException(
-            "næste() fra "+lydkilde.getKanal().kode+" gav null i="+index+" kk="+kanalkode));
+            "næste() fra "+lydkilde.getKanal().slug +" gav null i="+index+" kk="+kanalkode));
         return;
       }
       setLydkilde(k);
@@ -574,17 +556,11 @@ public class Afspiller {
     Udsendelse u = lydkilde.getUdsendelse();
     if (u == null) return;
     long posMs = getCurrentPosition();
-    int index = u.findPlaylisteElemTilTid(posMs, 0);
-    if (index < 0) {
-      // Skift 5% af udsendelsens varighed
-      posMs = posMs + getDuration()*5/100;
-      if (posMs>getDuration()) pauseAfspilning();
-      else seekTo(posMs);
-      return;
-    }
-    if (index + 1 == u.playliste.size()) return; // TODO næste udsendelse?
-    Playlisteelement pl = u.playliste.get(index + 1);
-    seekTo(pl.offsetMs);
+
+    // Skift 5% af udsendelsens varighed
+    posMs = posMs + getDuration()*5/100;
+    if (posMs>getDuration()) pauseAfspilning();
+    else seekTo(posMs);
   }
 
   //
@@ -705,7 +681,7 @@ public class Afspiller {
     @Override
     public void onBufferingUpdate(int procent) {
       if (App.fejlsøgning) Log.d("Afspiller onBufferingUpdate : " + procent + " " + mpTils());
-      Log.d("Afspiller onBufferingUpdate : " + procent);
+      //Log.d("Afspiller onBufferingUpdate : " + procent);
       //if (procent < -100) procent = -1; // Ignorér vilde tal
 
       sendOnAfspilningForbinder(procent);

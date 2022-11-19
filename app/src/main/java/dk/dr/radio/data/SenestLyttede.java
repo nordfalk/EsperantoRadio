@@ -39,7 +39,7 @@ public class SenestLyttede {
         if (sl.lydkilde instanceof Kanal) {
           // Serialiserede kanaler skal altid erstattes med instansværdier
           Kanal serialiseretKanal = (Kanal) sl.lydkilde;
-          sl.lydkilde = App.grunddata.kanalFraKode.get(serialiseretKanal.kode);
+          sl.lydkilde = App.grunddata.kanalFraSlug.get(serialiseretKanal.slug);
           // Forsvundne kanaler fjernes bare
           if (sl.lydkilde==null || sl.lydkilde==Grunddata.ukendtKanal) sli.remove();
         }

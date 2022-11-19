@@ -95,7 +95,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
             if (længdeMs>0) seekBar.setMax(længdeMs);
             slutttid.setText(DateUtils.formatElapsedTime(længdeMs / 1000));
             int pos = (int) afspiller.getCurrentPosition();
-            Log.d("   pos " + pos + "   " + længdeMs);
+            // Log.d("   pos " + pos + "   " + længdeMs);
             if (pos > 0) { // pos=0 rapporteres efter onSeekComplete, det skal ignoreres
               starttid.setText(DateUtils.formatElapsedTime(pos / 1000));
               seekBar.setProgress(pos);
@@ -440,7 +440,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
         Udsendelse udsendelse = lydkilde.getUdsendelse();
 
         Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
-        f.getArguments().putString(P_KANALKODE, lydkilde.getKanal().kode);
+        f.getArguments().putString(P_KANALKODE, lydkilde.getKanal().slug);
 
         getActivity().getSupportFragmentManager().beginTransaction()
             .replace(R.id.indhold_frag, f)

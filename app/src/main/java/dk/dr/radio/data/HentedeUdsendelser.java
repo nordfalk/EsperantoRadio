@@ -150,9 +150,7 @@ public class HentedeUdsendelser {
       if (hs.status != DownloadManager.STATUS_SUCCESSFUL) return;
       File file = new File(hs.destinationFil);
       if (file.exists()) {
-        udsendelse.hentetStream = new Lydstream();
-        udsendelse.hentetStream.url = hs.destinationFil;
-        udsendelse.kanHøres = true;
+        udsendelse.hentetStream = hs.destinationFil;
       } else {
         Log.rapporterFejl(new IllegalStateException("Fil " + file + " hentet, men fandtes ikke alligevel??!"));
       }
@@ -203,13 +201,13 @@ public class HentedeUdsendelser {
   public void hent(Udsendelse udsendelse) {
     tjekDataOprettet();
     try {
-      Lydstream prioriteretListe = udsendelse.findBedsteStreams();
+      String prioriteretListe = udsendelse.findBedsteStreams();
       if (prioriteretListe == null) {
         Log.rapporterFejl(new IllegalStateException("ingen streamurl"), udsendelse.slug);
         App.langToast(R.string.Beklager_udsendelsen_kunne_ikke_hentes);
         return;
       }
-      Uri uri = Uri.parse(prioriteretListe.url);
+      Uri uri = Uri.parse(prioriteretListe);
 
       File dir = findPlaceringAfHentedeFilerFraPrefs();
       Log.d("Hent uri=" + uri +" til "+dir);

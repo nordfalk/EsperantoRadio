@@ -110,7 +110,7 @@ public class AlarmReceiver extends BroadcastReceiver {
       context.startActivity(playAlarm);
 
 
-      Kanal nyKanal = App.grunddata.kanalFraKode.get(alarm.kanalo);
+      Kanal nyKanal = App.grunddata.kanalFraSlug.get(alarm.kanalo);
       if (nyKanal == null) {
         Log.rapporterFejl(new IllegalStateException("Alarm: Kanal findes ikke!" + alarm.kanalo + " for alarmstr=" + data));
         nyKanal = App.grunddata.forvalgtKanal;

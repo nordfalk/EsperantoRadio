@@ -38,7 +38,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
     assertTrue(App.grunddata.kanaler.size()>0);
     System.out.println( "kode \tnavn \tslug \tstreams");
     for (Kanal kanal : App.grunddata.kanaler) {
-      System.out.println( kanal.kode + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams+ " \t" + kanal.getUdsendelse()+ " \t" + kanal.udsendelser.size());
+      System.out.println( kanal.slug + "  \t" + kanal.navn + "  \t" + kanal.slug+ " \t" + kanal.streams+ " \t" + kanal.getUdsendelse()+ " \t" + kanal.udsendelser.size());
       //assertTrue("Mangler streams for " + kanal , kanal.getUdsendelse().findBedsteStreams(false).size() > 0);
     }
   }
@@ -74,7 +74,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
     for (Iterator<Kanal> ki = ĉefdatumoj2.kanaler.iterator(); ki.hasNext(); ) {
       Kanal k = ki.next();
       if (k.udsendelser.isEmpty()) {
-        Log.d("============ FORPRENAS "+k.kode +", ĉar ĝi ne havas elsendojn! "+k.eo_datumFonto);
+        Log.d("============ FORPRENAS "+k.slug +", ĉar ĝi ne havas elsendojn! "+k.eo_datumFonto);
       }
     }
   }
@@ -83,7 +83,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
 
   public void rezumo(Grunddata ĉefdatumoj2) {
     for (Kanal k : ĉefdatumoj2.kanaler) {
-      Log.d("============ "+k.kode +" ============= "+k.udsendelser.size()+" "+k.eo_datumFonto);
+      Log.d("============ "+k.slug +" ============= "+k.udsendelser.size()+" "+k.eo_datumFonto);
       int n = 0;
       for (Udsendelse e : k.udsendelser) {
 //        Log.d(n++ +" "+ e.startTidKl +" "+e.titel +" "+e.sonoUrl+" "+e.beskrivelse);
@@ -119,7 +119,7 @@ public class AfproevEsperantoRadioBackend extends BasisAfprøvning {
       Log.d(" akiris " + elsendojRssUrl);
       return EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.læsStreng(new FileInputStream(dosiero)), k);
     } catch (Exception ex) {
-      Log.e("Eraro parsante " + k.kode, ex);
+      Log.e("Eraro parsante " + k.slug, ex);
     }
     return null;
   }

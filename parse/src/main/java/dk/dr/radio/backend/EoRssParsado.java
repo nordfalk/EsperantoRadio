@@ -63,26 +63,26 @@ public class EoRssParsado {
       //System.out.println("<" + ns + ":" + tag + ">");
 
       if ("item".equals(tag)) {
-        if (e != null && e.sonoUrl.size()>0) liste.add(e);
+        if (e != null && e.streams !=null) liste.add(e);
         e = new Udsendelse(k);
       } else if (e == null) {
         continue; // Nur sercxu por 'item'
       } else if ("pubDate".equals(tag)) {
-        e.startTidKl = p.nextText().replaceAll(":00$", "00");// "Thu, 01 Aug 2013 12:01:01 +02:00" -> ..." +0200"
+        e.startTidDato = p.nextText().replaceAll(":00$", "00");// "Thu, 01 Aug 2013 12:01:01 +02:00" -> ..." +0200"
         //Log.d("xxxxx "+e.datoStr);
-        e.startTid = new Date(Date.parse(e.startTidKl));
-        e.startTidKl = datoformato.format(e.startTid);
-        e.slug = k.slug+":"+e.startTidKl;
+        e.startTid = new Date(Date.parse(e.startTidDato));
+        e.startTidDato = datoformato.format(e.startTid);
+        e.slug = k.slug+":"+e.startTidDato;
         //Log.d("xxxxx "+e.slug);
       } else if ("image".equals(tag)) {
-        if (k.kode.startsWith("laboren")) {
+        if (k.slug.startsWith("laboren")) {
           do {} while (p.next()!=XmlPullParser.TEXT); // transsaltu <url> en ekz. <image><url>http://laboren.org/static/img/laboren-3000x1687.jpg</url>...
         }
         e.billedeUrl = p.getText();
       } else if ("enclosure".equals(tag)) {
         String sontipo = p.getAttributeValue(null, "type");
         if (sontipo.startsWith("audio/")) { // audio/mpeg, audio/mpeg3 aŭ audio/mp3
-          e.sonoUrl.add(p.getAttributeValue(null, "url"));
+          if (e.streams !=null) e.streams = p.getAttributeValue(null, "url");
         }
       } else if ("link".equals(tag)) {
         e.shareLink = p.nextText();
@@ -110,31 +110,9 @@ public class EoRssParsado {
         e.beskrivelse = p.nextText();
       }
     }
-    if (e != null && e.sonoUrl.size()>0) liste.add(e);
+    if (e != null && e.streams !=null) liste.add(e);
     is.close();
 
-    if (k.kode.equals("varsoviavento")) {
-      // Varsovia Vento havas pluraj sondosieroj!
-      ArrayList<Udsendelse> liste2 = new ArrayList<Udsendelse>();
-      for (Udsendelse u : liste) {
-        liste2.add(u);
-        for (int n = 1; n < u.sonoUrl.size(); n++) {
-          Udsendelse u2 = u.kopi();
-          u2.sonoUrl = new ArrayList<>();
-          u2.sonoUrl.add(u.sonoUrl.get(n));
-          //u2.titel = u2.titel + " parto (" + (n + 1) + " el " + u.sonoUrl.size() + ") ";
-          String parto = (n + 1) + "a parto";
-          u2.titel = u2.titel + ", " + parto;
-          u2.slug += "/" + (n + 1);
-          int ind = u2.beskrivelse.indexOf(parto);
-          if (ind>0) u2.beskrivelse = u2.beskrivelse.substring(ind+parto.length());
-
-          // Log.d("XXXXXX kopi " + u2.toString() + " de " + u);
-          liste2.add(u2);
-        }
-      }
-      liste = liste2;
-    }
     return liste;
   }
 
@@ -161,7 +139,7 @@ public class EoRssParsado {
       //System.out.println("<" + ns + ":" + tag + ">");
 
       if ("entry".equals(tag)) {
-        if (e != null && e.sonoUrl.size()>0) liste.add(e);
+        if (e != null && e.streams !=null) liste.add(e);
         e = new Udsendelse(k);
       } else if (e == null) {
         continue;
@@ -169,16 +147,16 @@ public class EoRssParsado {
         e.titel = UnescapeHtml.unescapeHtml3(p.nextText());
       } else if ("published".equals(tag)) {
         String txt = p.nextText();
-        e.startTidKl = txt.split("T")[0];
+        e.startTidDato = txt.split("T")[0];
         //Log.d("e.datoStr="+e.datoStr);
-        e.startTid = datoformato.parse(e.startTidKl);
-        e.startTidKl = datoformato.format(e.startTid);
+        e.startTid = datoformato.parse(e.startTidDato);
+        e.startTidDato = datoformato.format(e.startTid);
         e.slug = "vk:"+txt.split("\\+")[0];
       } else if ("link".equals(tag)) {
         String type = p.getAttributeValue(null, "type");
         String href = p.getAttributeValue(null, "href");
         if ("audio/mpeg".equals(type)) {
-          e.sonoUrl.add(href);
+          e.streams = href;
         } else if ("image/jpeg".equals(type) && e.billedeUrl ==null) {
           e.billedeUrl =href;
         } else if ("text/html".equals(type)) {
@@ -191,16 +169,16 @@ public class EoRssParsado {
         while (e.beskrivelse.startsWith("</div>")) e.beskrivelse = e.beskrivelse.substring(6).trim();
       }
     }
-    if (e != null && e.sonoUrl.size()>0) liste.add(e);
+    if (e != null && e.streams !=null) liste.add(e);
     is.close();
     return liste;
   }
 
 
   public static ArrayList<Udsendelse> ŝarĝiElsendojnDeRssUrl(String xml, Kanal k) throws Exception {
-      System.out.println("============ parsas RSS de "+k.kode +" =============");
+      System.out.println("============ parsas RSS de "+k.slug +" =============");
       ArrayList<Udsendelse> elsendoj;
-      if ("vinilkosmo".equals(k.kode)) {
+      if ("vinilkosmo".equals(k.slug)) {
         elsendoj = EoRssParsado.parsiElsendojnDeRssVinilkosmo(new StringReader(xml), k);
       } else {
         elsendoj = EoRssParsado.parsiElsendojnDeRss(new StringReader(xml), k);
@@ -213,7 +191,7 @@ public class EoRssParsado {
           if (e.titel.length()>200) e.titel = e.titel.substring(0, 200);
         }
       }
-      System.out.println(" parsis " + k.kode + " kaj ricevis " + elsendoj.size() + " elsendojn");
+      System.out.println(" parsis " + k.slug + " kaj ricevis " + elsendoj.size() + " elsendojn");
       return elsendoj;
   }
 }

@@ -66,7 +66,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     public void run() {
       if (topView == null) return;
       CheckBox fav = topView.findViewById(R.id.favorit);
-      fav.setChecked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
+      fav.setChecked(App.backend.favoritter.erFavorit(kanal.slug));
     }
   };
 
@@ -77,8 +77,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Kanal kanalx = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
-    if (kanalx instanceof Kanal) kanal = kanalx;
+    kanal = App.grunddata.kanalFraSlug.get(getArguments().getString(P_KANALKODE));
     udsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (udsendelse == null) {
       if (!App.PRODUKTION)
@@ -90,10 +89,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     if ("".equals(kanal.slug)) {
       Log.d("Kender ikke kanalen");
     }
-
-    if (App.fejlsøgning) App.kortToast(udsendelse.programserieSlug);
-
-    Log.d("onCreateView " + this);
 
     rod = inflater.inflate(R.layout.udsendelse_frag, container, false);
     final AQuery aq = new AQuery(rod);
@@ -120,7 +115,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 //    aq.id(R.id.billede).width(billedeBr, false).height(billedeBr, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK, (float) højde9 / bredde16);
 //    aq.id(R.id.billede).width(billedeBr, false).image(burl, true, true, billedeBr, 0, null, AQuery.FADE_IN_NETWORK);
 
-    if (kanal.kode.equals("radioverda")) {
+    if (kanal.slug.equals("radioverda")) {
       aq.id(R.id.billede).image("http://radioverda.com/storage/bildoj/programbildoj/"+udsendelse.titel+".png")
           .getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
     } else {
@@ -155,7 +150,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     aq.id(R.id.hør).clicked(this);
     aq.id(R.id.hør_tekst).typeface(App.skrift_gibson);
     aq.id(R.id.hent).clicked(this).typeface(App.skrift_gibson);
-    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.backend.favoritter.erFavorit(udsendelse.programserieSlug));
+    aq.id(R.id.favorit).clicked(this).typeface(App.skrift_gibson).checked(App.backend.favoritter.erFavorit(kanal.slug));
     if (!App.data.hentedeUdsendelser.virker()) aq.gone(); // Understøttes ikke på Android 2.2
     aq.id(R.id.del).clicked(this).typeface(App.skrift_gibson);
     return v;
@@ -185,10 +180,6 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       hør_ikon.setVisibility(View.GONE);
       hør_tekst.setVisibility(View.VISIBLE);
       hør_tekst.setText(R.string.INTERNETFORBINDELSE_MANGLER);
-    } else if (!udsendelse.kanHøres && !udsendelsenErAktuelPåKanalen) {   // On demand og direkte udsendelser
-      hør_ikon.setVisibility(View.GONE);
-      hør_tekst.setVisibility(View.VISIBLE);
-      hør_tekst.setText(R.string.KAN_IKKE_AFSPILLES);
     } else {
       hør_ikon.setVisibility(View.VISIBLE);
       hør_tekst.setVisibility(View.GONE);
@@ -208,10 +199,8 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       }
       String statustekst = hs.statustekst;
       aq.text(" "+statustekst.toUpperCase()).enabled(true).textColor(R.color.grå40);
-    } else if (!udsendelse.kanHentes) {
+    } else if (udsendelse.erDirekte()) {
       aq.text(R.string.KAN_IKKE_HENTES).enabled(false).textColor(R.color.grå40);
-    } else if (!udsendelse.streamsKlar()) {
-      aq.text("").enabled(false).textColor(R.color.grå40);
     } else {
       aq.text(R.string.DOWNLOAD).enabled(true).textColor(R.color.blå);
     }
@@ -240,7 +229,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       if (!getUserVisibleHint() || !isResumed() || udsendelse==null) return; // Ekstra tjek
       Log.d("Udsendelse_frag tjekFragmentSynligt ");
       //if (aktuelUdsendelsePåKanalen() || udsendelse.playliste == null) opdaterSpillelisteRunnable.run();
-      if (udsendelse.kanHøres && afspiller.getAfspillerstatus() == Status.STOPPET) {
+      if (afspiller.getAfspillerstatus() == Status.STOPPET) {
         afspiller.setLydkilde(udsendelse);
       }
     }
@@ -451,7 +440,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       Linkify.addLinks(titel, Linkify.WEB_URLS);
     } else if (v.getId() == R.id.favorit) {
       CheckBox favorit = (CheckBox) v;
-      App.backend.favoritter.sætFavorit(udsendelse.programserieSlug, favorit.isChecked());
+      App.backend.favoritter.sætFavorit(kanal.slug, favorit.isChecked());
       if (favorit.isChecked()) App.kortToast(R.string.Programserien_er_føjet_til_favoritter);
     } else {
       App.langToast("fejl");
@@ -476,7 +465,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       String titolo = begrænsLgd(Html.fromHtml(udsendelse.titel).toString());
       String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
 
-      String txt = "Mi aŭskultis la elsendon '" + titolo + "' "+udsendelse.startTidKl+".\n"
+      String txt = "Mi aŭskultis la elsendon '" + titolo + "' "+udsendelse.startTidDato +".\n"
               + (hp != null ? hp : "")
               + "\n\nPS. Mi uzas la Androjdan Esperanto-radion:\n"
               + "https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\n";
@@ -533,23 +522,11 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
       return;
     }
-    if (!udsendelse.kanHentes) {
-      App.kortToast(R.string.Udsendelsen_kan_ikke_hentes);
-      Log.rapporterFejl(new IllegalStateException("Udsendelsen kan ikke hentes - burde ikke kunne komme hertil"));
-      return;
-    }
     App.data.hentedeUdsendelser.hent(udsendelse);
   }
 
   private void hør() {
     try {
-      if (!udsendelse.kanHøres) {
-        if (aktuelUdsendelsePåKanalen()) {
-          // Så skal man lytte til livestreamet
-          Kanal_frag.hør(kanal);
-        }
-        return;
-      }
       App.afspiller.setLydkilde(udsendelse);
       App.afspiller.startAfspilning();
     } catch (Exception e) {
@@ -570,9 +547,9 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
 
       Fragment f = new Programserie_frag();
       f.setArguments(new Intent()
-              .putExtra(P_KANALKODE, kanal.kode)
+              .putExtra(P_KANALKODE, kanal.slug)
               .putExtra(P_UDSENDELSE, udsendelse.slug)
-              .putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug)
+              .putExtra(P_PROGRAMSERIE, kanal.slug)
               .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()
               .replace(R.id.indhold_frag, f)

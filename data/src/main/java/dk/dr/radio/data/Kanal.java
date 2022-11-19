@@ -19,13 +19,9 @@
 package dk.dr.radio.data;
 
 import java.util.ArrayList;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class Kanal extends Lydkilde {
   private static final long serialVersionUID = 2L;
-
-  public String kode;
 
   public String navn;
   public String kanallogo_url;
@@ -44,7 +40,7 @@ public class Kanal extends Lydkilde {
 
   @Override
   public String toString() {
-    return kode+"/"+slug;// + "/" + navn + "/" + logoUrl;
+    return slug;// + "/" + navn + "/" + logoUrl;
   }
 
 
@@ -56,11 +52,6 @@ public class Kanal extends Lydkilde {
   @Override
   public boolean erDirekte() {
     return eo_rektaElsendo!=null;
-  }
-
-  @Override
-  public boolean harStreams() {
-    return udsendelser.size()>0;
   }
 
   /** Finder den aktuelle udsendelse på kanalen */

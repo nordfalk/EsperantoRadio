@@ -80,7 +80,7 @@ public class Hovedaktivitet extends Basisaktivitet implements Runnable {
           if (lydkilde instanceof Udsendelse) {
             Udsendelse udsendelse = lydkilde.getUdsendelse();
             Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
-            f.getArguments().putString(Basisfragment.P_KANALKODE, lydkilde.getKanal().kode);
+            f.getArguments().putString(Basisfragment.P_KANALKODE, lydkilde.getKanal().slug);
 
             getSupportFragmentManager().beginTransaction()
                 .replace(R.id.indhold_frag, f)

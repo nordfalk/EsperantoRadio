@@ -25,7 +25,7 @@ public class Fragmentfabrikering {
   public static Fragment kanal(Kanal k) {
     Fragment f = new Kanal_frag();
     Bundle b = new Bundle();
-    b.putString(P_KANALKODE, k.kode);
+    b.putString(P_KANALKODE, k.slug);
     f.setArguments(b);
     return f;
   }

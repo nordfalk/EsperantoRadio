@@ -46,13 +46,13 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
     View rod = inflater.inflate(R.layout.udsendelser_vandret_skift_frag, container, false);
 
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    kanal = App.grunddata.kanalFraSlug.get(getArguments().getString(P_KANALKODE));
     startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (startudsendelse == null) { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/805598045
       if (!App.PRODUKTION) { // https://www.bugsense.com/dashboard/project/cd78aa05/errors/822628124
         App.langToast("startudsendelse==null for " + kanal);
       }
-      Log.e(new IllegalStateException("startudsendelse==null"));
+      Log.e(new IllegalStateException("startudsendelse==null for "+getArguments().getString(P_UDSENDELSE)));
       // Fjern backstak og hop ud
       FragmentManager fm = getActivity().getSupportFragmentManager();
       fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -105,7 +105,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
   private HashSet<Integer> alledeForsøgtHentet = new HashSet<>(); // forsøg ikke at hente det samme offset flere gange
   private void opdaterUdsendelser() {
     if (viewPager == null) return;
-    if (programserie==null) programserie = App.data.programserieFraSlug.get(startudsendelse.programserieSlug);
+    if (programserie==null) programserie = App.data.programserieFraSlug.get(kanal.slug);
 
     Udsendelse udsFør = udsendelser.size()>viewPager.getCurrentItem() ? udsendelser.get(viewPager.getCurrentItem()) : null;
     udsendelser = new ArrayList<Udsendelse>();
@@ -185,7 +185,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
       //if (App.EMULATOR) Log.d("getItem() liste2.size() = "+liste2.size());
       Udsendelse u = liste2.get(position);
       Fragment f = Fragmentfabrikering.udsendelse(u);
-      f.getArguments().putString(P_KANALKODE, kanal.kode);
+      f.getArguments().putString(P_KANALKODE, kanal.slug);
       f.getArguments().putString(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, getArguments().getString(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG));
       return f;
     }
@@ -233,7 +233,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
         Log.rapporterFejl(new IllegalStateException("u.startTid==null for "+u.slug));
         return getString(R.string.i_dag);
       }
-      if ("REKTA".equals(u.startTidKl)) return u.startTidKl;
+      if ("REKTA".equals(u.startTidDato)) return u.startTidDato;
       String dato = Datoformater.datoformat.format(u.startTid);
       if (dato.equals(Datoformater.iDagDatoStr)) dato = getString(R.string.i_dag);
       else if (dato.equals(Datoformater.iMorgenDatoStr)) dato = getString(R.string.i_morgen);

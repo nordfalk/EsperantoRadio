@@ -138,7 +138,7 @@ public class Senest_lyttede_frag extends Basisfragment implements AdapterView.On
         vh.titel.setText(u.titel);
         vh.dato.setVisibility(View.VISIBLE);
         Kanal k = u.getKanal();
-        vh.dato.setText((k == Grunddata.ukendtKanal ? "" : (k.navn + " - ")) + getString(R.string._kl_, Datoformater.getDagsbeskrivelse(u.startTid).toLowerCase(), u.startTidKl));
+        vh.dato.setText((k == Grunddata.ukendtKanal ? "" : (k.navn + " - ")) + getString(R.string._kl_, Datoformater.getDagsbeskrivelse(u.startTid).toLowerCase(), u.startTidDato));
       } else {
         Log.rapporterFejl(new Exception("forkert type"), sl.lydkilde);
       }

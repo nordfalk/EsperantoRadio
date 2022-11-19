@@ -126,7 +126,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
   public void onPageSelected(int position) {
     Log.d("onPageSelected( " + position);
     // Husk foretrukken getKanal
-    App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanaler.get(position).kode).commit();
+    App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanaler.get(position).slug).commit();
   }
 
   @Override

@@ -51,7 +51,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     programserieSlug = getArguments().getString(P_PROGRAMSERIE);
     Log.d("onCreateView " + this + " viser " + programserieSlug);
-    kanal = App.grunddata.kanalFraKode.get(getArguments().getString(P_KANALKODE));
+    kanal = App.grunddata.kanalFraSlug.get(getArguments().getString(P_KANALKODE));
     rod = inflater.inflate(R.layout.udsendelse_frag, container, false);
     aq = new AQuery(rod);
     listView = aq.id(R.id.listView).adapter(adapter).getListView();
@@ -126,11 +126,6 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
       ArrayList<Udsendelse> l = programserie.udsendelser;
       if (l != null) {
         førsteUdsendelseDerKanHøresIndex = 0;
-
-        for (Udsendelse u : l) {
-          if (u.kanHøres) break;
-          førsteUdsendelseDerKanHøresIndex++;
-        }
 
         // Udsendelsesserie hvor ingen udsendelser kan høres - her viser vi alle udsendelserne
         if (førsteUdsendelseDerKanHøresIndex==l.size()) {
@@ -254,7 +249,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
         vh.titel.setText(u.titel);
         if (type==UDSENDELSE) {
           // Vis hvilke udsendelser der kan hentes
-          vh.titel.setTextColor(u.kanHentes ? Color.BLACK : App.color.grå60);
+          vh.titel.setTextColor(!u.erDirekte() ? Color.BLACK : App.color.grå60);
         }
         vh.dato.setText(Datoformater.datoformat.format(u.startTid));
         //Log.d("DRJson.datoformat.format(u.startTid)=" + DRJson.datoformat.format(u.startTid));
@@ -311,7 +306,7 @@ public class Programserie_frag extends Basisfragment implements AdapterView.OnIt
                   new Udsendelser_vandret_skift_frag(); // standard
       f.setArguments(new Intent()
           .putExtra(Udsendelse_frag.BLOKER_VIDERE_NAVIGERING, true)
-          .putExtra(P_KANALKODE, kanal == null ? null : kanal.kode)
+          .putExtra(P_KANALKODE, kanal == null ? null : kanal.slug)
           .putExtra(P_UDSENDELSE, udsendelse.slug)
           .getExtras());
       getActivity().getSupportFragmentManager().beginTransaction()

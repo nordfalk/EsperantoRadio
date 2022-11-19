@@ -229,9 +229,9 @@ public class Alarms {
     Calendar c = Calendar.getInstance();
     c.setTimeInMillis(atTimeInMillis);
 
-    Kanal nyKanal = App.grunddata.kanalFraKode.get(alarm.kanalo);
+    Kanal nyKanal = App.grunddata.kanalFraSlug.get(alarm.kanalo);
     if (nyKanal == null) {
-      Log.rapporterFejl(new IllegalStateException("Alarm: Kanal findes ikke!"), alarm.kanalo + " var ikke i "+ App.grunddata.kanalFraKode.keySet() );
+      Log.rapporterFejl(new IllegalStateException("Alarm: Kanal findes ikke!"), alarm.kanalo + " var ikke i "+ App.grunddata.kanalFraSlug.keySet() );
       nyKanal = App.grunddata.forvalgtKanal;
     }
 

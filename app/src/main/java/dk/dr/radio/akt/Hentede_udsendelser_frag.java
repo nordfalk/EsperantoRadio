@@ -240,11 +240,7 @@ public class Hentede_udsendelser_frag extends Basisfragment implements AdapterVi
         if (hs!=null) {
           hentedeUdsendelser.stop(u); //xxx
         } else {
-          if (u.streamsKlar()) hentedeUdsendelser.hent(u); // vi har streams, hent dem
-          else {
-            Log.d("Hentede_udsendelser_frag - hack - vis udsendelsessiden, den indlæser streamsne");
-            visUdsendelse_frag(u);
-          }
+          hentedeUdsendelser.hent(u); // vi har streams, hent dem
         }
       }
     } catch (Exception e) {

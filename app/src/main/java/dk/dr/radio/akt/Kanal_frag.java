@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AlertDialog;
+
 import android.text.Html;
 import android.text.Layout;
 import android.text.Spannable;
@@ -34,7 +34,6 @@ import java.util.Date;
 
 import dk.dr.radio.afspilning.Status;
 import dk.dr.radio.akt.diverse.Basisadapter;
-import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
@@ -70,7 +69,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
     //Log.d(this + " onCreateView startet efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     String kanalkode = getArguments().getString(P_KANALKODE);
     rod = null;
-    kanal = App.grunddata.kanalFraKode.get(kanalkode);
+    kanal = App.grunddata.kanalFraSlug.get(kanalkode);
     //Log.d(this + " onCreateView 2 efter " + (System.currentTimeMillis() - App.opstartstidspunkt) + " ms");
     if (rod == null) rod = inflater.inflate(R.layout.kanal_frag, container, false);
     if (kanal == null) {
@@ -230,7 +229,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       if (kanal.eo_rektaElsendo != null) liste.add( kanal.eo_rektaElsendo);
       liste.addAll(nyListe);
       aktuelUdsendelseViewholder = null;
-      if (App.fejlsøgning) Log.d("opdaterListe " + kanal.kode + "  aktuelUdsendelseIndex=" + aktuelUdsendelseIndex);
+      if (App.fejlsøgning) Log.d("opdaterListe " + kanal.slug + "  aktuelUdsendelseIndex=" + aktuelUdsendelseIndex);
       adapter.notifyDataSetChanged();
       if (!brugerHarNavigeret) {
         if (App.fejlsøgning)
@@ -399,7 +398,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
         case AKTUEL:
           aktuelUdsendelseViewholder = vh;
           udsendelse.beskrivelse = rektaElsendaPriskribo;
-          vh.starttid.setText(udsendelse.startTidKl);
+          vh.starttid.setText(udsendelse.startTidDato);
 
           if (udsendelse.rektaElsendaPriskriboUrl!=null && rektaElsendaPriskribo==null) {
             opdaterSenestSpillet(udsendelse);
@@ -413,12 +412,12 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           // det skyldtes at hentSendeplanForDag(), der ændrede i listen, mens ListView var ved at kalde fra getView()
           Spannable spannable;
           if (udsendelse.titel.equals(udsendelse.beskrivelse)) {
-            spannable = new SpannableString(udsendelse.startTidKl+"  "+udsendelse.titel);
+            spannable = new SpannableString(udsendelse.startTidDato +"  "+udsendelse.titel);
           } else {
-            spannable = new SpannableString(udsendelse.startTidKl+"  "+udsendelse.titel+"\n"+ Html.fromHtml(udsendelse.beskrivelse.replaceAll("<.+?>", "")));
+            spannable = new SpannableString(udsendelse.startTidDato +"  "+udsendelse.titel+"\n"+ Html.fromHtml(udsendelse.beskrivelse.replaceAll("<.+?>", "")));
           }
 
-          int klPos = udsendelse.startTidKl.length();
+          int klPos = udsendelse.startTidDato.length();
           spannable.setSpan(new ForegroundColorSpan(App.color.grå40), 0, klPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
           spannable.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), klPos+2, klPos+2+udsendelse.titel.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -505,7 +504,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
       App.accessibilityManager.isEnabled() || !App.prefs.getBoolean("udsendelser_bladr", true) ? Fragmentfabrikering.udsendelse(u) :
         new Udsendelser_vandret_skift_frag();
     f.setArguments(new Intent()
-      .putExtra(P_KANALKODE, kanal.kode)
+      .putExtra(P_KANALKODE, kanal.slug)
       .putExtra(Udsendelse_frag.AKTUEL_UDSENDELSE_SLUG, aktuelUdsendelseSlug)
       .putExtra(P_UDSENDELSE, u.slug)
       .getExtras());

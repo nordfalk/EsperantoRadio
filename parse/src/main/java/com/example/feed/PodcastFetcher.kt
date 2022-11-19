@@ -17,9 +17,8 @@
 package com.example.feed
 
 import com.rometools.modules.itunes.EntryInformation
-import com.rometools.modules.itunes.FeedInformation
-import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
+import dk.dr.radio.backend.EoRssParsado
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -48,6 +47,25 @@ class PodcastsFetcher() {
 
     }
 
+    /*
+
+data class Kanal2(
+val navn: String,
+val description: String? = null,
+val kanallogo_url: String? = null,
+// val copyright: String? = null
+)
+
+    val feedInfo = syndFeed.getModule(PodcastModuleDtd) as? FeedInformation
+    val kanal = Kanal2(
+        navn = syndFeed.title,
+        description = feedInfo?.summary ?: syndFeed.description,
+        // copyright = syndFeed.copyright,
+        kanallogo_url = feedInfo?.imageUri?.toString()
+    )
+    val podcastRssResponse = PodcastRssResponse(kanal, udsendelser)
+
+     */
 
     /**
      * It seems that most podcast hosts do not implement HTTP caching appropriately.
@@ -65,7 +83,7 @@ class PodcastsFetcher() {
      */
     private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
-    fun fetchPodcast(url: String): PodcastRssResponse {
+    fun fetchPodcast(url: String): List<Udsendelse2> {
         println("====== parsas "+url)
         val request = Request.Builder()
             .url(url)
@@ -77,49 +95,31 @@ class PodcastsFetcher() {
         // println("syndFeed.modules = ${syndFeed.modules}")
         println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
 
-        val udsendelser = syndFeed.entries.map {
-            val entryInformation = it.getModule(PodcastModuleDtd) as? EntryInformation
+        val udsendelser = syndFeed.entries.map { entry ->
+            val entryInformation = entry.getModule(PodcastModuleDtd) as? EntryInformation
             Udsendelse2(
-                titel = it.title,
-                summary = entryInformation?.summary ?: it.description?.value,
+                titel = entry.title,
+                summary = entryInformation?.summary ?: entry.description?.value,
                 subtitle = entryInformation?.subtitle,
-                published = it.publishedDate,
+                startTid = entry.publishedDate,
+                startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
                 duration = entryInformation?.duration?.milliseconds,
-                feedEntry = it
+                // feedEntry = entry
             )
         }
-        val feedInfo = syndFeed.getModule(PodcastModuleDtd) as? FeedInformation
-        val kanal = Kanal2(
-            navn = syndFeed.title,
-            description = feedInfo?.summary ?: syndFeed.description,
-            // copyright = syndFeed.copyright,
-            kanallogo_url = feedInfo?.imageUri?.toString()
-        )
-        val podcastRssResponse = PodcastRssResponse(kanal, udsendelser)
 
-        return podcastRssResponse
+        return udsendelser
     }
 }
-
-data class Kanal2(
-    val navn: String,
-    val description: String? = null,
-    val kanallogo_url: String? = null,
-    // val copyright: String? = null
-)
 
 data class Udsendelse2(
     val titel: String,
     val subtitle: String? = null,
-    val published: Date,
+    val startTid: Date,
+    val startTidDato: String,
     val summary: String? = null,
     val duration: Long? = null,
-    val feedEntry: SyndEntry
-)
-
-data class PodcastRssResponse(
-    val kanal: Kanal2,
-    val udsendelses: List<Udsendelse2>,
-    ) {
+    // val feedEntry: SyndEntry
+) {
 }
 

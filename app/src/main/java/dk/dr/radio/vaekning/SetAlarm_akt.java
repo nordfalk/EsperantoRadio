@@ -99,7 +99,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
     ArrayList<String> kk = new ArrayList<String>();
     ArrayList<String> kn = new ArrayList<String>();
     for (Kanal k : App.grunddata.kanaler) {
-      kk.add(k.kode);
+      kk.add(k.slug);
       kn.add(k.navn);
     }
     Log.d("kk=" + kk);
@@ -118,7 +118,7 @@ public class SetAlarm_akt extends PreferenceActivity implements Preference.OnPre
     if (alarm == null) {
       // No alarm means create a new alarm.
       alarm = new Alarm();
-      alarm.kanalo = App.grunddata.forvalgtKanal.kode;
+      alarm.kanalo = App.grunddata.forvalgtKanal.slug;
     }
     mOriginalAlarm = alarm;
 

@@ -214,7 +214,6 @@ public class App {
       if (grunddataStr != null) {
         backend.initGrunddata(grunddata, grunddataStr);
       }
-      grunddata.kanaler.addAll(grunddata.kanaler);
     } catch (Exception e) { Log.e(""+backend, e); }
     // undgå crash
     if (grunddata.json == null) grunddata.json = new JSONObject();
@@ -224,13 +223,13 @@ public class App {
     try {
       String kanalkode = prefs.getString(FORETRUKKEN_KANAL, null);
 
-      Kanal aktuelKanal = grunddata.kanalFraKode.get(kanalkode);
+      Kanal aktuelKanal = grunddata.kanalFraSlug.get(kanalkode);
       if (aktuelKanal == null || aktuelKanal == Grunddata.ukendtKanal) {
         aktuelKanal = grunddata.forvalgtKanal;
         Log.d("forvalgtKanal=" + aktuelKanal);
       }
 
-      if (aktuelKanal instanceof Kanal && aktuelKanal.getUdsendelse()==null) {
+      if (aktuelKanal.getUdsendelse()==null) {
         Log.rapporterFejl(new IllegalArgumentException("Ingen udsendelser for "+aktuelKanal+" - skifter til "+grunddata.kanaler.get(0)));
         aktuelKanal = grunddata.kanaler.get(0); // Problemet er at afspiller forventer en udsendelse på kanalen
       }
@@ -269,12 +268,6 @@ public class App {
       if (!erOnline()) return;
       boolean færdig = true;
       Log.d("Onlineinitialisering starter efter " + (System.currentTimeMillis() - TIDSSTEMPEL_VED_OPSTART) + " ms");
-
-      if (App.netværk.status == Netvaerksstatus.Status.WIFI) { // Tjek at alle kanaler har deres streamsurler
-        for (final Kanal kanal : grunddata.kanaler) {
-          if (kanal.harStreams())  continue;
-        }
-      }
 
       if (App.backend.favoritter.getAntalNyeUdsendelser() < 0) {
         færdig = false;

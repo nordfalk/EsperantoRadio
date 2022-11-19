@@ -92,8 +92,7 @@ public class Fjernbetjening implements Runnable {
       } else {
         remoteControlClient.editMetadata(false)
             .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, u.titel)
-            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, k == null ? "DR" : "DR " + k.navn)
-            .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, u.playliste == null || u.playliste.size() == 0 ? "" : u.playliste.get(0).kunstner)
+            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, k.navn)
             .apply();
       }
 

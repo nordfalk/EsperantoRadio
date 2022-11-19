@@ -51,12 +51,12 @@ public class Kanalvalg_frag extends Basisfragment implements AdapterView.OnItemC
 
 
     kanalkoder = new ArrayList<String>();
-    for (Kanal k : App.grunddata.kanaler) kanalkoder.add(k.kode);
+    for (Kanal k : App.grunddata.kanaler) kanalkoder.add(k.slug);
 
     for (String k : kanalkoder) {
-      if (App.grunddata.kanalFraKode.get(k) == null) {
+      if (App.grunddata.kanalFraSlug.get(k) == null) {
         new IllegalStateException("Kanalkode mangler! Det her må ikke ske!").printStackTrace();
-        App.grunddata.kanalFraKode.put(k, new Kanal()); // reparér problemet :-(
+        App.grunddata.kanalFraSlug.put(k, new Kanal()); // reparér problemet :-(
       }
     }
 
@@ -94,7 +94,7 @@ public class Kanalvalg_frag extends Basisfragment implements AdapterView.OnItemC
     private View bygListeelement(int position) {
 
       String kanalkode = kanalkoder.get(position);
-      Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
+      Kanal kanal = App.grunddata.kanalFraSlug.get(kanalkode);
       //View view = mInflater.inflate(R.layout.kanalvalg_elem, null);
       View view = getActivity().getLayoutInflater().inflate(R.layout.kanalvalg_elem, null, false);
       AQuery aq = new AQuery(view);
@@ -102,11 +102,11 @@ public class Kanalvalg_frag extends Basisfragment implements AdapterView.OnItemC
       ImageView ikon = aq.id(R.id.ikon).getImageView();
       TextView textView = aq.id(R.id.tekst).typeface(App.skrift_gibson_fed).textColor(Color.BLACK).getTextView();
 
-      Log.d("xxx" + kanal.navn + " " + kanal.kode);
+      Log.d("xxx" + kanal.navn + " " + kanal.slug);
       textView.setText(kanal.navn.replace("P4", ""));
       //Log.d("billedebilledebilledebillede"+billede+ikon+textView);
       // Sæt åbne/luk-ikon for P4 og højttalerikon for getKanal
-      if (App.afspiller.getLydkilde().getKanal().kode.equals(kanalkode)) {
+      if (App.afspiller.getLydkilde().getKanal().slug.equals(kanalkode)) {
         ikon.setImageResource(R.drawable.dri_lyd_blaa);
         //ikon.blindetekst = "Spiller nu";
       } else {
@@ -148,7 +148,7 @@ public class Kanalvalg_frag extends Basisfragment implements AdapterView.OnItemC
     String kanalkode = kanalkoder.get(position);
 
 
-    Kanal kanal = App.grunddata.kanalFraKode.get(kanalkode);
+    Kanal kanal = App.grunddata.kanalFraSlug.get(kanalkode);
     App.prefs.edit().putString(App.FORETRUKKEN_KANAL, kanalkode).commit();
     // Ny getKanal valgt - send valg til afspiller
     App.afspiller.setLydkilde(kanal);

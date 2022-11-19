@@ -29,12 +29,6 @@ public class Programdata {
 
   public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<>();
   public HashMap<String, Programserie> programserieFraSlug = new HashMap<>();
-  /**
-   * Manglende 'SeriesSlug' (i andre kald end det for dagsprogrammet for en kanal!)
-   * betyder at der ikke er en programserie, og videre navigering derfor skal slås fra.
-   * 9.okt 2014
-   */
-  public HashSet<String> programserieSlugFindesIkke = new HashSet<>();
 
   public SenestLyttede senestLyttede = new SenestLyttede();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();

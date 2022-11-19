@@ -2,7 +2,6 @@ package dk.dr.radio.afspilning;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Lydkilde;
-import dk.dr.radio.data.Lydstream;
 import dk.dr.radio.data.Udsendelse;
 
 /**
@@ -14,8 +13,7 @@ public class AlarmLydkilde extends Lydkilde {
   private final Lydkilde orgLydkilde;
 
   public AlarmLydkilde(String alarmUri, Lydkilde orgLydkilde) {
-    hentetStream = new Lydstream();
-    hentetStream.url = alarmUri;
+    hentetStream = alarmUri;
     this.orgLydkilde = orgLydkilde;
   }
 

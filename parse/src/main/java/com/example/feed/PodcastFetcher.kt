@@ -19,9 +19,11 @@ package com.example.feed
 import com.rometools.modules.itunes.EntryInformation
 import com.rometools.rome.io.SyndFeedInput
 import dk.dr.radio.backend.EoRssParsado
+import dk.dr.radio.data.Kanal
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.StringReader
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -83,43 +85,87 @@ val kanallogo_url: String? = null,
      */
     private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
-    fun fetchPodcast(url: String): List<Udsendelse2> {
+    fun fetchPodcastFromUrl(url: String, k : Kanal): List<Udsendelse2> {
         println("====== parsas "+url)
+        val str = fetchUrl(url)
+        return parsRss(str, k)
+    }
+
+    fun fetchUrl(url: String): String {
         val request = Request.Builder()
             .url(url)
             .cacheControl(cacheControl)
             .build()
 
-        val response = okHttpClient.newCall(request).execute()
-        val syndFeed = syndFeedInput.build(response.body!!.charStream())
+        val str = okHttpClient.newCall(request).execute().body!!.string()
+        return str
+    }
+
+    fun parsRss(str: String, k : Kanal): List<Udsendelse2> {
+        val syndFeed = syndFeedInput.build(StringReader(str))
         // println("syndFeed.modules = ${syndFeed.modules}")
-        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
 
-        val udsendelser = syndFeed.entries.map { entry ->
-            val entryInformation = entry.getModule(PodcastModuleDtd) as? EntryInformation
-            Udsendelse2(
-                titel = entry.title,
-                summary = entryInformation?.summary ?: entry.description?.value,
-                subtitle = entryInformation?.subtitle,
-                startTid = entry.publishedDate,
-                startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                duration = entryInformation?.duration?.milliseconds,
-                // feedEntry = entry
-            )
+        try {
+            println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
+
+            val uds = mutableListOf<Udsendelse2>()
+
+
+            val udsendelser = syndFeed.entries.map { entry ->
+                val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
+                //println("entry = ${entry}")
+                //println("information = ${information}")
+                Udsendelse2(
+                    titel = entry.title,
+                    beskrivelse = information?.summary ?: entry.description?.value,
+                    // subtitle = entryInformation?.subtitle,
+                    startTid = entry.publishedDate,
+                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
+                    slug = k.slug+":"+EoRssParsado.datoformato.format(entry.publishedDate),
+                    stream = entry.enclosures[0].url,
+                    duration = information?.duration?.milliseconds,
+                    // feedEntry = entry
+                )
+            }
+
+            return udsendelser
+        } catch (e : Exception) {
+            System.out.flush()
+            System.err.flush()
+            Thread.sleep(10)
+            e.printStackTrace()
+            System.out.flush()
+            System.err.flush()
+            Thread.sleep(10)
+            println("${syndFeed.entries.first()}")
+            throw e
         }
-
-        return udsendelser
     }
 }
 
 data class Udsendelse2(
+    val slug: String,
     val titel: String,
-    val subtitle: String? = null,
+    val billedeUrl: String? = null,
     val startTid: Date,
     val startTidDato: String,
-    val summary: String? = null,
+    val beskrivelse: String? = null,
+    val stream: String,
     val duration: Long? = null,
     // val feedEntry: SyndEntry
 ) {
+
+    override fun toString(): String {
+        // return slug + "/" + startTidKl;
+        return "Udsendelse{" +
+                "slug='" + slug + '\'' +
+                ", titel='" + titel + '\'' +
+                ", beskrivelse='" + beskrivelse + '\'' +
+                ", billedeUrl='" + billedeUrl + '\'' +
+                ", startTidKl='" + startTidDato + '\'' +
+                ", stream=" + stream +
+                '}'
+    }
+
 }
 

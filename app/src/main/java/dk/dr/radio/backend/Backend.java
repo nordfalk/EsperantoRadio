@@ -171,7 +171,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           e.kanal = k;
           e.slug = k.slug + ":" + e.startTidDato;
           e.startTid = EoRssParsado.datoformato.parse(x[1]);
-          e.streams = x[2];
+          e.stream = x[2];
           e.titel = e.beskrivelse = x[3];
           if (!"rss".equals(k.eo_datumFonto)) {
             k.eo_datumFonto = "radio.txt";

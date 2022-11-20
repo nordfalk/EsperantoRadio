@@ -136,7 +136,7 @@ public class Afspiller {
       if (vækningIGang) ringDenAlarm();
       return;
     }
-    if (lydkilde.streams == null) {
+    if (lydkilde.stream == null) {
       Log.e(new IllegalStateException("ingen streams " + lydkilde));
       return;
     }

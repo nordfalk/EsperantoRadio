@@ -13,7 +13,7 @@ public abstract class Lydkilde implements Serializable {
 
   /** Unik menneskelig læselig ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
   public String slug;
-  public transient String streams;
+  public transient String stream;
   public transient String hentetStream;
 
   @Override
@@ -26,7 +26,7 @@ public abstract class Lydkilde implements Serializable {
 
   public String findBedsteStreams() {
     if (hentetStream != null) return hentetStream;
-    return streams;
+    return stream;
   }
 
   public abstract Kanal getKanal();
@@ -39,7 +39,7 @@ public abstract class Lydkilde implements Serializable {
 
   @Override
   public String toString() {
-    return slug + " str=" + streams;
+    return slug + " str=" + stream;
   }
 
 }

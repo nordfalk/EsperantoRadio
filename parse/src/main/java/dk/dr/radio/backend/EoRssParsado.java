@@ -63,7 +63,7 @@ public class EoRssParsado {
       //System.out.println("<" + ns + ":" + tag + ">");
 
       if ("item".equals(tag)) {
-        if (e != null && e.streams !=null) liste.add(e);
+        if (e != null && e.stream !=null) liste.add(e);
         e = new Udsendelse(k);
       } else if (e == null) {
         continue; // Nur sercxu por 'item'
@@ -82,8 +82,8 @@ public class EoRssParsado {
       } else if ("enclosure".equals(tag)) {
         String sontipo = p.getAttributeValue(null, "type");
         if (sontipo.startsWith("audio/")) { // audio/mpeg, audio/mpeg3 aŭ audio/mp3
-          if (e.streams==null) e.streams = p.getAttributeValue(null, "url");
-          else new Exception("Xxx "+ e.streams + "  men der er flere " +sontipo +": " + p.getAttributeValue(null, "url")).printStackTrace();
+          if (e.stream ==null) e.stream = p.getAttributeValue(null, "url");
+          else new Exception("Xxx "+ e.stream + "  men der er flere " +sontipo +": " + p.getAttributeValue(null, "url")).printStackTrace();
         }
       } else if ("link".equals(tag)) {
         e.shareLink = p.nextText();
@@ -111,7 +111,7 @@ public class EoRssParsado {
         e.beskrivelse = p.nextText();
       }
     }
-    if (e != null && e.streams !=null) liste.add(e);
+    if (e != null && e.stream !=null) liste.add(e);
     is.close();
 
     return liste;
@@ -140,7 +140,7 @@ public class EoRssParsado {
       //System.out.println("<" + ns + ":" + tag + ">");
 
       if ("entry".equals(tag)) {
-        if (e != null && e.streams !=null) liste.add(e);
+        if (e != null && e.stream !=null) liste.add(e);
         e = new Udsendelse(k);
       } else if (e == null) {
         continue;
@@ -157,7 +157,7 @@ public class EoRssParsado {
         String type = p.getAttributeValue(null, "type");
         String href = p.getAttributeValue(null, "href");
         if ("audio/mpeg".equals(type)) {
-          e.streams = href;
+          e.stream = href;
         } else if ("image/jpeg".equals(type) && e.billedeUrl ==null) {
           e.billedeUrl =href;
         } else if ("text/html".equals(type)) {
@@ -170,7 +170,7 @@ public class EoRssParsado {
         while (e.beskrivelse.startsWith("</div>")) e.beskrivelse = e.beskrivelse.substring(6).trim();
       }
     }
-    if (e != null && e.streams !=null) liste.add(e);
+    if (e != null && e.stream !=null) liste.add(e);
     is.close();
     return liste;
   }

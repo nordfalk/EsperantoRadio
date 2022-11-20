@@ -33,12 +33,12 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     // return slug + "/" + startTidKl;
 
     return "Udsendelse{" +
-      "titel='" + titel + '\'' +
+      "slug='" + slug + '\'' +
+      ", titel='" + titel + '\'' +
       ", beskrivelse='" + beskrivelse + '\'' +
       ", billedeUrl='" + billedeUrl + '\'' +
-      ", startTid=" + startTid +
       ", startTidKl='" + startTidDato + '\'' +
-      ", streams=" + streams +
+      ", stream=" + stream +
       '}';
   }
 

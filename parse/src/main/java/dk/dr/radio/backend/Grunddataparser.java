@@ -51,11 +51,11 @@ public class Grunddataparser {
         rektaElsendo.startTid = new Date();
         rektaElsendo.startTidDato = "REKTA";
         rektaElsendo.titel = "";
-        rektaElsendo.streams = rektaElsendaSonoUrl;
+        rektaElsendo.stream = rektaElsendaSonoUrl;
         rektaElsendo.rektaElsendaPriskriboUrl = kJs.optString("rektaElsendaPriskriboUrl", null);
         rektaElsendo.slug = k.slug + "_rekta";
         k.eo_rektaElsendo = rektaElsendo;
-        k.streams = rektaElsendo.streams;
+        k.stream = rektaElsendo.stream;
       }
     }
 
@@ -87,19 +87,30 @@ public class Grunddataparser {
       // if (!k.slug.contains("varsovia")) continue;
       System.out.println("k.eo_elsendojRssUrl = " + k.eo_elsendojRssUrl);
       if (k.eo_elsendojRssUrl==null) continue;
-      ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl), k);
+      System.out.println();
+      String str = Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl);
+      //System.out.println("str = " + str);
+      System.out.println("entry = " + str.split("<item")[1]);
 
-      List<Udsendelse2> udsendelser2 = new PodcastsFetcher().fetchPodcast(k.eo_elsendojRssUrl);
+      ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(str, k);
+
+      List<Udsendelse2> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
+
+      if (udsendelser1.size()>0) System.out.println(udsendelser1.get(0));
+      System.out.println();
+      if (udsendelser2.size()>0) System.out.println(udsendelser2.get(0));
+      System.out.println();
 
       // System.out.println("feed = " + feed);
 
+      /*
       for (int i=0; i<3; i++) {
         if (udsendelser1.size()>i) System.out.println(udsendelser1.get(i));
         if (udsendelser2.size()>i) System.out.println(udsendelser2.get(i));
         System.out.println();
         System.out.println();
         System.out.println("------------------------------------------------------------------");
-      }
+      }*/
     }
   }
 }

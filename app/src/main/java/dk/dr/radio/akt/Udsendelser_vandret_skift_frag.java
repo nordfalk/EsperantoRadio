@@ -23,13 +23,10 @@ import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.NetsvarBehander;
 
-public class Udsendelser_vandret_skift_frag extends Basisfragment implements ViewPager.OnPageChangeListener {
+public class Udsendelser_vandret_skift_frag extends Basisfragment {
 
-  private Udsendelse startudsendelse;
-  private Programserie programserie;
   private Kanal kanal;
   private ArrayList<Udsendelse> udsendelser;
-  private int antalHentedeSendeplaner;
 
   private ViewPager viewPager;
   private UdsendelserAdapter adapter;
@@ -37,7 +34,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
 
   @Override
   public String toString() {
-    return super.toString() + "/" + kanal + "/" + programserie;
+    return super.toString() + "/" + kanal;
   }
 
   @Override
@@ -47,7 +44,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     View rod = inflater.inflate(R.layout.udsendelser_vandret_skift_frag, container, false);
 
     kanal = App.grunddata.kanalFraSlug.get(getArguments().getString(P_KANALKODE));
-    startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
+    Udsendelse startudsendelse = App.data.udsendelseFraSlug.get(getArguments().getString(P_UDSENDELSE));
     if (startudsendelse == null) { // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/805598045
       if (!App.PRODUKTION) { // https://www.bugsense.com/dashboard/project/cd78aa05/errors/822628124
         App.langToast("startudsendelse==null for " + kanal);
@@ -78,10 +75,8 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     udsendelser.add(startudsendelse);
     adapter.setListe(udsendelser);
     viewPager.setAdapter(adapter);
-    hentUdsendelser();
 
     vispager_title_strip();
-    viewPager.setOnPageChangeListener(this);
     // Nødvendigt fordi underfragmenter har optionsmenu
     // - ellers nulstilles optionsmenuen ikke når man hopper ud igen!
     setHasOptionsMenu(true);
@@ -101,8 +96,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     pager_title_strip.setVisibility(
             udsendelser.size() > 1 ? View.VISIBLE : View.INVISIBLE);
   }
-
-  private HashSet<Integer> alledeForsøgtHentet = new HashSet<>(); // forsøg ikke at hente det samme offset flere gange
+  /*
   private void opdaterUdsendelser() {
     if (viewPager == null) return;
     if (programserie==null) programserie = App.data.programserieFraSlug.get(kanal.slug);
@@ -149,20 +143,7 @@ public class Udsendelser_vandret_skift_frag extends Basisfragment implements Vie
     });
   }
 
-  @Override
-  public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-  }
-
-  @Override
-  public void onPageSelected(int position) {
-    if (programserie != null && position == udsendelser.size() - 1 && antalHentedeSendeplaner++ < 7) { // Hent flere udsendelser
-      hentUdsendelser();
-    }
-  }
-
-  @Override
-  public void onPageScrollStateChanged(int state) {
-  }
+   */
 
   //  public class UdsendelserAdapter extends FragmentPagerAdapter {
   public class UdsendelserAdapter extends FragmentStatePagerAdapter {

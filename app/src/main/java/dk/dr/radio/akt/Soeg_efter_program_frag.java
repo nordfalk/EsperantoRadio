@@ -3,7 +3,6 @@ package dk.dr.radio.akt;
 //import android.R;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -30,7 +29,6 @@ import java.util.HashSet;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;

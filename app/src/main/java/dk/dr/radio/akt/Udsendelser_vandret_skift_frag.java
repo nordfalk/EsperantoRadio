@@ -11,17 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.dr.radio.backend.NetsvarBehander;
 
 public class Udsendelser_vandret_skift_frag extends Basisfragment {
 

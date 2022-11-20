@@ -1,6 +1,5 @@
 package dk.dr.radio.akt;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -21,14 +20,12 @@ import java.util.Collections;
 
 import dk.dr.radio.akt.diverse.Basisadapter;
 import dk.dr.radio.data.Datoformater;
-import dk.dr.radio.data.Programserie;
+import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.net.volley.Netsvar;
 import dk.dr.radio.v3.R;
-import dk.dr.radio.backend.NetsvarBehander;
 
 public class Favoritprogrammer_frag extends Basisfragment implements AdapterView.OnItemClickListener, Runnable {
 
@@ -83,23 +80,9 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
       Collections.sort(pss);
       Log.d(this + " "+b +" psss = " + pss);
       for (final String programserieSlug : pss) {
-        Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
-        if (programserie != null) {
-          liste.add(new Pair(b, programserie));
-          adapter.notifyDataSetChanged();
-        } else {
-          b.hentProgramserie(new NetsvarBehander() {
-            @Override
-            public void fikSvar(Netsvar s) {
-              if (s.uændret || s.fejl) return;
-              Programserie programserie = App.data.programserieFraSlug.get(programserieSlug);
-              if (programserie != null) {
-                liste.add(new Pair(b, programserie));
-                adapter.notifyDataSetChanged();
-              }
-            }
-          });
-        }
+        Kanal programserie = App.grunddata.kanalFraSlug.get(programserieSlug);
+        liste.add(new Pair(b, programserie));
+        adapter.notifyDataSetChanged();
 /*
         App.netkald.kald(this, GammelDrRadioBackend.instans.getProgramserieUrl(programserie, programserieSlug, 0), new NetsvarBehander() {
           @Override
@@ -116,7 +99,7 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
               }
               ArrayList<Udsendelse> udsendelser = uliste;
               programserie.tilføjUdsendelser(0, udsendelser);
-              App.data.programserieFraSlug.put(programserieSlug, programserie);
+              App.grunddata.kanalFraSlug.put(programserieSlug, programserie);
             } else {
               App.data.programserieSlugFindesIkke.add(programserieSlug);
               Log.d("programserieSlugFindesIkke for " + programserieSlug);
@@ -148,9 +131,9 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
         Pair elem = (Pair) liste.get(position);
         Backend b = (Backend) elem.first;
         Object obj = elem.second;
-        if (obj instanceof Programserie) {
-          Programserie ps = (Programserie) obj;
-          aq.id(R.id.linje1).text(ps.titel).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
+        if (obj instanceof Kanal) {
+          Kanal ps = (Kanal) obj;
+          aq.id(R.id.linje1).text(ps.navn).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
           int n = b.favoritter.getAntalNyeUdsendelser(ps.slug);
           String txt = (n == 1 ? n + getString(R.string._ny_udsendelse) : n + getString(R.string._nye_udsendelser));
           aq.id(R.id.linje2).text(txt).typeface(App.skrift_gibson);

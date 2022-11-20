@@ -13,7 +13,6 @@ import java.util.Set;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.Log;
-import dk.dr.radio.backend.Backend;
 
 /**
  * Håndtering af favoritter.
@@ -99,7 +98,7 @@ public class Favoritter {
   };
 
   protected void startOpdaterAntalNyeUdsendelserForProgramserie(final String programserieSlug, String dato) {
-    Programserie ps = App.data.programserieFraSlug.get(programserieSlug);
+    Kanal ps = App.grunddata.kanalFraSlug.get(programserieSlug);
     if (ps==null || ps.udsendelser ==null) return; // Kial / kiel okazas?
     int antal = 0;
     try {

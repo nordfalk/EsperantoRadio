@@ -19,7 +19,6 @@
 package dk.dr.radio.data;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 
 /**
@@ -28,7 +27,6 @@ import java.util.HashSet;
 public class Programdata {
 
   public HashMap<String, Udsendelse> udsendelseFraSlug = new HashMap<>();
-  public HashMap<String, Programserie> programserieFraSlug = new HashMap<>();
 
   public SenestLyttede senestLyttede = new SenestLyttede();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();

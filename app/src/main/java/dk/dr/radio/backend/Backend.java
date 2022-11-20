@@ -17,7 +17,6 @@ import java.util.HashSet;
 import dk.dr.radio.data.Favoritter;
 import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
-import dk.dr.radio.data.Programserie;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.FilCache;
@@ -123,12 +122,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   public String radioTxtUrl = "http://esperanto-radio.com/radio.txt";
 
 
-  public static void eoElsendoAlDaUdsendelse(Udsendelse e, Kanal k) {
-    if (e.slug==null) e.slug = k.slug + ":" + e.startTidDato;
-    App.data.udsendelseFraSlug.put(e.slug, e);
-  }
-
-
   public static void leguRadioTxt(Grunddata grunddata, String radioTxt) {
     String kapo = null;
     HashSet<Kanal> kanalojDeRadioTxt = new HashSet<>();
@@ -151,11 +144,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
            Anonco : el retmesaĝo de Floréal Martorell « Katastrofo ĉe Vinilkosmo/ Eurokka Kanto : informo pri la kompaktdisko Hiphopa Kompilo 2 « Miela obsedo » Legado: el la verko de Ken Linton Kanako el Kananam ĉapitro 12 « Stranga ĝardeno » Lez el Monato de aŭgusto /septembro « Tantamas ŝtopiĝoj » de Ivo durwael Karlo el Monato » Eksplofas la popola kolero » [...]
            */
           String kanalslug = x[0].replaceAll(" ","").toLowerCase().replaceAll("ĉ", "cx");
-          e.startTidDato = x[1];
-          e.startTid = EoRssParsado.datoformato.parse(x[1]);
-          e.streams = x[2];
-          e.titel = e.beskrivelse = x[3];
-
           if (kanalslug.equals("movadavidpunkto")) kanalslug = "movada-vidpunkto";
 
           Kanal k = grunddata.kanalFraSlug.get(kanalslug);
@@ -173,12 +161,18 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             Log.d("Aldonas elsendon "+e.toString());
             k.udsendelser.add(e);
             kanalojDeRadioTxt.add(k);
-            eoElsendoAlDaUdsendelse(e, k);
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
             grunddata.kanalFraSlug.put(kanalslug, k);
             grunddata.kanaler.add(k);
           }
+
+
+          e.startTidDato = x[1];
           e.kanal = k;
+          e.slug = k.slug + ":" + e.startTidDato;
+          e.startTid = EoRssParsado.datoformato.parse(x[1]);
+          e.streams = x[2];
+          e.titel = e.beskrivelse = x[3];
           if (!"rss".equals(k.eo_datumFonto)) {
             k.eo_datumFonto = "radio.txt";
             if (!kanalojDeRadioTxt.contains(k)) {
@@ -187,40 +181,13 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
             }
             //Log.d("Aldonas elsendon "+e.toStri7ng());
             k.udsendelser.add(e);
-            eoElsendoAlDaUdsendelse(e, k);
+            App.data.udsendelseFraSlug.put(e.slug, e);
             k.eo_udsendelserFraRadioTxt = k.udsendelser;
           }
         } catch (Exception e) {
           Log.e("Ne povis legi unuon: " + unuo, e);
         }
       }
-    }
-
-    for (Kanal k : grunddata.kanaler) {
-      eo_opdaterProgramserieFraKanal(k);
-    }
-  }
-
-  static void eo_opdaterProgramserieFraKanal(Kanal k) {
-    Programserie ps = App.data.programserieFraSlug.get(k.slug);
-    if (ps==null) {
-      ps = new Programserie();
-      ps.billedeUrl = k.kanallogo_url;
-      ps.beskrivelse = k.getNavn();
-      ps.slug = k.slug;
-      ps.titel = k.getNavn();
-      App.data.programserieFraSlug.put(k.slug, ps);
-    } else {
-      ps.udsendelser.clear();
-    }
-    //Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + "  får tilføjet " + (uds == null ? "nul" : uds.size()) + " elementer");
-    //if (App.fejlsøgning) Log.d(this + " tilføjUdsendelser:" + (udsendelserListe == null ? "nul" : udsendelserListe.size()) + " elem liste:\n" + udsendelserListe + "\nfår tilføjet " + (uds == null ? "nul" : uds.size()) + " elem:\n" + uds);
-
-    if (ps.udsendelser == null) {
-      ps.udsendelser = new ArrayList<Udsendelse>(k.udsendelser);
-    } else {
-      ps.udsendelser.clear();
-      ps.udsendelser.addAll(k.udsendelser);
     }
   }
 
@@ -236,8 +203,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           ArrayList<Udsendelse> udsendelser = EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
           if (!udsendelser.isEmpty()) {
             kanal.udsendelser = udsendelser;
-            for (Udsendelse e : kanal.udsendelser) eoElsendoAlDaUdsendelse(e, kanal);
-            eo_opdaterProgramserieFraKanal(kanal);
+            for (Udsendelse e : kanal.udsendelser) App.data.udsendelseFraSlug.put(e.slug, e);
           }
           netsvarBehander.fikSvar(s);
         }
@@ -250,13 +216,4 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
       }
     }
   }
-
-  public void hentProgramserie(final NetsvarBehander netsvarBehander) {
-    try {
-      netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-  
 }

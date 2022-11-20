@@ -6,15 +6,9 @@ import android.os.Handler;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
 
-import dk.dr.radio.data.Datoformater;
 import dk.dr.radio.data.Grunddata;
-import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
-import dk.dr.radio.data.Programserie;
-import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
 import dk.dr.radio.diverse.FilCache;

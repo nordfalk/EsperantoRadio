@@ -82,7 +82,8 @@ public class EoRssParsado {
       } else if ("enclosure".equals(tag)) {
         String sontipo = p.getAttributeValue(null, "type");
         if (sontipo.startsWith("audio/")) { // audio/mpeg, audio/mpeg3 aŭ audio/mp3
-          if (e.streams !=null) e.streams = p.getAttributeValue(null, "url");
+          if (e.streams==null) e.streams = p.getAttributeValue(null, "url");
+          else new Exception("Xxx "+ e.streams + "  men der er flere " +sontipo +": " + p.getAttributeValue(null, "url")).printStackTrace();
         }
       } else if ("link".equals(tag)) {
         e.shareLink = p.nextText();

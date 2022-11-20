@@ -175,30 +175,14 @@ public class Favoritprogrammer_frag extends Basisfragment implements AdapterView
   @Override
   public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
     Pair elem = (Pair) liste.get(position);
-    Backend b = (Backend) elem.first;
     Object obj = elem.second;
-    if (obj instanceof Programserie) {
-      Programserie programserie = (Programserie) obj;
-      Fragment f = new Programserie_frag();
-      f.setArguments(new Intent()
-          .putExtra(P_PROGRAMSERIE, programserie.slug)
-          .getExtras());
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commit();
-
-    } else {
-      Udsendelse udsendelse = (Udsendelse) obj;
-      Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commit();
-
-    }
+    Udsendelse udsendelse = (Udsendelse) obj;
+    Fragment f = Fragmentfabrikering.udsendelse(udsendelse);
+    getActivity().getSupportFragmentManager().beginTransaction()
+        .replace(R.id.indhold_frag, f)
+        .addToBackStack(null)
+        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        .commit();
 
   }
 

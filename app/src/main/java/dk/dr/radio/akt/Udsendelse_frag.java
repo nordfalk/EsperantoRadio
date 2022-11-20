@@ -540,7 +540,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
     if (position == 0) return;
     //startActivity(new Intent(getActivity(), VisFragment_akt.class).putExtras(getArguments())  // Kanalkode + slug
     //    .putExtra(VisFragment_akt.KLASSE, Programserie_frag.class.getName()).putExtra(P_PROGRAMSERIE, udsendelse.programserieSlug));
-
+/*
     int type = adapter.getItemViewType(position);
 
     if (type == ALLE_UDSENDELSER) {
@@ -557,6 +557,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
               .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .commit();
     }
+ */
   }
 }
 

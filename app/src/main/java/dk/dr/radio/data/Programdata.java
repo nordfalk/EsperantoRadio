@@ -32,5 +32,4 @@ public class Programdata {
 
   public SenestLyttede senestLyttede = new SenestLyttede();
   public HentedeUdsendelser hentedeUdsendelser = new HentedeUdsendelser();
-  public ProgramserierAtilAA programserierAtilÅ = new ProgramserierAtilAA();
 }

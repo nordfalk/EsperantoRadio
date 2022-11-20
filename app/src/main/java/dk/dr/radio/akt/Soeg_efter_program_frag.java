@@ -49,7 +49,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
   private int max = 50;
 
   private static class SoegElement {
-    public Programserie programserie;
     public Udsendelse udsendelse; // EO ŝanĝo
     public String slug; // EO ŝanĝo
     public String titel;
@@ -105,11 +104,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
       }
     });
 
-    // Indlæs A-Å-liste hvis den ikke allerede er det, så vi har en komplet programliste
-    if (!App.data.programserierAtilÅ.indlæst) {
-      App.data.programserierAtilÅ.observatører.add(this);
-      App.data.programserierAtilÅ.startHentData();
-    }
     return rod;
   }
 
@@ -121,7 +115,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     } else {
       tomStr.setText("");
       liste.clear();
-      liste.addAll(App.data.programserierAtilÅ.getListe());
       adapter.notifyDataSetChanged();
       søgKnap.setImageResource(R.drawable.dri_soeg_blaa);
     }
@@ -130,7 +123,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    App.data.programserierAtilÅ.observatører.remove(this);
     // Anullér en eventuel søgning
     App.netkald.annullerKald(this);
     søgelistecache = null;
@@ -151,11 +143,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
 //        Log.d(position +  " AA  "+obj);
       obj = udpak(obj);
       try {
-        if (obj instanceof Programserie) {
-          Programserie ps = (Programserie) obj;
-          aq.id(R.id.linje1).text(ps.titel).typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
-          aq.id(R.id.linje2).text(ps.beskrivelse).typeface(App.skrift_gibson);
-        } else if (obj instanceof String) {
+        if (obj instanceof String) {
           aq.id(R.id.linje1).text("").typeface(App.skrift_gibson_fed).textColor(Color.BLACK);
           aq.id(R.id.linje2).text("Indsnævr din søgning").typeface(App.skrift_gibson);
         } else {
@@ -179,7 +167,6 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     if (obj instanceof SoegElement) {
       SoegElement se = (SoegElement) obj;
       if (se.udsendelse!=null) obj = se.udsendelse;
-      else obj = se.programserie;
     }
     return obj;
   }
@@ -190,19 +177,7 @@ public class Soeg_efter_program_frag extends Basisfragment implements
   public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
     Object obj = liste.get(position);
     obj = udpak(obj); // EO ŝanĝo
-    if (obj instanceof Programserie) {
-      Programserie programserie = (Programserie) obj;
-      Fragment f = new Programserie_frag();
-      f.setArguments(new Intent()
-          .putExtra(P_PROGRAMSERIE, programserie.slug)
-          .getExtras());
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.indhold_frag, f)
-          .addToBackStack(null)
-          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-          .commit();
-
-    } else if (obj instanceof String) {
+    if (obj instanceof String) {
       max = max*2;
       søg();
     } else {
@@ -237,16 +212,8 @@ public class Soeg_efter_program_frag extends Basisfragment implements
     }
 
     if (søgelistecache == null) {
-      søgelistecache = new ArrayList<SoegElement>(App.data.programserieFraSlug.size());
-      Log.d("DRData.programdata.programserieFraSlug?=" + App.data.programserieFraSlug);
-      if (false) for (Programserie ps : App.data.programserieFraSlug.values()) {
-        SoegElement se = new SoegElement();
-        se.programserie = ps;
-        se.titel = " "+ps.titel.toLowerCase() + " " + ps.undertitel.toLowerCase();
-        se.beskrivelse = (ps.beskrivelse==null ? "" : " "+ps.beskrivelse.toLowerCase());
-        søgelistecache.add(se);
-      }
-      else for (Udsendelse ps : App.data.udsendelseFraSlug.values()) {  // EO ŝanĝo
+      søgelistecache = new ArrayList<SoegElement>();
+      for (Udsendelse ps : App.data.udsendelseFraSlug.values()) {  // EO ŝanĝo
         SoegElement se = new SoegElement();
         se.udsendelse = ps;
         se.titel = " "+(ps.titel==null?"":ps.titel.toLowerCase());

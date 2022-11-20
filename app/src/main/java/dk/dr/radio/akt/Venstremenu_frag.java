@@ -398,9 +398,6 @@ public class Venstremenu_frag extends Fragment implements Runnable {
       }
 
 
-      tilføj(R.layout.venstremenu_elem_overskrift, AlleUdsendelserAtilAA_frag.class);
-      aq.id(R.id.tekst).text("Alle udsendelser A-Å").typeface(App.skrift_gibson_fed);
-
       tilføj(new MenuElement(layoutInflater.inflate(R.layout.venstremenu_elem_favoritprogrammer, null),
           new Runnable() {
             @Override

@@ -84,13 +84,13 @@ public class Grunddataparser {
     for (Kanal k : gd.kanaler) {
       System.out.println();
       System.out.println("===================================================================" + k);
-      if (k.slug.contains("varsovia")) continue;
+      if (!k.slug.contains("peranto")) continue;
       System.out.println("k.eo_elsendojRssUrl = " + k.eo_elsendojRssUrl);
       if (k.eo_elsendojRssUrl==null) continue;
       System.out.println();
       String str = Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl);
       //System.out.println("str = " + str);
-      System.out.println("entry = " + str.split("<item")[1]);
+      if (str.contains("<item")) System.out.println("entry = " + str.split("<item")[1]);
 
       ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(str, k);
       if (udsendelser1.size()>0) System.out.println(udsendelser1.get(0));
@@ -104,14 +104,13 @@ public class Grunddataparser {
 
       // System.out.println("feed = " + feed);
 
-      /*
-      for (int i=0; i<3; i++) {
+      for (int i=0; i<max(udsendelser1.size(), udsendelser2.size()); i++) {
         if (udsendelser1.size()>i) System.out.println(udsendelser1.get(i));
         if (udsendelser2.size()>i) System.out.println(udsendelser2.get(i));
         System.out.println();
         System.out.println();
         System.out.println("------------------------------------------------------------------");
-      }*/
+      }
     }
   }
 }

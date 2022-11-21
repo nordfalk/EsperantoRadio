@@ -27,6 +27,7 @@ import org.jsoup.Jsoup
 import java.io.StringReader
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 /**
  * A class which fetches some selected podcast RSS feeds.
@@ -121,7 +122,7 @@ val kanallogo_url: String? = null,
                     Jsoup.parse(entry.contents[0].value).select("audio")
                         .forEachIndexed { index, audioElement ->
                             val lydUrl = audioElement.selectFirst("source")?.attr("src") ?: return@forEachIndexed
-                            val tekstMedVarighed = audioElement.nextElementSibling()?.text()
+                            //val tekstMedVarighed = audioElement.nextElementSibling()?.text()
                             // audioElement.nextElementSibling()?.remove()
                             // audioElement.remove()
                             udsendelser.add(
@@ -138,11 +139,47 @@ val kanallogo_url: String? = null,
                         }
                 }
 
+            } else if (k.slug == "peranto") {
+                syndFeed.entries.forEach { entry ->
+                    var html = entry.contents[0].value
+                    for (purigu in arrayOf(
+                        Pattern.compile("<iframe.+?</iframe>", Pattern.DOTALL),
+                        Pattern.compile("<div class=\"separator\".+?>", Pattern.DOTALL),
+                    ))  html = purigu.matcher(html).replaceAll("")
+
+                    // println("\n\nhtml = ${html}")
+                    // println("entry = ${entry}")
+                    var lydUrl = ""
+                    val lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
+                    if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
+                        val id = lydIframeUrl.split("/").last()
+                        lydUrl = "https://archive.org/download/$id/$id.mp3"
+                    }
+
+                    if (lydUrl != null) udsendelser.add(
+                                Udsendelse2(
+                                    titel = entry.title,
+                                    slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                                    link = entry.link,
+                                    startTid = entry.publishedDate,
+                                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
+                                    stream = lydUrl,
+                                    beskrivelse = html,
+                                )
+                            )
+                        }
             } else {
+
                 syndFeed.entries.forEach { entry ->
                     val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
                     //println("entry = ${entry}")
                     //println("information = ${information}")
+                    var beskrivelse = entry.description?.value ?: information?.summary
+                    if (entry.contents.size>0) beskrivelse = entry.contents[0].value
+
+                    var stream = if (entry.enclosures.size>0) entry.enclosures[0].url else null
+                    if (stream==null) stream = Jsoup.parse(beskrivelse).selectFirst("audio")?.selectFirst("source")?.attr("src")
+
                     udsendelser.add(
                         Udsendelse2(
                             titel = entry.title,
@@ -150,15 +187,15 @@ val kanallogo_url: String? = null,
                             link = entry.link,
                             startTid = entry.publishedDate,
                             startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                            stream = entry.enclosures[0].url,
+                            stream = stream!!,
                             // duration = information?.duration?.milliseconds,
-                            beskrivelse = information?.summary ?: entry.description?.value,
+                            beskrivelse = beskrivelse?.trim()
                         )
                     )
+                    return udsendelser
                 }
             }
 
-            return udsendelser
         } catch (e : Exception) {
             System.out.flush()
             System.err.flush()
@@ -170,6 +207,7 @@ val kanallogo_url: String? = null,
             println("${syndFeed.entries.first()}")
             throw e
         }
+        return udsendelser
     }
 }
 
@@ -187,7 +225,7 @@ data class Udsendelse2(
 
     override fun toString(): String {
         // return slug + "/" + startTidKl;
-        return "Udsendelse{" +
+        return "Udsendelse2{" +
                 "slug='" + slug + '\'' +
                 ", titel='" + titel + '\'' +
                 ", beskrivelse='" + beskrivelse + '\'' +

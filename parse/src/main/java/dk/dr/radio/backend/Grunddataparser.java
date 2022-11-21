@@ -104,7 +104,7 @@ public class Grunddataparser {
 
       // System.out.println("feed = " + feed);
 
-      for (int i=0; i<max(udsendelser1.size(), udsendelser2.size()); i++) {
+      for (int i=0; i<Math.max(udsendelser1.size(), udsendelser2.size()); i++) {
         if (udsendelser1.size()>i) System.out.println(udsendelser1.get(i));
         if (udsendelser2.size()>i) System.out.println(udsendelser2.get(i));
         System.out.println();

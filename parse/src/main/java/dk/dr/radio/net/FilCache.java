@@ -1,4 +1,4 @@
-package dk.dr.radio.diverse;
+package dk.dr.radio.net;
 
 import java.io.Closeable;
 import java.io.File;
@@ -19,10 +19,11 @@ public class FilCache {
   private static final int BUFFERSTR = 4 * 1024;
   private static String lagerDir;
   public static int byteHentetOverNetværk = 0;
+  public static boolean fejlsøgning = false;
 
 
   private static void log(String tekst) {
-    Log.d("FilCache:" + tekst);
+    System.out.println("FilCache:" + tekst);
   }
 
   public static void init(File dir) {
@@ -67,11 +68,11 @@ public class FilCache {
     String cacheFilnavn = findLokaltFilnavn(url);
     File cacheFil = new File(cacheFilnavn);
 
-    if (App.fejlsøgning) log("cacheFil lastModified " + new Date(cacheFil.lastModified()) + " for " + url);
+    if (fejlsøgning) log("cacheFil lastModified " + new Date(cacheFil.lastModified()) + " for " + url);
     long nu = System.currentTimeMillis();
 
     if (cacheFil.exists() && ændrerSigIkke) {
-      if (App.fejlsøgning) log("Læser " + cacheFilnavn);
+      if (fejlsøgning) log("Læser " + cacheFilnavn);
       return cacheFilnavn;
     } else {
       long hentHvisNyereEnd = cacheFil.lastModified();
@@ -79,7 +80,7 @@ public class FilCache {
       int prøvIgen = 3;
       while (prøvIgen > 0) {
         prøvIgen = prøvIgen - 1;
-        if (App.fejlsøgning) log("Kontakter " + url);
+        if (fejlsøgning) log("Kontakter " + url);
         HttpURLConnection httpForb = (HttpURLConnection) new URL(url).openConnection();
 
         if (cacheFil.exists()) {
@@ -144,16 +145,16 @@ public class FilCache {
           continue;
         }
 
-        if (App.fejlsøgning) log("Henter " + url + " og gemmer i " + cacheFilnavn);
+        if (fejlsøgning) log("Henter " + url + " og gemmer i " + cacheFilnavn);
         InputStream is = httpForb.getInputStream();
         FileOutputStream fos = new FileOutputStream(cacheFilnavn + "_tmp");
         String indkodning = httpForb.getHeaderField("Content-Encoding");
-        if (App.fejlsøgning) Log.d("indkodning: " + indkodning);
+        if (fejlsøgning) log("indkodning: " + indkodning);
         if ("gzip".equals(indkodning)) {
           is = new GZIPInputStream(is); // Pak data ud
         }
         kopierOgLuk(is, fos);
-        if (App.fejlsøgning)
+        if (fejlsøgning)
           log(httpForb.getHeaderField("Content-Length") + " blev til " + new File(cacheFilnavn).length());
         cacheFil.delete();
         new File(cacheFilnavn + "_tmp").renameTo(cacheFil);
@@ -186,7 +187,7 @@ public class FilCache {
     String suf = url.substring(url.lastIndexOf('.')+1);
     if ("txt jpg gif png".indexOf(suf)==-1) cacheFilnavn+=".xml";
     cacheFilnavn = lagerDir + "/" + cacheFilnavn;
-    if (App.fejlsøgning) log("URL: " + url + "  -> " + cacheFilnavn);
+    if (fejlsøgning) log("URL: " + url + "  -> " + cacheFilnavn);
     return cacheFilnavn;
   }
 
@@ -217,7 +218,7 @@ public class FilCache {
 
   public static void rydCache() {
     for (File f : new File(lagerDir).listFiles()) {
-      Log.d("Sletter " + f);
+      log("Sletter " + f);
       f.delete();
     }
   }

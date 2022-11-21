@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.FilCache;
+import dk.dr.radio.net.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.volley.DrVolleyResonseListener;

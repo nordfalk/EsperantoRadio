@@ -5,7 +5,7 @@ import java.io.File;
 import dk.dr.radio.backend.Backend;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
-import dk.dr.radio.diverse.FilCache;
+import dk.dr.radio.net.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
 

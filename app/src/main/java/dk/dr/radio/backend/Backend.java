@@ -19,7 +19,7 @@ import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.diverse.App;
-import dk.dr.radio.diverse.FilCache;
+import dk.dr.radio.net.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.volley.Netsvar;

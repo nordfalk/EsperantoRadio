@@ -31,7 +31,7 @@ import dk.dr.radio.akt.Hentede_udsendelser_frag;
 import dk.dr.radio.akt.Hovedaktivitet;
 import dk.dr.radio.diverse.App;
 import dk.dr.radio.diverse.ApplicationSingleton;
-import dk.dr.radio.diverse.FilCache;
+import dk.dr.radio.net.FilCache;
 import dk.dr.radio.diverse.Log;
 import dk.dr.radio.diverse.Serialisering;
 import dk.dr.radio.v3.R;

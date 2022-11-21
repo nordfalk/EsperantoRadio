@@ -20,10 +20,12 @@ import com.rometools.modules.itunes.EntryInformation
 import com.rometools.rome.io.SyndFeedInput
 import dk.dr.radio.backend.EoRssParsado
 import dk.dr.radio.data.Kanal
+import dk.dr.radio.net.FilCache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
+import java.io.File
 import java.io.StringReader
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -49,6 +51,7 @@ class PodcastsFetcher() {
             }
             .build()
 
+        FilCache.init(File("/tmp/filcache"))
     }
 
     /*

@@ -71,6 +71,7 @@ import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Programdata;
 import dk.dr.radio.net.Diverse;
+import dk.dr.radio.net.FilCache;
 import dk.dr.radio.net.Netvaerksstatus;
 import dk.dr.radio.net.volley.DrBasicNetwork;
 import dk.dr.radio.net.volley.DrDiskBasedCache;
@@ -132,7 +133,7 @@ public class App {
     TIDSSTEMPEL_VED_OPSTART = System.currentTimeMillis();
 
     prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-    fejlsøgning = prefs.getBoolean("fejlsøgning", false);
+    fejlsøgning = FilCache.fejlsøgning = prefs.getBoolean("fejlsøgning", false);
     forgrundstråd = new Handler();
     connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
     notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);

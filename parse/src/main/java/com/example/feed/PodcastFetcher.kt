@@ -23,6 +23,7 @@ import dk.dr.radio.data.Kanal
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.Jsoup
 import java.io.StringReader
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -102,30 +103,59 @@ val kanallogo_url: String? = null,
     }
 
     fun parsRss(str: String, k : Kanal): List<Udsendelse2> {
-        val syndFeed = syndFeedInput.build(StringReader(str))
+        val udsendelser = mutableListOf<Udsendelse2>()
+
         // println("syndFeed.modules = ${syndFeed.modules}")
 
+        val syndFeed = syndFeedInput.build(StringReader(str))
+        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
         try {
-            println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
+            if (k.slug == "varsoviavento") {
+                syndFeed.entries.forEach { entry ->
+                    var html = entry.contents[0].value
+                    for (purigu in EoRssParsado.puriguVarsoviaVento)
+                        html = purigu.matcher(html).replaceAll("")
 
-            val uds = mutableListOf<Udsendelse2>()
+                    // println("\n\nhtml = ${html}")
+                    // println("entry = ${entry}")
+                    Jsoup.parse(entry.contents[0].value).select("audio")
+                        .forEachIndexed { index, audioElement ->
+                            val lydUrl = audioElement.selectFirst("source")?.attr("src") ?: return@forEachIndexed
+                            val tekstMedVarighed = audioElement.nextElementSibling()?.text()
+                            // audioElement.nextElementSibling()?.remove()
+                            // audioElement.remove()
+                            udsendelser.add(
+                                Udsendelse2(
+                                    titel = entry.title + " " + (index + 1)+"a parto",
+                                    slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
+                                    link = entry.link,
+                                    startTid = entry.publishedDate,
+                                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
+                                    stream = lydUrl,
+                                    beskrivelse = html,
+                                )
+                            )
+                        }
+                }
 
-
-            val udsendelser = syndFeed.entries.map { entry ->
-                val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
-                //println("entry = ${entry}")
-                //println("information = ${information}")
-                Udsendelse2(
-                    titel = entry.title,
-                    beskrivelse = information?.summary ?: entry.description?.value,
-                    // subtitle = entryInformation?.subtitle,
-                    startTid = entry.publishedDate,
-                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                    slug = k.slug+":"+EoRssParsado.datoformato.format(entry.publishedDate),
-                    stream = entry.enclosures[0].url,
-                    duration = information?.duration?.milliseconds,
-                    // feedEntry = entry
-                )
+            } else {
+                syndFeed.entries.forEach { entry ->
+                    val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
+                    //println("entry = ${entry}")
+                    //println("information = ${information}")
+                    udsendelser.add(
+                        Udsendelse2(
+                            titel = entry.title,
+                            slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                            link = entry.link,
+                            startTid = entry.publishedDate,
+                            startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
+                            stream = entry.enclosures[0].url,
+                            // duration = information?.duration?.milliseconds,
+                            beskrivelse = information?.summary ?: entry.description?.value,
+                        )
+                    )
+                }
             }
 
             return udsendelser
@@ -151,7 +181,7 @@ data class Udsendelse2(
     val startTidDato: String,
     val beskrivelse: String? = null,
     val stream: String,
-    val duration: Long? = null,
+    val link: String?,
     // val feedEntry: SyndEntry
 ) {
 

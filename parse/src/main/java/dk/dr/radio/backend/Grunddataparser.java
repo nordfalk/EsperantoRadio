@@ -84,7 +84,7 @@ public class Grunddataparser {
     for (Kanal k : gd.kanaler) {
       System.out.println();
       System.out.println("===================================================================" + k);
-      // if (!k.slug.contains("varsovia")) continue;
+      if (k.slug.contains("varsovia")) continue;
       System.out.println("k.eo_elsendojRssUrl = " + k.eo_elsendojRssUrl);
       if (k.eo_elsendojRssUrl==null) continue;
       System.out.println();
@@ -93,13 +93,14 @@ public class Grunddataparser {
       System.out.println("entry = " + str.split("<item")[1]);
 
       ArrayList<Udsendelse> udsendelser1 = EoRssParsado.ŝarĝiElsendojnDeRssUrl(str, k);
-
-      List<Udsendelse2> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
-
       if (udsendelser1.size()>0) System.out.println(udsendelser1.get(0));
       System.out.println();
+
+      List<Udsendelse2> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
       if (udsendelser2.size()>0) System.out.println(udsendelser2.get(0));
       System.out.println();
+
+      System.out.println("udsendelser2.size() = " + udsendelser2.size());
 
       // System.out.println("feed = " + feed);
 

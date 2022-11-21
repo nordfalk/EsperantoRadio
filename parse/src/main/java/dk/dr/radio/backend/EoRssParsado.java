@@ -37,10 +37,18 @@ public class EoRssParsado {
 
   private static Pattern puriguVinilkosmo = Pattern.compile("<p class=\"who\">.+?</p>", Pattern.DOTALL);
 
-  private static Pattern puriguVarsoviaVento1 = Pattern.compile("<p>.+?Ĉe Facebook ni kreis.+?</p>", Pattern.DOTALL);
-  private static Pattern puriguVarsoviaVento2 = Pattern.compile("<p>.+?Paŝo post paŝo moderniĝas nia retejo.+?</p>", Pattern.DOTALL);
-  private static Pattern puriguVarsoviaVentoDownload = Pattern.compile("<p>.+?>Download audio file.+?</p>");
-  private static Pattern puriguVarsoviaVentoElŝutu = Pattern.compile("<p>.+?>Elŝutu podkaston.+?</p>");
+  public static Pattern[] puriguVarsoviaVento = {
+    Pattern.compile("<p>.+?Ĉe Facebook ni kreis.+?</p>", Pattern.DOTALL),
+    Pattern.compile("<p>Ĉe Fejsbuko ni kreis.+?</p>", Pattern.DOTALL),
+    Pattern.compile("<p>.+?Paŝo post paŝo moderniĝas nia retejo.+?</p>", Pattern.DOTALL),
+    Pattern.compile("<audio .+?</audio>"),
+    Pattern.compile("<p>.+?Elŝutu podkaston.+?</p>"),
+    Pattern.compile("<p>.+?tempo-daŭro.+?elŝutu</a></p>"),
+    Pattern.compile("<p>.+?Download audio file.+?</p>"),
+    Pattern.compile("<p><strong>Subtenu nin.+?</p>"),
+    Pattern.compile("<p>Por scii novaĵojn vizitu subpaĝon.+?</p>"),
+  };
+
 
   /** Parser et youtube RSS feed og returnerer det som en liste at Elsendo-objekter */
   private static ArrayList<Udsendelse> parsiElsendojnDeRss(Reader is, Kanal k) throws Exception {
@@ -101,10 +109,9 @@ public class EoRssParsado {
 
       } else if ("content".equals(ns) && "encoded".equals(tag)) {
         e.beskrivelse = p.nextText();
-        e.beskrivelse = puriguVarsoviaVento1.matcher(e.beskrivelse).replaceAll("");
-        e.beskrivelse = puriguVarsoviaVento2.matcher(e.beskrivelse).replaceAll("");
-        e.beskrivelse = puriguVarsoviaVentoDownload.matcher(e.beskrivelse).replaceAll("");
-        e.beskrivelse = puriguVarsoviaVentoElŝutu.matcher(e.beskrivelse).replaceAll("");
+        for (Pattern purigu : puriguVarsoviaVento) {
+          e.beskrivelse = purigu.matcher(e.beskrivelse).replaceAll("");
+        }
       } else if (e.beskrivelse != null) {
         continue;
       } else if ("summary".equals(tag)) {

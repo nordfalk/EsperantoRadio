@@ -1,7 +1,7 @@
 {
 	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
 	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
-	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
+	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v9.json  javabog.dk:javabog.dk/privat/",
 
 
 	"android" : {
@@ -165,6 +165,18 @@
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto"
 		}
+	,{
+			"kodo": "peranto",
+			"nomo": "Esperanta Retradio",
+			"emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
+			//    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
+			//    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
+			//			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
+			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
+			"xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
+			"retpoŝto": "retradio@aldone.de",
+			"hejmpaĝoButono": "http://aldone.de/retradio"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [
@@ -185,18 +197,6 @@
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝo_alternativa": "https://djpod.com/amindaesperanto",
 			"hejmpaĝoButono": "https://amindaradio.wordpress.com/"
-		}
-	,{
-			"kodo": "peranto",
-			"nomo": "Esperanta Retradio",
-			"emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
-			//    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
-			//    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
-			//			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
-			"xxyelsendojRssUrl": "http://esperantaretradio.blogspot.co.at/feeds/posts/default",
-			"xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
-			"retpoŝto": "retradio@aldone.de",
-			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}
 	,{
 			"kodo": "laboren.org",

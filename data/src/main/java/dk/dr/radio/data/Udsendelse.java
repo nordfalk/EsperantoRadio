@@ -19,12 +19,24 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public String startTidDato;
 
 
-  public String shareLink;
+  public String link;
 
   public String rektaElsendaPriskriboUrl;
 
   public Udsendelse(Kanal k) {
     kanal = k;
+  }
+
+  public Udsendelse(Kanal kanal, String slug, String titel, String beskrivelse, String billedeUrl, Date startTid, String startTidDato, String stream, String link) {
+    this.kanal = kanal;
+    this.slug = slug;
+    this.titel = titel;
+    this.beskrivelse = beskrivelse;
+    this.billedeUrl = billedeUrl;
+    this.startTid = startTid;
+    this.startTidDato = startTidDato;
+    this.stream = stream;
+    this.link = link;
   }
 
 

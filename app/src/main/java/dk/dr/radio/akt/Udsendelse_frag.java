@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -382,7 +381,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
         aq = vh.aq = new AQuery(v);
         v.setTag(vh);
         if (type == INFOTEKST) {
-          String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
+          String hp = udsendelse.link ==null||udsendelse.link.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.link;
           Log.d("EoUdsendelse_frag hp="+hp);
           if (udsendelse.beskrivelse==null) {
             aq.id(R.id.titel).getWebView().loadUrl(hp);
@@ -463,7 +462,7 @@ public class Udsendelse_frag extends Basisfragment implements View.OnClickListen
       i.putExtra(Intent.EXTRA_SUBJECT, "Elsendo de " + kanal.getNavn());
 
       String titolo = begrænsLgd(Html.fromHtml(udsendelse.titel).toString());
-      String hp = udsendelse.shareLink==null||udsendelse.shareLink.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.shareLink;
+      String hp = udsendelse.link ==null||udsendelse.link.length()==0 ? kanal.eo_hejmpaĝoButono : udsendelse.link;
 
       String txt = "Mi aŭskultis la elsendon '" + titolo + "' "+udsendelse.startTidDato +".\n"
               + (hp != null ? hp : "")

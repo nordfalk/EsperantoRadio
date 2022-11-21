@@ -73,7 +73,7 @@ public class Grunddataparser {
 
   public static Grunddata getGrunddata() throws JSONException, IOException {
     Grunddata gd = new Grunddata();
-    initGrunddata2(gd, Diverse.læsStreng(new FileInputStream("app/src/main/res/raw/esperantoradio_kanaloj_v8.json")));
+    initGrunddata2(gd, Diverse.læsStreng(new FileInputStream("app/src/main/res/raw/esperantoradio_kanaloj_v9.json")));
     return gd;
   }
 

@@ -94,7 +94,7 @@ public class EoRssParsado {
           else new Exception("Xxx "+ e.stream + "  men der er flere " +sontipo +": " + p.getAttributeValue(null, "url")).printStackTrace();
         }
       } else if ("link".equals(tag)) {
-        e.shareLink = p.nextText();
+        e.link = p.nextText();
       } else if (ns == null && "title".equals(tag)) {
         e.titel = UnescapeHtml.unescapeHtml3(p.nextText());
       } else if ("description".equals(tag)) {
@@ -168,7 +168,7 @@ public class EoRssParsado {
         } else if ("image/jpeg".equals(type) && e.billedeUrl ==null) {
           e.billedeUrl =href;
         } else if ("text/html".equals(type)) {
-          e.shareLink =href;
+          e.link =href;
         }
       } else if ("content".equals(tag)) {
         e.beskrivelse = p.nextText().trim();

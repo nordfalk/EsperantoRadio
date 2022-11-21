@@ -20,12 +20,15 @@ import com.rometools.modules.itunes.EntryInformation
 import com.rometools.rome.io.SyndFeedInput
 import dk.dr.radio.backend.EoRssParsado
 import dk.dr.radio.data.Kanal
+import dk.dr.radio.data.Udsendelse
+import dk.dr.radio.net.Diverse
 import dk.dr.radio.net.FilCache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.FileInputStream
 import java.io.StringReader
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -130,7 +133,9 @@ val kanallogo_url: String? = null,
                             // audioElement.remove()
                             udsendelser.add(
                                 Udsendelse2(
+                                    kanal = k,
                                     titel = entry.title + " " + (index + 1)+"a parto",
+                                    billedeUrl = null,
                                     slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
                                     link = entry.link,
                                     startTid = entry.publishedDate,
@@ -144,33 +149,60 @@ val kanallogo_url: String? = null,
 
             } else if (k.slug == "peranto") {
                 syndFeed.entries.forEach { entry ->
+                    try {
                     var html = entry.contents[0].value
+
+                    val billedeUrl = Jsoup.parse(html).selectFirst("img")?.attr("src")
+                    if (billedeUrl != null) {
+                        html = Pattern.compile("<img.+? />", Pattern.DOTALL).matcher(html).replaceFirst("")
+                    }
+
                     for (purigu in arrayOf(
                         Pattern.compile("<iframe.+?</iframe>", Pattern.DOTALL),
                         Pattern.compile("<div class=\"separator\".+?>", Pattern.DOTALL),
-                    ))  html = purigu.matcher(html).replaceAll("")
+                    )) html = purigu.matcher(html).replaceAll("")
 
-                    // println("\n\nhtml = ${html}")
                     // println("entry = ${entry}")
+
                     var lydUrl = ""
-                    val lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
+                    var lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
                     if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
-                        val id = lydIframeUrl.split("/").last()
-                        lydUrl = "https://archive.org/download/$id/$id.mp3"
+
+                        if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl == "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
+
+                        val filData =
+                            Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
+                        lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
+
+                        //println("fil = ${fil}")
+                        //val id = lydIframeUrl.split("/").last()
+                        //lydUrl = "https://archive.org/download/$id/$id.mp3"
                     }
 
                     if (lydUrl != null) udsendelser.add(
-                                Udsendelse2(
-                                    titel = entry.title,
-                                    slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                                    link = entry.link,
-                                    startTid = entry.publishedDate,
-                                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                                    stream = lydUrl,
-                                    beskrivelse = html,
-                                )
-                            )
-                        }
+                        Udsendelse2(
+                            kanal = k,
+                            titel = entry.title,
+                            billedeUrl = billedeUrl,
+                            slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                            link = entry.link,
+                            startTid = entry.publishedDate,
+                            startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
+                            stream = lydUrl,
+                            beskrivelse = html,
+                        )
+                    ) else throw Exception()
+                    } catch (e : Exception) {
+                        System.out.flush()
+                        System.err.flush()
+                        Thread.sleep(10)
+                        e.printStackTrace()
+                        System.out.flush()
+                        System.err.flush()
+                        Thread.sleep(10)
+                        println(entry.toString())
+                    }
+                }
             } else {
 
                 syndFeed.entries.forEach { entry ->
@@ -185,13 +217,14 @@ val kanallogo_url: String? = null,
 
                     udsendelser.add(
                         Udsendelse2(
+                            kanal = k,
                             titel = entry.title,
+                            billedeUrl = null,
                             slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
                             link = entry.link,
                             startTid = entry.publishedDate,
                             startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
                             stream = stream!!,
-                            // duration = information?.duration?.milliseconds,
                             beskrivelse = beskrivelse?.trim()
                         )
                     )
@@ -215,15 +248,15 @@ val kanallogo_url: String? = null,
 }
 
 data class Udsendelse2(
+    val kanal: Kanal,
     val slug: String,
     val titel: String,
+    val beskrivelse: String? = null,
     val billedeUrl: String? = null,
     val startTid: Date,
     val startTidDato: String,
-    val beskrivelse: String? = null,
     val stream: String,
     val link: String?,
-    // val feedEntry: SyndEntry
 ) {
 
     override fun toString(): String {

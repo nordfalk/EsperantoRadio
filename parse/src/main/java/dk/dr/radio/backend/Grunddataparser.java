@@ -1,7 +1,6 @@
 package dk.dr.radio.backend;
 
 import com.example.feed.PodcastsFetcher;
-import com.example.feed.Udsendelse2;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -96,7 +95,7 @@ public class Grunddataparser {
       if (udsendelser1.size()>0) System.out.println(udsendelser1.get(0));
       System.out.println();
 
-      List<Udsendelse2> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
+      List<Udsendelse> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
       if (udsendelser2.size()>0) System.out.println(udsendelser2.get(0));
       System.out.println();
 

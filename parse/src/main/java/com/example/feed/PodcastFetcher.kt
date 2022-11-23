@@ -93,7 +93,7 @@ val kanallogo_url: String? = null,
      */
     private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
-    fun fetchPodcastFromUrl(url: String, k : Kanal): List<Udsendelse2> {
+    fun fetchPodcastFromUrl(url: String, k : Kanal): List<Udsendelse> {
         println("====== parsas "+url)
         val str = fetchUrl(url)
         return parsRss(str, k)
@@ -109,8 +109,8 @@ val kanallogo_url: String? = null,
         return str
     }
 
-    fun parsRss(str: String, k : Kanal): List<Udsendelse2> {
-        val udsendelser = mutableListOf<Udsendelse2>()
+    fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
+        val udsendelser = ArrayList<Udsendelse>()
 
         // println("syndFeed.modules = ${syndFeed.modules}")
 
@@ -132,16 +132,16 @@ val kanallogo_url: String? = null,
                             // audioElement.nextElementSibling()?.remove()
                             // audioElement.remove()
                             udsendelser.add(
-                                Udsendelse2(
-                                    kanal = k,
-                                    titel = entry.title + " " + (index + 1)+"a parto",
-                                    billedeUrl = null,
-                                    slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
-                                    link = entry.link,
-                                    startTid = entry.publishedDate,
-                                    startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                                    stream = lydUrl,
-                                    beskrivelse = html,
+                                Udsendelse(
+                                    k,
+                                    k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
+                                    entry.title + " " + (index + 1)+"a parto",
+                                    html,
+                                    null,
+                                    entry.publishedDate,
+                                    EoRssParsado.datoformato.format(entry.publishedDate),
+                                    lydUrl,
+                                    entry.link,
                                 )
                             )
                         }
@@ -149,7 +149,6 @@ val kanallogo_url: String? = null,
 
             } else if (k.slug == "peranto") {
                 syndFeed.entries.forEach { entry ->
-                    try {
                     var html = entry.contents[0].value
 
                     val billedeUrl = Jsoup.parse(html).selectFirst("img")?.attr("src")
@@ -170,8 +169,7 @@ val kanallogo_url: String? = null,
 
                         if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl == "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
 
-                        val filData =
-                            Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
+                        val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
                         lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
 
                         //println("fil = ${fil}")
@@ -180,28 +178,18 @@ val kanallogo_url: String? = null,
                     }
 
                     if (lydUrl != null) udsendelser.add(
-                        Udsendelse2(
-                            kanal = k,
-                            titel = entry.title,
-                            billedeUrl = billedeUrl,
-                            slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                            link = entry.link,
-                            startTid = entry.publishedDate,
-                            startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                            stream = lydUrl,
-                            beskrivelse = html,
+                        Udsendelse(
+                            k,
+                            k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                            entry.title,
+                            html,
+                            billedeUrl,
+                            entry.publishedDate,
+                            EoRssParsado.datoformato.format(entry.publishedDate),
+                            lydUrl,
+                            entry.link,
                         )
-                    ) else throw Exception()
-                    } catch (e : Exception) {
-                        System.out.flush()
-                        System.err.flush()
-                        Thread.sleep(10)
-                        e.printStackTrace()
-                        System.out.flush()
-                        System.err.flush()
-                        Thread.sleep(10)
-                        println(entry.toString())
-                    }
+                    )
                 }
             } else {
 
@@ -214,21 +202,32 @@ val kanallogo_url: String? = null,
 
                     var stream = if (entry.enclosures.size>0) entry.enclosures[0].url else null
                     if (stream==null) stream = Jsoup.parse(beskrivelse).selectFirst("audio")?.selectFirst("source")?.attr("src")
+                    if (stream==null) {
+                        IllegalArgumentException("Hm! stream==null!! for "+k+" "+entry.publishedDate)
+                        return@forEach
+                    }
+
+                    if (stream.startsWith("http://") && k.slug=="kernpunkto") {
+                        // dobbeltfejl .... <enclosure url="https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3"
+                        // bliver lavet om fra https til http af rometools - og exomedia kan ikke håndtere omdirigeringen fra http tilbage igen til https ....
+                      //System.out.println("XXX hov, HTTP på = " +k+" "+entry.publishedDate)
+                      stream = stream.replaceFirst("http", "https");
+                    }
+
 
                     udsendelser.add(
-                        Udsendelse2(
-                            kanal = k,
-                            titel = entry.title,
-                            billedeUrl = null,
-                            slug = k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                            link = entry.link,
-                            startTid = entry.publishedDate,
-                            startTidDato = EoRssParsado.datoformato.format(entry.publishedDate),
-                            stream = stream!!,
-                            beskrivelse = beskrivelse?.trim()
+                        Udsendelse(
+                            k,
+                            k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                            entry.title,
+                            beskrivelse?.trim(),
+                            null,
+                            entry.publishedDate,
+                            EoRssParsado.datoformato.format(entry.publishedDate),
+                            stream!!,
+                            entry.link
                         )
                     )
-                    return udsendelser
                 }
             }
 
@@ -246,30 +245,3 @@ val kanallogo_url: String? = null,
         return udsendelser
     }
 }
-
-data class Udsendelse2(
-    val kanal: Kanal,
-    val slug: String,
-    val titel: String,
-    val beskrivelse: String? = null,
-    val billedeUrl: String? = null,
-    val startTid: Date,
-    val startTidDato: String,
-    val stream: String,
-    val link: String?,
-) {
-
-    override fun toString(): String {
-        // return slug + "/" + startTidKl;
-        return "Udsendelse2{" +
-                "slug='" + slug + '\'' +
-                ", titel='" + titel + '\'' +
-                ", beskrivelse='" + beskrivelse + '\'' +
-                ", billedeUrl='" + billedeUrl + '\'' +
-                ", startTidKl='" + startTidDato + '\'' +
-                ", stream=" + stream +
-                '}'
-    }
-
-}
-

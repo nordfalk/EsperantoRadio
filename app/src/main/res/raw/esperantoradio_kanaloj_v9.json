@@ -168,12 +168,9 @@
 	,{
 			"kodo": "peranto",
 			"nomo": "Esperanta Retradio",
-			"emblemoUrl": "http://members.aon.at/aldone/peranto/retradiologo.gif",
-			//    Ho ve, bedaŭrinde "Esperanta Retradio" transiris al 'soundcloud' kiu ne facile elŝuteblas :-(
-			//    Por estonta laboro, jen informoj pri kiel fari: http://developers.soundcloud.com/docs/api#authentication
-			//			"elsendojRssUrl": "http://feeds.feedburner.com/peranto",
-			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
-			"xxelsendojRssUrl": "http://esperantaretradio.blogspot.com/feeds/posts/default?alt=rss",
+			"emblemoUrl": "http://wp11081574.server-he.de/peranto/retradiologo.gif",
+			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default",
+			"xxelsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
 			"retpoŝto": "retradio@aldone.de",
 			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}

@@ -414,7 +414,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
           if (udsendelse.titel.equals(udsendelse.beskrivelse)) {
             spannable = new SpannableString(udsendelse.startTidDato +"  "+udsendelse.titel);
           } else {
-            spannable = new SpannableString(udsendelse.startTidDato +"  "+udsendelse.titel+"\n"+ Html.fromHtml(udsendelse.beskrivelse.replaceAll("<.+?>", "")));
+            spannable = new SpannableString(udsendelse.startTidDato +"  "+udsendelse.titel+"\n"+ Html.fromHtml((""+udsendelse.beskrivelse).replaceAll("<.+?>", "")));
           }
 
           int klPos = udsendelse.startTidDato.length();

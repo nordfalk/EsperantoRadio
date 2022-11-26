@@ -44,6 +44,7 @@
 			"xxrektaElsendaSonoUrlSenGeobloko" : "https://muzaiko.saluton.dk/Muzaiko",
 			"xxxrektaElsendoPriskbUrl": "http://fluo.muzaiko.saluton.dk/api/nowplaying/1",
 			"rektaElsendaPriskriboUrl": "http://muzaiko.info/public/datumoj/aktuala_kanto.html",
+			"rektaElsendaPriskriboJsonUrl": "http://fluo.muzaiko.saluton.dk/api/nowplaying/1",
 			"XXemblemoUrl": "http://muzaiko.info/images/emblemo.png",
 			"XXemblemoUrl": "http://muzaiko.info/reklambendoj/rb2.png",
 			"emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",

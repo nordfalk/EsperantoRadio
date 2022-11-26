@@ -30,7 +30,6 @@ import org.jsoup.Jsoup
 import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -111,126 +110,11 @@ val kanallogo_url: String? = null,
 
     fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
         val udsendelser = ArrayList<Udsendelse>()
-
         // println("syndFeed.modules = ${syndFeed.modules}")
-
-        val syndFeed = syndFeedInput.build(StringReader(str))
-        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri}}")
         try {
-            if (k.slug == "varsoviavento") {
-                syndFeed.entries.forEach { entry ->
-                    var html = entry.contents[0].value
-                    for (purigu in EoRssParsado.puriguVarsoviaVento)
-                        html = purigu.matcher(html).replaceAll("")
-
-                    // println("\n\nhtml = ${html}")
-                    // println("entry = ${entry}")
-                    Jsoup.parse(entry.contents[0].value).select("audio")
-                        .forEachIndexed { index, audioElement ->
-                            val lydUrl = audioElement.selectFirst("source")?.attr("src") ?: return@forEachIndexed
-                            //val tekstMedVarighed = audioElement.nextElementSibling()?.text()
-                            // audioElement.nextElementSibling()?.remove()
-                            // audioElement.remove()
-                            udsendelser.add(
-                                Udsendelse(
-                                    k,
-                                    k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
-                                    entry.title + " " + (index + 1)+"a parto",
-                                    html,
-                                    null,
-                                    entry.publishedDate,
-                                    EoRssParsado.datoformato.format(entry.publishedDate),
-                                    lydUrl,
-                                    entry.link,
-                                )
-                            )
-                        }
-                }
-
-            } else if (k.slug == "peranto") {
-                syndFeed.entries.forEach { entry ->
-                    var html = entry.contents[0].value
-
-                    val billedeUrl = Jsoup.parse(html).selectFirst("img")?.attr("src")
-                    if (billedeUrl != null) {
-                        html = Pattern.compile("<img.+? />", Pattern.DOTALL).matcher(html).replaceFirst("")
-                    }
-
-                    for (purigu in arrayOf(
-                        Pattern.compile("<iframe.+?</iframe>", Pattern.DOTALL),
-                        Pattern.compile("<div class=\"separator\".+?>", Pattern.DOTALL),
-                    )) html = purigu.matcher(html).replaceAll("")
-
-                    // println("entry = ${entry}")
-
-                    var lydUrl = ""
-                    var lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
-                    if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
-
-                        if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl == "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
-
-                        val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
-                        lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
-
-                        //println("fil = ${fil}")
-                        //val id = lydIframeUrl.split("/").last()
-                        //lydUrl = "https://archive.org/download/$id/$id.mp3"
-                    }
-
-                    if (lydUrl != null) udsendelser.add(
-                        Udsendelse(
-                            k,
-                            k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                            entry.title,
-                            html,
-                            billedeUrl,
-                            entry.publishedDate,
-                            EoRssParsado.datoformato.format(entry.publishedDate),
-                            lydUrl,
-                            entry.link,
-                        )
-                    )
-                }
-            } else {
-
-                syndFeed.entries.forEach { entry ->
-                    val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
-                    //println("entry = ${entry}")
-                    //println("information = ${information}")
-                    var beskrivelse = entry.description?.value ?: information?.summary
-                    if (entry.contents.size>0) beskrivelse = entry.contents[0].value
-
-                    var stream = if (entry.enclosures.size>0) entry.enclosures[0].url else null
-                    if (stream==null) stream = Jsoup.parse(beskrivelse).selectFirst("audio")?.selectFirst("source")?.attr("src")
-                    if (stream==null) {
-                        IllegalArgumentException("Hm! stream==null!! for "+k+" "+entry.publishedDate)
-                        return@forEach
-                    }
-
-                    if (stream.startsWith("http://") && k.slug=="kernpunkto") {
-                        // dobbeltfejl .... <enclosure url="https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3"
-                        // bliver lavet om fra https til http af rometools - og exomedia kan ikke håndtere omdirigeringen fra http tilbage igen til https ....
-                      //System.out.println("XXX hov, HTTP på = " +k+" "+entry.publishedDate)
-                      stream = stream.replaceFirst("http", "https");
-                    }
-
-
-                    udsendelser.add(
-                        Udsendelse(
-                            k,
-                            k.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                            entry.title,
-                            beskrivelse?.trim(),
-                            null,
-                            entry.publishedDate,
-                            EoRssParsado.datoformato.format(entry.publishedDate),
-                            stream!!,
-                            entry.link
-                        )
-                    )
-                }
-            }
-
+            if (k.slug == "varsoviavento") parsVarsoviaVento(str, k, udsendelser)
+            else if (k.slug == "peranto") parsePeranto(str, k, udsendelser)
+            else parseAndre(str, k, udsendelser)
         } catch (e : Exception) {
             System.out.flush()
             System.err.flush()
@@ -239,9 +123,144 @@ val kanallogo_url: String? = null,
             System.out.flush()
             System.err.flush()
             Thread.sleep(10)
-            println("${syndFeed.entries.first()}")
+            println("str="  + str)
             throw e
         }
         return udsendelser
+    }
+
+    private fun parsVarsoviaVento(
+        str: String,
+        kanal: Kanal,
+        udsendelser: ArrayList<Udsendelse>,
+    ) {
+        val syndFeed = syndFeedInput.build(StringReader(str))
+        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
+        syndFeed.entries.forEach { entry ->
+            var html = entry.contents[0].value
+            for (purigu in EoRssParsado.puriguVarsoviaVento)
+                html = purigu.matcher(html).replaceAll("")
+
+            // println("\n\nhtml = ${html}")
+            // println("entry = ${entry}")
+            Jsoup.parse(entry.contents[0].value).select("audio")
+                .forEachIndexed { index, audioElement ->
+                    val lydUrl =
+                        audioElement.selectFirst("source")?.attr("src") ?: return@forEachIndexed
+                    //val tekstMedVarighed = audioElement.nextElementSibling()?.text()
+                    // audioElement.nextElementSibling()?.remove()
+                    // audioElement.remove()
+                    udsendelser.add(
+                        Udsendelse(
+                            kanal,
+                            kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate) + ":" + (index + 1),
+                            entry.title + " " + (index + 1) + "a parto",
+                            html,
+                            null,
+                            entry.publishedDate,
+                            EoRssParsado.datoformato.format(entry.publishedDate),
+                            lydUrl,
+                            entry.link,
+                        )
+                    )
+                }
+        }
+    }
+
+    private fun parsePeranto(
+        str: String,
+        kanal: Kanal,
+        udsendelser: ArrayList<Udsendelse>,
+    ) {
+        val syndFeed = syndFeedInput.build(StringReader(str))
+        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
+        syndFeed.entries.forEach { entry ->
+            var html = entry.contents[0].value
+
+            val billedeUrl = Jsoup.parse(html).selectFirst("img")?.attr("src")
+            if (billedeUrl != null) {
+                html = Pattern.compile("<img.+? />", Pattern.DOTALL).matcher(html).replaceFirst("")
+            }
+
+            for (purigu in arrayOf(
+                Pattern.compile("<iframe.+?</iframe>", Pattern.DOTALL),
+                Pattern.compile("<div class=\"separator\".+?>", Pattern.DOTALL),
+            )) html = purigu.matcher(html).replaceAll("")
+
+            // println("entry = ${entry}")
+
+            var lydUrl = ""
+            var lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
+            if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
+                if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl == "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
+                val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
+                lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
+
+                //println("fil = ${fil}")
+                //val id = lydIframeUrl.split("/").last()
+                //lydUrl = "https://archive.org/download/$id/$id.mp3"
+            }
+
+            if (lydUrl != null) udsendelser.add(
+                Udsendelse(
+                    kanal,
+                    kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                    entry.title,
+                    html,
+                    billedeUrl,
+                    entry.publishedDate,
+                    EoRssParsado.datoformato.format(entry.publishedDate),
+                    lydUrl,
+                    entry.link,
+                )
+            )
+        }
+    }
+
+
+    private fun parseAndre(
+        str: String,
+        kanal: Kanal,
+        udsendelser: ArrayList<Udsendelse>
+    ) {
+        val syndFeed = syndFeedInput.build(StringReader(str))
+        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
+        syndFeed.entries.forEach { entry ->
+            val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
+            //println("entry = ${entry}")
+            //println("information = ${information}")
+            var beskrivelse = entry.description?.value ?: information?.summary
+            if (entry.contents.size > 0) beskrivelse = entry.contents[0].value
+
+            var stream = if (entry.enclosures.size > 0) entry.enclosures[0].url else null
+            if (stream == null) stream =
+                Jsoup.parse(beskrivelse).selectFirst("audio")?.selectFirst("source")?.attr("src")
+            if (stream == null) {
+                IllegalArgumentException("Hm! stream==null!! for " + kanal + " " + entry.publishedDate)
+                return@forEach
+            }
+
+            if (stream.startsWith("http://") && kanal.slug == "kernpunkto") {
+                // dobbeltfejl .... <enclosure url="https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3"
+                // bliver lavet om fra https til http af rometools - og exomedia kan ikke håndtere omdirigeringen fra http tilbage igen til https ....
+                //System.out.println("XXX hov, HTTP på = " +k+" "+entry.publishedDate)
+                stream = stream.replaceFirst("http", "https");
+            }
+
+
+            udsendelser.add(
+                Udsendelse(
+                    kanal,
+                    kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                    entry.title,
+                    beskrivelse?.trim(),
+                    null,
+                    entry.publishedDate,
+                    EoRssParsado.datoformato.format(entry.publishedDate),
+                    stream!!,
+                    entry.link
+                )
+            )
+        }
     }
 }

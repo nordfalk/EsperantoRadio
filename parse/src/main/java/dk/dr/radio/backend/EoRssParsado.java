@@ -104,7 +104,7 @@ public class EoRssParsado {
         Pattern puriguRadioverdaSquarespace  = Pattern.compile("<div class='p_embed...[^i].+?</div>", Pattern.DOTALL);
 
 
-        while (e.beskrivelse.startsWith("<p>")) e.beskrivelse = e.beskrivelse.substring(3).trim();
+        //while (e.beskrivelse.startsWith("<p>")) e.beskrivelse = e.beskrivelse.substring(3).trim();
         while (e.beskrivelse.startsWith("</div>")) e.beskrivelse = e.beskrivelse.substring(6).trim();
 
       } else if ("content".equals(ns) && "encoded".equals(tag)) {

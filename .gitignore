@@ -43,3 +43,5 @@ captures/
 *.jks
 /.nb-gradle/
 /arkiv/
+/feed1/
+/feed2/

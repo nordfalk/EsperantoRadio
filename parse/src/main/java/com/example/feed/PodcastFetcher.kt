@@ -110,7 +110,6 @@ val kanallogo_url: String? = null,
 
     fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
         val udsendelser = ArrayList<Udsendelse>()
-        // println("syndFeed.modules = ${syndFeed.modules}")
         try {
             if (k.slug == "varsoviavento") parsVarsoviaVento(str, k, udsendelser)
             else if (k.slug == "peranto") parsePeranto(str, k, udsendelser)
@@ -173,6 +172,8 @@ val kanallogo_url: String? = null,
         udsendelser: ArrayList<Udsendelse>,
     ) {
         val syndFeed = syndFeedInput.build(StringReader(str))
+        kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
+        println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
         syndFeed.entries.forEach { entry ->
             var html = entry.contents[0].value
@@ -192,7 +193,7 @@ val kanallogo_url: String? = null,
             var lydUrl = ""
             var lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
             if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
-                if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl == "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
+                if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl = "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
                 val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
                 lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
 
@@ -224,7 +225,8 @@ val kanallogo_url: String? = null,
         udsendelser: ArrayList<Udsendelse>
     ) {
         val syndFeed = syndFeedInput.build(StringReader(str))
-        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
+        kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
+        println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         syndFeed.entries.forEach { entry ->
             val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
             //println("entry = ${entry}")

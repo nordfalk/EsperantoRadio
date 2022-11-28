@@ -36,6 +36,7 @@ public class Kanal extends Lydkilde {
   public String eo_elsendojRssUrl;
   public boolean eo_elsendojRssIgnoruTitolon;
   public boolean eo_montruTitolojn;
+  public String rss_nextLink;
 
 
   @Override

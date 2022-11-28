@@ -1,11 +1,13 @@
 package dk.dr.radio.backend;
 
 import com.example.feed.PodcastsFetcher;
+import com.example.feed.RomeFeedWriter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import dk.dr.radio.data.Grunddata;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 import dk.dr.radio.net.Diverse;
+import dk.dr.radio.net.FilCache;
 
 public class Grunddataparser {
 
@@ -78,6 +81,7 @@ public class Grunddataparser {
 
 
   public static void main(String[] args) throws Exception {
+    FilCache.init(new File("/tmp/filcache"));
     Grunddata gd = getGrunddata();
     System.out.println("gd.kanaler = " + gd.kanaler);
     for (Kanal k : gd.kanaler) {
@@ -87,7 +91,7 @@ public class Grunddataparser {
       System.out.println("k.eo_elsendojRssUrl = " + k.eo_elsendojRssUrl);
       if (k.eo_elsendojRssUrl==null) continue;
       System.out.println();
-      String str = Diverse.hentUrlSomStreng(k.eo_elsendojRssUrl);
+      String str = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(k.eo_elsendojRssUrl, true)));
       //System.out.println("str = " + str);
       if (str.contains("<item")) System.out.println("entry = " + str.split("<item")[1]);
 
@@ -100,6 +104,10 @@ public class Grunddataparser {
       System.out.println();
 
       System.out.println("udsendelser2.size() = " + udsendelser2.size());
+
+      // if (!k.slug.contains("kern")) continue;
+      RomeFeedWriter.write(new File("feed1"), k, udsendelser1);
+      RomeFeedWriter.write(new File("feed2"), k, udsendelser2);
 
       // System.out.println("feed = " + feed);
 

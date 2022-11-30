@@ -1,4 +1,4 @@
-package com.example.feed;
+package rssarkivserver;
 
 
 import com.rometools.rome.feed.synd.*;

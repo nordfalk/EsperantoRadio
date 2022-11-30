@@ -1,7 +1,6 @@
 package dk.dr.radio.backend;
 
-import com.example.feed.PodcastsFetcher;
-import com.example.feed.RomeFeedWriter;
+import rssarkivserver.RomeFeedWriter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,7 +72,7 @@ public class Grunddataparser {
     } // Ikke kritisk
   }
 
-  public static Grunddata getGrunddata() throws JSONException, IOException {
+  public static Grunddata getGrunddataPåPC() throws JSONException, IOException {
     Grunddata gd = new Grunddata();
     initGrunddata2(gd, Diverse.læsStreng(new FileInputStream("app/src/main/res/raw/esperantoradio_kanaloj_v9.json")));
     return gd;
@@ -82,7 +81,7 @@ public class Grunddataparser {
 
   public static void main(String[] args) throws Exception {
     FilCache.init(new File("/tmp/filcache"));
-    Grunddata gd = getGrunddata();
+    Grunddata gd = getGrunddataPåPC();
     System.out.println("gd.kanaler = " + gd.kanaler);
     for (Kanal k : gd.kanaler) {
       System.out.println();

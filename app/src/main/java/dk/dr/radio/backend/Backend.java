@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import com.example.feed.PodcastsFetcher;
-
 import org.json.JSONException;
 
 import java.io.File;

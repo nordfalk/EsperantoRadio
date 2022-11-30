@@ -14,76 +14,26 @@
  * limitations under the License.
  */
 
-package com.example.feed
+package dk.dr.radio.backend
 
 import com.rometools.modules.itunes.EntryInformation
 import com.rometools.rome.io.SyndFeedInput
-import dk.dr.radio.backend.EoRssParsado
 import dk.dr.radio.data.Kanal
 import dk.dr.radio.data.Udsendelse
 import dk.dr.radio.net.Diverse
 import dk.dr.radio.net.FilCache
-import okhttp3.CacheControl
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
-import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-/**
- * A class which fetches some selected podcast RSS feeds.
- *
- * @param okHttpClient [OkHttpClient] to use for network requests
- * @param syndFeedInput [SyndFeedInput] to use for parsing RSS feeds.
- * @param ioDispatcher [CoroutineDispatcher] to use for running fetch requests.
- */
 class PodcastsFetcher() {
     private val syndFeedInput = SyndFeedInput()
-
-    private val okHttpClient: OkHttpClient
     init {
-        okHttpClient = OkHttpClient.Builder()
-            //.cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
-            .apply {
-                //if (BuildConfig.DEBUG)
-                    // eventListenerFactory(LoggingEventListener.Factory())
-            }
-            .build()
-
         FilCache.init(File("/tmp/filcache"))
     }
 
-    /*
-
-data class Kanal2(
-val navn: String,
-val description: String? = null,
-val kanallogo_url: String? = null,
-// val copyright: String? = null
-)
-
-    val feedInfo = syndFeed.getModule(PodcastModuleDtd) as? FeedInformation
-    val kanal = Kanal2(
-        navn = syndFeed.title,
-        description = feedInfo?.summary ?: syndFeed.description,
-        // copyright = syndFeed.copyright,
-        kanallogo_url = feedInfo?.imageUri?.toString()
-    )
-    val podcastRssResponse = PodcastRssResponse(kanal, udsendelser)
-
-     */
-
-    /**
-     * It seems that most podcast hosts do not implement HTTP caching appropriately.
-     * Instead of fetching data on every app open, we instead allow the use of 'stale'
-     * network responses (up to 8 hours).
-     */
-    private val cacheControl by lazy {
-        CacheControl.Builder().maxStale(8, TimeUnit.HOURS).build()
-    }
 
     /**
      * Most feeds use the following DTD to include extra information related to
@@ -92,21 +42,6 @@ val kanallogo_url: String? = null,
      */
     private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
-    fun fetchPodcastFromUrl(url: String, k : Kanal): List<Udsendelse> {
-        println("====== parsas "+url)
-        val str = fetchUrl(url)
-        return parsRss(str, k)
-    }
-
-    fun fetchUrl(url: String): String {
-        val request = Request.Builder()
-            .url(url)
-            .cacheControl(cacheControl)
-            .build()
-
-        val str = okHttpClient.newCall(request).execute().body!!.string()
-        return str
-    }
 
     fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
         val udsendelser = ArrayList<Udsendelse>()

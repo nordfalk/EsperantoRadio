@@ -1,15 +1,15 @@
-package romerss
+package rssarkivserver.skrald
 
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import java.io.StringReader
 import java.net.URL
 
-object MyClass {
+object RomeSyndFeedTestParsning {
     @Throws(Exception::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        println("DDDDD MyClass")
+        println("DDDDD RomeSyndFeedTestParsning")
         val syndFeedInput = SyndFeedInput()
 
         val str = """

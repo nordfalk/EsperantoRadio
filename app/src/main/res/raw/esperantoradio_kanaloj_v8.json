@@ -148,6 +148,16 @@
 			"hejmpaĝoButono": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
 		}
 	,{
+			"kodo": "bitmono",
+			"nomo": "Bitmono",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/21881729/21881729-1666809337563-63459cc26442b.jpg",
+			"elsendojRssUrl": "https://anchor.fm/s/830574e4/podcast/rss",
+			"montruTitolojn": "false",
+			"uziWebViewPorElsendo": false,
+			"retpoŝto": "1822daniel@gmail.com",
+			"hejmpaĝoButono": "https://anchor.fm/bitmono"
+		}
+	,{
 			"kodo": "sano",
 			"nomo": "Pri Sano",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/6998773/6998773-1593998832730-95ad6d8e45a0a.jpg",

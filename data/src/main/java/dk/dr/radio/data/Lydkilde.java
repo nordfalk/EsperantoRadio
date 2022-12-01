@@ -6,14 +6,11 @@ import java.io.Serializable;
  * En lydkilde der kan spilles af afspilleren
  */
 public abstract class Lydkilde implements Serializable {
-  // Fix for https://www.bugsense.com/dashboard/project/cd78aa05/errors/1415558087
-  // - at proguard obfuskering havde
-  // Se også http://stackoverflow.com/questions/16210831/serialization-deserialization-proguard
   private static final long serialVersionUID = 6061992240626233386L;
 
   /** Unik menneskelig læselig ID - Bemærk - kan være tom! Se https://en.wikipedia.org/wiki/Uniform_Resource_Name */
   public String slug;
-  public transient String stream;
+  public String stream;
   public transient String hentetStream;
 
   @Override

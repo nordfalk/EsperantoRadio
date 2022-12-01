@@ -1,4 +1,4 @@
-package archive;
+package rssarkivserver.archiveorg;
 
 import java.io.IOException;
 import java.net.URL;

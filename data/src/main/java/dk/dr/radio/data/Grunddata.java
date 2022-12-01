@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Grunddata om kanaler og udsendelser
+ */
 public class Grunddata {
-  /**
-   * Grunddata
-   */
   public JSONObject android_json;
   public JSONObject json;
 

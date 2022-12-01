@@ -161,7 +161,7 @@ public class FilCache {
 
         if (!brugLokalTid) {
           long lastModified = httpForb.getHeaderFieldDate("last-modified", nu);
-          log("last-modified " + new Date(lastModified));
+          log("setLastModified " + new Date(lastModified)+" for "+url);
           cacheFil.setLastModified(lastModified);
         }
 

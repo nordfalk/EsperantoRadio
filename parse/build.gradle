@@ -58,3 +58,14 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+
+task rssarkivserverJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'rssarkivserver.RssArkivServer'
+    }
+    archiveBaseName = 'rssarkivserver'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

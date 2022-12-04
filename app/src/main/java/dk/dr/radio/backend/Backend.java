@@ -194,20 +194,22 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
 
   public void hentUdsendelserPåKanal(final Kanal kanal, final NetsvarBehander netsvarBehander) {
     Log.d("eo RSS por "+kanal+" ="+kanal.eo_elsendojRssUrl);
+    //org.brotli.dec.BrotliInputStream
     if (kanal.eo_elsendojRssUrl !=null &&  !"rss".equals(kanal.eo_datumFonto)) {
-      App.netkald.kald(this, kanal.eo_elsendojRssUrl, new NetsvarBehander() {
-        @Override
-        public void fikSvar(Netsvar s) throws Exception {
-          if (s.uændret) return;
-          Log.d("eo RSS por "+kanal+" ="+s.json);
-          ArrayList<Udsendelse> udsendelser = new PodcastsFetcher().parsRss(s.json, kanal); // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
-          if (!udsendelser.isEmpty()) {
-            kanal.udsendelser = udsendelser;
-            for (Udsendelse e : kanal.udsendelser) App.data.udsendelseFraSlug.put(e.slug, e);
+      // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+      App.netkald.kald(this, kanal.eo_elsendojRssUrl, null, new NetsvarBehander() {
+          @Override
+          public void fikSvar(Netsvar s) throws Exception {
+            if (s.uændret) return;
+            Log.d("eo RSS por "+kanal+" ="+s.json);
+            ArrayList<Udsendelse> udsendelser = new PodcastsFetcher().parsRss(s.json, kanal); // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+            if (!udsendelser.isEmpty()) {
+              kanal.udsendelser = udsendelser;
+              for (Udsendelse e : kanal.udsendelser) App.data.udsendelseFraSlug.put(e.slug, e);
+            }
+            netsvarBehander.fikSvar(s);
           }
-          netsvarBehander.fikSvar(s);
-        }
-      });
+        });
     } else {
       try {
         netsvarBehander.fikSvar(Netsvar.IKKE_NØDVENDIGT);

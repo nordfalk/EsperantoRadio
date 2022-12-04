@@ -453,7 +453,7 @@ public class Kanal_frag extends Basisfragment implements AdapterView.OnItemClick
   }
 
   private void opdaterSenestSpillet(final Udsendelse u2) {
-    App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, new NetsvarBehander() {
+    App.netkald.kald(this, u2.rektaElsendaPriskriboUrl, null, new NetsvarBehander() {
       @Override
       public void fikSvar(Netsvar s) {
         if (App.fejlsøgning) Log.d("KAN fikSvar playliste(" + s.fraCache + s.uændret + " " + s.url);

@@ -36,6 +36,9 @@ dependencies {
     // https://mvnrepository.com/artifact/net.sf.kxml/kxml2
     implementation 'net.sf.kxml:kxml2:2.3.0'
 
+    // implementation 'com.github.google:brotli:'
+    // https://mvnrepository.com/artifact/org.brotli/dec
+    implementation 'org.brotli:dec:0.1.2'
 
     implementation("org.jsoup:jsoup:1.14.3")
 }

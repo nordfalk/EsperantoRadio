@@ -32,10 +32,6 @@ public class Netkald {
     return data;
   }
 
-  public void kald(Object kalder, String url, final NetsvarBehander netsvarBehander) {
-    kald(kalder, url, null, netsvarBehander);
-  }
-
   public void kald(final Object kalder, final String url, final Request.Priority priority, final NetsvarBehander netsvarBehander) {
     Log.d("Netkald "+url);
     if (url==null) return;

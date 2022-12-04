@@ -46,8 +46,9 @@ class PodcastsFetcher() {
     fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
         val udsendelser = ArrayList<Udsendelse>()
         try {
-            if (k.slug == "varsoviavento") parsVarsoviaVento(str, k, udsendelser)
-            else if (k.slug == "peranto") parsePeranto(str, k, udsendelser)
+            var deArkivo = k.eo_elsendojRssUrl.contains("podkasta_arkivo")
+            if (k.slug == "varsoviavento" && !deArkivo) parsVarsoviaVento(str, k, udsendelser)
+            else if (k.slug == "peranto" && !deArkivo) parsePeranto(str, k, udsendelser)
             else parseAndre(str, k, udsendelser)
         } catch (e : Exception) {
             System.out.flush()

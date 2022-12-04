@@ -16,29 +16,37 @@ import java.util.List;
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
 
+/*
+brotli -k feed-peranto.xml
+
+ */
+
 public class RomeFeedWriter {
 
   public static void write(File mappe, Kanal kanal, List<Udsendelse> udsendelser) throws IOException, FeedException {
-        String fileName = "feed-"+kanal.slug+".xml";
         mappe.mkdirs();
+
+        List entries = getEntries(udsendelser);
+
+        SyndFeed feed = new SyndFeedImpl();
+        feed.setTitle(kanal.navn);
+        feed.setLink(kanal.eo_hejmpaĝoButono);
+        feed.setUri(kanal.eo_elsendojRssUrl);
+        feed.setDescription("This feed has been created using ROME (Java syndication utilities");
+        feed.setEntries(entries);
+
+        SyndFeedOutput output = new SyndFeedOutput();
+        feed.setFeedType("rss_2.0");
+        String fileName = "feed-"+kanal.slug+".xml";
+        // brotli -k feed-peranto.xml
         Writer writer = new FileWriter(new File(mappe, fileName));
-
-        write(kanal, udsendelser, writer);
-
+        output.output(feed, writer);
         writer.close();
         System.out.println("The feed has been written to the file ["+fileName+"]");
   }
 
-      private static void write(Kanal kanal, List<Udsendelse> udsendelser, Writer writer) throws IOException, FeedException {
-            SyndFeed feed = new SyndFeedImpl();
-            feed.setFeedType("rss_2.0");
-
-            feed.setTitle(kanal.navn);
-            feed.setLink(kanal.eo_hejmpaĝoButono);
-            feed.setUri(kanal.eo_elsendojRssUrl);
-            feed.setDescription("This feed has been created using ROME (Java syndication utilities");
-
-            List entries = new ArrayList();
+      private static ArrayList getEntries(List<Udsendelse> udsendelser) {
+            ArrayList<SyndEntryImpl> entries = new ArrayList<>();
 
             for (Udsendelse udsendelse : udsendelser) {
                   SyndEntryImpl entry = new SyndEntryImpl();
@@ -59,11 +67,7 @@ public class RomeFeedWriter {
 
                   entries.add(entry);
             }
-
-            feed.setEntries(entries);
-
-            SyndFeedOutput output = new SyndFeedOutput();
-            output.output(feed, writer);
+            return entries;
       }
 
 }

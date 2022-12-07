@@ -22,6 +22,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public static final DateFormat datoformato = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
   public String startTidDato;
 
+  public double duration; // varighed i sekunder
 
   public String link;
 
@@ -31,7 +32,8 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     kanal = k;
   }
 
-  public Udsendelse(Kanal kanal, String slug, String titel, String beskrivelse, String billedeUrl, Date startTid, String stream, String link) {
+  public Udsendelse(Kanal kanal, String slug, String titel, String beskrivelse, String billedeUrl, Date startTid,
+                    String stream, double duration, String link) {
     this.kanal = kanal;
     this.slug = slug;
     this.titel = titel;
@@ -40,6 +42,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     this.startTid = startTid;
     this.startTidDato = datoformato.format(startTid);
     this.stream = stream;
+    this.duration = duration;
     this.link = link;
   }
 

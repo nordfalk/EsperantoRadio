@@ -88,6 +88,18 @@ public class RssArkivServer implements Serializable {
             }
             k.udsendelser.addAll(0, tilføjes);
 
+            for (Udsendelse u : k.udsendelser) {
+                if (u.duration == 0) {
+                    FilCache.hentFil(u.stream, true);
+/*
+ffprobe  muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 2>&1 | grep Duration
+exiftool muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 | grep Duration
+mp3info -p %S muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3
+
+ */
+
+                }
+            }
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
 

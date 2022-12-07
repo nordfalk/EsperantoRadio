@@ -94,6 +94,7 @@ class RomePodcastParser() {
                             null,
                             entry.publishedDate,
                             lydUrl,
+                            0.0,
                             entry.link,
                         )
                     )
@@ -146,6 +147,7 @@ class RomePodcastParser() {
                     billedeUrl,
                     entry.publishedDate,
                     lydUrl,
+                    0.0,
                     entry.link,
                 )
             )
@@ -193,6 +195,7 @@ class RomePodcastParser() {
                     information?.imageUri ?: information?.image.toString(),
                     entry.publishedDate,
                     stream!!,
+                    (information?.duration?.milliseconds ?: 0)/1000.0,
                     entry.link
                 )
             )

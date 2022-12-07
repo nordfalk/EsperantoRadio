@@ -23,8 +23,7 @@ brotli -k feed-peranto.xml
 
 public class RomeFeedWriter {
 
-  public static void write(File mappe, Kanal kanal, List<Udsendelse> udsendelser) throws IOException, FeedException {
-        mappe.mkdirs();
+  public static void write(File fil, Kanal kanal, List<Udsendelse> udsendelser) throws IOException, FeedException {
 
         List entries = getEntries(udsendelser);
 
@@ -37,12 +36,11 @@ public class RomeFeedWriter {
 
         SyndFeedOutput output = new SyndFeedOutput();
         feed.setFeedType("rss_2.0");
-        String fileName = "feed-"+kanal.slug+".xml";
         // brotli -k feed-peranto.xml
-        Writer writer = new FileWriter(new File(mappe, fileName));
+        Writer writer = new FileWriter(fil);
         output.output(feed, writer);
         writer.close();
-        System.out.println("The feed has been written to the file ["+fileName+"]");
+        System.out.println("The feed has been written to the file ["+fil+"]");
   }
 
       private static ArrayList getEntries(List<Udsendelse> udsendelser) {

@@ -42,6 +42,7 @@ public class Grunddataparser {
       k.eo_retpoŝto = kJs.optString("retpoŝto", null);
       k.kanallogo_url = kJs.optString("emblemoUrl", null);
       k.eo_elsendojRssUrl = kJs.optString("elsendojRssUrl", null);
+      // k.eo_elsendojRssUrl = "https://javabog.dk/podkasta_arkivo/feed-" + k.slug + ".xml";
       k.eo_elsendojRssIgnoruTitolon = kJs.optBoolean("elsendojRssIgnoruTitolon", false);
       k.eo_montruTitolojn = kJs.optBoolean("montruTitolojn", false);
 

@@ -5,9 +5,12 @@ import dk.dr.radio.backend.PodcastsFetcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import dk.dr.radio.backend.Grunddataparser;
 import dk.dr.radio.data.Grunddata;
@@ -44,6 +47,8 @@ public class RssArkivServer implements Serializable {
             System.out.println(e);
         }
 
+        File rssDir = new File("RssArkivServer");
+        rssDir.mkdirs();
 
         System.out.println("gd.kanaler = " + gd.kanaler);
         for (Kanal k : gd.kanaler) {
@@ -83,11 +88,18 @@ public class RssArkivServer implements Serializable {
             }
             k.udsendelser.addAll(0, tilføjes);
 
-            File dir = new File("RssArkivServer");
-            dir.mkdirs();
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
-            RomeFeedWriter.write(dir, k, k.udsendelser);
+
+            LocalDate nu = LocalDate.now();
+            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            int sidsteÅr = nu.getYear()-1;
+
+
+            RomeFeedWriter.write(new File(rssDir, k.slug+"-aktuala.xml"), k, k.udsendelser.stream().filter(it -> !it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
+            File arkivFil = new File(rssDir, k.slug+"-arkivo"+sidsteÅr+".xml");
+            RomeFeedWriter.write(arkivFil, k, k.udsendelser.stream().filter(it -> it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
+            Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
         }
 
         RssArkivServer server = new RssArkivServer();

@@ -1,6 +1,9 @@
 package dk.dr.radio.data;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 /**
@@ -16,6 +19,7 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
   public String billedeUrl; // Bemærk - kan være tom
 
   public Date startTid;
+  public static final DateFormat datoformato = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
   public String startTidDato;
 
 
@@ -27,14 +31,14 @@ public class Udsendelse extends Lydkilde implements Comparable<Udsendelse>, Clon
     kanal = k;
   }
 
-  public Udsendelse(Kanal kanal, String slug, String titel, String beskrivelse, String billedeUrl, Date startTid, String startTidDato, String stream, String link) {
+  public Udsendelse(Kanal kanal, String slug, String titel, String beskrivelse, String billedeUrl, Date startTid, String stream, String link) {
     this.kanal = kanal;
     this.slug = slug;
     this.titel = titel;
     this.beskrivelse = beskrivelse;
     this.billedeUrl = billedeUrl;
     this.startTid = startTid;
-    this.startTidDato = startTidDato;
+    this.startTidDato = datoformato.format(startTid);
     this.stream = stream;
     this.link = link;
   }

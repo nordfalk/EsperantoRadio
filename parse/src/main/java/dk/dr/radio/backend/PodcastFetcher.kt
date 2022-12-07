@@ -16,7 +16,7 @@
 
 package dk.dr.radio.backend
 
-import com.rometools.modules.itunes.EntryInformation
+import com.rometools.modules.itunes.EntryInformationImpl
 import com.rometools.rome.io.SyndFeedInput
 import dk.dr.radio.data.Kanal
 import dk.dr.radio.data.Udsendelse
@@ -28,7 +28,7 @@ import java.io.FileInputStream
 import java.io.StringReader
 import java.util.regex.Pattern
 
-class PodcastsFetcher() {
+class RomePodcastParser() {
     private val syndFeedInput = SyndFeedInput()
     init {
         FilCache.init(File("/tmp/filcache"))
@@ -93,7 +93,6 @@ class PodcastsFetcher() {
                             html,
                             null,
                             entry.publishedDate,
-                            EoRssParsado.datoformato.format(entry.publishedDate),
                             lydUrl,
                             entry.link,
                         )
@@ -146,7 +145,6 @@ class PodcastsFetcher() {
                     html,
                     billedeUrl,
                     entry.publishedDate,
-                    EoRssParsado.datoformato.format(entry.publishedDate),
                     lydUrl,
                     entry.link,
                 )
@@ -164,7 +162,7 @@ class PodcastsFetcher() {
         kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
         println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         syndFeed.entries.forEach { entry ->
-            val information = entry.getModule(PodcastModuleDtd) as? EntryInformation
+            val information = entry.getModule(PodcastModuleDtd) as? EntryInformationImpl
             //println("entry = ${entry}")
             //println("information = ${information}")
             var beskrivelse = entry.description?.value ?: information?.summary
@@ -192,9 +190,8 @@ class PodcastsFetcher() {
                     kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
                     entry.title,
                     beskrivelse?.trim(),
-                    null,
+                    information?.imageUri ?: information?.image.toString(),
                     entry.publishedDate,
-                    EoRssParsado.datoformato.format(entry.publishedDate),
                     stream!!,
                     entry.link
                 )

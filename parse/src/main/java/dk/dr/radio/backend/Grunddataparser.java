@@ -99,7 +99,7 @@ public class Grunddataparser {
       if (udsendelser1.size()>0) System.out.println(udsendelser1.get(0));
       System.out.println();
 
-      List<Udsendelse> udsendelser2 = new PodcastsFetcher().parsRss(str, k);
+      List<Udsendelse> udsendelser2 = new RomePodcastParser().parsRss(str, k);
       if (udsendelser2.size()>0) System.out.println(udsendelser2.get(0));
       System.out.println();
 

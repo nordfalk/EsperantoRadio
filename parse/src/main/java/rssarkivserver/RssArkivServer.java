@@ -1,6 +1,6 @@
 package rssarkivserver;
 
-import dk.dr.radio.backend.PodcastsFetcher;
+import dk.dr.radio.backend.RomePodcastParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,7 +63,7 @@ public class RssArkivServer implements Serializable {
             //System.out.println("str = " + str);
             if (str.contains("<item")) System.out.println("entry = " + str.split("<item")[1]);
 
-            ArrayList<Udsendelse> hentedeUdsendelser = new PodcastsFetcher().parsRss(str, k);
+            ArrayList<Udsendelse> hentedeUdsendelser = new RomePodcastParser().parsRss(str, k);
             if (hentedeUdsendelser.size()>0) System.out.println(hentedeUdsendelser.get(0));
             System.out.println();
 
@@ -84,7 +84,7 @@ public class RssArkivServer implements Serializable {
                 if (k.rss_nextLink==null) break;
                 str = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(k.rss_nextLink, true)));
                 k.rss_nextLink = null;
-                hentedeUdsendelser = new PodcastsFetcher().parsRss(str, k);
+                hentedeUdsendelser = new RomePodcastParser().parsRss(str, k);
             }
             k.udsendelser.addAll(0, tilføjes);
 

@@ -202,7 +202,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           public void fikSvar(Netsvar s) throws Exception {
             if (s.uændret) return;
             Log.d("eo RSS por "+kanal+" ="+s.json);
-            ArrayList<Udsendelse> udsendelser = new PodcastsFetcher().parsRss(s.json, kanal); // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
+            ArrayList<Udsendelse> udsendelser = new RomePodcastParser().parsRss(s.json, kanal); // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
             if (!udsendelser.isEmpty()) {
               kanal.udsendelser = udsendelser;
               for (Udsendelse e : kanal.udsendelser) App.data.udsendelseFraSlug.put(e.slug, e);

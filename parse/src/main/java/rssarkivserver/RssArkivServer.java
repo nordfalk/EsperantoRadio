@@ -1,10 +1,13 @@
 package rssarkivserver;
 
+import static java.lang.Integer.*;
+
 import dk.dr.radio.backend.RomePodcastParser;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public class RssArkivServer implements Serializable {
     HashMap<String, ArrayList<Udsendelse>> udsendelserFraKanalslug = new HashMap<>();  // slug er index
 
 
+    @SuppressWarnings("NewApi")
     public static void main(String[] args) throws Exception {
         FilCache.init(new File("/tmp/filcache"));
 
@@ -89,16 +93,24 @@ public class RssArkivServer implements Serializable {
             k.udsendelser.addAll(0, tilføjes);
 
             for (Udsendelse u : k.udsendelser) {
-                if (u.duration == 0) {
-                    FilCache.hentFil(u.stream, true);
+                if (k.xxxx++ % 10 == 0 && u.duration == 0 || u.stream.length()<5) try {
+                    String fil = FilCache.hentFil(u.stream, true);
+                    System.out.println("u.stream = " + u.stream + "  i "+fil + " "+u.slug);
+                    String ffProbeOutput =  new String(Runtime.getRuntime().exec(new String[] {"ffprobe",fil}).getErrorStream().readAllBytes());
+                    //   Duration: 00:16:35.47, start: 0.025057, bitrate: 64 kb/s
+                    //System.out.println("ffProbeOutput = " + ffProbeOutput);
+                    //System.out.println("ffProbeOutput = " + ffProbeOutput.split("Duration: ").length);
+                    String durationStr = ffProbeOutput.split("Duration: ")[1].split(",")[0]; // 00:16:35.47
+                    String[] ds = durationStr.split(":");
+                    u.duration = parseInt(ds[0])*60*60 + parseInt(ds[1])*60+ Double.parseDouble(ds[2]);
+                    System.out.println("u.duration = " + u.duration + " for "+u.slug);
 /*
 ffprobe  muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 2>&1 | grep Duration
 exiftool muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 | grep Duration
 mp3info -p %S muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3
 
  */
-
-                }
+                } catch (Exception e) { e.printStackTrace(); System.err.println("FEJL for "+u.slug + " i "+u.stream); break; }
             }
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;

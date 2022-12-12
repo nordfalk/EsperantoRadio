@@ -112,7 +112,13 @@ class RomePodcastParser() {
         println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
         syndFeed.entries.forEach { entry ->
-            var html = entry.contents[0].value
+            var slug = kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate)
+            val htmlOrg = entry.contents[0].value
+            var html = htmlOrg
+
+            if (slug == "peranto:2019-11-08" || slug=="peranto:2019-09-29") { // Ingen lyd i HTML'en
+                return@forEach
+            }
 
             val billedeUrl = Jsoup.parse(html).selectFirst("img")?.attr("src")
             if (billedeUrl != null) {
@@ -127,30 +133,47 @@ class RomePodcastParser() {
             // println("entry = ${entry}")
 
             var lydUrl = ""
-            var lydIframeUrl = Jsoup.parse(entry.contents[0].value).selectFirst("iframe")?.attr("src")
-            if (lydIframeUrl != null && lydIframeUrl.startsWith("https://archive.org/embed/")) {
-                if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl = "https://archive.org/embed/orkestro_sklavidoj" // tajperaro
+            var lydIframeUrl = Jsoup.parse(htmlOrg).selectFirst("iframe")?.attr("src")
+            if (lydIframeUrl==null) {
+                if (html.contains("http://yourlisten.com/")) return@forEach
+                if (html.contains("http://vocaroo.com")) return@forEach
+                //println("html = ${html}")
+                // IllegalStateException("lydIframeUrl==null").printStackTrace()
+                return@forEach
+            } else if (lydIframeUrl.startsWith("https://drive.google.com/file/d/")) {
+                val googleDriveId = lydIframeUrl.split("/")[5]
+                lydUrl = "https://drive.google.com/u/1/uc?id="+googleDriveId+"&export=download"
+                FilCache.hentFil(lydUrl, true)
+            } else if (lydIframeUrl.startsWith("https://archive.org/embed/")) {
+                if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl = "https://archive.org/embed/orkestro_sklavidoj" // Fix fejl i feed
                 val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
                 lydUrl = "http" + (filData.split(".mp3\"")[0] + ".mp3").split("http").last()
-
-                //println("fil = ${fil}")
-                //val id = lydIframeUrl.split("/").last()
-                //lydUrl = "https://archive.org/download/$id/$id.mp3"
+                lydUrl = UnescapeHtml.unescapeHtml3(lydUrl)
+            } else if (lydIframeUrl.contains("yourlisten.com")) {
+                return@forEach // Kan ikke hente MP3 ...
+            } else if (lydIframeUrl.contains("audioboom.com")) {
+                return@forEach // Kan ikke hente MP3 ...
+            } else if (lydIframeUrl.contains("vimeo.com")) {
+                return@forEach // Kan ikke hente MP3 ...
+            } else if (lydIframeUrl.contains("ipernity.com")) {
+                return@forEach // Kan ikke hente MP3 ...
+            } else if (lydIframeUrl.contains("youtube.com/")) {
+                return@forEach // Kan ikke hente MP3 fra youtube...
+            } else if (lydIframeUrl.startsWith("https://w.soundcloud.com/player/")) {
+                return@forEach // Kan ikke hente MP3 fra soundcloud...
+            } else {
+                println("html = ${html}")
+                // IllegalStateException().printStackTrace()
             }
 
-            if (lydUrl != null) udsendelser.add(
-                Udsendelse(
-                    kanal,
-                    kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
-                    entry.title,
-                    html,
-                    billedeUrl,
-                    entry.publishedDate,
-                    lydUrl,
-                    0.0,
-                    entry.link,
-                )
-            )
+
+            if (lydUrl != null) try {
+                FilCache.hentFil(lydUrl, true)
+                val u = Udsendelse( kanal, slug, entry.title, html, billedeUrl, entry.publishedDate, lydUrl,0.0, entry.link)
+                udsendelser.add(u)
+            } catch (e : Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

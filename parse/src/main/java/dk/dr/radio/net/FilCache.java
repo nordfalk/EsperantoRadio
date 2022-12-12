@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
@@ -19,7 +22,7 @@ public class FilCache {
   private static final int BUFFERSTR = 4 * 1024;
   private static String lagerDir;
   public static int byteHentetOverNetværk = 0;
-  public static boolean fejlsøgning = false;
+  public static boolean fejlsøgning = true;
 
 
   private static void log(String tekst) {
@@ -76,6 +79,10 @@ public class FilCache {
       return cacheFilnavn;
     } else {
       long hentHvisNyereEnd = cacheFil.lastModified();
+
+      // https://archive.org/download/2-poemoj/2 poemoj.mp3   ->    2%20poemoj.mp
+      int slash = url.lastIndexOf('/') + 1;
+      url = url.substring(0, slash) + URLEncoder.encode( url.substring(slash), "UTF-8").replaceAll("\\+", "%20");
 
       int prøvIgen = 3;
       while (prøvIgen > 0) {
@@ -154,10 +161,9 @@ public class FilCache {
           is = new GZIPInputStream(is); // Pak data ud
         }
         kopierOgLuk(is, fos);
-        if (fejlsøgning)
-          log(httpForb.getHeaderField("Content-Length") + " blev til " + new File(cacheFilnavn).length());
         cacheFil.delete();
         new File(cacheFilnavn + "_tmp").renameTo(cacheFil);
+        if (fejlsøgning) log(httpForb.getHeaderField("Content-Length") + " blev til " + new File(cacheFilnavn).length());
 
         if (!brugLokalTid) {
           long lastModified = httpForb.getHeaderFieldDate("last-modified", nu);
@@ -182,7 +188,7 @@ public class FilCache {
     // String cacheFilnavn = url.substring(url.lastIndexOf('/') +
     // 1).replace('?', '_').replace('/', '_').replace('&', '_'); // f.eks.
     // byvejr_dag1?by=2500&mode=long
-    String cacheFilnavn = url.replaceFirst("http://","").replace('=', '_').replace('?', '_').replace('/', '_').replace('&', '_').replace(':', '_'); // f.eks.
+    String cacheFilnavn = url.replaceFirst("https://","").replaceFirst("http://","").replace('=', '_').replace('?', '_').replace('/', '_').replace('&', '_').replace(':', '_'); // f.eks.
     // byvejr_dag1?by=2500&mode=long
     String suf = url.substring(url.lastIndexOf('.')+1);
     //if ("txt jpg gif png".indexOf(suf)==-1) cacheFilnavn+=".xml";

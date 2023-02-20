@@ -1,7 +1,7 @@
 {
 	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
 	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
-	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v8.json  javabog.dk:javabog.dk/privat/",
+	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v*.json  javabog.dk:javabog.dk/privat/",
 
 
 	"android" : {
@@ -14,7 +14,8 @@
 		"sdsddrift_statusmeddelelse": "Aŭgusto 2020:<br><br>Nova versio kiu korektis kelkajn eraretojn<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti kelkajn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu :-)<br><br>Kore, Jacob Nordfalk.",
 		"x0drift_statusmeddelelse": "Majo 2022:<br><br>Bedaŭrinde la <b>rektaj elsendoj de Muzaiko</b> ne plu funkcias.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"x1drift_statusmeddelelse": "Junio 2022:<br><br>La <b>rektaj elsendoj de Muzaiko</b> estas restarigataj.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
-		"drift_statusmeddelelse": "Decembro 2022; Aldoniĝis nova podkasto pri Bitmono. Ĝuu :-)"
+		"x2drift_statusmeddelelse": "Decembro 2022; Aldoniĝis nova podkasto pri Bitmono. Ĝuu :-)",
+		"drift_statusmeddelelse": ""
 	},
 
 	"sugestoj_por_alarmoj":
@@ -93,16 +94,15 @@
 			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
 			"elsendojRssIgnoruTitolon": true,
 			"retpoŝto": "retradio.esperanto@gmail.com",
-			"hejmpaĝoButono": "http://pola-retradio.org/"
+			"hejmpaĝoButono": "https://pola-retradio.org/"
 		}
 	,{
-			"kodo": "kernpunkto",
-			"nomo": "Kernpunkto",
-			"emblemoUrl": "https://esperanto-radio.com/_kernpunkto.png",
-			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
-			"montruTitolojn": "true",
-			"uziWebViewPorElsendo": false,
-			"hejmpaĝoButono": "https://kern.punkto.info/"
+			"kodo": "babibejo",
+			"nomo": "BabiBEJO",
+			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
+			"elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
+			"retpoŝto": "babibejopodcast@gmail.com",
+			"hejmpaĝoButono": "https://bejo.esperanto.org.br/babibejo"
 		}
 	,{
 			"kodo": "movada-vidpunkto",

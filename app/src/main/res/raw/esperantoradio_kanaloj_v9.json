@@ -94,7 +94,15 @@
 			"elsendojRssUrl_derivita": "http://feeds.feedburner.com/retradio?format=xml",
 			"elsendojRssIgnoruTitolon": true,
 			"retpoŝto": "retradio.esperanto@gmail.com",
-			"hejmpaĝoButono": "http://pola-retradio.org/"
+			"hejmpaĝoButono": "https://pola-retradio.org/"
+		}
+	,{
+			"kodo": "babibejo",
+			"nomo": "BabiBEJO",
+			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
+			"elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
+			"retpoŝto": "babibejopodcast@gmail.com",
+			"hejmpaĝoButono": "https://bejo.esperanto.org.br/babibejo"
 		}
 	,{
 			"kodo": "kernpunkto",

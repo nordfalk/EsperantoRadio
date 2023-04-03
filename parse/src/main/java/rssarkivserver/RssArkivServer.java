@@ -55,7 +55,7 @@ public class RssArkivServer implements Serializable {
         rssDir.mkdirs();
 
         System.out.println("gd.kanaler = " + gd.kanaler);
-        for (Kanal k : gd.kanaler) {
+        for (Kanal k : gd.kanaler) try {
             System.out.println();
             System.out.println("===================================================================" + k);
             //if (!k.slug.contains("peranto")) continue;
@@ -92,8 +92,9 @@ public class RssArkivServer implements Serializable {
             }
             k.udsendelser.addAll(0, tilføjes);
 
+            /*
             for (Udsendelse u : k.udsendelser) {
-                if (k.xxxx++ % 10 == 0 && u.duration == 0 || u.stream.length()<5) try {
+                if (u.duration == 0 || u.stream.length()<5) try {
                     String fil = FilCache.hentFil(u.stream, true);
                     System.out.println("u.stream = " + u.stream + "  i "+fil + " "+u.slug);
                     String ffProbeOutput =  new String(Runtime.getRuntime().exec(new String[] {"ffprobe",fil}).getErrorStream().readAllBytes());
@@ -104,14 +105,12 @@ public class RssArkivServer implements Serializable {
                     String[] ds = durationStr.split(":");
                     u.duration = parseInt(ds[0])*60*60 + parseInt(ds[1])*60+ Double.parseDouble(ds[2]);
                     System.out.println("u.duration = " + u.duration + " for "+u.slug);
-/*
-ffprobe  muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 2>&1 | grep Duration
-exiftool muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 | grep Duration
-mp3info -p %S muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3
-
- */
-                } catch (Exception e) { e.printStackTrace(); System.err.println("FEJL for "+u.slug + " i "+u.stream); break; }
+                    // ffprobe  muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 2>&1 | grep Duration
+                    // exiftool muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3 | grep Duration
+                    // mp3info -p %S muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3
+                } catch (Exception e) { e.printStackTrace(); System.err.println("FEJL for "+u.slug + " i "+u.stream);  } // break;
             }
+             */
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
 
@@ -124,7 +123,7 @@ mp3info -p %S muzaiko.info_public_podkasto_podkasto-2022-05-02.mp3
             File arkivFil = new File(rssDir, k.slug+"-arkivo"+sidsteÅr+".xml");
             RomeFeedWriter.write(arkivFil, k, k.udsendelser.stream().filter(it -> it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
             Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
 
         RssArkivServer server = new RssArkivServer();
         server.kanalFraSlug = gd.kanalFraSlug;

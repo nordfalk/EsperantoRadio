@@ -9,10 +9,15 @@ import java.io.FileInputStream;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Period;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -116,46 +121,34 @@ public class RssArkivServer implements Serializable {
              */
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
+            k.udsendelser.sort((udsendelse, t1) -> -udsendelse.startTid.compareTo(t1.startTid));
+            k.udsendelser = new ArrayList<>(k.udsendelser.stream().distinct().collect(Collectors.toList()));
 
 
             LocalDate nu = LocalDate.now();
-            int sidsteÅr = nu.getYear()-1;
-            ZonedDateTime måned = nu.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault());
-            while (måned.getYear() != sidsteÅr) {
-                Date slut = Date.from(måned.toInstant());
-                måned = måned.minusMonths(1);
-                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("YYYY-MM")) + ".xml";
-                Date start = Date.from(måned.toInstant());
-                System.out.println(fn + ":  " + start +  " - " + slut);
+            LocalDateTime måned = nu.withDayOfMonth(1).atStartOfDay();
+            while (måned.getMonth() != Month.JANUARY) {
+                Date slut = Date.from(måned.toInstant(ZoneOffset.UTC));
+                måned = måned.minus(1, ChronoUnit.MONTHS);
+                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("yyyy-MM")) + ".xml";
+                Date start = Date.from(måned.toInstant(ZoneOffset.UTC));
+                System.out.println("xxxxxxxxxxxxx" + fn + ":  " + start +  " - " + slut + "\n"+k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).map(udsendelse -> udsendelse.slug).collect(Collectors.toList()));
                 // RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).collect(Collectors.toList()));
             }
 
-            System.exit(0);
 
 
-            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            //System.exit(0);
+
+
 
             /*
-peranto-2023-03-nun.xml
-peranto-2023-02.xml
-peranto-2023-01.xml
-peranto-2022.xml
-peranto.xml
-
-
-peranto-2023-02.xml
-peranto-2023.xml
-peranto.xml
-
-
-peranto-aktuala.xml
-peranto-arkivo2021.xml
--
-
              */
 
 
-            RomeFeedWriter.write(new File(rssDir, k.slug+"-aktuala.xml"), k, k.udsendelser.stream().filter(it -> !it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
+            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            RomeFeedWriter.write(new File(rssDir, k.slug+"-aktuala.xml"), k, k.udsendelser.stream().distinct().filter(it -> !it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
+            int sidsteÅr = nu.getYear()-1;
             File arkivFil = new File(rssDir, k.slug+"-arkivo"+sidsteÅr+".xml");
             RomeFeedWriter.write(arkivFil, k, k.udsendelser.stream().filter(it -> it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
             // Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();

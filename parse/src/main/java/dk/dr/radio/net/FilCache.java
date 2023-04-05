@@ -22,7 +22,7 @@ public class FilCache {
   private static final int BUFFERSTR = 4 * 1024;
   private static String lagerDir;
   public static int byteHentetOverNetværk = 0;
-  public static boolean fejlsøgning = true;
+  public static boolean fejlsøgning = false;
 
 
   private static void log(String tekst) {
@@ -172,7 +172,7 @@ public class FilCache {
 
         if (!brugLokalTid) {
           long lastModified = httpForb.getHeaderFieldDate("last-modified", nu);
-          log("setLastModified " + new Date(lastModified)+" for "+url);
+          if (fejlsøgning) log("setLastModified " + new Date(lastModified)+" for "+url);
           cacheFil.setLastModified(lastModified);
         }
 

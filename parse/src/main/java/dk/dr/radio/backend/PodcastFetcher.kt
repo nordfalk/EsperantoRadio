@@ -167,7 +167,7 @@ class RomePodcastParser() {
             }
 
 
-            if (lydUrl != null) try {
+            if (lydUrl.isNotEmpty() != null) try {
                 FilCache.hentFil(lydUrl, true)
                 val u = Udsendelse( kanal, slug, entry.title, html, billedeUrl, entry.publishedDate, lydUrl,0.0, entry.link)
                 udsendelser.add(u)
@@ -195,7 +195,7 @@ class RomePodcastParser() {
 
             var stream = if (entry.enclosures.size > 0) entry.enclosures[0].url else null
             if (stream == null) stream =
-                Jsoup.parse(beskrivelse).selectFirst("audio")?.selectFirst("source")?.attr("src")
+                Jsoup.parse(beskrivelse!!).selectFirst("audio")?.selectFirst("source")?.attr("src")
             if (stream == null) {
                 IllegalArgumentException("Hm! stream==null!! for " + kanal + " " + entry.publishedDate)
                 return@forEach
@@ -217,7 +217,7 @@ class RomePodcastParser() {
                     beskrivelse?.trim(),
                     information?.imageUri ?: information?.image.toString(),
                     entry.publishedDate,
-                    stream!!,
+                    stream,
                     (information?.duration?.milliseconds ?: 0)/1000.0,
                     entry.link
                 )

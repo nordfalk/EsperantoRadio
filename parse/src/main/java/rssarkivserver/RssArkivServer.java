@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -114,15 +117,48 @@ public class RssArkivServer implements Serializable {
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
 
+
             LocalDate nu = LocalDate.now();
-            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
             int sidsteÅr = nu.getYear()-1;
+            ZonedDateTime måned = nu.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault());
+            while (måned.getYear() != sidsteÅr) {
+                Date slut = Date.from(måned.toInstant());
+                måned = måned.minusMonths(1);
+                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("YYYY-MM")) + ".xml";
+                Date start = Date.from(måned.toInstant());
+                System.out.println(fn + ":  " + start +  " - " + slut);
+                // RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).collect(Collectors.toList()));
+            }
+
+            System.exit(0);
+
+
+            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            /*
+peranto-2023-03-nun.xml
+peranto-2023-02.xml
+peranto-2023-01.xml
+peranto-2022.xml
+peranto.xml
+
+
+peranto-2023-02.xml
+peranto-2023.xml
+peranto.xml
+
+
+peranto-aktuala.xml
+peranto-arkivo2021.xml
+-
+
+             */
 
 
             RomeFeedWriter.write(new File(rssDir, k.slug+"-aktuala.xml"), k, k.udsendelser.stream().filter(it -> !it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
             File arkivFil = new File(rssDir, k.slug+"-arkivo"+sidsteÅr+".xml");
             RomeFeedWriter.write(arkivFil, k, k.udsendelser.stream().filter(it -> it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
-            Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
+            // Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
         } catch (Exception e) { e.printStackTrace(); }
 
         RssArkivServer server = new RssArkivServer();

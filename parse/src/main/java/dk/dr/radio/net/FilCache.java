@@ -82,7 +82,8 @@ public class FilCache {
 
       // https://archive.org/download/2-poemoj/2 poemoj.mp3   ->    2%20poemoj.mp
       int slash = url.lastIndexOf('/') + 1;
-      url = url.substring(0, slash) + URLEncoder.encode( url.substring(slash), "UTF-8").replaceAll("\\+", "%20");
+      url = url.substring(0, slash) +  url.substring(slash).replaceAll(" ", "%20");
+      // url = url.substring(0, slash) + URLEncoder.encode( url.substring(slash), "UTF-8").replaceAll("\\+", "%20");
 
       int prøvIgen = 3;
       while (prøvIgen > 0) {
@@ -140,7 +141,11 @@ public class FilCache {
           return cacheFilnavn;
         }
         if (responseCode != 200) {
-          if (prøvIgen == 0) throw new IOException(responseCode + " " + httpForb.getResponseMessage() + " for " + url);
+          if (prøvIgen == 0) {
+            String body = new String(httpForb.getErrorStream().readAllBytes());
+            log(body);
+            throw new IOException(responseCode + " " + httpForb.getResponseMessage() + " for " + url);
+          }
           // Prøv igen
           log("Netværksfejl, vi venter lidt og prøver igen");
           log(responseCode + " " + httpForb.getResponseMessage() + " for " + url);

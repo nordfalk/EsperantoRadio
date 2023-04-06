@@ -100,7 +100,7 @@ public class FilCache {
         }
 
         if (prøvIgen > 0) httpForb.addRequestProperty("Accept-Encoding", "gzip");
-        httpForb.setConnectTimeout(10000); // 10 sekunder
+        httpForb.setConnectTimeout(3000); // 3 sekunder
         try {
           httpForb.connect();
         } catch (IOException e) {

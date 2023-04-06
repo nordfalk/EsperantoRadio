@@ -1,6 +1,8 @@
 package rssarkivserver;
 
 
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.itunes.types.Duration;
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
@@ -35,10 +37,10 @@ public class RomeFeedWriter {
         feed.setDescription("This feed has been created using ROME (Java syndication utilities");
         feed.setEntries(entries);
 
-        SyndFeedOutput output = new SyndFeedOutput();
         feed.setFeedType("rss_2.0");
         // brotli -k feed-peranto.xml
         Writer writer = new FileWriter(fil);
+        SyndFeedOutput output = new SyndFeedOutput();
         output.output(feed, writer);
         writer.close();
         System.out.println("The feed has been written to the file ["+fil+"]");
@@ -53,6 +55,12 @@ public class RomeFeedWriter {
                   entry.setLink(udsendelse.link);
                   entry.setUri(udsendelse.slug);
                   entry.setPublishedDate(udsendelse.startTid);
+
+                  if (udsendelse.duration != 0) {
+                        EntryInformationImpl e = new EntryInformationImpl();
+                        e.setDuration(new Duration((long) (udsendelse.duration*1000)));
+                        entry.setModules(new ArrayList<>(List.of(e)));
+                  }
 
                   SyndEnclosureImpl enclosure = new SyndEnclosureImpl();
                   enclosure.setType("audio/mpeg");

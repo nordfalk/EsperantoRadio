@@ -1,26 +1,25 @@
 package rssarkivserver;
 
-import static java.lang.Integer.*;
+import static java.lang.Integer.parseInt;
+
+import com.rometools.rome.io.FeedException;
 
 import dk.dr.radio.backend.RomePodcastParser;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import dk.dr.radio.backend.Grunddataparser;
@@ -45,7 +44,7 @@ public class RssArkivServer implements Serializable {
 
     @SuppressWarnings("NewApi")
     public static void main(String[] args) throws Exception {
-        FilCache.init(new File("/tmp/filcache"));
+        FilCache.init(new File("RssArkivServer-filcache"));
 
         Grunddata gd = Grunddataparser.getGrunddataPåPC();
         try {
@@ -97,11 +96,12 @@ public class RssArkivServer implements Serializable {
                 str = Diverse.læsStreng(new FileInputStream(FilCache.hentFil(k.rss_nextLink, true)));
                 k.rss_nextLink = null;
                 hentedeUdsendelser = new RomePodcastParser().parsRss(str, k);
+                // break;
             }
             k.udsendelser.addAll(0, tilføjes);
 
             /*
-            for (Udsendelse u : k.udsendelser) {
+            for (Udsendelse u : k.udsendelser) { // find længden på udsendelserne
                 if (u.duration == 0 || u.stream.length()<5) try {
                     String fil = FilCache.hentFil(u.stream, true);
                     System.out.println("u.stream = " + u.stream + "  i "+fil + " "+u.slug);
@@ -119,51 +119,55 @@ public class RssArkivServer implements Serializable {
                 } catch (Exception e) { e.printStackTrace(); System.err.println("FEJL for "+u.slug + " i "+u.stream);  } // break;
             }
              */
+
             // for (File f : dir.listFiles()) f.delete();
             // if (!k.slug.contains("kern")) continue;
             k.udsendelser.sort((udsendelse, t1) -> -udsendelse.startTid.compareTo(t1.startTid));
             k.udsendelser = new ArrayList<>(k.udsendelser.stream().distinct().collect(Collectors.toList()));
 
-
             LocalDate nu = LocalDate.now();
-            LocalDateTime måned = nu.withDayOfMonth(1).atStartOfDay();
+            LocalDate periode = nu.withDayOfMonth(1);
 
+            gemRss(rssDir, k.slug + "-" + periode.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-aktuala.xml", periode, null, k);
 
-            { // aktuala monato
-                Date slut = Date.from(måned.toInstant(ZoneOffset.UTC));
-                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-aktuala.xml";
-                RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> it.startTid.after(slut)).collect(Collectors.toList()));
+            while (periode.getMonth() != Month.JANUARY) { // antaŭaj monatoj, ĝis januaro
+                LocalDate slut = periode;
+                periode = periode.minus(1, ChronoUnit.MONTHS);
+                gemRss(rssDir, k.slug + "-" + periode.format(DateTimeFormatter.ofPattern("yyyy-MM")) + ".xml", periode, slut, k);
             }
 
-            while (måned.getMonth() != Month.JANUARY) { // antaŭaj monatoj, ĝis januaro
-                Date slut = Date.from(måned.toInstant(ZoneOffset.UTC));
-                måned = måned.minus(1, ChronoUnit.MONTHS);
-                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("yyyy-MM")) + ".xml";
-                Date start = Date.from(måned.toInstant(ZoneOffset.UTC));
-                RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).collect(Collectors.toList()));
+            gemRss(rssDir, k.slug + "-" + periode.format(DateTimeFormatter.ofPattern("yyyy")) + "-aktuala.xml", periode, null, k);
+
+            LocalDate rssStartDato = LocalDate.ofInstant(k.udsendelser.get(k.udsendelser.size()-1).startTid.toInstant(), ZoneOffset.UTC);
+            while (periode.isAfter(rssStartDato)) { // antaŭaj monatoj, ĝis januaro
+                LocalDate slut = periode;
+                periode = periode.minus(1, ChronoUnit.YEARS);
+                gemRss(rssDir, k.slug + "-" + periode.format(DateTimeFormatter.ofPattern("yyyy")) + ".xml", periode, slut, k);
             }
 
+            gemRss(rssDir, k.slug + "-aktuala.xml", null, null, k);
 
 
-            //System.exit(0);
-
-
-
-            /*
-             */
-
-
-            Date sidsteÅrsSkifte = Date.from(nu.withDayOfYear(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-            RomeFeedWriter.write(new File(rssDir, k.slug+"-aktuala.xml"), k, k.udsendelser.stream().distinct().filter(it -> !it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
-            int sidsteÅr = nu.getYear()-1;
-            File arkivFil = new File(rssDir, k.slug+"-arkivo"+sidsteÅr+".xml");
-            RomeFeedWriter.write(arkivFil, k, k.udsendelser.stream().filter(it -> it.startTid.before(sidsteÅrsSkifte)).collect(Collectors.toList()));
-            // Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
         } catch (Exception e) { e.printStackTrace(); }
 
         RssArkivServer server = new RssArkivServer();
         server.kanalFraSlug = gd.kanalFraSlug;
         for (Kanal k : gd.kanaler) server.udsendelserFraKanalslug.put(k.slug, k.udsendelser);
         Serialisering.gem(server, "RssArkivServer.ser");
+    }
+
+    private static void gemRss(File rssDir, String fn, LocalDate start0, LocalDate slut0, Kanal k) throws IOException, FeedException {
+        Date start = start0==null? null : Date.from(start0.atStartOfDay().toInstant(ZoneOffset.UTC));
+        Date slut = slut0==null? null : Date.from(slut0.atStartOfDay().toInstant(ZoneOffset.UTC));
+
+        List<Udsendelse> liste = k.udsendelser.stream().filter(udsendelse ->
+          (start==null || start.before(udsendelse.startTid)) && (slut==null || udsendelse.startTid.before(slut))
+        ).collect(Collectors.toList());
+
+        if (!liste.isEmpty()) {
+            RomeFeedWriter.write(new File(rssDir, fn), k, liste);
+            // Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
+        }
+        else System.out.println("Tom: "+fn);
     }
 }

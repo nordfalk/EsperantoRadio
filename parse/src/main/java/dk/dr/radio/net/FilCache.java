@@ -137,6 +137,10 @@ public class FilCache {
           log("Der er cachet kopi i " + cacheFilnavn);
           return cacheFilnavn;
         }
+        if (responseCode == 403) {
+          httpForb.disconnect();
+          throw new IOException(responseCode + " " + httpForb.getResponseMessage() + " for " + url);
+        }
         if (responseCode != 200) {
           if (prøvIgen == 0) {
             String body = new String(httpForb.getErrorStream().readAllBytes());

@@ -59,7 +59,7 @@ public class RomeFeedWriter {
                   if (udsendelse.duration != 0) {
                         EntryInformationImpl e = new EntryInformationImpl();
                         e.setDuration(new Duration((long) (udsendelse.duration*1000)));
-                        entry.setModules(new ArrayList<>(List.of(e)));
+                        entry.getModules().add(e);
                   }
 
                   SyndEnclosureImpl enclosure = new SyndEnclosureImpl();

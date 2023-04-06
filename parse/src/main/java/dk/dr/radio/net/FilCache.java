@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
@@ -22,7 +19,7 @@ public class FilCache {
   private static final int BUFFERSTR = 4 * 1024;
   private static String lagerDir;
   public static int byteHentetOverNetværk = 0;
-  public static boolean fejlsøgning = false;
+  public static boolean fejlsøgning = true;
 
 
   private static void log(String tekst) {
@@ -102,7 +99,7 @@ public class FilCache {
           }
         }
 
-        httpForb.addRequestProperty("Accept-Encoding", "gzip");
+        if (prøvIgen > 0) httpForb.addRequestProperty("Accept-Encoding", "gzip");
         httpForb.setConnectTimeout(10000); // 10 sekunder
         try {
           httpForb.connect();

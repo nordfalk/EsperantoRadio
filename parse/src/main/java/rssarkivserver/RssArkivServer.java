@@ -127,13 +127,20 @@ public class RssArkivServer implements Serializable {
 
             LocalDate nu = LocalDate.now();
             LocalDateTime måned = nu.withDayOfMonth(1).atStartOfDay();
-            while (måned.getMonth() != Month.JANUARY) {
+
+
+            { // aktuala monato
+                Date slut = Date.from(måned.toInstant(ZoneOffset.UTC));
+                String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-aktuala.xml";
+                RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> it.startTid.after(slut)).collect(Collectors.toList()));
+            }
+
+            while (måned.getMonth() != Month.JANUARY) { // antaŭaj monatoj, ĝis januaro
                 Date slut = Date.from(måned.toInstant(ZoneOffset.UTC));
                 måned = måned.minus(1, ChronoUnit.MONTHS);
                 String fn = k.slug + "-" + måned.format(DateTimeFormatter.ofPattern("yyyy-MM")) + ".xml";
                 Date start = Date.from(måned.toInstant(ZoneOffset.UTC));
-                System.out.println("xxxxxxxxxxxxx" + fn + ":  " + start +  " - " + slut + "\n"+k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).map(udsendelse -> udsendelse.slug).collect(Collectors.toList()));
-                // RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).collect(Collectors.toList()));
+                RomeFeedWriter.write(new File(rssDir, fn), k, k.udsendelser.stream().filter(it -> start.before(it.startTid) && it.startTid.before(slut)).collect(Collectors.toList()));
             }
 
 

@@ -15,6 +15,7 @@ import java.util.List;
 
 import dk.dr.radio.data.Kanal;
 import dk.dr.radio.data.Udsendelse;
+import dk.dr.radio.net.FilCache;
 
 /*
 brotli -k feed-peranto.xml
@@ -50,11 +51,15 @@ public class RomeFeedWriter {
                   SyndEntryImpl entry = new SyndEntryImpl();
                   entry.setTitle(udsendelse.titel);
                   entry.setLink(udsendelse.link);
+                  entry.setUri(udsendelse.slug);
                   entry.setPublishedDate(udsendelse.startTid);
 
                   SyndEnclosureImpl enclosure = new SyndEnclosureImpl();
                   enclosure.setType("audio/mpeg");
                   enclosure.setUrl(udsendelse.stream);
+
+                  File lokalStream = new File(FilCache.findLokaltFilnavn(udsendelse.stream));
+                  if (lokalStream.exists()) enclosure.setLength(lokalStream.length());
                   entry.setEnclosures(Arrays.asList(enclosure));
 
                   SyndContentImpl description = new SyndContentImpl();

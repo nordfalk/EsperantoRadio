@@ -28,7 +28,7 @@ import java.io.FileInputStream
 import java.io.StringReader
 import java.util.regex.Pattern
 
-class RomePodcastParser() {
+class RomePodcastParser {
     private val syndFeedInput = SyndFeedInput()
     init {
         FilCache.init(File("/tmp/filcache"))
@@ -110,13 +110,14 @@ class RomePodcastParser() {
         val syndFeed = syndFeedInput.build(StringReader(str))
         kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
         println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
-        println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
+        // println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
         syndFeed.entries.forEach { entry ->
-            var slug = kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate)
+            val slug = entry.uri // kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate)
             val htmlOrg = entry.contents[0].value
             var html = htmlOrg
 
-            if (slug == "peranto:2019-11-08" || slug=="peranto:2019-09-29") { // Ingen lyd i HTML'en
+            var xslug = EoRssParsado.datoformato.format(entry.publishedDate)
+            if (xslug == "2019-11-08" || slug=="2019-09-29") { // Ingen lyd i HTML'en
                 return@forEach
             }
 
@@ -187,6 +188,7 @@ class RomePodcastParser() {
         kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
         println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         syndFeed.entries.forEach { entry ->
+            val slug = entry.uri ?: kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate)
             val information = entry.getModule(PodcastModuleDtd) as? EntryInformationImpl
             //println("entry = ${entry}")
             //println("information = ${information}")
@@ -212,7 +214,7 @@ class RomePodcastParser() {
             udsendelser.add(
                 Udsendelse(
                     kanal,
-                    kanal.slug + ":" + EoRssParsado.datoformato.format(entry.publishedDate),
+                    slug,
                     entry.title,
                     beskrivelse?.trim(),
                     information?.imageUri ?: information?.image.toString(),

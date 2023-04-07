@@ -169,7 +169,7 @@ class RomePodcastParser {
 
 
             if (lydUrl.isNotEmpty() != null) try {
-                FilCache.hentFil(lydUrl, true)
+                //FilCache.hentFil(lydUrl, true)
                 val u = Udsendelse( kanal, slug, entry.title, html, billedeUrl, entry.publishedDate, lydUrl,0.0, entry.link)
                 udsendelser.add(u)
             } catch (e : Exception) {

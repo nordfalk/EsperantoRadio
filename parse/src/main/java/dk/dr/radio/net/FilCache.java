@@ -160,6 +160,7 @@ public class FilCache {
 
         if (fejlsøgning) log("Henter " + url + " og gemmer i " + cacheFilnavn);
         InputStream is = httpForb.getInputStream();
+        new File(cacheFilnavn).getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream(cacheFilnavn + "_tmp");
         String indkodning = httpForb.getHeaderField("Content-Encoding");
         if (fejlsøgning) log("indkodning: " + indkodning);
@@ -191,13 +192,11 @@ public class FilCache {
    * @return Stien til hvor filen (muligvis) findes lokalt.
    */
   public static String findLokaltFilnavn(String url) {
-    // String cacheFilnavn = url.substring(url.lastIndexOf('/') +
-    // 1).replace('?', '_').replace('/', '_').replace('&', '_'); // f.eks.
-    // byvejr_dag1?by=2500&mode=long
-    String cacheFilnavn = url.replaceFirst("https://","").replaceFirst("http://","").replace('=', '_').replace('?', '_').replace('/', '_').replace('&', '_').replace(':', '_'); // f.eks.
-    // byvejr_dag1?by=2500&mode=long
-    String suf = url.substring(url.lastIndexOf('.')+1);
-    //if ("txt jpg gif png".indexOf(suf)==-1) cacheFilnavn+=".xml";
+    url = url.replaceFirst("https://","").replaceFirst("http://","");
+    String host = url.substring(0, url.indexOf('/')+1);
+    String rest = url.substring(host.length());
+    String cacheFilnavn = host + rest.replace('=', '_').replace('?', '_').replace('/', '_').replace('&', '_').replace(':', '_');
+    // String suf = url.substring(url.lastIndexOf('.')+1);
     cacheFilnavn = lagerDir + "/" + cacheFilnavn;
     if (fejlsøgning) log("URL: " + url + "  -> " + cacheFilnavn);
     return cacheFilnavn;

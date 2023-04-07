@@ -125,9 +125,7 @@ public class RssArkivServer implements Serializable {
             k.udsendelser.sort((udsendelse, t1) -> -udsendelse.startTid.compareTo(t1.startTid));
             k.udsendelser = new ArrayList<>(k.udsendelser.stream().distinct().collect(Collectors.toList()));
 
-            LocalDate nu = LocalDate.now();
-            LocalDate periode = nu.withDayOfMonth(1);
-
+            LocalDate periode = LocalDate.now().withDayOfMonth(1);
             gemRss(rssDir, k.slug + "-" + periode.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-aktuala.xml", periode, null, k);
 
             while (periode.getMonth() != Month.JANUARY) { // antaŭaj monatoj, ĝis januaro
@@ -165,8 +163,9 @@ public class RssArkivServer implements Serializable {
         ).collect(Collectors.toList());
 
         if (!liste.isEmpty()) {
-            RomeFeedWriter.write(new File(rssDir, fn), k, liste);
-            // Runtime.getRuntime().exec("brotli -k "+arkivFil).waitFor();
+            File arkivFil = new File(rssDir, fn);
+            RomeFeedWriter.write(arkivFil, k, liste);
+            // Runtime.getRuntime().exec("brotli -k "+arkivFil); //.waitFor();
         }
         else System.out.println("Tom: "+fn);
     }

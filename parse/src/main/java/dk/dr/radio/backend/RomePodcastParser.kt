@@ -108,6 +108,7 @@ class RomePodcastParser {
         udsendelser: ArrayList<Udsendelse>,
     ) {
         val syndFeed = syndFeedInput.build(StringReader(str))
+        val HENTLYD = false
         kanal.rss_nextLink = syndFeed.links.find { it.rel == "next" }?.href
         println("kanal.rss_nextLink = ${kanal.rss_nextLink}")
         // println("syndFeed.entries.first().modules = ${syndFeed.entries.first().modules.map { it.uri }}")
@@ -144,7 +145,6 @@ class RomePodcastParser {
             } else if (lydIframeUrl.startsWith("https://drive.google.com/file/d/")) {
                 val googleDriveId = lydIframeUrl.split("/")[5]
                 lydUrl = "https://drive.google.com/u/1/uc?id="+googleDriveId+"&export=download"
-                FilCache.hentFil(lydUrl, true)
             } else if (lydIframeUrl.startsWith("https://archive.org/embed/")) {
                 if (lydIframeUrl == "https://archive.org/embed/orkestro_sklavidojj") lydIframeUrl = "https://archive.org/embed/orkestro_sklavidoj" // Fix fejl i feed
                 val filData = Diverse.læsStreng(FileInputStream(FilCache.hentFil(lydIframeUrl, true)))
@@ -169,7 +169,7 @@ class RomePodcastParser {
 
 
             if (lydUrl.isNotEmpty() != null) try {
-                //FilCache.hentFil(lydUrl, true)
+                if (HENTLYD) FilCache.hentFil(lydUrl, true)
                 val u = Udsendelse( kanal, slug, entry.title, html, billedeUrl, entry.publishedDate, lydUrl,0.0, entry.link)
                 udsendelser.add(u)
             } catch (e : Exception) {

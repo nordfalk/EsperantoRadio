@@ -30,12 +30,6 @@ import dk.dr.radio.diverse.Serialisering;
 import dk.dr.radio.net.Diverse;
 import dk.dr.radio.net.FilCache;
 
-/*
-
-./gradlew :parse:rssarkivserverJar
-java -jar parse/build/libs/rssarkivserver.jar
-
- */
 
 public class RssArkivServer implements Serializable {
     HashMap<String, Kanal> kanalFraSlug = new HashMap<>(); // slug er index

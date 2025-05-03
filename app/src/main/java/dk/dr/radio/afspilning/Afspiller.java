@@ -277,8 +277,8 @@ public class Afspiller {
 
     // mediaPlayer.setDataSource() bør kaldes fra en baggrundstråd da det kan ske
     // at den hænger under visse netværksforhold
-    new Thread() {
-      public void run() {
+    //new Thread() {
+      //public void run() {
         setDataSourceTid = System.currentTimeMillis();
         setDataSourceLyd = false;
         try {
@@ -310,8 +310,8 @@ public class Afspiller {
             }
           });
         }
-      }
-    }.start();
+      //}
+    //}.start();
   }
 
   synchronized private void pauseAfspilningIntern() {
@@ -320,9 +320,9 @@ public class Afspiller {
     // alle lyttere og bruger en ny
     final MediaPlayerWrapper gammelMediaPlayer = mediaPlayer;
     sætMediaPlayerLytter(gammelMediaPlayer, null); // afregistrér alle lyttere
-    new Thread() {
-      @Override
-      public void run() {
+    //new Thread() {
+      //@Override
+      //public void run() {
         try {
           try { // Ignorér IllegalStateException, det er fordi den allerede er stoppet
             gammelMediaPlayer.stop();
@@ -335,8 +335,8 @@ public class Afspiller {
           Log.d("P gammelMediaPlayer færdig");
         } catch (IllegalStateException e) { e.printStackTrace();
         } catch (Exception e) { Log.rapporterFejl(e); }
-      }
-    }.start();
+      //}
+    //}.start();
 
     mediaPlayer = new EmaPlayerWrapper();
     sætMediaPlayerLytter(mediaPlayer, this.lytter); // registrér lyttere på den nye instans
@@ -600,8 +600,8 @@ public class Afspiller {
         // alle lyttere og bruger en ny
         final MediaPlayerWrapper gammelMediaPlayer = mediaPlayer;
         sætMediaPlayerLytter(gammelMediaPlayer, null); // afregistrér alle lyttere
-        new Thread() {
-          public void run() {
+        //new Thread() {
+          //public void run() {
             try {
               Log.d("COMPL gammelMediaPlayer.reset() "+gammelMediaPlayer);
               gammelMediaPlayer.reset();
@@ -609,8 +609,8 @@ public class Afspiller {
               gammelMediaPlayer.release();
               Log.d("COMPL gammelMediaPlayer.release()");
             } catch (Exception e) { Log.d(e); }
-          }
-        }.start();
+          //}
+        //}.start();
 
         if (lydkilde.erDirekte()) {
           Log.d("Genstarter afspilning!");

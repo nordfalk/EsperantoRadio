@@ -12,7 +12,9 @@ repositories {
 
 
 android {
-    compileSdkVersion 30
+    namespace 'dk.dr.radio.v3'
+
+    compileSdk 34
 
     compileOptions {
         sourceCompatibility 11
@@ -51,9 +53,10 @@ android {
     lint {
         abortOnError false
     }
-
     packagingOptions {
-        pickFirst 'rome-utils-1.18.0.jar'
+        resources {
+            pickFirsts += ['rome-utils-1.18.0.jar']
+        }
     }
 }
 /*
@@ -67,14 +70,14 @@ dependencies {
     implementation project(path: ':data')
     implementation project(path: ':parse')
 
-    implementation 'com.android.volley:volley:1.1.1'
+    implementation 'com.android.volley:volley:1.2.1'
     implementation 'io.sentry:sentry-android:1.7.27'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 //    compile 'com.devbrackets.android:exomedia:2.4.2'
-    implementation 'com.devbrackets.android:exomedia:4.3.0'
+    implementation 'com.devbrackets.android:exomedia:5.0.0'
 //    //compile 'com.android.support.constraint:constraint-layout:1.0.1'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'

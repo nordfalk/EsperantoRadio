@@ -24,17 +24,17 @@ public class EmaPlayerWrapper extends AudioPlayer implements  MediaPlayerWrapper
   @Override
   public void setDataSource(final String url) throws IOException {
     //App.kortToast("EmaPlayerWrapper setDataSource\n" + url);
-    super.setDataSource(Uri.parse(url));
+    setMedia(Uri.parse(url));
   }
 
   @Override
   public void setAudioStreamType(int streamMusic) {
-    super.setAudioStreamType(streamMusic);
+    // super.setAudioStreamType(streamMusic);
   }
 
   @Override
   public void prepare() throws IOException {
-    super.prepareAsync();
+    // super.prepareAsync();
   }
 
   @Override
@@ -61,7 +61,7 @@ public class EmaPlayerWrapper extends AudioPlayer implements  MediaPlayerWrapper
 
   @Override
   public void stop() {
-    super.stopPlayback();
+    super.stop();
     stayAwake(false);
   }
 
@@ -84,7 +84,7 @@ public class EmaPlayerWrapper extends AudioPlayer implements  MediaPlayerWrapper
 
   @Override
   public void setVolume(float leftVolume, float rightVolume) {
-    super.setVolume(leftVolume, rightVolume);
+    super.setVolume(leftVolume);
   }
 
   /**

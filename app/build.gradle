@@ -58,6 +58,14 @@ android {
             pickFirsts += ['rome-utils-1.18.0.jar']
         }
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.5.1"
+    }
 }
 /*
 logomakr.com/6oKjBc
@@ -95,4 +103,9 @@ dependencies {
     // Se også https://github.com/robolectric/robolectric/issues/3288
     testImplementation 'org.bouncycastle:bcprov-jdk15on:1.57'
     testImplementation 'junit:junit:4.12'
+
+    implementation 'androidx.compose.ui:ui:1.5.4'
+    implementation 'androidx.compose.material:material:1.5.4'
+    implementation 'androidx.compose.ui:ui-tooling-preview:1.5.4'
+    implementation 'androidx.activity:activity-compose:1.8.0'
 }

@@ -15,7 +15,8 @@
 		"x0drift_statusmeddelelse": "Majo 2022:<br><br>Bedaŭrinde la <b>rektaj elsendoj de Muzaiko</b> ne plu funkcias.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"x1drift_statusmeddelelse": "Junio 2022:<br><br>La <b>rektaj elsendoj de Muzaiko</b> estas restarigataj.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"x2drift_statusmeddelelse": "Decembro 2022; Aldoniĝis nova podkasto pri Bitmono. Ĝuu :-)",
-		"drift_statusmeddelelse": ""
+		"drift_statusmeddelelse": "Majo 2025:<br><br>La kanalo de <b>Muzaiko</b> estu restarigata - havu paciencon<br><br>Se vi povus partopreni, bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>. Intertempe, pro teknikaj kialoj, estas brazilaj podkastoj de BaBibejo montrataj ĉe Muzaiko",
+		"x3drift_statusmeddelelse": ""
 	},
 
 	"sugestoj_por_alarmoj":
@@ -41,18 +42,17 @@
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
 			"rektaElsendaSonoUrl": "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
-			"xxxrektaElsendaSonoUrl": "http://fluo.muzaiko.saluton.dk:8000/radio.mp3",
-			"xxrektaElsendaSonoUrlSenGeobloko" : "https://muzaiko.saluton.dk/Muzaiko",
-			"xxxrektaElsendoPriskbUrl": "http://fluo.muzaiko.saluton.dk/api/nowplaying/1",
-			"rektaElsendaPriskriboUrl": "http://muzaiko.info/public/datumoj/aktuala_kanto.html",
-			"XXemblemoUrl": "http://muzaiko.info/images/emblemo.png",
-			"XXemblemoUrl": "http://muzaiko.info/reklambendoj/rb2.png",
+			"xxxrektaElsendoPriskbUrl": "https://fluo.muzaiko.info/api/nowplaying/1",
+			"rektaElsendaPriskriboUrl": "https://muzaiko.info/data.json",
 			"emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",
+			// https://web.archive.org/web/20240111000000*/http://muzaiko.info/public/podkasto/podkasto.rss
 			//"elsendojRssUrl": "http://muzaiko.info/podkasto/podkasto.rss",
-			"elsendojRssUrl": "http://muzaiko.info/public/podkasto/podkasto.rss",
+			// "elsendojRssUrl": "https://javabog.dk/privat/muzaiko-arkiva-podkasto.rss",
+			// "elsendojRssUrl": "https://javabog.dk/privat/muzaiko-malplena-podkasto.rss",
+			"elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
 			// RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
 			"elsendojRssIgnoruTitolon": true,
-			"retpoŝto": "info@muzaiko.info",
+			//"retpoŝto": "info@muzaiko.info",
 			//"hejmpaĝoEkrane": "http://muzaiko.info/programo.php",
 			"hejmpaĝoButono": "http://muzaiko.info/"
 		}

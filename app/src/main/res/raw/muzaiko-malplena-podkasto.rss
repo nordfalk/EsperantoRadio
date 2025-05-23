@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+	<channel>
+		<title>Muzaiko</title>
+		<description>Podkasto de la Esperanta radio Muzaiko</description>
+		<link>https://muzaiko.info/</link>
+		<language>eo</language>
+		<pubdate>Fri, 06 May 2022 01:02:48 UTC</pubdate>
+		<lastbuilddate>Fri, 06 May 2022 01:02:48 UTC</lastbuilddate>
+		<image>
+			<url>https://esperanto-radio.com/_muzaiko.png</url>
+			<title>Muzaiko</title>
+			<link>https://muzaiko.info/</link>
+		</image>
+		<item>
+			<title>Elsendoj mankas</title>
+			<pubdate>Fri, 06 May 2022 03:00:00 UTC</pubdate>
+			<description>Elsendoj mankas</description>
+			<enclosure url="https://anchor.fm/s/54291ba8/podcast/play/63823778/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fproduction%2Fexports%2F54291ba8%2F63823778%2F642ddd99379bf6f292a4a6bc2a68b95d.m4a" length="29250125" type="audio/x-m4a"/>
+		</item>
+	</channel>
+</rss>

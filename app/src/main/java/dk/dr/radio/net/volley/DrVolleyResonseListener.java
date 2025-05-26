@@ -45,7 +45,7 @@ public abstract class DrVolleyResonseListener implements Response.Listener<Strin
     App.sætErIGang(false, url);
     Log.e("fikFejl networkResponse='" + error.networkResponse + "' for " + url, error);
     //error.printStackTrace();
-    if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
+    //if (App.fejlsøgning || App.EMULATOR) Log.e("fikFejl startet herfra:", startetHerfra);
     try {
       Netsvar s = new Netsvar(url, null, false, false);
       s.fejl = true;

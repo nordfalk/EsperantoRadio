@@ -43,7 +43,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
       }
     }
     kanaler.addAll(kanalerEjFavorit); // Tilføj ikke-favoritter sidst i listen
-    if (adapter != null) { // Sørg for at den valgte kanal stadig er den, der vises
+    if (adapter != null) try { // Sørg for at den valgte kanal stadig er den, der vises
       int glIndex = viewPager.getCurrentItem();
       Kanal valgtKanal = adapter.kanaler2.get(glIndex);
       Log.d("Kanal_frag opdaterer fra index "+glIndex+" valgt "+valgtKanal);
@@ -54,7 +54,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
       if (nyIndex<0) nyIndex = glIndex;
       viewPager.setCurrentItem(nyIndex);
       kanalfaneblade.notifyDataSetChanged();
-    }
+    } catch (Exception e) { Log.rapporterFejl(e); }
   }
 
   @Override

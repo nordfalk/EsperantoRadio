@@ -1,22 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:anchor="https://anchor.fm/xmlns" xmlns:podcast="https://podcastindex.org/namespace/1.0">
 	<channel>
-		<title>Muzaiko</title>
-		<description>Podkasto de la Esperanta radio Muzaiko</description>
+		<title><![CDATA[Muzaiko podkasto - provizore malplena]]></title>
+		<description><![CDATA[Muzaiko podkasto - provizore malplena]]></description>
 		<link>https://muzaiko.info/</link>
-		<language>eo</language>
-		<pubdate>Fri, 06 May 2022 01:02:48 UTC</pubdate>
-		<lastbuilddate>Fri, 06 May 2022 01:02:48 UTC</lastbuilddate>
 		<image>
 			<url>https://esperanto-radio.com/_muzaiko.png</url>
 			<title>Muzaiko</title>
 			<link>https://muzaiko.info/</link>
 		</image>
+		<generator>Anchor Podcasts</generator>
+		<lastBuildDate>Mon, 26 May 2025 09:06:43 GMT</lastBuildDate>
+		<author><![CDATA[Babibejo]]></author>
+		<copyright><![CDATA[Babibejo]]></copyright>
+		<language><![CDATA[eo]]></language>
+		<itunes:block>Yes</itunes:block>
+		<itunes:author>Babibejo</itunes:author>
+		<itunes:summary>Nur loko por paroli, aŭskulti kaj amuziĝi.
+			Sendu mesaĝon al ni: babibejopodcast@gmail.com</itunes:summary>
+		<itunes:type>episodic</itunes:type>
+		<itunes:owner>
+			<itunes:name>Babibejo</itunes:name>
+			<itunes:email>babibejopodcast@gmail.com</itunes:email>
+		</itunes:owner>
+		<itunes:explicit>No</itunes:explicit>
+		<itunes:category text="Education">
+			<itunes:category text="Language Learning"/>
+		</itunes:category>
 		<item>
-			<title>Elsendoj mankas</title>
-			<pubdate>Fri, 06 May 2022 03:00:00 UTC</pubdate>
-			<description>Elsendoj mankas</description>
-			<enclosure url="https://anchor.fm/s/54291ba8/podcast/play/63823778/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fproduction%2Fexports%2F54291ba8%2F63823778%2F642ddd99379bf6f292a4a6bc2a68b95d.m4a" length="29250125" type="audio/x-m4a"/>
+			<title><![CDATA[Podkastoj provizore mankas.]]></title>
+			<description><![CDATA[<p>Muzaiko provizore mankas podkastojn - elektu alian kanalon</p>
+]]></description>
+			<link>https://muzaiko.info/</link>
+			<pubDate>Mon, 26 May 2025 09:00:00 GMT</pubDate>
+			<enclosure url="https://fluo.muzaiko.info/hls/muzaiko/live.m3u8" type="audio/mpeg"/>
+			<itunes:summary>&lt;p&gt;Podkastoj provizore mankas por Muzaiko&lt;/p&gt;
+			</itunes:summary>
 		</item>
 	</channel>
 </rss>

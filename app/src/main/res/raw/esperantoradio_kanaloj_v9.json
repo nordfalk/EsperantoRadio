@@ -45,14 +45,12 @@
             "emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",
             // https://web.archive.org/web/20240111000000*/http://muzaiko.info/public/podkasto/podkasto.rss
             //"elsendojRssUrl": "http://muzaiko.info/podkasto/podkasto.rss",
-            // "elsendojRssUrl": "https://javabog.dk/privat/muzaiko-arkiva-podkasto.rss",
-            // "elsendojRssUrl": "https://javabog.dk/privat/muzaiko-malplena-podkasto.rss",
-            "elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
+			"elsendojRssUrl": "https://javabog.dk/privat/muzaiko-malplena-podkasto.rss",
             // RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
             "elsendojRssIgnoruTitolon": true,
             //"retpoŝto": "info@muzaiko.info",
 			//"hejmpaĝoEkrane": "http://muzaiko.info/programo.php",
-			"hejmpaĝoButono": "http://muzaiko.info/"
+			"hejmpaĝoButono": "https://muzaiko.info/"
 		}
 	,{
 			"kodo": "varsoviavento",
@@ -140,7 +138,7 @@
 	,{
 			"kodo": "spiritismavocxo",
 			"nomo": "Spiritisma Voĉo",
-			"emblemoUrl": "https://d1bm3dmew779uf.cloudfront.net/large/8baa9d2b387b75be75a1356240351e09.jpg",
+			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/t_square_limited_320/images.spreaker.com/original/8baa9d2b387b75be75a1356240351e09.jpg",
 			"elsendojRssUrl": "https://www.spreaker.com/user/8650988/episodes/feed",
 			"retpoŝto": "leo.cassanho@yahoo.com.br",
 			"hejmpaĝoButono": "https://www.spreaker.com/user/8650988"

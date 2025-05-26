@@ -221,7 +221,7 @@ public class Alarms {
     intent.putExtra(ALARM_RAW_DATA, alarm.toString());
 
     PendingIntent sender = PendingIntent.getBroadcast(
-        context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
     am.set(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
 
@@ -249,7 +249,7 @@ public class Alarms {
     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     PendingIntent sender = PendingIntent.getBroadcast(
         context, 0, new Intent(ALARM_ALERT_ACTION),
-        PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     am.cancel(sender);
     setStatusBarIcon(context, false);
   }

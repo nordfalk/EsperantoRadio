@@ -45,6 +45,7 @@
         tools:ignore="UnusedAttribute">
         <activity
             android:name="dk.dr.radio.akt.Hovedaktivitet"
+            android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,6 +58,7 @@
             android:name="dk.dr.radio.akt.Indstillinger_akt"
             android:label="@string/D_R_Radio_Indstillinger"
             android:theme="@style/Theme.Indstillinger"
+            android:exported="true"
             tools:ignore="ExportedPreferenceActivity">
 
             <!-- Gør aktivitet synlig i forbindelse med at brugeren gennemser sit dataforbrug -->
@@ -67,7 +69,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="dk.dr.radio.data.HentedeUdsendelser$DownloadServiceReciever">
+        <receiver android:exported="false" android:name="dk.dr.radio.data.HentedeUdsendelser$DownloadServiceReciever">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
@@ -91,13 +93,16 @@
         <receiver android:name="dk.dr.radio.afspilning.HovedtelefonFjernetReciever" />
 
         <!-- Til håndtering af knapper på fjernbetjening (f.eks. på Bluetooth headset.) -->
-        <receiver android:name="dk.dr.radio.afspilning.FjernbetjeningReciever">
+        <receiver
+            android:exported="true"
+            android:name="dk.dr.radio.afspilning.FjernbetjeningReciever">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
         <receiver
             android:name="dk.dr.radio.afspilning.AfspillerIkonOgNotifikation"
+            android:exported="true"
             android:label="@string/appnavn">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -125,7 +130,9 @@
                 <action android:name="dk.dr.radio.ALARM_ALERT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="dk.dr.radio.vaekning.AlarmInitReceiver">
+        <receiver
+            android:exported="true"
+            android:name="dk.dr.radio.vaekning.AlarmInitReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <!--

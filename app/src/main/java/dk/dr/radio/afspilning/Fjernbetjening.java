@@ -157,7 +157,7 @@ public class Fjernbetjening implements Runnable {
     if (!App.prefs.getBoolean("fjernbetjening", true)) return;
 
     Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).setComponent(fjernbetjeningReciever);
-    PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, mediaButtonIntent, 0);
+    PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, mediaButtonIntent, PendingIntent.FLAG_IMMUTABLE);
     // create and register the remote control client
     remoteControlClient = new RemoteControlClient(mediaPendingIntent);
     remoteControlClient.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE

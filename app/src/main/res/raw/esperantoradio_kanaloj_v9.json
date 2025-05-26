@@ -40,6 +40,7 @@
 		{
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
+			"rektaElsendaSonoUrl": "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
             "xxxrektaElsendoPriskbUrl": "https://fluo.muzaiko.info/api/nowplaying/1",
             "rektaElsendaPriskriboUrl": "https://muzaiko.info/data.json",
             "emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",

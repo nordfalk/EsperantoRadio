@@ -42,7 +42,7 @@ public class Backend {
     /*
 scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v9.json  javabog.dk:javabog.dk/privat/
      */
-    return "http://javabog.dk/privat/esperantoradio_kanaloj_v9.json";
+    return "https://javabog.dk/privat/esperantoradio_kanaloj_v9.json";
   }
 
   public InputStream getLokaleGrunddata(Context ctx) {
@@ -201,7 +201,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
           @Override
           public void fikSvar(Netsvar s) throws Exception {
             if (s.uændret) return;
-            Log.d("eo RSS por "+kanal+" ="+s.json);
+            Log.d("eo RSS por "+kanal+" ="+s.json + " fra "+s.url);
             ArrayList<Udsendelse> udsendelser = new RomePodcastParser().parsRss(s.json, kanal); // EoRssParsado.ŝarĝiElsendojnDeRssUrl(s.json, kanal);
             if (!udsendelser.isEmpty()) {
               kanal.udsendelser = udsendelser;

@@ -45,7 +45,7 @@
             "emblemoUrl": "https://esperanto-radio.com/_muzaiko.png",
             // https://web.archive.org/web/20240111000000*/http://muzaiko.info/public/podkasto/podkasto.rss
             //"elsendojRssUrl": "http://muzaiko.info/podkasto/podkasto.rss",
-			"elsendojRssUrl": "https://javabog.dk/privat/muzaiko-malplena-podkasto.rss",
+			"elsendojRssUrl": "https://javabog.dk/privat/muzaiko_malplena_podkasto.rss",
             // RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
             "elsendojRssIgnoruTitolon": true,
             //"retpoŝto": "info@muzaiko.info",

@@ -37,6 +37,8 @@ import android.os.Vibrator;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +115,7 @@ public class Afspiller {
     wifilock = ((WifiManager) ApplicationSingleton.instans.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "DR Radio");
     wifilock.setReferenceCounted(false);
     Opkaldshaandtering opkaldshåndtering = new Opkaldshaandtering(this);
-    try {
+    if (Build.VERSION.SDK_INT < 31) try {
       /* kræver
         <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="22" />
       */
@@ -169,7 +171,7 @@ public class Afspiller {
 
       if (!hovedtelefonFjernetReciever.aktiv) {
         hovedtelefonFjernetReciever.aktiv = true;
-        ApplicationSingleton.instans.registerReceiver(hovedtelefonFjernetReciever, hovedtelefonFjernetReciever.FILTER);
+        ContextCompat.registerReceiver(ApplicationSingleton.instans, hovedtelefonFjernetReciever, hovedtelefonFjernetReciever.FILTER, ContextCompat.RECEIVER_EXPORTED);
       }
       startAfspilningIntern();
 

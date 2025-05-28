@@ -25,6 +25,7 @@ public class ParseFraJvm {
     try {
       String grunddataStr = Diverse.læsStreng(App.backend.getLokaleGrunddata(ApplicationSingleton.instans));
       App.backend.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+      App.backend.startHentBg(App.grunddata);
     } catch (Exception e) {
       e.printStackTrace();
     }

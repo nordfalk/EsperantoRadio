@@ -223,7 +223,7 @@ public class Alarms {
     PendingIntent sender = PendingIntent.getBroadcast(
         context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-    am.set(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
+    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
 
     setStatusBarIcon(context, true);
     Calendar c = Calendar.getInstance();

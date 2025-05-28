@@ -107,7 +107,7 @@ public class Log {
     Log.e(e);
     if (fejlRapporteret++ > 2) return; // rapportér ikke mere end 2 fejl per kørsel
     if (!App.EMULATOR) {
-      Sentry.capture(e);
+      Sentry.captureException(e);
       //Mint.logException(e);
       if (!App.PRODUKTION && App.instans!=null) App.langToast("fejl: " + e);
     }
@@ -117,8 +117,8 @@ public class Log {
     Log.e("" + f, e);
     if (fejlRapporteret++ > 2) return; // rapportér ikke mere end 2 fejl per kørsel
     if (!App.EMULATOR) {
-      Sentry.capture("fejl " + f);
-      Sentry.capture(e);
+      Sentry.captureMessage("fejl " + f);
+      Sentry.captureException(e);
     }
     if (!App.PRODUKTION && App.instans!=null) App.langToast("Fejl: " + f);
   }
@@ -126,7 +126,7 @@ public class Log {
 
   public static void rapporterOgvisFejl(final Activity akt, final Exception e) {
     if (!App.EMULATOR) {
-      Sentry.capture(e);
+      Sentry.captureException(e);
     }
     Log.e(e);
 

@@ -14,7 +14,7 @@ repositories {
 android {
     namespace 'dk.dr.radio.v3'
 
-    compileSdk 34
+    compileSdk 35
 
     compileOptions {
         sourceCompatibility 11
@@ -24,15 +24,15 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 33
+        targetSdkVersion 34
         signingConfigs {
             config {
                 storeFile file('/home/j/android/A_signaturer/jacobnordfalk.keystore')
             }
         }
         applicationId "dk.nordfalk.esperanto.radio"
-        versionCode 240
-        versionName '2.4 Republikigo'
+        versionCode 242
+        versionName '2.4.2 Republikigo'
     }
     buildTypes {
         release {
@@ -71,19 +71,19 @@ dependencies {
     implementation project(path: ':parse')
 
     implementation 'com.android.volley:volley:1.2.1'
-    implementation 'io.sentry:sentry-android:1.7.27'
+    implementation 'io.sentry:sentry-android:5.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 //    compile 'com.devbrackets.android:exomedia:2.4.2'
     implementation 'com.devbrackets.android:exomedia:5.0.0'
 //    //compile 'com.android.support.constraint:constraint-layout:1.0.1'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.gms:play-services-cast-framework:9.4.0'
-    implementation 'androidx.mediarouter:mediarouter:1.0.0'
+    //implementation 'com.google.android.gms:play-services-cast-framework:9.4.0'
+    implementation 'androidx.mediarouter:mediarouter:1.7.0'
     // Datohåndtering - se https://github.com/JakeWharton/ThreeTenABP - gør debug APK'en 200 kb større og release APKen 100 kb større
     //compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     // Joda-time - fylder 450 kb mere !
@@ -94,5 +94,5 @@ dependencies {
     // Fix for javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Algorithm constraints check failed on signature algorithm: SHA256WithRSAEncryption
     // Se også https://github.com/robolectric/robolectric/issues/3288
     testImplementation 'org.bouncycastle:bcprov-jdk15on:1.57'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }

@@ -48,6 +48,8 @@ import android.preference.PreferenceManager;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -80,8 +82,8 @@ import dk.dr.radio.v3.BuildConfig;
 import dk.dr.radio.v3.R;
 import dk.dr.radio.backend.Netkald;
 import dk.dr.radio.backend.NetsvarBehander;
-import io.sentry.Sentry;
-import io.sentry.android.AndroidSentryClientFactory;
+import io.sentry.SentryLevel;
+import io.sentry.android.core.SentryAndroid;
 
 public class App {
   public static App instans;
@@ -147,9 +149,17 @@ public class App {
 
     EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator") || IKKE_Android_VM;
     if (!EMULATOR) {
-      Sentry.init("https://a251d3860be54aa5a7ebd02084a91a9a@sentry.io/1886051", new AndroidSentryClientFactory(ctx));
-      io.sentry.context.Context sc = Sentry.getContext();
-      Log.d("Sentry startet mod "+sc.getHttp());
+      SentryAndroid.init(ctx, options -> {
+        options.setDsn("https://a251d3860be54aa5a7ebd02084a91a9a@o332889.ingest.us.sentry.io/1886051");
+        // Add a callback that will be used before the event is sent to Sentry.
+        // With this callback, you can modify the event or, when returning null, also discard the event.
+        options.setBeforeSend((event, hint) -> {
+          if (SentryLevel.DEBUG.equals(event.getLevel()))
+            return null;
+          else
+            return event;
+        });
+      });
     }
 
     //com.jakewharton.threetenabp.AndroidThreeTen.init(ctx);
@@ -191,7 +201,7 @@ public class App {
 
 
     netværk = new Netvaerksstatus();
-    ctx.registerReceiver(netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    ContextCompat.registerReceiver(ctx, netværk, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_EXPORTED);
     netværk.onReceive(ctx, null); // Få opdateret netværksstatus
 
     afspiller = new Afspiller();
@@ -214,6 +224,7 @@ public class App {
       }
       if (grunddataStr != null) {
         backend.initGrunddata(grunddata, grunddataStr);
+        backend.startHentBg(grunddata);
       }
     } catch (Exception e) { Log.e(""+backend, e); }
     // undgå crash
@@ -319,10 +330,17 @@ public class App {
               App.kortToast("Vi fik nye grunddata for\n"+backend);
             }
             try {
-              backend.initGrunddata(grunddata, nyeGrunddata);
+              Grunddata grunddata2 = new Grunddata();
+              backend.initGrunddata(grunddata2, nyeGrunddata);
+              backend.startHentBg(grunddata2);
+
               // Er vi nået hertil så gik parsning godt - gem de nye stamdata i prefs, så de også bruges ved næste opstart
+              grunddata.android_json = grunddata2.android_json;
+              grunddata.json = grunddata2.json;
               grunddata.kanaler.clear();
-              grunddata.kanaler.addAll(App.grunddata.kanaler);
+              grunddata.kanaler.addAll(grunddata2.kanaler);
+              grunddata.forvalgtKanal = grunddata2.forvalgtKanal;
+              grunddata.kanalFraSlug.putAll(grunddata2.kanalFraSlug);
               grunddata_prefs.edit().putString(backend.getGrunddataUrl(), nyeGrunddata).commit();
             } catch (Exception e) { Log.rapporterFejl(e); } // rapportér problem med parsning af grunddata
             // fix for https://mint.splunk.com/dashboard/project/cd78aa05/errors/2774928662

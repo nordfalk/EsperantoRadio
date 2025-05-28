@@ -45,7 +45,7 @@ public class Kanaler_frag extends Basisfragment implements ViewPager.OnPageChang
     kanaler.addAll(kanalerEjFavorit); // Tilføj ikke-favoritter sidst i listen
     if (adapter != null) try { // Sørg for at den valgte kanal stadig er den, der vises
       int glIndex = viewPager.getCurrentItem();
-      Kanal valgtKanal = adapter.kanaler2.get(glIndex);
+      Kanal valgtKanal = glIndex<adapter.kanaler2.size() ? adapter.kanaler2.get(glIndex) : null;
       Log.d("Kanal_frag opdaterer fra index "+glIndex+" valgt "+valgtKanal);
       adapter.kanaler2 = kanaler;
       adapter.notifyDataSetChanged();

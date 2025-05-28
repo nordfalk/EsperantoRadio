@@ -58,6 +58,10 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
     InputStream is = fil.exists() ? new FileInputStream(fil) : App.res.openRawResource(R.raw.radio);
     leguRadioTxt(grunddata, Diverse.læsStreng(is));
 
+    Log.d("parseKanaler gav " + grunddata.kanaler + " for " + this.getClass().getSimpleName());
+  }
+
+  public void startHentBg(Grunddata grunddata) {
     new Thread() {
       @Override
       public void run() {
@@ -79,7 +83,6 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
         }
       }
     }.start();
-    Log.d("parseKanaler gav " + grunddata.kanaler + " for " + this.getClass().getSimpleName());
   }
 
 
@@ -119,7 +122,7 @@ scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio
   }
 
 
-  public String radioTxtUrl = "http://esperanto-radio.com/radio.txt";
+  public String radioTxtUrl = "https://esperanto-radio.com/radio.txt";
 
 
   public static void leguRadioTxt(Grunddata grunddata, String radioTxt) {

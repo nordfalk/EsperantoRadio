@@ -8,7 +8,7 @@ dependencies {
 //nej    implementation 'org.json:json:20150729'
 // nej    implementation 'org.json:json:20131018'
 // næsten    implementation 'org.json:json:20090211'
-    implementation 'org.json:json:20080701'
+    implementation 'org.json:json:20231013'
 
 }
 

@@ -12,10 +12,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- For at kunne gemme podcasts på eksternt lager -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <!-- For at kunne starte en forgrundsservice på Android P (29) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- For at kunne afbryde afspilningen ved et telefonopkald -->
     <uses-permission
@@ -44,6 +46,7 @@
         android:theme="@style/Theme.Dr"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
         <activity
             android:name="dk.dr.radio.akt.Hovedaktivitet"
             android:exported="true"
@@ -81,7 +84,9 @@
      * Tidligere AfspillerService - service-del der sørger for at app'en
      * bliver i hukommelsen mens der spilles lyd
         -->
-        <service android:name="dk.dr.radio.afspilning.HoldAppIHukommelsenService" />
+        <service
+            android:foregroundServiceType="mediaPlayback"
+            android:name="dk.dr.radio.afspilning.HoldAppIHukommelsenService" />
 
         <!--
  * BroadcastReceiver som aktiverer afspilleren og evt instantierer den.

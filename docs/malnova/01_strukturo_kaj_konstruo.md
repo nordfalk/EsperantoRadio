@@ -2,7 +2,7 @@
 
 ## Moduloj (Gradle)
 
-La malnovaj moduloj moviĝis al `malnova/` por fari lokon por la nova apo en `nova/`:
+La malnovaj moduloj moviĝis al `malnova/` por fari lokon por la nova apo en la radiko:
 
 ```
 EsperantoRadio/
@@ -10,7 +10,7 @@ EsperantoRadio/
 │   ├── app/      # Android-apo (dk.dr.radio.v3 / dk.nordfalk.esperanto.radio)
 │   ├── parse/    # RSS-parsado + RssArkivServer (java-library + Kotlin)
 │   └── data/     # Datummodeloj (java-library)
-└── nova/         # Loko por la nova Compose Multiplatform-apo (ankoraŭ malplena)
+└── (radiko)      # Nova Compose Multiplatform-apo (estonte — vidu docs/nova/)
 ```
 
 `settings.gradle`:

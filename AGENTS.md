@@ -21,7 +21,7 @@ Rekrei la apot en **Compose Multiplatform** (Android + iOS + opcie Desktop), plu
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (planata, en `nova/`): priskribita en `docs/nova/`.
+- **Nova apo** (planata, en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`composeApp/`, `shared/`, `iosApp/`, `server/`) vivos en la radiko, apud `malnova/`.
 
 ## Dosierujo-structuro
 
@@ -31,7 +31,11 @@ EsperantoRadio/
 │   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
 │   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
 │   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
-├── nova/                   # Loko por la nova Compose Multiplatform-apo + servilo (ankoraŭ malplena)
+├── composeApp/             # Nova CMP-apo (estonte — vidu docs/nova/)
+├── shared/                 # Nova komuna KMP-modulo (estonte)
+├── iosApp/                 # Nova iOS-velopo (estonte)
+├── server/                 # Nova podkasta arkiv-servilo (estonte)
+├── settings.gradle.kts     # Nova Kotlin-DSL-build (estonte — anstataŭigos settings.gradle)
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo

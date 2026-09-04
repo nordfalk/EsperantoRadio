@@ -5,8 +5,8 @@
 > kaj kiel la arkiva servilo funkcias. Ĝi estas la referenco por la rekreado.
 >
 > **Noto:** La malnovaj moduloj (`app/`, `parse/`, `data/`) moviĝis al la
-> dosierujo `malnova/` por fari lokon por la nova Compose Multiplatform-apo
-> en `nova/`. La Gradle-modulnomoj restas `:app`/`:parse`/`:data`.
+> dosierujo `malnova/`. La nova Compose Multiplatform-apo vivos en la radiko
+> (unuigita Kotlin-DSL-build). La Gradle-modulnomoj restas `:app`/`:parse`/`:data`.
 
 ## Legu-ordo
 

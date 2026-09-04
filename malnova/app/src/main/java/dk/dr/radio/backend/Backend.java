@@ -40,13 +40,13 @@ public class Backend {
 
   public String getGrunddataUrl() {
     /*
-scp /home/j/android/esperanto/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v9.json  javabog.dk:javabog.dk/privat/
+scp /home/j/android/esperanto/EsperantoRadio/malnova/app/src/main/res/raw/esperantoradio_kanaloj_v9.json  javabog.dk:javabog.dk/privat/
      */
     return "https://javabog.dk/privat/esperantoradio_kanaloj_v9.json";
   }
 
   public InputStream getLokaleGrunddata(Context ctx) {
-    if (ctx==null) try { return new FileInputStream("/home/j/andet/EspoRadio/EsperantoRadio/app/src/main/res/raw/esperantoradio_kanaloj_v9.json"); } catch (Exception e) { e.printStackTrace();}
+    if (ctx==null) try { return new FileInputStream("malnova/app/src/main/res/raw/esperantoradio_kanaloj_v9.json"); } catch (Exception e) { e.printStackTrace();}
     return ctx.getResources().openRawResource(R.raw.esperantoradio_kanaloj_v9);
   }
 

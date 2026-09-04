@@ -48,8 +48,12 @@ Platformo (Android/iOS/Desktop-specifaj implementaĵoj)
 
 ## Modulo-strukturo (Kotlin Multiplatform)
 
+La nova KMP-aposieraĵo vivas **en la radiko**, apud `malnova/`. Unu Gradle-build
+(`settings.gradle.kts`, Kotlin DSL) estros kaj la novajn modulojn kaj la
+malnovajn (el `malnova/`).
+
 ```
-EsperantoRadioMultiplatform/
+EsperantoRadio/
 ├── shared/                          # Komuna KMP-modulo
 │   ├── src/
 │   │   ├── commonMain/kotlin/dk/nordfalk/esperanto/
@@ -63,17 +67,24 @@ EsperantoRadioMultiplatform/
 │   │   │   ├── domain/              # model, repository (interfacoj), usecase
 │   │   │   └── ui/                  # komuna Compose (komponantoj, temo, navigado)
 │   │   ├── commonTest/              # golden-testoj (kontraŭ fiksaĵoj)
-│   │   ├── androidMain/             # platform/, di/
+│   │   ├── androidMain/             # platform/
 │   │   ├── iosMain/                 # platform/
 │   │   ├── desktopMain/             # platform/ (JVM)
 │   │   └── wasmJsMain/             # platform/ (Web)
 │   ├── src/commonTest/resources/feeds/  # frostigitaj golden-fiksaĵoj
 │   └── build.gradle.kts
-├── androidApp/                      # MainActivity, res/, AndroidManifest
-├── iosApp/                          # App.swift, ContentView.swift, Info.plist
+├── androidApp/                      # Android-aplikaĵo (MainActivity, res/, AndroidManifest)
+├── iosApp/                          # iOS-Xcode-projekto (App.swift, ContentView.swift, Info.plist)
+├── desktopApp/                      # Desktop-JVM-aplikaĵo
+├── webApp/                          # Web-aplikaĵo (JS + Wasm)
 ├── server/                          # podkasta arkiv-servilo (06_servilo_arkivo.md)
+├── malnova/                         # Malnova Android-apo (heredaĵo, ne tuŝebla)
+│   ├── app/
+│   ├── parse/
+│   └── data/
+├── settings.gradle.kts              # Unuigita Kotlin-DSL-build (ankaŭ inkluzivas malnova/*)
 ├── build.gradle.kts
-├── settings.gradle.kts
+├── gradle/libs.versions.toml
 └── gradle.properties
 ```
 

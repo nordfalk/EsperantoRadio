@@ -8,7 +8,7 @@ Por kontrui mian arkivon de Esperanto-elsendoj, mi uzas
 
 ./gradlew clean
 ./gradlew :parse:rssarkivserverJar
-java -jar parse/build/libs/rssarkivserver.jar
+java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 
 # Dansk

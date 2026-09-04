@@ -1,3 +1,0 @@
-include ':app'
-include ':parse'
-include ':data'

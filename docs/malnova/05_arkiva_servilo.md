@@ -10,13 +10,13 @@ podkastaj fontoj. Ĝi rulas sur PC, ne sur telefono.
 
 ```bash
 ./gradlew :parse:rssarkivserverJar
-java -jar parse/build/libs/rssarkivserver.jar
+java -jar malnova/parse/build/libs/rssarkivserver.jar
 ```
 
 ## Kie ĝi vivas
 
 ```
-parse/src/main/java/rssarkivserver/
+malnova/parse/src/main/java/rssarkivserver/
 ├── RssArkivServer.java        # ĉefprogramo (main())
 ├── RomeFeedWriter.java        # skribas RSS 2.0 elsendojn per Rome
 ├── archiveorg/
@@ -29,7 +29,7 @@ parse/src/main/java/rssarkivserver/
 ## La `main()`-fluo
 
 1. Preparas `FilCache` en `RssArkivServer-filcache/`.
-2. Legas grunddata-JSON de `app/src/main/res/raw/esperantoradio_kanaloj_v9.json`
+2. Legas grunddata-JSON de `malnova/app/src/main/res/raw/esperantoradio_kanaloj_v9.json`
    per `Grunddataparser.getGrunddataPåPC()`.
 3. Reakiras datumojn de la antaŭa rulo (`RssArkivServer.ser`) por rehavi antaŭe
    parsitajn elsendojn.
@@ -57,7 +57,7 @@ ligo, publikigdato, priskribo, `enclosure` (audio/mpeg), kaj iTunes-duration-mod
 ## `ArchiveOrg.java`
 
 Memstara utilo kiu elŝutas podkastojn de Archive.org per ekstera `waybackpack`-
-komando. Kreas dosierujon `parse/data/s0_archive.org/<host>/`. **Ne integrita
+komando. Kreas dosierujon `malnova/parse/data/s0_archive.org/<host>/`. **Ne integrita
 en la ĉefservilan fluon** — estas aparta ilo.
 
 ## Rilato al la apo

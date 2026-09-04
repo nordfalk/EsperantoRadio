@@ -20,16 +20,24 @@ kanaloj ekzistas, kiel iliaj fluoj aspektas, kaj kiel eltiri rektan MP3-URL el �
 Rekrei la apot en **Compose Multiplatform** (Android + iOS + opcie Desktop), plus
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
-- **Malnova apo** (nuna kodo en `app/`, `parse/`, `data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (planata): priskribita en `docs/nova/`.
+- **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
+- **Nova apo** (planata, en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `iosApp/`, `desktopApp/`, `webApp/`, `shared/`, `server/`) vivos en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html).
 
 ## Dosierujo-structuro
 
 ```
 EsperantoRadio/
-├── app/                    # Malnova Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
-├── parse/                  # RSS-parsado + RssArkivServer (memstara CLI-servilo)
-├── data/                   # Datummodeloj (Kanal, Udsendelse, Grunddata...)
+├── malnova/                # Malnova Android-apo (funkcianta, ne tuŝebla)
+│   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
+│   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
+│   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
+├── androidApp/            # Nova Android-aplikaĵo (estonte)
+├── iosApp/                # Nova iOS-Xcode-projekto (estonte)
+├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (estonte)
+├── webApp/                # Nova Web-aplikaĵo (JS + Wasm, estonte)
+├── shared/                # Nova komuna KMP-modulo (estonte)
+├── server/                # Nova podkasta arkiv-servilo (estonte)
+├── settings.gradle.kts     # Nova Kotlin-DSL-build (estonte — anstataŭigos settings.gradle)
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
@@ -58,7 +66,7 @@ EsperantoRadio/
 ```bash
 ./gradlew clean
 ./gradlew :parse:rssarkivserverJar   # konstruas RssArkivServer-jaron
-java -jar parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
+java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
 ./gradlew :app:assembleDebug         # konstruas la Android-apk
 ```
 

@@ -53,14 +53,13 @@ EsperantoRadioMultiplatform/
 ├── shared/                          # Komuna KMP-modulo
 │   ├── src/
 │   │   ├── commonMain/kotlin/dk/nordfalk/esperanto/
-│   │   │   ├── app/                 # eniro, Koin-moduloj
+│   │   │   ├── app/                 # eniro, komponado de dependencaĵoj (permana)
 │   │   │   ├── common/              # komunaj utilaĵoj
 │   │   │   ├── data/                # kaŝmemoro, dto, mapilo, reto, deponejo, fonto
 │   │   │   │   ├── network/         # Ktor-kliento, RSS-parsilo
 │   │   │   │   ├── parser/          # la sep parsregoloj (04_parsado_kaj_arkivo.md)
 │   │   │   │   ├── repository/      # deponej-implementaĵoj
 │   │   │   │   └── cache/           # kanal-kaŝmemoro
-│   │   │   ├── di/                  # Koin-DI
 │   │   │   ├── domain/              # model, repository (interfacoj), usecase
 │   │   │   └── ui/                  # komuna Compose (komponantoj, temo, navigado)
 │   │   ├── commonTest/              # golden-testoj (kontraŭ fiksaĵoj)
@@ -123,7 +122,7 @@ EsperantoRadioMultiplatform/
 
 ### Fazo 0 — Fundamento
 - Konstrui CMP-projekton (`shared` + 4 celoj), versikatalogo, ĉiuj celoj kompilas "Saluton".
-- Porti datenmodelon al Kotlin `@Serializable`. Agordi Koin, Ktor, kotlinx.serialization, SQLDelight, Coil.
+- Porti datenmodelon al Kotlin `@Serializable`. Agordi Ktor, kotlinx.serialization, Coil.
 - Enmeti `esperantoradio_kanaloj_v9.json` kiel bundled asset + defora elŝuto.
 
 ### Fazoj 1–3 — MVP (kerno)
@@ -136,7 +135,7 @@ EsperantoRadioMultiplatform/
   serĉbreto, ludi/paŭzi/antaŭa/sekva. Livestream (Muzaiko) + podkastoj. Live
   "nun ludas"-metadatena pridemandado.
 - **Fazo 3 — Personigo**: plejŝatataj (+ novaj-elsendoj-signo), lastaŭskultitaj
-  (+ daŭriga pozicio), serĉo, agordoj. Persisto per SQLDelight + multiplatform-settings.
+  (+ daŭriga pozicio), serĉo, agordoj. Persisto per dosierkaŝmemoro + multiplatform-settings.
 
 ### Fazoj 4–6 — Plena eldono
 - **Fazo 4 — Malfono & mediaintegriĝo (Android/iOS)**: Android MediaSessionService

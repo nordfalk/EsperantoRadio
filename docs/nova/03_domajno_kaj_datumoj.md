@@ -171,8 +171,9 @@ class SercxiElsendojnUseCase(val dep: ElsendoDeponejo)
 class GetLastauxskultitajnUseCase(val dep: LastAuxskultitajDeponejo)
 ```
 
-Uzkazoj estas maldikaj envolvaĵoj — la logiko vivas en la deponejoj. Ij ĉefe
-helpas DI kaj testmokado.
+Uzkazoj estas maldikaj envolvaĵoj — la logiko vivas en la deponejoj. Ili ĉefe
+helpas testmokadon kaj separas la deponejojn de la ViewModel-oj. Dependencaĵoj
+estas transdonitaj permane en konstruktiloj, sen DI-framintervalo.
 
 ## Datentavolo (`shared/data`)
 

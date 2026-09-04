@@ -10,7 +10,7 @@
 | # | Dokumento | Enhavo |
 |---|---|---|
 | 1 | [01_celoj_kaj_arkitekturo.md](./01_celoj_kaj_arkitekturo.md) | Celoj, principoj, tavoligita arkitekturo, modulo-strukturo |
-| 2 | [02_teknika_stako.md](./02_teknika_stako.md) | Kotlin Multiplatform, Compose, Ktor, Koin, Media3/AVPlayer, ktp |
+| 2 | [02_teknika_stako.md](./02_teknika_stako.md) | Kotlin Multiplatform, Compose, Ktor, Media3/AVPlayer, ktp |
 | 3 | [03_domajno_kaj_datumoj.md](./03_domajno_kaj_datumoj.md) | Domajnmodeloj, deponej-interfacoj, uzkazoj, datentavolo |
 | 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | Reprodukto de la sep parsregoloj, golden-testoj, parser-kontrakto |
 | 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado |
@@ -28,7 +28,7 @@ UI-on kaj servilon kiu normigas la rompiĝemajn fontojn servilflanke.
 |---|---|
 | `dk.dr.radio.*` (dana/esperanto-miksaĵo) | `dk.nordfalk.esperanto.*` (Esperanto) |
 | Android-nur (Java + Kotlin) | Kotlin Multiplatform (Compose) |
-| Singletona `App`-stato | Koin-DI + StateFlow |
+| Singletona `App`-stato | Permana injektado + StateFlow |
 | Fragmentoj + Volley | Compose + Ktor |
 | ExoMedia | Media3 ExoPlayer (Android) / AVPlayer (iOS) |
 | RssArkivServer (Java-jar) | KMP-servilo (Ktor-server aŭ Kotlin-script) |

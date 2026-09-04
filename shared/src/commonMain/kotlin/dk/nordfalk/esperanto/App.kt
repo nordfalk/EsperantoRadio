@@ -1,8 +1,13 @@
 package dk.nordfalk.esperanto
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
+import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
+import dk.nordfalk.esperanto.ui.KanalaroEkrano
+import dk.nordfalk.esperanto.ui.KanalaroViewModel
 
 /**
  * La radika Compose-funkcio por la tuta apo.
@@ -11,6 +16,14 @@ import androidx.compose.runtime.Composable
 @Composable
 fun EsperantoRadioApp() {
     MaterialTheme {
-        Text("Saluton, EsperantoRadio!")
+        val viewModel = remember {
+            val leganto = KanalAgordoLeganto()
+            val deponejo = KanalDeponejoImpl(
+                leganto = leganto,
+                bundledTeksto = ::leguBundledKanalkonfiguron
+            )
+            KanalaroViewModel(deponejo)
+        }
+        KanalaroEkrano(viewModel = viewModel)
     }
 }

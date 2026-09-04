@@ -25,14 +25,12 @@ class KanalaroViewModel(
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
-    fun sxargxi() {
-        kotlinx.coroutines.MainScope().launch {
-            _sxargxas.value = true
-            try {
-                deponejo.getKanalojn()
-            } finally {
-                _sxargxas.value = false
-            }
+    suspend fun sxargxi() {
+        _sxargxas.value = true
+        try {
+            deponejo.getKanalojn()
+        } finally {
+            _sxargxas.value = false
         }
     }
 }
@@ -45,9 +43,10 @@ fun KanalaroEkrano(
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        viewModel.sxargxi()
+        scope.launch { viewModel.sxargxi() }
     }
 
     Scaffold(

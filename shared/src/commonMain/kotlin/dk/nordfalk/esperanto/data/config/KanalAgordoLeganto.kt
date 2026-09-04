@@ -25,24 +25,33 @@ class KanalAgordoLeganto {
     }
 
     /**
-     * Striptigas `//`-liniajn komentojn, sed ne tuŝas `//` ene de ĉenoj.
+     * Striptigas `//`-liniajn komentojn kaj normaligas plurliniajn ĉenojn.
+     *
+     * La JSONC-dosiero enhavas `//`-komentojn kaj plurliniajn ĉenojn kun `\`
+     * ĉe lini-fino (ekz. `sugestoj_por_alarmoj`). Ni striptigas komentojn
+     * kaj traktas `\` + linisalton kiel lin-daŭrigon (forigu ambaŭ).
      */
     private fun striptiguKomentojn(teksto: String): String {
         val sb = StringBuilder(teksto.length)
         var i = 0
         var enCxeno = false
-        var eskapita = false
         while (i < teksto.length) {
             val c = teksto[i]
-            if (eskapita) {
+            if (enCxeno && c == '\\') {
+                // `\` + linisalto = lin-daŭrigo — forigu ambaŭ
+                if (i + 1 < teksto.length && (teksto[i + 1] == '\n' || teksto[i + 1] == '\r')) {
+                    i++ // saltu `\`
+                    // saltu linisalton(j)
+                    while (i < teksto.length && (teksto[i] == '\n' || teksto[i] == '\r')) i++
+                    continue
+                }
+                // Alie: normala JSON-eskapo (ekz. \", \\, \n) — kopiu ambaŭ signojn
                 sb.append(c)
-                eskapita = false
-                i++
-                continue
-            }
-            if (c == '\\' && enCxeno) {
-                sb.append(c)
-                eskapita = true
+                if (i + 1 < teksto.length) {
+                    sb.append(teksto[i + 1])
+                    i += 2
+                    continue
+                }
                 i++
                 continue
             }

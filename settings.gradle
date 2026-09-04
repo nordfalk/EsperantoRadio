@@ -1,3 +1,8 @@
+// Malnova apo — moduloj movitaj al malnova/ por fari lokon por la nova Compose Multiplatform-apo
 include ':app'
 include ':parse'
 include ':data'
+
+project(':app').projectDir = new File('malnova/app')
+project(':parse').projectDir = new File('malnova/parse')
+project(':data').projectDir = new File('malnova/data')

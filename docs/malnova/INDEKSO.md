@@ -1,8 +1,12 @@
 # docs/malnova — Superrigordo de la malnova EsperantoRadio-apo
 
-> Ĉi tiu dosierujo priskribas la **nun ekzistantan** Android-apon — kiel ĝi estas
+> Ĉi tiu dosierujo priskribas la **malnovan** Android-apon — kiel ĝi estas
 > konstruita, kiel datumoj fluas, kiel la parsado funkcias, kiel la UI aspektas,
 > kaj kiel la arkiva servilo funkcias. Ĝi estas la referenco por la rekreado.
+>
+> **Noto:** La malnovaj moduloj (`app/`, `parse/`, `data/`) moviĝis al la
+> dosierujo `malnova/` por fari lokon por la nova Compose Multiplatform-apo
+> en `nova/`. La Gradle-modulnomoj restas `:app`/`:parse`/`:data`.
 
 ## Legu-ordo
 

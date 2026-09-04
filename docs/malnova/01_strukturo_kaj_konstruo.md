@@ -2,11 +2,15 @@
 
 ## Moduloj (Gradle)
 
+La malnovaj moduloj moviĝis al `malnova/` por fari lokon por la nova apo en `nova/`:
+
 ```
 EsperantoRadio/
-├── app/      # Android-apo (dk.dr.radio.v3 / dk.nordfalk.esperanto.radio)
-├── parse/    # RSS-parsado + RssArkivServer (java-library + Kotlin)
-└── data/     # Datummodeloj (java-library)
+├── malnova/
+│   ├── app/      # Android-apo (dk.dr.radio.v3 / dk.nordfalk.esperanto.radio)
+│   ├── parse/    # RSS-parsado + RssArkivServer (java-library + Kotlin)
+│   └── data/     # Datummodeloj (java-library)
+└── nova/         # Loko por la nova Compose Multiplatform-apo (ankoraŭ malplena)
 ```
 
 `settings.gradle`:
@@ -14,16 +18,23 @@ EsperantoRadio/
 include ':app'
 include ':parse'
 include ':data'
+
+project(':app').projectDir = new File('malnova/app')
+project(':parse').projectDir = new File('malnova/parse')
+project(':data').projectDir = new File('malnova/data')
 ```
+
+La Gradle-modulnomoj restas `:app`/`:parse`/`:data` (por ne rompi la build-dosierojn);
+nur la dosierujaj lokoj ŝanĝiĝis.
 
 `app` dependas de `parse` kaj `data`; `parse` dependas de `data`.
 
 ## Radika `build.gradle`
 
 - AGP `8.7.3`, deponejoj `google()` + `jcenter()`
-- Neniu versikatalogo; ĉiuj versioj malmolaj en `app/build.gradle`
+- Neniu versikatalogo; ĉiuj versioj malmolaj en `malnova/app/build.gradle`
 
-## `app/build.gradle`
+## `malnova/app/build.gradle`
 
 | Eco | Valoro |
 |---|---|
@@ -56,7 +67,7 @@ include ':data'
 
 - Robolectric 4.3, JUnit 4.12, BouncyCastle 1.57
 
-## `parse/build.gradle`
+## `malnova/parse/build.gradle`
 
 - `java-library` + Kotlin 1.8.21, Java 11
 - Rometools Rome 1.18.0 (+ modules) — RSS/Atom
@@ -67,7 +78,7 @@ include ':data'
 - Tasko `rssarkivserverJar` — konstruas ruleblan JAR kun
   `Main-Class: rssarkivserver.RssArkivServer`
 
-## `data/build.gradle`
+## `malnova/data/build.gradle`
 
 - `java-library`, Java 11
 - `org.json:json:20080701`

@@ -1,6 +1,6 @@
 # 2. Datumfluo
 
-## Pakoj en `app/src/main/java/dk/dr/radio/`
+## Pakoj en `malnova/app/src/main/java/dk/dr/radio/`
 
 ```
 dk.dr.radio/
@@ -68,7 +68,7 @@ ApplicationSingleton.onCreate()
    `R.raw.esperantoradio_kanaloj_v9`), vokas `Backend.initGrunddata()`, kiu vokas
    `Grunddataparser.initGrunddata2()`.
 
-2. **Grunddata-parsado** — `Grunddataparser` (`parse/.../Grunddataparser.java`)
+2. **Grunddata-parsado** — `Grunddataparser` (`malnova/parse/.../Grunddataparser.java`)
    legas la JSON-array `kanaloj`, kreas `Kanal`-objektojn kun `kodo` (slug),
    `nomo`, `elsendojRssUrl`, `emblemoUrl`, `rektaElsendaSonoUrl` ktp.
 

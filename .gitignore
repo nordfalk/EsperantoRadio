@@ -48,3 +48,6 @@ captures/
 /RssArkivServer/
 /RssArkivServer-filcache/
 /RssArkivServer.ser
+
+# Kotlin/KMP
+.kotlin/

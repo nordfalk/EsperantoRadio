@@ -73,8 +73,10 @@ EsperantoRadio/
 │   │   └── wasmJsMain/             # platform/ (Web)
 │   ├── src/commonTest/resources/feeds/  # frostigitaj golden-fiksaĵoj
 │   └── build.gradle.kts
-├── composeApp/                      # CMP-aplikaĵo (Compose UI, enirejoj por ĉiu celo)
-├── iosApp/                          # Xcode-velopo (App.swift, ContentView.swift, Info.plist)
+├── androidApp/                      # Android-aplikaĵo (MainActivity, res/, AndroidManifest)
+├── iosApp/                          # iOS-Xcode-projekto (App.swift, ContentView.swift, Info.plist)
+├── desktopApp/                      # Desktop-JVM-aplikaĵo
+├── webApp/                          # Web-aplikaĵo (JS + Wasm)
 ├── server/                          # podkasta arkiv-servilo (06_servilo_arkivo.md)
 ├── malnova/                         # Malnova Android-apo (heredaĵo, ne tuŝebla)
 │   ├── app/

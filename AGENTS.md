@@ -21,7 +21,7 @@ Rekrei la apot en **Compose Multiplatform** (Android + iOS + opcie Desktop), plu
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (planata, en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`composeApp/`, `shared/`, `iosApp/`, `server/`) vivos en la radiko, apud `malnova/`.
+- **Nova apo** (planata, en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `iosApp/`, `desktopApp/`, `webApp/`, `shared/`, `server/`) vivos en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html).
 
 ## Dosierujo-structuro
 
@@ -31,10 +31,12 @@ EsperantoRadio/
 │   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
 │   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
 │   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
-├── composeApp/             # Nova CMP-apo (estonte — vidu docs/nova/)
-├── shared/                 # Nova komuna KMP-modulo (estonte)
-├── iosApp/                 # Nova iOS-velopo (estonte)
-├── server/                 # Nova podkasta arkiv-servilo (estonte)
+├── androidApp/            # Nova Android-aplikaĵo (estonte)
+├── iosApp/                # Nova iOS-Xcode-projekto (estonte)
+├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (estonte)
+├── webApp/                # Nova Web-aplikaĵo (JS + Wasm, estonte)
+├── shared/                # Nova komuna KMP-modulo (estonte)
+├── server/                # Nova podkasta arkiv-servilo (estonte)
 ├── settings.gradle.kts     # Nova Kotlin-DSL-build (estonte — anstataŭigos settings.gradle)
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo

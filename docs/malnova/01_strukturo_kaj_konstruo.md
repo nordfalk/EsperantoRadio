@@ -13,19 +13,21 @@ EsperantoRadio/
 └── (radiko)      # Nova Compose Multiplatform-apo (estonte — vidu docs/nova/)
 ```
 
-`settings.gradle`:
-```groovy
-include ':app'
-include ':parse'
-include ':data'
+`settings.gradle.kts`:
+```kotlin
+include(":app")
+include(":parse")
+include(":data")
 
-project(':app').projectDir = new File('malnova/app')
-project(':parse').projectDir = new File('malnova/parse')
-project(':data').projectDir = new File('malnova/data')
+project(":app").projectDir = file("malnova/app")
+project(":parse").projectDir = file("malnova/parse")
+project(":data").projectDir = file("malnova/data")
 ```
 
 La Gradle-modulnomoj restas `:app`/`:parse`/`:data` (por ne rompi la build-dosierojn);
-nur la dosierujaj lokoj ŝanĝiĝis.
+nur la dosierujaj lokoj ŝanĝiĝis. La radikaj konstrudosieroj estas nun Kotlin DSL
+(`settings.gradle.kts`, `build.gradle.kts`); la malnovaj modulaj build-dosieroj restas
+Groovy (`malnova/*/build.gradle`).
 
 `app` dependas de `parse` kaj `data`; `parse` dependas de `data`.
 

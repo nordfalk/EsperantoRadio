@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.android.library)}
+    alias(libs.plugins.android.library)
+}
 
 kotlin {
     androidTarget {
@@ -25,11 +26,6 @@ kotlin {
             baseName = "Shared"
             isStatic = true
         }
-    }
-
-    js {
-        browser()
-        binaries.executable()
     }
 
     wasmJs {

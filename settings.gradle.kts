@@ -15,10 +15,10 @@ project(":app").projectDir = file("malnova/app")
 project(":parse").projectDir = file("malnova/parse")
 project(":data").projectDir = file("malnova/data")
 
-// Novaj moduloj (malkomentu kiam ili estos kreitaj):
-// include(":shared")
-// include(":androidApp")
-// include(":iosApp")
-// include(":desktopApp")
-// include(":webApp")
+// Novaj moduloj
+include(":shared")
+include(":androidApp")
+include(":desktopApp")
+include(":webApp")
+// include(":iosApp")  — bezonas macOS/Xcode por konstrui; malkomentu sur Mac
 // include(":server")

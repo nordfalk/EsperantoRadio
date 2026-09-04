@@ -19,11 +19,13 @@ kotlin {
         val wasmJsMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                implementation(compose.ui)
             }
         }
         val jsMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                implementation(compose.ui)
             }
         }
     }

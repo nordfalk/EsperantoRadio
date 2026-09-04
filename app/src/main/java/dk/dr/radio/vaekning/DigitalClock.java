@@ -28,6 +28,8 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
@@ -133,7 +135,7 @@ public class DigitalClock extends RelativeLayout {
       filter.addAction(Intent.ACTION_TIME_TICK);
       filter.addAction(Intent.ACTION_TIME_CHANGED);
       filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-      getContext().registerReceiver(mIntentReceiver, filter);
+      ContextCompat.registerReceiver(getContext(), mIntentReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
     }
 
     /* monitor 12/24-hour display preference */

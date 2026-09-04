@@ -43,9 +43,9 @@ class RomePodcastParser {
     private val PodcastModuleDtd = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
 
-    fun parsRss(str: String, k : Kanal): ArrayList<Udsendelse> {
+    fun parsRss(str: String?, k : Kanal): ArrayList<Udsendelse> {
         val udsendelser = ArrayList<Udsendelse>()
-        try {
+        if (str != null) try {
             var deArkivo = k.eo_elsendojRssUrl.contains("podkasta_arkivo")
             if (k.slug == "varsoviavento" && !deArkivo) parsVarsoviaVento(str, k, udsendelser)
             else if (k.slug == "peranto" && !deArkivo) parsePeranto(str, k, udsendelser)

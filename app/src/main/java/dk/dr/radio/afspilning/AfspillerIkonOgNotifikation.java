@@ -106,7 +106,7 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
 
     Intent hovedAktI = new Intent(ApplicationSingleton.instans, Hovedaktivitet.class);
     hovedAktI.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    PendingIntent åbnAktivitetPI = PendingIntent.getActivity(ApplicationSingleton.instans, 0, hovedAktI, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent åbnAktivitetPI = PendingIntent.getActivity(ApplicationSingleton.instans, 0, hovedAktI, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     remoteViews.setOnClickPendingIntent(R.id.yderstelayout, åbnAktivitetPI);
 
 
@@ -157,15 +157,15 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
 
     if (type == TYPE_notifikation_lille || type == TYPE_notifikation_stor || type == TYPE_låseskærm) {
       Intent startPauseI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.PAUSE);
-      PendingIntent startPausePI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startPauseI, PendingIntent.FLAG_UPDATE_CURRENT);
+      PendingIntent startPausePI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startPauseI, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
       remoteViews.setOnClickPendingIntent(R.id.startStopKnap, startPausePI);
 
       Intent lukI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class).setAction(AfspillerStartStopReciever.LUK);
-      PendingIntent lukPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, lukI, PendingIntent.FLAG_UPDATE_CURRENT);
+      PendingIntent lukPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, lukI, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
       remoteViews.setOnClickPendingIntent(R.id.luk, lukPI);
     } else {
       Intent startStopI = new Intent(ApplicationSingleton.instans, AfspillerStartStopReciever.class);
-      PendingIntent startStopPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startStopI, PendingIntent.FLAG_UPDATE_CURRENT);
+      PendingIntent startStopPI = PendingIntent.getBroadcast(ApplicationSingleton.instans, 0, startStopI, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
       remoteViews.setOnClickPendingIntent(R.id.startStopKnap, startStopPI);
     }
 
@@ -199,7 +199,7 @@ public class AfspillerIkonOgNotifikation extends AppWidgetProvider {
         .setAutoCancel(false)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setPriority(1001) // holder den øverst
-        .setContentIntent(PendingIntent.getActivity(ctx, 0, new Intent(ctx, Hovedaktivitet.class), 0));
+        .setContentIntent(PendingIntent.getActivity(ctx, 0, new Intent(ctx, Hovedaktivitet.class), PendingIntent.FLAG_IMMUTABLE));
     // PendingIntent er til at pege på aktiviteten der skal startes hvis
     // brugeren vælger notifikationen
 

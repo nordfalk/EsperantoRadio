@@ -73,7 +73,7 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
           return;
         }
         */
-        Udsendelse u = App.afspiller.getLydkilde().getUdsendelse();
+        //Udsendelse u = App.afspiller.getLydkilde().getUdsendelse();
         //long passeret = App.serverCurrentTimeMillis() - u.startTid.getTime();
         //long længde = u.slutTid.getTime() - u.startTid.getTime();
         //int passeretPct = længde > 0 ? (int) (passeret * 100 / længde) : 0;
@@ -209,24 +209,24 @@ public class Afspiller_frag extends Basisfragment implements Runnable, View.OnCl
     Lydkilde lydkilde = App.afspiller.getLydkilde();
     if (lydkilde == null) {
       Log.rapporterFejl(new IllegalStateException("lydkilde er null"));
-      return;
-    }
-    Kanal kanal = lydkilde.getKanal();
-    if (kanal == null) {
-      Log.rapporterFejl(new IllegalStateException("kanal er null for "+lydkilde+ " "+lydkilde.getClass()));
-      return;
-    }
-    Udsendelse udsendelse = lydkilde.getUdsendelse();
-    if (App.backend.kanallogo_eo.get(kanal.slug) !=null) {
-      kanallogo.setImageBitmap(App.backend.kanallogo_eo.get(kanal.slug));
     } else {
-      kanallogo.setImageResource(R.drawable.appikon);
-      Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
-      Log.d("Mankas emblemo por "+kanal+ "  (lk "+ App.backend.kanallogo_eo.get(lk.slug) +")");
-    }
+      Kanal kanal = lydkilde.getKanal();
+      if (kanal == null) {
+        Log.rapporterFejl(new IllegalStateException("kanal er null for "+lydkilde+ " "+lydkilde.getClass()));
+      } else {
+        Udsendelse udsendelse = lydkilde.getUdsendelse();
+        if (App.backend.kanallogo_eo.get(kanal.slug) !=null) {
+          kanallogo.setImageBitmap(App.backend.kanallogo_eo.get(kanal.slug));
+        } else {
+          kanallogo.setImageResource(R.drawable.appikon);
+          Kanal lk = App.grunddata.kanalFraSlug.get(kanal.slug);
+          Log.d("Mankas emblemo por "+kanal+ "  (lk "+ App.backend.kanallogo_eo.get(lk.slug) +")");
+        }
 
-    direktetekst.setVisibility(lydkilde.erDirekte()?View.VISIBLE:View.GONE);
-    metainformation.setText(Html.fromHtml(udsendelse!=null?udsendelse.titel:kanal.navn));
+        direktetekst.setVisibility(lydkilde.erDirekte()?View.VISIBLE:View.GONE);
+        metainformation.setText(Html.fromHtml(udsendelse!=null?udsendelse.titel:kanal.navn));
+      }
+    }
     switch (App.afspiller.getAfspillerstatus()) {
       case STOPPET:
         startStopKnapNyImageResource = R.drawable.afspiller_spil;

@@ -1,0 +1,52 @@
+<rss version="2.0">
+	<channel>
+		<title>Muzaiko</title>
+		<description>Podkasto de la Esperanta radio Muzaiko</description>
+		<link>https://muzaiko.info/</link>
+		<language>eo</language>
+		<pubdate>Fri, 06 May 2022 01:02:48 UTC</pubdate>
+		<lastbuilddate>Fri, 06 May 2022 01:02:48 UTC</lastbuilddate>
+		<image>
+			<url>https://esperanto-radio.com/_muzaiko.png</url>
+			<title>Muzaiko</title>
+			<link>https://muzaiko.info/</link>
+		</image>
+		<item>
+			<title>Elsendo de 2022-05-05</title>
+			<pubdate>Fri, 06 May 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;Julia rakontas "La mondo estas vila&#285;o"&lt;/p&gt; &lt;p&gt;Maycon Fernandes el Brazilo pri Skotlando&lt;/p&gt; &lt;p&gt;&lt;a href="https://www.youtube.com/user/goberiko"&gt;La profesoro de Esperanto&lt;/a&gt;: Zamenhofaj meditoj de Federico Gobbo&lt;/p&gt;</description>
+			<enclosure length="8966268" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-05-05.mp3"/>
+		</item>
+		<item>
+			<title>Elsendo de 2022-05-04</title>
+			<pubdate>Thu, 05 May 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;&lt;a href="https://frazeologia.punkto.info/"&gt;Frazeologia minuto&lt;/a&gt; - Malfermi la skatolon de Pandora&lt;/p&gt;</description>
+			<enclosure length="1005817" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-05-04.mp3"/>
+		</item>
+		<item>
+			<title>Elsendo de 2022-05-03</title>
+			<pubdate>Wed, 04 May 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;La muzikisto Martin Wiese estas malanta&#365; la mikrofono de Muzaiko (farita dum IJK 2011)&lt;/p&gt; &lt;p&gt;&lt;a href="https://www.youtube.com/user/goberiko"&gt;La profesoro de Esperanto&lt;/a&gt;: Zamenhofaj meditoj de Federico Gobbo&lt;/p&gt;</description>
+			<enclosure length="10419094" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-05-03.mp3"/>
+		</item>
+		<item>
+			<title>Elsendo de 2022-05-02</title>
+			<pubdate>Tue, 03 May 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;Francesco raportas pri reprezentado de TEJO el la domo de OECD kaj poste li rakontas pri siaj studtempaj voja&#285;oj - el 2011&lt;/p&gt; &lt;p&gt;Kuiru kun Petra! - Krespoj&lt;/p&gt; &lt;p&gt;Kuiru kun Petra! - Citron&#349;aumo&lt;/p&gt;</description>
+			<enclosure length="7964002" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-05-02.mp3"/>
+		</item>
+		<item>
+			<title>Elsendo de 2022-04-30</title>
+			<pubdate>Sun, 01 May 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;Esperantistoj aktivas prezentas intervjuon kun la brazila aktivulo Emilio Cid, kreinto de la retpa&#285;oj &lt;a href="http://www.esperanto.com.br"&gt;Esperanto Brasil&lt;/a&gt; kaj &lt;a href="http://facila.org/"&gt;Facila Vento&lt;/a&gt;.&lt;/p&gt; &lt;p&gt;El la 19a podkasto de &lt;a href="http://esperan.to/podkasto/"&gt;esPodkasto&lt;/a&gt;: Pri muzikaj rajtoj (la originalan artikolon verkis Steve Jobs en 2007) - dua parto&lt;/p&gt; &lt;p&gt;Pri naciaj festotagoj - 1&lt;/p&gt; &lt;p&gt;&lt;a href="https://www.youtube.com/user/goberiko"&gt;La profesoro de Esperanto&lt;/a&gt;:
+ - por Muzaiko adaptis: Roberto Poort&lt;/p&gt;</description>
+			<enclosure length="16979172" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-04-30.mp3"/>
+		</item>
+		<item>
+			<title>Elsendo de 2022-04-29</title>
+			<pubdate>Sat, 30 Apr 2022 03:00:00 UTC</pubdate>
+			<description>&lt;p&gt;Mirejo parolas kun Jeanne pri la evoluo de la statuso de la bretona lingvo&lt;/p&gt; &lt;p&gt;&lt;a href="https://frazeologia.punkto.info/"&gt;Frazeologia minuto&lt;/a&gt; - Kredu min sinjorino&lt;/p&gt; &lt;p&gt;&lt;a href="https://www.youtube.com/user/goberiko"&gt;La profesoro de Esperanto&lt;/a&gt;: Zamenhofaj meditoj de Federico Gobbo&lt;/p&gt;</description>
+			<enclosure length="7764008" type="audio/mpeg" url="http://muzaiko.info/public/podkasto/podkasto-2022-04-29.mp3"/>
+		</item>
+	</channel>
+</rss>

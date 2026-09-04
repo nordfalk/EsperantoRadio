@@ -54,6 +54,7 @@ public class BasisAfprøvning {
     try {
       String grunddataStr = Diverse.læsStreng(backenden.getLokaleGrunddata(ApplicationSingleton.instans));
       backenden.initGrunddata(App.grunddata = new Grunddata(), grunddataStr);
+      backenden.startHentBg(App.grunddata);
     } catch (Exception e) {
       e.printStackTrace();
     }

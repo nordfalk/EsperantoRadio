@@ -12,10 +12,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- For at kunne gemme podcasts på eksternt lager -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <!-- For at kunne starte en forgrundsservice på Android P (29) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- For at kunne afbryde afspilningen ved et telefonopkald -->
     <uses-permission
@@ -27,6 +29,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -43,8 +46,10 @@
         android:theme="@style/Theme.Dr"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
         <activity
             android:name="dk.dr.radio.akt.Hovedaktivitet"
+            android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,6 +62,7 @@
             android:name="dk.dr.radio.akt.Indstillinger_akt"
             android:label="@string/D_R_Radio_Indstillinger"
             android:theme="@style/Theme.Indstillinger"
+            android:exported="true"
             tools:ignore="ExportedPreferenceActivity">
 
             <!-- Gør aktivitet synlig i forbindelse med at brugeren gennemser sit dataforbrug -->
@@ -67,7 +73,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="dk.dr.radio.data.HentedeUdsendelser$DownloadServiceReciever">
+        <receiver android:exported="false" android:name="dk.dr.radio.data.HentedeUdsendelser$DownloadServiceReciever">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
@@ -78,7 +84,9 @@
      * Tidligere AfspillerService - service-del der sørger for at app'en
      * bliver i hukommelsen mens der spilles lyd
         -->
-        <service android:name="dk.dr.radio.afspilning.HoldAppIHukommelsenService" />
+        <service
+            android:foregroundServiceType="mediaPlayback"
+            android:name="dk.dr.radio.afspilning.HoldAppIHukommelsenService" />
 
         <!--
  * BroadcastReceiver som aktiverer afspilleren og evt instantierer den.
@@ -91,13 +99,16 @@
         <receiver android:name="dk.dr.radio.afspilning.HovedtelefonFjernetReciever" />
 
         <!-- Til håndtering af knapper på fjernbetjening (f.eks. på Bluetooth headset.) -->
-        <receiver android:name="dk.dr.radio.afspilning.FjernbetjeningReciever">
+        <receiver
+            android:exported="true"
+            android:name="dk.dr.radio.afspilning.FjernbetjeningReciever">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
         <receiver
             android:name="dk.dr.radio.afspilning.AfspillerIkonOgNotifikation"
+            android:exported="true"
             android:label="@string/appnavn">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -125,7 +136,9 @@
                 <action android:name="dk.dr.radio.ALARM_ALERT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="dk.dr.radio.vaekning.AlarmInitReceiver">
+        <receiver
+            android:exported="true"
+            android:name="dk.dr.radio.vaekning.AlarmInitReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <!--

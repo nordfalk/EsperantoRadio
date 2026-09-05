@@ -1,10 +1,14 @@
 package dk.nordfalk.esperanto.data.config
 
+import android.content.Context
+
+/**
+ * Statika Context — devas esti agordita frue (ekz. en MainActivity.onCreate).
+ * Malpura sed rapida solvo. Pli poste: transdoni kiel parametro.
+ */
+lateinit var appContext: Context
+
 actual fun leguBundledKanalkonfiguron(): String {
-    // TODO: Legi el Android res/raw
-    // Provizore legu per la sama klaso-ŝarĝilo
-    val stream = Thread.currentThread().contextClassLoader
-        ?.getResourceAsStream("esperantoradio_kanaloj_v9.json")
-        ?: error("Kanalkonfiguro ne trovita en resurcoj")
-    return stream.bufferedReader().use { it.readText() }
+    return appContext.assets.open("esperantoradio_kanaloj_v9.json")
+        .bufferedReader().use { it.readText() }
 }

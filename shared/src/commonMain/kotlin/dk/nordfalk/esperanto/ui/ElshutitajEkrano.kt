@@ -69,7 +69,7 @@ private fun ElshutitaEro(
     val elsendo = elshutita.elsendo
     val statoTeksto = when (elshutita.stato) {
         is ElshutStato.NeElshutita -> "Ne elŝutita"
-        is ElshutStato.Elshutanta -> "Elŝutas... ${(elshutita.stato as ElshutStato.Elshutanta).progreso * 100}%"
+        is ElshutStato.Elshutanta -> "Elŝutas... ${((elshutita.stato as ElshutStato.Elshutanta).progreso * 100).toInt()}%"
         is ElshutStato.Preta -> "Preta"
         is ElshutStato.Eraro -> "Eraro: ${(elshutita.stato as ElshutStato.Eraro).mesagho}"
         is ElshutStato.Pauxzita -> "Paŭzita"

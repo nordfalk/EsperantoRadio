@@ -124,3 +124,4 @@ actual class AlarmoSkedilo actual constructor() {
         return target.timeInMillis
     }
 }
+actual val subtenasVekhorlogxn: Boolean = true

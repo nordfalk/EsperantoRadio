@@ -34,7 +34,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
 | — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
 | — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
-| 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro) | — |
+| 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro — UI+persisto farita, AlarmManager venas) | #24,#25,#26,#27 |
 
 ### Kio funkcias nun
 

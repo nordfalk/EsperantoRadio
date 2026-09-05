@@ -26,9 +26,13 @@ interface LudiloRegilo {
 }
 
 /**
- * Kreas la defaŭltan (no-op) LudiloRegilo-n por platformoj sen vera sonludado.
+ * Kreas la platform-specifan LudiloRegilo-n.
+ * - Android: provizita ekstere (ExoPlayerLudiloRegilo kun Context)
+ * - Desktop: DesktopLudiloRegilo (JavaFX MediaPlayer)
+ * - wasmJs: WasmJsLudiloRegilo (HTMLAudioElement)
+ * - iOS: NoOpLudiloRegilo (estonte: AVPlayer)
  */
-fun kreDefauxltanLudiloRegilon(): LudiloRegilo = NoOpLudiloRegilo()
+expect fun kreDefauxltanLudiloRegilon(): LudiloRegilo
 
 /**
  * No-op ludilo — UI funkcias, stato-ŝanĝoj funkcias, sed neniu sono.

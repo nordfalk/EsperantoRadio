@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.kreSettings
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
+import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
@@ -66,7 +67,11 @@ fun EsperantoRadioApp(
         val plejsatatajDeponejo = remember { PersistantaPlejsatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
         val elshutDeponejo = remember { kreElshutDeponejo(httpKliento) }
-        val alarmoDeponejo = remember { MemorAlarmoDeponejo() }
+        val alarmoDeponejo = remember {
+            val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
+            val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
+            MemorAlarmoDeponejo(sugestoj)
+        }
         val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()
 

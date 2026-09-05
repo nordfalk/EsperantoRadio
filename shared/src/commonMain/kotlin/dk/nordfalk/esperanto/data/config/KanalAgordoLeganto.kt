@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.data.config
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Alarmo
 
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
@@ -81,6 +82,7 @@ data class KanalAgordo(
     val elsendojUrl: String? = null,
     val hejmpagho: String? = null,
     val kanaloj: List<KanalDto> = emptyList(),
+    val sugestoj_por_alarmoj: String? = null,
 ) {
     @Serializable
     data class AndroidSekcio(
@@ -125,3 +127,46 @@ fun KanalDto.alKanal(): Kanal = Kanal(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
 )
+
+/**
+ * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
+ *
+ * Formato: `id/enabled/horo/minuto/ripeto/time/=kanalo/=etikedo/`
+ * kun `\` cxe lini-fino por lin-daŭrigo.
+ * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
+ */
+fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
+    return teksto.lines().mapNotNull { linio ->
+        val partoj = linio.split("/")
+        if (partoj.size < 8) return@mapNotNull null
+        try {
+            val id = partoj[0].toInt()
+            val aktiva = partoj[1] == "1"
+            val horo = partoj[2].toInt()
+            val minuto = partoj[3].toInt()
+            val ripeto = partoj[4].toInt()
+            val kanalSlug = partoj[6].removePrefix("=")
+            val etikedo = partoj[7].removePrefix("=")
+                .replace("+", " ")
+                .replace("%0A", "\n")
+                .replace("%C4%88", "Ĉ")
+                .replace("%C4%A5", "ĵ")
+                .replace("%C5%9C", "ŝ")
+                .replace("%C5%AD", "ŭ")
+                .replace("%C4%9C", "Ĝ")
+                .replace("%C4%88", "Ĉ")
+                .replace("%C4%89", "ĉ")
+            Alarmo(
+                id = id,
+                horo = horo,
+                minuto = minuto,
+                ripeto = ripeto,
+                kanalSlug = kanalSlug,
+                aktiva = aktiva,
+                etikedo = etikedo.ifBlank { null }
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+}

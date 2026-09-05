@@ -3,6 +3,8 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -86,6 +88,9 @@ private fun AlarmoEro(
         supportingContent = {
             Column {
                 Text(kanalNomo)
+                if (!alarmo.etikedo.isNullOrBlank()) {
+                    Text(alarmo.etikedo!!, style = MaterialTheme.typography.bodySmall)
+                }
                 Text(alarmo.ripetoTeksto, style = MaterialTheme.typography.bodySmall)
             }
         },
@@ -109,7 +114,12 @@ private fun AlarmoKreilo(
     var elektitaKanalSlug by remember { mutableStateOf(kanaloj.firstOrNull()?.slug ?: "") }
     var ripeto by remember { mutableStateOf(0x7f) } // cxiutage
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
         Text("Nova alarmo", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(16.dp))
 
@@ -132,15 +142,19 @@ private fun AlarmoKreilo(
         }
         Spacer(Modifier.height(16.dp))
 
-        // Kanal
+        // Kanal — rulebla listo
         Text("Kanalo:")
-        kanaloj.forEach { kanal ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = elektitaKanalSlug == kanal.slug,
-                    onClick = { elektitaKanalSlug = kanal.slug }
-                )
-                Text(kanal.nomo)
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+        ) {
+            items(kanaloj, key = { it.slug }) { kanal ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = elektitaKanalSlug == kanal.slug,
+                        onClick = { elektitaKanalSlug = kanal.slug }
+                    )
+                    Text(kanal.nomo)
+                }
             }
         }
         Spacer(Modifier.height(16.dp))

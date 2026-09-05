@@ -9,12 +9,26 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * En-memora AlarmoDeponejo. Platform-specifa planado (AlarmManager) venos poste.
+ *
+ * Se sugestoj estas provizitaj kaj la uzanto ne kreis/forigis alarmojn,
+ * la sugestoj estas montritaj (cxiuj malaktivaj). Kiam la uzanto ŝanĝas ion,
+ * la sugestoj malaperas kaj nur la uzant-kreitaj alarmoj restas.
  */
-class MemorAlarmoDeponejo : AlarmoDeponejo {
+class MemorAlarmoDeponejo(
+    sugestoj: List<Alarmo> = emptyList(),
+) : AlarmoDeponejo {
     private val _alarmoj = MutableStateFlow<List<Alarmo>>(emptyList())
     override fun observiAlarmojn(): StateFlow<List<Alarmo>> = _alarmoj.asStateFlow()
 
-    private var nextId = 1
+    private val sugestoj = sugestoj.map { it.copy(aktiva = false) }
+    private var nextId = 1000
+
+    init {
+        if (sugestoj.isNotEmpty()) {
+            _alarmoj.value = this.sugestoj
+            logi("AlarmoDeponejo", "Montras ${this.sugestoj.size} sugestojn (malaktivaj)")
+        }
+    }
 
     override suspend fun krei(alarmo: Alarmo) {
         val nova = alarmo.copy(id = nextId++)

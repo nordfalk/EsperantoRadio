@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,12 +92,19 @@ private fun KanalEro(
             )
         },
         leadingContent = {
-            // TODO: Coil 3-bildo kiam Coil estos aldonita
-            Box(
-                modifier = Modifier.size(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(kanal.nomo.take(2))
+            if (kanal.emblemoUrl != null) {
+                AsyncImage(
+                    model = kanal.emblemoUrl,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier.size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(kanal.nomo.take(2))
+                }
             }
         },
         modifier = Modifier.clickable(onClick = onClick)

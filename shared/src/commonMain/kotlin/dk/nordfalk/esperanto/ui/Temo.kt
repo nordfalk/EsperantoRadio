@@ -13,65 +13,69 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// === Muzaiko-koloroj ===
+// === Esperanto-verdaj koloroj ===
+// Inspiro: Esperanto-flago (#009900), muzaiko.info fono (#f0edea), TEJO verdo (#007D13)
 
-val MuzaikoRugo = Color(0xFFD0002F)
-val MuzaikoRugoMalhela = Color(0xFF9F001E)
-val MuzaikoRugoProfunda = Color(0xFF4F000E)
-val MuzaikoKremo = Color(0xFFFAF6F2)
-val MuzaikoKarbono = Color(0xFF1A1413)
-val MuzaikoArgento = Color(0xFFE8E2DD)
-val MuzaikoBlanko = Color(0xFFFFFFFF)
-val MuzaikoMalhelaFono = Color(0xFF1A1413)
-val MuzaikoMalhelaSurfaco = Color(0xFF241D1B)
-val MuzaikoMalhelaMalaktiva = Color(0xFF3A3030)
+val EsperantoVerdo = Color(0xFF009900)       // Esperanto-flago verdo — chefa akcento
+val VerdoMalhela = Color(0xFF007D13)         // TEJO-verdo — emfazo, premata
+val VerdoProfunda = Color(0xFF004D0C)        // Malhela temo, profundeco
+val VerdoHela = Color(0xFFE8F5E9)            // Hela verda fono por kartoj
+val VerdoMeza = Color(0xFF4CAF50)            // Meza verdo por malaktivaj akcentoj
+
+// Fono de muzaiko.info
+val MuzaikoKremo = Color(0xFFF0EDEA)         // muzaiko.info fono (varma kremo)
+val Karbono = Color(0xFF1A1A1A)              // Teksto, malhela fono
+val Argento = Color(0xFFE0E0E0)              // Dividiloj, malaktivaj
+
+// Kontrasta ruĝo (de Muzaiko-emblemo) por eraroj kaj avertmarkoj
+val MuzikoRugo = Color(0xFFD0002F)          // Muzaiko-emblemo ruĝo
 
 // === Kolorskemoj ===
 
-val MuzaikoHelaKolorskemo = lightColorScheme(
-    primary = MuzaikoRugo,
-    onPrimary = MuzaikoBlanko,
-    primaryContainer = MuzaikoRugoMalhela,
-    onPrimaryContainer = MuzaikoKremo,
-    secondary = MuzaikoKarbono,
-    onSecondary = MuzaikoKremo,
-    secondaryContainer = MuzaikoArgento,
-    onSecondaryContainer = MuzaikoKarbono,
-    tertiary = MuzaikoRugoProfunda,
-    onTertiary = MuzaikoKremo,
+val EsperantoHelaKolorskemo = lightColorScheme(
+    primary = EsperantoVerdo,
+    onPrimary = Color.White,
+    primaryContainer = VerdoMalhela,
+    onPrimaryContainer = Color.White,
+    secondary = Karbono,
+    onSecondary = Color.White,
+    secondaryContainer = Argento,
+    onSecondaryContainer = Karbono,
+    tertiary = VerdoMeza,
+    onTertiary = Karbono,
     background = MuzaikoKremo,
-    onBackground = MuzaikoKarbono,
-    surface = MuzaikoBlanko,
-    onSurface = MuzaikoKarbono,
-    surfaceVariant = MuzaikoArgento,
-    onSurfaceVariant = MuzaikoKarbono,
-    outline = MuzaikoArgento,
+    onBackground = Karbono,
+    surface = Color.White,
+    onSurface = Karbono,
+    surfaceVariant = Argento,
+    onSurfaceVariant = Karbono,
+    outline = Argento,
     outlineVariant = MuzaikoKremo,
-    error = MuzaikoRugo,
-    onError = MuzaikoBlanko,
+    error = MuzikoRugo,
+    onError = Color.White,
 )
 
-val MuzaikoMalhelaKolorskemo = darkColorScheme(
-    primary = MuzaikoRugo,
-    onPrimary = MuzaikoBlanko,
-    primaryContainer = MuzaikoRugoProfunda,
-    onPrimaryContainer = MuzaikoKremo,
-    secondary = MuzaikoKremo,
-    onSecondary = MuzaikoKarbono,
-    secondaryContainer = MuzaikoMalhelaMalaktiva,
-    onSecondaryContainer = MuzaikoKremo,
-    tertiary = MuzaikoRugoMalhela,
-    onTertiary = MuzaikoKremo,
-    background = MuzaikoMalhelaFono,
-    onBackground = MuzaikoKremo,
-    surface = MuzaikoMalhelaSurfaco,
-    onSurface = MuzaikoKremo,
-    surfaceVariant = MuzaikoMalhelaMalaktiva,
-    onSurfaceVariant = MuzaikoArgento,
-    outline = MuzaikoMalhelaMalaktiva,
-    outlineVariant = MuzaikoKarbono,
-    error = MuzaikoRugo,
-    onError = MuzaikoBlanko,
+val EsperantoMalhelaKolorskemo = darkColorScheme(
+    primary = EsperantoVerdo,
+    onPrimary = Color.White,
+    primaryContainer = VerdoProfunda,
+    onPrimaryContainer = VerdoHela,
+    secondary = Color(0xFFB0BEC5),
+    onSecondary = Karbono,
+    secondaryContainer = Color(0xFF2E3B2E),
+    onSecondaryContainer = VerdoHela,
+    tertiary = VerdoMeza,
+    onTertiary = Karbono,
+    background = Color(0xFF1A2E1A),
+    onBackground = Color(0xFFE8F5E9),
+    surface = Color(0xFF243824),
+    onSurface = Color(0xFFE8F5E9),
+    surfaceVariant = Color(0xFF2E3B2E),
+    onSurfaceVariant = Argento,
+    outline = Color(0xFF2E3B2E),
+    outlineVariant = Color(0xFF1A2E1A),
+    error = MuzikoRugo,
+    onError = Color.White,
 )
 
 // === Formoj ===
@@ -104,4 +108,4 @@ val MuzaikoTiparo = Typography(
  */
 @androidx.compose.runtime.Composable
 fun muzaikoKolorskemo(malhela: Boolean = isSystemInDarkTheme()): ColorScheme =
-    if (malhela) MuzaikoMalhelaKolorskemo else MuzaikoHelaKolorskemo
+    if (malhela) EsperantoMalhelaKolorskemo else EsperantoHelaKolorskemo

@@ -62,6 +62,7 @@ class NavigaTesto {
         onNodeWithText("Kernpunkto").assertIsDisplayed()
         onNodeWithText("Rekta elsendo").assertIsDisplayed()
         onAllNodesWithText("Podkasto").assertCountEquals(2)
+        Thread.sleep(500)
     }
 
     @Test
@@ -71,6 +72,7 @@ class NavigaTesto {
         }
         waitForIdle()
         onAllNodesWithText("KP204 Pigmentoj").assertCountEquals(2)
+        Thread.sleep(500)
     }
 
     @Test
@@ -82,6 +84,7 @@ class NavigaTesto {
         setContent { SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onReen = {}, onElsendo = {}) }
         waitForIdle()
         onNodeWithText("Serĉi").assertIsDisplayed()
+        Thread.sleep(500)
     }
 
     @Test
@@ -99,6 +102,7 @@ class NavigaTesto {
         }
         waitForIdle()
         onNodeWithText("Muzaiko").assertIsDisplayed()
+        Thread.sleep(500)
     }
 
     @Test
@@ -119,6 +123,7 @@ class NavigaTesto {
         waitForIdle()
         onNodeWithText("KP204 Pigmentoj").assertIsDisplayed()
         onNodeWithText("Preta").assertIsDisplayed()
+        Thread.sleep(500)
     }
 
     @Test
@@ -132,6 +137,7 @@ class NavigaTesto {
         waitForIdle()
         onNodeWithText("06:45").assertIsDisplayed()
         onNodeWithText("Cxiutage").assertIsDisplayed()
+        Thread.sleep(500)
     }
 
     @Test
@@ -142,6 +148,7 @@ class NavigaTesto {
         onNodeWithText("Agordoj").assertIsDisplayed()
         onNodeWithText("Lingvo").assertIsDisplayed()
         onNodeWithText("Esperanto").assertIsDisplayed()
+        Thread.sleep(500)
     }
 
     @Test
@@ -153,6 +160,7 @@ class NavigaTesto {
         waitForIdle()
         onNodeWithText("KP204 Pigmentoj").assertIsDisplayed()
         onNodeWithText("Ludas").assertIsDisplayed()
+        Thread.sleep(500)
     }
 }
 

@@ -34,7 +34,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
 | — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
 | — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
-| 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro — UI+persisto farita, AlarmManager venas) | #24,#25,#26,#27 |
+| 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro farita, aliaj venas) | #24-#30 |
 
 ### Kio funkcias nun
 
@@ -44,7 +44,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado, fallback ringtono, volumo-boost
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Testoj**: 56 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
@@ -52,7 +52,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 ### Kio NE funkcias ankoraŭ
 
 - Nur-WiFi-agordo ne estas konektita al elŝut-logiko (agordo ekzistas sed ne efikas)
-- Vekhorloĝo: alarmoj estas persistitaj sed ne vere vekas la aparaton (bezonas Android AlarmManager + BroadcastReceiver + WakeLock)
+- Vekhorloĝo: podkastoj ne povas aŭtomate ludi ĉe alarmo (nur rekta radio)
 - iOS-ludado (no-op, bezonas AVPlayer)
 - Hejmekrana widget, Chromecast, talesyntezo
 

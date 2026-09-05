@@ -41,6 +41,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.ksoup)
         }
 
         commonTest.dependencies {

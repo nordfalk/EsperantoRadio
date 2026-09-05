@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:psc="http://podlove.org/simple-chapters" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:fh="http://purl.org/syndication/history/1.0" xmlns:podcast="https://podcastindex.org/namespace/1.0" >
+
+<channel>
+	<title>kern.punkto</title>
+	<link>https://kern.punkto.info</link>
+	<description><![CDATA[Podkasto de Eva kaj Johannes]]></description>
+	<lastBuildDate>Sun, 06 Apr 2025 20:22:57 +0000</lastBuildDate>
+	
+<image><url>https://kern.punkto.info/bildoj/emblemo.png</url><title>kern.punkto</title><link>https://kern.punkto.info</link></image>
+<atom:link rel="self" type="application/rss+xml" title="kern.punkto (mp3)" href="https://kern.punkto.info/feed/mp3/" />
+	<atom:link rel="alternate" type="application/rss+xml" title="kern.punkto (m4a)" href="https://kern.punkto.info/feed/m4a/" />
+	<atom:link rel="alternate" type="application/rss+xml" title="kern.punkto (opus)" href="https://kern.punkto.info/feed/opus/" />
+	<atom:link rel="next" href="https://kern.punkto.info/feed/mp3/?paged=2" />
+	<atom:link rel="first" href="https://kern.punkto.info/feed/mp3/" />
+	<atom:link rel="last" href="https://kern.punkto.info/feed/mp3/?paged=24" />
+	<language>eo</language>
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+<generator>Podlove Podcast Publisher v4.2.3</generator>
+	<podcast:guid>152745a7-6369-48f0-9d07-555b1cbaf9be</podcast:guid>
+	<copyright>© 2025 Eva &amp; Johannes</copyright>
+	<itunes:author>Eva &amp; Johannes</itunes:author>
+	<itunes:type>episodic</itunes:type>
+	<itunes:summary><![CDATA[Ni parolas pri ajnaj temoj, pri kiuj ni en la tiama momento interesiĝas. Superrigardon pri la temoj donas nia tema paĝo http://kern.punkto.info/temoj. Tie oni povas en la komento proponi novajn temojn.]]></itunes:summary>
+<itunes:category text="Society &amp; Culture" />
+<itunes:category text="Technology" />
+<itunes:category text="Education" />
+
+	
+	<itunes:owner>
+		<itunes:name>Johannes Mueller &amp; Eva Fitzelová</itunes:name>
+		<itunes:email>kontakto@kern.punkto.info</itunes:email>
+	</itunes:owner>
+	<itunes:image href="https://kern.punkto.info/bildoj/emblemo.png"/>
+	<itunes:subtitle>Podkasto de Eva kaj Johannes</itunes:subtitle>
+	<itunes:block>no</itunes:block>
+	<itunes:explicit>false</itunes:explicit>
+	
+	<podcast:license url="http://creativecommons.org/licenses/by-sa/3.0/deed.eo">Krea Komunaĵo Atribuite-Samkondiĉe  3.0 Neadaptita permesilo</podcast:license>
+
+	
+	<item>
+        <title>KP226 Stimulado de la cerbo</title>
+		<link>https://kern.punkto.info/2025/04/06/kp226-stimulado-de-la-cerbo/</link>
+		<pubDate>Sun, 06 Apr 2025 20:22:57 +0000</pubDate>
+		<guid isPermaLink="false">11a27dc1-473f-48ad-b0b6-28f4bf8a9efd</guid>
+    	<description><![CDATA[En la medicina scienco oni esploras la funkciadon de la cerbo por kompreni cerbajn malsanojn kiel ekzemple epilepsio. Per precize celata stimulado de la cerbo oni povas mildigi la simptomojn de la malsano. Nia gasto estas spertulino en tiu kampo. Ni lernas de ŝi, kiel tiuj metodoj principe funkcias.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2025/04/06/kp226-stimulado-de-la-cerbo/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2572/s/feed/c/mp3/kp226-stimulado-de-la-cerbo.mp3" length="63072674" type="audio/mpeg"/>
+
+		<itunes:duration>01:15:01</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>La scienco pri stimulado de la cerbo por fine kuraci ĝin</itunes:subtitle>
+		<itunes:episode>227</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[En la medicina scienco oni esploras la funkciadon de la cerbo por kompreni cerbajn malsanojn kiel ekzemple epilepsio. Per precize celata stimulado de la cerbo oni povas mildigi la simptomojn de la malsano. Nia gasto estas spertulino en tiu kampo. Ni lernas de ŝi, kiel tiuj metodoj principe funkcias.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp227-stimulado-de-la-cerbo.jpg"/>
+		<content:encoded><![CDATA[<h2>La scienco pri stimulado de la cerbo por fine kuraci ĝin</h2>
+<p>En la medicina scienco oni esploras la funkciadon de la cerbo por kompreni cerbajn malsanojn kiel ekzemple epilepsio. Per precize celata stimulado de la cerbo oni povas mildigi la simptomojn de la malsano. Nia gasto estas spertulino en tiu kampo. Ni lernas de ŝi, kiel tiuj metodoj principe funkcias.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:24.686" title="Bonvenigo kaj prezento de la gasto"/>
+  <psc:chapter start="00:04:39.997" title="Kiel funkcias la cerbo"/>
+  <psc:chapter start="00:14:19.103" title="Esploroj pri cerbaj malsanoj"/>
+  <psc:chapter start="00:21:22.901" title="Stimuli vivantajn cerbojn"/>
+  <psc:chapter start="00:43:18.161" title="Sekvaj pa&#x15D;oj de la esplorado"/>
+  <psc:chapter start="00:49:18.527" title="Estontaj perspektivoj de cerbokuracado"/>
+  <psc:chapter start="00:57:34.873" title="Etikaj demandoj pri cerbokuracado"/>
+  <psc:chapter start="01:00:56.630" title="Transpreneblo de bestaj modeloj al la homo"/>
+  <psc:chapter start="01:04:08.969" title="Obstakloj al la vojo de praktika uzo de la kuracmetodo"/>
+</psc:chapters>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Marta Nowakowska-Desplantes</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/marta-nowakowska-desplantes.jpg">Marta Nowakowska-Desplantes</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP226 Nia loko en la kosmo</title>
+		<link>https://kern.punkto.info/2025/03/02/kp226-nia-loko-en-la-kosmo/</link>
+		<pubDate>Sun, 02 Mar 2025 21:03:54 +0000</pubDate>
+		<guid isPermaLink="false">60b61baa-0743-4d79-b836-68de323cc9dc</guid>
+    	<description><![CDATA[Ekde la komenco de la homaro oni klopodis kompreni kion oni vidas en la ĉielo. Observante la ĉielan spektaklon oni pli kaj pli komprenis, kia speca estas la tero kaj kie ĝi troviĝas en la mondo. De la plata tero al la sfera, de la tercentra universo al la suncentra al la sencentra. Kun nia gasto ni desegnas la historion de la praepoko ĝis nun.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2025/03/02/kp226-nia-loko-en-la-kosmo/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2568/s/feed/c/mp3/kp226-nia-loko-en-la-kosmo.mp3" length="78016138" type="audio/mpeg"/>
+
+		<itunes:duration>01:32:49</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Interparolo pri la paŝoj kompreni kio estas nia loko en la universo</itunes:subtitle>
+		<itunes:episode>226</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Ekde la komenco de la homaro oni klopodis kompreni kion oni vidas en la ĉielo. Observante la ĉielan spektaklon oni pli kaj pli komprenis, kia speca estas la tero kaj kie ĝi troviĝas en la mondo. De la plata tero al la sfera, de la tercentra universo al la suncentra al la sencentra. Kun nia gasto ni desegnas la historion de la praepoko ĝis nun.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp226-nia-loko-en-la-kosmo.jpg"/>
+		<content:encoded><![CDATA[<h2>Interparolo pri la paŝoj kompreni kio estas nia loko en la universo</h2>
+<p>Ekde la komenco de la homaro oni klopodis kompreni kion oni vidas en la ĉielo. Observante la ĉielan spektaklon oni pli kaj pli komprenis, kia speca estas la tero kaj kie ĝi troviĝas en la mondo. De la plata tero al la sfera, de la tercentra universo al la suncentra al la sencentra. Kun nia gasto ni desegnas la historion de la praepoko ĝis nun.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:26.061" title="Bonvenigo"/>
+  <psc:chapter start="00:05:29.445" title="Historio de la kosmo studado"/>
+  <psc:chapter start="00:07:43.924" title="Fruaj uzoj kaj pripensoj pri la nokt&#x109;iela spektaklo"/>
+  <psc:chapter start="00:11:47.353" title="La kompreno ke la tero estas globo"/>
+  <psc:chapter start="00:22:47.299" title="La malnovgrekaj observoj de la steloj"/>
+  <psc:chapter start="00:28:46.477" title="La revolucio de Koperniko"/>
+  <psc:chapter start="00:44:11.737" title="La unuaj mezuro de la distnaco inter tero kaj suno"/>
+  <psc:chapter start="00:53:00.123" title="La rolo de Newton"/>
+  <psc:chapter start="00:58:32.688" title="Iom da resumo"/>
+  <psc:chapter start="01:03:36.573" title="La malkovro de kosmaj nebuloj kaj fremdaj galaksioj"/>
+  <psc:chapter start="01:10:56.033" title="La falo de la koncepto de la stabila universo"/>
+  <psc:chapter start="01:22:12.596" title="Astronomio pere de gravitaj ondoj"/>
+  <psc:chapter start="01:25:09.991" title="La nuna evoluo de la esplorado"/>
+  <psc:chapter start="01:31:39.937" title="Danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Carlos Spinola</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/carlos-spinola.jpg">Carlos Spinola</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP225 Dekjariĝo</title>
+		<link>https://kern.punkto.info/2025/01/27/kp225-dekjarigxo/</link>
+		<pubDate>Mon, 27 Jan 2025 20:35:39 +0000</pubDate>
+		<guid isPermaLink="false">43576b4b-d807-4038-b9d2-8400b8a688ca</guid>
+    	<description><![CDATA[Kelkajn monatojn post nia dekjariĝo ni pripensas nian ĝisnunan agadon.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2025/01/27/kp225-dekjarigxo/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2565/s/feed/c/mp3/kp225-dekjarigo.mp3" length="36080599" type="audio/mpeg"/>
+
+		<itunes:duration>00:42:54</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Iomete malfrua festo de nia dekjara jubileo</itunes:subtitle>
+		<itunes:title>Dekjariĝo</itunes:title>
+		<itunes:episode>225</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Kelkajn monatojn post nia dekjariĝo ni pripensas nian ĝisnunan agadon.]]></itunes:summary>
+		
+		<content:encoded><![CDATA[]]></content:encoded>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP224 Biciklaj vojaĝoj</title>
+		<link>https://kern.punkto.info/2024/11/25/kp224-biciklaj-vojagxoj/</link>
+		<pubDate>Mon, 25 Nov 2024 21:52:42 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-11-25t21:24:38+00:00-9c51a85a6dd92c5</guid>
+    	<description><![CDATA[Spertaj Esperantistoj eble en Esperanto renkontiĝoj jam vidis alveni la BEMIanojn veturinte longajn distancojn perbicikle. Ankaŭ al la ĉi-jara IJK alvenis grupo de biciklantoj de eksterlande. Ni parolas kun du el ili pri iliaj longjaraj spertoj kiel organizi kaj travivi longdistancajn biciklajn vojaĝojn.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/11/25/kp224-biciklaj-vojagxoj/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2560/s/feed/c/mp3/kp224-biciklaj-vojagoj.mp3" length="75203097" type="audio/mpeg"/>
+
+		<itunes:duration>01:29:27</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Kiel travivi longajn distancojn bicikle</itunes:subtitle>
+		<itunes:episode>224</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Spertaj Esperantistoj eble en Esperanto renkontiĝoj jam vidis alveni la BEMIanojn veturinte longajn distancojn perbicikle. Ankaŭ al la ĉi-jara IJK alvenis grupo de biciklantoj de eksterlande. Ni parolas kun du el ili pri iliaj longjaraj spertoj kiel organizi kaj travivi longdistancajn biciklajn vojaĝojn.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp224-biciklaj-vojagxoj.jpg"/>
+		<content:encoded><![CDATA[<h2>Kiel travivi longajn distancojn bicikle</h2>
+<p>Spertaj Esperantistoj eble en Esperanto renkontiĝoj jam vidis alveni la BEMIanojn veturinte longajn distancojn perbicikle. Ankaŭ al la ĉi-jara IJK alvenis grupo de biciklantoj de eksterlande. Ni parolas kun du el ili pri iliaj longjaraj spertoj kiel organizi kaj travivi longdistancajn biciklajn vojaĝojn.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:21.991" title="Bonvenigo"/>
+  <psc:chapter start="00:00:49.082" title="Prezento de la gastoj"/>
+  <psc:chapter start="00:06:42.681" title="Longaj voja&#x11D;oj perbiciklaj"/>
+  <psc:chapter start="00:15:07.744" title="Solaj kaj grupaj voja&#x11D;oj"/>
+  <psc:chapter start="00:21:57.909" title="La rolo de la biciklo"/>
+  <psc:chapter start="00:28:26.195" title="Planado de la itinero"/>
+  <psc:chapter start="00:42:34.793" title="Kie tranokti dum la voja&#x11D;oj"/>
+  <psc:chapter start="00:50:47.790" title="Kion kunporti al la voja&#x11D;o"/>
+  <psc:chapter start="00:55:56.330" title="Kion man&#x11D;i dum la voja&#x11D;o"/>
+  <psc:chapter start="01:01:00.940" title="Ekhavi elektran energion por elektroniko"/>
+  <psc:chapter start="01:04:06.267" title="Riparoj dum la voja&#x11D;o"/>
+  <psc:chapter start="01:09:57.093" title="Grupaj problemoj dum la voja&#x11D;o"/>
+  <psc:chapter start="01:19:54.297" title="Biciklista Esperantista Movado Internacia"/>
+  <psc:chapter start="01:27:24.585" title="Konkludaj rimarkoj, danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Lars Sözüer</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Viola Gubo</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/lars-sozuer.jpg">Lars Sözüer</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/viola-gubo.jpg">Viola Gubo</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP223 Konstelacioj</title>
+		<link>https://kern.punkto.info/2024/11/04/kp223-konstelacioj/</link>
+		<pubDate>Mon, 04 Nov 2024 11:37:32 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-11-04t10:39:53+00:00-06ad2a422874301</guid>
+    	<description><![CDATA[Stelaj konstelacioj ekde jarmiloj fascinas la homaron. La diversaj kulturoj diverse interpretis kion ili vidas en la nokta ĉielo.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/11/04/kp223-konstelacioj/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2557/s/feed/c/mp3/kp223-konstelacioj.mp3" length="71126325" type="audio/mpeg"/>
+
+		<itunes:duration>01:24:32</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Stelaj konstelacioj kaj ties interago kun diversaj kulturoj</itunes:subtitle>
+		<itunes:episode>223</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Stelaj konstelacioj ekde jarmiloj fascinas la homaron. La diversaj kulturoj diverse interpretis kion ili vidas en la nokta ĉielo.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp223-konstelacioj.jpg"/>
+		<content:encoded><![CDATA[<h2>Stelaj konstelacioj kaj ties interago kun diversaj kulturoj</h2>
+<p>Stelaj konstelacioj ekde jarmiloj fascinas la homaron. La diversaj kulturoj diverse interpretis kion ili vidas en la nokta ĉielo.</p>
+<h2>Ligiloj</p>
+<h2>
+<p><a href="https://eo.wikipedia.org/wiki/Zodiako">vkp: Zodiako</a></p>
+<p><a href="https://eo.wikipedia.org/wiki/Meteorfluo">vkp: Meteorfluo</a></p>
+<p><a href="https://eo.wikipedia.org/wiki/Perseidoj">vkp: Perseidoj</a></p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:26.719" title="Bonvenigo kaj prezento de la gasto"/>
+  <psc:chapter start="00:01:52.976" title="Volontulado en obsercatorio"/>
+  <psc:chapter start="00:09:56.285" title="Stelaj konstelacioj"/>
+  <psc:chapter start="00:19:30.474" title="Historiaj observoj de la &#x109;ielo"/>
+  <psc:chapter start="00:24:54.061" title="Rekoneblo de la konstelacioj"/>
+  <psc:chapter start="00:37:33.466" title="Rilatoj de konstelacioj kun mitoj"/>
+  <psc:chapter start="00:44:54.817" title="Konstelacioj kun komunaj steloj"/>
+  <psc:chapter start="00:48:02.652" title="La Perseidoj"/>
+  <psc:chapter start="00:54:29.052" title="La Zodiako"/>
+  <psc:chapter start="01:03:51.824" title="Astrologio"/>
+  <psc:chapter start="01:10:10.010" title="Mallumaj konstelacioj"/>
+  <psc:chapter start="01:18:40.868" title="Sameaj konstelaciaj interpretoj"/>
+  <psc:chapter start="01:23:41.341" title="Danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Frank van Hertrooij</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/frank-van-hertrooij.jpg">Frank van Hertrooij</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP222 Zorgogepatreco</title>
+		<link>https://kern.punkto.info/2024/10/14/kp222-zorgogepatreco/</link>
+		<pubDate>Mon, 14 Oct 2024 21:01:24 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-10-14t20:08:01+00:00-a4baa523a019caf</guid>
+    	<description><![CDATA[Por homoj kiuj vane atendas proprajn infanojn estas ne nur la eblo adopti infanojn – pri tio ni jam faris epizodon. Estas ankaŭ la eblo akcepti zorginfanojn. Tio signifas, ke la aŭtoritatoj transdonas al iu la respondecon zorgi pri infano, kiu aliloke ne havas taŭgan hejmon. Nia ĉi-epizoda gasto kune kun sia edzo tion faras ekde ĉirkaŭ dek jaroj kaj intertempe havas du zorginfanojn. En la epizodo ni lernas kiel oni fariĝas zorgogepatroj kaj kiaj estas la vivo kaj la defioj de tiu agado.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/10/14/kp222-zorgogepatreco/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2547/s/feed/c/mp3/kp222-zorgogepatreco.mp3" length="80514730" type="audio/mpeg"/>
+
+		<itunes:duration>01:35:48</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Zorgi pri infanoj nek propraj nek adoptitaj</itunes:subtitle>
+		<itunes:episode>222</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Por homoj kiuj vane atendas proprajn infanojn estas ne nur la eblo adopti infanojn – pri tio ni jam faris epizodon. Estas ankaŭ la eblo akcepti zorginfanojn. Tio signifas, ke la aŭtoritatoj transdonas al iu la respondecon zorgi pri infano, kiu aliloke ne havas taŭgan hejmon. Nia ĉi-epizoda gasto kune kun sia edzo tion faras ekde ĉirkaŭ dek jaroj kaj intertempe havas du zorginfanojn. En la epizodo ni lernas kiel oni fariĝas zorgogepatroj kaj kiaj estas la vivo kaj la defioj de tiu agado.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp222-zorgogepatreco.jpg"/>
+		<content:encoded><![CDATA[<h2>Zorgi pri infanoj nek propraj nek adoptitaj</h2>
+<p>Por homoj kiuj vane atendas proprajn infanojn estas ne nur la eblo adopti infanojn – pri tio ni jam faris epizodon. Estas ankaŭ la eblo akcepti zorginfanojn. Tio signifas, ke la aŭtoritatoj transdonas al iu la respondecon zorgi pri infano, kiu aliloke ne havas taŭgan hejmon. Nia ĉi-epizoda gasto kune kun sia edzo tion faras ekde ĉirkaŭ dek jaroj kaj intertempe havas du zorginfanojn. En la epizodo ni lernas kiel oni fariĝas zorgogepatroj kaj kiaj estas la vivo kaj la defioj de tiu agado.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:25.728" title="Bonvenigo kaj prezento de la gasto"/>
+  <psc:chapter start="00:04:52.512" title="La koncepto de zorgogepatreco"/>
+  <psc:chapter start="00:20:55.188" title="La decido fari&#x11D;i zorgogepatroj kaj unuaj kontaktoj kun la infano"/>
+  <psc:chapter start="00:32:27.760" title="La komenco de la zorgogepatreco"/>
+  <psc:chapter start="00:38:34.632" title="La rolo de la originaj gepatroj"/>
+  <psc:chapter start="00:57:56.353" title="La dua zorginfano"/>
+  <psc:chapter start="01:05:55.879" title="Diversaj aspektoj de la temo"/>
+  <psc:chapter start="01:30:07.277" title="Konkludaj rimarkoj, danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Birke Dockhorn</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/birke-dockhorn.jpg">Birke Dockhorn</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP221 Kondutekonomiko</title>
+		<link>https://kern.punkto.info/2024/10/01/kp221-kondutekonomiko/</link>
+		<pubDate>Tue, 01 Oct 2024 21:15:45 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-10-01t20:55:50+00:00-160c2b1b5e53923</guid>
+    	<description><![CDATA[La novklasika ekonomika teorio supozas, ke homoj partoprenantaj la merkaton ĉiam agas racie. Tiel oni povas bone antaŭsupozi homan ekonomian konduton. Tamen la kondutekonomiko montras, ke tiu supozo ne pravas kaj homoj ne ĉiam agas plene racio. Ni parolas pri esploroj pri kondutekonomik kun nia ĉi-epizoda gasto. Ŝi profesio esploras homan ekonomian konduton kaj manierojn influi ĝin.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/10/01/kp221-kondutekonomiko/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2541/s/feed/c/mp3/kp221-kondutekonomiko.mp3" length="61467739" type="audio/mpeg"/>
+
+		<itunes:duration>01:13:07</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Ekonomika teorio konsideranta ke homoj ne ĉiam agas plene racie</itunes:subtitle>
+		<itunes:title>Kondutekonomiko</itunes:title>
+		<itunes:episode>221</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[La novklasika ekonomika teorio supozas, ke homoj partoprenantaj la merkaton ĉiam agas racie. Tiel oni povas bone antaŭsupozi homan ekonomian konduton. Tamen la kondutekonomiko montras, ke tiu supozo ne pravas kaj homoj ne ĉiam agas plene racio. Ni parolas pri esploroj pri kondutekonomik kun nia ĉi-epizoda gasto. Ŝi profesio esploras homan ekonomian konduton kaj manierojn influi ĝin.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp221-kondutekonomiko.jpg"/>
+		<content:encoded><![CDATA[<h2>Ekonomika teorio konsideranta ke homoj ne ĉiam agas plene racie</h2>
+<p>La novklasika ekonomika teorio supozas, ke homoj partoprenantaj la merkaton ĉiam agas racie. Tiel oni povas bone antaŭsupozi homan ekonomian konduton. Tamen la kondutekonomiko montras, ke tiu supozo ne pravas kaj homoj ne ĉiam agas plene racio. Ni parolas pri esploroj pri kondutekonomik kun nia ĉi-epizoda gasto. Ŝi profesio esploras homan ekonomian konduton kaj manierojn influi ĝin.</p>
+<h2>Ligiloj</h2>
+<p><a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"><img src="https://s.w.org/images/core/emoji/15.1.0/72x72/1f1ec-1f1e7.png" alt="🇬🇧" class="wp-smiley" style="height: 1em; max-height: 1em;" /> vkp: Thinkin fast and Slow</a> – a libro &#8220;Pensi rapide kaj malrapide&#8221;<br />
+<a href="https://www.youtube.com/@Seltenvideo>Jutuba kanalo pri Reinhard Selten</a></p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:26.394" title="Bonvenigo kaj prezento de gasto kaj temo"/>
+  <psc:chapter start="00:02:51.792" title="La novklasika ekonomiko"/>
+  <psc:chapter start="00:07:38.767" title="Libera paternalismo"/>
+  <psc:chapter start="00:19:50.313" title="Laboratoriaj eksperimentoj &#x2013; diktatora ludo"/>
+  <psc:chapter start="00:29:50.449" title="La rilato kun la ludoteorio"/>
+  <psc:chapter start="00:31:42.298" title="La prizonula dilemo"/>
+  <psc:chapter start="00:39:18.839" title="Aliaj laboratoriaj ludoj"/>
+  <psc:chapter start="00:50:33.982" title="La bazilisko de Roko"/>
+  <psc:chapter start="00:57:40.901" title="Pu&#x15D;etado"/>
+  <psc:chapter start="01:05:30.480" title="Rapida kaj malrapida pensado"/>
+  <psc:chapter start="01:12:14.994" title="Konkludaj rimarkoj, danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Paulína Jalakšová</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/paulina-jalaksova.jpg">Paulína Jalakšová</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP220 Teo</title>
+		<link>https://kern.punkto.info/2024/09/15/kp220-teo/</link>
+		<pubDate>Sun, 15 Sep 2024 19:47:22 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-09-15t18:38:55+00:00-2e3cecc07a36260</guid>
+    	<description><![CDATA[Nia ĉi-epizoda gasto spertas multe pri japana kaj ankaŭ alilanda tekulturo. Ŝi klarigas al ni, kiel teo estas prilaborata de la rikolto ĝis la trinkado.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/09/15/kp220-teo/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2536/s/feed/c/mp3/kp220-teo.mp3" length="59984424" type="audio/mpeg"/>
+
+		<itunes:duration>01:11:07</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Monda kulturaĵo inter simpla trinkaĵo kaj formo meditado</itunes:subtitle>
+		<itunes:episode>220</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Nia ĉi-epizoda gasto spertas multe pri japana kaj ankaŭ alilanda tekulturo. Ŝi klarigas al ni, kiel teo estas prilaborata de la rikolto ĝis la trinkado.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp220-teo.jpg"/>
+		<content:encoded><![CDATA[<h2>Monda kulturaĵo inter simpla trinkaĵo kaj formo meditado</h2>
+<p>Nia ĉi-epizoda gasto spertas multe pri japana kaj ankaŭ alilanda tekulturo. Ŝi klarigas al ni, kiel teo estas prilaborata de la rikolto ĝis la trinkado.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:22.866" title="Bonvenigo kaj prezento de la gasto"/>
+  <psc:chapter start="00:01:56.568" title="La difino de teo"/>
+  <psc:chapter start="00:04:44.540" title="La diverseco de teo"/>
+  <psc:chapter start="00:09:24.882" title="La produktado de teo"/>
+  <psc:chapter start="00:18:46.158" title="La rikolto de teo"/>
+  <psc:chapter start="00:25:42.661" title="La prilaborado de la tefolioj"/>
+  <psc:chapter start="00:37:45.258" title="La preparado de teo"/>
+  <psc:chapter start="00:46:27.315" title="La teoceremonio"/>
+  <psc:chapter start="01:07:16.215" title="Konkludaj  rimarkoj danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Ingi</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/ingi.jpg">Ingi</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP219 Akvokvalito</title>
+		<link>https://kern.punkto.info/2024/09/01/kp219-akvokvalito/</link>
+		<pubDate>Sun, 01 Sep 2024 18:57:39 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-09-01t18:08:49+00:00-c023ec6ac988d3d</guid>
+    	<description><![CDATA[Nia gasto doktoriĝas pri la mezurado de malpuraĵoj en nia trinkakvo. Ni lernas kiaj estas tiuj malpuraĵoj kaj kiel oni mezuras ilin.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/09/01/kp219-akvokvalito/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2532/s/feed/c/mp3/kp219-akvokvalito.mp3" length="53537773" type="audio/mpeg"/>
+
+		<itunes:duration>01:03:26</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Esploroj pri rubaĵo en trinkakvo</itunes:subtitle>
+		<itunes:title>Akvokvalito</itunes:title>
+		<itunes:episode>219</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Nia gasto doktoriĝas pri la mezurado de malpuraĵoj en nia trinkakvo. Ni lernas kiaj estas tiuj malpuraĵoj kaj kiel oni mezuras ilin.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp219-akvokvalito.jpg"/>
+		<content:encoded><![CDATA[<h2>Esploroj pri rubaĵo en trinkakvo</h2>
+<p>Nia gasto doktoriĝas pri la mezurado de malpuraĵoj en nia trinkakvo. Ni lernas kiaj estas tiuj malpuraĵoj kaj kiel oni mezuras ilin.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:20.918" title="Bonvenigo kaj pardonpeto"/>
+  <psc:chapter start="00:02:58.910" title="Prezento de la gasto"/>
+  <psc:chapter start="00:06:26.545" title="Kion oni kontrolas pri akvo"/>
+  <psc:chapter start="00:14:20.444" title="La esploroj de Alan"/>
+  <psc:chapter start="00:25:36.570" title="La teknika procezo por la esplorado"/>
+  <psc:chapter start="00:29:58.455" title="Kiel mezuri la efikon de la akvo al organismo"/>
+  <psc:chapter start="00:38:45.518" title="Kiu akvo estas kontrolata dum la esploroj"/>
+  <psc:chapter start="00:43:44.125" title="Konsekvencoj de la esplorado"/>
+  <psc:chapter start="00:45:46.945" title="Kial uzi kancerajn &#x109;elojn por la esplorado"/>
+  <psc:chapter start="00:51:29.362" title="Akvokolektado kiel hobio"/>
+  <psc:chapter start="00:57:08.601" title="Analizo de kloaka akvo"/>
+  <psc:chapter start="00:59:17.188" title="Kie estas la plej bongusta akvo?"/>
+  <psc:chapter start="01:01:58.463" title="Konkludaj rimarkoj danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Allan Argolo</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="https://kern.punkto.info/bildoj/allan-argolo.jpg">Allan Argolo</podcast:person>
+	</item>
+	
+	<item>
+        <title>KP218 Geostrategio</title>
+		<link>https://kern.punkto.info/2024/07/08/kp218-geostrategio/</link>
+		<pubDate>Mon, 08 Jul 2024 19:47:23 +0000</pubDate>
+		<guid isPermaLink="false">podlove-2024-07-08t19:24:31+00:00-9992b8a3bdd382e</guid>
+    	<description><![CDATA[Dum jardekoj ni Eŭropanoj ĝuis tempon de paco tute neglektante la eblon ke iam iu atakus nin de ekstere. Tiu eblo plejmalfrue ekde februaro 2022 estas nekontestebla. Kiel reagi al tio kaj kiel aspektu defenda strategio Eŭropa. Tion ni priparolas kun spertulo.]]></description>
+		<atom:link rel="http://podlove.org/deep-link" href="https://kern.punkto.info/2024/07/08/kp218-geostrategio/#" />
+		
+<enclosure url="https://kern.punkto.info/podlove/file/2528/s/feed/c/mp3/kp218-geostrategio.mp3" length="59170086" type="audio/mpeg"/>
+
+		<itunes:duration>01:10:09</itunes:duration>
+		<itunes:author>Eva &amp;amp; Johannes</itunes:author>
+		<itunes:subtitle>Ĉu Eŭropo bezonas geostrategion?</itunes:subtitle>
+		<itunes:episode>218</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:summary><![CDATA[Dum jardekoj ni Eŭropanoj ĝuis tempon de paco tute neglektante la eblon ke iam iu atakus nin de ekstere. Tiu eblo plejmalfrue ekde februaro 2022 estas nekontestebla. Kiel reagi al tio kaj kiel aspektu defenda strategio Eŭropa. Tion ni priparolas kun spertulo.]]></itunes:summary>
+		<itunes:image href="https://kern.punkto.info/bildoj/kp218-geostrategio.jpg"/>
+		<content:encoded><![CDATA[<h2>Ĉu Eŭropo bezonas geostrategion?</h2>
+<p>Dum jardekoj ni Eŭropanoj ĝuis tempon de paco tute neglektante la eblon ke iam iu atakus nin de ekstere. Tiu eblo plejmalfrue ekde februaro 2022 estas nekontestebla. Kiel reagi al tio kaj kiel aspektu defenda strategio Eŭropa. Tion ni priparolas kun spertulo.</p>
+]]></content:encoded><psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+  <psc:chapter start="00:00:00.000" title="Intro"/>
+  <psc:chapter start="00:00:27.083" title="Bonvenigo"/>
+  <psc:chapter start="00:01:55.893" title="Geopolitiko &#x2013; kio estas"/>
+  <psc:chapter start="00:05:11.947" title="E&#x16D;ropuniaj klopodoj pri paco kaj sekureco"/>
+  <psc:chapter start="00:24:13.934" title="La nuntempa situacio de E&#xFC;ropo el sekureca vidpunkto"/>
+  <psc:chapter start="00:38:52.560" title="La situacio pri Rusio"/>
+  <psc:chapter start="00:43:49.273" title="La strategiaj perspektivoj de E&#x16D;ropo"/>
+  <psc:chapter start="00:59:37.339" title="Estonta logoko de milito"/>
+  <psc:chapter start="01:08:01.694" title="Konkludaj rimarkoj, danko kaj adia&#x16D;o"/>
+</psc:chapters>
+<atom:contributor><atom:name>Johannes</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Eva</atom:name></atom:contributor>
+
+<atom:contributor><atom:name>Ulrich Brandenburg</atom:name></atom:contributor>
+
+<podcast:person img="http://kern.punkto.info/bildoj/johannes.jpg">Johannes</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/eva.jpg">Eva</podcast:person>
+
+<podcast:person img="http://kern.punkto.info/bildoj/ulrich-brandenburg.jpg">Ulrich Brandenburg</podcast:person>
+	</item>
+	</channel>
+</rss>

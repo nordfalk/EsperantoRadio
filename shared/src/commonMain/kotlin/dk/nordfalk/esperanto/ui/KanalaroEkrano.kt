@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -30,6 +32,8 @@ class KanalaroViewModel(
         _sxargxas.value = true
         try {
             deponejo.getKanalojn()
+        } catch (e: Exception) {
+            loge("KanalaroViewModel", "Malsukcesis sargi kanalojn", e)
         } finally {
             _sxargxas.value = false
         }
@@ -58,9 +62,9 @@ fun KanalaroEkrano(
             TopAppBar(
                 title = { Text("EsperantoRadio") },
                 actions = {
-                    TextButton(onClick = onSercxo) { Text("🔍") }
-                    TextButton(onClick = onPlejsatataj) { Text("★") }
-                    TextButton(onClick = onAgordoj) { Text("⚙") }
+                    TextButton(onClick = { logi("Klako", "serĉo-butono"); onSercxo() }) { Text("🔍") }
+                    TextButton(onClick = { logi("Klako", "plejŝatataj-butono"); onPlejsatataj() }) { Text("★") }
+                    TextButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Text("⚙") }
                 }
             )
         }
@@ -78,7 +82,7 @@ fun KanalaroEkrano(
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(kanaloj, key = { it.slug }) { kanal ->
-                    KanalEro(kanal = kanal, onClick = { onKanal(kanal) })
+                    KanalEro(kanal = kanal, onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) })
                 }
             }
         }

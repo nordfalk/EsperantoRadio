@@ -14,6 +14,8 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -33,6 +35,8 @@ class KanalViewModel(
         try {
             val rezulto = elsendoDeponejo.sxargxiElsendojn(kanal)
             _elsendoj.value = rezulto
+        } catch (e: Exception) {
+            loge("KanalViewModel", "Malsukcesis sargi elsendojn por ${kanal.slug}", e)
         } finally {
             _sxargxas.value = false
         }
@@ -62,7 +66,7 @@ fun KanalEkrano(
             TopAppBar(
                 title = { Text(kanal.nomo) },
                 navigationIcon = {
-                    TextButton(onClick = onReen) { Text("← Reen") }
+                    TextButton(onClick = { logi("Klako", "reen (KanalEkrano)"); onReen() }) { Text("← Reen") }
                 }
             )
         }
@@ -95,7 +99,7 @@ fun KanalEkrano(
                         ListItem(
                             headlineContent = { Text("Aŭskulti rekte") },
                             leadingContent = { Text("▶", style = MaterialTheme.typography.headlineMedium) },
-                            modifier = Modifier.clickable { onLudi(Sonfonto.RektaKanalo(kanal)) }
+                            modifier = Modifier.clickable { logi("Klako", "ludi rekte — ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) }
                         )
                         HorizontalDivider()
                     }
@@ -112,7 +116,7 @@ fun KanalEkrano(
                         )
                     }
                     items(grupo, key = { it.id }) { elsendo ->
-                        ElsendoEro(elsendo = elsendo, onClick = { onElsendo(elsendo) })
+                        ElsendoEro(elsendo = elsendo, onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) })
                     }
                 }
             }

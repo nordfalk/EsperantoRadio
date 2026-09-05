@@ -118,6 +118,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
                 log("fiksiFonton: volumo = $volumeno (gain=${gain}dB, range=$min..$max)")
             } catch (e: Exception) {
                 log("fiksiFonton: ne eblis agordi volumon: ${e.message}")
+                e.printStackTrace(System.err)
             }
 
             // Dauro
@@ -175,6 +176,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
                     stream.read(buffer)
                 } catch (e: Exception) {
                     log("ludi: eraro legante fluon: ${e.message}")
+                    e.printStackTrace(System.err)
                     -1
                 }
                 if (read <= 0) {
@@ -233,11 +235,13 @@ class DesktopLudiloRegilo : LudiloRegilo {
             sourceDataLine?.close()
         } catch (e: Exception) {
             log("halti: eraro fermante line: ${e.message}")
+            e.printStackTrace(System.err)
         }
         try {
             audioInputStream?.close()
         } catch (e: Exception) {
             log("halti: eraro fermante stream: ${e.message}")
+            e.printStackTrace(System.err)
         }
         sourceDataLine = null
         audioInputStream = null
@@ -263,6 +267,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             log("fiksiLauxtecon: gain=${ctrl.value}dB")
         } catch (e: Exception) {
             log("fiksiLauxtecon: ne eblis: ${e.message}")
+            e.printStackTrace(System.err)
         }
     }
 

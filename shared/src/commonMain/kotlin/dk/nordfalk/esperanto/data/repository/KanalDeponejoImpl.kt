@@ -4,6 +4,8 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanal
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.logd
+import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +26,15 @@ class KanalDeponejoImpl(
 
     override suspend fun getKanalojn(fortoRefresigi: Boolean): List<Kanal> {
         if (_kanaloj.value.isNotEmpty() && !fortoRefresigi) {
+            logd("KanalDeponejo", "Kanaloj jam ŝargitaj (${_kanaloj.value.size}) — uzas kaŝon")
             return _kanaloj.value
         }
+        logi("KanalDeponejo", "Legas kanalkonfiguron el bundled resource")
         val teksto = bundledTeksto()
         val agordo = leganto.legu(teksto)
         val kanaloj = agordo.kanaloj.map { it.alKanal() }
         _kanaloj.value = kanaloj
+        logi("KanalDeponejo", "Ŝargis ${kanaloj.size} kanalojn")
         return kanaloj
     }
 

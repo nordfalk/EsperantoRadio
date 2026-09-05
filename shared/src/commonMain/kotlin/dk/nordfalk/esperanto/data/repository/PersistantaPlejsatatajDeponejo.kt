@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
+import dk.nordfalk.esperanto.logi
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,7 @@ class PersistantaPlejsatatajDeponejo(
         if (kanalSlug in nuna) nuna.remove(kanalSlug) else nuna.add(kanalSlug)
         skribu(nuna)
         _plejsatataj.value = nuna
+        logi("Plejsatataj", "Baskulas: $kanalSlug → ${if (kanalSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
     override suspend fun estasPlejsatata(kanalSlug: String): Boolean = kanalSlug in _plejsatataj.value

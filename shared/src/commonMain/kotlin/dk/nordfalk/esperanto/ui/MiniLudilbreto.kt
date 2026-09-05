@@ -12,6 +12,7 @@ import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 
 /**
@@ -105,6 +106,7 @@ fun MiniLudilbreto(
 
             // Ludi/paŭzi-butono
             IconButton(onClick = {
+                logi("Klako", if (ludas) "paŭzigi" else "ludi")
                 scope.launch {
                     if (ludas) ludilo.pauxzigi() else ludilo.ludi()
                 }
@@ -116,7 +118,7 @@ fun MiniLudilbreto(
             }
 
             // Halti-butono
-            IconButton(onClick = { ludilo.halti() }) {
+            IconButton(onClick = { logi("Klako", "halti"); ludilo.halti() }) {
                 Text("■", style = MaterialTheme.typography.bodySmall)
             }
         }

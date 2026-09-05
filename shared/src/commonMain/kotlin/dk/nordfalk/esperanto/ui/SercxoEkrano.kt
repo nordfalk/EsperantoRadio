@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
+import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +29,7 @@ fun SercxoEkrano(
         topBar = {
             TopAppBar(
                 title = { Text("Serĉi") },
-                navigationIcon = { TextButton(onClick = onReen) { Text("← Reen") } }
+                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (SercxoEkrano)"); onReen() }) { Text("← Reen") } }
             )
         }
     ) { padding ->
@@ -62,7 +63,7 @@ fun SercxoEkrano(
                         ListItem(
                             headlineContent = { Text(elsendo.titolo, maxLines = 2) },
                             supportingContent = { Text(elsendo.kanalSlug) },
-                            modifier = Modifier.clickable { onElsendo(elsendo) }
+                            modifier = Modifier.clickable { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
                         )
                         HorizontalDivider()
                     }

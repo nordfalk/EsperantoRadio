@@ -87,6 +87,10 @@ fun EsperantoRadioApp(
                         KanalaroEkrano(
                             viewModel = kanalaroViewModel,
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
+                            onLudi = { fonto ->
+                                logi("Nav", "Ludas rekte: ${fonto}")
+                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                            },
                             onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
                             onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
                             onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },

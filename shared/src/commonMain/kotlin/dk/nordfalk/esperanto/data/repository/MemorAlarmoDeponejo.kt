@@ -25,8 +25,20 @@ class MemorAlarmoDeponejo(
 
     init {
         if (sugestoj.isNotEmpty()) {
-            _alarmoj.value = sugestoj.map { it.copy(aktiva = false) }
-            logi("AlarmoDeponejo", "Montras ${sugestoj.size} sugestojn (malaktivaj)")
+            // Certigu unikajn ID-ojn — la sugestoj povas havi duplikatojn
+            val uzitajIdj = mutableSetOf<Int>()
+            val unikaj = sugestoj.map { s ->
+                var id = s.id
+                while (id in uzitajIdj) {
+                    logi("AlarmoDeponejo", "ID-kolizio: $id — asignas novan")
+                    id = nextId++
+                }
+                uzitajIdj.add(id)
+                s.copy(id = id, aktiva = false)
+            }
+            nextId = maxOf(nextId, (uzitajIdj.maxOrNull() ?: 0) + 1)
+            _alarmoj.value = unikaj
+            logi("AlarmoDeponejo", "Montras ${unikaj.size} sugestojn (malaktivaj)")
         }
     }
 

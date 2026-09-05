@@ -132,21 +132,26 @@ fun KanalDto.alKanal(): Kanal = Kanal(
  * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
  *
  * Formato: `id/enabled/horo/minuto/ripeto/time/=kanalo/=etikedo/`
- * kun `\` cxe lini-fino por lin-daŭrigo.
+ * kun `\` cxe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
  * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
+ *
+ * Post JSONC-striptigo cxiuj sugestoj estas sur unu linio, apartigitaj per `/`.
+ * Cxiu alarmo konsistas el 8 partoj + trailing `/` (9 elementoj per split).
  */
 fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
-    return teksto.lines().mapNotNull { linio ->
-        val partoj = linio.split("/")
-        if (partoj.size < 8) return@mapNotNull null
+    val partoj = teksto.split("/")
+    val rezulto = mutableListOf<Alarmo>()
+    var i = 0
+    while (i + 7 < partoj.size) {
         try {
-            val id = partoj[0].toInt()
-            val aktiva = partoj[1] == "1"
-            val horo = partoj[2].toInt()
-            val minuto = partoj[3].toInt()
-            val ripeto = partoj[4].toInt()
-            val kanalSlug = partoj[6].removePrefix("=")
-            val etikedo = partoj[7].removePrefix("=")
+            val id = partoj[i].toInt()
+            val aktiva = partoj[i + 1] == "1"
+            val horo = partoj[i + 2].toInt()
+            val minuto = partoj[i + 3].toInt()
+            val ripeto = partoj[i + 4].toInt()
+            // partoj[i + 5] = time (malnova, ne uzata)
+            val kanalSlug = partoj[i + 6].removePrefix("=")
+            val etikedo = partoj[i + 7].removePrefix("=")
                 .replace("+", " ")
                 .replace("%0A", "\n")
                 .replace("%C4%88", "Ĉ")
@@ -154,9 +159,11 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 .replace("%C5%9C", "ŝ")
                 .replace("%C5%AD", "ŭ")
                 .replace("%C4%9C", "Ĝ")
-                .replace("%C4%88", "Ĉ")
                 .replace("%C4%89", "ĉ")
-            Alarmo(
+                .replace("%C4%B4", "Ĵ")
+                .replace("%C5%AC", "Ŝ")
+                .replace("%C5%AC", "Ŝ")
+            rezulto.add(Alarmo(
                 id = id,
                 horo = horo,
                 minuto = minuto,
@@ -164,9 +171,11 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 kanalSlug = kanalSlug,
                 aktiva = aktiva,
                 etikedo = etikedo.ifBlank { null }
-            )
+            ))
         } catch (e: Exception) {
-            null
+            // Saltu eraran eron
         }
+        i += 8
     }
+    return rezulto
 }

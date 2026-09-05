@@ -56,7 +56,7 @@ fun AlarmoEkrano(
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
-                items(alarmoj, key = { it.id }) { alarmo ->
+                items(alarmoj) { alarmo ->
                     AlarmoEro(
                         alarmo = alarmo,
                         kanalNomo = kanaloj.find { it.slug == alarmo.kanalSlug }?.nomo ?: alarmo.kanalSlug,

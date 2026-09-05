@@ -108,10 +108,8 @@ EsperantoRadio/
    en agordo, ne en logiko.
 6. **GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
 7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
-   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston en
-   `shared/src/commonTest/`. Malgrandaj unuoc-testoj estas pli bonaj ol nenio.
-   Regulo: se vi aldonas novan branĉon al `sealed interface`, skribu teston por
-   ĝi. Se vi aldonas novan metodon al interfaco, skribu teston por ĝi.
+   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
+   faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

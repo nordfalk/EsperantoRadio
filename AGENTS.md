@@ -15,13 +15,46 @@ kanal superrigardo, livestreno, podkastoj, elŝutoj, plej ŝatataj, serĉo, vekh
 La plej valora parto ne estas la ludilo aŭ UI, sed la **scio pri la fontoj** — kiuj
 kanaloj ekzistas, kiel iliaj fluoj aspektas, kaj kiel eltiri rektan MP3-URL el ĉiu.
 
+## Stato de la projekto (2026-09-05)
+
+La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
+
+| Fazo | Priskribo | Stato | PR |
+|---|---|---|---|
+| 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
+| 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
+| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + 13 golden-testoj | ✅ Farita | #7 |
+| 1c | Kanalvido (elsendlisto) + elsendodetalo en UI + Ktor-kliento | 🔨 Nuna | — |
+| 1d | Peranto-parsilo (archive.org-skrapado, Google Drive) | Planita | — |
+| 2 | Ludado (LudiloRegilo, Media3/AVPlayer, mini-ludilbreto) | Planita | — |
+| 3 | Personigo (plejŝatataj, lastaŭskultitaj, serĉo, agordoj) | Planita | — |
+| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) | Planita | — |
+| 5 | Elŝutoj | Planita | — |
+| 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | Planita | — |
+
+### Kio funkcias nun
+
+- **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
+- **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
+- **Nova apo — RSS-parsilo**: parsas Kernpunkto, Varsovia Vento, Vinilkosmo, kaj ĉiujn ĝeneralajn kanalojn
+- **Testoj**: 27 testoj (5 JSONC + 8 modeloj + 13 RSS + 1 UI), ĉiuj pasas sur Desktop
+- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
+
+### Kio NE funkcias ankoraŭ
+
+- Peranto (Esperanta Retradio) — iframe/archive.org-skrapado (regulo 6.3) estas TODO
+- Ludado (neniu sono en la nova apo ankoraŭ)
+- Ktor-kliento por defora elŝuto (la parsilo estas pura, sen reto)
+- iOS (bezonas macOS/Xcode)
+- Coil 3 por emblemoj (ne aldonita)
+
 ## Granda plano
 
-Rekrei la apot en **Compose Multiplatform** (Android + iOS + opcie Desktop), plus
+Rekrei la apot en **Compose Multiplatform** (Android + iOS + Desktop + Web/Wasm), plus
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (planata, en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `iosApp/`, `desktopApp/`, `webApp/`, `shared/`, `server/`) vivos en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html).
+- **Nova apo** (en la radiko): priskribita en `docs/nova/`. La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `iosApp/`, `desktopApp/`, `webApp/`, `shared/`, `server/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html).
 
 ## Dosierujo-structuro
 
@@ -31,13 +64,21 @@ EsperantoRadio/
 │   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
 │   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
 │   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
-├── androidApp/            # Nova Android-aplikaĵo (estonte)
-├── iosApp/                # Nova iOS-Xcode-projekto (estonte)
-├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (estonte)
-├── webApp/                # Nova Web-aplikaĵo (JS + Wasm, estonte)
-├── shared/                # Nova komuna KMP-modulo (estonte)
+├── androidApp/            # Nova Android-aplikaĵo (MainActivity → EsperantoRadioApp)
+├── iosApp/                # Nova iOS-Xcode-projekto (malkomentu en settings.gradle.kts sur Mac)
+├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (Window + Compose)
+├── webApp/                # Nova Web-aplikaĵo (wasmJs, CanvasBasedWindow)
+├── shared/                # Nova komuna KMP-modulo
+│   ├── src/commonMain/    #   Komuna kodo (modeloj, parsilo, UI, deponejoj)
+│   ├── src/androidMain/   #   Android-specifa
+│   ├── src/desktopMain/   #   Desktop-specifa (JVM)
+│   ├── src/iosMain/       #   iOS-specifa
+│   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
+│   └── src/commonTest/    #   Testoj (27 testoj, ĉiuj pasas)
 ├── server/                # Nova podkasta arkiv-servilo (estonte)
-├── settings.gradle.kts     # Nova Kotlin-DSL-build (estonte — anstataŭigos settings.gradle)
+├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova)
+├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
+├── gradle/libs.versions.toml # Versikatalogo
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
@@ -54,6 +95,7 @@ EsperantoRadio/
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
    determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+   La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
    devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
 5. **Konservu la kanalkonfiguron** (`esperantoradio_kanaloj_v9.json`). Ĝi estas
@@ -61,25 +103,54 @@ EsperantoRadio/
    en agordo, ne en logiko.
 6. **GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
 
-## Konstru-komandoj (malnova apo)
+## Teknikaj scioj lernitaj dum la laboro
+
+- **JDK 17** estas necesa por konstrui la Android-apk (la defaŭlta JDK 21 mankas `jlink`).
+  Uzu: `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`
+- **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.1.0 (0.2.6+ postulas Kotlin 2.3+).
+  La API: `Ksoup.parseXml(teksto, "")` por XML, `Ksoup.parse(teksto)` por HTML.
+  `selectFirst(...)` ekzistas (ne nur `select(...).firstOrNull()`).
+- **Ktor 3 CIO-motoro** funkcias trans ĉiuj platformoj (JVM/Android/Native/WasmJs) sen
+  `expect`/`actual`. Nur HTTP/1.x sed sufiĉas por JSON+RSS.
+- **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
+- **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
+- **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per
+  `./gradlew :webApp:wasmJsBrowserDevelopmentRun`.
+- **JSONC-parsado**: la kanalkonfiguro havas `//`-komentojn kaj plurliniajn ĉenojn kun
+  `\` ĉe lini-fino. La `KanalAgordoLeganto.striptiguKomentojn` traktas ambaŭ.
+- **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en `<content:encoded>`.
+  Uzu `getElementsByTag("content:encoded").firstOrNull()?.text()` (ne `html()`) por
+  akiri la malkoditan HTML-enhavon, poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
+
+## Konstru-komandoj
 
 ```bash
-./gradlew clean
+# Malnova apo
+./gradlew :app:assembleDebug         # konstruas la malnovan Android-apk (bezonas JDK 17)
 ./gradlew :parse:rssarkivserverJar   # konstruas RssArkivServer-jaron
 java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
-./gradlew :app:assembleDebug         # konstruas la Android-apk
+
+# Nova apo
+./gradlew :shared:desktopTest        # rulas testojn (27 testoj)
+./gradlew :desktopApp:run            # rulas la desktop-apo
+./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
+./gradlew :webApp:wasmJsBrowserDevelopmentRun  # rulas la web-apo en retumilo
 ```
 
-## Mallonga resumo de la datenfluo
+## Datumfluo (nova apo)
 
 ```
-esperantoradio_kanaloj_v9.json  +  radio.txt
-        ↓ Grunddataparser
-   Grunddata.kanaler (List<Kanal>)
-        ↓ por ĉiu kanal: Backend.hentUdsendelserPåKanal
-   RomePodcastParser.parsRss()  (3 branĉoj: VarsoviaVento / Peranto / ĝenerala)
+esperantoradio_kanaloj_v9.json (bundled resource)
+        ↓ KanalAgordoLeganto (striptigas // komentojn, traktas JSONC)
+   List<Kanal>
+        ↓ KanalDeponejoImpl (StateFlow)
         ↓
-   Kanal.udsendelser  →  Fragmentoj  →  Afspiller  →  sono
+   KanalaroEkrano (Compose UI — LazyColumn de kanaloj)
+        ↓ (estonte: Ktor-kliento elŝutas RSS-fluon)
+   RssParsilo.parsRss(fluoTeksto, kanal)
+        ↓ (reguloj 6.1–6.7)
+   List<Elsendo>
+        ↓ (estonte: KanalEkrano — elsendlisto per dat-grupigo)
 ```
 
 ## Kie trovi kion
@@ -93,8 +164,30 @@ esperantoradio_kanaloj_v9.json  +  radio.txt
 | Kompreni la arkivan servilon | `docs/malnova/05_arkiva_servilo.md` |
 | Vidi la planon por la nova apo | `docs/nova/INDEKSO.md` |
 | Vidi la novan arkitekturon | `docs/nova/01_celoj_kaj_arkitekturo.md` |
+| Vidi la teknikan stakon | `docs/nova/02_teknika_stako.md` |
+| Vidi la domajnmodelojn | `docs/nova/03_domajno_kaj_datumoj.md` |
+| Vidi la parsad-specifaĵon | `docs/nova/04_parsado_kaj_arkivo.md` |
 | Vidi la dizajnon (Muzaiko-temo) | `docs/nova/05_dizajno_kaj_ui.md` |
 | Vidi la servilan planon | `docs/nova/06_servilo_arkivo.md` |
+
+## La nova kodo — strukturo
+
+La nova kodo vivas en `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/`:
+
+```
+dk/nordfalk/esperanto/
+├── App.kt                    # Radika Compose-funkcio (EsperantoRadioApp)
+├── domain/
+│   ├── model/Modeloj.kt      # Kanal, Elsendo, Sonfonto, LudantoStato
+│   └── repository/Deponejoj.kt # KanalDeponejo, ElsendoDeponejo (interfacoj)
+├── data/
+│   ├── config/KanalAgordoLeganto.kt  # JSONC-leganto (striptigas komentojn)
+│   ├── config/PlatformResource.kt   # expect/actual por legi resurcojn
+│   ├── parser/RssParsilo.kt         # RSS/Atom-parsilo (sep regoloj)
+│   └── repository/KanalDeponejoImpl.kt # Deponej-implementaĵo
+└── ui/
+    └── KanalaroEkrano.kt     # Kanalaro-ekrano (Compose UI)
+```
 
 ## Stilo
 

@@ -106,4 +106,56 @@ class ModelojTest {
         val fonto = Sonfonto.ElsendoFonto(elsendo)
         assertTrue(fonto is Sonfonto.ElsendoFonto)
     }
+
+    @Test
+    fun sonfontoLokaElsendo() {
+        val elsendo = Elsendo(id = "x", kanalSlug = "y", titolo = "t", stream = "s", dato = "2024-01-01")
+        val fonto = Sonfonto.LokaElsendo(elsendo, "/tmp/x.mp3")
+        assertTrue(fonto is Sonfonto.LokaElsendo)
+        assertEquals("/tmp/x.mp3", fonto.dosieroVojo)
+        assertEquals("x", fonto.elsendo.id)
+    }
+
+    @Test
+    fun elshutStatoNeElshutita() {
+        val stato = ElshutStato.NeElshutita
+        assertTrue(stato is ElshutStato.NeElshutita)
+    }
+
+    @Test
+    fun elshutStatoElshutanta() {
+        val stato = ElshutStato.Elshutanta(0.5f, 500L, 1000L)
+        assertTrue(stato is ElshutStato.Elshutanta)
+        assertEquals(0.5f, stato.progreso)
+        assertEquals(500L, stato.elshutitajBitokoj)
+        assertEquals(1000L, stato.totalajBitokoj)
+    }
+
+    @Test
+    fun elshutStatoPreta() {
+        val stato = ElshutStato.Preta
+        assertTrue(stato is ElshutStato.Preta)
+    }
+
+    @Test
+    fun elshutStatoEraro() {
+        val stato = ElshutStato.Eraro("HTTP 404")
+        assertTrue(stato is ElshutStato.Eraro)
+        assertEquals("HTTP 404", stato.mesagho)
+    }
+
+    @Test
+    fun elshutStatoPauxzita() {
+        val stato = ElshutStato.Pauxzita
+        assertTrue(stato is ElshutStato.Pauxzita)
+    }
+
+    @Test
+    fun elshutitaElsendoKampoj() {
+        val elsendo = Elsendo(id = "x", kanalSlug = "y", titolo = "t", stream = "s", dato = "2024-01-01")
+        val elshutita = ElshutitaElsendo(elsendo, "/tmp/x.mp3", ElshutStato.Preta)
+        assertEquals("x", elshutita.elsendo.id)
+        assertEquals("/tmp/x.mp3", elshutita.dosieroVojo)
+        assertTrue(elshutita.stato is ElshutStato.Preta)
+    }
 }

@@ -74,6 +74,30 @@ class MiniLudilbretoTest {
         onNodeWithText("Muzaiko").assertIsDisplayed()
         onNodeWithText("Rekta elsendo").assertIsDisplayed()
     }
+
+    @Test
+    fun montrasLokaElsendonTitolon() = runComposeUiTest {
+        val elsendo = Elsendo(
+            id = "test:2024-01-01",
+            kanalSlug = "test",
+            titolo = "Eksterreta podkasto",
+            stream = "https://x.com/a.mp3",
+            dato = "2024-01-01"
+        )
+        val ludilo = TestLudiloRegilo(LudantoInformo(
+            stato = LudantoStato.Ludas,
+            nunaFonto = Sonfonto.LokaElsendo(elsendo, "/tmp/test.mp3"),
+            pozicioMs = 0,
+            dauroMs = 60000,
+            estasRekta = false
+        ))
+
+        setContent { MiniLudilbreto(ludilo = ludilo) }
+        waitForIdle()
+
+        onNodeWithText("Eksterreta podkasto").assertIsDisplayed()
+        onNodeWithText("Ludas").assertIsDisplayed()
+    }
 }
 
 /** Test-ludilo kun antaŭdifinita stato. */

@@ -44,7 +44,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + agordoj
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
-- **Testoj**: 41 testoj (37 KMP sur Desktop + 4 Android sur emulatoro), ĉiuj pasas
+- **Testoj**: 52 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 
 ### Kio NE funkcias ankoraŭ
@@ -107,6 +107,11 @@ EsperantoRadio/
    daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
    en agordo, ne en logiko.
 6. **GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
+7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
+   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston en
+   `shared/src/commonTest/`. Malgrandaj unuoc-testoj estas pli bonaj ol nenio.
+   Regulo: se vi aldonas novan branĉon al `sealed interface`, skribu teston por
+   ĝi. Se vi aldonas novan metodon al interfaco, skribu teston por ĝi.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

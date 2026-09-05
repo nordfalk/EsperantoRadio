@@ -105,12 +105,26 @@ fun EsperantoRadioApp(
                             onReen = { logi("Nav", "→ KANAL (reen)"); ekrano = Ekrano.KANAL },
                             onLudi = {
                                 logi("Nav", "Ludas elsendon: ${elsendo.id}")
-                                scope.launch { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo)); ludilo.ludi() }
+                                scope.launch {
+                                    val lokaVojo = elshutDeponejo.getLokaDosieroVojo(elsendo.id)
+                                    val fonto = if (lokaVojo != null) {
+                                        logi("Nav", "Ludas elŝutitan: $lokaVojo")
+                                        Sonfonto.LokaElsendo(elsendo, lokaVojo)
+                                    } else {
+                                        Sonfonto.ElsendoFonto(elsendo)
+                                    }
+                                    ludilo.fiksiFonton(fonto); ludilo.ludi()
+                                }
                             },
                             onElshuti = {
                                 logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
                                 scope.launch { elshutDeponejo.elshuti(elsendo) }
-                            }
+                            },
+                            onForigiElshuton = {
+                                logi("Nav", "Forigas elŝuton: ${elsendo.id}")
+                                scope.launch { elshutDeponejo.forigi(elsendo.id) }
+                            },
+                            elshutDeponejo = elshutDeponejo
                         )
                     }
                     Ekrano.SERCXO -> {

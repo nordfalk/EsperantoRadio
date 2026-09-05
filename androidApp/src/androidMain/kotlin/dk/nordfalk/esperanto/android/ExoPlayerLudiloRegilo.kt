@@ -38,6 +38,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
         is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.LokaElsendo -> "file://${fonto.dosieroVojo}"
     }
 
     private fun updateState() {

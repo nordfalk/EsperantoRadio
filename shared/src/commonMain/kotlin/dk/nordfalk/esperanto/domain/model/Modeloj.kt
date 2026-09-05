@@ -43,12 +43,13 @@ data class Elsendo(
 )
 
 /**
- * Sonfonto — unuigas rekta ludado kaj podkast-ludado.
+ * Sonfonto — unuigas rekta ludado, podkast-ludado kaj eksterreta ludado.
  */
 @Serializable
 sealed interface Sonfonto {
     @Serializable data class RektaKanalo(val kanal: Kanal) : Sonfonto
     @Serializable data class ElsendoFonto(val elsendo: Elsendo) : Sonfonto
+    @Serializable data class LokaElsendo(val elsendo: Elsendo, val dosieroVojo: String) : Sonfonto
 }
 
 /**

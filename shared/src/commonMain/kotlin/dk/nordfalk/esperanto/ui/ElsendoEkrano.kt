@@ -18,6 +18,7 @@ fun ElsendoEkrano(
     elsendo: Elsendo,
     onReen: () -> Unit,
     onLudi: () -> Unit = {},
+    onElshuti: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -86,6 +87,16 @@ fun ElsendoEkrano(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("▶ Aŭskulti")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Elŝut-butono
+            OutlinedButton(
+                onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("⬇ Elŝuti")
             }
         }
     }

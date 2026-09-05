@@ -47,6 +47,7 @@ fun KanalaroEkrano(
     onKanal: (Kanal) -> Unit = {},
     onSercxo: () -> Unit = {},
     onPlejsatataj: () -> Unit = {},
+    onElshutoj: () -> Unit = {},
     onAgordoj: () -> Unit = {},
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
@@ -64,6 +65,7 @@ fun KanalaroEkrano(
                 actions = {
                     TextButton(onClick = { logi("Klako", "serĉo-butono"); onSercxo() }) { Text("🔍") }
                     TextButton(onClick = { logi("Klako", "plejŝatataj-butono"); onPlejsatataj() }) { Text("★") }
+                    TextButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Text("⬇") }
                     TextButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Text("⚙") }
                 }
             )

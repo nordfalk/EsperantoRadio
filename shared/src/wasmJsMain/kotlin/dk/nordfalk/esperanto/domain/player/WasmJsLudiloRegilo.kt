@@ -23,6 +23,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
         is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.LokaElsendo -> fonto.dosieroVojo  // wasmJs ne havas lokan dosier-sistemon
     }
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {

@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,6 +32,8 @@ class KanalaroViewModel(
         _sxargxas.value = true
         try {
             deponejo.getKanalojn()
+        } catch (e: Exception) {
+            loge("KanalaroViewModel", "Malsukcesis sargi kanalojn", e)
         } finally {
             _sxargxas.value = false
         }

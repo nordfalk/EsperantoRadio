@@ -69,7 +69,7 @@ class ElsendoDeponejoImpl(
             fluoj.getOrPut(kanal.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             elsendoj
         } catch (e: Exception) {
-            loge("ElsendoDeponejo", "${kanal.slug}: RSS-elŝuto malsukcesa: ${e::class.simpleName}: ${e.message}")
+            loge("ElsendoDeponejo", "${kanal.slug}: RSS-elŝuto malsukcesa", e)
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }

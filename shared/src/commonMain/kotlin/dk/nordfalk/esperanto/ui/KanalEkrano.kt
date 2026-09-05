@@ -15,6 +15,7 @@ import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -34,6 +35,8 @@ class KanalViewModel(
         try {
             val rezulto = elsendoDeponejo.sxargxiElsendojn(kanal)
             _elsendoj.value = rezulto
+        } catch (e: Exception) {
+            loge("KanalViewModel", "Malsukcesis sargi elsendojn por ${kanal.slug}", e)
         } finally {
             _sxargxas.value = false
         }

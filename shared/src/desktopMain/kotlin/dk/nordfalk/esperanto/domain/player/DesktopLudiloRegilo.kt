@@ -3,11 +3,6 @@ package dk.nordfalk.esperanto.domain.player
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import javafx.application.Platform
-import javafx.scene.media.Media
-import javafx.scene.media.MediaException
-import javafx.scene.media.MediaPlayer
-import javafx.util.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,12 +13,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.BufferedInputStream
+import java.net.URL
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioInputStream
+import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.FloatControl
+import javax.sound.sampled.SourceDataLine
 
 /**
- * Desktop-implemento de LudiloRegilo per JavaFX MediaPlayer.
+ * Desktop-implemento de LudiloRegilo per javax.sound.sampled + mp3spi.
  *
- * Subtenas MP3-fluadon super HTTP, seek, volumon kaj pozicion.
- * JavaFX Platform estas komencigita unufoje per Platform.startup().
+ * Pura Java MP3-fluado super HTTP — neniu nacia dependeco.
+ * mp3spi (com.googlecode.soundlibs:mp3spi) registrigas MP3-malkodilon
+ * cxe AudioSystem, kiu tiam povas legi MP3-fluojn kaj konverti ilin al PCM.
  *
  * Protokolado: cxiuj protokoloj iras al stderr (videbla en terminalo).
  */
@@ -32,23 +35,18 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var ludaJob: Job? = null
+    private var sourceDataLine: SourceDataLine? = null
+    private var audioInputStream: AudioInputStream? = null
     private var nunaFonto: Sonfonto? = null
-    private var atendataPozicioMs: Long = 0
+    private var volumeno: Float = 1.0f
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private var pozicioJob: Job? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    init {
-        log("Komencigas JavaFX-platformon")
-        try {
-            Platform.startup {
-                log("JavaFX-platformo pretas")
-            }
-        } catch (_: IllegalStateException) {
-            log("JavaFX-platformo jam komencigita")
-        }
-    }
+    @Volatile private var ludas = false
+    @Volatile private var pauxzita = false
+    @Volatile private var totalBytesLuditaj: Long = 0
+    private var pcmFormat: AudioFormat? = null
 
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
@@ -62,13 +60,10 @@ class DesktopLudiloRegilo : LudiloRegilo {
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         nunaFonto = fonto
-        atendataPozicioMs = komencoPozicioMs
-        pozicioJob?.cancel()
+        log("fiksiFonton: ${fontoNomo(fonto)}")
 
         val url = getStreamUrl(fonto)
-        log("fiksiFonton: ${fontoNomo(fonto)}")
         log("fiksiFonton: URL = $url")
-        log("fiksiFonton: komencoPozicioMs = $komencoPozicioMs")
 
         if (url.isBlank()) {
             log("fiksiFonton: ERARO — malplena sono-URL")
@@ -80,150 +75,194 @@ class DesktopLudiloRegilo : LudiloRegilo {
             return
         }
 
-        Platform.runLater {
-            log("fiksiFonton: disponigas antauxvan MediaPlayer")
-            mediaPlayer?.dispose()
+        halti()
 
+        try {
+            log("fiksiFonton: malfermas HTTP-fluon")
+            val rawStream = BufferedInputStream(URL(url).openStream())
+            log("fiksiFonton: akiras AudioInputStream")
+            val mp3Stream = AudioSystem.getAudioInputStream(rawStream)
+            audioInputStream = mp3Stream
+            log("fiksiFonton: MP3-formato = ${mp3Stream.format}")
+
+            // Konvertu al PCM por SourceDataLine
+            val baseFormat = mp3Stream.format
+            val decodedFormat = AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED,
+                baseFormat.sampleRate,
+                16,
+                baseFormat.channels,
+                baseFormat.channels * 2,
+                baseFormat.sampleRate,
+                false
+            )
+            log("fiksiFonton: PCM-formato = $decodedFormat")
+            val decodedStream = AudioSystem.getAudioInputStream(decodedFormat, mp3Stream)
+            audioInputStream = decodedStream
+            pcmFormat = decodedFormat
+
+            // Krei SourceDataLine
+            log("fiksiFonton: kreas SourceDataLine")
+            val line = AudioSystem.getSourceDataLine(decodedFormat)
+            line.open(decodedFormat)
+            sourceDataLine = line
+            log("fiksiFonton: SourceDataLine pretas, buffer = ${line.bufferSize} bytes")
+
+            // Volumo
             try {
-                log("fiksiFonton: kreas Media(url)")
-                val media = Media(url)
-                log("fiksiFonton: kreas MediaPlayer(media)")
-                val player = MediaPlayer(media)
-                mediaPlayer = player
-                log("fiksiFonton: MediaPlayer kreita sukcese")
+                val ctrl = line.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
+                val min = ctrl.minimum
+                val max = ctrl.maximum
+                val gain = min + (max - min) * volumeno
+                ctrl.value = gain
+                log("fiksiFonton: volumo = $volumeno (gain=${gain}dB, range=$min..$max)")
+            } catch (e: Exception) {
+                log("fiksiFonton: ne eblis agordi volumon: ${e.message}")
+            }
 
-                player.statusProperty().addListener { _, oldStatus, status ->
-                    log("statuso: $oldStatus -> $status")
-                    val novaStato = when (status) {
-                        MediaPlayer.Status.READY -> {
-                            log("statuso READY: dauro = ${player.totalDuration}")
-                            if (atendataPozicioMs > 0 && nunaFonto !is Sonfonto.RektaKanalo) {
-                                log("statuso READY: seek al ${atendataPozicioMs}ms")
-                                player.seek(Duration.millis(atendataPozicioMs.toDouble()))
-                            }
-                            LudantoStato.Konektas
-                        }
-                        MediaPlayer.Status.PLAYING -> LudantoStato.Ludas
-                        MediaPlayer.Status.PAUSED -> LudantoStato.Haltita
-                        MediaPlayer.Status.STOPPED -> LudantoStato.Haltita
-                        MediaPlayer.Status.HALTED -> {
-                            log("statuso HALTED — MediaPlayer eraro: ${player.error}")
-                            LudantoStato.Eraro("JavaFX-ludilo haltis: ${player.error?.message}")
-                        }
-                        MediaPlayer.Status.DISPOSED -> LudantoStato.Haltita
-                        MediaPlayer.Status.STALLED -> LudantoStato.Konektas
-                        MediaPlayer.Status.UNKNOWN -> LudantoStato.Konektas
-                        else -> LudantoStato.Konektas
-                    }
-                    _stato.value = _stato.value.copy(stato = novaStato)
-                }
-
-                player.totalDurationProperty().addListener { _, _, duration ->
-                    val dauroMs = duration.toMillis()
-                    log("dauro aktualigita: $duration (${dauroMs}ms)")
-                    if (!dauroMs.isNaN() && !dauroMs.isInfinite()) {
-                        _stato.value = _stato.value.copy(dauroMs = dauroMs.toLong())
-                    }
-                }
-
-                player.setOnError {
-                    val err = player.error
-                    log("=== MediaPlayer.onError ===")
-                    log("eraro: $err")
-                    log("eraro.type: ${err?.type}")
-                    log("eraro.message: ${err?.message}")
-                    log("eraro.cause: ${err?.cause}")
-                    if (err is MediaException) {
-                        log("eraro.MediaException.type: ${err.type}")
-                        log("eraro.MediaException.message: ${err.message}")
-                    }
-                    log("=== fino de eraro ===")
-                    _stato.value = _stato.value.copy(
-                        stato = LudantoStato.Eraro(err?.message ?: "JavaFX-ludila eraro")
-                    )
-                }
-
+            // Dauro
+            val frameLength = decodedStream.frameLength
+            if (frameLength > 0) {
+                val dauroMs = (frameLength * 1000L / decodedFormat.sampleRate.toLong())
+                log("fiksiFonton: dauro = ${dauroMs}ms ($frameLength kadroj)")
                 _stato.value = LudantoInformo(
-                    stato = LudantoStato.Konektas,
+                    stato = LudantoStato.Haltita,
                     nunaFonto = fonto,
                     pozicioMs = komencoPozicioMs,
-                    dauroMs = 0,
+                    dauroMs = dauroMs,
                     estasRekta = fonto is Sonfonto.RektaKanalo
                 )
-                log("fiksiFonton: stato = Konektas, atendas statuson READY")
-            } catch (e: Exception) {
-                log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
-                log("fiksiFonton: stack-trace:")
-                e.printStackTrace(System.err)
-                _stato.value = _stato.value.copy(
-                    stato = LudantoStato.Eraro("Ne eblis sxargxi: ${e.message}")
+            } else {
+                log("fiksiFonton: dauro nekonata (streaming)")
+                _stato.value = LudantoInformo(
+                    stato = LudantoStato.Haltita,
+                    nunaFonto = fonto,
+                    pozicioMs = komencoPozicioMs,
+                    dauroMs = if (fonto is Sonfonto.ElsendoFonto) (fonto.elsendo.dauro ?: 0L) * 1000 else 0,
+                    estasRekta = fonto is Sonfonto.RektaKanalo
                 )
             }
+
+            log("fiksiFonton: bone — preta por ludi")
+        } catch (e: Exception) {
+            log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
+            e.printStackTrace(System.err)
+            _stato.value = _stato.value.copy(
+                stato = LudantoStato.Eraro("Ne eblis sxargxi: ${e.message}")
+            )
         }
     }
 
-    private fun komenciPoziciSekvadon() {
-        pozicioJob?.cancel()
-        pozicioJob = scope.launch {
-            while (isActive) {
-                delay(500)
-                val mp = mediaPlayer ?: continue
-                Platform.runLater {
-                    val pos = mp.currentTime.toMillis()
-                    if (!pos.isNaN() && !pos.isInfinite()) {
-                        _stato.value = _stato.value.copy(pozicioMs = pos.toLong())
-                    }
+    private fun komenciLudadon() {
+        ludaJob?.cancel()
+        ludaJob = scope.launch {
+            val line = sourceDataLine ?: return@launch
+            val stream = audioInputStream ?: return@launch
+            val format = pcmFormat ?: return@launch
+
+            line.start()
+            log("ludi: SourceDataLine.start()")
+
+            val buffer = ByteArray(4096)
+            totalBytesLuditaj = 0L
+
+            while (isActive && ludas) {
+                if (pauxzita) {
+                    delay(50)
+                    continue
                 }
+                val read = try {
+                    stream.read(buffer)
+                } catch (e: Exception) {
+                    log("ludi: eraro legante fluon: ${e.message}")
+                    -1
+                }
+                if (read <= 0) {
+                    log("ludi: fino de fluo (read=$read)")
+                    break
+                }
+                line.write(buffer, 0, read)
+                totalBytesLuditaj += read
+
+                // Aktualigu pozicion
+                val pozicioMs = (totalBytesLuditaj * 1000L) /
+                    (format.sampleRate.toLong() * format.channels * (format.sampleSizeInBits / 8))
+                _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
+            }
+
+            line.drain()
+            line.stop()
+            log("ludi: SourceDataLine haltigita")
+            if (ludas) {
+                // Fino de fluo — naturfino
+                ludas = false
+                _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
             }
         }
     }
 
     override fun ludi() {
         log("ludi()")
-        Platform.runLater {
-            val mp = mediaPlayer
-            if (mp == null) {
-                log("ludi: ERARO — mediaPlayer estas null")
-                return@runLater
-            }
-            log("ludi: vokas mediaPlayer.play()")
-            mp.play()
-            komenciPoziciSekvadon()
+        val line = sourceDataLine
+        val stream = audioInputStream
+        if (line == null || stream == null) {
+            log("ludi: ERARO — sourceDataLine aü audioInputStream estas null")
+            return
         }
+        ludas = true
+        pauxzita = false
+        _stato.value = _stato.value.copy(stato = LudantoStato.Ludas)
+        komenciLudadon()
     }
 
     override fun pauxzigi() {
         log("pauxzigi()")
-        pozicioJob?.cancel()
-        Platform.runLater {
-            mediaPlayer?.pause()
-        }
+        pauxzita = true
+        sourceDataLine?.stop()
+        _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
     }
 
     override fun halti() {
         log("halti()")
-        pozicioJob?.cancel()
-        Platform.runLater {
-            mediaPlayer?.stop()
-            mediaPlayer?.dispose()
-            mediaPlayer = null
+        ludas = false
+        pauxzita = false
+        ludaJob?.cancel()
+        ludaJob = null
+        try {
+            sourceDataLine?.stop()
+            sourceDataLine?.close()
+        } catch (e: Exception) {
+            log("halti: eraro fermante line: ${e.message}")
         }
+        try {
+            audioInputStream?.close()
+        } catch (e: Exception) {
+            log("halti: eraro fermante stream: ${e.message}")
+        }
+        sourceDataLine = null
+        audioInputStream = null
         nunaFonto = null
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
 
     override fun saltiAl(pozicioMs: Long) {
-        log("saltiAl($pozicioMs ms)")
-        Platform.runLater {
-            mediaPlayer?.seek(Duration.millis(pozicioMs.toDouble()))
-        }
+        log("saltiAl($pozicioMs ms) — ne implementita por mp3spi (streaming)")
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
     }
 
     override fun fiksiLauxtecon(volumeno: Float) {
-        log("fiksiLauxtecon($volumeno)")
-        Platform.runLater {
-            mediaPlayer?.volume = volumeno.coerceIn(0f, 1f).toDouble()
+        val v = volumeno.coerceIn(0f, 1f)
+        this.volumeno = v
+        log("fiksiLauxtecon($v)")
+        try {
+            val line = sourceDataLine ?: return
+            val ctrl = line.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
+            val min = ctrl.minimum
+            val max = ctrl.maximum
+            ctrl.value = min + (max - min) * v
+            log("fiksiLauxtecon: gain=${ctrl.value}dB")
+        } catch (e: Exception) {
+            log("fiksiLauxtecon: ne eblis: ${e.message}")
         }
     }
 

@@ -132,19 +132,24 @@ EsperantoRadio/
     por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
   - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
     Compose 1.10.0 — tro nova por nia Kotlin 2.1.0 / Compose 1.7.3. Ankaŭ bezonas VLC sur Desktop.
-  - **JavaFX MediaPlayer** estis elektita: subtenas HTTP-fluadon, seek, volumon, pozicion.
-    Necesas `org.openjfx:javafx-media:17.0.13` kun `:linux`-klasifikilo (Gradle ne aktivigas
-    Maven-profilojn, do oni devas specifi la klasifikilon eksplicite). `Platform.startup()`
-    komencigas la JavaFX-fadeno; ĉiuj MediaPlayer-vokoj devas esti en `Platform.runLater { }`.
+  - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
+    kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
+    `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
+    estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
+  - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
+    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
+    Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
+    `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
+    pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
 - **Platforma subteno — sonludado**:
 
   | Funkcio | Android | Desktop (JVM) | Web (wasmJs) | iOS |
   |---|:--:|:--:|:--:|:--:|
-  | MP3-fluado | ExoPlayer | JavaFX MediaPlayer | HTMLAudioElement | no-op |
-  | HLS | ExoPlayer | JavaFX (ĉu?) | retumilo | no-op |
-  | Seek | ExoPlayer | JavaFX MediaPlayer | HTMLAudioElement | no-op |
-  | Volumo | ExoPlayer | JavaFX MediaPlayer | HTMLAudioElement | no-op |
-  | Pozicio-sekvado | ExoPlayer | korutino (500ms) | eventlistener | no-op |
+  | MP3-fluado | ExoPlayer | mp3spi + SourceDataLine | HTMLAudioElement | no-op |
+  | HLS | ExoPlayer | ne | retumilo | no-op |
+  | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
+  | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
+  | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
 
 ## Konstru-komandoj
 

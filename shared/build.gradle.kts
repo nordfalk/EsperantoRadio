@@ -69,13 +69,8 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.multiplatform.settings.jvm)
-                // JavaFX MediaPlayer por sonludado — classes + platform-native
-                // Gradle ne aktivigas Maven-profilojn, do oni devas specifi la klasifikilon
-                implementation("org.openjfx:javafx-media:${libs.versions.javafx.get()}")
-                implementation("org.openjfx:javafx-media:${libs.versions.javafx.get()}:linux")
-                implementation("org.openjfx:javafx-graphics:${libs.versions.javafx.get()}")
-                implementation("org.openjfx:javafx-graphics:${libs.versions.javafx.get()}:linux")
-                implementation("org.openjfx:javafx-base:${libs.versions.javafx.get()}:linux")
+                // mp3spi — pura Java MP3-malkodado por javax.sound.sampled (neniu nacia dependeco)
+                implementation(libs.mp3spi)
             }
         }
     }

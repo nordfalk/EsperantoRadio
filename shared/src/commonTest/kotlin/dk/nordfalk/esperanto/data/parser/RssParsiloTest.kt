@@ -327,4 +327,176 @@ class RssParsiloTest {
         assertEquals(1, elsendoj.size)
         assertEquals(3077L, elsendoj[0].dauro)
     }
+
+    // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
+
+    @Test
+    fun parsasPeranton() {
+        val fluo = leguFiksaĵon("peranto_feed.xml")
+        val kanal = Kanal(
+            slug = "peranto",
+            nomo = "Esperanta Retradio",
+            podkastaRssUrl = "https://esperantaretradio.blogspot.com/feeds/posts/default",
+            ignoruTitolon = true,
+        )
+
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertTrue(elsendoj.isNotEmpty(), "Peranto devas havi elsendojn")
+        println("Peranto: ${elsendoj.size} elsendoj")
+
+        // Ĉiuj stream-oj devas esti archive.org/download/...mp3
+        for (e in elsendoj) {
+            assertTrue(e.stream.contains("archive.org/download/"), "Stream devas enhavi archive.org/download/: ${e.stream}")
+            assertTrue(e.stream.endsWith(".mp3"), "Stream devas finii per .mp3: ${e.stream}")
+            assertTrue(e.id.startsWith("peranto:"), "ID devas komenciĝi per 'peranto:': ${e.id}")
+            assertTrue(e.dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}")), "Dato: ${e.dato}")
+        }
+    }
+
+    @Test
+    fun perantoArchiveOrgRekonstruasMallonganUrlon() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Seksismo sabotas gruplaboron</title>
+                <published>2025-05-03T08:00:00.001+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/seksismo_sabotas&quot;&gt;&lt;/iframe&gt;</content>
+                <link rel="alternate" href="https://esperantaretradio.blogspot.com/2025/05/seksismo-sabotas-gruplaboron.html"/>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(1, elsendoj.size)
+        assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].stream)
+        assertEquals("peranto:2025-05-03", elsendoj[0].id)
+    }
+
+    @Test
+    fun perantoKorektasOrkestroSkavidojj() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Test</title>
+                <published>2020-01-01T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/orkestro_sklavidojj&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(1, elsendoj.size)
+        assertEquals("https://archive.org/download/orkestro_sklavidoj/orkestro_sklavidoj.mp3", elsendoj[0].stream)
+    }
+
+    @Test
+    fun perantoRekonstruasGoogleDriveUrlon() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Test</title>
+                <published>2020-06-15T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://drive.google.com/file/d/1ABC123XYZ/view&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(1, elsendoj.size)
+        assertEquals("https://drive.google.com/u/1/uc?id=1ABC123XYZ&export=download", elsendoj[0].stream)
+    }
+
+    @Test
+    fun perantoSaltasNesubtenatajnGastigantojn() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>YouTube</title>
+                <published>2020-01-01T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://www.youtube.com/embed/dQw4w9WgXcQ&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+              <entry>
+                <title>SoundCloud</title>
+                <published>2020-01-02T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://w.soundcloud.com/player/?url=xyz&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+              <entry>
+                <title>Vimeo</title>
+                <published>2020-01-03T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://vimeo.com/12345&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+              <entry>
+                <title>Bona</title>
+                <published>2020-01-04T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/bona&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(1, elsendoj.size, "Nur archive.org-ero devas resti")
+        assertEquals("Bona", elsendoj[0].titolo)
+    }
+
+    @Test
+    fun perantoSaltasKonatajnMalplenajnDatojn() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Malplena1</title>
+                <published>2019-11-08T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/xxx&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+              <entry>
+                <title>Malplena2</title>
+                <published>2019-09-29T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/yyy&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+              <entry>
+                <title>Bona</title>
+                <published>2020-01-04T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/bona&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(1, elsendoj.size, "Malplenaj datoj devas esti saltitaj")
+        assertEquals("Bona", elsendoj[0].titolo)
+    }
+
+    @Test
+    fun perantoSenIframeEstasSaltita() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Sen iframe</title>
+                <published>2020-01-01T08:00:00.000+02:00</published>
+                <content type='html'>Neniu iframe ĉi tie</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsRss(fluo, kanal)
+
+        assertEquals(0, elsendoj.size, "Ero sen iframe devas esti saltita")
+    }
 }

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.logw
 
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
@@ -173,7 +174,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 etikedo = etikedo.ifBlank { null }
             ))
         } catch (e: Exception) {
-            // Saltu eraran eron
+            logw("AlarmoSugestoj", "Ne eblis parsii alarmon cxe indekso $i", e)
         }
         i += 8
     }

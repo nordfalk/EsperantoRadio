@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,50 +27,81 @@ fun AlarmoEkrano(
 ) {
     val alarmoj by alarmoDeponejo.observiAlarmojn().collectAsState()
     val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
-    var montriKreilon by remember { mutableStateOf(false) }
+    var redaktoModo by remember { mutableStateOf<Alarmo?>(null) } // null = listo, ne-null = redakti cxi tiun
+    var kreiModo by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("⏰ Vekhorloĝo (${alarmoj.size})") },
-                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (AlarmoEkrano)"); onReen() }) { Text("← Reen") } },
+                navigationIcon = {
+                    TextButton(onClick = {
+                        logi("Klako", "reen (AlarmoEkrano)")
+                        if (redaktoModo != null) redaktoModo = null
+                        else if (kreiModo) kreiModo = false
+                        else onReen()
+                    }) { Text("← Reen") }
+                },
                 actions = {
-                    TextButton(onClick = { logi("Klako", "nova alarmo"); montriKreilon = true }) { Text("+") }
+                    if (redaktoModo == null && !kreiModo) {
+                        TextButton(onClick = { logi("Klako", "nova alarmo"); kreiModo = true }) { Text("+") }
+                    }
                 }
             )
         }
     ) { padding ->
-        if (montriKreilon) {
-            AlarmoKreilo(
-                kanaloj = kanaloj,
-                onKrei = { alarmo ->
-                    logi("Klako", "konfirmu novan alarmon")
-                    scope.launch { alarmoDeponejo.krei(alarmo) }
-                    montriKreilon = false
-                },
-                onNuligi = { montriKreilon = false }
-            )
-        } else if (alarmoj.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Neniu alarmo. Premu + por krei.")
+        when {
+            redaktoModo != null -> {
+                AlarmoRedaktilo(
+                    kanaloj = kanaloj,
+                    ekzistanta = redaktoModo!!,
+                    onKonfirmi = { alarmo ->
+                        logi("Klako", "konfirmu redaktadon de alarmo ${alarmo.id}")
+                        scope.launch { alarmoDeponejo.ghisdatigi(alarmo) }
+                        redaktoModo = null
+                    },
+                    onNuligi = { redaktoModo = null }
+                )
             }
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
-                items(alarmoj) { alarmo ->
-                    AlarmoEro(
-                        alarmo = alarmo,
-                        kanalNomo = kanaloj.find { it.slug == alarmo.kanalSlug }?.nomo ?: alarmo.kanalSlug,
-                        onBaskuli = {
-                            logi("Klako", "baskuligu alarmon ${alarmo.id}")
-                            scope.launch { alarmoDeponejo.baskuliAktivon(alarmo.id) }
-                        },
-                        onForigi = {
-                            logi("Klako", "forigu alarmon ${alarmo.id}")
-                            scope.launch { alarmoDeponejo.forigi(alarmo.id) }
-                        }
-                    )
-                    HorizontalDivider()
+            kreiModo -> {
+                AlarmoRedaktilo(
+                    kanaloj = kanaloj,
+                    ekzistanta = null,
+                    onKonfirmi = { alarmo ->
+                        logi("Klako", "konfirmu novan alarmon")
+                        scope.launch { alarmoDeponejo.krei(alarmo) }
+                        kreiModo = false
+                    },
+                    onNuligi = { kreiModo = false }
+                )
+            }
+            alarmoj.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    Text("Neniu alarmo. Premu + por krei.")
+                }
+            }
+            else -> {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    items(alarmoj) { alarmo ->
+                        AlarmoEro(
+                            alarmo = alarmo,
+                            kanalNomo = kanaloj.find { it.slug == alarmo.kanalSlug }?.nomo ?: alarmo.kanalSlug,
+                            onBaskuli = {
+                                logi("Klako", "baskuligu alarmon ${alarmo.id}")
+                                scope.launch { alarmoDeponejo.baskuliAktivon(alarmo.id) }
+                            },
+                            onForigi = {
+                                logi("Klako", "forigu alarmon ${alarmo.id}")
+                                scope.launch { alarmoDeponejo.forigi(alarmo.id) }
+                            },
+                            onRedakti = {
+                                logi("Klako", "redakti alarmon ${alarmo.id}")
+                                redaktoModo = alarmo
+                            }
+                        )
+                        HorizontalDivider()
+                    }
                 }
             }
         }
@@ -82,11 +114,15 @@ private fun AlarmoEro(
     kanalNomo: String,
     onBaskuli: () -> Unit,
     onForigi: () -> Unit,
+    onRedakti: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text(alarmo.tempoTeksto, style = MaterialTheme.typography.headlineMedium) },
+        headlineContent = {
+            Text(alarmo.tempoTeksto, style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.clickable { onRedakti() })
+        },
         supportingContent = {
-            Column {
+            Column(modifier = Modifier.clickable { onRedakti() }) {
                 Text(kanalNomo)
                 if (!alarmo.etikedo.isNullOrBlank()) {
                     Text(alarmo.etikedo!!, style = MaterialTheme.typography.bodySmall)
@@ -103,16 +139,21 @@ private fun AlarmoEro(
     )
 }
 
+/**
+ * Redaktilo por krei novan aü redakti ekzistantan alarmon.
+ * Se ekzistanta != null, la kampoj estas antaüplenigitaj kaj la butono diras "Konservi".
+ */
 @Composable
-private fun AlarmoKreilo(
+private fun AlarmoRedaktilo(
     kanaloj: List<Kanal>,
-    onKrei: (Alarmo) -> Unit,
+    ekzistanta: Alarmo?,
+    onKonfirmi: (Alarmo) -> Unit,
     onNuligi: () -> Unit,
 ) {
-    var horo by remember { mutableStateOf(6) }
-    var minuto by remember { mutableStateOf(0) }
-    var elektitaKanalSlug by remember { mutableStateOf(kanaloj.firstOrNull()?.slug ?: "") }
-    var ripeto by remember { mutableStateOf(0x7f) } // cxiutage
+    var horo by remember { mutableStateOf(ekzistanta?.horo ?: 6) }
+    var minuto by remember { mutableStateOf(ekzistanta?.minuto ?: 0) }
+    var elektitaKanalSlug by remember { mutableStateOf(ekzistanta?.kanalSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
+    var ripeto by remember { mutableStateOf(ekzistanta?.ripeto ?: 0x7f) }
 
     Column(
         modifier = Modifier
@@ -120,10 +161,12 @@ private fun AlarmoKreilo(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Text("Nova alarmo", style = MaterialTheme.typography.titleLarge)
+        Text(
+            if (ekzistanta != null) "Redakti alarmon" else "Nova alarmo",
+            style = MaterialTheme.typography.titleLarge
+        )
         Spacer(Modifier.height(16.dp))
 
-        // Tempo
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Tempo: ")
             OutlinedTextField(
@@ -142,7 +185,6 @@ private fun AlarmoKreilo(
         }
         Spacer(Modifier.height(16.dp))
 
-        // Kanal — rulebla listo
         Text("Kanalo:")
         LazyColumn(
             modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
@@ -159,7 +201,6 @@ private fun AlarmoKreilo(
         }
         Spacer(Modifier.height(16.dp))
 
-        // Ripeto
         Text("Ripeto:")
         Row {
             val tagoj = listOf("Lu" to 0x01, "Ma" to 0x02, "Me" to 0x04, "Ja" to 0x08, "Ve" to 0x10, "Sa" to 0x20, "Di" to 0x40)
@@ -174,18 +215,17 @@ private fun AlarmoKreilo(
         }
         Spacer(Modifier.height(24.dp))
 
-        // Butonoj
         Row {
             Button(onClick = {
-                onKrei(Alarmo(
-                    id = 0,
+                onKonfirmi(Alarmo(
+                    id = ekzistanta?.id ?: 0,
                     horo = horo,
                     minuto = minuto,
                     ripeto = ripeto,
                     kanalSlug = elektitaKanalSlug,
-                    aktiva = true
+                    aktiva = ekzistanta?.aktiva ?: true
                 ))
-            }) { Text("Krei") }
+            }) { Text(if (ekzistanta != null) "Konservi" else "Krei") }
             Spacer(Modifier.width(8.dp))
             OutlinedButton(onClick = onNuligi) { Text("Nuligi") }
         }

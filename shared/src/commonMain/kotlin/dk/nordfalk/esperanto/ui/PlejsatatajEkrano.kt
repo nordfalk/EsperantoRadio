@@ -44,7 +44,7 @@ fun PlejsatatajEkrano(
                         supportingContent = { Text(if (kanal.estasRekta) "Rekta elsendo" else "Podkasto") },
                         modifier = Modifier.clickable { logi("Klako", "plejŝatata kanal ${kanal.slug}"); onKanal(kanal) }
                     )
-                    HorizontalDivider()
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }

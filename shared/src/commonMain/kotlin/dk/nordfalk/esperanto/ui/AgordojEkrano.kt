@@ -54,7 +54,7 @@ fun AgordojEkrano(
                     )
                 }
             )
-            Divider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }

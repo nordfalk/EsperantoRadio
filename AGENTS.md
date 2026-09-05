@@ -24,11 +24,12 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
 | 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
 | 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + 13 golden-testoj | ✅ Farita | #7 |
-| 1c | Kanalvido (elsendlisto) + elsendodetalo en UI + Ktor-kliento | 🔨 Nuna | — |
-| 1d | Peranto-parsilo (archive.org-skrapado, Google Drive) | Planita | — |
-| 2 | Ludado (LudiloRegilo, Media3/AVPlayer, mini-ludilbreto) | Planita | — |
-| 3 | Personigo (plejŝatataj, lastaŭskultitaj, serĉo, agordoj) | Planita | — |
-| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) | Planita | — |
+| 1c | Kanalvido (elsendlisto) + elsendodetalo + Ktor + Coil 3 | ✅ Farita | #9 |
+| 1d | Peranto-parsilo (archive.org + Google Drive, regulo 6.3) | ✅ Farita | #10 |
+| 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
+| 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
+| — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
+| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | 🔨 Nuna | — |
 | 5 | Elŝutoj | Planita | — |
 | 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | Planita | — |
 
@@ -36,17 +37,22 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 
 - **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
 - **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
-- **Nova apo — RSS-parsilo**: parsas Kernpunkto, Varsovia Vento, Vinilkosmo, kaj ĉiujn ĝeneralajn kanalojn
-- **Testoj**: 27 testoj (5 JSONC + 8 modeloj + 13 RSS + 1 UI), ĉiuj pasas sur Desktop
+- **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregolojn (inkl. Peranto/archive.org)
+- **Nova apo — ludado**: vera sonludado sur Android per Media3 ExoPlayer (MP3 + HLS)
+- **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + agordoj
+- **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
+- **Testoj**: 41 testoj (37 KMP sur Desktop + 4 Android sur emulatoro), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 
 ### Kio NE funkcias ankoraŭ
 
-- Peranto (Esperanta Retradio) — iframe/archive.org-skrapado (regulo 6.3) estas TODO
-- Ludado (neniu sono en la nova apo ankoraŭ)
-- Ktor-kliento por defora elŝuto (la parsilo estas pura, sen reto)
-- iOS (bezonas macOS/Xcode)
-- Coil 3 por emblemoj (ne aldonita)
+- Persisto de plejŝatataj/agordoj (en-memoraj, perdiĝas je restarto)
+- Malfona ludado (MediaSession, sciigoj) — ExoPlayer ne release()-ita en onDestroy
+- Desktop-ludado (no-op, neniu sono)
+- iOS-ludado (no-op, bezonas AVPlayer)
+- Web-ludado (no-op, bezonas HTMLAudioElement)
+- Elŝutoj (eksterreta reĝimo)
+- Vekhorloĝo, hejmekrana widget, Chromecast, talesyntezo
 
 ## Granda plano
 

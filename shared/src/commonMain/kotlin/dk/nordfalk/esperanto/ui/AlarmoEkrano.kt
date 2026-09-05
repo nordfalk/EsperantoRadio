@@ -15,6 +15,7 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.data.repository.subtenasVekhorlogxn
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 
@@ -77,12 +78,34 @@ fun AlarmoEkrano(
                 )
             }
             alarmoj.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Text("Neniu alarmo. Premu + por krei.")
+                    if (!subtenasVekhorlogxn) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "ℹ Alarmoj funkcias nur sur Android-telefonoj.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
             else -> {
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    if (!subtenasVekhorlogxn) {
+                        item {
+                            Text(
+                                "ℹ Alarmoj funkcias nur sur Android-telefonoj. Sur ĉi tiu platformo vi povas nur agordi ilin.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                    }
                     items(alarmoj) { alarmo ->
                         AlarmoEro(
                             alarmo = alarmo,

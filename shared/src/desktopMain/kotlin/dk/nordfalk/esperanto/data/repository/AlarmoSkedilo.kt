@@ -16,3 +16,4 @@ actual class AlarmoSkedilo actual constructor() {
         logd("AlarmoSkedilo", "reskediCxiujn (NoOp): ${alarmoj.size} alarmoj")
     }
 }
+actual val subtenasVekhorlogxn: Boolean = false

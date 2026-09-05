@@ -17,3 +17,10 @@ expect class AlarmoSkedilo() {
     /** Re-planas cxiujn aktivajn alarmojn (ekz. post boot). */
     fun reskediCxiujn(alarmoj: List<Alarmo>)
 }
+
+/**
+ * Cxu cxi tiu platformo vere subtenas vekhorlogxon (vekigas la aparaton).
+ * - Android: true (AlarmManager)
+ * - Desktop/wasmJs/iOS: false (nur UI, ne vere vekas)
+ */
+expect val subtenasVekhorlogxn: Boolean

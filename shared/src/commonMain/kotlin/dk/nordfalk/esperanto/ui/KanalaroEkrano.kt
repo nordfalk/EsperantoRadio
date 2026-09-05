@@ -41,6 +41,9 @@ class KanalaroViewModel(
 fun KanalaroEkrano(
     viewModel: KanalaroViewModel,
     onKanal: (Kanal) -> Unit = {},
+    onSercxo: () -> Unit = {},
+    onPlejsatataj: () -> Unit = {},
+    onAgordoj: () -> Unit = {},
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
@@ -52,7 +55,14 @@ fun KanalaroEkrano(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("EsperantoRadio") })
+            TopAppBar(
+                title = { Text("EsperantoRadio") },
+                actions = {
+                    TextButton(onClick = onSercxo) { Text("🔍") }
+                    TextButton(onClick = onPlejsatataj) { Text("★") }
+                    TextButton(onClick = onAgordoj) { Text("⚙") }
+                }
+            )
         }
     ) { padding ->
         if (sxargxas && kanaloj.isEmpty()) {

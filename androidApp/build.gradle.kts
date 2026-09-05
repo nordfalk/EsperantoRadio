@@ -19,13 +19,14 @@ kotlin {
             implementation(project(":shared"))
             implementation(libs.androidx.activity.compose)
             implementation(compose.material3)
+            implementation(libs.androidx.media3.exoplayer)
         }
     }
 }
 
 android {
     namespace = "dk.nordfalk.esperanto.android"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "dk.nordfalk.esperanto.android"

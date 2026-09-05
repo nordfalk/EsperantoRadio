@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,7 @@ fun KanalEkrano(
     elsendoDeponejo: ElsendoDeponejoImpl,
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
+    onLudi: (Sonfonto) -> Unit = {},
 ) {
     val viewModel = remember(kanal.slug) { KanalViewModel(kanal, elsendoDeponejo) }
     val elsendoj by viewModel.elsendoj.collectAsState()
@@ -93,7 +95,7 @@ fun KanalEkrano(
                         ListItem(
                             headlineContent = { Text("Aŭskulti rekte") },
                             leadingContent = { Text("▶", style = MaterialTheme.typography.headlineMedium) },
-                            modifier = Modifier.clickable { /* TODO: Ludilo */ }
+                            modifier = Modifier.clickable { onLudi(Sonfonto.RektaKanalo(kanal)) }
                         )
                         HorizontalDivider()
                     }

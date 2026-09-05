@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +46,7 @@ class KanalaroViewModel(
 fun KanalaroEkrano(
     viewModel: KanalaroViewModel,
     onKanal: (Kanal) -> Unit = {},
+    onLudi: (Sonfonto) -> Unit = {},
     onSercxo: () -> Unit = {},
     onPlejsatataj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
@@ -86,7 +88,13 @@ fun KanalaroEkrano(
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(kanaloj, key = { it.slug }) { kanal ->
-                    KanalEro(kanal = kanal, onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) })
+                    KanalEro(
+                        kanal = kanal,
+                        onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) },
+                        onLudi = if (kanal.havasPodkastojn || kanal.estasRekta) {
+                            { logi("Klako", "ludi ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) }
+                        } else null
+                    )
                 }
             }
         }
@@ -97,6 +105,7 @@ fun KanalaroEkrano(
 private fun KanalEro(
     kanal: Kanal,
     onClick: () -> Unit,
+    onLudi: (() -> Unit)? = null,
 ) {
     ListItem(
         headlineContent = { Text(kanal.nomo) },
@@ -123,6 +132,11 @@ private fun KanalEro(
                 ) {
                     Text(kanal.nomo.take(2))
                 }
+            }
+        },
+        trailingContent = {
+            if (onLudi != null) {
+                TextButton(onClick = onLudi) { Text("▶") }
             }
         },
         modifier = Modifier.clickable(onClick = onClick)

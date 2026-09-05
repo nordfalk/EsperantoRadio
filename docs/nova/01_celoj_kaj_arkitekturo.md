@@ -131,16 +131,20 @@ EsperantoRadio/
 
 ## Faza koureplano
 
-### Fazo 0 — Fundamento
-- Konstrui CMP-projekton (`shared` + 4 celoj), versikatalogo, ĉiuj celoj kompilas "Saluton".
-- Porti datenmodelon al Kotlin `@Serializable`. Agordi Ktor, kotlinx.serialization, Coil.
-- Enmeti `esperantoradio_kanaloj_v9.json` kiel bundled asset + defora elŝuto.
+### Fazoj 0–1b — Faritaj ✅
 
-### Fazoj 1–3 — MVP (kerno)
-- **Fazo 1 — Datumoj & foliumado** (nur legado): `KanalDeponejo` (JSON) + kanalaro
-  (Compose, emblemoj per Coil). `ElsendoDeponejo` + RSS-parsilo (komuna, ksoup)
-  por vivantaj kanaloj + radio.txt-rezervo. Kanalvido (`LazyColumn` + gluaj
-  dat-kapoj) kaj elsendodetalo (sen ludado ankoraŭ).
+- **Fazo 0 — Fundamento** ✅ (PR #5): KMP-strukturo (`shared` + androidApp + desktopApp + webApp),
+  versikatalogo, ĉiuj celoj kompilas "Saluton". JSONC-leganto + kanalkonfiguro kiel bundled resource.
+- **Fazo 1a — Domajnmodeloj kaj kanalaro** ✅ (PR #6): `Kanal`, `Elsendo`, `Sonfonto` modeloj,
+  `KanalDeponejo` interfaco + implementaĵo, `KanalaroEkrano` (Compose UI), 14 testoj.
+- **Fazo 1b — RSS-parsilo** ✅ (PR #7): `RssParsilo` kun reguloj 6.1 (ĝenerala), 6.2 (Varsovia Vento),
+  6.4 (Vinilkosmo), 6.5 (titol-derivado), 6.6 (HTML-purigado), 6.7 (paĝigo). 13 golden-testoj
+  kontraŭ realaj fiksaĵoj el `RssArkivServer-filcache/`. 27 testoj totalo.
+
+### Fazoj 1c–3 — MVP (kerno, restanta)
+- **Fazo 1c — Kanalvido + Ktor**: Kanalvido (`LazyColumn` + gluaj dat-kapoj) kaj elsendodetalo
+  (sen ludado ankoraŭ). Ktor-kliento (CIO-motoro) por defora elŝuto de RSS-fluoj. Coil 3 por emblemoj.
+- **Fazo 1d — Peranto**: archive.org-embed-skrapado, Google Drive-rekonstruo (regulo 6.3).
 - **Fazo 2 — Ludado**: `LudiloRegilo` (expect/actual): Android (Media3) + Desktop
   (VLCJ) unue, poste iOS (AVPlayer), poste Web (`HTMLAudioElement`). Mini-ludilbreto,
   serĉbreto, ludi/paŭzi/antaŭa/sekva. Livestream (Muzaiko) + podkastoj. Live

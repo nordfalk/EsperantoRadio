@@ -41,7 +41,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private var nunaFonto: Sonfonto? = null
     private var atendataPozicioMs: Long = 0
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var pozicioJob: Job? = null
 
     init {

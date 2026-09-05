@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+            implementation(libs.multiplatform.settings)
         }
 
         commonTest.dependencies {
@@ -67,6 +68,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation(libs.multiplatform.settings.jvm)
             }
         }
     }

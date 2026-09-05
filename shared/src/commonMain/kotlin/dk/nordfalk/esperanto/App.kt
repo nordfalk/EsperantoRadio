@@ -9,10 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.data.config.kreSettings
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.PlejsatatajDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -58,7 +59,8 @@ fun EsperantoRadioApp(
         }
         val elsendoDeponejo = remember { ElsendoDeponejoImpl(httpKliento) }
         val kanalaroViewModel = remember { KanalaroViewModel(kanalDeponejo) }
-        val plejsatatajDeponejo = remember { PlejsatatajDeponejoImpl() }
+        val settings = remember { kreSettings() }
+        val plejsatatajDeponejo = remember { PersistantaPlejsatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
         val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()

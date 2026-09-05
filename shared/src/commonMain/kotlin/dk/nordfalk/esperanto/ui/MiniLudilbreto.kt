@@ -39,11 +39,13 @@ fun MiniLudilbreto(
     val titolo = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.nomo
         is Sonfonto.ElsendoFonto -> fonto.elsendo.titolo
+        is Sonfonto.LokaElsendo -> fonto.elsendo.titolo
     }
 
     val bildUrl = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.emblemoUrl
         is Sonfonto.ElsendoFonto -> fonto.elsendo.bildUrl
+        is Sonfonto.LokaElsendo -> fonto.elsendo.bildUrl
     }
 
     val ludas = info.stato is LudantoStato.Ludas

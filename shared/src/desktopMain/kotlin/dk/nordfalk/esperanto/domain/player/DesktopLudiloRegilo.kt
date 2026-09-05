@@ -51,11 +51,13 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
         is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.LokaElsendo -> "file://${fonto.dosieroVojo}"
     }
 
     private fun fontoNomo(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> "RektaKanalo(${fonto.kanal.nomo})"
         is Sonfonto.ElsendoFonto -> "ElsendoFonto(${fonto.elsendo.titolo})"
+        is Sonfonto.LokaElsendo -> "LokaElsendo(${fonto.elsendo.titolo})"
     }
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {

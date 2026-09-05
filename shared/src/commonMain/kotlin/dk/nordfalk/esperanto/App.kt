@@ -16,6 +16,7 @@ import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.kreElshutDeponejo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -33,7 +34,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, AGORDOJ }
+private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHUTOJ, AGORDOJ }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +64,7 @@ fun EsperantoRadioApp(
         val settings = remember { kreSettings() }
         val plejsatatajDeponejo = remember { PersistantaPlejsatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
+        val elshutDeponejo = remember { kreElshutDeponejo(httpKliento) }
         val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()
 
@@ -79,6 +81,7 @@ fun EsperantoRadioApp(
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
                             onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
                             onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
+                            onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
                             onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
                         )
                     }
@@ -103,6 +106,10 @@ fun EsperantoRadioApp(
                             onLudi = {
                                 logi("Nav", "Ludas elsendon: ${elsendo.id}")
                                 scope.launch { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo)); ludilo.ludi() }
+                            },
+                            onElshuti = {
+                                logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
+                                scope.launch { elshutDeponejo.elshuti(elsendo) }
                             }
                         )
                     }
@@ -119,6 +126,17 @@ fun EsperantoRadioApp(
                             kanalDeponejo = kanalDeponejo,
                             onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO },
                             onKanal = { kanal -> logi("Nav", "→ KANAL el plejŝatataj: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL }
+                        )
+                    }
+                    Ekrano.ELSHUTOJ -> {
+                        ElshutitajEkrano(
+                            elshutDeponejo = elshutDeponejo,
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO },
+                            onLudi = { fonto ->
+                                logi("Nav", "Ludas elŝutitan: ${fonto}")
+                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                            },
+                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el elŝutoj: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
                         )
                     }
                     Ekrano.AGORDOJ -> {

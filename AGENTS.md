@@ -30,9 +30,10 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
 | — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
 | 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | ✅ Farita | #15,#16 |
-| 5 | Elŝutoj | Planita | — |
+| 5 | Elŝutoj | 🔨 Nuna | — |
 | — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
-| — | Sonludado sur Desktop (JavaFX MediaPlayer) | 🔨 Nuna | — |
+| — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
+| — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
 | 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | Planita | — |
 
 ### Kio funkcias nun
@@ -40,17 +41,16 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
 - **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
 - **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregolojn (inkl. Peranto/archive.org)
-- **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (JavaFX MediaPlayer)
+- **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + agordoj
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
-- **Testoj**: 41 testoj (37 KMP sur Desktop + 4 Android sur emulatoro), ĉiuj pasas
+- **Testoj**: 52 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 
 ### Kio NE funkcias ankoraŭ
 
-- Desktop-ludado: JavaFX MediaPlayer komencigita, sed nur provita sur CI (ne interaga)
+- Elŝutoj (eksterreta reĝimo) — fazo 5, nune komencata
 - iOS-ludado (no-op, bezonas AVPlayer)
-- Elŝutoj (eksterreta reĝimo)
 - Vekhorloĝo, hejmekrana widget, Chromecast, talesyntezo
 
 ## Granda plano
@@ -107,6 +107,9 @@ EsperantoRadio/
    daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
    en agordo, ne en logiko.
 6. **GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
+7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
+   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
+   faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

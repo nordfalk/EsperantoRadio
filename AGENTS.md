@@ -29,8 +29,10 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
 | 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
 | — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
-| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | 🔨 Nuna | — |
+| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | ✅ Farita | #15,#16 |
 | 5 | Elŝutoj | Planita | — |
+| — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
+| — | Sonludado sur Desktop (JavaFX MediaPlayer) | 🔨 Nuna | — |
 | 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | Planita | — |
 
 ### Kio funkcias nun
@@ -38,7 +40,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
 - **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
 - **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregolojn (inkl. Peranto/archive.org)
-- **Nova apo — ludado**: vera sonludado sur Android per Media3 ExoPlayer (MP3 + HLS)
+- **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (JavaFX MediaPlayer)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + agordoj
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Testoj**: 41 testoj (37 KMP sur Desktop + 4 Android sur emulatoro), ĉiuj pasas
@@ -46,11 +48,8 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 
 ### Kio NE funkcias ankoraŭ
 
-- Persisto de plejŝatataj/agordoj (en-memoraj, perdiĝas je restarto)
-- Malfona ludado (MediaSession, sciigoj) — ExoPlayer ne release()-ita en onDestroy
-- Desktop-ludado (no-op, neniu sono)
+- Desktop-ludado: JavaFX MediaPlayer komencigita, sed nur provita sur CI (ne interaga)
 - iOS-ludado (no-op, bezonas AVPlayer)
-- Web-ludado (no-op, bezonas HTMLAudioElement)
 - Elŝutoj (eksterreta reĝimo)
 - Vekhorloĝo, hejmekrana widget, Chromecast, talesyntezo
 
@@ -127,6 +126,30 @@ EsperantoRadio/
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en `<content:encoded>`.
   Uzu `getElementsByTag("content:encoded").firstOrNull()?.text()` (ne `html()`) por
   akiri la malkoditan HTML-enhavon, poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
+- **Sonludado — bibliotek-elekto**:
+  - **basic-sound** (LexiLabs-App/basic-sound, MIT) estis provita unue. La JVM-implemento
+    uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
+    por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
+  - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
+    Compose 1.10.0 — tro nova por nia Kotlin 2.1.0 / Compose 1.7.3. Ankaŭ bezonas VLC sur Desktop.
+  - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
+    kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
+    `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
+    estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
+  - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
+    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
+    Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
+    `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
+    pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
+- **Platforma subteno — sonludado**:
+
+  | Funkcio | Android | Desktop (JVM) | Web (wasmJs) | iOS |
+  |---|:--:|:--:|:--:|:--:|
+  | MP3-fluado | ExoPlayer | mp3spi + SourceDataLine | HTMLAudioElement | no-op |
+  | HLS | ExoPlayer | ne | retumilo | no-op |
+  | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
+  | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
+  | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
 
 ## Konstru-komandoj
 

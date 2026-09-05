@@ -69,6 +69,8 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.multiplatform.settings.jvm)
+                // mp3spi — pura Java MP3-malkodado por javax.sound.sampled (neniu nacia dependeco)
+                implementation(libs.mp3spi)
             }
         }
     }

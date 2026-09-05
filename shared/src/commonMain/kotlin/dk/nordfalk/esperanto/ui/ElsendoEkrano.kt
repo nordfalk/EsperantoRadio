@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,7 +21,10 @@ fun ElsendoEkrano(
     onReen: () -> Unit,
     onLudi: () -> Unit = {},
     onElshuti: () -> Unit = {},
+    onForigiElshuton: () -> Unit = {},
+    elshutDeponejo: ElshutDeponejo? = null,
 ) {
+    val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,12 +96,36 @@ fun ElsendoEkrano(
 
             Spacer(Modifier.height(8.dp))
 
-            // Elŝut-butono
-            OutlinedButton(
-                onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("⬇ Elŝuti")
+            // Elŝut-butono — statdependa
+            when (elshutStato) {
+                is ElshutStato.NeElshutita -> OutlinedButton(
+                    onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("⬇ Elŝuti") }
+
+                is ElshutStato.Elshutanta -> {
+                    val p = (elshutStato as ElshutStato.Elshutanta).progreso
+                    OutlinedButton(
+                        onClick = {},
+                        enabled = false,
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("⏳ Elŝutas... ${((p * 100).toInt())}%") }
+                }
+
+                is ElshutStato.Preta -> OutlinedButton(
+                    onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("✓ Elŝutita — Forigi") }
+
+                is ElshutStato.Eraro -> OutlinedButton(
+                    onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("⚠ Eraro — reprovi") }
+
+                is ElshutStato.Pauxzita -> OutlinedButton(
+                    onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("⏸ Paŭzita — reprovi") }
             }
         }
     }

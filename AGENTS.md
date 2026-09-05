@@ -42,8 +42,9 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
 - **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregolojn (inkl. Peranto/archive.org)
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
-- **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + agordoj
+- **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Testoj**: 56 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
@@ -51,8 +52,9 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 ### Kio NE funkcias ankoraŭ
 
 - Nur-WiFi-agordo ne estas konektita al elŝut-logiko (agordo ekzistas sed ne efikas)
+- Vekhorloĝo: alarmoj estas persistitaj sed ne vere vekas la aparaton (bezonas Android AlarmManager + BroadcastReceiver + WakeLock)
 - iOS-ludado (no-op, bezonas AVPlayer)
-- Vekhorloĝo, hejmekrana widget, Chromecast, talesyntezo
+- Hejmekrana widget, Chromecast, talesyntezo
 
 ## Granda plano
 

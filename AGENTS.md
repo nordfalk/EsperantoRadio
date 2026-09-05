@@ -30,7 +30,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
 | — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
 | 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | ✅ Farita | #15,#16 |
-| 5 | Elŝutoj | 🔨 Nuna | — |
+| 5 | Elŝutoj | ✅ Farita | #20 |
 | — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
 | — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
 | — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
@@ -49,7 +49,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 
 ### Kio NE funkcias ankoraŭ
 
-- Elŝutoj (eksterreta reĝimo) — fazo 5, nune komencata
+- Elŝutoj: fluanta elŝuto (readBytes ŝargas en memoron), persisto inter restartoj, nur-WiFi
 - iOS-ludado (no-op, bezonas AVPlayer)
 - Vekhorloĝo, hejmekrana widget, Chromecast, talesyntezo
 

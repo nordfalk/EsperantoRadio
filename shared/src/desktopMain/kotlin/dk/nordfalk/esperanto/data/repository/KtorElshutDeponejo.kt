@@ -8,9 +8,10 @@ import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,8 +19,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Ktor-bazita elŝut-deponejo. Funkcias sur JVM (Desktop + Android).
@@ -69,14 +72,24 @@ class KtorElshutDeponejo(
                 }
 
                 val totalajBitokoj = respondo.contentLength() ?: 0L
-                val bajtoj = respondo.readBytes()
-                val elshutitaj = bajtoj.size.toLong()
+                val channel = respondo.bodyAsChannel()
 
-                celdosiero.writeBytes(bajtoj)
+                FileOutputStream(celdosiero).use { out ->
+                    val buffer = ByteArray(8192)
+                    var elshutitaj = 0L
+                    while (isActive) {
+                        val read = channel.readAvailable(buffer)
+                        if (read <= 0) break
+                        out.write(buffer, 0, read)
+                        elshutitaj += read
+                        val progreso = if (totalajBitokoj > 0) elshutitaj.toFloat() / totalajBitokoj else 0f
+                        stato.value = ElshutStato.Elshutanta(progreso, elshutitaj, totalajBitokoj)
+                    }
+                }
 
                 stato.value = ElshutStato.Preta
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
-                logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} — $elshutitaj bitokoj → ${celdosiero.absolutePath}")
+                logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
             } catch (e: Exception) {
                 loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")

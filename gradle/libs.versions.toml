@@ -14,6 +14,7 @@ coil = "3.0.4"
 multiplatform-settings = "1.2.0"
 turbine = "1.2.0"
 androidx-datastore = "1.1.1"
+javafx = "17.0.13"
 agp = "8.7.3"
 androidx-activity-compose = "1.9.3"
 
@@ -51,6 +52,8 @@ androidx-media3-ui-compose = { module = "androidx.media3:media3-ui-compose", ver
 # Android — agordoj
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
+# (JavaFX dependencoj estas en build.gradle.kts kun platform-klasifikilo)
 
 # Testoj
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

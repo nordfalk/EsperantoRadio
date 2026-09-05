@@ -3,6 +3,8 @@ package dk.nordfalk.esperanto.data.config
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.logw
 
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
@@ -81,6 +83,7 @@ data class KanalAgordo(
     val elsendojUrl: String? = null,
     val hejmpagho: String? = null,
     val kanaloj: List<KanalDto> = emptyList(),
+    val sugestoj_por_alarmoj: String? = null,
 ) {
     @Serializable
     data class AndroidSekcio(
@@ -125,3 +128,55 @@ fun KanalDto.alKanal(): Kanal = Kanal(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
 )
+
+/**
+ * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
+ *
+ * Formato: `id/enabled/horo/minuto/ripeto/time/=kanalo/=etikedo/`
+ * kun `\` cxe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
+ * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
+ *
+ * Post JSONC-striptigo cxiuj sugestoj estas sur unu linio, apartigitaj per `/`.
+ * Cxiu alarmo konsistas el 8 partoj + trailing `/` (9 elementoj per split).
+ */
+fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
+    val partoj = teksto.split("/")
+    val rezulto = mutableListOf<Alarmo>()
+    var i = 0
+    while (i + 7 < partoj.size) {
+        try {
+            val id = partoj[i].toInt()
+            val aktiva = partoj[i + 1] == "1"
+            val horo = partoj[i + 2].toInt()
+            val minuto = partoj[i + 3].toInt()
+            val ripeto = partoj[i + 4].toInt()
+            // partoj[i + 5] = time (malnova, ne uzata)
+            val kanalSlug = partoj[i + 6].removePrefix("=")
+            val etikedo = partoj[i + 7].removePrefix("=")
+                .replace("+", " ")
+                .replace("%0A", "\n")
+                .replace("%C4%88", "Ĉ")
+                .replace("%C4%A5", "ĵ")
+                .replace("%C5%9C", "ŝ")
+                .replace("%C5%AD", "ŭ")
+                .replace("%C4%9C", "Ĝ")
+                .replace("%C4%89", "ĉ")
+                .replace("%C4%B4", "Ĵ")
+                .replace("%C5%AC", "Ŝ")
+                .replace("%C5%AC", "Ŝ")
+            rezulto.add(Alarmo(
+                id = id,
+                horo = horo,
+                minuto = minuto,
+                ripeto = ripeto,
+                kanalSlug = kanalSlug,
+                aktiva = aktiva,
+                etikedo = etikedo.ifBlank { null }
+            ))
+        } catch (e: Exception) {
+            logw("AlarmoSugestoj", "Ne eblis parsii alarmon cxe indekso $i", e)
+        }
+        i += 8
+    }
+    return rezulto
+}

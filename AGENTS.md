@@ -111,6 +111,9 @@ EsperantoRadio/
 7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
    regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
    faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
+8. **Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
+   eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
+   Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

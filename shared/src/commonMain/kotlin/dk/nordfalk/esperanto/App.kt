@@ -19,6 +19,7 @@ import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreElshutDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
+import dk.nordfalk.esperanto.data.repository.kreAlarmoSkedilo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -70,7 +71,7 @@ fun EsperantoRadioApp(
         val alarmoDeponejo = remember {
             val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
             val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
-            PersistantaAlarmoDeponejo(settings, sugestoj)
+            PersistantaAlarmoDeponejo(settings, sugestoj, kreAlarmoSkedilo())
         }
         val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()

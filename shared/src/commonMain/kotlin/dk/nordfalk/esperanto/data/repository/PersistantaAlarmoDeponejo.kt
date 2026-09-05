@@ -21,6 +21,7 @@ import kotlinx.serialization.json.Json
 class PersistantaAlarmoDeponejo(
     private val settings: Settings,
     sugestoj: List<Alarmo> = emptyList(),
+    private val skedilo: AlarmoSkedilo? = null,
 ) : AlarmoDeponejo {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -75,17 +76,21 @@ class PersistantaAlarmoDeponejo(
         val nova = alarmo.copy(id = nextId++)
         _alarmoj.value = _alarmoj.value + nova
         persistu()
+        skedilo?.skedi(nova)
         logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanalSlug} (nova id=${nova.id})")
     }
 
     override suspend fun ghisdatigi(alarmo: Alarmo) {
+        skedilo?.malplani(alarmo.id)
         _alarmoj.value = _alarmoj.value.map { if (it.id == alarmo.id) alarmo else it }
         persistu()
+        if (alarmo.aktiva) skedilo?.skedi(alarmo) else skedilo?.malplani(alarmo.id)
         logi("AlarmoDeponejo", "Ĝisdatigis: id=${alarmo.id} tempo=${alarmo.tempoTeksto}")
     }
 
     override suspend fun forigi(alarmoId: Int) {
         val antauxa = _alarmoj.value.find { it.id == alarmoId }
+        skedilo?.malplani(alarmoId)
         _alarmoj.value = _alarmoj.value.filter { it.id != alarmoId }
         persistu()
         logi("AlarmoDeponejo", "Forigis: id=$alarmoId tempo=${antauxa?.tempoTeksto} — restas ${_alarmoj.value.size} alarmoj")
@@ -97,6 +102,9 @@ class PersistantaAlarmoDeponejo(
         }
         persistu()
         val alarmo = _alarmoj.value.find { it.id == alarmoId }
+        if (alarmo != null) {
+            if (alarmo.aktiva) skedilo?.skedi(alarmo) else skedilo?.malplani(alarmoId)
+        }
         logi("AlarmoDeponejo", "Baskulis: id=$alarmoId tempo=${alarmo?.tempoTeksto} → ${if (alarmo?.aktiva == true) "aktiva" else "malaktiva"}")
     }
 }

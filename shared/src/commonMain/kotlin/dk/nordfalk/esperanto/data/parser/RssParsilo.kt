@@ -127,11 +127,75 @@ class RssParsilo {
         return rezulto
     }
 
-    // === Regulo 6.3 — Peranto (TODO) ===
+    // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
 
     private fun parsPeranto(doc: Document, kanal: Kanal, httpKliento: suspend (String) -> String): List<Elsendo> {
-        // TODO: archive.org-embed-skrapado, Google Drive-rekonstruo
-        return parsGenerel(doc, kanal)
+        val malplenajDatoj = setOf("2019-11-08", "2019-09-29")
+
+        return doc.select("entry").mapNotNull { ero ->
+            val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
+            val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
+
+            // Saltu konatajn malplenajn datojn
+            if (dato in malplenajDatoj) return@mapNotNull null
+
+            // La enhavo estas HTML-eskapita en <content type='html'>
+            val htmlEsprimite = ero.selectFirst("content")?.text() ?: ""
+            // Malkodu HTML-entitojn
+            val htmlDoc = Ksoup.parse(htmlEsprimite)
+
+            // Eltiru bildon el la unua <img>
+            val bildUrl = htmlDoc.selectFirst("img")?.attr("src")
+
+            // Forigu <img>, <iframe>, <div class="separator"> el priskribo
+            htmlDoc.select("img").remove()
+            htmlDoc.select("iframe").remove()
+            htmlDoc.select("div.separator").remove()
+            val priskribo = htmlDoc.text()
+
+            // Trovu la unuan <iframe src>
+            val iframeSrc = Ksoup.parse(htmlEsprimite).selectFirst("iframe")?.attr("src") ?: ""
+
+            // Rekonstruu la stream-URL el la iframe-src
+            val stream = when {
+                // archive.org/embed/<nomo> → archive.org/download/<nomo>/<nomo>.mp3
+                iframeSrc.contains("archive.org/embed/") -> {
+                    val nomo = iframeSrc.substringAfter("archive.org/embed/").substringBefore("?").trimEnd('/')
+                    // Korekto: orkestro_sklavidojj → orkestro_sklavidoj
+                    val korektitaNomo = if (nomo == "orkestro_sklavidojj") "orkestro_sklavidoj" else nomo
+                    "https://archive.org/download/$korektitaNomo/$korektitaNomo.mp3"
+                }
+                // drive.google.com/file/d/<ID>/... → drive.google.com/u/1/uc?id=<ID>&export=download
+                iframeSrc.contains("drive.google.com/file/d/") -> {
+                    val id = iframeSrc.substringAfter("/file/d/").substringBefore("/")
+                    "https://drive.google.com/u/1/uc?id=$id&export=download"
+                }
+                // Neniu iframe aŭ nesubtenata gastiganto → saltu
+                iframeSrc.isEmpty() -> return@mapNotNull null
+                iframeSrc.contains("youtube.com") || iframeSrc.contains("youtu.be") -> return@mapNotNull null
+                iframeSrc.contains("soundcloud.com") -> return@mapNotNull null
+                iframeSrc.contains("vimeo.com") -> return@mapNotNull null
+                iframeSrc.contains("audioboom.com") -> return@mapNotNull null
+                iframeSrc.contains("yourlisten.com") -> return@mapNotNull null
+                iframeSrc.contains("vocaroo.com") -> return@mapNotNull null
+                else -> return@mapNotNull null
+            }
+
+            val titolo = ero.selectFirst("title")?.text() ?: ""
+            val retpaghoUrl = ero.selectFirst("link[rel=alternate]")?.attr("href")
+            val id = "peranto:$dato"
+
+            Elsendo(
+                id = id,
+                kanalSlug = kanal.slug,
+                titolo = if (kanal.ignoruTitolon) puriguHtml(priskribo).take(200) else titolo,
+                priskribo = priskribo,
+                bildUrl = bildUrl,
+                dato = dato,
+                stream = stream,
+                retpaghoUrl = retpaghoUrl,
+            )
+        }
     }
 
     // === Regulo 6.4 — Vinilkosmo ===

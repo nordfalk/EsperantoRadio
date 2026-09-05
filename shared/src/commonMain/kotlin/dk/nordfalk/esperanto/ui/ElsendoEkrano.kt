@@ -16,6 +16,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 fun ElsendoEkrano(
     elsendo: Elsendo,
     onReen: () -> Unit,
+    onLudi: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -78,9 +79,9 @@ fun ElsendoEkrano(
 
             Spacer(Modifier.height(24.dp))
 
-            // Lud-butono (TODO: Fazo 2)
+            // Lud-butono
             Button(
-                onClick = { /* TODO: Ludilo */ },
+                onClick = onLudi,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("▶ Aŭskulti")

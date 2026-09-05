@@ -77,4 +77,11 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
     override fun halti() { player.stop(); player.clearMediaItems(); nunaFonto = null; _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { player.seekTo(pozicioMs) }
     override fun fiksiLauxtecon(volumeno: Float) { player.volume = volumeno }
+
+    /**
+     * Liberigas la ExoPlayer-rimedojn. Devas esti vokita en Activity.onDestroy().
+     */
+    fun release() {
+        player.release()
+    }
 }

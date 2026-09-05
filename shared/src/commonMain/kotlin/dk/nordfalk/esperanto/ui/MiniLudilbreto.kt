@@ -120,5 +120,16 @@ fun MiniLudilbreto(
                 Text("■", style = MaterialTheme.typography.bodySmall)
             }
         }
+
+        // Pozicio-breto por podkastoj (ne por rekta elsendo)
+        if (!info.estasRekta && info.dauroMs > 0) {
+            val progreso = if (info.dauroMs > 0) {
+                (info.pozicioMs.toFloat() / info.dauroMs.toFloat()).coerceIn(0f, 1f)
+            } else 0f
+            LinearProgressIndicator(
+                progress = { progreso },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
+            )
+        }
     }
 }

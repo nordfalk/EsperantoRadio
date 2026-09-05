@@ -69,8 +69,14 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.multiplatform.settings.jvm)
-                // mp3spi — pura Java MP3-malkodado por javax.sound.sampled (neniu nacia dependeco)
                 implementation(libs.mp3spi)
+            }
+        }
+
+        val desktopTest by getting {
+            dependencies {
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
             }
         }
     }

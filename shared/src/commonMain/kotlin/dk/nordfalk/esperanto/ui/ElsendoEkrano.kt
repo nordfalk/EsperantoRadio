@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +24,7 @@ fun ElsendoEkrano(
             TopAppBar(
                 title = { Text(elsendo.titolo, maxLines = 1) },
                 navigationIcon = {
-                    TextButton(onClick = onReen) { Text("← Reen") }
+                    TextButton(onClick = { logi("Klako", "reen (ElsendoEkrano)"); onReen() }) { Text("← Reen") }
                 }
             )
         }
@@ -81,7 +82,7 @@ fun ElsendoEkrano(
 
             // Lud-butono
             Button(
-                onClick = onLudi,
+                onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("▶ Aŭskulti")

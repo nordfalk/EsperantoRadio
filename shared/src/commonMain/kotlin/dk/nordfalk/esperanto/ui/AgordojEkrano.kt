@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
+import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,7 +21,7 @@ fun AgordojEkrano(
         topBar = {
             TopAppBar(
                 title = { Text("Agordoj") },
-                navigationIcon = { TextButton(onClick = onReen) { Text("← Reen") } }
+                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (AgordojEkrano)"); onReen() }) { Text("← Reen") } }
             )
         }
     ) { padding ->
@@ -30,13 +31,13 @@ fun AgordojEkrano(
             Row {
                 FilterChip(
                     selected = lingvo == "eo",
-                    onClick = { agordojDeponejo.fiksiLingvon("eo") },
+                    onClick = { logi("Klako", "lingvo → eo"); agordojDeponejo.fiksiLingvon("eo") },
                     label = { Text("Esperanto") }
                 )
                 Spacer(Modifier.width(8.dp))
                 FilterChip(
                     selected = lingvo == "da",
-                    onClick = { agordojDeponejo.fiksiLingvon("da") },
+                    onClick = { logi("Klako", "lingvo → da"); agordojDeponejo.fiksiLingvon("da") },
                     label = { Text("Dana") }
                 )
             }
@@ -49,7 +50,7 @@ fun AgordojEkrano(
                 trailingContent = {
                     Switch(
                         checked = nurWifi,
-                        onCheckedChange = { agordojDeponejo.fiksiNurWifi(it) }
+                        onCheckedChange = { logi("Klako", "nurWifi → $it"); agordojDeponejo.fiksiNurWifi(it) }
                     )
                 }
             )

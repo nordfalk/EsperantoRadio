@@ -5,6 +5,8 @@ import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.logd
+import dk.nordfalk.esperanto.logi
 
 /**
  * La ĝenerala RSS/Atom-parsilo. Traktas la sep parsregolojn.
@@ -17,17 +19,34 @@ class RssParsilo {
         kanal: Kanal,
         httpKliento: suspend (String) -> String = { "" }
     ): List<Elsendo> {
+        logd("RssParsilo", "Parsas RSS por ${kanal.slug} — ${fluoTeksto.length} signoj")
         val doc = Ksoup.parseXml(fluoTeksto, "")
         val deArkivo = kanal.podkastaRssUrl?.contains("podkasta_arkivo") == true
 
-        if (deArkivo) return parsGenerel(doc, kanal)
-
-        return when (kanal.slug) {
-            "varsoviavento" -> parsVarsoviaVento(doc, kanal)
-            "peranto" -> parsPeranto(doc, kanal, httpKliento)
-            "vinilkosmo" -> parsVinilkosmo(doc, kanal)
-            else -> parsGenerel(doc, kanal)
+        val rezulto = if (deArkivo) {
+            logd("RssParsilo", "${kanal.slug}: uzas arkiv-parsilon")
+            parsGenerel(doc, kanal)
+        } else when (kanal.slug) {
+            "varsoviavento" -> {
+                logd("RssParsilo", "${kanal.slug}: uzas VarsoviaVento-parsilon")
+                parsVarsoviaVento(doc, kanal)
+            }
+            "peranto" -> {
+                logd("RssParsilo", "${kanal.slug}: uzas Peranto-parsilon")
+                parsPeranto(doc, kanal, httpKliento)
+            }
+            "vinilkosmo" -> {
+                logd("RssParsilo", "${kanal.slug}: uzas Vinilkosmo-parsilon")
+                parsVinilkosmo(doc, kanal)
+            }
+            else -> {
+                logd("RssParsilo", "${kanal.slug}: uzas ĝeneralan parsilon")
+                parsGenerel(doc, kanal)
+            }
         }
+
+        logi("RssParsilo", "${kanal.slug}: parsado kompleta — ${rezulto.size} elsendoj")
+        return rezulto
     }
 
     fun leguNextLink(fluoTeksto: String): String? {

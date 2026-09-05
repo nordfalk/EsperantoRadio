@@ -6,6 +6,8 @@ import dk.nordfalk.esperanto.domain.repository.LastAuxskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
+import dk.nordfalk.esperanto.logd
+import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +20,7 @@ class PlejsatatajDeponejoImpl : PlejsatatajDeponejo {
         val nuna = _plejsatataj.value.toMutableSet()
         if (kanalSlug in nuna) nuna.remove(kanalSlug) else nuna.add(kanalSlug)
         _plejsatataj.value = nuna
+        logi("Plejsatataj", "Baskulas: $kanalSlug → ${if (kanalSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
     override suspend fun estasPlejsatata(kanalSlug: String): Boolean = kanalSlug in _plejsatataj.value
@@ -34,6 +37,7 @@ class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
         nuna.removeAll { it.id == elsendo.id }
         nuna.add(0, elsendo)
         _listo.value = nuna.take(50) // LRU-maks 50
+        logd("LastAuxskultitaj", "Registras: ${elsendo.id} — ${elsendo.titolo}")
     }
 
     override suspend fun getPozicio(elsendoId: String): Long? = pozicioj[elsendoId]
@@ -43,7 +47,9 @@ class SercxoDeponejoImpl(
     private val elsendoDeponejo: ElsendoDeponejo,
 ) : SercxoDeponejo {
     override suspend fun sercxi(taxto: String, limo: Int): List<Elsendo> {
-        return elsendoDeponejo.sercxiElsendojn(taxto, limo)
+        val rezulto = elsendoDeponejo.sercxiElsendojn(taxto, limo)
+        logd("Sercxo", "Serĉas '$taxto' (limo=$limo) — ${rezulto.size} trovoj")
+        return rezulto
     }
 }
 
@@ -54,6 +60,12 @@ class AgordojDeponejoImpl : AgordojDeponejo {
     private val _nurWifi = MutableStateFlow(false)
     override val nurWifi: StateFlow<Boolean> = _nurWifi.asStateFlow()
 
-    override fun fiksiLingvon(lingvo: String) { _lingvo.value = lingvo }
-    override fun fiksiNurWifi(nurWifi: Boolean) { _nurWifi.value = nurWifi }
+    override fun fiksiLingvon(lingvo: String) {
+        _lingvo.value = lingvo
+        logi("Agordoj", "Lingvo → $lingvo")
+    }
+    override fun fiksiNurWifi(nurWifi: Boolean) {
+        _nurWifi.value = nurWifi
+        logi("Agordoj", "NurWifi → $nurWifi")
+    }
 }

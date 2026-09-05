@@ -21,6 +21,7 @@ import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.kreDefauxltanLudiloRegilon
+import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.ui.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -75,10 +76,10 @@ fun EsperantoRadioApp(
                     Ekrano.KANALARO -> {
                         KanalaroEkrano(
                             viewModel = kanalaroViewModel,
-                            onKanal = { kanal -> elektitaKanal = kanal; ekrano = Ekrano.KANAL },
-                            onSercxo = { ekrano = Ekrano.SERCXO },
-                            onPlejsatataj = { ekrano = Ekrano.PLEJSATATAJ },
-                            onAgordoj = { ekrano = Ekrano.AGORDOJ }
+                            onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
+                            onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
+                            onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
+                            onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
                         )
                     }
                     Ekrano.KANAL -> {
@@ -86,38 +87,44 @@ fun EsperantoRadioApp(
                         KanalEkrano(
                             kanal = kanal,
                             elsendoDeponejo = elsendoDeponejo,
-                            onReen = { ekrano = Ekrano.KANALARO },
-                            onElsendo = { elsendo -> elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
-                            onLudi = { fonto -> scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() } }
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO },
+                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
+                            onLudi = { fonto ->
+                                logi("Nav", "Ludas rekte: ${kanal.slug}")
+                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                            }
                         )
                     }
                     Ekrano.ELSENDO -> {
                         val elsendo = elektitaElsendo!!
                         ElsendoEkrano(
                             elsendo = elsendo,
-                            onReen = { ekrano = Ekrano.KANAL },
-                            onLudi = { scope.launch { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo)); ludilo.ludi() } }
+                            onReen = { logi("Nav", "→ KANAL (reen)"); ekrano = Ekrano.KANAL },
+                            onLudi = {
+                                logi("Nav", "Ludas elsendon: ${elsendo.id}")
+                                scope.launch { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo)); ludilo.ludi() }
+                            }
                         )
                     }
                     Ekrano.SERCXO -> {
                         SercxoEkrano(
                             sercxoDeponejo = sercxoDeponejo,
-                            onReen = { ekrano = Ekrano.KANALARO },
-                            onElsendo = { elsendo -> elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO },
+                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el serĉo: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
                         )
                     }
                     Ekrano.PLEJSATATAJ -> {
                         PlejsatatajEkrano(
                             plejsatatajDeponejo = plejsatatajDeponejo,
                             kanalDeponejo = kanalDeponejo,
-                            onReen = { ekrano = Ekrano.KANALARO },
-                            onKanal = { kanal -> elektitaKanal = kanal; ekrano = Ekrano.KANAL }
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO },
+                            onKanal = { kanal -> logi("Nav", "→ KANAL el plejŝatataj: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL }
                         )
                     }
                     Ekrano.AGORDOJ -> {
                         AgordojEkrano(
                             agordojDeponejo = agordojDeponejo,
-                            onReen = { ekrano = Ekrano.KANALARO }
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO }
                         )
                     }
                 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +28,7 @@ fun PlejsatatajEkrano(
         topBar = {
             TopAppBar(
                 title = { Text("Plej ŝatataj") },
-                navigationIcon = { TextButton(onClick = onReen) { Text("← Reen") } }
+                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (PlejsatatajEkrano)"); onReen() }) { Text("← Reen") } }
             )
         }
     ) { padding ->
@@ -41,7 +42,7 @@ fun PlejsatatajEkrano(
                     ListItem(
                         headlineContent = { Text(kanal.nomo) },
                         supportingContent = { Text(if (kanal.estasRekta) "Rekta elsendo" else "Podkasto") },
-                        modifier = Modifier.clickable { onKanal(kanal) }
+                        modifier = Modifier.clickable { logi("Klako", "plejŝatata kanal ${kanal.slug}"); onKanal(kanal) }
                     )
                     HorizontalDivider()
                 }

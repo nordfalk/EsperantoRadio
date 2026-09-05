@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.domain.repository
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.Alarmo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -42,4 +43,17 @@ interface ElshutDeponejo {
     suspend fun forigi(elsendoId: String)
     suspend fun getLokaDosieroVojo(elsendoId: String): String?
     fun estasElshutita(elsendoId: String): Boolean
+}
+
+/**
+ * Vekhorloĝo-deponejo. Platform-specifaj implementoj:
+ * - Android: AlarmManager + BroadcastReceiver (estonte)
+ * - Desktop/wasmJs/iOS: NoOp (nur UI, ne planas vere)
+ */
+interface AlarmoDeponejo {
+    fun observiAlarmojn(): StateFlow<List<Alarmo>>
+    suspend fun krei(alarmo: Alarmo)
+    suspend fun ghisdatigi(alarmo: Alarmo)
+    suspend fun forigi(alarmoId: Int)
+    suspend fun baskuliAktivon(alarmoId: Int)
 }

@@ -17,6 +17,7 @@ import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreElshutDeponejo
+import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -34,7 +35,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHUTOJ, AGORDOJ }
+private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHUTOJ, ALARMOJ, AGORDOJ }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +66,7 @@ fun EsperantoRadioApp(
         val plejsatatajDeponejo = remember { PersistantaPlejsatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
         val elshutDeponejo = remember { kreElshutDeponejo(httpKliento) }
+        val alarmoDeponejo = remember { MemorAlarmoDeponejo() }
         val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()
 
@@ -82,6 +84,7 @@ fun EsperantoRadioApp(
                             onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
                             onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
                             onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
+                            onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
                             onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
                         )
                     }
@@ -151,6 +154,13 @@ fun EsperantoRadioApp(
                                 scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                             },
                             onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el elŝutoj: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
+                        )
+                    }
+                    Ekrano.ALARMOJ -> {
+                        AlarmoEkrano(
+                            alarmoDeponejo = alarmoDeponejo,
+                            kanalDeponejo = kanalDeponejo,
+                            onReen = { logi("Nav", "→ KANALARO (reen)"); ekrano = Ekrano.KANALARO }
                         )
                     }
                     Ekrano.AGORDOJ -> {

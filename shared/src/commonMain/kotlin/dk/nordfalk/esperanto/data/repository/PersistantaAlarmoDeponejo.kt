@@ -42,7 +42,10 @@ class PersistantaAlarmoDeponejo(
                 val uzitajIdj = mutableSetOf<Int>()
                 val unikaj = sugestoj.map { s ->
                     var id = s.id
-                    while (id in uzitajIdj) id = nextId++
+                    while (id in uzitajIdj) {
+                        logi("AlarmoDeponejo", "ID-kolizio por $s — asignas novan")
+                        id = nextId++
+                    }
                     uzitajIdj.add(id)
                     s.copy(id = id)
                 }

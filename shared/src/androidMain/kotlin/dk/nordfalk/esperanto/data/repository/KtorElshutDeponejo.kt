@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
 
@@ -35,12 +36,50 @@ class KtorElshutDeponejo(
     private val elshuthejjo: () -> File,
 ) : ElshutDeponejo {
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     private val _elshutoj = MutableStateFlow<Map<String, ElshutitaElsendo>>(emptyMap())
     override fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>> = _elshutoj.asStateFlow()
 
     private val _statoj = mutableMapOf<String, MutableStateFlow<ElshutStato>>()
     private val joboj = mutableMapOf<String, Job>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    init {
+        rekargxiElshutojn()
+    }
+
+    /**
+     * Skanas la elŝuthejmon kaj rekonstruas la elŝut-liston el persistitaj JSON-metadatenoj.
+     * Vokata aŭtomate en init, sed ankaŭ re-vokebla mane.
+     */
+    fun rekargxiElshutojn() {
+        val hejjo = elshuthejjo()
+        if (!hejjo.exists()) return
+
+        val trovitaj = mutableMapOf<String, ElshutitaElsendo>()
+
+        hejjo.listFiles { f -> f.name.endsWith(".json") }?.forEach { jsonDosiero ->
+            try {
+                val elsendo = json.decodeFromString(Elsendo.serializer(), jsonDosiero.readText())
+                val mp3 = File(hejjo, "${elsendo.id}.mp3")
+                if (mp3.exists() && mp3.length() > 0) {
+                    val stato = ElshutStato.Preta
+                    _statoj[elsendo.id] = MutableStateFlow(stato)
+                    trovitaj[elsendo.id] = ElshutitaElsendo(elsendo, mp3.absolutePath, stato)
+                    logi("ElshutDeponejo", "Reŝargis: ${elsendo.titolo} (${mp3.length()} bitokoj)")
+                } else {
+                    logi("ElshutDeponejo", "Forigas orfan JSON: ${jsonDosiero.name} (MP3 mankas)")
+                    jsonDosiero.delete()
+                }
+            } catch (e: Exception) {
+                loge("ElshutDeponejo", "Ne eblis legi JSON: ${jsonDosiero.name}", e)
+            }
+        }
+
+        _elshutoj.value = trovitaj
+        logi("ElshutDeponejo", "Reŝargis ${trovitaj.size} elŝutojn")
+    }
 
     override fun observiElshutStaton(elsendoId: String): StateFlow<ElshutStato> {
         return _statoj.getOrPut(elsendoId) { MutableStateFlow(ElshutStato.NeElshutita) }
@@ -89,6 +128,9 @@ class KtorElshutDeponejo(
 
                 stato.value = ElshutStato.Preta
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
+                // Persistu metadatenojn por rekargxo ce restarto
+                val jsonDosiero = File(hejjo, "$id.json")
+                jsonDosiero.writeText(json.encodeToString(Elsendo.serializer(), elsendo))
                 logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
             } catch (e: Exception) {
                 loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
@@ -124,6 +166,10 @@ class KtorElshutDeponejo(
             } catch (e: Exception) {
                 loge("ElshutDeponejo", "Ne eblis forigi dosieron: ${elshutita.dosieroVojo}", e)
             }
+            // Forigu ankaŭ la JSON-metadatumbazon
+            val hejjo = elshuthejjo()
+            val jsonDosiero = File(hejjo, "$elsendoId.json")
+            if (jsonDosiero.exists()) jsonDosiero.delete()
         }
         _elshutoj.value = _elshutoj.value - elsendoId
         _statoj[elsendoId]?.value = ElshutStato.NeElshutita

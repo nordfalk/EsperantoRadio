@@ -4,10 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
@@ -108,38 +113,72 @@ private fun KanalEro(
     onLudi: (() -> Unit)? = null,
 ) {
     ListItem(
-        headlineContent = { Text(kanal.nomo) },
+        headlineContent = {
+            Text(
+                kanal.nomo,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
         supportingContent = {
             Text(
                 when {
                     kanal.estasRekta -> "Rekta elsendo"
                     kanal.havasPodkastojn -> "Podkasto"
                     else -> "Neniu fluo"
-                }
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         leadingContent = {
             if (kanal.emblemoUrl != null) {
                 AsyncImage(
                     model = kanal.emblemoUrl,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                    contentDescription = "Emblemo de ${kanal.nomo}",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(10.dp))
                 )
             } else {
-                Box(
+                Surface(
                     modifier = Modifier.size(48.dp),
-                    contentAlignment = Alignment.Center
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    Text(kanal.nomo.take(2))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            kanal.nomo.take(2),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         },
         trailingContent = {
             if (onLudi != null) {
-                TextButton(onClick = onLudi) { Text("▶") }
+                Surface(
+                    onClick = onLudi,
+                    shape = androidx.compose.foundation.shape.CircleShape,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("▶", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
             }
         },
         modifier = Modifier.clickable(onClick = onClick)
     )
-    HorizontalDivider()
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }

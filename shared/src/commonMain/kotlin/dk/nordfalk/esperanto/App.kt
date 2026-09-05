@@ -27,6 +27,9 @@ import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.kreDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.ui.*
+import dk.nordfalk.esperanto.ui.MuzaikoTiparo
+import dk.nordfalk.esperanto.ui.MuzaikoFormoj
+import dk.nordfalk.esperanto.ui.muzaikoKolorskemo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -44,7 +47,12 @@ private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHU
 fun EsperantoRadioApp(
     ludilo: LudiloRegilo = kreDefauxltanLudiloRegilon(),
 ) {
-    MaterialTheme {
+    val malhela = androidx.compose.foundation.isSystemInDarkTheme()
+    MaterialTheme(
+        colorScheme = muzaikoKolorskemo(malhela),
+        typography = MuzaikoTiparo,
+        shapes = MuzaikoFormoj,
+    ) {
         val httpKliento = remember {
             HttpClient(CIO) {
                 install(Logging) { level = LogLevel.INFO }

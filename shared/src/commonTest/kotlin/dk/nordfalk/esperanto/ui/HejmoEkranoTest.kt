@@ -144,9 +144,10 @@ class HejmoEkranoTest {
         waitForIdle()
         // La flava emblemeto montras kiom nova la elsendo estas
         // (aperas nur en "Kio novas", ne en "Kio popularas")
+        // 5 tagoj, 12 tagoj (<=14 restas tagoj), 3 tagoj, 17 tagoj (-> 2 semajnoj)
         onNodeWithText("5 tagoj").assertIsDisplayed()
         onNodeWithText("3 tagoj").assertIsDisplayed()
-        onNodeWithText("1 semajno").assertIsDisplayed()
+        onNodeWithText("12 tagoj").assertIsDisplayed()
         onNodeWithText("2 semajnoj").assertIsDisplayed()
     }
 }

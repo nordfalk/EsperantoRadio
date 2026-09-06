@@ -49,10 +49,8 @@ fun kalkuliNovectempon(
     return when {
         tagoj == 0 -> "hodiaŭ"
         tagoj == 1 -> "1 tago"
-        tagoj < 7 -> "$tagoj tagoj"
-        tagoj < 14 -> "1 semajno"
-        tagoj < 30 -> "${tagoj / 7} semajnoj"
-        tagoj < 60 -> "1 monato"
+        tagoj <= 14 -> "$tagoj tagoj"
+        tagoj < 60 -> "${tagoj / 7} semajnoj"
         tagoj < 180 -> "${tagoj / 30} monatoj"
         else -> null
     }
@@ -97,13 +95,13 @@ class HejmoViewModel(
 
             val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
 
-            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanal, maks 20 entute
+            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanal, maks 50 entute
             val novaj = ĉiujElsendoj
                 .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
                 .groupBy { it.kanalSlug }
                 .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
                 .sortedByDescending { it.dato }
-                .take(20)
+                .take(50)
             _novajElsendoj.value = novaj
             logi("HejmoViewModel", "Kio novas: ${novaj.size} elsendoj (post filtrado)")
 

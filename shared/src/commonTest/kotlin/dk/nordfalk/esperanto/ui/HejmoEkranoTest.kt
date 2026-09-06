@@ -13,7 +13,8 @@ import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -29,7 +30,7 @@ import kotlin.test.Test
  * Datoj estas kalkulitaj dinamike relative al hodiaux por ke la testoj
  * cxiiam validu (ne malnovigxu post 6 monatoj).
  */
-@OptIn(ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class, ExperimentalTime::class)
 class HejmoEkranoTest {
 
     private val hodiaux = Clock.System.todayIn(TimeZone.UTC)

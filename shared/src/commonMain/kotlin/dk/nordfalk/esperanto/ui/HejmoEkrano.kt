@@ -27,7 +27,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
@@ -39,6 +40,7 @@ import kotlinx.datetime.todayIn
  *
  * Ekzemploj: "hodiaux", "1 tago", "3 tagoj", "1 semajno", "2 semajnoj", "1 monato", "4 monatoj"
  */
+@OptIn(ExperimentalTime::class)
 fun kalkuliNovectempon(
     dato: String,
     nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
@@ -62,6 +64,7 @@ fun kalkuliNovectempon(
  * - [novajElsendoj] — ĉiuj elsendoj ordigitaj laŭ dato (plej nova unue) por "Kio novas"
  * - [popularajElsendoj] — hazardaj elsendoj por "Kio popularas"
  */
+@OptIn(ExperimentalTime::class)
 class HejmoViewModel(
     private val kanalDeponejo: KanalDeponejo,
     private val elsendoDeponejo: ElsendoDeponejo,

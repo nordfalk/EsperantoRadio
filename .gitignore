@@ -51,3 +51,6 @@ captures/
 
 # Kotlin/KMP
 .kotlin/
+.figma-scratch/
+img.png
+ekranfoto.svg

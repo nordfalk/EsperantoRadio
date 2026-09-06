@@ -60,6 +60,9 @@ class AgordojDeponejoImpl : AgordojDeponejo {
     private val _nurWifi = MutableStateFlow(false)
     override val nurWifi: StateFlow<Boolean> = _nurWifi.asStateFlow()
 
+    private val _temo = MutableStateFlow("ANTONIA")
+    override val temo: StateFlow<String> = _temo.asStateFlow()
+
     override fun fiksiLingvon(lingvo: String) {
         _lingvo.value = lingvo
         logi("Agordoj", "Lingvo → $lingvo")
@@ -67,5 +70,9 @@ class AgordojDeponejoImpl : AgordojDeponejo {
     override fun fiksiNurWifi(nurWifi: Boolean) {
         _nurWifi.value = nurWifi
         logi("Agordoj", "NurWifi → $nurWifi")
+    }
+    override fun fiksiTemon(temo: String) {
+        _temo.value = temo
+        logi("Agordoj", "Temo → $temo")
     }
 }

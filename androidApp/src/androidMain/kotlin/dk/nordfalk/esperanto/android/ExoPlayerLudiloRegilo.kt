@@ -94,10 +94,12 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
             }
             is Sonfonto.ElsendoFonto -> {
                 builder.setTitle(fonto.elsendo.titolo)
+                fonto.elsendo.kanalNomo?.let { builder.setArtist(it) }
                 fonto.elsendo.bildUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
             }
             is Sonfonto.LokaElsendo -> {
                 builder.setTitle(fonto.elsendo.titolo)
+                fonto.elsendo.kanalNomo?.let { builder.setArtist(it) }
                 fonto.elsendo.bildUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
             }
         }

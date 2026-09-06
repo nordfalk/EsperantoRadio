@@ -100,6 +100,7 @@ class RssParsilo {
         return Elsendo(
             id = "${kanal.slug}:$dato",
             kanalSlug = kanal.slug,
+            kanalNomo = kanal.nomo,
             titolo = finaTitolo,
             priskribo = puriguHtml(priskriboHtml.ifEmpty { priskribo }),
             bildUrl = bildUrl,
@@ -136,6 +137,7 @@ class RssParsilo {
                 rezulto.add(Elsendo(
                     id = "${kanal.slug}:$dato:${i + 1}",
                     kanalSlug = kanal.slug,
+                    kanalNomo = kanal.nomo,
                     titolo = "$titolo ${i + 1}a parto",
                     priskribo = puriguHtml(htmlEnhavo),
                     dato = dato,
@@ -207,6 +209,7 @@ class RssParsilo {
             Elsendo(
                 id = id,
                 kanalSlug = kanal.slug,
+                kanalNomo = kanal.nomo,
                 titolo = if (kanal.ignoruTitolon) puriguHtml(priskribo).take(200) else titolo,
                 priskribo = priskribo,
                 bildUrl = bildUrl,
@@ -234,6 +237,7 @@ class RssParsilo {
             Elsendo(
                 id = id,
                 kanalSlug = kanal.slug,
+                kanalNomo = kanal.nomo,
                 titolo = puriguHtml(priskribo).take(200),
                 priskribo = puriguHtml(priskribo),
                 bildUrl = bildUrl,

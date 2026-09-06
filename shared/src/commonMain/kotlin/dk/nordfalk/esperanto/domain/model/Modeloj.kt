@@ -32,6 +32,7 @@ data class Kanal(
 data class Elsendo(
     val id: String,                   // slug — vidu id-konvenciojn
     val kanalSlug: String,
+    val kanalNomo: String? = null,    // nomo de la kanal (por sciigoj kaj UI)
     val titolo: String,
     val priskribo: String? = null,    // purigita HTML/teksto
     val bildUrl: String? = null,

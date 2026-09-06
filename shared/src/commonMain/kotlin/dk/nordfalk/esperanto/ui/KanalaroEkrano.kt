@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -181,4 +182,10 @@ private fun KanalEro(
         modifier = Modifier.clickable(onClick = onClick)
     )
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+}
+
+@Preview(name = "Kanalaro", showBackground = true, heightDp = 250)
+@Composable
+fun KanalaroEkranoPreview() {
+    pTemo { KanalaroEkrano(viewModel = KanalaroViewModel(pKanalDeponejo())) }
 }

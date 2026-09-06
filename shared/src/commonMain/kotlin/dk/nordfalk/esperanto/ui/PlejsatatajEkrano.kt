@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
@@ -49,4 +50,10 @@ fun PlejsatatajEkrano(
             }
         }
     }
+}
+
+@Preview(name = "PlejsatatajEkrano", showBackground = true, heightDp = 250)
+@Composable
+fun PlejsatatajEkranoPreview() {
+    pTemo { PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {}, onKanal = {}) }
 }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -87,4 +88,10 @@ private fun ElshutitaEro(
             }
         }
     )
+}
+
+@Preview(name = "ElshutitajEkrano", showBackground = true, heightDp = 250)
+@Composable
+fun ElshutitajEkranoPreview() {
+    pTemo { ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), onReen = {}, onLudi = {}, onElsendo = {}) }
 }

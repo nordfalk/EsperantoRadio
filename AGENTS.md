@@ -124,13 +124,6 @@ EsperantoRadio/
 9. **Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
    uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
    La commit-mesaĝo estu la titolo de la PR + ligo al la PR
-   (ekz. `Nova hejmekrano (#33)`). Forigu la branĉon post kunfando.
-10. **Esploru logcat-erarojn.** Kiam la uzanto provizas logcat-eligon,
-    serĉu liniojn kun `E` (eraro) aŭ `FATAL EXCEPTION`. Plej ofte la problemo
-    estas `NullPointerException` kaŭzita de `!!` sur nullable ŝtato. Tuj
-    riparu tiajn kraŝojn — ili estas prioritataj. Legu la stack-trace por
-    trovi la precizan dosieron kaj linion. Ne ignoru `SLF4J(W)` aŭ
-    `failed lock verification` — tiuj estas harmless sur emulators.
 
 ## Git-laborfluo
 
@@ -140,8 +133,9 @@ EsperantoRadio/
 3. Commit, push, kreu PR kun `gh pr create`.
 4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
    Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
-5. Ne uzigu `--merge` (kreas merge-commit) aŭ `--rebase` (reaspektas la
-   individuajn commitojn). Nur `--squash` donas puran historion.
+5. Faru commit malofte kaj kiel eble plej malfrue (kiam bezonas por la daŭrigo)
+6. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
+   kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
 
 ## Teknikaj scioj lernitaj dum la laboro
 
@@ -185,6 +179,17 @@ EsperantoRadio/
   | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
   | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
   | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
+
+## Logcat (Android)
+
+`adb` jam haveblas en la medio (`/home/j/Android/Sdk/platform-tools/adb`) kaj la
+emulilo kuras kiel `emulator-5554`. Oni povas legi logcat-on rekte:
+
+```bash
+adb logcat -d -t 100                      # lastaj 100 linioj
+adb logcat -d | grep FATAL                 # nur kraŝoj
+adb logcat -d | grep -E "dk.nordfalk.esperanto.android"  # nur apo
+```
 
 ## UI-dizajno (celo)
 

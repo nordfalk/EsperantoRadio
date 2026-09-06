@@ -45,6 +45,12 @@ fun MiniLudilbreto(
         is Sonfonto.LokaElsendo -> fonto.elsendo.titolo
     }
 
+    val subtitolo = when (fonto) {
+        is Sonfonto.RektaKanalo -> null
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.kanalNomo
+        is Sonfonto.LokaElsendo -> fonto.elsendo.kanalNomo
+    }
+
     val bildUrl = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanal.emblemoUrl
         is Sonfonto.ElsendoFonto -> fonto.elsendo.bildUrl
@@ -107,8 +113,9 @@ fun MiniLudilbreto(
                     is LudantoStato.Haltita -> if (info.estasRekta) "Haltita" else "Paŭzita"
                     is LudantoStato.Eraro -> "Eraro: ${(info.stato as LudantoStato.Eraro).mesagho}"
                 }
+                val plenaTeksto = if (subtitolo != null) "$subtitolo · $statTeksto" else statTeksto
                 Text(
-                    text = statTeksto,
+                    text = plenaTeksto,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.material3)
             implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.session)
         }
     }
 }

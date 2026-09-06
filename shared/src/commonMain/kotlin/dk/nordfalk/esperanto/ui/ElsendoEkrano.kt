@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.logi
 
@@ -23,6 +24,8 @@ fun ElsendoEkrano(
     onLudi: () -> Unit = {},
     onElshuti: () -> Unit = {},
     onForigiElshuton: () -> Unit = {},
+    onKanal: (Kanal) -> Unit = {},
+    kanal: Kanal? = null,
     elshutDeponejo: ElshutDeponejo? = null,
 ) {
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
@@ -75,6 +78,22 @@ fun ElsendoEkrano(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            // Klakebla kanalnomo → iras al kanal-ekrano
+            if (kanal != null) {
+                Spacer(Modifier.height(4.dp))
+                TextButton(
+                    onClick = { logi("Klako", "kanal-ligilo → ${kanal.slug}"); onKanal(kanal) },
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp, vertical = 0.dp)
+                ) {
+                    Text(
+                        text = kanal.nomo,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             Spacer(Modifier.height(24.dp))
 
             // Priskribo

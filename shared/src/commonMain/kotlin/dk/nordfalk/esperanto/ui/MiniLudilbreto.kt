@@ -23,15 +23,15 @@ import kotlinx.coroutines.launch
  *
  * Montroj:
  * - Emblemo/bildeto de la nuna elsendo
- * - Titolo de la nuna elsendo
+ * - Titolo de la nuna elsendo (klakebla → elsendodetalo aŭ kanalo)
  * - Ludi/paŭzi-butono
  * - Pozicio-breto (serĉbreto) por podkastoj (ne por rekta)
- * - Volvigi-butono (→ elsendodetalo) — estonte
  */
 @Composable
 fun MiniLudilbreto(
     ludilo: LudiloRegilo,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -62,6 +62,7 @@ fun MiniLudilbreto(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable { logi("Klako", "mini-ludilbreto → detalo"); onClick() }
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

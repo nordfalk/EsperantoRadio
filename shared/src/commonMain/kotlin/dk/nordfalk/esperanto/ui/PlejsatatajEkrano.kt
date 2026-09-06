@@ -18,7 +18,6 @@ import dk.nordfalk.esperanto.logi
 fun PlejsatatajEkrano(
     plejsatatajDeponejo: PlejsatatajDeponejo,
     kanalDeponejo: KanalDeponejo,
-    onReen: () -> Unit,
     onKanal: (Kanal) -> Unit,
 ) {
     val plejsatataj by plejsatatajDeponejo.observiPlejsatatajn().collectAsState()
@@ -28,8 +27,7 @@ fun PlejsatatajEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Plej ŝatataj") },
-                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (PlejsatatajEkrano)"); onReen() }) { Text("← Reen") } }
+                title = { Text("Plej ŝatataj") }
             )
         }
     ) { padding ->
@@ -55,5 +53,5 @@ fun PlejsatatajEkrano(
 @Preview(name = "PlejsatatajEkrano", showBackground = true, heightDp = 250)
 @Composable
 fun PlejsatatajEkranoPreview() {
-    pTemo { PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {}, onKanal = {}) }
+    pTemo { PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onKanal = {}) }
 }

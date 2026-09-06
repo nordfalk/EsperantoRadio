@@ -79,7 +79,7 @@ class NavigaTesto {
             override suspend fun sercxi(taxto: String, limo: Int) =
                 if (taxto.length >= 2) listOf(testElsendo) else emptyList()
         }
-        setContent { SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onReen = {}, onElsendo = {}) }
+        setContent { SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onElsendo = {}) }
         waitForIdle()
         onNodeWithText("Serĉi").assertIsDisplayed()
     }
@@ -95,7 +95,7 @@ class NavigaTesto {
             override suspend fun estasPlejsatata(kanalSlug: String) = kanalSlug in _set.value
         }
         setContent {
-            PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onReen = {}, onKanal = {})
+            PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onKanal = {})
         }
         waitForIdle()
         onNodeWithText("Muzaiko").assertIsDisplayed()

@@ -103,21 +103,6 @@ class HejmoEkranoTest {
     }
 
     @Test
-    fun montrasNavigaBreton() = runComposeUiTest {
-        setContent {
-            HejmoEkrano(
-                kanalDeponejo = falsaKanalDeponejo(),
-                elsendoDeponejo = falsaElsendoDeponejo(),
-            )
-        }
-        waitForIdle()
-        onNodeWithText("Hejmo").assertIsDisplayed()
-        onNodeWithText("Kanaloj").assertIsDisplayed()
-        onNodeWithText("Plej ŝatataj").assertIsDisplayed()
-        onNodeWithText("Serĉi").assertIsDisplayed()
-    }
-
-    @Test
     fun montrasElsendojnEnKioNovas() = runComposeUiTest {
         setContent {
             HejmoEkrano(

@@ -57,7 +57,7 @@ fun PreviewElsendoDetalo() {
 @Composable
 fun PreviewSerchxo() {
     pTemo() {
-        SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onReen = {}, onElsendo = {})
+        SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onElsendo = {})
     }
 }
 
@@ -65,7 +65,7 @@ fun PreviewSerchxo() {
 @Composable
 fun PreviewPlejsatataj() {
     pTemo() {
-        PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {}, onKanal = {})
+        PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onKanal = {})
     }
 }
 

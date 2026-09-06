@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SercxoEkrano(
     sercxoDeponejo: SercxoDeponejo,
-    onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit,
 ) {
     var taxto by remember { mutableStateOf("") }
@@ -29,8 +28,7 @@ fun SercxoEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Serĉi") },
-                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (SercxoEkrano)"); onReen() }) { Text("← Reen") } }
+                title = { Text("Serĉi") }
             )
         }
     ) { padding ->
@@ -77,5 +75,5 @@ fun SercxoEkrano(
 @Preview(name = "SercxoEkrano", showBackground = true, heightDp = 350)
 @Composable
 fun SercxoEkranoPreview() {
-    pTemo { SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onReen = {}, onElsendo = {}) }
+    pTemo { SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onElsendo = {}) }
 }

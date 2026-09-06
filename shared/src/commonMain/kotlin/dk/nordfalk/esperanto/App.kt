@@ -93,6 +93,11 @@ fun EsperantoRadioApp(
         var elektitaKanal by remember { mutableStateOf<Kanal?>(null) }
         var elektitaElsendo by remember { mutableStateOf<Elsendo?>(null) }
 
+        val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
+        val ludantoStato by ludilo.stato.collectAsState()
+
+        val montruSubanBreton = ekrano != Ekrano.AGORDOJ && ekrano != Ekrano.ALARMOJ
+
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
                 when (ekrano) {
@@ -102,9 +107,6 @@ fun EsperantoRadioApp(
                             elsendoDeponejo = elsendoDeponejo,
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
                             onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
-                            onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
-                            onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
-                            onKanalaro = { logi("Nav", "→ KANALARO"); ekrano = Ekrano.KANALARO },
                             onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ },
                             onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
                             onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
@@ -113,14 +115,11 @@ fun EsperantoRadioApp(
                     Ekrano.KANALARO -> {
                         KanalaroEkrano(
                             viewModel = kanalaroViewModel,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
                             onLudi = { fonto ->
                                 logi("Nav", "Ludas rekte: ${fonto}")
                                 scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                             },
-                            onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
-                            onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
                             onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
                             onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
                             onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
@@ -148,8 +147,11 @@ fun EsperantoRadioApp(
                         if (elsendo == null) {
                             ekrano = Ekrano.HEJMO
                         } else {
+                            val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
                             ElsendoEkrano(
                                 elsendo = elsendo,
+                                kanal = kanal,
+                                onKanal = { k -> logi("Nav", "→ KANAL el elsendo: ${k.slug}"); elektitaKanal = k; ekrano = Ekrano.KANAL },
                                 onReen = {
                                     logi("Nav", "→ reen de ELSENDO")
                                     if (elektitaKanal != null) { ekrano = Ekrano.KANAL }
@@ -183,7 +185,6 @@ fun EsperantoRadioApp(
                     Ekrano.SERCXO -> {
                         SercxoEkrano(
                             sercxoDeponejo = sercxoDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
                             onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el serĉo: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
                         )
                     }
@@ -191,7 +192,6 @@ fun EsperantoRadioApp(
                         PlejsatatajEkrano(
                             plejsatatajDeponejo = plejsatatajDeponejo,
                             kanalDeponejo = kanalDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
                             onKanal = { kanal -> logi("Nav", "→ KANAL el plejŝatataj: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL }
                         )
                     }
@@ -222,7 +222,45 @@ fun EsperantoRadioApp(
                 }
             }
 
-            MiniLudilbreto(ludilo = ludilo)
+            if (montruSubanBreton) {
+                MiniLudilbreto(
+                    ludilo = ludilo,
+                    onClick = {
+                        val fonto = ludantoStato.nunaFonto
+                        when (fonto) {
+                            is Sonfonto.ElsendoFonto -> {
+                                logi("Nav", "→ ELSENDO el mini-ludilo")
+                                elektitaElsendo = fonto.elsendo
+                                ekrano = Ekrano.ELSENDO
+                            }
+                            is Sonfonto.LokaElsendo -> {
+                                logi("Nav", "→ ELSENDO el mini-ludilo (loka)")
+                                elektitaElsendo = fonto.elsendo
+                                ekrano = Ekrano.ELSENDO
+                            }
+                            is Sonfonto.RektaKanalo -> {
+                                logi("Nav", "→ KANAL el mini-ludilo")
+                                elektitaKanal = fonto.kanal
+                                ekrano = Ekrano.KANAL
+                            }
+                            null -> {}
+                        }
+                    }
+                )
+                MalsupraNavigaBreto(
+                    nunaTab = when (ekrano) {
+                        Ekrano.HEJMO -> EkranoTab.HEJMO
+                        Ekrano.KANALARO -> EkranoTab.KANALARO
+                        Ekrano.PLEJSATATAJ -> EkranoTab.PLEJSATATAJ
+                        Ekrano.SERCXO -> EkranoTab.SERCXO
+                        else -> EkranoTab.NENIO
+                    },
+                    onHejmo = { logi("Nav", "→ HEJMO (tab)"); ekrano = Ekrano.HEJMO },
+                    onKanalaro = { logi("Nav", "→ KANALARO (tab)"); ekrano = Ekrano.KANALARO },
+                    onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ (tab)"); ekrano = Ekrano.PLEJSATATAJ },
+                    onSercxo = { logi("Nav", "→ SERCXO (tab)"); ekrano = Ekrano.SERCXO },
+                )
+            }
         }
     }
 }

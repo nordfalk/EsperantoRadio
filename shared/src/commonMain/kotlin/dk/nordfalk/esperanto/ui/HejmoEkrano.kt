@@ -136,9 +136,6 @@ fun HejmoEkrano(
     onKanal: (Kanal) -> Unit = {},
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
-    onSercxo: () -> Unit = {},
-    onPlejsatataj: () -> Unit = {},
-    onKanalaro: () -> Unit = {},
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
@@ -159,16 +156,10 @@ fun HejmoEkrano(
             TopAppBar(
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
+                    TextButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Text("⬇") }
+                    TextButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Text("⏰") }
                     TextButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Text("⚙") }
                 }
-            )
-        },
-        bottomBar = {
-            MalsupraNavigaBreto(
-                onHejmo = {},
-                onKanalaro = { logi("Nav", "→ KANALARO"); onKanalaro() },
-                onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); onPlejsatataj() },
-                onSercxo = { logi("Nav", "→ SERCXO"); onSercxo() },
             )
         }
     ) { padding ->
@@ -316,20 +307,5 @@ private fun ElsendoKarto(
                 maxLines = 2, overflow = TextOverflow.Ellipsis
             )
         }
-    }
-}
-
-@Composable
-private fun MalsupraNavigaBreto(
-    onHejmo: () -> Unit,
-    onKanalaro: () -> Unit,
-    onPlejsatataj: () -> Unit,
-    onSercxo: () -> Unit,
-) {
-    NavigationBar {
-        NavigationBarItem(selected = true, onClick = { logi("Klako", "hejmo-tab"); onHejmo() }, icon = { Text("🏠") }, label = { Text("Hejmo") })
-        NavigationBarItem(selected = false, onClick = { logi("Klako", "kanalaro-tab"); onKanalaro() }, icon = { Text("🎵") }, label = { Text("Kanaloj") })
-        NavigationBarItem(selected = false, onClick = { logi("Klako", "plejsatataj-tab"); onPlejsatataj() }, icon = { Text("★") }, label = { Text("Plej ŝatataj") })
-        NavigationBarItem(selected = false, onClick = { logi("Klako", "sercxo-tab"); onSercxo() }, icon = { Text("🔍") }, label = { Text("Serĉi") })
     }
 }

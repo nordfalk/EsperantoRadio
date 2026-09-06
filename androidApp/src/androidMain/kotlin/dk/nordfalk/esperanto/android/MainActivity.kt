@@ -1,6 +1,8 @@
 package dk.nordfalk.esperanto.android
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.RingtoneManager
 import android.os.Build
@@ -9,6 +11,8 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
@@ -30,6 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appContext = applicationContext
+        petiSciigPermeson()
         ludilo = ExoPlayerLudiloRegilo(this)
         setContent {
             EsperantoRadioApp(ludilo = ludilo)
@@ -140,6 +145,25 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // NUR malkonektas la MediaController — la servo pluvivas kaj daŭre ludas en la fono
         ludilo.release()
+    }
+
+    /**
+     * Petas sciig-permeson por Android 13+ (API 33+).
+     * Necesa por la mediasciigo dum fona ludado.
+     */
+    private fun petiSciigPermeson() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
+        }
     }
 }

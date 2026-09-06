@@ -13,73 +13,74 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// === Muzaiko-koloroj ===
+// === Antonia-koloroj (de Figma-dizajno "Muzaiko — Antonia") ===
 
-val MuzaikoRugo = Color(0xFFD0002F)
-val MuzaikoRugoMalhela = Color(0xFF9F001E)
-val MuzaikoRugoProfunda = Color(0xFF4F000E)
-val MuzaikoKremo = Color(0xFFFAF6F2)
-val MuzaikoKarbono = Color(0xFF1A1413)
-val MuzaikoArgento = Color(0xFFE8E2DD)
-val MuzaikoBlanko = Color(0xFFFFFFFF)
-val MuzaikoMalhelaFono = Color(0xFF1A1413)
-val MuzaikoMalhelaSurfaco = Color(0xFF241D1B)
-val MuzaikoMalhelaMalaktiva = Color(0xFF3A3030)
+val AntoniaPurpura = Color(0xFF2A1D40)      // titoloj, priskriboj
+val AntoniaRuhaPurpura = Color(0xFF32000A)   // kanalnomo (tre malhela)
+val AntoniaGrizaBruna = Color(0xFF746E6F)    // kanalnomoj en kartoj
+val AntoniaKartFono = Color(0xFFF6F6F6)      // kartfono
+val AntoniaLokokupilo = Color(0xFFC4C4C4)    // bildlokokupilo
+val AntoniaRozeta = Color(0xFFEABDC5)        // favorato, aktiva langeto, ludbutono
+val AntoniaEraro = Color(0xFFB00020)        // eraroj
+val AntoniaBlanko = Color(0xFFFFFFFF)        // fono
+val AntoniaNigra = Color(0xFF000000)         // teksto
+val AntoniaMalhelaFono = Color(0xFF1A1424)   // malhela temo fono
+val AntoniaMalhelaSurfaco = Color(0xFF241D30) // malhela temo surfaco
 
 // === Kolorskemoj ===
 
 val MuzaikoHelaKolorskemo = lightColorScheme(
-    primary = MuzaikoRugo,
-    onPrimary = MuzaikoBlanko,
-    primaryContainer = MuzaikoRugoMalhela,
-    onPrimaryContainer = MuzaikoKremo,
-    secondary = MuzaikoKarbono,
-    onSecondary = MuzaikoKremo,
-    secondaryContainer = MuzaikoArgento,
-    onSecondaryContainer = MuzaikoKarbono,
-    tertiary = MuzaikoRugoProfunda,
-    onTertiary = MuzaikoKremo,
-    background = MuzaikoKremo,
-    onBackground = MuzaikoKarbono,
-    surface = MuzaikoBlanko,
-    onSurface = MuzaikoKarbono,
-    surfaceVariant = MuzaikoArgento,
-    onSurfaceVariant = MuzaikoKarbono,
-    outline = MuzaikoArgento,
-    outlineVariant = MuzaikoKremo,
-    error = MuzaikoRugo,
-    onError = MuzaikoBlanko,
+    primary = AntoniaPurpura,
+    onPrimary = AntoniaBlanko,
+    primaryContainer = AntoniaRuhaPurpura,
+    onPrimaryContainer = AntoniaRozeta,
+    secondary = AntoniaGrizaBruna,
+    onSecondary = AntoniaBlanko,
+    secondaryContainer = AntoniaKartFono,
+    onSecondaryContainer = AntoniaPurpura,
+    tertiary = AntoniaRozeta,
+    onTertiary = AntoniaPurpura,
+    background = AntoniaBlanko,
+    onBackground = AntoniaPurpura,
+    surface = AntoniaBlanko,
+    onSurface = AntoniaPurpura,
+    surfaceVariant = AntoniaKartFono,
+    onSurfaceVariant = AntoniaGrizaBruna,
+    outline = AntoniaLokokupilo,
+    outlineVariant = AntoniaKartFono,
+    error = AntoniaEraro,
+    onError = AntoniaBlanko,
 )
 
 val MuzaikoMalhelaKolorskemo = darkColorScheme(
-    primary = MuzaikoRugo,
-    onPrimary = MuzaikoBlanko,
-    primaryContainer = MuzaikoRugoProfunda,
-    onPrimaryContainer = MuzaikoKremo,
-    secondary = MuzaikoKremo,
-    onSecondary = MuzaikoKarbono,
-    secondaryContainer = MuzaikoMalhelaMalaktiva,
-    onSecondaryContainer = MuzaikoKremo,
-    tertiary = MuzaikoRugoMalhela,
-    onTertiary = MuzaikoKremo,
-    background = MuzaikoMalhelaFono,
-    onBackground = MuzaikoKremo,
-    surface = MuzaikoMalhelaSurfaco,
-    onSurface = MuzaikoKremo,
-    surfaceVariant = MuzaikoMalhelaMalaktiva,
-    onSurfaceVariant = MuzaikoArgento,
-    outline = MuzaikoMalhelaMalaktiva,
-    outlineVariant = MuzaikoKarbono,
-    error = MuzaikoRugo,
-    onError = MuzaikoBlanko,
+    primary = AntoniaRozeta,
+    onPrimary = AntoniaPurpura,
+    primaryContainer = AntoniaPurpura,
+    onPrimaryContainer = AntoniaRozeta,
+    secondary = Color(0xFFB0AAB0),
+    onSecondary = AntoniaMalhelaFono,
+    secondaryContainer = Color(0xFF2E2830),
+    onSecondaryContainer = AntoniaRozeta,
+    tertiary = AntoniaRozeta,
+    onTertiary = AntoniaPurpura,
+    background = AntoniaMalhelaFono,
+    onBackground = Color(0xFFE8E2E8),
+    surface = AntoniaMalhelaSurfaco,
+    onSurface = Color(0xFFE8E2E8),
+    surfaceVariant = Color(0xFF2E2830),
+    onSurfaceVariant = Color(0xFFB0AAB0),
+    outline = Color(0xFF2E2830),
+    outlineVariant = AntoniaMalhelaFono,
+    error = AntoniaEraro,
+    onError = AntoniaBlanko,
 )
 
 // === Formoj ===
 
 val MuzaikoFormoj = Shapes(
     small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
+    medium = RoundedCornerShape(10.dp),
+    large = RoundedCornerShape(15.dp),
 )
 
 // === Tiparo ===

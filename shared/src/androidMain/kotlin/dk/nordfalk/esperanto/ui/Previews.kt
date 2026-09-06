@@ -169,10 +169,16 @@ fun PreviewMiniLudilbreto() {
 @Composable
 fun PreviewHejmoNova() {
     val elsendoDeponejo = object : dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo {
-        override fun observiElsendojn(kanalSlug: String) = MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()).asStateFlow()
-        override suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
-        override suspend fun getElsendo(id: String) = null
-        override suspend fun sercxiElsendojn(taxto: String, limo: Int) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        private val elsendoj = listOf(
+            dk.nordfalk.esperanto.domain.model.Elsendo(id = "kp:1", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", stream = "", dato = "2026-09-01"),
+            dk.nordfalk.esperanto.domain.model.Elsendo(id = "kp:2", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", stream = "", dato = "2026-08-25"),
+            dk.nordfalk.esperanto.domain.model.Elsendo(id = "vv:1", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", stream = "", dato = "2026-09-03"),
+        )
+        override fun observiElsendojn(kanalSlug: String) = MutableStateFlow(elsendoj.filter { it.kanalSlug == kanalSlug }).asStateFlow()
+        override suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean) = elsendoj.filter { it.kanalSlug == kanalSlug }
+        override suspend fun getElsendo(id: String) = elsendoj.find { it.id == id }
+        override suspend fun sercxiElsendojn(taxto: String, limo: Int) = elsendoj.filter { it.titolo.contains(taxto, ignoreCase = true) }.take(limo)
+        override suspend fun sxargxiElsendojnPorKanal(kanal: dk.nordfalk.esperanto.domain.model.Kanal, fortoRefresigi: Boolean) = elsendoj.filter { it.kanalSlug == kanal.slug }
     }
     pTemo() {
         HejmoEkrano(

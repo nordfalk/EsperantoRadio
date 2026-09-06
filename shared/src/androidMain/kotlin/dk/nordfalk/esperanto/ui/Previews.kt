@@ -165,6 +165,23 @@ fun PreviewMiniLudilbreto() {
     }
 }
 
+@Preview(name = "Hejmo (nova)", showBackground = true, widthDp = 411, heightDp = 731)
+@Composable
+fun PreviewHejmoNova() {
+    val elsendoDeponejo = object : dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo {
+        override fun observiElsendojn(kanalSlug: String) = MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()).asStateFlow()
+        override suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        override suspend fun getElsendo(id: String) = null
+        override suspend fun sercxiElsendojn(taxto: String, limo: Int) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
+    }
+    pTemo() {
+        HejmoEkrano(
+            kanalDeponejo = pKanalDeponejo(),
+            elsendoDeponejo = elsendoDeponejo,
+        )
+    }
+}
+
 private class PreviewLudiloRegilo(initial: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita)) : LudiloRegilo {
     private val s = MutableStateFlow(initial)
     override val stato: StateFlow<LudantoInformo> = s.asStateFlow()

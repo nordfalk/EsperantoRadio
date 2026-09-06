@@ -22,6 +22,8 @@ import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
+import dk.nordfalk.esperanto.ui.TemoNomo
+import dk.nordfalk.esperanto.ui.temuKolorskemo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,7 +79,7 @@ class EkranfotoTesto {
     fun ekranfoto_kanalaro() = runComposeUiTest {
         val viewModel = KanalaroViewModel(falsaKanalDeponejo())
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 KanalaroEkrano(viewModel = viewModel)
             }
         }
@@ -86,9 +88,33 @@ class EkranfotoTesto {
     }
 
     @Test
+    fun ekranfoto_kanalaro_rugxa() = runComposeUiTest {
+        val viewModel = KanalaroViewModel(falsaKanalDeponejo())
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.RUGXA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                KanalaroEkrano(viewModel = viewModel)
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "temo_rugxa_kanalaro")
+    }
+
+    @Test
+    fun ekranfoto_kanalaro_verda() = runComposeUiTest {
+        val viewModel = KanalaroViewModel(falsaKanalDeponejo())
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.VERDA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                KanalaroEkrano(viewModel = viewModel)
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "temo_verda_kanalaro")
+    }
+
+    @Test
     fun ekranfoto_elsendo_detalo() = runComposeUiTest {
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, onElshuti = {})
             }
         }
@@ -103,7 +129,7 @@ class EkranfotoTesto {
                 if (taxto.length >= 2) listOf(testElsendo) else emptyList()
         }
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onReen = {}, onElsendo = {})
             }
         }
@@ -120,7 +146,7 @@ class EkranfotoTesto {
             override suspend fun estasPlejsatata(kanalSlug: String) = kanalSlug in _set.value
         }
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onReen = {}, onKanal = {})
             }
         }
@@ -143,7 +169,7 @@ class EkranfotoTesto {
             override fun estasElshutita(elsendoId: String) = true
         }
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 ElshutitajEkrano(elshutDeponejo = elshutDeponejo, onReen = {}, onLudi = {}, onElsendo = {})
             }
         }
@@ -160,7 +186,7 @@ class EkranfotoTesto {
             )
         )
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 AlarmoEkrano(alarmoDeponejo = alarmoDeponejo, kanalDeponejo = falsaKanalDeponejo(), onReen = {})
             }
         }
@@ -172,7 +198,7 @@ class EkranfotoTesto {
     fun ekranfoto_agordoj() = runComposeUiTest {
         val agordojDeponejo = AgordojDeponejoImpl()
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 AgordojEkrano(agordojDeponejo = agordojDeponejo, onReen = {})
             }
         }
@@ -186,7 +212,7 @@ class EkranfotoTesto {
             LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
         )
         setContent {
-            MaterialTheme(colorScheme = muzaikoKolorskemo(false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize())
             }
         }

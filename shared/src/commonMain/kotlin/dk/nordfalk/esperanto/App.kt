@@ -127,46 +127,58 @@ fun EsperantoRadioApp(
                         )
                     }
                     Ekrano.KANAL -> {
-                        val kanal = elektitaKanal!!
-                        KanalEkrano(
-                            kanal = kanal,
-                            elsendoDeponejo = elsendoDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
-                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
-                            onLudi = { fonto ->
-                                logi("Nav", "Ludas rekte: ${kanal.slug}")
-                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
-                            }
-                        )
+                        val kanal = elektitaKanal
+                        if (kanal != null) {
+                            KanalEkrano(
+                                kanal = kanal,
+                                elsendoDeponejo = elsendoDeponejo,
+                                onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
+                                onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
+                                onLudi = { fonto ->
+                                    logi("Nav", "Ludas rekte: ${kanal.slug}")
+                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                }
+                            )
+                        } else {
+                            ekrano = Ekrano.HEJMO
+                        }
                     }
                     Ekrano.ELSENDO -> {
-                        val elsendo = elektitaElsendo!!
-                        ElsendoEkrano(
-                            elsendo = elsendo,
-                            onReen = { logi("Nav", "→ KANAL (reen)"); ekrano = Ekrano.KANAL },
-                            onLudi = {
-                                logi("Nav", "Ludas elsendon: ${elsendo.id}")
-                                scope.launch {
-                                    val lokaVojo = elshutDeponejo.getLokaDosieroVojo(elsendo.id)
-                                    val fonto = if (lokaVojo != null) {
-                                        logi("Nav", "Ludas elŝutitan: $lokaVojo")
-                                        Sonfonto.LokaElsendo(elsendo, lokaVojo)
-                                    } else {
-                                        Sonfonto.ElsendoFonto(elsendo)
+                        val elsendo = elektitaElsendo
+                        if (elsendo == null) {
+                            ekrano = Ekrano.HEJMO
+                        } else {
+                            ElsendoEkrano(
+                                elsendo = elsendo,
+                                onReen = {
+                                    logi("Nav", "→ reen de ELSENDO")
+                                    if (elektitaKanal != null) { ekrano = Ekrano.KANAL }
+                                    else { ekrano = Ekrano.HEJMO }
+                                },
+                                onLudi = {
+                                    logi("Nav", "Ludas elsendon: ${elsendo.id}")
+                                    scope.launch {
+                                        val lokaVojo = elshutDeponejo.getLokaDosieroVojo(elsendo.id)
+                                        val fonto = if (lokaVojo != null) {
+                                            logi("Nav", "Ludas elŝutitan: $lokaVojo")
+                                            Sonfonto.LokaElsendo(elsendo, lokaVojo)
+                                        } else {
+                                            Sonfonto.ElsendoFonto(elsendo)
+                                        }
+                                        ludilo.fiksiFonton(fonto); ludilo.ludi()
                                     }
-                                    ludilo.fiksiFonton(fonto); ludilo.ludi()
-                                }
-                            },
-                            onElshuti = {
-                                logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
-                                scope.launch { elshutDeponejo.elshuti(elsendo) }
-                            },
-                            onForigiElshuton = {
-                                logi("Nav", "Forigas elŝuton: ${elsendo.id}")
-                                scope.launch { elshutDeponejo.forigi(elsendo.id) }
-                            },
-                            elshutDeponejo = elshutDeponejo
-                        )
+                                },
+                                onElshuti = {
+                                    logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
+                                    scope.launch { elshutDeponejo.elshuti(elsendo) }
+                                },
+                                onForigiElshuton = {
+                                    logi("Nav", "Forigas elŝuton: ${elsendo.id}")
+                                    scope.launch { elshutDeponejo.forigi(elsendo.id) }
+                                },
+                                elshutDeponejo = elshutDeponejo
+                            )
+                        }
                     }
                     Ekrano.SERCXO -> {
                         SercxoEkrano(

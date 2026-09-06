@@ -125,3 +125,15 @@ fun PreviewMiniLudilbretoHaltita() {
         MiniLudilbreto(ludilo = ludilo)
     }
 }
+
+@Preview(name = "Hejmo (nova)", showBackground = true, widthDp = 411, heightDp = 731)
+@Composable
+fun PreviewHejmoNova() {
+    val elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo))
+    pTemo() {
+        HejmoEkrano(
+            kanalDeponejo = pKanalDeponejo(),
+            elsendoDeponejo = elsendoDeponejo,
+        )
+    }
+}

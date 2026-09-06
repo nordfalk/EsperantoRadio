@@ -121,6 +121,27 @@ EsperantoRadio/
 8. **Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
    eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
    Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.
+9. **Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
+   uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
+   La commit-mesaĝo estu la titolo de la PR + ligo al la PR
+   (ekz. `Nova hejmekrano (#33)`). Forigu la branĉon post kunfando.
+10. **Esploru logcat-erarojn.** Kiam la uzanto provizas logcat-eligon,
+    serĉu liniojn kun `E` (eraro) aŭ `FATAL EXCEPTION`. Plej ofte la problemo
+    estas `NullPointerException` kaŭzita de `!!` sur nullable ŝtato. Tuj
+    riparu tiajn kraŝojn — ili estas prioritataj. Legu la stack-trace por
+    trovi la precizan dosieron kaj linion. Ne ignoru `SLF4J(W)` aŭ
+    `failed lock verification` — tiuj estas harmless sur emulators.
+
+## Git-laborfluo
+
+1. Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
+   plia kommito en ekzistanta PR).
+2. Faru ŝanĝojn, skribu testojn, kompilu kaj rulu testojn.
+3. Commit, push, kreu PR kun `gh pr create`.
+4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
+   Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
+5. Ne uzigu `--merge` (kreas merge-commit) aŭ `--rebase` (reaspektas la
+   individuajn commitojn). Nur `--squash` donas puran historion.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

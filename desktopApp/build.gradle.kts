@@ -11,6 +11,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                @Suppress("DEPRECATION")
                 implementation(compose.desktop.currentOs)
             }
         }

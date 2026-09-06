@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.logi
@@ -71,4 +72,10 @@ fun SercxoEkrano(
             }
         }
     }
+}
+
+@Preview(name = "SercxoEkrano", showBackground = true, heightDp = 350)
+@Composable
+fun SercxoEkranoPreview() {
+    pTemo { SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onReen = {}, onElsendo = {}) }
 }

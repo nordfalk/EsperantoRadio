@@ -1,7 +1,8 @@
-# Plano: Ĝisdatigo al Compose Multiplatform 1.10 + Kotlin 2.1.20
+# Plano: Ĝisdatigo al Compose Multiplatform 1.10 + Kotlin 2.2.20
 
-> **Ne kuru ĉi tion aŭtomate.** Tiu ĉi dokumento priskribas la paŝojn kaj riskojn.
-> La ĝisdatigo devas esti farata zorgeme, paŝo post paŝo, kun kontrolo je ĉiu paŝo.
+> **Efektivigita: 2026-09-06.** Ĉi tiu dokumento priskribis la planon.
+> La efektiva ĝisdatigo estas farita en branĉo `ghisdatigo-compose-1.10`.
+> Vidu la fino de la dosiero por la rezulto kaj lernitaj lecionoj.
 
 ## Kial ĝisdatigi
 
@@ -14,17 +15,18 @@
 
 ## Versioj
 
-| Komponanto | Nuna versio | Celo | Risko |
-|---|---|---|---|
-| Kotlin | 2.1.0 | 2.1.20 (minimume) | Malalta — patch-versio |
-| Compose Multiplatform | 1.7.3 | 1.10.x | Meza — multaj ŝanĝoj |
-| AGP | 8.7.3 | 8.7.3 (aŭ 9.0 se necesa) | Alta se 9.0 postulata |
-| Ktor | 3.1.3 | 3.1.3 (neniu ŝanĝo) | Malalta |
-| ksoup | 0.2.2 | ??? (kontroli kongruecon) | **Alta** — 0.2.6+ postulas Kotlin 2.3+ |
-| Coil | 3.0.4 | 3.0.4 (aŭ pli nova) | Malalta |
-| Media3 | 1.5.1 | 1.5.1 (neniu ŝanĝo) | Neniu |
-| mp3spi | 1.9.5.4 | 1.9.5.4 (neniu ŝanĝo) | Neniu |
-| multiplatform-settings | 1.2.0 | 1.2.0 (neniu ŝanĝo) | Neniu |
+| Komponanto | Nuna versio | Celo | Aktuala versio | Risko |
+|---|---|---|---|---|
+| Kotlin | 2.1.0 | 2.1.20 (minimume) | 2.2.20 | **Pli alta ol planita** — web/native postulas 2.2.20 |
+| Compose Multiplatform | 1.7.3 | 1.10.x | 1.10.0 | Meza — multaj ŝanĝoj |
+| AGP | 8.7.3 | 8.7.3 (aŭ 9.0 se necesa) | 8.7.3 (ne necesis 9.0) | Malalta |
+| Ktor | 3.1.3 | 3.1.3 (neniu ŝanĝo) | 3.1.3 | Neniu |
+| ksoup | 0.2.2 | ??? (kontroli kongruecon) | 0.2.2 (kongrua!) | Malalta — funkcias kun 2.2.20 |
+| Coil | 3.0.4 | 3.0.4 (aŭ pli nova) | 3.0.4 (ne necesis ĝisdatigi) | Neniu |
+| Material3 | (parto de Compose) | — | 1.10.0-alpha05 (aparta versio!) | Meza |
+| Media3 | 1.5.1 | 1.5.1 (neniu ŝanĝo) | 1.5.1 | Neniu |
+| mp3spi | 1.9.5.4 | 1.9.5.4 (neniu ŝanĝo) | 1.9.5.4 | Neniu |
+| multiplatform-settings | 1.2.0 | 1.2.0 (neniu ŝanĝo) | 1.2.0 | Neniu |
 
 ## La plej grandaj riskoj
 
@@ -128,3 +130,47 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 # Ekranfotoj (kontroli ke la UI aspektas gxuste)
 ./gradlew :shared:desktopTest --tests "*EkranfotoTesto*"
 ```
+
+## Rezulto (2026-09-06)
+
+Ĉiuj 6 paŝoj efektivigitaj en branĉo `ghisdatigo-compose-1.10`.
+
+### Kio ŝanĝiĝis
+
+- **Kotlin**: 2.1.0 -> 2.2.20 (ne 2.1.20 kiel planite — web/native-celoj postulas 2.2.20)
+- **Compose MP**: 1.7.3 -> 1.10.0
+- **kotlinOptions -> compilerOptions**: Kotlin 2.2.20 forigis la malnovan DSL (nun estas eraro)
+- **Kaŝnomoj -> rektaj Maven-referencoj**: ĉiuj `compose.xxx` kaŝnomoj anstataŭigitaj
+  per versikatalogaj eniroj, krom `compose.desktop.currentOs`
+- **Material3**: aparta versio `1.10.0-alpha05` (ne la sama kiel `compose-multiplatform`)
+- **@Preview**: movita de `androidMain` al `commonMain`
+- **ui-tooling-preview**: movita de `androidMain` al `commonMain`
+- **@OptIn(ExperimentalComposeLibrary::class)**: forigita (ne plu necesas)
+
+### Lernitaj lecionoj
+
+1. **Kotlin 2.2.20, ne 2.1.20**: La originala plano celis Kotlin 2.1.20, sed la oficiala
+   dokumentaro diras "Kotlin 2.2 is required for native and web platforms". Ĉar ni havas
+   wasmJs-celon, 2.2.20 estas necesa. La Hot Reload-minimumo (2.1.20) ne sufiĉas.
+
+2. **ksoup 0.2.2 estas kongrua kun Kotlin 2.2.20**: Kontraŭe al timo, ĝi funkcias senprobleme.
+
+3. **`compose.desktop.currentOs` ne povas esti anstataŭigita**: La deprecation-mesaĝo diras
+   "can be safely removed", sed la `desktop` artifiko sole ne enhavas la platform-specifan
+   Skia-runtimon (`skiko-awt-runtime-linux-x64`). Ni konservis `currentOs` kun
+   `@Suppress("DEPRECATION")`. Kiam JetBrains disponigas veran anstataŭaĵon, ni migrigos.
+
+4. **Material3 havas apartan version**: `org.jetbrains.compose.material3:material3` estas
+   `1.10.0-alpha05`, ne `1.10.0`. Aldonita `compose-material3` al la versikatalogo.
+
+5. **AGP 8.7.3 sufiĉas**: Ne necesis ĝisdatigi al AGP 9.0.
+
+6. **Coil 3.0.4 funkcias**: Neniu ĝisdatigo necesa.
+
+### Kontrolrezultoj
+
+- compileKotlinDesktop: PASAS
+- compileDebugKotlinAndroid: PASAS
+- compileKotlinWasmJs: PASAS
+- desktopTest: 76 testoj, 0 fiaskoj, 0 eraroj
+- androidApp:assembleDebug: PASAS (APK konstruiĝas)

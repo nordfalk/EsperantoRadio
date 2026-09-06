@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
@@ -194,4 +195,16 @@ private fun ElsendoEro(
         modifier = Modifier.clickable(onClick = onClick)
     )
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+}
+
+@Preview(name = "KanalEkrano", showBackground = true, heightDp = 400)
+@Composable
+fun KanalEkranoPreview() {
+    pTemo {
+        KanalEkrano(
+            kanal = pKanaloj[1],
+            elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
+            onReen = {},
+        )
+    }
 }

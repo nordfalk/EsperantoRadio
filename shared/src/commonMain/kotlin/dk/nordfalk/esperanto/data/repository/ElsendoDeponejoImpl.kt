@@ -19,13 +19,13 @@ import kotlinx.coroutines.flow.asStateFlow
  * ElsendoDeponejo-implentaĵo. Elŝutas RSS-fluojn per Ktor, parsas per RssParsilo,
  * kaŝenas en memoro (StateFlow). Tolerema: eraro → liveri kaŝenitan datumon.
  */
-class ElsendoDeponejoImpl(
+open class ElsendoDeponejoImpl(
     private val httpKliento: HttpClient,
     private val parsilo: RssParsilo = RssParsilo(),
 ) : ElsendoDeponejo {
 
-    private val kaŝmemoro = mutableMapOf<String, List<Elsendo>>()
-    private val fluoj = mutableMapOf<String, MutableStateFlow<List<Elsendo>>>()
+    protected val kaŝmemoro = mutableMapOf<String, List<Elsendo>>()
+    protected val fluoj = mutableMapOf<String, MutableStateFlow<List<Elsendo>>>()
 
     override fun observiElsendojn(kanalSlug: String): StateFlow<List<Elsendo>> {
         return fluoj.getOrPut(kanalSlug) { MutableStateFlow(kaŝmemoro[kanalSlug] ?: emptyList()) }.asStateFlow()
@@ -45,7 +45,7 @@ class ElsendoDeponejoImpl(
      * Elŝutas kaj parsas la RSS-fluon por specifa kanal.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    suspend fun sxargxiElsendojn(kanal: Kanal, fortoRefresigi: Boolean = false): List<Elsendo> {
+    open suspend fun sxargxiElsendojn(kanal: Kanal, fortoRefresigi: Boolean = false): List<Elsendo> {
         val url = kanal.podkastaRssUrl ?: run {
             logw("ElsendoDeponejo", "${kanal.slug}: neniu RSS-URL — saltas")
             return kaŝmemoro[kanal.slug] ?: emptyList()

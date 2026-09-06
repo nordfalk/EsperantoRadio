@@ -7,10 +7,8 @@ plugins {
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
 
@@ -18,7 +16,7 @@ kotlin {
         androidMain.dependencies {
             implementation(project(":shared"))
             implementation(libs.androidx.activity.compose)
-            implementation(compose.material3)
+            implementation(libs.compose.material3)
             implementation(libs.androidx.media3.exoplayer)
         }
     }
@@ -50,6 +48,7 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.compose.ui.tooling)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")

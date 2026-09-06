@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.logi
 
@@ -71,4 +72,10 @@ fun AgordojEkrano(
             }
         }
     }
+}
+
+@Preview(name = "AgordojEkrano", showBackground = true, heightDp = 400)
+@Composable
+fun AgordojEkranoPreview() {
+    pTemo { AgordojEkrano(agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(), onReen = {}) }
 }

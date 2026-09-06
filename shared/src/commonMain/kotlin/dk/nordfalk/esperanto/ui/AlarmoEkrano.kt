@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
@@ -253,4 +254,10 @@ private fun AlarmoRedaktilo(
             OutlinedButton(onClick = onNuligi) { Text("Nuligi") }
         }
     }
+}
+
+@Preview(name = "AlarmoEkrano", showBackground = true, heightDp = 350)
+@Composable
+fun AlarmoEkranoPreview() {
+    pTemo { AlarmoEkrano(alarmoDeponejo = pAlarmoDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {}) }
 }

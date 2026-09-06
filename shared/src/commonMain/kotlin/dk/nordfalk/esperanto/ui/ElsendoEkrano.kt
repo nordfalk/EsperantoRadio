@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
@@ -129,4 +130,10 @@ fun ElsendoEkrano(
             }
         }
     }
+}
+
+@Preview(name = "ElsendoEkrano", showBackground = true, heightDp = 500)
+@Composable
+fun ElsendoEkranoPreview() {
+    pTemo { ElsendoEkrano(elsendo = pElsendo, onReen = {}, onLudi = {}, onElshuti = {}) }
 }

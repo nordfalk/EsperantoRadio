@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -144,4 +145,17 @@ fun MiniLudilbreto(
             )
         }
     }
+}
+
+@Preview(name = "MiniLudilbreto — ludas", showBackground = true, heightDp = 80)
+@Composable
+fun MiniLudilbretoPreview() {
+    val ludilo = PreviewLudiloRegilo(
+        dk.nordfalk.esperanto.domain.model.LudantoInformo(
+            stato = dk.nordfalk.esperanto.domain.model.LudantoStato.Ludas,
+            nunaFonto = dk.nordfalk.esperanto.domain.model.Sonfonto.ElsendoFonto(pElsendo),
+            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+        )
+    )
+    pTemo { MiniLudilbreto(ludilo = ludilo) }
 }

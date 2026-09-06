@@ -48,6 +48,7 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.compose.ui.tooling)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")

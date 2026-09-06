@@ -58,9 +58,9 @@ class RssParsilo {
     // === Regulo 6.1 — Ĝenerala ===
 
     private fun parsGenerel(doc: Document, kanal: Kanal): List<Elsendo> =
-        doc.select("item, entry").mapNotNull { parsEroGenerel(it, kanal) }
+        doc.select("item, entry").mapIndexedNotNull { i, ero -> parsEroGenerel(ero, kanal, i) }
 
-    private fun parsEroGenerel(ero: Element, kanal: Kanal): Elsendo? {
+    private fun parsEroGenerel(ero: Element, kanal: Kanal, indekso: Int): Elsendo? {
         val titolo = ero.selectFirst("title")?.text() ?: ""
         val priskriboHtml = ero.selectFirst("content|encoded")?.html()
             ?: ero.selectFirst("description")?.html()
@@ -97,8 +97,12 @@ class RssParsilo {
 
         val finaTitolo = if (kanal.ignoruTitolon) derivuTitolon(priskribo) else titolo
 
+        // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
+        val guid = ero.selectFirst("guid")?.text()
+        val id = if (guid != null) "${kanal.slug}:$dato:$guid" else "${kanal.slug}:$dato:${indekso + 1}"
+
         return Elsendo(
-            id = "${kanal.slug}:$dato",
+            id = id,
             kanalSlug = kanal.slug,
             kanalNomo = kanal.nomo,
             titolo = finaTitolo,
@@ -153,12 +157,12 @@ class RssParsilo {
     private fun parsPeranto(doc: Document, kanal: Kanal, httpKliento: suspend (String) -> String): List<Elsendo> {
         val malplenajDatoj = setOf("2019-11-08", "2019-09-29")
 
-        return doc.select("entry").mapNotNull { ero ->
-            val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
-            val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
+        return doc.select("entry").mapIndexedNotNull { i, ero ->
+            val published = ero.selectFirst("published")?.text() ?: return@mapIndexedNotNull null
+            val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapIndexedNotNull null
 
             // Saltu konatajn malplenajn datojn
-            if (dato in malplenajDatoj) return@mapNotNull null
+            if (dato in malplenajDatoj) return@mapIndexedNotNull null
 
             // La enhavo estas HTML-eskapita en <content type='html'>
             val htmlEsprimite = ero.selectFirst("content")?.text() ?: ""
@@ -192,19 +196,20 @@ class RssParsilo {
                     "https://drive.google.com/u/1/uc?id=$id&export=download"
                 }
                 // Neniu iframe aŭ nesubtenata gastiganto → saltu
-                iframeSrc.isEmpty() -> return@mapNotNull null
-                iframeSrc.contains("youtube.com") || iframeSrc.contains("youtu.be") -> return@mapNotNull null
-                iframeSrc.contains("soundcloud.com") -> return@mapNotNull null
-                iframeSrc.contains("vimeo.com") -> return@mapNotNull null
-                iframeSrc.contains("audioboom.com") -> return@mapNotNull null
-                iframeSrc.contains("yourlisten.com") -> return@mapNotNull null
-                iframeSrc.contains("vocaroo.com") -> return@mapNotNull null
-                else -> return@mapNotNull null
+                iframeSrc.isEmpty() -> return@mapIndexedNotNull null
+                iframeSrc.contains("youtube.com") || iframeSrc.contains("youtu.be") -> return@mapIndexedNotNull null
+                iframeSrc.contains("soundcloud.com") -> return@mapIndexedNotNull null
+                iframeSrc.contains("vimeo.com") -> return@mapIndexedNotNull null
+                iframeSrc.contains("audioboom.com") -> return@mapIndexedNotNull null
+                iframeSrc.contains("yourlisten.com") -> return@mapIndexedNotNull null
+                iframeSrc.contains("vocaroo.com") -> return@mapIndexedNotNull null
+                else -> return@mapIndexedNotNull null
             }
 
             val titolo = ero.selectFirst("title")?.text() ?: ""
             val retpaghoUrl = ero.selectFirst("link[rel=alternate]")?.attr("href")
-            val id = "peranto:$dato"
+            val guid = ero.selectFirst("id")?.text()
+            val id = if (guid != null) "peranto:$dato:$guid" else "peranto:$dato:${i + 1}"
 
             Elsendo(
                 id = id,

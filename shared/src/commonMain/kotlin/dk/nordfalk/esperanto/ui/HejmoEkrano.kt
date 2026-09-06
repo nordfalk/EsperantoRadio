@@ -10,26 +10,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanal
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
 import dk.nordfalk.esperanto.logi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 /**
  * Nova hejmekrano laux Figma-dizajno "Muzaiko — Antonia".
  *
  * Horizontalaj rulantaj sekcioj:
  * - "Kio novas" — novaj elsendoj (horizontala LazyRow de kartoj)
- * - "Lastatempe ludata" — laste luditaj (horizontala LazyRow de kartoj)
+ * - "Lastatempe ludata" — laste luditaj (nur se ekzistas)
  * - "Kio popularas" — popularaj kanaloj (horizontala LazyRow de kartoj)
  *
  * Malsupra naviga breto (NavigationBar) kun 4 langetoj.
@@ -50,7 +46,23 @@ fun HejmoEkrano(
     onAlarmoj: () -> Unit = {},
 ) {
     val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
-    val scope = rememberCoroutineScope()
+
+    // Generi test-elsendojn por "Kio novas" kaj "Kio popularas"
+    // Lastatempe ludata komencigxe malplena
+    val novajElsendoj = kanaloj.flatMap { kanal ->
+        (1..2).map { i ->
+            Elsendo(
+                id = "${kanal.slug}:novo$i",
+                kanalSlug = kanal.slug,
+                titolo = "Elsendo de 2024-01-0$i",
+                stream = "",
+                dato = "2024-01-0$i",
+                bildUrl = kanal.emblemoUrl,
+            )
+        }
+    }
+    val popularajKanaloj = kanaloj.take(8)
+    val lastatempeLuditaj: List<Elsendo> = emptyList()
 
     Scaffold(
         topBar = {
@@ -75,55 +87,61 @@ fun HejmoEkrano(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             // "Kio novas"
-            item {
-                SekcioTitolo("Kio novas")
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(kanaloj.take(6)) { kanal ->
-                        KanalKarto(
-                            kanal = kanal,
-                            onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) }
-                        )
+            if (novajElsendoj.isNotEmpty()) {
+                item { SekcioTitolo("Kio novas") }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(novajElsendoj) { elsendo ->
+                            val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
+                            ElsendoKarto(
+                                elsendo = elsendo,
+                                kanalNomo = kanal?.nomo ?: elsendo.kanalSlug,
+                                bildUrl = elsendo.bildUrl ?: kanal?.emblemoUrl,
+                                onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                            )
+                        }
                     }
                 }
             }
 
-            // "Lastatempe ludata"
-            item {
-                SekcioTitolo("Lastatempe ludata")
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(kanaloj.take(6)) { kanal ->
-                        KanalKarto(
-                            kanal = kanal,
-                            onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) }
-                        )
+            // "Lastatempe ludata" — nur se ekzistas
+            if (lastatempeLuditaj.isNotEmpty()) {
+                item { SekcioTitolo("Lastatempe ludata") }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(lastatempeLuditaj) { elsendo ->
+                            val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
+                            ElsendoKarto(
+                                elsendo = elsendo,
+                                kanalNomo = kanal?.nomo ?: elsendo.kanalSlug,
+                                bildUrl = elsendo.bildUrl ?: kanal?.emblemoUrl,
+                                onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                            )
+                        }
                     }
                 }
             }
 
             // "Kio popularas"
-            item {
-                SekcioTitolo("Kio popularas")
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(kanaloj.take(6)) { kanal ->
-                        KanalKarto(
-                            kanal = kanal,
-                            onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) }
-                        )
+            if (popularajKanaloj.isNotEmpty()) {
+                item { SekcioTitolo("Kio popularas") }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(popularajKanaloj) { kanal ->
+                            KanalKarto(
+                                kanal = kanal,
+                                onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) }
+                            )
+                        }
                     }
                 }
             }
@@ -145,29 +163,24 @@ private fun SekcioTitolo(titolo: String) {
 }
 
 @Composable
-private fun KanalKarto(
-    kanal: Kanal,
+private fun ElsendoKarto(
+    elsendo: Elsendo,
+    kanalNomo: String,
+    bildUrl: String?,
     onClick: () -> Unit,
 ) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier
-            .width(150.dp)
-            .height(200.dp)
+        modifier = Modifier.width(150.dp).height(200.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            // Emblemo (130x130 aŭ 59x59 dependanta de varianto)
-            if (kanal.emblemoUrl != null) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            if (bildUrl != null) {
                 AsyncImage(
-                    model = kanal.emblemoUrl,
-                    contentDescription = "Emblemo de ${kanal.nomo}",
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                    model = bildUrl,
+                    contentDescription = "Bildeto de ${elsendo.titolo}",
+                    modifier = Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))
                 )
             } else {
                 Surface(
@@ -176,29 +189,65 @@ private fun KanalKarto(
                     color = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            kanal.nomo.take(2),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("♪", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
             }
-
             Spacer(Modifier.height(8.dp))
+            Text(
+                text = kanalNomo,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1, overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = elsendo.titolo,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2, overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
 
-            // Kanalnomo
+@Composable
+private fun KanalKarto(
+    kanal: Kanal,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.width(150.dp).height(200.dp)
+    ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            if (kanal.emblemoUrl != null) {
+                AsyncImage(
+                    model = kanal.emblemoUrl,
+                    contentDescription = "Emblemo de ${kanal.nomo}",
+                    modifier = Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                Surface(
+                    modifier = Modifier.size(130.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(kanal.nomo.take(2), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = kanal.nomo,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 1, overflow = TextOverflow.Ellipsis
             )
-
-            // Subteksto
             Text(
                 text = when {
                     kanal.estasRekta -> "Rekta elsendo"
@@ -207,8 +256,7 @@ private fun KanalKarto(
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -222,29 +270,9 @@ private fun MalsupraNavigaBreto(
     onSercxo: () -> Unit,
 ) {
     NavigationBar {
-        NavigationBarItem(
-            selected = true,
-            onClick = { logi("Klako", "hejmo-tab"); onHejmo() },
-            icon = { Text("🏠") },
-            label = { Text("Hejmo") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { logi("Klako", "kanalaro-tab"); onKanalaro() },
-            icon = { Text("🎵") },
-            label = { Text("Kanaloj") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { logi("Klako", "plejsatataj-tab"); onPlejsatataj() },
-            icon = { Text("★") },
-            label = { Text("Plej ŝatataj") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { logi("Klako", "sercxo-tab"); onSercxo() },
-            icon = { Text("🔍") },
-            label = { Text("Serĉi") }
-        )
+        NavigationBarItem(selected = true, onClick = { logi("Klako", "hejmo-tab"); onHejmo() }, icon = { Text("🏠") }, label = { Text("Hejmo") })
+        NavigationBarItem(selected = false, onClick = { logi("Klako", "kanalaro-tab"); onKanalaro() }, icon = { Text("🎵") }, label = { Text("Kanaloj") })
+        NavigationBarItem(selected = false, onClick = { logi("Klako", "plejsatataj-tab"); onPlejsatataj() }, icon = { Text("★") }, label = { Text("Plej ŝatataj") })
+        NavigationBarItem(selected = false, onClick = { logi("Klako", "sercxo-tab"); onSercxo() }, icon = { Text("🔍") }, label = { Text("Serĉi") })
     }
 }

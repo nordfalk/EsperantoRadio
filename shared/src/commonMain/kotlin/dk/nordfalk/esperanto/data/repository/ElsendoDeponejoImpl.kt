@@ -75,6 +75,9 @@ open class ElsendoDeponejoImpl(
         }
     }
 
+    override suspend fun sxargxiElsendojnPorKanal(kanal: Kanal, fortoRefresigi: Boolean): List<Elsendo> =
+        sxargxiElsendojn(kanal, fortoRefresigi)
+
     override suspend fun getElsendo(id: String): Elsendo? {
         for ((_, elsendoj) in kaŝmemoro) {
             val e = elsendoj.find { it.id == id }

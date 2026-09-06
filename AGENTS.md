@@ -116,6 +116,8 @@ EsperantoRadio/
 7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
    regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
    faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
+   Ne nur skribu kodon — ankaŭ validigu ĝin. Se estas UI-ŝanĝo, antaŭ ol fari 
+   commit, kontrolu ke navigado funkcias, kaj ke la enhavo estas videbla.
 8. **Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
    eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
    Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.

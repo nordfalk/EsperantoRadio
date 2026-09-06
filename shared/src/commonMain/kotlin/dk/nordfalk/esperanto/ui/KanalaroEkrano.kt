@@ -51,6 +51,7 @@ class KanalaroViewModel(
 @Composable
 fun KanalaroEkrano(
     viewModel: KanalaroViewModel,
+    onReen: () -> Unit = {},
     onKanal: (Kanal) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
     onSercxo: () -> Unit = {},
@@ -71,6 +72,9 @@ fun KanalaroEkrano(
         topBar = {
             TopAppBar(
                 title = { Text("EsperantoRadio") },
+                navigationIcon = {
+                    TextButton(onClick = { logi("Klako", "reen (KanalaroEkrano)"); onReen() }) { Text("← Reen") }
+                },
                 actions = {
                     TextButton(onClick = { logi("Klako", "serĉo-butono"); onSercxo() }) { Text("🔍") }
                     TextButton(onClick = { logi("Klako", "plejŝatataj-butono"); onPlejsatataj() }) { Text("★") }

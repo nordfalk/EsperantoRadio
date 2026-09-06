@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.config
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.SerialName
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.logw
@@ -108,8 +109,8 @@ data class KanaloDto(
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
     val rektaElsendaPriskriboUrl: String? = null,
-    val hejmpaghoButono: String? = null,
-    val retposhto: String? = null,
+    @SerialName("hejmpaĝoButono") val hejmpaghoButono: String? = null,
+    @SerialName("retpoŝto") val retposhto: String? = null,
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = false,

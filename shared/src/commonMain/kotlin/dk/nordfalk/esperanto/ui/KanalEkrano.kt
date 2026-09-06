@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -76,28 +77,36 @@ fun KanaloEkrano(
             )
         }
     ) { padding ->
-        if (sxargxas && elsendoj.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
-                    Text("Ŝarĝas elsendojn...", modifier = Modifier.padding(8.dp))
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            // Kanalinformoj: emblemo, nomo, retejo, retpoŝto
+            item { KanalInformoj(kanalo) }
+
+            // Ŝargado
+            if (sxargxas && elsendoj.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Text("Ŝarĝas elsendojn...", modifier = Modifier.padding(8.dp))
+                        }
+                    }
                 }
-            }
-        } else if (elsendoj.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Neniu elsendo trovita")
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(8.dp)
-            ) {
+            } else if (elsendoj.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Neniu elsendo trovita")
+                    }
+                }
+            } else {
                 // Rekta elsendo-butono se la kanalo havas livestream
                 if (kanalo.estasRekta) {
                     item {
@@ -144,6 +153,72 @@ fun KanaloEkrano(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun KanalInformoj(kanalo: Kanalo) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Emblemo — tutpaĝa larĝo, adaptas aldon altecon
+        if (kanalo.emblemoUrl != null) {
+            AsyncImage(
+                model = kanalo.emblemoUrl,
+                contentDescription = "Emblemo de ${kanalo.nomo}",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+            )
+        } else {
+            Surface(
+                modifier = Modifier.fillMaxWidth().height(120.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("♪", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+        Text(kanalo.nomo, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+        // Retejo kaj retpoŝto butonoj
+        if (kanalo.retejoUrl != null || kanalo.retposhto != null) {
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (kanalo.retejoUrl != null) {
+                    AssistChip(
+                        onClick = { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) },
+                        label = { Text("Retejo") },
+                        leadingIcon = { Text("🌐") }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                }
+                if (kanalo.retposhto != null) {
+                    AssistChip(
+                        onClick = {
+                            logi("Klako", "retposhto ${kanalo.slug}")
+                            malfermuRetposhton(
+                                retposhto = kanalo.retposhto,
+                                temo = "Pri ${kanalo.nomo}",
+                                teksto = "Mi aŭskultas la elsendon kaj havas komenton",
+                            )
+                        },
+                        label = { Text("Retpoŝto") },
+                        leadingIcon = { Text("✉") }
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(4.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 

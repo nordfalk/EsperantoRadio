@@ -27,6 +27,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.todayIn
+
+/**
+ * Kalkulas kiom nova la elsendo estas, kiel homlegabla teksto.
+ * Redonas null se la elsendo estas pli malnova ol 6 monatoj.
+ *
+ * Ekzemploj: "hodiaux", "1 tago", "3 tagoj", "1 semajno", "2 semajnoj", "1 monato", "4 monatoj"
+ */
+fun kalkuliNovectempon(
+    dato: String,
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
+): String? {
+    val parsita = runCatching { LocalDate.parse(dato) }.getOrNull() ?: return null
+    val tagoj = maxOf(0, parsita.daysUntil(nunaDatumo))
+
+    return when {
+        tagoj == 0 -> "hodiaŭ"
+        tagoj == 1 -> "1 tago"
+        tagoj < 7 -> "$tagoj tagoj"
+        tagoj < 14 -> "1 semajno"
+        tagoj < 30 -> "${tagoj / 7} semajnoj"
+        tagoj < 60 -> "1 monato"
+        tagoj < 180 -> "${tagoj / 30} monatoj"
+        else -> null
+    }
+}
 
 /**
  * Stato por la hejmekrano. Dum starto ĝi ŝargas ĉiujn kanalojn kaj iliajn
@@ -65,8 +95,17 @@ class HejmoViewModel(
             }
             logi("HejmoViewModel", "Ŝargis ${ĉiujElsendoj.size} elsendojn entute")
 
-            // "Kio novas" — ĉiuj elsendoj ordigitaj laŭ dato (plej nova unue)
-            _novajElsendoj.value = ĉiujElsendoj.sortedByDescending { it.dato }
+            val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+
+            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanal, maks 20 entute
+            val novaj = ĉiujElsendoj
+                .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
+                .groupBy { it.kanalSlug }
+                .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
+                .sortedByDescending { it.dato }
+                .take(20)
+            _novajElsendoj.value = novaj
+            logi("HejmoViewModel", "Kio novas: ${novaj.size} elsendoj (post filtrado)")
 
             // "Kio popularas" — hazardaj elsendoj (maksimume 20)
             _popularajElsendoj.value = ĉiujElsendoj.shuffled().take(20)
@@ -161,6 +200,7 @@ fun HejmoEkrano(
                                     elsendo = elsendo,
                                     kanalNomo = kanal?.nomo ?: elsendo.kanalSlug,
                                     bildUrl = elsendo.bildUrl ?: kanal?.emblemoUrl,
+                                    novectempo = kalkuliNovectempon(elsendo.dato),
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
                                 )
                             }
@@ -215,6 +255,7 @@ private fun ElsendoKarto(
     kanalNomo: String,
     bildUrl: String?,
     onClick: () -> Unit,
+    novectempo: String? = null,
 ) {
     Surface(
         onClick = onClick,
@@ -223,20 +264,39 @@ private fun ElsendoKarto(
         modifier = Modifier.width(150.dp).height(200.dp)
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
-            if (bildUrl != null) {
-                AsyncImage(
-                    model = bildUrl,
-                    contentDescription = "Bildeto de ${elsendo.titolo}",
-                    modifier = Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))
-                )
-            } else {
-                Surface(
-                    modifier = Modifier.size(130.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("♪", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Box {
+                if (bildUrl != null) {
+                    AsyncImage(
+                        model = bildUrl,
+                        contentDescription = "Bildeto de ${elsendo.titolo}",
+                        modifier = Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))
+                    )
+                } else {
+                    Surface(
+                        modifier = Modifier.size(130.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("♪", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        }
+                    }
+                }
+                if (novectempo != null) {
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp),
+                        color = androidx.compose.ui.graphics.Color(0xFFFFC107),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = novectempo,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = androidx.compose.ui.graphics.Color.Black,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
                     }
                 }
             }

@@ -13,6 +13,7 @@ import dk.nordfalk.esperanto.data.config.kreSettings
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
@@ -96,18 +97,16 @@ fun EsperantoRadioApp(
             Box(modifier = Modifier.weight(1f)) {
                 when (ekrano) {
                     Ekrano.KANALARO -> {
-                        KanalaroEkrano(
-                            viewModel = kanalaroViewModel,
+                        HejmoEkrano(
+                            kanalDeponejo = kanalDeponejo,
+                            elsendoDeponejo = elsendoDeponejo,
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
-                            onLudi = { fonto ->
-                                logi("Nav", "Ludas rekte: ${fonto}")
-                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
-                            },
                             onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
                             onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
+                            onKanalaro = { logi("Nav", "→ KANALARO (malnova)"); },
+                            onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ },
                             onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
                             onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
-                            onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
                         )
                     }
                     Ekrano.KANAL -> {

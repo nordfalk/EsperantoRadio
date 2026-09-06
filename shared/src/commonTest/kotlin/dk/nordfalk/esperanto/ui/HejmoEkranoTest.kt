@@ -13,6 +13,11 @@ import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.todayIn
 import kotlin.test.Test
 
 /**
@@ -20,9 +25,17 @@ import kotlin.test.Test
  *
  * Uzas falsan ElsendoDeponejo kiu liveras realajn testelsendojn
  * por "Kio novas" kaj "Kio popularas".
+ *
+ * Datoj estas kalkulitaj dinamike relative al hodiaux por ke la testoj
+ * cxiiam validu (ne malnovigxu post 6 monatoj).
  */
 @OptIn(ExperimentalTestApi::class)
 class HejmoEkranoTest {
+
+    private val hodiaux = Clock.System.todayIn(TimeZone.UTC)
+
+    private fun datoAntaux(tagoloj: Int): String =
+        (hodiaux.minus(DatePeriod(days = tagoloj))).toString()
 
     private val testKanaloj = listOf(
         Kanal(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x.com/m.m3u8"),
@@ -31,10 +44,10 @@ class HejmoEkranoTest {
     )
 
     private val testElsendoj = listOf(
-        Elsendo(id = "kp:1", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", stream = "", dato = "2026-09-01"),
-        Elsendo(id = "kp:2", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", stream = "", dato = "2026-08-25"),
-        Elsendo(id = "vv:1", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", stream = "", dato = "2026-09-03"),
-        Elsendo(id = "vv:2", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", stream = "", dato = "2026-08-20"),
+        Elsendo(id = "kp:1", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", stream = "", dato = datoAntaux(5)),
+        Elsendo(id = "kp:2", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", stream = "", dato = datoAntaux(12)),
+        Elsendo(id = "vv:1", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", stream = "", dato = datoAntaux(3)),
+        Elsendo(id = "vv:2", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", stream = "", dato = datoAntaux(17)),
     )
 
     private fun falsaKanalDeponejo() = object : KanalDeponejo {
@@ -118,5 +131,22 @@ class HejmoEkranoTest {
         onAllNodesWithText("Kernpunkto epizodo 2").assertCountEquals(2)
         onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
         onAllNodesWithText("Varsovia Vento epizodo 2").assertCountEquals(2)
+    }
+
+    @Test
+    fun montrasNovectempajnEmblemetojn() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                kanalDeponejo = falsaKanalDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+            )
+        }
+        waitForIdle()
+        // La flava emblemeto montras kiom nova la elsendo estas
+        // (aperas nur en "Kio novas", ne en "Kio popularas")
+        onNodeWithText("5 tagoj").assertIsDisplayed()
+        onNodeWithText("3 tagoj").assertIsDisplayed()
+        onNodeWithText("1 semajno").assertIsDisplayed()
+        onNodeWithText("2 semajnoj").assertIsDisplayed()
     }
 }

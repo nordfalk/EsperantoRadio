@@ -16,4 +16,10 @@ interface ElsendoDeponejo {
     suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean = false): List<Elsendo>
     suspend fun getElsendo(id: String): Elsendo?
     suspend fun sercxiElsendojn(taxto: String, limo: Int = 50): List<Elsendo>
+
+    /**
+     * Elŝutas kaj parsas la RSS-fluon por specifa kanal.
+     * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
+     */
+    suspend fun sxargxiElsendojnPorKanal(kanal: Kanal, fortoRefresigi: Boolean = false): List<Elsendo>
 }

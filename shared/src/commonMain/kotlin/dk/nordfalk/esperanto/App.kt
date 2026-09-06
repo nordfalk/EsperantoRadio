@@ -101,6 +101,7 @@ fun EsperantoRadioApp(
                             kanalDeponejo = kanalDeponejo,
                             elsendoDeponejo = elsendoDeponejo,
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
+                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
                             onSercxo = { logi("Nav", "→ SERCXO"); ekrano = Ekrano.SERCXO },
                             onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ"); ekrano = Ekrano.PLEJSATATAJ },
                             onKanalaro = { logi("Nav", "→ KANALARO"); ekrano = Ekrano.KANALARO },

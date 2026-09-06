@@ -63,6 +63,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation("androidx.compose.ui:ui-tooling-preview:1.7.6")
         }
 
         val desktopMain by getting {

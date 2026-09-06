@@ -63,14 +63,21 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation("androidx.compose.ui:ui-tooling-preview:1.7.6")
         }
 
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.multiplatform.settings.jvm)
-                // mp3spi — pura Java MP3-malkodado por javax.sound.sampled (neniu nacia dependeco)
                 implementation(libs.mp3spi)
+            }
+        }
+
+        val desktopTest by getting {
+            dependencies {
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
             }
         }
     }

@@ -27,6 +27,10 @@ import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.kreDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.ui.*
+import dk.nordfalk.esperanto.ui.MuzaikoTiparo
+import dk.nordfalk.esperanto.ui.MuzaikoFormoj
+import dk.nordfalk.esperanto.ui.temuKolorskemo
+import dk.nordfalk.esperanto.ui.TemoNomo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -44,7 +48,16 @@ private enum class Ekrano { KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHU
 fun EsperantoRadioApp(
     ludilo: LudiloRegilo = kreDefauxltanLudiloRegilon(),
 ) {
-    MaterialTheme {
+    val malhela = androidx.compose.foundation.isSystemInDarkTheme()
+    val agordojDeponejo = remember { AgordojDeponejoImpl() }
+    val temoNomo by agordojDeponejo.temo.collectAsState()
+    val temo = runCatching { TemoNomo.valueOf(temoNomo) }.getOrDefault(TemoNomo.ANTONIA)
+
+    MaterialTheme(
+        colorScheme = temuKolorskemo(temo, malhela),
+        typography = MuzaikoTiparo,
+        shapes = MuzaikoFormoj,
+    ) {
         val httpKliento = remember {
             HttpClient(CIO) {
                 install(Logging) { level = LogLevel.INFO }
@@ -73,7 +86,6 @@ fun EsperantoRadioApp(
             val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
             PersistantaAlarmoDeponejo(settings, sugestoj, kreAlarmoSkedilo())
         }
-        val agordojDeponejo = remember { AgordojDeponejoImpl() }
         val scope = rememberCoroutineScope()
 
         var ekrano by remember { mutableStateOf(Ekrano.KANALARO) }

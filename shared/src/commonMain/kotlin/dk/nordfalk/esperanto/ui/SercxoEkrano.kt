@@ -65,7 +65,7 @@ fun SercxoEkrano(
                             supportingContent = { Text(elsendo.kanalSlug) },
                             modifier = Modifier.clickable { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
                         )
-                        HorizontalDivider()
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
             }

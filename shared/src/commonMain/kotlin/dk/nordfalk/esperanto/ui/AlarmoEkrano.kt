@@ -123,7 +123,7 @@ fun AlarmoEkrano(
                                 redaktoModo = alarmo
                             }
                         )
-                        HorizontalDivider()
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
             }

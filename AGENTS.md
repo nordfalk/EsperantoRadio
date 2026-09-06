@@ -1,5 +1,8 @@
 # AGENTS.md — Gvidlinioj por agentoj en ĉi tiu deponejo
 
+> **Nuna jaro: 2026 (septembro).** Ĉiuj referencoj al "aktuala" datas
+> rilatas al 2026 se ne alie specifite.
+
 > Lingvo: Preferu Esperanton por ĉiu dokumentado, komentoj, identigiloj kaj
 > komuniko kun la uzanto. La nova kodo uzas Esperanton anstataŭ la dana de la
 > malnova kodo. La malnova kodo (`dk.dr.radio.*`) uzas dano/esperanto-miksaĵon
@@ -159,6 +162,25 @@ EsperantoRadio/
   | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
   | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
   | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
+
+## UI-dizajno (celo)
+
+La celo estas moderna podkasta apo-inspirita UI, bazita sur la Figma-dizajno
+"Muzaiko — Antonia" (https://www.figma.com/design/uyQhrRKTLfJgQgXgAxchM4/).
+
+### Ĉefekrano (celo)
+- **Horizontala rulantaj sekcioj**: "Kio novas", "Lastatempe ludata", "Kio popularas"
+  - Ĉiu sekcio estas horizontale rulebla `LazyRow` de kartoj
+  - Kartoj montras emblemon, titolon, subtitolon
+- **Malsupra naviga breto** (bottom navigation bar):
+  - Hejmo, Serĉo, Biblioteko/Plejsatataj, Agordoj
+  - Anstataŭigas la nunan TopAppBar-action-butonojn
+- La nuna kanalaro (`LazyColumn` de `ListItem`-oj) iĝos la "Hejmo"-langeto
+
+### Nuna stato
+- La nuna UI uzas `TopAppBar` kun emoji-butonoj (🔍 ★ ⬇ ⏰ ⚙) kaj `LazyColumn`
+- Tio funkcias sed ne aspektas kiel moderna podkasta apo
+- La Muzaiko-temo (koloroj, tiparo, formoj) estas jam implementita en `Temo.kt`
 
 ## Konstru-komandoj
 

@@ -4,10 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -96,12 +100,29 @@ fun KanalEkrano(
                 // Rekta elsendo-butono se la kanal havas livestream
                 if (kanal.estasRekta) {
                     item {
-                        ListItem(
-                            headlineContent = { Text("Aŭskulti rekte") },
-                            leadingContent = { Text("▶", style = MaterialTheme.typography.headlineMedium) },
-                            modifier = Modifier.clickable { logi("Klako", "ludi rekte — ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) }
-                        )
-                        HorizontalDivider()
+                        Surface(
+                            onClick = { logi("Klako", "ludi rekte — ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) },
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Surface(
+                                    shape = androidx.compose.foundation.shape.CircleShape,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        Text("▶", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleMedium)
+                                    }
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Text("Aŭskulti rekte", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            }
+                        }
                     }
                 }
 
@@ -112,7 +133,8 @@ fun KanalEkrano(
                         Text(
                             text = dato,
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 4.dp)
                         )
                     }
                     items(grupo, key = { it.id }) { elsendo ->
@@ -130,32 +152,46 @@ private fun ElsendoEro(
     onClick: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text(elsendo.titolo, maxLines = 2) },
+        headlineContent = {
+            Text(
+                elsendo.titolo,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Medium
+            )
+        },
         supportingContent = {
             val dauro = elsendo.dauro
             if (dauro != null && dauro > 0) {
                 val min = dauro / 60
                 val sek = dauro % 60
-                Text("$min:${sek.toString().padStart(2, '0')}")
+                Text(
+                    "$min:${sek.toString().padStart(2, '0')}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
         leadingContent = {
             if (elsendo.bildUrl != null) {
                 AsyncImage(
                     model = elsendo.bildUrl,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                    contentDescription = "Bildeto de ${elsendo.titolo}",
+                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp))
                 )
             } else {
-                Box(
+                Surface(
                     modifier = Modifier.size(48.dp),
-                    contentAlignment = Alignment.Center
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
-                    Text("♪")
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("♪", color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    }
                 }
             }
         },
         modifier = Modifier.clickable(onClick = onClick)
     )
-    HorizontalDivider()
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }

@@ -52,7 +52,7 @@ fun ElshutitajEkrano(
                             scope.launch { elshutDeponejo.forigi(elshutita.elsendo.id) }
                         }
                     )
-                    HorizontalDivider()
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }

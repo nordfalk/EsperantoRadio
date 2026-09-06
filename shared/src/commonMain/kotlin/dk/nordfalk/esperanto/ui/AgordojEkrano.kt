@@ -16,6 +16,7 @@ fun AgordojEkrano(
 ) {
     val lingvo by agordojDeponejo.lingvo.collectAsState()
     val nurWifi by agordojDeponejo.nurWifi.collectAsState()
+    val temoNomo by agordojDeponejo.temo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -54,7 +55,20 @@ fun AgordojEkrano(
                     )
                 }
             )
-            Divider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(Modifier.height(24.dp))
+            Text("Temo", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            TemoNomo.entries.forEach { temo ->
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = temoNomo == temo.name,
+                        onClick = { logi("Klako", "temo → ${temo.name}"); agordojDeponejo.fiksiTemon(temo.name) }
+                    )
+                    Text(temo.etikedo)
+                }
+            }
         }
     }
 }

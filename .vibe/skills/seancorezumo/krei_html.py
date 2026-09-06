@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Kreas HTML-resumon de cxiuj uzantomesagxoj kaj asistantaj respondoj
-el Vibe-seancoprotokoloj por specifa repo-dosierujo.
+el Vibe-seancoprotokoloj por cxiuj dosierujoj de la sama git-repo.
 
 Uzado:
     python3 krei_html.py <repo_dosierujo> [eligxdosiero]
@@ -12,6 +12,7 @@ Se eligxdosiero mankas, defauxlto estas <repo_dosierujo>/seancorezumo.html
 import json
 import html
 import os
+import subprocess
 import sys
 from datetime import datetime
 
@@ -26,33 +27,82 @@ def get_text(content):
     return str(content) if content else ""
 
 
+def get_git_remote(cwd):
+    """Provu akiri la origin-remote-URL de git-dosierujo. Returnu None se fiaskas."""
+    try:
+        r = subprocess.run(
+            ["git", "-C", cwd, "remote", "get-url", "origin"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+    return None
+
+
 def find_sessions(vibe_home, repo_cwd):
-    """Trovu cxiujn seancojn kies working_directory kongruas kun repo_cwd."""
+    """
+    Trovu cxiujn seancojn kies working_directory apartenas al la sama git-repo
+    kiel repo_cwd (kongrue laux git remote URL).
+    """
     session_dir = os.path.join(vibe_home, "logs", "session")
     if not os.path.isdir(session_dir):
         return []
 
-    sessions = []
+    target_remote = get_git_remote(repo_cwd)
+
+    all_sessions = []
+    seen_cwds = {}
     for entry in sorted(os.listdir(session_dir)):
         full = os.path.join(session_dir, entry)
-        if not os.path.isdir(full):
-            continue
-        if not entry.startswith("session_"):
+        if not os.path.isdir(full) or not entry.startswith("session_"):
             continue
         meta_path = os.path.join(full, "meta.json")
         msg_path = os.path.join(full, "messages.jsonl")
         if not os.path.isfile(msg_path):
             continue
         cwd = ""
+        start_time = ""
         try:
             with open(meta_path) as mf:
                 m = json.load(mf)
             cwd = m.get("environment", {}).get("working_directory", "")
+            start_time = m.get("start_time", "")
         except (json.JSONDecodeError, FileNotFoundError, KeyError):
             pass
-        # Kongruo: akceptu ankaux se la dosierujo nomigxas (EsperantoRadio2 vs EsperantoRadio)
-        if cwd == repo_cwd or os.path.realpath(cwd) == os.path.realpath(repo_cwd):
-            sessions.append((entry, full, msg_path))
+        if not cwd:
+            continue
+        all_sessions.append((entry, full, msg_path, cwd, start_time))
+        if cwd not in seen_cwds:
+            seen_cwds[cwd] = None
+
+    # Determinu git-remote-URL por cxiuj unikaj dosierujoj
+    if target_remote:
+        for cwd in seen_cwds:
+            if not os.path.isdir(cwd):
+                rp = os.path.realpath(cwd)
+                if os.path.isdir(rp):
+                    seen_cwds[cwd] = get_git_remote(rp)
+                else:
+                    seen_cwds[cwd] = None
+            else:
+                seen_cwds[cwd] = get_git_remote(cwd)
+
+    repo_basename = os.path.basename(os.path.normpath(repo_cwd))
+    sessions = []
+    for entry, full, msg_path, cwd, start_time in all_sessions:
+        remote = seen_cwds.get(cwd)
+        if target_remote and remote and remote == target_remote:
+            sessions.append((entry, full, msg_path, cwd, start_time))
+        elif not target_remote and (
+            cwd == repo_cwd or os.path.realpath(cwd) == os.path.realpath(repo_cwd)
+        ):
+            sessions.append((entry, full, msg_path, cwd, start_time))
+        elif not remote and os.path.basename(os.path.normpath(cwd)) == repo_basename:
+            # Dosierujo forigita/sen git — inkluzivu se samnoma
+            sessions.append((entry, full, msg_path, cwd, start_time))
+
     return sessions
 
 
@@ -101,7 +151,7 @@ def extract_pairs(msg_path):
     return pairs
 
 
-def build_html(all_data, max_len, repo_cwd):
+def build_html(all_data, max_len, repo_cwd, target_remote):
     """Konstruu la HTML-eligxon."""
     out = []
     out.append("""<!DOCTYPE html>
@@ -114,7 +164,9 @@ def build_html(all_data, max_len, repo_cwd):
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #222; }
 h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
 .session { margin-bottom: 28px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
-.session-header { background: #6750A4; color: white; padding: 8px 14px; font-size: 0.85em; font-weight: 600; }
+.session-header { background: #6750A4; color: white; padding: 8px 14px; font-size: 0.85em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.session-cwd { font-size: 0.85em; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 4px; font-weight: 400; }
+.session-cwd.changed { background: #ffeb3b; color: #333; font-weight: 600; }
 .exchange { padding: 12px 14px; border-bottom: 1px solid #eee; }
 .exchange:last-child { border-bottom: none; }
 .msg-time { font-size: 0.75em; color: #888; margin-bottom: 4px; }
@@ -130,17 +182,31 @@ h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
 <h1>Seancorezumo — """ + html.escape(os.path.basename(repo_cwd)) + """</h1>""")
 
     total_msgs = sum(len(pairs) for _, _, pairs, _ in all_data)
-    out.append(
-        f'<div class="summary">Entute {total_msgs} mesagxoj el {len(all_data)} seancoj. '
-        f"Mesagxoj pli longaj ol {max_len} signoj estas fortonditaj.</div>"
-    )
+    dosierujoj = sorted({cwd for _, _, _, cwd in all_data})
+    summary = f"Entute {total_msgs} mesagxoj el {len(all_data)} seancoj en {len(dosierujoj)} dosierujo(j). "
+    if target_remote:
+        summary += f"Repo: {html.escape(target_remote)}. "
+    summary += f"Mesagxoj pli longaj ol {max_len} signoj estas fortonditaj."
+    out.append(f'<div class="summary">{summary}</div>')
 
-    for sid, dato, pairs, _ in all_data:
+    if len(dosierujoj) > 1:
+        out.append('<div class="summary"><b>Dosierujoj:</b><br>')
+        for d in dosierujoj:
+            out.append(f"{html.escape(d)}<br>")
+        out.append("</div>")
+
+    prev_cwd = None
+    for sid, dato, pairs, cwd in all_data:
         if not pairs:
             continue
+        cwd_changed = prev_cwd is not None and cwd != prev_cwd
+        cwd_class = "session-cwd changed" if cwd_changed else "session-cwd"
+        out.append('<div class="session">')
         out.append(
-            f'<div class="session"><div class="session-header">'
-            f"{html.escape(sid)} — {html.escape(dato)}</div>"
+            f'<div class="session-header">'
+            f'<span>{html.escape(sid)} — {html.escape(dato)}</span>'
+            f'<span class="{cwd_class}">{html.escape(cwd)}</span>'
+            f'</div>'
         )
         for user_text, asst_text in pairs:
             user_trunc = False
@@ -176,6 +242,7 @@ h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
                 )
             out.append("</div>")
         out.append("</div>")
+        prev_cwd = cwd
 
     out.append("</body></html>")
     return "\n".join(out)
@@ -197,36 +264,34 @@ def main():
         print(f"Neniu seanco trovita por {repo_cwd}", file=sys.stderr)
         sys.exit(1)
 
+    target_remote = get_git_remote(repo_cwd)
+
     all_data = []
-    for sid, full_path, msg_path in sessions:
-        # Legu start_time el meta.json
-        start_time = ""
-        try:
-            with open(os.path.join(full_path, "meta.json")) as mf:
-                m = json.load(mf)
-            start_time = m.get("start_time", "")
-        except (json.JSONDecodeError, FileNotFoundError):
-            pass
+    for entry, full, msg_path, cwd, start_time in sessions:
         try:
             dt = datetime.fromisoformat(start_time.replace("Z", ""))
             dato = dt.strftime("%Y-%m-%d %H:%M")
         except (ValueError, TypeError):
-            dato = sid
+            dato = entry
 
         pairs = extract_pairs(msg_path)
         if pairs:
-            all_data.append((sid, dato, pairs, full_path))
+            all_data.append((entry, dato, pairs, cwd))
 
     if not all_data:
         print("Neniu uzantomesagxo trovita.", file=sys.stderr)
         sys.exit(1)
 
-    html_content = build_html(all_data, max_len, repo_cwd)
+    # Ordigu laux starttempo por intertempa ordo
+    all_data.sort(key=lambda x: x[1])
+
+    html_content = build_html(all_data, max_len, repo_cwd, target_remote)
     with open(output_path, "w") as f:
         f.write(html_content)
 
     total = sum(len(p) for _, _, p, _ in all_data)
-    print(f"Skribis {output_path} ({total} mesagxoj el {len(all_data)} seancoj)")
+    dosierujoj = sorted({cwd for _, _, _, cwd in all_data})
+    print(f"Skribis {output_path} ({total} mesagxoj el {len(all_data)} seancoj en {len(dosierujoj)} dosierujoj)")
 
 
 if __name__ == "__main__":

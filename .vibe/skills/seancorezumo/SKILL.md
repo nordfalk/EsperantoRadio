@@ -1,6 +1,6 @@
 ---
 name: seancorezumo
-description: Kreas HTML-resumon de cxiuj uzantomesagxoj kaj asistantaj respondoj el Vibe-seancoprotokoloj por la nuna repo. Sxargxu cxi tiun skill kiam la uzanto petas resumon de siaj mesagxoj al Mistral Vibe.
+description: Kreas HTML-resumon de cxiuj uzantomesagxoj kaj asistantaj respondoj el Vibe-seancoprotokoloj por cxiuj dosierujoj de la sama git-repo. Sxargxu cxi tiun skill kiam la uzanto petas resumon de siaj mesagxoj al Mistral Vibe.
 user-invocable: true
 allowed-tools: bash read_file
 ---
@@ -8,7 +8,8 @@ allowed-tools: bash read_file
 # Skill: Seancoresumo
 
 Kreas HTML-dosieron kiu montras cxiujn uzantomesagxojn kaj la finajn asistantajn
-respondojn el la Vibe-seancoprotokoloj por la nuna repo (kongrue laux `cwd`).
+respondojn el la Vibe-seancoprotokoloj por cxiuj dosierujoj de la sama git-repo
+(kongrue laux git remote URL, ne nur laux preciza dosierujo).
 
 ## Kiam uzi
 
@@ -32,18 +33,25 @@ Kiam la uzanto petas ion kiel:
    ```
 
 2. La skripto:
+   - Determinas la git-remote-URL de la nuna repo (`git remote get-url origin`)
    - Trovas cxiujn seanc-dosierujojn en `~/.vibe/logs/session/`
-   - Filtras laux `environment.working_directory` kongruanta la nuna repo-dosierujo
-   - Legas `messages.jsonl` el cxiiu seanco
-   - Por cxiiu uzantomesagxo (`role=user`, `injected=false`) trovas la finan
+   - Inkluzivas seancojn el cxiuj dosierujoj kiuj havas la saman git-remote-URL
+     (ekz. `EsperantoRadio` kaj `EsperantoRadio2` ambaux inkluzivigxas)
+   - Legas `messages.jsonl` el cxiu seanco
+   - Por cxiu uzantomesagxo (`role=user`, `injected=false`) trovas la finan
      asistantan respondon (lasta `role=assistant` kun `content` kaj sen `tool_calls`)
    - Fortondas mesagxojn pli longajn ol 1000 signojn
-   - Generas HTML-grupigitan laux seanco, kun tempohoro, bluaj uzantomesagxoj
-     kaj purpuraj asistantaj respondoj
+   - Ordigas seancojn kronologie
+   - Generas HTML-grupigitan laux seanco, kun:
+     - tempohoro por cxiu seanco
+     - la dosierujo (cwd) en la session-header, emfazita flave kiam gxi
+       sxtangxas inter seancoj
+     - liston de cxiuj dosierujoj en la resumo
+     - bluajn uzantomesagxojn kaj purpurajn asistantajn respondojn
 
 3. Raportu al la uzanto:
    - Kiom da mesagxoj trovigxas
-   - Kiom da seancoj
+   - Kiom da seancoj kaj kiom da dosierujoj
    - La dosierindikon de la generita HTML
    - Sugestu malfermi gxin per `xdg-open`
 

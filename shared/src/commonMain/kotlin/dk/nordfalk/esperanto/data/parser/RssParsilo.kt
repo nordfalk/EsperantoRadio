@@ -99,7 +99,7 @@ class RssParsilo {
 
         // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
         val guid = ero.selectFirst("guid")?.text()
-        val id = if (guid != null) "${kanal.slug}:$dato:$guid" else "${kanal.slug}:$dato:$indekso"
+        val id = if (guid != null) "${kanal.slug}:$dato:$guid" else "${kanal.slug}:$dato:${indekso + 1}"
 
         return Elsendo(
             id = id,
@@ -207,7 +207,7 @@ class RssParsilo {
             val titolo = ero.selectFirst("title")?.text() ?: ""
             val retpaghoUrl = ero.selectFirst("link[rel=alternate]")?.attr("href")
             val guid = ero.selectFirst("id")?.text()
-            val id = if (guid != null) "peranto:$dato:$guid" else "peranto:$dato:$i"
+            val id = if (guid != null) "peranto:$dato:$guid" else "peranto:$dato:${i + 1}"
 
             Elsendo(
                 id = id,

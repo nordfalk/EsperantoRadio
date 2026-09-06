@@ -373,7 +373,7 @@ class RssParsiloTest {
 
         assertEquals(1, elsendoj.size)
         assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].stream)
-        assertEquals("peranto:2025-05-03:0", elsendoj[0].id)
+        assertEquals("peranto:2025-05-03:1", elsendoj[0].id)
     }
 
     @Test

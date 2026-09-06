@@ -117,7 +117,8 @@ fun EsperantoRadioApp(
         fun switchTab(vojo: Vojo) {
             logi("Nav", "→ tab: $vojo")
             backStack.clear()
-            backStack.add(vojo)
+            backStack.add(Vojo.Hejmo)
+            if (vojo !is Vojo.Hejmo) backStack.add(vojo)
         }
 
         fun push(vojo: Vojo) {
@@ -127,7 +128,7 @@ fun EsperantoRadioApp(
 
         fun reen() {
             logi("Nav", "← reen")
-            backStack.removeLastOrNull()
+            if (backStack.size > 1) backStack.removeLastOrNull()
         }
 
         val montruSubanBreton = nunaVojo !is Vojo.Agordoj && nunaVojo !is Vojo.Alarmoj

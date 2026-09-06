@@ -112,6 +112,7 @@ fun EsperantoRadioApp(
                     Ekrano.KANALARO -> {
                         KanalaroEkrano(
                             viewModel = kanalaroViewModel,
+                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
                             onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
                             onLudi = { fonto ->
                                 logi("Nav", "Ludas rekte: ${fonto}")

@@ -6,7 +6,7 @@ import com.russhwolf.settings.Settings
  * wasmJs: provizore no-op (neniu persisto sur web).
  * TODO: Aldoni localStorage-bazitan Settings.
  */
-actual fun kreSettings(): Settings = NoOpSettings()
+actual fun kreuSettings(): Settings = NoOpSettings()
 
 private class NoOpSettings : Settings {
     override val keys: Set<String> get() = emptySet()

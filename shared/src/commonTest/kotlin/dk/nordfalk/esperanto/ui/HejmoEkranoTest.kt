@@ -7,9 +7,9 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,46 +39,46 @@ class HejmoEkranoTest {
         (hodiaux.minus(DatePeriod(days = tagoloj))).toString()
 
     private val testKanaloj = listOf(
-        Kanal(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x.com/m.m3u8"),
-        Kanal(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"),
-        Kanal(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://x.com/v.rss"),
+        Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x.com/m.m3u8"),
+        Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"),
+        Kanalo(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://x.com/v.rss"),
     )
 
     private val testElsendoj = listOf(
-        Elsendo(id = "kp:1", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", stream = "", dato = datoAntaux(5)),
-        Elsendo(id = "kp:2", kanalSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", stream = "", dato = datoAntaux(12)),
-        Elsendo(id = "vv:1", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", stream = "", dato = datoAntaux(3)),
-        Elsendo(id = "vv:2", kanalSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", stream = "", dato = datoAntaux(17)),
+        Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaux(5)),
+        Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaux(12)),
+        Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaux(3)),
+        Elsendo(id = "vv:2", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", fluo = "", dato = datoAntaux(17)),
     )
 
-    private fun falsaKanalDeponejo() = object : KanalDeponejo {
+    private fun falsaKanaloDeponejo() = object : KanaloDeponejo {
         private val f = MutableStateFlow(testKanaloj)
         override fun observiKanalojn() = f.asStateFlow()
         override suspend fun getKanalojn(fortoRefresigi: Boolean) = f.value
-        override suspend fun getKanal(slug: String) = f.value.find { it.slug == slug }
+        override suspend fun getKanalo(slug: String) = f.value.find { it.slug == slug }
     }
 
     private fun falsaElsendoDeponejo() = object : ElsendoDeponejo {
-        override fun observiElsendojn(kanalSlug: String): Flow<List<Elsendo>> =
-            MutableStateFlow(testElsendoj.filter { it.kanalSlug == kanalSlug }).asStateFlow()
+        override fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>> =
+            MutableStateFlow(testElsendoj.filter { it.kanaloSlug == kanaloSlug }).asStateFlow()
 
-        override suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean): List<Elsendo> =
-            testElsendoj.filter { it.kanalSlug == kanalSlug }
+        override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> =
+            testElsendoj.filter { it.kanaloSlug == kanaloSlug }
 
         override suspend fun getElsendo(id: String): Elsendo? = testElsendoj.find { it.id == id }
 
-        override suspend fun sercxiElsendojn(taxto: String, limo: Int): List<Elsendo> =
-            testElsendoj.filter { it.titolo.contains(taxto, ignoreCase = true) }.take(limo)
+        override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> =
+            testElsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
 
-        override suspend fun sxargxiElsendojnPorKanal(kanal: Kanal, fortoRefresigi: Boolean): List<Elsendo> =
-            testElsendoj.filter { it.kanalSlug == kanal.slug }
+        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
+            testElsendoj.filter { it.kanaloSlug == kanalo.slug }
     }
 
     @Test
     fun montrasSekciojn() = runComposeUiTest {
         setContent {
             HejmoEkrano(
-                kanalDeponejo = falsaKanalDeponejo(),
+                kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
         }
@@ -91,7 +91,7 @@ class HejmoEkranoTest {
     fun montrasKanalNomojnEnElsendoj() = runComposeUiTest {
         setContent {
             HejmoEkrano(
-                kanalDeponejo = falsaKanalDeponejo(),
+                kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
         }
@@ -106,7 +106,7 @@ class HejmoEkranoTest {
     fun montrasElsendojnEnKioNovas() = runComposeUiTest {
         setContent {
             HejmoEkrano(
-                kanalDeponejo = falsaKanalDeponejo(),
+                kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
         }
@@ -123,7 +123,7 @@ class HejmoEkranoTest {
     fun montrasNovectempajnEmblemetojn() = runComposeUiTest {
         setContent {
             HejmoEkrano(
-                kanalDeponejo = falsaKanalDeponejo(),
+                kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
         }

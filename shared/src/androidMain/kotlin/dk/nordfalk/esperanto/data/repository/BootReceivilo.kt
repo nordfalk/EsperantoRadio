@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dk.nordfalk.esperanto.data.config.appContext
-import dk.nordfalk.esperanto.data.config.kreSettings
+import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.serialization.builtins.ListSerializer
@@ -25,9 +25,9 @@ class BootReceivilo : BroadcastReceiver() {
         logi("BootReceivilo", "Boot ricevita — re-planas alarmojn")
 
         try {
-            // Agordu appContext por AlarmoSkedilo kaj kreSettings (cexe boot, MainActivity ne jam rulis)
+            // Agordu appContext por AlarmoSkedilo kaj kreuSettings (cexe boot, MainActivity ne jam rulis)
             appContext = context.applicationContext
-            val settings = kreSettings()
+            val settings = kreuSettings()
             val str = settings.getString("alarmoj", "")
             if (str.isBlank()) {
                 logi("BootReceivilo", "Neniu persistita alarmo")

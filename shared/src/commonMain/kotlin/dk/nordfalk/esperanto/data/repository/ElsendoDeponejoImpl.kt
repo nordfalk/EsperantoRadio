@@ -6,7 +6,7 @@ import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -27,56 +27,56 @@ open class ElsendoDeponejoImpl(
     protected val kaŝmemoro = mutableMapOf<String, List<Elsendo>>()
     protected val fluoj = mutableMapOf<String, MutableStateFlow<List<Elsendo>>>()
 
-    override fun observiElsendojn(kanalSlug: String): StateFlow<List<Elsendo>> {
-        return fluoj.getOrPut(kanalSlug) { MutableStateFlow(kaŝmemoro[kanalSlug] ?: emptyList()) }.asStateFlow()
+    override fun observiElsendojn(kanaloSlug: String): StateFlow<List<Elsendo>> {
+        return fluoj.getOrPut(kanaloSlug) { MutableStateFlow(kaŝmemoro[kanaloSlug] ?: emptyList()) }.asStateFlow()
     }
 
-    override suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean): List<Elsendo> {
-        val kaŝenitaj = kaŝmemoro[kanalSlug]
+    override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> {
+        val kaŝenitaj = kaŝmemoro[kanaloSlug]
         if (kaŝenitaj != null && !fortoRefresigi) {
             return kaŝenitaj
         }
-        // Ni bezonas la kanal-URL por elŝuti. La kanal estas provizita ekstere.
-        // Tiu metodon estos vokita kun la kanal-URL jam konata.
+        // Ni bezonas la kanalo-URL por elŝuti. La kanalo estas provizita ekstere.
+        // Tiu metodon estos vokita kun la kanalo-URL jam konata.
         return kaŝenitaj ?: emptyList()
     }
 
     /**
-     * Elŝutas kaj parsas la RSS-fluon por specifa kanal.
+     * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    open suspend fun sxargxiElsendojn(kanal: Kanal, fortoRefresigi: Boolean = false): List<Elsendo> {
-        val url = kanal.podkastaRssUrl ?: run {
-            logw("ElsendoDeponejo", "${kanal.slug}: neniu RSS-URL — saltas")
-            return kaŝmemoro[kanal.slug] ?: emptyList()
+    open suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
+        val url = kanalo.podkastaRssUrl ?: run {
+            logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
+            return kaŝmemoro[kanalo.slug] ?: emptyList()
         }
-        val kaŝenitaj = kaŝmemoro[kanal.slug]
+        val kaŝenitaj = kaŝmemoro[kanalo.slug]
 
         if (kaŝenitaj != null && !fortoRefresigi) {
-            logd("ElsendoDeponejo", "${kanal.slug}: uzas kaŝenitan datumon (${kaŝenitaj.size} elsendoj)")
+            logd("ElsendoDeponejo", "${kanalo.slug}: uzas kaŝenitan datumon (${kaŝenitaj.size} elsendoj)")
             return kaŝenitaj
         }
 
         return try {
-            logi("ElsendoDeponejo", "${kanal.slug}: elŝutas RSS-fluon: $url")
+            logi("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
             val respondo = httpKliento.get(url).bodyAsText()
-            logi("ElsendoDeponejo", "${kanal.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
-            val elsendoj = parsilo.parsRss(respondo, kanal) { urlD ->
+            logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+            val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
                 httpKliento.get(urlD).bodyAsText()
             }
-            logi("ElsendoDeponejo", "${kanal.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
-            kaŝmemoro[kanal.slug] = elsendoj
-            fluoj.getOrPut(kanal.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
+            logi("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
+            kaŝmemoro[kanalo.slug] = elsendoj
+            fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             elsendoj
         } catch (e: Exception) {
-            loge("ElsendoDeponejo", "${kanal.slug}: RSS-elŝuto malsukcesa", e)
+            loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }
     }
 
-    override suspend fun sxargxiElsendojnPorKanal(kanal: Kanal, fortoRefresigi: Boolean): List<Elsendo> =
-        sxargxiElsendojn(kanal, fortoRefresigi)
+    override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
+        sxargxiElsendojn(kanalo, fortoRefresigi)
 
     override suspend fun getElsendo(id: String): Elsendo? {
         for ((_, elsendoj) in kaŝmemoro) {
@@ -86,13 +86,13 @@ open class ElsendoDeponejoImpl(
         return null
     }
 
-    override suspend fun sercxiElsendojn(taxto: String, limo: Int): List<Elsendo> {
+    override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> {
         val ĉiuj = kaŝmemoro.values.flatten()
-        val result = ĉiuj.filter {
-            it.titolo.contains(taxto, ignoreCase = true) ||
-            (it.priskribo?.contains(taxto, ignoreCase = true) ?: false)
+        val rezulto = ĉiuj.filter {
+            it.titolo.contains(teksto, ignoreCase = true) ||
+            (it.priskribo?.contains(teksto, ignoreCase = true) ?: false)
         }.take(limo)
-        logi("ElsendoDeponejo", "Serĉas '$taxto' en ${ĉiuj.size} elsendoj — ${result.size} trovoj")
-        return result
+        logi("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
+        return rezulto
     }
 }

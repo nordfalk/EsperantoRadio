@@ -8,20 +8,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlejsatatajEkrano(
     plejsatatajDeponejo: PlejsatatajDeponejo,
-    kanalDeponejo: KanalDeponejo,
-    onKanal: (Kanal) -> Unit,
+    kanaloDeponejo: KanaloDeponejo,
+    onKanalo: (Kanalo) -> Unit,
 ) {
     val plejsatataj by plejsatatajDeponejo.observiPlejsatatajn().collectAsState()
-    val ĉiujKanaloj by kanalDeponejo.observiKanalojn().collectAsState()
+    val ĉiujKanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
     val plejKanaloj = ĉiujKanaloj.filter { it.slug in plejsatataj }
 
     Scaffold(
@@ -37,11 +37,11 @@ fun PlejsatatajEkrano(
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
-                items(plejKanaloj, key = { it.slug }) { kanal ->
+                items(plejKanaloj, key = { it.slug }) { kanalo ->
                     ListItem(
-                        headlineContent = { Text(kanal.nomo) },
-                        supportingContent = { Text(if (kanal.estasRekta) "Rekta elsendo" else "Podkasto") },
-                        modifier = Modifier.clickable { logi("Klako", "plejŝatata kanal ${kanal.slug}"); onKanal(kanal) }
+                        headlineContent = { Text(kanalo.nomo) },
+                        supportingContent = { Text(if (kanalo.estasRekta) "Rekta elsendo" else "Podkasto") },
+                        modifier = Modifier.clickable { logi("Klako", "plejŝatata kanalo ${kanalo.slug}"); onKanalo(kanalo) }
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
@@ -53,5 +53,5 @@ fun PlejsatatajEkrano(
 @Preview(name = "PlejsatatajEkrano", showBackground = true, heightDp = 250)
 @Composable
 fun PlejsatatajEkranoPreview() {
-    pTemo { PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onKanal = {}) }
+    pTemo { PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onKanalo = {}) }
 }

@@ -15,9 +15,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.async
@@ -66,10 +66,10 @@ fun kalkuliNovectempon(
  */
 @OptIn(ExperimentalTime::class)
 class HejmoViewModel(
-    private val kanalDeponejo: KanalDeponejo,
+    private val kanaloDeponejo: KanaloDeponejo,
     private val elsendoDeponejo: ElsendoDeponejo,
 ) {
-    val kanaloj: StateFlow<List<Kanal>> = kanalDeponejo.observiKanalojn()
+    val kanaloj: StateFlow<List<Kanalo>> = kanaloDeponejo.observiKanalojn()
 
     private val _novajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val novajElsendoj = _novajElsendoj.asStateFlow()
@@ -83,14 +83,14 @@ class HejmoViewModel(
     suspend fun sxargxi() {
         _sxargxas.value = true
         try {
-            val kanaloj = kanalDeponejo.getKanalojn()
+            val kanaloj = kanaloDeponejo.getKanalojn()
             logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj")
 
-            // Ŝargi ĉiujn RSS-fluojn samtempe (po unu async per kanal kun podkasta RSS)
+            // Ŝargi ĉiujn RSS-fluojn samtempe (po unu async per kanalo kun podkasta RSS)
             val ĉiujElsendoj = coroutineScope {
                 kanaloj
                     .filter { it.havasPodkastojn }
-                    .map { kanal -> async { elsendoDeponejo.sxargxiElsendojnPorKanal(kanal) } }
+                    .map { kanalo -> async { elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo) } }
                     .awaitAll()
                     .flatten()
             }
@@ -98,10 +98,10 @@ class HejmoViewModel(
 
             val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
 
-            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanal, maks 50 entute
+            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanalo, maks 50 entute
             val novaj = ĉiujElsendoj
                 .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
-                .groupBy { it.kanalSlug }
+                .groupBy { it.kanaloSlug }
                 .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
                 .sortedByDescending { it.dato }
                 .take(50)
@@ -131,16 +131,16 @@ class HejmoViewModel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HejmoEkrano(
-    kanalDeponejo: KanalDeponejo,
+    kanaloDeponejo: KanaloDeponejo,
     elsendoDeponejo: ElsendoDeponejo,
-    onKanal: (Kanal) -> Unit = {},
+    onKanalo: (Kanalo) -> Unit = {},
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
 ) {
-    val viewModel = remember { HejmoViewModel(kanalDeponejo, elsendoDeponejo) }
+    val viewModel = remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo) }
     val kanaloj by viewModel.kanaloj.collectAsState()
     val novajElsendoj by viewModel.novajElsendoj.collectAsState()
     val popularajElsendoj by viewModel.popularajElsendoj.collectAsState()
@@ -187,11 +187,11 @@ fun HejmoEkrano(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(novajElsendoj) { elsendo ->
-                                val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
+                                val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanalNomo = kanal?.nomo ?: elsendo.kanalSlug,
-                                    bildUrl = elsendo.bildUrl ?: kanal?.emblemoUrl,
+                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
+                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
                                     novectempo = kalkuliNovectempon(elsendo.dato),
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
                                 )
@@ -212,11 +212,11 @@ fun HejmoEkrano(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(popularajElsendoj) { elsendo ->
-                                val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
+                                val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanalNomo = kanal?.nomo ?: elsendo.kanalSlug,
-                                    bildUrl = elsendo.bildUrl ?: kanal?.emblemoUrl,
+                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
+                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
                                 )
                             }
@@ -244,8 +244,8 @@ private fun SekcioTitolo(titolo: String) {
 @Composable
 private fun ElsendoKarto(
     elsendo: Elsendo,
-    kanalNomo: String,
-    bildUrl: String?,
+    kanaloNomo: String,
+    bildoUrl: String?,
     onClick: () -> Unit,
     novectempo: String? = null,
 ) {
@@ -257,9 +257,9 @@ private fun ElsendoKarto(
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
             Box {
-                if (bildUrl != null) {
+                if (bildoUrl != null) {
                     AsyncImage(
-                        model = bildUrl,
+                        model = bildoUrl,
                         contentDescription = "Bildeto de ${elsendo.titolo}",
                         modifier = Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))
                     )
@@ -294,7 +294,7 @@ private fun ElsendoKarto(
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                text = kanalNomo,
+                text = kanaloNomo,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

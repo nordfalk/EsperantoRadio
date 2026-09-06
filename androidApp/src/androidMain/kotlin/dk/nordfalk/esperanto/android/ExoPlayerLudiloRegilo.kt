@@ -77,8 +77,8 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
     }
 
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
-        is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
-        is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.RektaKanalo -> fonto.kanalo.rektaElsendaSonoUrl ?: ""
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.fluo
         is Sonfonto.LokaElsendo -> "file://${fonto.dosieroVojo}"
     }
 
@@ -89,18 +89,18 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         val builder = MediaMetadata.Builder()
         when (fonto) {
             is Sonfonto.RektaKanalo -> {
-                builder.setTitle(fonto.kanal.nomo)
-                fonto.kanal.emblemoUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
+                builder.setTitle(fonto.kanalo.nomo)
+                fonto.kanalo.emblemoUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
             }
             is Sonfonto.ElsendoFonto -> {
                 builder.setTitle(fonto.elsendo.titolo)
-                fonto.elsendo.kanalNomo?.let { builder.setArtist(it) }
-                fonto.elsendo.bildUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
+                fonto.elsendo.kanaloNomo?.let { builder.setArtist(it) }
+                fonto.elsendo.bildoUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
             }
             is Sonfonto.LokaElsendo -> {
                 builder.setTitle(fonto.elsendo.titolo)
-                fonto.elsendo.kanalNomo?.let { builder.setArtist(it) }
-                fonto.elsendo.bildUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
+                fonto.elsendo.kanaloNomo?.let { builder.setArtist(it) }
+                fonto.elsendo.bildoUrl?.let { builder.setArtworkUri(Uri.parse(it)) }
             }
         }
         return builder.build()

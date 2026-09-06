@@ -32,7 +32,7 @@ interface LudiloRegilo {
  * - wasmJs: WasmJsLudiloRegilo (HTMLAudioElement)
  * - iOS: NoOpLudiloRegilo (estonte: AVPlayer)
  */
-expect fun kreDefauxltanLudiloRegilon(): LudiloRegilo
+expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 
 /**
  * No-op ludilo — UI funkcias, stato-ŝanĝoj funkcias, sed neniu sono.

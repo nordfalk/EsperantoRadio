@@ -21,8 +21,8 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     private var nunaFonto: Sonfonto? = null
 
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
-        is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
-        is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.RektaKanalo -> fonto.kanalo.rektaElsendaSonoUrl ?: ""
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.fluo
         is Sonfonto.LokaElsendo -> fonto.dosieroVojo  // wasmJs ne havas lokan dosier-sistemon
     }
 

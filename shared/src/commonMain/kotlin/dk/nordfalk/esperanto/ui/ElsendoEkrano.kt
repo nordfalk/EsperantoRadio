@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.logi
 
@@ -24,8 +24,8 @@ fun ElsendoEkrano(
     onLudi: () -> Unit = {},
     onElshuti: () -> Unit = {},
     onForigiElshuton: () -> Unit = {},
-    onKanal: (Kanal) -> Unit = {},
-    kanal: Kanal? = null,
+    onKanalo: (Kanalo) -> Unit = {},
+    kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
 ) {
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
@@ -48,9 +48,9 @@ fun ElsendoEkrano(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Bildo
-            if (elsendo.bildUrl != null) {
+            if (elsendo.bildoUrl != null) {
                 AsyncImage(
-                    model = elsendo.bildUrl,
+                    model = elsendo.bildoUrl,
                     contentDescription = null,
                     modifier = Modifier.size(200.dp)
                 )
@@ -79,15 +79,15 @@ fun ElsendoEkrano(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Klakebla kanalnomo → iras al kanal-ekrano
-            if (kanal != null) {
+            // Klakebla kanalnomo → iras al kanalo-ekrano
+            if (kanalo != null) {
                 Spacer(Modifier.height(4.dp))
                 TextButton(
-                    onClick = { logi("Klako", "kanal-ligilo → ${kanal.slug}"); onKanal(kanal) },
+                    onClick = { logi("Klako", "kanalo-ligilo → ${kanalo.slug}"); onKanalo(kanalo) },
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp, vertical = 0.dp)
                 ) {
                     Text(
-                        text = kanal.nomo,
+                        text = kanalo.nomo,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )

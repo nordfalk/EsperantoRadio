@@ -39,7 +39,7 @@ actual class AlarmoSkedilo actual constructor() {
             )
         }
 
-        logi("AlarmoSkedilo", "Skedis alarmon ${alarmo.id}: ${alarmo.tempoTeksto} ${alarmo.ripetoTeksto} → ${alarmo.kanalSlug} (trigger en ${(triggerAtMillis - System.currentTimeMillis()) / 1000}s)")
+        logi("AlarmoSkedilo", "Skedis alarmon ${alarmo.id}: ${alarmo.tempoTeksto} ${alarmo.ripetoTeksto} → ${alarmo.kanaloSlug} (trigger en ${(triggerAtMillis - System.currentTimeMillis()) / 1000}s)")
     }
 
     actual fun malplani(alarmoId: Int) {
@@ -61,13 +61,13 @@ actual class AlarmoSkedilo actual constructor() {
     }
 
     private fun kreuPendingIntent(alarmo: Alarmo): PendingIntent =
-        kreuPendingIntent(alarmo.id, alarmo.kanalSlug, alarmo.etikedo)
+        kreuPendingIntent(alarmo.id, alarmo.kanaloSlug, alarmo.etikedo)
 
-    private fun kreuPendingIntent(alarmoId: Int, kanalSlug: String? = null, etikedo: String? = null): PendingIntent {
+    private fun kreuPendingIntent(alarmoId: Int, kanaloSlug: String? = null, etikedo: String? = null): PendingIntent {
         val intent = Intent(appContext, AlarmoReceivilo::class.java).apply {
             action = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
             putExtra("alarmo_id", alarmoId)
-            if (kanalSlug != null) putExtra("kanal_slug", kanalSlug)
+            if (kanaloSlug != null) putExtra("kanal_slug", kanaloSlug)
             if (etikedo != null) putExtra("etikedo", etikedo)
         }
         return PendingIntent.getBroadcast(

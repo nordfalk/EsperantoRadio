@@ -49,13 +49,13 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private var pcmFormat: AudioFormat? = null
 
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
-        is Sonfonto.RektaKanalo -> fonto.kanal.rektaElsendaSonoUrl ?: ""
-        is Sonfonto.ElsendoFonto -> fonto.elsendo.stream
+        is Sonfonto.RektaKanalo -> fonto.kanalo.rektaElsendaSonoUrl ?: ""
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.fluo
         is Sonfonto.LokaElsendo -> "file://${fonto.dosieroVojo}"
     }
 
     private fun fontoNomo(fonto: Sonfonto): String = when (fonto) {
-        is Sonfonto.RektaKanalo -> "RektaKanalo(${fonto.kanal.nomo})"
+        is Sonfonto.RektaKanalo -> "RektaKanalo(${fonto.kanalo.nomo})"
         is Sonfonto.ElsendoFonto -> "ElsendoFonto(${fonto.elsendo.titolo})"
         is Sonfonto.LokaElsendo -> "LokaElsendo(${fonto.elsendo.titolo})"
     }
@@ -160,7 +160,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
         ludaJob?.cancel()
         ludaJob = scope.launch {
             val line = sourceDataLine ?: return@launch
-            val stream = audioInputStream ?: return@launch
+            val fluo = audioInputStream ?: return@launch
             val format = pcmFormat ?: return@launch
 
             line.start()
@@ -175,7 +175,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
                     continue
                 }
                 val read = try {
-                    stream.read(buffer)
+                    fluo.read(buffer)
                 } catch (e: Exception) {
                     log("ludi: eraro legante fluon: ${e.message}")
                     e.printStackTrace(System.err)
@@ -208,8 +208,8 @@ class DesktopLudiloRegilo : LudiloRegilo {
     override fun ludi() {
         log("ludi()")
         val line = sourceDataLine
-        val stream = audioInputStream
-        if (line == null || stream == null) {
+        val fluo = audioInputStream
+        if (line == null || fluo == null) {
             log("ludi: ERARO — sourceDataLine aü audioInputStream estas null")
             return
         }
@@ -242,7 +242,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
         try {
             audioInputStream?.close()
         } catch (e: Exception) {
-            log("halti: eraro fermante stream: ${e.message}")
+            log("halti: eraro fermante fluo: ${e.message}")
             e.printStackTrace(System.err)
         }
         sourceDataLine = null

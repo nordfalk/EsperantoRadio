@@ -87,7 +87,7 @@ class KtorElshutDeponejo(
 
     override suspend fun elshuti(elsendo: Elsendo) {
         val id = elsendo.id
-        logi("ElshutDeponejo", "Elŝutas: ${elsendo.titolo} — ${elsendo.stream}")
+        logi("ElshutDeponejo", "Elŝutas: ${elsendo.titolo} — ${elsendo.fluo}")
 
         val hejjo = elshuthejjo()
         hejjo.mkdirs()
@@ -102,7 +102,7 @@ class KtorElshutDeponejo(
 
         val job = scope.launch {
             try {
-                val respondo = httpKliento.get(elsendo.stream)
+                val respondo = httpKliento.get(elsendo.fluo)
                 if (!respondo.status.isSuccess()) {
                     stato.value = ElshutStato.Eraro("HTTP ${respondo.status.value}")
                     _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))

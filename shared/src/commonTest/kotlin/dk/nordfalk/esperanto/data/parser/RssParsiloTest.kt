@@ -1,6 +1,6 @@
 package dk.nordfalk.esperanto.data.parser
 
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -11,10 +11,10 @@ class RssParsiloTest {
     private val parsilo = RssParsilo()
 
     private fun leguFiksaĵon(nomo: String): String {
-        val stream = Thread.currentThread().contextClassLoader
+        val fluo = Thread.currentThread().contextClassLoader
             ?.getResourceAsStream("feeds/$nomo")
             ?: error("Fiksaĵo $nomo ne trovita")
-        return stream.bufferedReader().use { it.readText() }
+        return fluo.bufferedReader().use { it.readText() }
     }
 
     // === Regulo 6.1 — Ĝenerala parsado (Kernpunkto) ===
@@ -22,13 +22,13 @@ class RssParsiloTest {
     @Test
     fun parsasKernpunkton() {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "kernpunkto",
             nomo = "Kernpunkto",
             podkastaRssUrl = "https://kern.punkto.info/feed/mp3/"
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertTrue(elsendoj.isNotEmpty(), "Kernpunkto devas havi elsendojn")
         println("Kernpunkto: ${elsendoj.size} elsendoj")
@@ -36,8 +36,8 @@ class RssParsiloTest {
         // Unua elsendo
         val unua = elsendoj.first()
         assertTrue(unua.titolo.contains("KP"), "Titolo devas enhavi KP: ${unua.titolo}")
-        assertTrue(unua.stream.startsWith("https://"), "Stream devas komenciĝi per https://: ${unua.stream}")
-        assertTrue(unua.stream.endsWith(".mp3"), "Stream devas finii per .mp3: ${unua.stream}")
+        assertTrue(unua.fluo.startsWith("https://"), "Stream devas komenciĝi per https://: ${unua.fluo}")
+        assertTrue(unua.fluo.endsWith(".mp3"), "Stream devas finii per .mp3: ${unua.fluo}")
         assertNotNull(unua.dato, "Dato ne estu nul")
         assertTrue(unua.dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}")), "Dato devas esti yyyy-MM-dd: ${unua.dato}")
 
@@ -51,26 +51,26 @@ class RssParsiloTest {
     @Test
     fun kernpunktoHavasHttpsNeHttp() {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "kernpunkto",
             nomo = "Kernpunkto",
             podkastaRssUrl = "https://kern.punkto.info/feed/mp3/"
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         // Ĉiuj streamoj devas esti https:// (ne http://) por Kernpunkto
         for (e in elsendoj) {
-            assertTrue(e.stream.startsWith("https://"), "Stream devas esti https://: ${e.stream}")
+            assertTrue(e.fluo.startsWith("https://"), "Stream devas esti https://: ${e.fluo}")
         }
     }
 
     @Test
     fun kernpunktoIdFormato() {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
-        val kanal = Kanal(slug = "kernpunkto", nomo = "Kernpunkto")
+        val kanalo = Kanalo(slug = "kernpunkto", nomo = "Kernpunkto")
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("kernpunkto:"), "ID devas komenciĝi per 'kernpunkto:': ${e.id}")
@@ -82,13 +82,13 @@ class RssParsiloTest {
     @Test
     fun parsasVarsoviaVenton() {
         val fluo = leguFiksaĵon("varsoviavento_feed.xml")
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "varsoviavento",
             nomo = "Varsovia Vento",
             podkastaRssUrl = "https://www.podkasto.net/feed/"
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertTrue(elsendoj.isNotEmpty(), "Varsovia Vento devas havi elsendojn")
         println("Varsovia Vento: ${elsendoj.size} elsendoj")
@@ -99,13 +99,13 @@ class RssParsiloTest {
             val unuaParto = plurpartaj.first()
             println("Plurparta: ${unuaParto.titolo} — ${unuaParto.id}")
             assertTrue(unuaParto.titolo.contains("parto"), "Titolo devas enhavi 'parto': ${unuaParto.titolo}")
-            assertTrue(unuaParto.stream.contains(".mp3"), "Stream devas enhavi .mp3: ${unuaParto.stream}")
+            assertTrue(unuaParto.fluo.contains(".mp3"), "Stream devas enhavi .mp3: ${unuaParto.fluo}")
         }
 
         // Ĉiuj ID-oj devas havi formaton varsoviavento:yyyy-MM-dd:n
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("varsoviavento:"), "ID: ${e.id}")
-            assertTrue(e.kanalSlug == "varsoviavento")
+            assertTrue(e.kanaloSlug == "varsoviavento")
         }
     }
 
@@ -114,13 +114,13 @@ class RssParsiloTest {
     @Test
     fun parsasVinilkosmon() {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "vinilkosmo",
             nomo = "Vinilkosmo",
             podkastaRssUrl = "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio"
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertTrue(elsendoj.isNotEmpty(), "Vinilkosmo devas havi elsendojn")
         println("Vinilkosmo: ${elsendoj.size} elsendoj")
@@ -128,8 +128,8 @@ class RssParsiloTest {
         // ID-formato: vk:<publikig-sen-tempzonon>
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("vk:"), "ID devas komenciĝi per 'vk:': ${e.id}")
-            assertTrue(e.stream.contains("ipernity.com"), "Stream devas enhavi ipernity.com: ${e.stream}")
-            assertTrue(e.stream.contains(".mp3"), "Stream devas enhavi .mp3: ${e.stream}")
+            assertTrue(e.fluo.contains("ipernity.com"), "Stream devas enhavi ipernity.com: ${e.fluo}")
+            assertTrue(e.fluo.contains(".mp3"), "Stream devas enhavi .mp3: ${e.fluo}")
             assertTrue(e.dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}")), "Dato: ${e.dato}")
         }
     }
@@ -152,13 +152,13 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "muzaiko",
             nomo = "Muzaiko",
             ignoruTitolon = true
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         val titolo = elsendoj[0].titolo
@@ -179,7 +179,7 @@ class RssParsiloTest {
         assertTrue(nextLink.contains("paged=2"), "Next-link devas enhavi paged=2: $nextLink")
     }
 
-    // === Sen stream → forĵetu ===
+    // === Sen fluo → forĵetu ===
 
     @Test
     fun eroSenStreamEstasForjxetita() {
@@ -202,10 +202,10 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
-        assertEquals(1, elsendoj.size, "Nur ero kun stream devas resti")
+        assertEquals(1, elsendoj.size, "Nur ero kun fluo devas resti")
         assertEquals("Kun sono", elsendoj[0].titolo)
     }
 
@@ -227,8 +227,8 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         assertEquals("2022-11-09", elsendoj[0].dato)
@@ -250,8 +250,8 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         assertEquals("2013-08-01", elsendoj[0].dato)
@@ -271,8 +271,8 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         assertEquals("2018-03-21", elsendoj[0].dato)
@@ -297,8 +297,8 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         assertEquals(6916L, elsendoj[0].dauro)
@@ -321,8 +321,8 @@ class RssParsiloTest {
             </rss>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "test", nomo = "Test")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
         assertEquals(3077L, elsendoj[0].dauro)
@@ -333,22 +333,22 @@ class RssParsiloTest {
     @Test
     fun parsasPeranton() {
         val fluo = leguFiksaĵon("peranto_feed.xml")
-        val kanal = Kanal(
+        val kanalo = Kanalo(
             slug = "peranto",
             nomo = "Esperanta Retradio",
             podkastaRssUrl = "https://esperantaretradio.blogspot.com/feeds/posts/default",
             ignoruTitolon = true,
         )
 
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertTrue(elsendoj.isNotEmpty(), "Peranto devas havi elsendojn")
         println("Peranto: ${elsendoj.size} elsendoj")
 
-        // Ĉiuj stream-oj devas esti archive.org/download/...mp3
+        // Ĉiuj fluo-oj devas esti archive.org/download/...mp3
         for (e in elsendoj) {
-            assertTrue(e.stream.contains("archive.org/download/"), "Stream devas enhavi archive.org/download/: ${e.stream}")
-            assertTrue(e.stream.endsWith(".mp3"), "Stream devas finii per .mp3: ${e.stream}")
+            assertTrue(e.fluo.contains("archive.org/download/"), "Stream devas enhavi archive.org/download/: ${e.fluo}")
+            assertTrue(e.fluo.endsWith(".mp3"), "Stream devas finii per .mp3: ${e.fluo}")
             assertTrue(e.id.startsWith("peranto:"), "ID devas komenciĝi per 'peranto:': ${e.id}")
             assertTrue(e.dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}")), "Dato: ${e.dato}")
         }
@@ -368,11 +368,11 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
-        assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].stream)
+        assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].fluo)
         assertEquals("peranto:2025-05-03:1", elsendoj[0].id)
     }
 
@@ -389,11 +389,11 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
-        assertEquals("https://archive.org/download/orkestro_sklavidoj/orkestro_sklavidoj.mp3", elsendoj[0].stream)
+        assertEquals("https://archive.org/download/orkestro_sklavidoj/orkestro_sklavidoj.mp3", elsendoj[0].fluo)
     }
 
     @Test
@@ -409,11 +409,11 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
-        assertEquals("https://drive.google.com/u/1/uc?id=1ABC123XYZ&export=download", elsendoj[0].stream)
+        assertEquals("https://drive.google.com/u/1/uc?id=1ABC123XYZ&export=download", elsendoj[0].fluo)
     }
 
     @Test
@@ -444,8 +444,8 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size, "Nur archive.org-ero devas resti")
         assertEquals("Bona", elsendoj[0].titolo)
@@ -474,8 +474,8 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size, "Malplenaj datoj devas esti saltitaj")
         assertEquals("Bona", elsendoj[0].titolo)
@@ -494,8 +494,8 @@ class RssParsiloTest {
             </feed>
         """.trimIndent()
 
-        val kanal = Kanal(slug = "peranto", nomo = "Peranto")
-        val elsendoj = parsilo.parsRss(fluo, kanal)
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(0, elsendoj.size, "Ero sen iframe devas esti saltita")
     }

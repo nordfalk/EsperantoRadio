@@ -5,9 +5,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Alarmo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,16 +36,16 @@ class AlarmoEkranoTest {
         }
     }
 
-    private class FalsaKanalDeponejo(kanaloj: List<Kanal>) : KanalDeponejo {
+    private class FalsaKanaloDeponejo(kanaloj: List<Kanalo>) : KanaloDeponejo {
         private val _kanaloj = MutableStateFlow(kanaloj)
-        override fun observiKanalojn(): StateFlow<List<Kanal>> = _kanaloj.asStateFlow()
-        override suspend fun getKanalojn(fortoRefresigi: Boolean): List<Kanal> = _kanaloj.value
-        override suspend fun getKanal(slug: String): Kanal? = _kanaloj.value.find { it.slug == slug }
+        override fun observiKanalojn(): StateFlow<List<Kanalo>> = _kanaloj.asStateFlow()
+        override suspend fun getKanalojn(fortoRefresigi: Boolean): List<Kanalo> = _kanaloj.value
+        override suspend fun getKanalo(slug: String): Kanalo? = _kanaloj.value.find { it.slug == slug }
     }
 
     private val testKanaloj = listOf(
-        Kanal(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x"),
-        Kanal(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "y"),
+        Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x"),
+        Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "y"),
     )
 
     @Test
@@ -54,7 +54,7 @@ class AlarmoEkranoTest {
         setContent {
             AlarmoEkrano(
                 alarmoDeponejo = deponejo,
-                kanalDeponejo = FalsaKanalDeponejo(testKanaloj),
+                kanaloDeponejo = FalsaKanaloDeponejo(testKanaloj),
                 onReen = {}
             )
         }
@@ -65,13 +65,13 @@ class AlarmoEkranoTest {
     @Test
     fun montrasAlarmojnEnListo() = runComposeUiTest {
         val alarmoj = listOf(
-            Alarmo(id = 1, horo = 6, minuto = 45, ripeto = 0x7f, kanalSlug = "muzaiko", aktiva = true, etikedo = "Matene"),
-            Alarmo(id = 2, horo = 22, minuto = 0, ripeto = 0, kanalSlug = "kernpunkto", aktiva = false),
+            Alarmo(id = 1, horo = 6, minuto = 45, ripeto = 0x7f, kanaloSlug = "muzaiko", aktiva = true, etikedo = "Matene"),
+            Alarmo(id = 2, horo = 22, minuto = 0, ripeto = 0, kanaloSlug = "kernpunkto", aktiva = false),
         )
         setContent {
             AlarmoEkrano(
                 alarmoDeponejo = FalsaAlarmoDeponejo(alarmoj),
-                kanalDeponejo = FalsaKanalDeponejo(testKanaloj),
+                kanaloDeponejo = FalsaKanaloDeponejo(testKanaloj),
                 onReen = {}
             )
         }

@@ -14,20 +14,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
-import dk.nordfalk.esperanto.data.config.kreSettings
+import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.kreElshutDeponejo
+import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
-import dk.nordfalk.esperanto.data.repository.kreAlarmoSkedilo
+import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
-import dk.nordfalk.esperanto.domain.player.kreDefauxltanLudiloRegilon
+import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.navigation.Vojo
 import dk.nordfalk.esperanto.ui.*
@@ -57,7 +57,7 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.Elshutoj::class, Vojo.Elshutoj.serializer())
             subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
             subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
-            subclass(Vojo.KanalDetalo::class, Vojo.KanalDetalo.serializer())
+            subclass(Vojo.KanaloDetalo::class, Vojo.KanaloDetalo.serializer())
             subclass(Vojo.ElsendoDetalo::class, Vojo.ElsendoDetalo.serializer())
         }
     }
@@ -66,7 +66,7 @@ private val navConfig = SavedStateConfiguration {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EsperantoRadioApp(
-    ludilo: LudiloRegilo = kreDefauxltanLudiloRegilon(),
+    ludilo: LudiloRegilo = kreuDefauxltanLudiloRegilon(),
 ) {
     val malhela = androidx.compose.foundation.isSystemInDarkTheme()
     val agordojDeponejo = remember { AgordojDeponejoImpl() }
@@ -89,27 +89,27 @@ fun EsperantoRadioApp(
             }
         }
 
-        val kanalDeponejo = remember {
-            KanalDeponejoImpl(
+        val kanaloDeponejo = remember {
+            KanaloDeponejoImpl(
                 leganto = KanalAgordoLeganto(),
                 bundledTeksto = ::leguBundledKanalkonfiguron
             )
         }
         val elsendoDeponejo = remember { ElsendoDeponejoImpl(httpKliento) }
-        val kanalaroViewModel = remember { KanalaroViewModel(kanalDeponejo) }
-        val settings = remember { kreSettings() }
+        val kanalaroViewModel = remember { KanalaroViewModel(kanaloDeponejo) }
+        val settings = remember { kreuSettings() }
         val plejsatatajDeponejo = remember { PersistantaPlejsatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
-        val elshutDeponejo = remember { kreElshutDeponejo(httpKliento) }
+        val elshutDeponejo = remember { kreuElshutDeponejo(httpKliento) }
         val alarmoDeponejo = remember {
             val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
             val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
-            PersistantaAlarmoDeponejo(settings, sugestoj, kreAlarmoSkedilo())
+            PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
         }
         val scope = rememberCoroutineScope()
 
         val backStack = rememberNavBackStack(navConfig, Vojo.Hejmo)
-        val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
+        val kanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
         val ludantoStato by ludilo.stato.collectAsState()
 
         val nunaVojo = backStack.lastOrNull()
@@ -141,9 +141,9 @@ fun EsperantoRadioApp(
                     entryProvider = entryProvider {
                         entry<Vojo.Hejmo> {
                             HejmoEkrano(
-                                kanalDeponejo = kanalDeponejo,
+                                kanaloDeponejo = kanaloDeponejo,
                                 elsendoDeponejo = elsendoDeponejo,
-                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
@@ -153,7 +153,7 @@ fun EsperantoRadioApp(
                         entry<Vojo.Kanalaro> {
                             KanalaroEkrano(
                                 viewModel = kanalaroViewModel,
-                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas rekte: $fonto")
                                     scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
@@ -166,8 +166,8 @@ fun EsperantoRadioApp(
                         entry<Vojo.Plejsatataj> {
                             PlejsatatajEkrano(
                                 plejsatatajDeponejo = plejsatatajDeponejo,
-                                kanalDeponejo = kanalDeponejo,
-                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                                kanaloDeponejo = kanaloDeponejo,
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                             )
                         }
                         entry<Vojo.Sercxo> {
@@ -190,7 +190,7 @@ fun EsperantoRadioApp(
                         entry<Vojo.Alarmoj> {
                             AlarmoEkrano(
                                 alarmoDeponejo = alarmoDeponejo,
-                                kanalDeponejo = kanalDeponejo,
+                                kanaloDeponejo = kanaloDeponejo,
                                 onReen = { reen() },
                             )
                         }
@@ -200,25 +200,25 @@ fun EsperantoRadioApp(
                                 onReen = { reen() },
                             )
                         }
-                        entry<Vojo.KanalDetalo> { vojo ->
-                            KanalEkrano(
-                                kanal = vojo.kanal,
+                        entry<Vojo.KanaloDetalo> { vojo ->
+                            KanaloEkrano(
+                                kanalo = vojo.kanalo,
                                 elsendoDeponejo = elsendoDeponejo,
                                 onReen = { reen() },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onLudi = { fonto ->
-                                    logi("Nav", "Ludas rekte: ${vojo.kanal.slug}")
+                                    logi("Nav", "Ludas rekte: ${vojo.kanalo.slug}")
                                     scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                                 },
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
                             val elsendo = vojo.elsendo
-                            val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
+                            val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                             ElsendoEkrano(
                                 elsendo = elsendo,
-                                kanal = kanal,
-                                onKanal = { k -> push(Vojo.KanalDetalo(k)) },
+                                kanalo = kanalo,
+                                onKanalo = { k -> push(Vojo.KanaloDetalo(k)) },
                                 onReen = { reen() },
                                 onLudi = {
                                     logi("Nav", "Ludas elsendon: ${elsendo.id}")
@@ -256,18 +256,18 @@ fun EsperantoRadioApp(
                         when (fonto) {
                             is Sonfonto.ElsendoFonto -> push(Vojo.ElsendoDetalo(fonto.elsendo))
                             is Sonfonto.LokaElsendo -> push(Vojo.ElsendoDetalo(fonto.elsendo))
-                            is Sonfonto.RektaKanalo -> push(Vojo.KanalDetalo(fonto.kanal))
+                            is Sonfonto.RektaKanalo -> push(Vojo.KanaloDetalo(fonto.kanalo))
                             null -> {}
                         }
                     },
                 )
                 MalsupraNavigaBreto(
                     nunaTab = when (nunaVojo) {
-                        is Vojo.Hejmo -> EkranoTab.HEJMO
-                        is Vojo.Kanalaro -> EkranoTab.KANALARO
-                        is Vojo.Plejsatataj -> EkranoTab.PLEJSATATAJ
-                        is Vojo.Sercxo -> EkranoTab.SERCXO
-                        else -> EkranoTab.NENIO
+                        is Vojo.Hejmo -> EkranoLangeto.HEJMO
+                        is Vojo.Kanalaro -> EkranoLangeto.KANALARO
+                        is Vojo.Plejsatataj -> EkranoLangeto.PLEJSATATAJ
+                        is Vojo.Sercxo -> EkranoLangeto.SERCXO
+                        else -> EkranoLangeto.NENIO
                     },
                     onHejmo = { switchTab(Vojo.Hejmo) },
                     onKanalaro = { switchTab(Vojo.Kanalaro) },

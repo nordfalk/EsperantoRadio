@@ -16,14 +16,14 @@ class PlejsatatajDeponejoImpl : PlejsatatajDeponejo {
     private val _plejsatataj = MutableStateFlow<Set<String>>(emptySet())
     override fun observiPlejsatatajn(): StateFlow<Set<String>> = _plejsatataj.asStateFlow()
 
-    override suspend fun baskuliPlejsaton(kanalSlug: String) {
+    override suspend fun baskuliPlejsaton(kanaloSlug: String) {
         val nuna = _plejsatataj.value.toMutableSet()
-        if (kanalSlug in nuna) nuna.remove(kanalSlug) else nuna.add(kanalSlug)
+        if (kanaloSlug in nuna) nuna.remove(kanaloSlug) else nuna.add(kanaloSlug)
         _plejsatataj.value = nuna
-        logi("Plejsatataj", "Baskulas: $kanalSlug → ${if (kanalSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
+        logi("Plejsatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
-    override suspend fun estasPlejsatata(kanalSlug: String): Boolean = kanalSlug in _plejsatataj.value
+    override suspend fun estasPlejsatata(kanaloSlug: String): Boolean = kanaloSlug in _plejsatataj.value
 }
 
 class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
@@ -46,9 +46,9 @@ class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
 class SercxoDeponejoImpl(
     private val elsendoDeponejo: ElsendoDeponejo,
 ) : SercxoDeponejo {
-    override suspend fun sercxi(taxto: String, limo: Int): List<Elsendo> {
-        val rezulto = elsendoDeponejo.sercxiElsendojn(taxto, limo)
-        logd("Sercxo", "Serĉas '$taxto' (limo=$limo) — ${rezulto.size} trovoj")
+    override suspend fun sercxi(teksto: String, limo: Int): List<Elsendo> {
+        val rezulto = elsendoDeponejo.sercxiElsendojn(teksto, limo)
+        logd("Sercxo", "Serĉas '$teksto' (limo=$limo) — ${rezulto.size} trovoj")
         return rezulto
     }
 }

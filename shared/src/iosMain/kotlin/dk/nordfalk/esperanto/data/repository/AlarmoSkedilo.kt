@@ -5,7 +5,7 @@ import dk.nordfalk.esperanto.logd
 
 actual class AlarmoSkedilo actual constructor() {
     actual fun skedi(alarmo: Alarmo) {
-        logd("AlarmoSkedilo", "skedi (NoOp): ${alarmo.tempoTeksto} → ${alarmo.kanalSlug}")
+        logd("AlarmoSkedilo", "skedi (NoOp): ${alarmo.tempoTeksto} → ${alarmo.kanaloSlug}")
     }
 
     actual fun malplani(alarmoId: Int) {

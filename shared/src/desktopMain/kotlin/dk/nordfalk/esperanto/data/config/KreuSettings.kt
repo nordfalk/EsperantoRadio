@@ -7,6 +7,6 @@ import java.util.prefs.Preferences
 /**
  * Desktop (JVM): uzas java.util.prefs.Preferences.
  */
-actual fun kreSettings(): Settings {
+actual fun kreuSettings(): Settings {
     return PreferencesSettings(Preferences.userRoot().node("esperantoradio"))
 }

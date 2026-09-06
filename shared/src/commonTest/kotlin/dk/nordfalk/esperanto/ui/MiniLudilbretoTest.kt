@@ -33,9 +33,9 @@ class MiniLudilbretoTest {
     fun montrasTitolonKajStaton() = runComposeUiTest {
         val elsendo = Elsendo(
             id = "test:2024-01-01",
-            kanalSlug = "test",
+            kanaloSlug = "test",
             titolo = "Mia podkasto",
-            stream = "https://x.com/a.mp3",
+            fluo = "https://x.com/a.mp3",
             dato = "2024-01-01"
         )
         val ludilo = TestLudiloRegilo(LudantoInformo(
@@ -55,14 +55,14 @@ class MiniLudilbretoTest {
 
     @Test
     fun montrasRektaElsendoTeksto() = runComposeUiTest {
-        val kanal = dk.nordfalk.esperanto.domain.model.Kanal(
+        val kanalo = dk.nordfalk.esperanto.domain.model.Kanalo(
             slug = "muzaiko",
             nomo = "Muzaiko",
             rektaElsendaSonoUrl = "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8"
         )
         val ludilo = TestLudiloRegilo(LudantoInformo(
             stato = LudantoStato.Ludas,
-            nunaFonto = Sonfonto.RektaKanalo(kanal),
+            nunaFonto = Sonfonto.RektaKanalo(kanalo),
             pozicioMs = 0,
             dauroMs = 0,
             estasRekta = true
@@ -79,9 +79,9 @@ class MiniLudilbretoTest {
     fun montrasLokaElsendonTitolon() = runComposeUiTest {
         val elsendo = Elsendo(
             id = "test:2024-01-01",
-            kanalSlug = "test",
+            kanaloSlug = "test",
             titolo = "Eksterreta podkasto",
-            stream = "https://x.com/a.mp3",
+            fluo = "https://x.com/a.mp3",
             dato = "2024-01-01"
         )
         val ludilo = TestLudiloRegilo(LudantoInformo(

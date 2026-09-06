@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -138,7 +139,7 @@ fun KanalEkrano(
                             modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 4.dp)
                         )
                     }
-                    items(grupo, key = { it.id }) { elsendo ->
+                    itemsIndexed(grupo, key = { idx, elsendo -> "$idx-${elsendo.id}" }) { _, elsendo ->
                         ElsendoEro(elsendo = elsendo, onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) })
                     }
                 }

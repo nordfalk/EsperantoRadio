@@ -130,7 +130,7 @@ class EkranfotoTesto {
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onReen = {}, onElsendo = {})
+                SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onElsendo = {})
             }
         }
         waitForIdle()
@@ -147,7 +147,7 @@ class EkranfotoTesto {
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onReen = {}, onKanal = {})
+                PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onKanal = {})
             }
         }
         waitForIdle()

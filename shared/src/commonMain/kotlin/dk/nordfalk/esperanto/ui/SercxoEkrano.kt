@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,7 +19,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SercxoEkrano(
     sercxoDeponejo: SercxoDeponejo,
-    onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit,
 ) {
     var taxto by remember { mutableStateOf("") }
@@ -29,8 +29,7 @@ fun SercxoEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Serĉi") },
-                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (SercxoEkrano)"); onReen() }) { Text("← Reen") } }
+                title = { Text("Serĉi") }
             )
         }
     ) { padding ->
@@ -60,7 +59,7 @@ fun SercxoEkrano(
                 }
             } else {
                 LazyColumn {
-                    items(rezultoj.value, key = { it.id }) { elsendo ->
+                    itemsIndexed(rezultoj.value, key = { idx, elsendo -> "$idx-${elsendo.id}" }) { _, elsendo ->
                         ListItem(
                             headlineContent = { Text(elsendo.titolo, maxLines = 2) },
                             supportingContent = { Text(elsendo.kanalSlug) },
@@ -77,5 +76,5 @@ fun SercxoEkrano(
 @Preview(name = "SercxoEkrano", showBackground = true, heightDp = 350)
 @Composable
 fun SercxoEkranoPreview() {
-    pTemo { SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onReen = {}, onElsendo = {}) }
+    pTemo { SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onElsendo = {}) }
 }

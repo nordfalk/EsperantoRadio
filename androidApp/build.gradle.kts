@@ -24,7 +24,7 @@ kotlin {
 
 android {
     namespace = "dk.nordfalk.esperanto.android"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "dk.nordfalk.esperanto.android"

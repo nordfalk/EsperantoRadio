@@ -6,6 +6,6 @@ import com.russhwolf.settings.nssecure.NSSettings
 /**
  * iOS: uzas NSUserDefaults.
  */
-actual fun kreSettings(): Settings {
+actual fun kreuSettings(): Settings {
     return NSSettings("esperantoradio")
 }

@@ -20,7 +20,7 @@ fun SercxoEkrano(
     sercxoDeponejo: SercxoDeponejo,
     onElsendo: (Elsendo) -> Unit,
 ) {
-    var taxto by remember { mutableStateOf("") }
+    var teksto by remember { mutableStateOf("") }
     val rezultoj = remember { mutableStateOf<List<Elsendo>>(emptyList()) }
     val sxargxas = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -34,9 +34,9 @@ fun SercxoEkrano(
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             OutlinedTextField(
-                value = taxto,
+                value = teksto,
                 onValueChange = {
-                    taxto = it
+                    teksto = it
                     if (it.length >= 2) {
                         sxargxas.value = true
                         scope.launch {
@@ -61,7 +61,7 @@ fun SercxoEkrano(
                     items(rezultoj.value, key = { it.id }) { elsendo ->
                         ListItem(
                             headlineContent = { Text(elsendo.titolo, maxLines = 2) },
-                            supportingContent = { Text(elsendo.kanalSlug) },
+                            supportingContent = { Text(elsendo.kanaloSlug) },
                             modifier = Modifier.clickable { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
                         )
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)

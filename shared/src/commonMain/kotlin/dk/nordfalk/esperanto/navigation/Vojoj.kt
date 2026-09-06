@@ -2,14 +2,14 @@ package dk.nordfalk.esperanto.navigation
 
 import androidx.navigation3.runtime.NavKey
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlinx.serialization.Serializable
 
 /**
  * Vojoj (routes) por Navigation 3.
  *
  * Radikaj ekranoj (tab-oj): [Hejmo], [Kanalaro], [Plejsatataj], [Sercxo]
- * Detal-ekranoj: [KanalDetalo], [ElsendoDetalo]
+ * Detal-ekranoj: [KanaloDetalo], [ElsendoDetalo]
  * Plenekranoj: [Elshutoj], [Alarmoj], [Agordoj]
  */
 @Serializable
@@ -21,6 +21,6 @@ sealed interface Vojo : NavKey {
     @Serializable data object Elshutoj : Vojo
     @Serializable data object Alarmoj : Vojo
     @Serializable data object Agordoj : Vojo
-    @Serializable data class KanalDetalo(val kanal: Kanal) : Vojo
+    @Serializable data class KanaloDetalo(val kanalo: Kanalo) : Vojo
     @Serializable data class ElsendoDetalo(val elsendo: Elsendo) : Vojo
 }

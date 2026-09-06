@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @param horo horo (0-23)
  * @param minuto minuto (0-59)
  * @param ripeto bitmasko: 0x01=lundo ... 0x40=dimanĉo, 0x7f=cxiutage, 0x00=unufoje
- * @param kanalSlug kanal-slugo por ludi
+ * @param kanaloSlug kanalo-slugo por ludi
  * @param aktiva cxu la alarmo estas sxaltita
  * @param etikedo vidiga nomo (opcia)
  */
@@ -19,7 +19,7 @@ data class Alarmo(
     val horo: Int,
     val minuto: Int,
     val ripeto: Int = 0,
-    val kanalSlug: String,
+    val kanaloSlug: String,
     val aktiva: Boolean = true,
     val etikedo: String? = null,
 ) {

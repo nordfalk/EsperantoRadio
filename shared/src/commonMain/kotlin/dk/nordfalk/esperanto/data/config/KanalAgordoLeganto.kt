@@ -2,7 +2,7 @@ package dk.nordfalk.esperanto.data.config
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.logw
 
@@ -82,7 +82,7 @@ data class KanalAgordo(
     val komenca_kanalo: String? = null,
     val elsendojUrl: String? = null,
     val hejmpagho: String? = null,
-    val kanaloj: List<KanalDto> = emptyList(),
+    val kanaloj: List<KanaloDto> = emptyList(),
     val sugestoj_por_alarmoj: String? = null,
 ) {
     @Serializable
@@ -101,7 +101,7 @@ data class KanalAgordo(
 }
 
 @Serializable
-data class KanalDto(
+data class KanaloDto(
     val kodo: String,
     val nomo: String,
     val emblemoUrl: String? = null,
@@ -115,7 +115,7 @@ data class KanalDto(
     val uziWebViewPorElsendo: Boolean = false,
 )
 
-fun KanalDto.alKanal(): Kanal = Kanal(
+fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     slug = kodo,
     nomo = nomo,
     emblemoUrl = emblemoUrl,
@@ -151,7 +151,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
             val minuto = partoj[i + 3].toInt()
             val ripeto = partoj[i + 4].toInt()
             // partoj[i + 5] = time (malnova, ne uzata)
-            val kanalSlug = partoj[i + 6].removePrefix("=")
+            val kanaloSlug = partoj[i + 6].removePrefix("=")
             val etikedo = partoj[i + 7].removePrefix("=")
                 .replace("+", " ")
                 .replace("%0A", "\n")
@@ -169,7 +169,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 horo = horo,
                 minuto = minuto,
                 ripeto = ripeto,
-                kanalSlug = kanalSlug,
+                kanaloSlug = kanaloSlug,
                 aktiva = aktiva,
                 etikedo = etikedo.ifBlank { null }
             ))

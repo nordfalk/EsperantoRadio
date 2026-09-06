@@ -10,7 +10,7 @@ import dk.nordfalk.esperanto.logw
 /**
  * BroadcastReceiver kiu ricevas la alarmon kiam ĝi ekigas.
  *
- * Ĝi akiras WakeLock, lanĉas la ĉefaktivon kaj metas la kanal-slugon kiel
+ * Ĝi akiras WakeLock, lanĉas la ĉefaktivon kaj metas la kanalo-slugon kiel
  * ekstran intencon por ke la apo povu komenci ludi la ĝustan kanalon.
  */
 class AlarmoReceivilo : BroadcastReceiver() {
@@ -22,10 +22,10 @@ class AlarmoReceivilo : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val alarmoId = intent.getIntExtra("alarmo_id", -1)
-        val kanalSlug = intent.getStringExtra("kanal_slug")
+        val kanaloSlug = intent.getStringExtra("kanal_slug")
         val etikedo = intent.getStringExtra("etikedo")
 
-        logi("AlarmoReceivilo", "Alarmo ekigis! id=$alarmoId kanal=$kanalSlug etikedo=$etikedo")
+        logi("AlarmoReceivilo", "Alarmo ekigis! id=$alarmoId kanalo=$kanaloSlug etikedo=$etikedo")
 
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wakeLock = powerManager.newWakeLock(
@@ -39,11 +39,11 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 setClassName(context, "dk.nordfalk.esperanto.android.MainActivity")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 action = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
-                putExtra("alarmo_kanal_slug", kanalSlug)
+                putExtra("alarmo_kanal_slug", kanaloSlug)
                 putExtra("alarmo_etikedo", etikedo)
             }
             context.startActivity(launchIntent)
-            logi("AlarmoReceivilo", "Lanĉis MainActivity kun kanal=$kanalSlug")
+            logi("AlarmoReceivilo", "Lanĉis MainActivity kun kanalo=$kanaloSlug")
         } catch (e: Exception) {
             logw("AlarmoReceivilo", "Eraro lanĉante aktivon", e)
         } finally {

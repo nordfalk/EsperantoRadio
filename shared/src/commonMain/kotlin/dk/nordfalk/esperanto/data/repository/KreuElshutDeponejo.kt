@@ -8,4 +8,4 @@ import io.ktor.client.HttpClient
  * - Desktop/Android: KtorElshutDeponejo (Ktor → dosiero)
  * - wasmJs/iOS: NoOpElshutDeponejo
  */
-expect fun kreElshutDeponejo(httpKliento: HttpClient): ElshutDeponejo
+expect fun kreuElshutDeponejo(httpKliento: HttpClient): ElshutDeponejo

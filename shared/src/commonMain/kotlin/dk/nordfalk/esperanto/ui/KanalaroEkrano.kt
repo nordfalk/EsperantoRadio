@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
  * Stato por la kanalaro-ekrano.
  */
 class KanalaroViewModel(
-    private val deponejo: dk.nordfalk.esperanto.domain.repository.KanalDeponejo,
+    private val deponejo: dk.nordfalk.esperanto.domain.repository.KanaloDeponejo,
 ) {
     val kanaloj = deponejo.observiKanalojn()
 
@@ -51,7 +51,7 @@ class KanalaroViewModel(
 @Composable
 fun KanalaroEkrano(
     viewModel: KanalaroViewModel,
-    onKanal: (Kanal) -> Unit = {},
+    onKanalo: (Kanalo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
@@ -89,12 +89,12 @@ fun KanalaroEkrano(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(kanaloj, key = { it.slug }) { kanal ->
-                    KanalEro(
-                        kanal = kanal,
-                        onClick = { logi("Klako", "kanal ${kanal.slug}"); onKanal(kanal) },
-                        onLudi = if (kanal.havasPodkastojn || kanal.estasRekta) {
-                            { logi("Klako", "ludi ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) }
+                items(kanaloj, key = { it.slug }) { kanalo ->
+                    KanaloEro(
+                        kanalo = kanalo,
+                        onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
+                        onLudi = if (kanalo.havasPodkastojn || kanalo.estasRekta) {
+                            { logi("Klako", "ludi ${kanalo.slug}"); onLudi(Sonfonto.RektaKanalo(kanalo)) }
                         } else null
                     )
                 }
@@ -104,15 +104,15 @@ fun KanalaroEkrano(
 }
 
 @Composable
-private fun KanalEro(
-    kanal: Kanal,
+private fun KanaloEro(
+    kanalo: Kanalo,
     onClick: () -> Unit,
     onLudi: (() -> Unit)? = null,
 ) {
     ListItem(
         headlineContent = {
             Text(
-                kanal.nomo,
+                kanalo.nomo,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -121,8 +121,8 @@ private fun KanalEro(
         supportingContent = {
             Text(
                 when {
-                    kanal.estasRekta -> "Rekta elsendo"
-                    kanal.havasPodkastojn -> "Podkasto"
+                    kanalo.estasRekta -> "Rekta elsendo"
+                    kanalo.havasPodkastojn -> "Podkasto"
                     else -> "Neniu fluo"
                 },
                 style = MaterialTheme.typography.bodySmall,
@@ -130,10 +130,10 @@ private fun KanalEro(
             )
         },
         leadingContent = {
-            if (kanal.emblemoUrl != null) {
+            if (kanalo.emblemoUrl != null) {
                 AsyncImage(
-                    model = kanal.emblemoUrl,
-                    contentDescription = "Emblemo de ${kanal.nomo}",
+                    model = kanalo.emblemoUrl,
+                    contentDescription = "Emblemo de ${kanalo.nomo}",
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(10.dp))
@@ -149,7 +149,7 @@ private fun KanalEro(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            kanal.nomo.take(2),
+                            kanalo.nomo.take(2),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Bold
@@ -183,5 +183,5 @@ private fun KanalEro(
 @Preview(name = "Kanalaro", showBackground = true, heightDp = 250)
 @Composable
 fun KanalaroEkranoPreview() {
-    pTemo { KanalaroEkrano(viewModel = KanalaroViewModel(pKanalDeponejo())) }
+    pTemo { KanalaroEkrano(viewModel = KanalaroViewModel(pKanaloDeponejo())) }
 }

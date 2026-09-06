@@ -40,21 +40,21 @@ fun MiniLudilbreto(
     if (fonto == null) return // Nenio ludiĝas — ne montru la breton
 
     val titolo = when (fonto) {
-        is Sonfonto.RektaKanalo -> fonto.kanal.nomo
+        is Sonfonto.RektaKanalo -> fonto.kanalo.nomo
         is Sonfonto.ElsendoFonto -> fonto.elsendo.titolo
         is Sonfonto.LokaElsendo -> fonto.elsendo.titolo
     }
 
     val subtitolo = when (fonto) {
         is Sonfonto.RektaKanalo -> null
-        is Sonfonto.ElsendoFonto -> fonto.elsendo.kanalNomo
-        is Sonfonto.LokaElsendo -> fonto.elsendo.kanalNomo
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.kanaloNomo
+        is Sonfonto.LokaElsendo -> fonto.elsendo.kanaloNomo
     }
 
-    val bildUrl = when (fonto) {
-        is Sonfonto.RektaKanalo -> fonto.kanal.emblemoUrl
-        is Sonfonto.ElsendoFonto -> fonto.elsendo.bildUrl
-        is Sonfonto.LokaElsendo -> fonto.elsendo.bildUrl
+    val bildoUrl = when (fonto) {
+        is Sonfonto.RektaKanalo -> fonto.kanalo.emblemoUrl
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.bildoUrl
+        is Sonfonto.LokaElsendo -> fonto.elsendo.bildoUrl
     }
 
     val ludas = info.stato is LudantoStato.Ludas
@@ -73,9 +73,9 @@ fun MiniLudilbreto(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Bildeto
-            if (bildUrl != null) {
+            if (bildoUrl != null) {
                 AsyncImage(
-                    model = bildUrl,
+                    model = bildoUrl,
                     contentDescription = "Bildeto de nuna elsendo",
                     modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp))
                 )

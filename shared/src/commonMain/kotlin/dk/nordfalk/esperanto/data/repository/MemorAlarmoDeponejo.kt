@@ -45,7 +45,7 @@ class MemorAlarmoDeponejo(
     override suspend fun krei(alarmo: Alarmo) {
         val nova = alarmo.copy(id = nextId++)
         _alarmoj.value = _alarmoj.value + nova
-        logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanalSlug} (nova id=${nova.id})")
+        logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanaloSlug} (nova id=${nova.id})")
     }
 
     override suspend fun ghisdatigi(alarmo: Alarmo) {

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
@@ -25,8 +25,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class KanalViewModel(
-    private val kanal: Kanal,
+class KanaloViewModel(
+    private val kanalo: Kanalo,
     private val elsendoDeponejo: ElsendoDeponejoImpl,
 ) {
     private val _elsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
@@ -38,10 +38,10 @@ class KanalViewModel(
     suspend fun sxargxi() {
         _sxargxas.value = true
         try {
-            val rezulto = elsendoDeponejo.sxargxiElsendojn(kanal)
+            val rezulto = elsendoDeponejo.sxargxiElsendojn(kanalo)
             _elsendoj.value = rezulto
         } catch (e: Exception) {
-            loge("KanalViewModel", "Malsukcesis sargi elsendojn por ${kanal.slug}", e)
+            loge("KanaloViewModel", "Malsukcesis sargi elsendojn por ${kanalo.slug}", e)
         } finally {
             _sxargxas.value = false
         }
@@ -50,28 +50,28 @@ class KanalViewModel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun KanalEkrano(
-    kanal: Kanal,
+fun KanaloEkrano(
+    kanalo: Kanalo,
     elsendoDeponejo: ElsendoDeponejoImpl,
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
 ) {
-    val viewModel = remember(kanal.slug) { KanalViewModel(kanal, elsendoDeponejo) }
+    val viewModel = remember(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
     val elsendoj by viewModel.elsendoj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(kanal.slug) {
+    LaunchedEffect(kanalo.slug) {
         scope.launch { viewModel.sxargxi() }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(kanal.nomo) },
+                title = { Text(kanalo.nomo) },
                 navigationIcon = {
-                    TextButton(onClick = { logi("Klako", "reen (KanalEkrano)"); onReen() }) { Text("← Reen") }
+                    TextButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Text("← Reen") }
                 }
             )
         }
@@ -98,11 +98,11 @@ fun KanalEkrano(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                // Rekta elsendo-butono se la kanal havas livestream
-                if (kanal.estasRekta) {
+                // Rekta elsendo-butono se la kanalo havas livestream
+                if (kanalo.estasRekta) {
                     item {
                         Surface(
-                            onClick = { logi("Klako", "ludi rekte — ${kanal.slug}"); onLudi(Sonfonto.RektaKanalo(kanal)) },
+                            onClick = { logi("Klako", "ludi rekte — ${kanalo.slug}"); onLudi(Sonfonto.RektaKanalo(kanalo)) },
                             shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.primaryContainer,
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
@@ -174,9 +174,9 @@ private fun ElsendoEro(
             }
         },
         leadingContent = {
-            if (elsendo.bildUrl != null) {
+            if (elsendo.bildoUrl != null) {
                 AsyncImage(
-                    model = elsendo.bildUrl,
+                    model = elsendo.bildoUrl,
                     contentDescription = "Bildeto de ${elsendo.titolo}",
                     modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp))
                 )
@@ -197,12 +197,12 @@ private fun ElsendoEro(
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }
 
-@Preview(name = "KanalEkrano", showBackground = true, heightDp = 400)
+@Preview(name = "KanaloEkrano", showBackground = true, heightDp = 400)
 @Composable
-fun KanalEkranoPreview() {
+fun KanaloEkranoPreview() {
     pTemo {
-        KanalEkrano(
-            kanal = pKanaloj[1],
+        KanaloEkrano(
+            kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
             onReen = {},
         )

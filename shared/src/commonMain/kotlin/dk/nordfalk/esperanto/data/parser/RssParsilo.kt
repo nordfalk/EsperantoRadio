@@ -4,7 +4,7 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 
@@ -14,38 +14,38 @@ import dk.nordfalk.esperanto.logi
  */
 class RssParsilo {
 
-    fun parsRss(
+    fun parsuRss(
         fluoTeksto: String,
-        kanal: Kanal,
+        kanalo: Kanalo,
         httpKliento: suspend (String) -> String = { "" }
     ): List<Elsendo> {
-        logd("RssParsilo", "Parsas RSS por ${kanal.slug} — ${fluoTeksto.length} signoj")
+        logd("RssParsilo", "Parsas RSS por ${kanalo.slug} — ${fluoTeksto.length} signoj")
         val doc = Ksoup.parseXml(fluoTeksto, "")
-        val deArkivo = kanal.podkastaRssUrl?.contains("podkasta_arkivo") == true
+        val deArkivo = kanalo.podkastaRssUrl?.contains("podkasta_arkivo") == true
 
         val rezulto = if (deArkivo) {
-            logd("RssParsilo", "${kanal.slug}: uzas arkiv-parsilon")
-            parsGenerel(doc, kanal)
-        } else when (kanal.slug) {
+            logd("RssParsilo", "${kanalo.slug}: uzas arkiv-parsilon")
+            parsuGxenerala(doc, kanalo)
+        } else when (kanalo.slug) {
             "varsoviavento" -> {
-                logd("RssParsilo", "${kanal.slug}: uzas VarsoviaVento-parsilon")
-                parsVarsoviaVento(doc, kanal)
+                logd("RssParsilo", "${kanalo.slug}: uzas VarsoviaVento-parsilon")
+                parsuVarsoviaVento(doc, kanalo)
             }
             "peranto" -> {
-                logd("RssParsilo", "${kanal.slug}: uzas Peranto-parsilon")
-                parsPeranto(doc, kanal, httpKliento)
+                logd("RssParsilo", "${kanalo.slug}: uzas Peranto-parsilon")
+                parsuPeranto(doc, kanalo, httpKliento)
             }
             "vinilkosmo" -> {
-                logd("RssParsilo", "${kanal.slug}: uzas Vinilkosmo-parsilon")
-                parsVinilkosmo(doc, kanal)
+                logd("RssParsilo", "${kanalo.slug}: uzas Vinilkosmo-parsilon")
+                parsuVinilkosmo(doc, kanalo)
             }
             else -> {
-                logd("RssParsilo", "${kanal.slug}: uzas ĝeneralan parsilon")
-                parsGenerel(doc, kanal)
+                logd("RssParsilo", "${kanalo.slug}: uzas ĝeneralan parsilon")
+                parsuGxenerala(doc, kanalo)
             }
         }
 
-        logi("RssParsilo", "${kanal.slug}: parsado kompleta — ${rezulto.size} elsendoj")
+        logi("RssParsilo", "${kanalo.slug}: parsado kompleta — ${rezulto.size} elsendoj")
         return rezulto
     }
 
@@ -57,10 +57,10 @@ class RssParsilo {
 
     // === Regulo 6.1 — Ĝenerala ===
 
-    private fun parsGenerel(doc: Document, kanal: Kanal): List<Elsendo> =
-        doc.select("item, entry").mapIndexedNotNull { i, ero -> parsEroGenerel(ero, kanal, i) }
+    private fun parsuGxenerala(doc: Document, kanalo: Kanalo): List<Elsendo> =
+        doc.select("item, entry").mapIndexedNotNull { i, ero -> parsuEroGxenerala(ero, kanalo, i) }
 
-    private fun parsEroGenerel(ero: Element, kanal: Kanal, indekso: Int): Elsendo? {
+    private fun parsuEroGxenerala(ero: Element, kanalo: Kanalo, indekso: Int): Elsendo? {
         val titolo = ero.selectFirst("title")?.text() ?: ""
         val priskriboHtml = ero.selectFirst("content|encoded")?.html()
             ?: ero.selectFirst("description")?.html()
@@ -76,48 +76,48 @@ class RssParsilo {
         val dato = normigiDaton(pubDate) ?: return null
 
         // Stream: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
-        var stream = ero.selectFirst("enclosure")?.attr("url") ?: ""
-        if (stream.isEmpty()) {
-            stream = ero.selectFirst("link[rel=enclosure]")?.attr("href") ?: ""
+        var fluo = ero.selectFirst("enclosure")?.attr("url") ?: ""
+        if (fluo.isEmpty()) {
+            fluo = ero.selectFirst("link[rel=enclosure]")?.attr("href") ?: ""
         }
-        if (stream.isEmpty()) {
-            stream = ero.selectFirst("audio source")?.attr("src") ?: ""
+        if (fluo.isEmpty()) {
+            fluo = ero.selectFirst("audio source")?.attr("src") ?: ""
         }
-        if (stream.isEmpty()) return null
+        if (fluo.isEmpty()) return null
 
-        if (kanal.slug == "kernpunkto" && stream.startsWith("http://")) {
-            stream = "https://" + stream.removePrefix("http://")
+        if (kanalo.slug == "kernpunkto" && fluo.startsWith("http://")) {
+            fluo = "https://" + fluo.removePrefix("http://")
         }
 
         val dauro = leguDauron(ero.selectFirst("itunes|duration")?.text())
-        val bildUrl = ero.selectFirst("itunes|image")?.attr("href")
+        val bildoUrl = ero.selectFirst("itunes|image")?.attr("href")
             ?: ero.selectFirst("image url")?.text()
         val retpaghoUrl = ero.selectFirst("link")?.text()
             ?: ero.selectFirst("link")?.attr("href")
 
-        val finaTitolo = if (kanal.ignoruTitolon) derivuTitolon(priskribo) else titolo
+        val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskribo) else titolo
 
         // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
         val guid = ero.selectFirst("guid")?.text()
-        val id = if (guid != null) "${kanal.slug}:$dato:$guid" else "${kanal.slug}:$dato:${indekso + 1}"
+        val id = if (guid != null) "${kanalo.slug}:$dato:$guid" else "${kanalo.slug}:$dato:${indekso + 1}"
 
         return Elsendo(
             id = id,
-            kanalSlug = kanal.slug,
-            kanalNomo = kanal.nomo,
+            kanaloSlug = kanalo.slug,
+            kanaloNomo = kanalo.nomo,
             titolo = finaTitolo,
             priskribo = puriguHtml(priskriboHtml.ifEmpty { priskribo }),
-            bildUrl = bildUrl,
+            bildoUrl = bildoUrl,
             dato = dato,
             dauro = dauro,
-            stream = stream,
+            fluo = fluo,
             retpaghoUrl = retpaghoUrl,
         )
     }
 
     // === Regulo 6.2 — Varsovia Vento ===
 
-    private fun parsVarsoviaVento(doc: Document, kanal: Kanal): List<Elsendo> {
+    private fun parsuVarsoviaVento(doc: Document, kanalo: Kanalo): List<Elsendo> {
         val rezulto = mutableListOf<Elsendo>()
         for (ero in doc.select("item, entry")) {
             val titolo = ero.selectFirst("title")?.text() ?: ""
@@ -136,16 +136,16 @@ class RssParsilo {
             if (audioj.isEmpty()) continue
 
             for ((i, source) in audioj.withIndex()) {
-                val stream = source.attr("src")
-                if (stream.isEmpty()) continue
+                val fluo = source.attr("src")
+                if (fluo.isEmpty()) continue
                 rezulto.add(Elsendo(
-                    id = "${kanal.slug}:$dato:${i + 1}",
-                    kanalSlug = kanal.slug,
-                    kanalNomo = kanal.nomo,
+                    id = "${kanalo.slug}:$dato:${i + 1}",
+                    kanaloSlug = kanalo.slug,
+                    kanaloNomo = kanalo.nomo,
                     titolo = "$titolo ${i + 1}a parto",
                     priskribo = puriguHtml(htmlEnhavo),
                     dato = dato,
-                    stream = stream,
+                    fluo = fluo,
                 ))
             }
         }
@@ -154,7 +154,7 @@ class RssParsilo {
 
     // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
 
-    private fun parsPeranto(doc: Document, kanal: Kanal, httpKliento: suspend (String) -> String): List<Elsendo> {
+    private fun parsuPeranto(doc: Document, kanalo: Kanalo, httpKliento: suspend (String) -> String): List<Elsendo> {
         val malplenajDatoj = setOf("2019-11-08", "2019-09-29")
 
         return doc.select("entry").mapIndexedNotNull { i, ero ->
@@ -170,7 +170,7 @@ class RssParsilo {
             val htmlDoc = Ksoup.parse(htmlEsprimite)
 
             // Eltiru bildon el la unua <img>
-            val bildUrl = htmlDoc.selectFirst("img")?.attr("src")
+            val bildoUrl = htmlDoc.selectFirst("img")?.attr("src")
 
             // Forigu <img>, <iframe>, <div class="separator"> el priskribo
             htmlDoc.select("img").remove()
@@ -181,8 +181,8 @@ class RssParsilo {
             // Trovu la unuan <iframe src>
             val iframeSrc = Ksoup.parse(htmlEsprimite).selectFirst("iframe")?.attr("src") ?: ""
 
-            // Rekonstruu la stream-URL el la iframe-src
-            val stream = when {
+            // Rekonstruu la fluo-URL el la iframe-src
+            val fluo = when {
                 // archive.org/embed/<nomo> → archive.org/download/<nomo>/<nomo>.mp3
                 iframeSrc.contains("archive.org/embed/") -> {
                     val nomo = iframeSrc.substringAfter("archive.org/embed/").substringBefore("?").trimEnd('/')
@@ -213,13 +213,13 @@ class RssParsilo {
 
             Elsendo(
                 id = id,
-                kanalSlug = kanal.slug,
-                kanalNomo = kanal.nomo,
-                titolo = if (kanal.ignoruTitolon) puriguHtml(priskribo).take(200) else titolo,
+                kanaloSlug = kanalo.slug,
+                kanaloNomo = kanalo.nomo,
+                titolo = if (kanalo.ignoruTitolon) puriguHtml(priskribo).take(200) else titolo,
                 priskribo = priskribo,
-                bildUrl = bildUrl,
+                bildoUrl = bildoUrl,
                 dato = dato,
-                stream = stream,
+                fluo = fluo,
                 retpaghoUrl = retpaghoUrl,
             )
         }
@@ -227,27 +227,27 @@ class RssParsilo {
 
     // === Regulo 6.4 — Vinilkosmo ===
 
-    private fun parsVinilkosmo(doc: Document, kanal: Kanal): List<Elsendo> =
+    private fun parsuVinilkosmo(doc: Document, kanalo: Kanalo): List<Elsendo> =
         doc.select("entry").mapNotNull { ero ->
             val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
             val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
 
-            val stream = ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href")
+            val fluo = ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href")
                 ?: return@mapNotNull null
-            val bildUrl = ero.selectFirst("link[type=image/jpeg]")?.attr("href")
+            val bildoUrl = ero.selectFirst("link[type=image/jpeg]")?.attr("href")
             val retpaghoUrl = ero.selectFirst("link[type=text/html]")?.attr("href")
             val priskribo = ero.selectFirst("content")?.html() ?: ""
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
             Elsendo(
                 id = id,
-                kanalSlug = kanal.slug,
-                kanalNomo = kanal.nomo,
+                kanaloSlug = kanalo.slug,
+                kanaloNomo = kanalo.nomo,
                 titolo = puriguHtml(priskribo).take(200),
                 priskribo = puriguHtml(priskribo),
-                bildUrl = bildUrl,
+                bildoUrl = bildoUrl,
                 dato = dato,
-                stream = stream,
+                fluo = fluo,
                 retpaghoUrl = retpaghoUrl,
             )
         }

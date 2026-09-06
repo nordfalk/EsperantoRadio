@@ -19,9 +19,9 @@ class NoOpElshutDeponejoTest {
 
     private val testElsendo = Elsendo(
         id = "test:2024-01-01",
-        kanalSlug = "test",
+        kanaloSlug = "test",
         titolo = "Testa elsendo",
-        stream = "https://x.com/a.mp3",
+        fluo = "https://x.com/a.mp3",
         dato = "2024-01-01"
     )
 

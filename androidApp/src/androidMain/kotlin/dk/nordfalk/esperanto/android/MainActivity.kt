@@ -17,7 +17,7 @@ import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
-import dk.nordfalk.esperanto.data.config.alKanal
+import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -50,12 +50,12 @@ class MainActivity : ComponentActivity() {
     private fun traktuAlarmIntent(intent: Intent?) {
         if (intent?.action != "dk.nordfalk.esperanto.ALARMO_EKIGAS") return
 
-        val kanalSlug = intent.getStringExtra("alarmo_kanal_slug")
+        val kanaloSlug = intent.getStringExtra("alarmo_kanal_slug")
         val etikedo = intent.getStringExtra("alarmo_etikedo")
-        logi("MainActivity", "Alarmo ricevita: kanal=$kanalSlug etikedo=$etikedo")
+        logi("MainActivity", "Alarmo ricevita: kanalo=$kanaloSlug etikedo=$etikedo")
 
-        if (kanalSlug.isNullOrBlank()) {
-            logw("MainActivity", "Neniu kanal-slug en alarm-intento")
+        if (kanaloSlug.isNullOrBlank()) {
+            logw("MainActivity", "Neniu kanalo-slug en alarm-intento")
             luduFallbackRingtonon()
             return
         }
@@ -73,24 +73,24 @@ class MainActivity : ComponentActivity() {
             try {
                 // Shargu la kanalaron por trovi la gxustan kanalon
                 val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
-                val kanal = agordo.kanaloj.find { it.kodo == kanalSlug }?.alKanal()
+                val kanalo = agordo.kanaloj.find { it.kodo == kanaloSlug }?.alKanalo()
 
-                if (kanal == null) {
-                    logw("MainActivity", "Kanal ne trovita: $kanalSlug")
+                if (kanalo == null) {
+                    logw("MainActivity", "Kanalo ne trovita: $kanaloSlug")
                     luduFallbackRingtonon()
                     return@launch
                 }
 
-                logi("MainActivity", "Komencas ludi: ${kanal.nomo}")
+                logi("MainActivity", "Komencas ludi: ${kanalo.nomo}")
 
                 // Se rekta kanalo: ludi rekte
                 // Se podkasto: bezonas RSS-fluon — tro komplika cxi tie, ludi rekte se eblas
-                val fonto = if (kanal.rektaElsendaSonoUrl != null) {
-                    Sonfonto.RektaKanalo(kanal)
+                val fonto = if (kanalo.rektaElsendaSonoUrl != null) {
+                    Sonfonto.RektaKanalo(kanalo)
                 } else {
                     // Por podkastoj: bezonas elsendon, sed ni ne sxargxis RSS fluon.
                     // Fallback al ringtono por nun.
-                    logw("MainActivity", "Kanal $kanalSlug ne estas rekta — ne eblas auxtomate ludi podkaston")
+                    logw("MainActivity", "Kanalo $kanaloSlug ne estas rekta — ne eblas auxtomate ludi podkaston")
                     luduFallbackRingtonon()
                     return@launch
                 }

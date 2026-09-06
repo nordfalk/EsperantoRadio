@@ -4,8 +4,8 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
-import dk.nordfalk.esperanto.domain.model.Kanal
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,20 +19,20 @@ import kotlin.test.Test
 @OptIn(ExperimentalTestApi::class)
 class KanalaroEkranoTest {
 
-    private class FalsaKanalDeponejo(kanaloj: List<Kanal>) : KanalDeponejo {
+    private class FalsaKanaloDeponejo(kanaloj: List<Kanalo>) : KanaloDeponejo {
         private val _kanaloj = MutableStateFlow(kanaloj)
-        override fun observiKanalojn(): StateFlow<List<Kanal>> = _kanaloj.asStateFlow()
-        override suspend fun getKanalojn(fortoRefresigi: Boolean): List<Kanal> = _kanaloj.value
-        override suspend fun getKanal(slug: String): Kanal? = _kanaloj.value.find { it.slug == slug }
+        override fun observiKanalojn(): StateFlow<List<Kanalo>> = _kanaloj.asStateFlow()
+        override suspend fun getKanalojn(fortoRefresigi: Boolean): List<Kanalo> = _kanaloj.value
+        override suspend fun getKanalo(slug: String): Kanalo? = _kanaloj.value.find { it.slug == slug }
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun kanalaroMontrasKanalojn() = runComposeUiTest {
-        val deponejo = FalsaKanalDeponejo(
+        val deponejo = FalsaKanaloDeponejo(
             listOf(
-                Kanal(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x"),
-                Kanal(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "y"),
+                Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x"),
+                Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "y"),
             )
         )
         val viewModel = KanalaroViewModel(deponejo)

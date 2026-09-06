@@ -3,12 +3,12 @@ package dk.nordfalk.esperanto.domain.model
 import kotlinx.serialization.Serializable
 
 /**
- * Kanal-modelo. Pura Kotlin, @Serializable, komuna trans ĉiuj platformoj.
+ * Kanalo-modelo. Pura Kotlin, @Serializable, komuna trans ĉiuj platformoj.
  *
  * La kampoj kongruas kun `esperantoradio_kanaloj_v9.json`.
  */
 @Serializable
-data class Kanal(
+data class Kanalo(
     val slug: String,                         // kodo — unika ŝlosilo
     val nomo: String,                          // vidiga nomo
     val emblemoUrl: String? = null,
@@ -31,14 +31,14 @@ data class Kanal(
 @Serializable
 data class Elsendo(
     val id: String,                   // slug — vidu id-konvenciojn
-    val kanalSlug: String,
-    val kanalNomo: String? = null,    // nomo de la kanal (por sciigoj kaj UI)
+    val kanaloSlug: String,
+    val kanaloNomo: String? = null,    // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,
     val priskribo: String? = null,    // purigita HTML/teksto
-    val bildUrl: String? = null,
+    val bildoUrl: String? = null,
     val dato: String,                 // yyyy-MM-dd
     val dauro: Long? = null,          // sekundoj
-    val stream: String,              // audio-URL (mp3) — la plej grava kampo
+    val fluo: String,              // audio-URL (mp3) — la plej grava kampo
     val retpaghoUrl: String? = null,
     val estasRekta: Boolean = false,
 )
@@ -48,7 +48,7 @@ data class Elsendo(
  */
 @Serializable
 sealed interface Sonfonto {
-    @Serializable data class RektaKanalo(val kanal: Kanal) : Sonfonto
+    @Serializable data class RektaKanalo(val kanalo: Kanalo) : Sonfonto
     @Serializable data class ElsendoFonto(val elsendo: Elsendo) : Sonfonto
     @Serializable data class LokaElsendo(val elsendo: Elsendo, val dosieroVojo: String) : Sonfonto
 }

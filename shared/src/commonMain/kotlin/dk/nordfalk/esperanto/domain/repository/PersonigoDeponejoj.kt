@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface PlejsatatajDeponejo {
-    fun observiPlejsatatajn(): StateFlow<Set<String>>  // kanal-slugs
-    suspend fun baskuliPlejsaton(kanalSlug: String)
-    suspend fun estasPlejsatata(kanalSlug: String): Boolean
+    fun observiPlejsatatajn(): StateFlow<Set<String>>  // kanalo-slugs
+    suspend fun baskuliPlejsaton(kanaloSlug: String)
+    suspend fun estasPlejsatata(kanaloSlug: String): Boolean
 }
 
 interface LastAuxskultitajDeponejo {
@@ -20,7 +20,7 @@ interface LastAuxskultitajDeponejo {
 }
 
 interface SercxoDeponejo {
-    suspend fun sercxi(taxto: String, limo: Int = 50): List<Elsendo>
+    suspend fun sercxi(teksto: String, limo: Int = 50): List<Elsendo>
 }
 
 interface AgordojDeponejo {

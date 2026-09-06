@@ -7,14 +7,14 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,31 +31,31 @@ import kotlin.test.Test
 class NavigaTesto {
 
     private val testKanaloj = listOf(
-        Kanal(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8"),
-        Kanal(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/"),
-        Kanal(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://www.podkasto.net/feed/"),
+        Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8"),
+        Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/"),
+        Kanalo(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://www.podkasto.net/feed/"),
     )
 
     private val testElsendo = Elsendo(
         id = "test:2024-01-01",
-        kanalSlug = "kernpunkto",
+        kanaloSlug = "kernpunkto",
         titolo = "KP204 Pigmentoj",
         priskribo = "Hodiaux ni parolas pri pigmentoj kaj koloroj en la naturon.",
-        stream = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
+        fluo = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
         dato = "2024-01-01",
         dauro = 6916,
     )
 
-    private fun falsaKanalDeponejo(kanaloj: List<Kanal> = testKanaloj) = object : KanalDeponejo {
+    private fun falsaKanaloDeponejo(kanaloj: List<Kanalo> = testKanaloj) = object : KanaloDeponejo {
         private val _kanaloj = MutableStateFlow(kanaloj)
         override fun observiKanalojn() = _kanaloj.asStateFlow()
         override suspend fun getKanalojn(fortoRefresigi: Boolean) = _kanaloj.value
-        override suspend fun getKanal(slug: String) = _kanaloj.value.find { it.slug == slug }
+        override suspend fun getKanalo(slug: String) = _kanaloj.value.find { it.slug == slug }
     }
 
     @Test
     fun montrasKanalaron() = runComposeUiTest {
-        val viewModel = KanalaroViewModel(falsaKanalDeponejo())
+        val viewModel = KanalaroViewModel(falsaKanaloDeponejo())
         setContent { KanalaroEkrano(viewModel = viewModel) }
         waitForIdle()
         onNodeWithText("Muzaiko").assertIsDisplayed()
@@ -76,8 +76,8 @@ class NavigaTesto {
     @Test
     fun montrasSerchon() = runComposeUiTest {
         val sercxoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SercxoDeponejo {
-            override suspend fun sercxi(taxto: String, limo: Int) =
-                if (taxto.length >= 2) listOf(testElsendo) else emptyList()
+            override suspend fun sercxi(teksto: String, limo: Int) =
+                if (teksto.length >= 2) listOf(testElsendo) else emptyList()
         }
         setContent { SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onElsendo = {}) }
         waitForIdle()
@@ -89,13 +89,13 @@ class NavigaTesto {
         val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo {
             private val _set = MutableStateFlow(setOf("muzaiko"))
             override fun observiPlejsatatajn() = _set.asStateFlow()
-            override suspend fun baskuliPlejsaton(kanalSlug: String) {
-                _set.value = if (kanalSlug in _set.value) _set.value - kanalSlug else _set.value + kanalSlug
+            override suspend fun baskuliPlejsaton(kanaloSlug: String) {
+                _set.value = if (kanaloSlug in _set.value) _set.value - kanaloSlug else _set.value + kanaloSlug
             }
-            override suspend fun estasPlejsatata(kanalSlug: String) = kanalSlug in _set.value
+            override suspend fun estasPlejsatata(kanaloSlug: String) = kanaloSlug in _set.value
         }
         setContent {
-            PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanalDeponejo = falsaKanalDeponejo(), onKanal = {})
+            PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
         }
         waitForIdle()
         onNodeWithText("Muzaiko").assertIsDisplayed()
@@ -124,10 +124,10 @@ class NavigaTesto {
     @Test
     fun montrasAlarmojn() = runComposeUiTest {
         val alarmoDeponejo = MemorAlarmoDeponejo(
-            listOf(dk.nordfalk.esperanto.domain.model.Alarmo(id = 1, horo = 6, minuto = 45, ripeto = 0x7f, kanalSlug = "muzaiko", aktiva = true, etikedo = "Matene"))
+            listOf(dk.nordfalk.esperanto.domain.model.Alarmo(id = 1, horo = 6, minuto = 45, ripeto = 0x7f, kanaloSlug = "muzaiko", aktiva = true, etikedo = "Matene"))
         )
         setContent {
-            AlarmoEkrano(alarmoDeponejo = alarmoDeponejo, kanalDeponejo = falsaKanalDeponejo(), onReen = {})
+            AlarmoEkrano(alarmoDeponejo = alarmoDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onReen = {})
         }
         waitForIdle()
         onNodeWithText("06:45").assertIsDisplayed()

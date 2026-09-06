@@ -5,4 +5,4 @@ package dk.nordfalk.esperanto.data.repository
  * - Android: AlarmManager + PendingIntent + BroadcastReceiver
  * - Desktop/wasmJs/iOS: NoOp
  */
-expect fun kreAlarmoSkedilo(): AlarmoSkedilo
+expect fun kreuAlarmoSkedilo(): AlarmoSkedilo

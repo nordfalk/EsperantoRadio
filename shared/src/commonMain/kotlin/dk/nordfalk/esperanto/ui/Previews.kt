@@ -13,7 +13,7 @@ import dk.nordfalk.esperanto.domain.model.Sonfonto
 @Composable
 fun PreviewKanalaroAntonia() {
     pTemo(TemoNomo.ANTONIA) {
-        KanalaroEkrano(viewModel = KanalaroViewModel(pKanalDeponejo()))
+        KanalaroEkrano(viewModel = KanalaroViewModel(pKanaloDeponejo()))
     }
 }
 
@@ -21,7 +21,7 @@ fun PreviewKanalaroAntonia() {
 @Composable
 fun PreviewKanalaroRugxa() {
     pTemo(TemoNomo.RUGXA) {
-        KanalaroEkrano(viewModel = KanalaroViewModel(pKanalDeponejo()))
+        KanalaroEkrano(viewModel = KanalaroViewModel(pKanaloDeponejo()))
     }
 }
 
@@ -29,16 +29,16 @@ fun PreviewKanalaroRugxa() {
 @Composable
 fun PreviewKanalaroVerda() {
     pTemo(TemoNomo.VERDA) {
-        KanalaroEkrano(viewModel = KanalaroViewModel(pKanalDeponejo()))
+        KanalaroEkrano(viewModel = KanalaroViewModel(pKanaloDeponejo()))
     }
 }
 
-@Preview(name = "KanalEkrano — Kernpunkto", showBackground = true, heightDp = 400)
+@Preview(name = "KanaloEkrano — Kernpunkto", showBackground = true, heightDp = 400)
 @Composable
-fun PreviewKanalEkrano() {
+fun PreviewKanaloEkrano() {
     pTemo() {
-        KanalEkrano(
-            kanal = pKanaloj[1],
+        KanaloEkrano(
+            kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
             onReen = {},
         )
@@ -65,7 +65,7 @@ fun PreviewSerchxo() {
 @Composable
 fun PreviewPlejsatataj() {
     pTemo() {
-        PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanalDeponejo = pKanalDeponejo(), onKanal = {})
+        PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onKanalo = {})
     }
 }
 
@@ -81,7 +81,7 @@ fun PreviewElshutitaj() {
 @Composable
 fun PreviewAlarmoj() {
     pTemo() {
-        AlarmoEkrano(alarmoDeponejo = pAlarmoDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {})
+        AlarmoEkrano(alarmoDeponejo = pAlarmoDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onReen = {})
     }
 }
 
@@ -132,7 +132,7 @@ fun PreviewHejmoNova() {
     val elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo))
     pTemo() {
         HejmoEkrano(
-            kanalDeponejo = pKanalDeponejo(),
+            kanaloDeponejo = pKanaloDeponejo(),
             elsendoDeponejo = elsendoDeponejo,
         )
     }

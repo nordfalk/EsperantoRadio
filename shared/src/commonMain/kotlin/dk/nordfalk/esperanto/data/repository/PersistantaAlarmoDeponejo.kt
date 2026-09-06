@@ -77,7 +77,7 @@ class PersistantaAlarmoDeponejo(
         _alarmoj.value = _alarmoj.value + nova
         persistu()
         skedilo?.skedi(nova)
-        logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanalSlug} (nova id=${nova.id})")
+        logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanaloSlug} (nova id=${nova.id})")
     }
 
     override suspend fun ghisdatigi(alarmo: Alarmo) {

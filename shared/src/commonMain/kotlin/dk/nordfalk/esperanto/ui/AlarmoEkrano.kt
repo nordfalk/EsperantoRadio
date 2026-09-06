@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Alarmo
-import dk.nordfalk.esperanto.domain.model.Kanal
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
-import dk.nordfalk.esperanto.domain.repository.KanalDeponejo
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.data.repository.subtenasVekhorlogxn
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
@@ -24,11 +24,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun AlarmoEkrano(
     alarmoDeponejo: AlarmoDeponejo,
-    kanalDeponejo: KanalDeponejo,
+    kanaloDeponejo: KanaloDeponejo,
     onReen: () -> Unit,
 ) {
     val alarmoj by alarmoDeponejo.observiAlarmojn().collectAsState()
-    val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
+    val kanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
     var redaktoModo by remember { mutableStateOf<Alarmo?>(null) } // null = listo, ne-null = redakti cxi tiun
     var kreiModo by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -110,7 +110,7 @@ fun AlarmoEkrano(
                     items(alarmoj) { alarmo ->
                         AlarmoEro(
                             alarmo = alarmo,
-                            kanalNomo = kanaloj.find { it.slug == alarmo.kanalSlug }?.nomo ?: alarmo.kanalSlug,
+                            kanaloNomo = kanaloj.find { it.slug == alarmo.kanaloSlug }?.nomo ?: alarmo.kanaloSlug,
                             onBaskuli = {
                                 logi("Klako", "baskuligu alarmon ${alarmo.id}")
                                 scope.launch { alarmoDeponejo.baskuliAktivon(alarmo.id) }
@@ -135,7 +135,7 @@ fun AlarmoEkrano(
 @Composable
 private fun AlarmoEro(
     alarmo: Alarmo,
-    kanalNomo: String,
+    kanaloNomo: String,
     onBaskuli: () -> Unit,
     onForigi: () -> Unit,
     onRedakti: () -> Unit,
@@ -147,7 +147,7 @@ private fun AlarmoEro(
         },
         supportingContent = {
             Column(modifier = Modifier.clickable { onRedakti() }) {
-                Text(kanalNomo)
+                Text(kanaloNomo)
                 if (!alarmo.etikedo.isNullOrBlank()) {
                     Text(alarmo.etikedo!!, style = MaterialTheme.typography.bodySmall)
                 }
@@ -169,14 +169,14 @@ private fun AlarmoEro(
  */
 @Composable
 private fun AlarmoRedaktilo(
-    kanaloj: List<Kanal>,
+    kanaloj: List<Kanalo>,
     ekzistanta: Alarmo?,
     onKonfirmi: (Alarmo) -> Unit,
     onNuligi: () -> Unit,
 ) {
     var horo by remember { mutableStateOf(ekzistanta?.horo ?: 6) }
     var minuto by remember { mutableStateOf(ekzistanta?.minuto ?: 0) }
-    var elektitaKanalSlug by remember { mutableStateOf(ekzistanta?.kanalSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
+    var elektitaKanaloSlug by remember { mutableStateOf(ekzistanta?.kanaloSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
     var ripeto by remember { mutableStateOf(ekzistanta?.ripeto ?: 0x7f) }
 
     Column(
@@ -213,13 +213,13 @@ private fun AlarmoRedaktilo(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
         ) {
-            items(kanaloj, key = { it.slug }) { kanal ->
+            items(kanaloj, key = { it.slug }) { kanalo ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        selected = elektitaKanalSlug == kanal.slug,
-                        onClick = { elektitaKanalSlug = kanal.slug }
+                        selected = elektitaKanaloSlug == kanalo.slug,
+                        onClick = { elektitaKanaloSlug = kanalo.slug }
                     )
-                    Text(kanal.nomo)
+                    Text(kanalo.nomo)
                 }
             }
         }
@@ -246,7 +246,7 @@ private fun AlarmoRedaktilo(
                     horo = horo,
                     minuto = minuto,
                     ripeto = ripeto,
-                    kanalSlug = elektitaKanalSlug,
+                    kanaloSlug = elektitaKanaloSlug,
                     aktiva = ekzistanta?.aktiva ?: true
                 ))
             }) { Text(if (ekzistanta != null) "Konservi" else "Krei") }
@@ -259,5 +259,5 @@ private fun AlarmoRedaktilo(
 @Preview(name = "AlarmoEkrano", showBackground = true, heightDp = 350)
 @Composable
 fun AlarmoEkranoPreview() {
-    pTemo { AlarmoEkrano(alarmoDeponejo = pAlarmoDeponejo(), kanalDeponejo = pKanalDeponejo(), onReen = {}) }
+    pTemo { AlarmoEkrano(alarmoDeponejo = pAlarmoDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onReen = {}) }
 }

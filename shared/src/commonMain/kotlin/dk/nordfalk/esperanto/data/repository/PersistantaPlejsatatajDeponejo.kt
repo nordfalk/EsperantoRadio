@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Persistanta PlejsatatajDeponejo. Uzas multiplatform-settings por persisti
- * la plejŝatatajn kanal-slugs inter restartoj.
+ * la plejŝatatajn kanalo-slugs inter restartoj.
  *
  * Decido: Uzas Settings (key-value store) kun komma-disigita listo.
  * Simplaj kaj sufiĉa por malgranda nombro da kanaloj.
@@ -32,13 +32,13 @@ class PersistantaPlejsatatajDeponejo(
     private val _plejsatataj = MutableStateFlow<Set<String>>(legu())
     override fun observiPlejsatatajn(): StateFlow<Set<String>> = _plejsatataj.asStateFlow()
 
-    override suspend fun baskuliPlejsaton(kanalSlug: String) {
+    override suspend fun baskuliPlejsaton(kanaloSlug: String) {
         val nuna = _plejsatataj.value.toMutableSet()
-        if (kanalSlug in nuna) nuna.remove(kanalSlug) else nuna.add(kanalSlug)
+        if (kanaloSlug in nuna) nuna.remove(kanaloSlug) else nuna.add(kanaloSlug)
         skribu(nuna)
         _plejsatataj.value = nuna
-        logi("Plejsatataj", "Baskulas: $kanalSlug → ${if (kanalSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
+        logi("Plejsatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
-    override suspend fun estasPlejsatata(kanalSlug: String): Boolean = kanalSlug in _plejsatataj.value
+    override suspend fun estasPlejsatata(kanaloSlug: String): Boolean = kanaloSlug in _plejsatataj.value
 }

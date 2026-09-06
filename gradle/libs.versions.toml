@@ -3,7 +3,7 @@
 # Vidu docs/nova/02_teknika_stako.md por la teknika stako.
 
 [versions]
-kotlin = "2.1.0"
+kotlin = "2.1.20"
 compose-multiplatform = "1.7.3"
 ktor = "3.1.3"
 kotlinx-serialization = "1.7.3"

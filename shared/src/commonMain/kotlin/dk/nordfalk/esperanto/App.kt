@@ -8,12 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.kreSettings
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
-import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.data.repository.KanalDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
@@ -21,12 +25,11 @@ import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreElshutDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.kreAlarmoSkedilo
-import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanal
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.kreDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.navigation.Vojo
 import dk.nordfalk.esperanto.ui.*
 import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
@@ -41,8 +44,24 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
-private enum class Ekrano { HEJMO, KANALARO, KANAL, ELSENDO, SERCXO, PLEJSATATAJ, ELSHUTOJ, ALARMOJ, AGORDOJ }
+private val navConfig = SavedStateConfiguration {
+    serializersModule = SerializersModule {
+        polymorphic(NavKey::class) {
+            subclass(Vojo.Hejmo::class, Vojo.Hejmo.serializer())
+            subclass(Vojo.Kanalaro::class, Vojo.Kanalaro.serializer())
+            subclass(Vojo.Plejsatataj::class, Vojo.Plejsatataj.serializer())
+            subclass(Vojo.Sercxo::class, Vojo.Sercxo.serializer())
+            subclass(Vojo.Elshutoj::class, Vojo.Elshutoj.serializer())
+            subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
+            subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
+            subclass(Vojo.KanalDetalo::class, Vojo.KanalDetalo.serializer())
+            subclass(Vojo.ElsendoDetalo::class, Vojo.ElsendoDetalo.serializer())
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,74 +108,117 @@ fun EsperantoRadioApp(
         }
         val scope = rememberCoroutineScope()
 
-        var ekrano by remember { mutableStateOf(Ekrano.HEJMO) }
-        var elektitaKanal by remember { mutableStateOf<Kanal?>(null) }
-        var elektitaElsendo by remember { mutableStateOf<Elsendo?>(null) }
-
+        val backStack = rememberNavBackStack(navConfig, Vojo.Hejmo)
         val kanaloj by kanalDeponejo.observiKanalojn().collectAsState()
         val ludantoStato by ludilo.stato.collectAsState()
 
-        val montruSubanBreton = ekrano != Ekrano.AGORDOJ && ekrano != Ekrano.ALARMOJ
+        val nunaVojo = backStack.lastOrNull()
+
+        fun switchTab(vojo: Vojo) {
+            logi("Nav", "→ tab: $vojo")
+            backStack.clear()
+            backStack.add(vojo)
+        }
+
+        fun push(vojo: Vojo) {
+            logi("Nav", "→ push: $vojo")
+            backStack.add(vojo)
+        }
+
+        fun reen() {
+            logi("Nav", "← reen")
+            backStack.removeLastOrNull()
+        }
+
+        val montruSubanBreton = nunaVojo !is Vojo.Agordoj && nunaVojo !is Vojo.Alarmoj
 
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
-                when (ekrano) {
-                    Ekrano.HEJMO -> {
-                        HejmoEkrano(
-                            kanalDeponejo = kanalDeponejo,
-                            elsendoDeponejo = elsendoDeponejo,
-                            onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
-                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
-                            onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ },
-                            onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
-                            onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
-                        )
-                    }
-                    Ekrano.KANALARO -> {
-                        KanalaroEkrano(
-                            viewModel = kanalaroViewModel,
-                            onKanal = { kanal -> logi("Nav", "→ KANAL: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL },
-                            onLudi = { fonto ->
-                                logi("Nav", "Ludas rekte: ${fonto}")
-                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
-                            },
-                            onElshutoj = { logi("Nav", "→ ELSHUTOJ"); ekrano = Ekrano.ELSHUTOJ },
-                            onAlarmoj = { logi("Nav", "→ ALARMOJ"); ekrano = Ekrano.ALARMOJ },
-                            onAgordoj = { logi("Nav", "→ AGORDOJ"); ekrano = Ekrano.AGORDOJ }
-                        )
-                    }
-                    Ekrano.KANAL -> {
-                        val kanal = elektitaKanal
-                        if (kanal != null) {
-                            KanalEkrano(
-                                kanal = kanal,
+                NavDisplay(
+                    backStack = backStack,
+                    onBack = { reen() },
+                    entryProvider = entryProvider {
+                        entry<Vojo.Hejmo> {
+                            HejmoEkrano(
+                                kanalDeponejo = kanalDeponejo,
                                 elsendoDeponejo = elsendoDeponejo,
-                                onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
-                                onElsendo = { elsendo -> logi("Nav", "→ ELSENDO: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO },
-                                onLudi = { fonto ->
-                                    logi("Nav", "Ludas rekte: ${kanal.slug}")
-                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
-                                }
+                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onAgordoj = { push(Vojo.Agordoj) },
+                                onElshutoj = { push(Vojo.Elshutoj) },
+                                onAlarmoj = { push(Vojo.Alarmoj) },
                             )
-                        } else {
-                            ekrano = Ekrano.HEJMO
                         }
-                    }
-                    Ekrano.ELSENDO -> {
-                        val elsendo = elektitaElsendo
-                        if (elsendo == null) {
-                            ekrano = Ekrano.HEJMO
-                        } else {
+                        entry<Vojo.Kanalaro> {
+                            KanalaroEkrano(
+                                viewModel = kanalaroViewModel,
+                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                                onLudi = { fonto ->
+                                    logi("Nav", "Ludas rekte: $fonto")
+                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                },
+                                onElshutoj = { push(Vojo.Elshutoj) },
+                                onAlarmoj = { push(Vojo.Alarmoj) },
+                                onAgordoj = { push(Vojo.Agordoj) },
+                            )
+                        }
+                        entry<Vojo.Plejsatataj> {
+                            PlejsatatajEkrano(
+                                plejsatatajDeponejo = plejsatatajDeponejo,
+                                kanalDeponejo = kanalDeponejo,
+                                onKanal = { kanal -> push(Vojo.KanalDetalo(kanal)) },
+                            )
+                        }
+                        entry<Vojo.Sercxo> {
+                            SercxoEkrano(
+                                sercxoDeponejo = sercxoDeponejo,
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                            )
+                        }
+                        entry<Vojo.Elshutoj> {
+                            ElshutitajEkrano(
+                                elshutDeponejo = elshutDeponejo,
+                                onReen = { reen() },
+                                onLudi = { fonto ->
+                                    logi("Nav", "Ludas elŝutitan: $fonto")
+                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                            )
+                        }
+                        entry<Vojo.Alarmoj> {
+                            AlarmoEkrano(
+                                alarmoDeponejo = alarmoDeponejo,
+                                kanalDeponejo = kanalDeponejo,
+                                onReen = { reen() },
+                            )
+                        }
+                        entry<Vojo.Agordoj> {
+                            AgordojEkrano(
+                                agordojDeponejo = agordojDeponejo,
+                                onReen = { reen() },
+                            )
+                        }
+                        entry<Vojo.KanalDetalo> { vojo ->
+                            KanalEkrano(
+                                kanal = vojo.kanal,
+                                elsendoDeponejo = elsendoDeponejo,
+                                onReen = { reen() },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onLudi = { fonto ->
+                                    logi("Nav", "Ludas rekte: ${vojo.kanal.slug}")
+                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                },
+                            )
+                        }
+                        entry<Vojo.ElsendoDetalo> { vojo ->
+                            val elsendo = vojo.elsendo
                             val kanal = kanaloj.find { it.slug == elsendo.kanalSlug }
                             ElsendoEkrano(
                                 elsendo = elsendo,
                                 kanal = kanal,
-                                onKanal = { k -> logi("Nav", "→ KANAL el elsendo: ${k.slug}"); elektitaKanal = k; ekrano = Ekrano.KANAL },
-                                onReen = {
-                                    logi("Nav", "→ reen de ELSENDO")
-                                    if (elektitaKanal != null) { ekrano = Ekrano.KANAL }
-                                    else { ekrano = Ekrano.HEJMO }
-                                },
+                                onKanal = { k -> push(Vojo.KanalDetalo(k)) },
+                                onReen = { reen() },
                                 onLudi = {
                                     logi("Nav", "Ludas elsendon: ${elsendo.id}")
                                     scope.launch {
@@ -178,48 +240,11 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Forigas elŝuton: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.forigi(elsendo.id) }
                                 },
-                                elshutDeponejo = elshutDeponejo
+                                elshutDeponejo = elshutDeponejo,
                             )
                         }
-                    }
-                    Ekrano.SERCXO -> {
-                        SercxoEkrano(
-                            sercxoDeponejo = sercxoDeponejo,
-                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el serĉo: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
-                        )
-                    }
-                    Ekrano.PLEJSATATAJ -> {
-                        PlejsatatajEkrano(
-                            plejsatatajDeponejo = plejsatatajDeponejo,
-                            kanalDeponejo = kanalDeponejo,
-                            onKanal = { kanal -> logi("Nav", "→ KANAL el plejŝatataj: ${kanal.slug}"); elektitaKanal = kanal; ekrano = Ekrano.KANAL }
-                        )
-                    }
-                    Ekrano.ELSHUTOJ -> {
-                        ElshutitajEkrano(
-                            elshutDeponejo = elshutDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO },
-                            onLudi = { fonto ->
-                                logi("Nav", "Ludas elŝutitan: ${fonto}")
-                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
-                            },
-                            onElsendo = { elsendo -> logi("Nav", "→ ELSENDO el elŝutoj: ${elsendo.id}"); elektitaElsendo = elsendo; ekrano = Ekrano.ELSENDO }
-                        )
-                    }
-                    Ekrano.ALARMOJ -> {
-                        AlarmoEkrano(
-                            alarmoDeponejo = alarmoDeponejo,
-                            kanalDeponejo = kanalDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO }
-                        )
-                    }
-                    Ekrano.AGORDOJ -> {
-                        AgordojEkrano(
-                            agordojDeponejo = agordojDeponejo,
-                            onReen = { logi("Nav", "→ HEJMO (reen)"); ekrano = Ekrano.HEJMO }
-                        )
-                    }
-                }
+                    },
+                )
             }
 
             if (montruSubanBreton) {
@@ -228,37 +253,25 @@ fun EsperantoRadioApp(
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {
-                            is Sonfonto.ElsendoFonto -> {
-                                logi("Nav", "→ ELSENDO el mini-ludilo")
-                                elektitaElsendo = fonto.elsendo
-                                ekrano = Ekrano.ELSENDO
-                            }
-                            is Sonfonto.LokaElsendo -> {
-                                logi("Nav", "→ ELSENDO el mini-ludilo (loka)")
-                                elektitaElsendo = fonto.elsendo
-                                ekrano = Ekrano.ELSENDO
-                            }
-                            is Sonfonto.RektaKanalo -> {
-                                logi("Nav", "→ KANAL el mini-ludilo")
-                                elektitaKanal = fonto.kanal
-                                ekrano = Ekrano.KANAL
-                            }
+                            is Sonfonto.ElsendoFonto -> push(Vojo.ElsendoDetalo(fonto.elsendo))
+                            is Sonfonto.LokaElsendo -> push(Vojo.ElsendoDetalo(fonto.elsendo))
+                            is Sonfonto.RektaKanalo -> push(Vojo.KanalDetalo(fonto.kanal))
                             null -> {}
                         }
-                    }
+                    },
                 )
                 MalsupraNavigaBreto(
-                    nunaTab = when (ekrano) {
-                        Ekrano.HEJMO -> EkranoTab.HEJMO
-                        Ekrano.KANALARO -> EkranoTab.KANALARO
-                        Ekrano.PLEJSATATAJ -> EkranoTab.PLEJSATATAJ
-                        Ekrano.SERCXO -> EkranoTab.SERCXO
+                    nunaTab = when (nunaVojo) {
+                        is Vojo.Hejmo -> EkranoTab.HEJMO
+                        is Vojo.Kanalaro -> EkranoTab.KANALARO
+                        is Vojo.Plejsatataj -> EkranoTab.PLEJSATATAJ
+                        is Vojo.Sercxo -> EkranoTab.SERCXO
                         else -> EkranoTab.NENIO
                     },
-                    onHejmo = { logi("Nav", "→ HEJMO (tab)"); ekrano = Ekrano.HEJMO },
-                    onKanalaro = { logi("Nav", "→ KANALARO (tab)"); ekrano = Ekrano.KANALARO },
-                    onPlejsatataj = { logi("Nav", "→ PLEJSATATAJ (tab)"); ekrano = Ekrano.PLEJSATATAJ },
-                    onSercxo = { logi("Nav", "→ SERCXO (tab)"); ekrano = Ekrano.SERCXO },
+                    onHejmo = { switchTab(Vojo.Hejmo) },
+                    onKanalaro = { switchTab(Vojo.Kanalaro) },
+                    onPlejsatataj = { switchTab(Vojo.Plejsatataj) },
+                    onSercxo = { switchTab(Vojo.Sercxo) },
                 )
             }
         }

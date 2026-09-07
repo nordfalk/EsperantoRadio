@@ -21,61 +21,35 @@ import java.util.concurrent.Executors
  */
 class LudiElsendoReceivilo : BroadcastReceiver() {
 
-    companion object {
-        private const val TAG = "LudiElsendoReceivilo"
-    }
-
     private var controllerFuture: ListenableFuture<MediaController>? = null
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != NovajElsendojKontroloWorker.ACTION_LUDI_ELSENDON) return
 
-        val elsendoId = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_ID)
         val titolo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_TITOLO)
         val fluo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_FLUO)
-        val kanaloNomo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO)
-        val bildoUrl = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_BILDO_URL)
+        if (fluo.isNullOrBlank()) { logw("LudiElsendo", "Neniu fluo-URL"); return }
 
-        logi(TAG, "Ludi elsendon: id=$elsendoId titolo=$titolo fluo=$fluo")
+        logi("LudiElsendo", "Ludi: $titolo")
 
-        if (fluo.isNullOrBlank()) {
-            logw(TAG, "Neniu fluo-URL en la sciigo-intento")
-            return
-        }
+        val metadata = MediaMetadata.Builder().setTitle(titolo ?: "Nekonata elsendo").apply {
+            intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO)?.let { setArtist(it) }
+            intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_BILDO_URL)?.let {
+                runCatching { setArtworkUri(android.net.Uri.parse(it)) }
+            }
+        }.build()
 
-        // Konektiĝu al la MediaSessionService kaj komencu ludi
-        val sessionToken = SessionToken(
-            context,
-            ComponentName(context, "dk.nordfalk.esperanto.android.EsperantoLudadoServo")
-        )
-
-        val metadataBuilder = MediaMetadata.Builder()
-            .setTitle(titolo ?: "Nekonata elsendo")
-        if (kanaloNomo != null) metadataBuilder.setArtist(kanaloNomo)
-        if (bildoUrl != null) {
-            try { metadataBuilder.setArtworkUri(android.net.Uri.parse(bildoUrl)) } catch (_: Exception) {}
-        }
-
-        val mediaItem = MediaItem.Builder()
-            .setUri(fluo)
-            .setMediaMetadata(metadataBuilder.build())
-            .build()
+        val mediaItem = MediaItem.Builder().setUri(fluo).setMediaMetadata(metadata).build()
+        val sessionToken = SessionToken(context, ComponentName(context, "dk.nordfalk.esperanto.android.EsperantoLudadoServo"))
 
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         controllerFuture?.addListener({
-            try {
-                val controller = controllerFuture?.get()
-                if (controller != null) {
-                    controller.setMediaItem(mediaItem)
-                    controller.prepare()
-                    controller.play()
-                    logi(TAG, "Komencis ludi: $titolo")
-                } else {
-                    logw(TAG, "MediaController estas null")
+            runCatching {
+                controllerFuture?.get()?.apply {
+                    setMediaItem(mediaItem); prepare(); play()
+                    logi("LudiElsendo", "Komencis ludi: $titolo")
                 }
-            } catch (e: Exception) {
-                logw(TAG, "Eraro dum konektado al ludado-servo", e)
-            }
+            }.onFailure { logw("LudiElsendo", "Eraro dum konektado", it) }
         }, Executors.newSingleThreadExecutor())
     }
 }

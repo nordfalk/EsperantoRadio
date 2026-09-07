@@ -7,41 +7,65 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dk.nordfalk.esperanto.logi
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 /**
  * Skedas la NovajElsendojKontroloWorker per WorkManager.
  *
- * Rulas cxiun ~12 horojn (2 fojojn tage) se retkonekto ekzistas.
- * Ankaux tuj rulas unu fojon se la apo estas nova instalita.
+ * Rulas 2 fojojn tage — cxe 7:00 kaj 16:00 (±1h), kiam retkonekto ekzistas
+ * kaj la baterio ne estas malalta.
  */
 object NovajElsendojSkedilo {
 
-    private const val WORK_NOMO = "novaj_elsendoj_kontrolo"
+    private const val WORK_MATENA = "novaj_elsendoj_matene"
+    private const val WORK_POSTTAGMEZE = "novaj_elsendoj_posttagmeze"
+
+    private val construktoj = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .setRequiresBatteryNotLow(true)
+        .build()
 
     /**
-     * Skedas la periodan Worker-on kaj, se unua fojo, lanĉas tuj.
+     * Skedas du periodajn Worker-ojn (24h ciklo):
+     * - unu cxe 7:00 (matena kontrolo)
+     * - unu cxe 16:00 (posttagmeza kontrolo)
      */
     fun skedu(context: Context) {
-        val workManager = WorkManager.getInstance(context)
+        val wm = WorkManager.getInstance(context)
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        // Perioda: cxiu 12 horoj (WorkManager minimumo estas 15 min)
-        val periodaPeto = PeriodicWorkRequestBuilder<NovajElsendojKontroloWorker>(
-            12, TimeUnit.HOURS
-        )
-            .setConstraints(constraints)
-            .build()
-
-        workManager.enqueueUniquePeriodicWork(
-            WORK_NOMO,
+        wm.enqueueUniquePeriodicWork(
+            WORK_MATENA,
             ExistingPeriodicWorkPolicy.KEEP,
-            periodaPeto
+            PeriodicWorkRequestBuilder<NovajElsendojKontroloWorker>(24, TimeUnit.HOURS)
+                .setConstraints(construktoj)
+                .setInitialDelay(kalkuluInitialProkraston(7), TimeUnit.MILLISECONDS)
+                .build()
+        )
+        wm.enqueueUniquePeriodicWork(
+            WORK_POSTTAGMEZE,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<NovajElsendojKontroloWorker>(24, TimeUnit.HOURS)
+                .setConstraints(construktoj)
+                .setInitialDelay(kalkuluInitialProkraston(16), TimeUnit.MILLISECONDS)
+                .build()
         )
 
-        logi("NovajElsendojSkedilo", "Worker skedita (perioda, cxiu 12h)")
+        logi("NovajElsendojSkedilo", "Worker skedita (7:00 kaj 16:00, ±1h, neniu ĉe malalta baterio)")
+    }
+
+    /**
+     * Kalkulas prokraston en ms ĝis la sekva horo `celaHoro`.
+     */
+    private fun kalkuluInitialProkraston(celaHoro: Int): Long {
+        val nun = Calendar.getInstance()
+        val celo = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, celaHoro)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            if (timeInMillis <= nun.timeInMillis) add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return celo.timeInMillis - nun.timeInMillis
     }
 }

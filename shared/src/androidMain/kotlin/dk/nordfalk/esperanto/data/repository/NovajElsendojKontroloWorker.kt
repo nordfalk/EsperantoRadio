@@ -58,20 +58,37 @@ class NovajElsendojKontroloWorker(
     }
 
     override suspend fun doWork(): Result {
-        logi("NovajElsendoj", "Worker komencis — kontrolas ŝatatajn kanalojn")
+        logi("NovajElsendoj", "=== Worker komencis ===")
         return try {
             val settings = kreuSettings()
+
+            // Kontrolu ĉu sciigoj estas ŝaltitaj
+            val sciigoj = settings.getBoolean("sciigoj", true)
+            if (!sciigoj) {
+                logi("NovajElsendoj", "Sciigoj malŝaltitaj en agordoj — finas sen kontroli")
+                return Result.success()
+            }
+
             val plejStr = settings.getString("plejŝatataj_kanaloj", "")
-            if (plejStr.isBlank()) return Result.success()
+            if (plejStr.isBlank()) {
+                logi("NovajElsendoj", "Neniu ŝatata kanalo — finas")
+                return Result.success()
+            }
             val plejŝatataj = plejStr.split(",").toSet()
+            logi("NovajElsendoj", "Kontrolas ${plejŝatataj.size} ŝatatajn kanalojn: $plejŝatataj")
 
             val kanaloj = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron()).kanaloj
                 .filter { it.kodo in plejŝatataj && it.elsendojRssUrl != null }
                 .map { it.alKanalo() }
-            if (kanaloj.isEmpty()) return Result.success()
+            if (kanaloj.isEmpty()) {
+                logi("NovajElsendoj", "Neniu ŝatata kanalo kun RSS-fluo — finas")
+                return Result.success()
+            }
+            logi("NovajElsendoj", "${kanaloj.size} kanaloj kun RSS-fluo: ${kanaloj.map { it.slug }}")
 
             val viditaj = settings.getString(VIDITAJ_KEY, "")
                 .let { if (it.isBlank()) mutableSetOf() else it.split(",").toMutableSet() }
+            logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj")
 
             val httpKliento = HttpClient(CIO) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
@@ -81,12 +98,14 @@ class NovajElsendojKontroloWorker(
 
             for (kanalo in kanaloj) {
                 try {
-                    logi("NovajElsendoj", "Kontrolas ${kanalo.slug}")
-                    val elsendoj = parsilo.parsuRss(
-                        httpKliento.get(kanalo.podkastaRssUrl!!).bodyAsText(), kanalo
-                    ) { httpKliento.get(it).bodyAsText() }
+                    logi("NovajElsendoj", "Kontrolas ${kanalo.slug}: ${kanalo.podkastaRssUrl}")
+                    val respondo = httpKliento.get(kanalo.podkastaRssUrl!!).bodyAsText()
+                    logi("NovajElsendoj", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+                    val elsendoj = parsilo.parsuRss(respondo, kanalo) { httpKliento.get(it).bodyAsText() }
+                    logi("NovajElsendoj", "${kanalo.slug}: ${elsendoj.size} elsendoj en RSS-fluo")
                     val plejNovaj = elsendoj.take(5)
                     val novaj = plejNovaj.filter { it.id !in viditaj }
+                    logi("NovajElsendoj", "${kanalo.slug}: ${novaj.size} novaj el ${plejNovaj.size} kontrolitaj")
                     for (elsendo in novaj) {
                         viditaj.add(elsendo.id)
                         senduSciigon(elsendo, kanalo)
@@ -104,10 +123,10 @@ class NovajElsendojKontroloWorker(
                 viditaj.retainAll(viditaj.toList().takeLast(MAKS_VIDITAJ).toSet())
             }
             settings.putString(VIDITAJ_KEY, viditaj.joinToString(","))
-            logi("NovajElsendoj", "Worker finis — $totalNovaj novaj, ${viditaj.size} viditaj")
+            logi("NovajElsendoj", "=== Worker finis — $totalNovaj novaj elsendoj, ${viditaj.size} viditaj total ===")
             Result.success()
         } catch (e: Exception) {
-            loge("NovajElsendoj", "Worker paneis", e)
+            loge("NovajElsendoj", "=== Worker paneis ===", e)
             Result.retry()
         }
     }

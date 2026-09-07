@@ -19,7 +19,6 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
-import dk.nordfalk.esperanto.data.repository.NovajElsendojSkedilo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
@@ -42,8 +41,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             EsperantoRadioApp(ludilo = ludilo)
         }
-        // Skedu la fonan kontrolilon por novaj elsendoj (2x tage)
-        NovajElsendojSkedilo.skedu(this)
+        // La sciig-skedo estas mastrumata de App.kt per ghisdatiguSciigSkedon()
         traktuIntenton(intent)
     }
 

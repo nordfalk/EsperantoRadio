@@ -145,6 +145,7 @@ class NavigaTesto {
                 kanalo = testKanaloj[1],
                 elsendoDeponejo = elsendoDeponejo,
                 plejŝatatajDeponejo = plejDeponejo,
+                agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(),
                 onReen = {},
             )
         }
@@ -167,12 +168,22 @@ class NavigaTesto {
                 kanalo = testKanaloj[1],
                 elsendoDeponejo = elsendoDeponejo,
                 plejŝatatajDeponejo = plejDeponejo,
+                agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(),
                 onReen = {},
             )
         }
         waitForIdle()
         // ★ = ŝatata
         onNodeWithText("★").assertIsDisplayed()
+    }
+
+    @Test
+    fun agordojMontrasSciigojn() = runComposeUiTest {
+        val agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl()
+        setContent { AgordojEkrano(agordojDeponejo = agordojDeponejo, onReen = {}) }
+        waitForIdle()
+        onNodeWithText("Ricevi sciigojn").assertIsDisplayed()
+        onNodeWithText("Sciigo kiam aperas nova elsendo el ŝatata kanalo").assertIsDisplayed()
     }
 
     @Test

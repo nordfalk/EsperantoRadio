@@ -55,6 +55,16 @@ object NovajElsendojSkedilo {
     }
 
     /**
+     * Malplanas ĉiujn Worker-ojn — la telefono ne vekiĝos.
+     */
+    fun malplani(context: Context) {
+        val wm = WorkManager.getInstance(context)
+        wm.cancelUniqueWork(WORK_MATENA)
+        wm.cancelUniqueWork(WORK_POSTTAGMEZE)
+        logi("NovajElsendojSkedilo", "Worker malplanita — telefono ne vekiĝos por sciigoj")
+    }
+
+    /**
      * Kalkulas prokraston en ms ĝis la sekva horo `celaHoro`.
      */
     private fun kalkuluInitialProkraston(celaHoro: Int): Long {

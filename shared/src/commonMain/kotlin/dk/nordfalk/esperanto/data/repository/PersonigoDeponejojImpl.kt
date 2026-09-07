@@ -8,6 +8,7 @@ import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,7 +54,9 @@ class SercxoDeponejoImpl(
     }
 }
 
-class AgordojDeponejoImpl : AgordojDeponejo {
+class AgordojDeponejoImpl(
+    private val settings: Settings? = null,
+) : AgordojDeponejo {
     private val _lingvo = MutableStateFlow("eo")
     override val lingvo: StateFlow<String> = _lingvo.asStateFlow()
 
@@ -62,6 +65,9 @@ class AgordojDeponejoImpl : AgordojDeponejo {
 
     private val _temo = MutableStateFlow("ANTONIA")
     override val temo: StateFlow<String> = _temo.asStateFlow()
+
+    private val _sciigoj = MutableStateFlow(settings?.getBoolean("sciigoj", true) ?: true)
+    override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
     override fun fiksiLingvon(lingvo: String) {
         _lingvo.value = lingvo
@@ -74,5 +80,10 @@ class AgordojDeponejoImpl : AgordojDeponejo {
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
+    }
+    override fun fiksiSciigojn(sxaltita: Boolean) {
+        _sciigoj.value = sxaltita
+        settings?.putBoolean("sciigoj", sxaltita)
+        logi("Agordoj", "Sciigoj → $sxaltita")
     }
 }

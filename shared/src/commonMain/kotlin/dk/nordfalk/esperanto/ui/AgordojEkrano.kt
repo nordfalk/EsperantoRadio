@@ -18,6 +18,7 @@ fun AgordojEkrano(
     val lingvo by agordojDeponejo.lingvo.collectAsState()
     val nurWifi by agordojDeponejo.nurWifi.collectAsState()
     val temoNomo by agordojDeponejo.temo.collectAsState()
+    val sciigoj by agordojDeponejo.sciigoj.collectAsState()
 
     Scaffold(
         topBar = {
@@ -53,6 +54,21 @@ fun AgordojEkrano(
                     Switch(
                         checked = nurWifi,
                         onCheckedChange = { logi("Klako", "nurWifi → $it"); agordojDeponejo.fiksiNurWifi(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(Modifier.height(24.dp))
+            Text("Sciigoj", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Ricevi sciigojn") },
+                supportingContent = { Text("Sciigo kiam aperas nova elsendo el ŝatata kanalo") },
+                trailingContent = {
+                    Switch(
+                        checked = sciigoj,
+                        onCheckedChange = { logi("Klako", "sciigoj → $it"); agordojDeponejo.fiksiSciigojn(it) }
                     )
                 }
             )

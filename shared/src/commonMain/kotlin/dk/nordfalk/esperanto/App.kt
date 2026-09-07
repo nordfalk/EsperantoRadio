@@ -22,6 +22,7 @@ import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.ghisdatiguSciigSkedon
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
@@ -69,7 +70,8 @@ fun EsperantoRadioApp(
     ludilo: LudiloRegilo = kreuDefauxltanLudiloRegilon(),
 ) {
     val malhela = androidx.compose.foundation.isSystemInDarkTheme()
-    val agordojDeponejo = remember { AgordojDeponejoImpl() }
+    val settings = remember { kreuSettings() }
+    val agordojDeponejo = remember { AgordojDeponejoImpl(settings) }
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val temo = runCatching { TemoNomo.valueOf(temoNomo) }.getOrDefault(TemoNomo.ANTONIA)
 
@@ -97,7 +99,6 @@ fun EsperantoRadioApp(
         }
         val elsendoDeponejo = remember { ElsendoDeponejoImpl(httpKliento) }
         val kanalaroViewModel = remember { KanalaroViewModel(kanaloDeponejo) }
-        val settings = remember { kreuSettings() }
         val plejŝatatajDeponejo = remember { PersistantaPlejŝatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
         val elshutDeponejo = remember { kreuElshutDeponejo(httpKliento) }
@@ -113,6 +114,13 @@ fun EsperantoRadioApp(
         val ludantoStato by ludilo.stato.collectAsState()
 
         val nunaVojo = backStack.lastOrNull()
+
+        // Observi ŝanĝojn de ŝatoj kaj sciigoj por ĝisdatigi la fonan skedon
+        val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
+        val sciigoj by agordojDeponejo.sciigoj.collectAsState()
+        LaunchedEffect(plejŝatataj, sciigoj) {
+            ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
+        }
 
         fun switchTab(vojo: Vojo) {
             logi("Nav", "→ tab: $vojo")
@@ -205,6 +213,7 @@ fun EsperantoRadioApp(
                                 kanalo = vojo.kanalo,
                                 elsendoDeponejo = elsendoDeponejo,
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
+                                agordojDeponejo = agordojDeponejo,
                                 onReen = { reen() },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onLudi = { fonto ->

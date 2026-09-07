@@ -41,6 +41,7 @@ fun PreviewKanaloEkrano() {
             kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
             plejŝatatajDeponejo = pPlejŝatatajDeponejo(),
+            agordojDeponejo = AgordojDeponejoImpl(),
             onReen = {},
         )
     }

@@ -22,11 +22,15 @@ class BootReceivilo : BroadcastReceiver() {
             intent.action != "android.intent.action.LOCKED_BOOT_COMPLETED"
         ) return
 
-        logi("BootReceivilo", "Boot ricevita — re-planas alarmojn")
+        logi("BootReceivilo", "Boot ricevita — re-planas alarmojn kaj sciigojn")
 
         try {
             // Agordu appContext por AlarmoSkedilo kaj kreuSettings (cexe boot, MainActivity ne jam rulis)
             appContext = context.applicationContext
+
+            // Re-skedu la Worker por novaj-elsendoj-sciigoj
+            NovajElsendojSkedilo.skedu(context)
+
             val settings = kreuSettings()
             val str = settings.getString("alarmoj", "")
             if (str.isBlank()) {

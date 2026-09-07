@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
@@ -17,9 +18,8 @@ import kotlinx.coroutines.launch
 /**
  * Ekrano por plej ŝatataj kanaloj.
  *
- * TODO (venonta PR): Sciigoj — kiam nova elsendo aperas el ŝatata kanalo,
- * la apo devas sendi sciigon. Ankaŭ aldonu klarigon en ĉi tiu ekrano:
- * "Vi ricevos sciigon kiam aperas nova elsendo el ŝatata kanalo."
+ * Sciigoj: la apo regule kontrolas ŝatatajn kanalojn por novaj elsendoj
+ * kaj sendas sciigon. La uzanto povas ludi rekte de la sciigo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +46,14 @@ fun PlejŝatatajEkrano(
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+                item {
+                    Text(
+                        "Vi ricevos sciigon kiam aperas nova elsendo el ŝatata kanalo.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                    )
+                }
                 items(plejKanaloj, key = { it.slug }) { kanalo ->
                     ListItem(
                         headlineContent = { Text(kanalo.nomo) },

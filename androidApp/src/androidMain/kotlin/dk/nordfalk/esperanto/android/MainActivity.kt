@@ -18,6 +18,9 @@ import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
+import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
+import dk.nordfalk.esperanto.data.repository.NovajElsendojSkedilo
+import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -39,12 +42,60 @@ class MainActivity : ComponentActivity() {
         setContent {
             EsperantoRadioApp(ludilo = ludilo)
         }
-        traktuAlarmIntent(intent)
+        // Skedu la fonan kontrolilon por novaj elsendoj (2x tage)
+        NovajElsendojSkedilo.skedu(this)
+        traktuIntenton(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        traktuAlarmIntent(intent)
+        traktuIntenton(intent)
+    }
+
+    /**
+     * Traktas alvenantajn intentojn de sciigoj aŭ alarmoj.
+     */
+    private fun traktuIntenton(intent: Intent?) {
+        if (intent == null) return
+        when (intent.action) {
+            "dk.nordfalk.esperanto.ALARMO_EKIGAS" -> traktuAlarmIntent(intent)
+            NovajElsendojKontroloWorker.ACTION_MALFERMI_ELSENDON -> traktuMalfermiElsendon(intent)
+        }
+    }
+
+    /**
+     * Traktas la intenton kiam la uzanto klakas sur sciigo pri nova elsendo.
+     * Rekonstruas la Elsendo-objekton kaj komencas ludi ĝin.
+     */
+    private fun traktuMalfermiElsendon(intent: Intent) {
+        val elsendoId = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_ID) ?: return
+        val titolo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_TITOLO) ?: ""
+        val fluo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_FLUO) ?: return
+        val kanaloSlug = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_SLUG) ?: ""
+        val kanaloNomo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO)
+        val bildoUrl = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_BILDO_URL)
+
+        logi("MainActivity", "Malfermi elsendon de sciigo: id=$elsendoId titolo=$titolo")
+
+        val elsendo = Elsendo(
+            id = elsendoId,
+            kanaloSlug = kanaloSlug,
+            kanaloNomo = kanaloNomo,
+            titolo = titolo,
+            fluo = fluo,
+            bildoUrl = bildoUrl,
+            dato = "",
+        )
+
+        scope.launch {
+            try {
+                ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo))
+                ludilo.ludi()
+                logi("MainActivity", "Ludado komencita de sciigo: $titolo")
+            } catch (e: Exception) {
+                logw("MainActivity", "Eraro dum ludi elsendon de sciigo", e)
+            }
+        }
     }
 
     private fun traktuAlarmIntent(intent: Intent?) {

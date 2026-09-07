@@ -102,6 +102,80 @@ class NavigaTesto {
     }
 
     @Test
+    fun plejŝatatajMontrasSciiganKlarigon() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            private val _set = MutableStateFlow(setOf("muzaiko"))
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in _set.value
+        }
+        setContent {
+            PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
+        }
+        waitForIdle()
+        onNodeWithText("Vi ricevos sciigon kiam aperas nova elsendo el ŝatata kanalo.").assertIsDisplayed()
+    }
+
+    @Test
+    fun plejŝatatajMalplenaNeMontrasKlarigon() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            private val _set = MutableStateFlow<Set<String>>(emptySet())
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = false
+        }
+        setContent {
+            PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
+        }
+        waitForIdle()
+        onNodeWithText("Neniu plej ŝatata kanalo. Premu ★ sur kanalo por aldoni.").assertIsDisplayed()
+    }
+
+    @Test
+    fun kanalEkranoMontrasŜatButononNeŜatata() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            private val _set = MutableStateFlow<Set<String>>(emptySet())
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = false
+        }
+        val elsendoDeponejo = PreviewElsendoDeponejo(listOf(testElsendo))
+        setContent {
+            KanaloEkrano(
+                kanalo = testKanaloj[1],
+                elsendoDeponejo = elsendoDeponejo,
+                plejŝatatajDeponejo = plejDeponejo,
+                onReen = {},
+            )
+        }
+        waitForIdle()
+        // ☆ = ne ŝatata
+        onNodeWithText("☆").assertIsDisplayed()
+    }
+
+    @Test
+    fun kanalEkranoMontrasŜatButononŜatata() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            private val _set = MutableStateFlow(setOf("kernpunkto"))
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in _set.value
+        }
+        val elsendoDeponejo = PreviewElsendoDeponejo(listOf(testElsendo))
+        setContent {
+            KanaloEkrano(
+                kanalo = testKanaloj[1],
+                elsendoDeponejo = elsendoDeponejo,
+                plejŝatatajDeponejo = plejDeponejo,
+                onReen = {},
+            )
+        }
+        waitForIdle()
+        // ★ = ŝatata
+        onNodeWithText("★").assertIsDisplayed()
+    }
+
+    @Test
     fun montrasElshutitajn() = runComposeUiTest {
         val elshutDeponejo = object : ElshutDeponejo {
             private val _elshutoj = MutableStateFlow(

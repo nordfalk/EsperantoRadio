@@ -161,8 +161,6 @@ fun KanaloEkrano(
 
 @Composable
 private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
-    val ludantoStato = ludilo?.stato?.collectAsState()
-
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -209,7 +207,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                     AssistChip(
                         onClick = {
                             logi("Klako", "retposhto ${kanalo.slug}")
-                            val stato = ludantoStato?.value
+                            val stato = ludilo?.stato?.value
                             val nunaElsendo: Elsendo? = when (stato?.nunaFonto) {
                                 is Sonfonto.ElsendoFonto -> (stato.nunaFonto as Sonfonto.ElsendoFonto).elsendo
                                 is Sonfonto.LokaElsendo -> (stato.nunaFonto as Sonfonto.LokaElsendo).elsendo

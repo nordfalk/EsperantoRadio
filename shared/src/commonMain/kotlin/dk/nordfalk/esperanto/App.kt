@@ -210,6 +210,7 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Ludas rekte: ${vojo.kanalo.slug}")
                                     scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                                 },
+                                ludilo = ludilo,
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->

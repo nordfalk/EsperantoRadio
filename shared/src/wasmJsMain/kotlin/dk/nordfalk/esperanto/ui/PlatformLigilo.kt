@@ -14,7 +14,8 @@ actual fun malfermuLigon(url: String) {
 actual fun malfermuRetposhton(retposhto: String, temo: String, teksto: String) {
     logi("Ligilo", "Malfermas retpoŝton al: $retposhto")
     try {
-        val url = "mailto:$retposhto?subject=${js("encodeURIComponent").unsafeCast<String>()(temo)}&body=${js("encodeURIComponent").unsafeCast<String>()}(teksto)"
+        val encode = js("encodeURIComponent").unsafeCast<String>()
+        val url = "mailto:$retposhto?subject=${encode(temo)}&body=${encode(teksto)}"
         kotlinx.browser.window.open(url, "_blank")
     } catch (e: dynamic) {
         dk.nordfalk.esperanto.logw("Ligilo", "Ne povas malfermi retpoŝto-programon", e as Throwable)

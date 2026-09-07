@@ -147,6 +147,22 @@ fun ElsendoEkrano(
                     modifier = Modifier.fillMaxWidth()
                 ) { Text("⏸ Paŭzita — reprovi") }
             }
+
+            // Retpoŝto-butono — nur se la kanalo havas retpoŝtadreson
+            if (kanalo?.retposhto != null) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        logi("Klako", "retpoŝto el elsendo ${elsendo.id}")
+                        malfermuRetposhton(
+                            retposhto = kanalo.retposhto,
+                            temo = "Pri ${kanalo.nomo}",
+                            teksto = "Mi aŭskultas la elsendon (${elsendo.titolo} — ${elsendo.dato}) kaj havas komenton",
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("✉ Komenti") }
+            }
         }
     }
 }

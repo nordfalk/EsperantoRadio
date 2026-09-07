@@ -161,22 +161,7 @@ fun KanaloEkrano(
 
 @Composable
 private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
-    // Observu ludanton-staton por rekoni ĉu la uzanto aŭskultas(nun aŭ lastatempe) elsendon de tiu kanalo
-    val ludantoStato = ludilo?.stato?.collectAsState()?.value
-
-    val nunaElsendo: Elsendo? = when (ludantoStato?.nunaFonto) {
-        is Sonfonto.ElsendoFonto -> (ludantoStato.nunaFonto as Sonfonto.ElsendoFonto).elsendo
-        is Sonfonto.LokaElsendo -> (ludantoStato.nunaFonto as Sonfonto.LokaElsendo).elsendo
-        else -> null
-    }?.takeIf { it.kanaloSlug == kanalo.slug }
-
-    val retposhtoTeksto = if (nunaElsendo != null) {
-        val verbTempo = if (ludantoStato?.stato is LudantoStato.Ludas || ludantoStato?.stato is LudantoStato.Konektas)
-            "aŭskultas" else "aŭskultis"
-        "Mi $verbTempo la elsendon (${nunaElsendo.titolo} — ${nunaElsendo.dato}) kaj havas komenton"
-    } else {
-        "Mi aŭskultas la elsendon kaj havas komenton"
-    }
+    val ludantoStato = ludilo?.stato?.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
@@ -224,10 +209,23 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                     AssistChip(
                         onClick = {
                             logi("Klako", "retposhto ${kanalo.slug}")
+                            val stato = ludantoStato?.value
+                            val nunaElsendo: Elsendo? = when (stato?.nunaFonto) {
+                                is Sonfonto.ElsendoFonto -> (stato.nunaFonto as Sonfonto.ElsendoFonto).elsendo
+                                is Sonfonto.LokaElsendo -> (stato.nunaFonto as Sonfonto.LokaElsendo).elsendo
+                                else -> null
+                            }?.takeIf { it.kanaloSlug == kanalo.slug }
+                            val teksto = if (nunaElsendo != null) {
+                                val verbTempo = if (stato?.stato is LudantoStato.Ludas || stato?.stato is LudantoStato.Konektas)
+                                    "aŭskultas" else "aŭskultis"
+                                "Mi $verbTempo la elsendon (${nunaElsendo.titolo} — ${nunaElsendo.dato}) kaj havas komenton"
+                            } else {
+                                "Mi aŭskultas la elsendon kaj havas komenton"
+                            }
                             malfermuRetposhton(
                                 retposhto = kanalo.retposhto,
                                 temo = "Pri ${kanalo.nomo}",
-                                teksto = retposhtoTeksto,
+                                teksto = teksto,
                             )
                         },
                         label = { Text("Retpoŝto") },

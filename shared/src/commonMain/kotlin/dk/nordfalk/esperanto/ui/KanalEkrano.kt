@@ -18,7 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
@@ -57,6 +59,7 @@ fun KanaloEkrano(
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
+    ludilo: LudiloRegilo? = null,
 ) {
     val viewModel = remember(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
     val elsendoj by viewModel.elsendoj.collectAsState()
@@ -82,7 +85,7 @@ fun KanaloEkrano(
             contentPadding = PaddingValues(8.dp)
         ) {
             // Kanalinformoj: emblemo, nomo, retejo, retpoŝto
-            item { KanalInformoj(kanalo) }
+            item { KanalInformoj(kanalo, ludilo) }
 
             // Ŝargado
             if (sxargxas && elsendoj.isEmpty()) {
@@ -157,7 +160,7 @@ fun KanaloEkrano(
 }
 
 @Composable
-private fun KanalInformoj(kanalo: Kanalo) {
+private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -204,10 +207,23 @@ private fun KanalInformoj(kanalo: Kanalo) {
                     AssistChip(
                         onClick = {
                             logi("Klako", "retposhto ${kanalo.slug}")
+                            val stato = ludilo?.stato?.value
+                            val nunaElsendo: Elsendo? = when (stato?.nunaFonto) {
+                                is Sonfonto.ElsendoFonto -> (stato.nunaFonto as Sonfonto.ElsendoFonto).elsendo
+                                is Sonfonto.LokaElsendo -> (stato.nunaFonto as Sonfonto.LokaElsendo).elsendo
+                                else -> null
+                            }?.takeIf { it.kanaloSlug == kanalo.slug }
+                            val teksto = if (nunaElsendo != null) {
+                                val verbTempo = if (stato?.stato is LudantoStato.Ludas || stato?.stato is LudantoStato.Konektas)
+                                    "aŭskultas" else "aŭskultis"
+                                "Mi $verbTempo la elsendon (${nunaElsendo.titolo} — ${nunaElsendo.dato}) kaj havas komenton"
+                            } else {
+                                "Mi aŭskultas la elsendon kaj havas komenton"
+                            }
                             malfermuRetposhton(
                                 retposhto = kanalo.retposhto,
                                 temo = "Pri ${kanalo.nomo}",
-                                teksto = "Mi aŭskultas la elsendon kaj havas komenton",
+                                teksto = teksto,
                             )
                         },
                         label = { Text("Retpoŝto") },

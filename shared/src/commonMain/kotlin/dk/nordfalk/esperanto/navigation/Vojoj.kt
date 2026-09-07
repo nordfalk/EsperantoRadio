@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 /**
  * Vojoj (routes) por Navigation 3.
  *
- * Radikaj ekranoj (tab-oj): [Hejmo], [Kanalaro], [Plejsatataj], [Sercxo]
+ * Radikaj ekranoj (tab-oj): [Hejmo], [Kanalaro], [Plejŝatataj], [Sercxo]
  * Detal-ekranoj: [KanaloDetalo], [ElsendoDetalo]
  * Plenekranoj: [Elshutoj], [Alarmoj], [Agordoj]
  */
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 sealed interface Vojo : NavKey {
     @Serializable data object Hejmo : Vojo
     @Serializable data object Kanalaro : Vojo
-    @Serializable data object Plejsatataj : Vojo
+    @Serializable data object Plejŝatataj : Vojo
     @Serializable data object Sercxo : Vojo
     @Serializable data object Elshutoj : Vojo
     @Serializable data object Alarmoj : Vojo

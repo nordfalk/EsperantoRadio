@@ -12,7 +12,7 @@ import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
-import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
+import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
@@ -53,11 +53,11 @@ internal fun pSercxoDeponejo() = object : SercxoDeponejo {
         if (teksto.length >= 2) listOf(pElsendo) else emptyList()
 }
 
-internal fun pPlejsatatajDeponejo() = object : PlejsatatajDeponejo {
+internal fun pPlejŝatatajDeponejo() = object : PlejŝatatajDeponejo {
     private val s = MutableStateFlow(setOf("muzaiko", "kernpunkto"))
-    override fun observiPlejsatatajn() = s.asStateFlow()
-    override suspend fun baskuliPlejsaton(kanaloSlug: String) {}
-    override suspend fun estasPlejsatata(kanaloSlug: String) = kanaloSlug in s.value
+    override fun observiPlejŝatatajn() = s.asStateFlow()
+    override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+    override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in s.value
 }
 
 internal fun pElshutDeponejo() = object : ElshutDeponejo {

@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
+import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.logi
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,16 +9,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Persistanta PlejsatatajDeponejo. Uzas multiplatform-settings por persisti
+ * Persistanta PlejŝatatajDeponejo. Uzas multiplatform-settings por persisti
  * la plejŝatatajn kanalo-slugs inter restartoj.
  *
  * Decido: Uzas Settings (key-value store) kun komma-disigita listo.
  * Simplaj kaj sufiĉa por malgranda nombro da kanaloj.
  */
-class PersistantaPlejsatatajDeponejo(
+class PersistantaPlejŝatatajDeponejo(
     private val settings: Settings,
-) : PlejsatatajDeponejo {
-    private val key = "plejsatataj_kanaloj"
+) : PlejŝatatajDeponejo {
+    private val key = "plejŝatataj_kanaloj"
 
     private fun legu(): Set<String> {
         val str = settings.getString(key, "")
@@ -29,16 +29,16 @@ class PersistantaPlejsatatajDeponejo(
         settings.putString(key, value.joinToString(","))
     }
 
-    private val _plejsatataj = MutableStateFlow<Set<String>>(legu())
-    override fun observiPlejsatatajn(): StateFlow<Set<String>> = _plejsatataj.asStateFlow()
+    private val _plejŝatataj = MutableStateFlow<Set<String>>(legu())
+    override fun observiPlejŝatatajn(): StateFlow<Set<String>> = _plejŝatataj.asStateFlow()
 
-    override suspend fun baskuliPlejsaton(kanaloSlug: String) {
-        val nuna = _plejsatataj.value.toMutableSet()
+    override suspend fun baskuliPlejŝaton(kanaloSlug: String) {
+        val nuna = _plejŝatataj.value.toMutableSet()
         if (kanaloSlug in nuna) nuna.remove(kanaloSlug) else nuna.add(kanaloSlug)
         skribu(nuna)
-        _plejsatataj.value = nuna
-        logi("Plejsatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
+        _plejŝatataj.value = nuna
+        logi("Plejŝatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
-    override suspend fun estasPlejsatata(kanaloSlug: String): Boolean = kanaloSlug in _plejsatataj.value
+    override suspend fun estasPlejŝatata(kanaloSlug: String): Boolean = kanaloSlug in _plejŝatataj.value
 }

@@ -85,17 +85,17 @@ class NavigaTesto {
     }
 
     @Test
-    fun montrasPlejsatatajn() = runComposeUiTest {
-        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo {
+    fun montrasPlejŝatatajn() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
             private val _set = MutableStateFlow(setOf("muzaiko"))
-            override fun observiPlejsatatajn() = _set.asStateFlow()
-            override suspend fun baskuliPlejsaton(kanaloSlug: String) {
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {
                 _set.value = if (kanaloSlug in _set.value) _set.value - kanaloSlug else _set.value + kanaloSlug
             }
-            override suspend fun estasPlejsatata(kanaloSlug: String) = kanaloSlug in _set.value
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in _set.value
         }
         setContent {
-            PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
+            PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
         }
         waitForIdle()
         onNodeWithText("Muzaiko").assertIsDisplayed()

@@ -20,6 +20,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +55,7 @@ class KanaloViewModel(
 fun KanaloEkrano(
     kanalo: Kanalo,
     elsendoDeponejo: ElsendoDeponejoImpl,
+    plejŝatatajDeponejo: PlejŝatatajDeponejo,
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
@@ -62,6 +64,8 @@ fun KanaloEkrano(
     val elsendoj by viewModel.elsendoj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
+    val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
+    val estasPlejŝatata = kanalo.slug in plejŝatataj
 
     LaunchedEffect(kanalo.slug) {
         scope.launch { viewModel.sxargxi() }
@@ -73,6 +77,14 @@ fun KanaloEkrano(
                 title = { Text(kanalo.nomo) },
                 navigationIcon = {
                     TextButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Text("← Reen") }
+                },
+                actions = {
+                    TextButton(onClick = {
+                        logi("Klako", "★ baskulas plejŝaton: ${kanalo.slug}")
+                        scope.launch { plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug) }
+                    }) {
+                        Text(if (estasPlejŝatata) "★" else "☆", style = MaterialTheme.typography.headlineSmall)
+                    }
                 }
             )
         }
@@ -279,6 +291,7 @@ fun KanaloEkranoPreview() {
         KanaloEkrano(
             kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
+            plejŝatatajDeponejo = pPlejŝatatajDeponejo(),
             onReen = {},
         )
     }

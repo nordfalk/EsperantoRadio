@@ -8,7 +8,7 @@ import dk.nordfalk.esperanto.logi
  * Kiu langeto estas aktiva en la malsupra naviga breto.
  * NENIO = neniu langeto estas aktiva (ekz. sur detalekranoj).
  */
-enum class EkranoLangeto { HEJMO, KANALARO, PLEJSATATAJ, SERCXO, NENIO }
+enum class EkranoLangeto { HEJMO, KANALARO, PLEJŜATATAJ, SERCXO, NENIO }
 
 /**
  * Malsupra naviga breto — 4 langetoj: Hejmo, Kanaloj, Plej ŝatataj, Serĉo.
@@ -19,7 +19,7 @@ fun MalsupraNavigaBreto(
     nunaTab: EkranoLangeto,
     onHejmo: () -> Unit,
     onKanalaro: () -> Unit,
-    onPlejsatataj: () -> Unit,
+    onPlejŝatataj: () -> Unit,
     onSercxo: () -> Unit,
 ) {
     NavigationBar {
@@ -36,8 +36,8 @@ fun MalsupraNavigaBreto(
             label = { Text("Kanaloj") }
         )
         NavigationBarItem(
-            selected = nunaTab == EkranoLangeto.PLEJSATATAJ,
-            onClick = { logi("Klako", "plejsatataj-tab"); onPlejsatataj() },
+            selected = nunaTab == EkranoLangeto.PLEJŜATATAJ,
+            onClick = { logi("Klako", "plejŝatataj-tab"); onPlejŝatataj() },
             icon = { Text("★") },
             label = { Text("Plej ŝatataj") }
         )

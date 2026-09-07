@@ -7,10 +7,10 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface PlejsatatajDeponejo {
-    fun observiPlejsatatajn(): StateFlow<Set<String>>  // kanalo-slugs
-    suspend fun baskuliPlejsaton(kanaloSlug: String)
-    suspend fun estasPlejsatata(kanaloSlug: String): Boolean
+interface PlejŝatatajDeponejo {
+    fun observiPlejŝatatajn(): StateFlow<Set<String>>  // kanalo-slugs
+    suspend fun baskuliPlejŝaton(kanaloSlug: String)
+    suspend fun estasPlejŝatata(kanaloSlug: String): Boolean
 }
 
 interface LastAuxskultitajDeponejo {

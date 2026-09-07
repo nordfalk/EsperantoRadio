@@ -138,20 +138,20 @@ class EkranfotoTesto {
     }
 
     @Test
-    fun ekranfoto_plejsatataj() = runComposeUiTest {
-        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo {
+    fun ekranfoto_plejŝatataj() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
             private val _set = MutableStateFlow(setOf("muzaiko", "kernpunkto"))
-            override fun observiPlejsatatajn() = _set.asStateFlow()
-            override suspend fun baskuliPlejsaton(kanaloSlug: String) {}
-            override suspend fun estasPlejsatata(kanaloSlug: String) = kanaloSlug in _set.value
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in _set.value
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                PlejsatatajEkrano(plejsatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
+                PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
             }
         }
         waitForIdle()
-        kaptuKajSavu(this, "04_plejsatataj")
+        kaptuKajSavu(this, "04_plejŝatataj")
     }
 
     @Test

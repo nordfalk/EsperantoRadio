@@ -8,7 +8,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.google.common.util.concurrent.ListenableFuture
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import java.util.concurrent.Executors
@@ -16,12 +15,10 @@ import java.util.concurrent.Executors
 /**
  * BroadcastReceiver kiu komencas ludi elsendon rekte de la sciigo.
  *
- * Ricevas la intencon kun ago LUDI_ELSENDON, konektiĝas al EsperantoLudadoServo
- * per MediaController, kaj komencas ludi la donitan elsendo-URL.
+ * Uzas goAsync() por teni la Receivilon vivanta dum la nesinkrona MediaController-konekto.
+ * Sen tio, la sistemo povas detrui la Receivilon antaŭ ol la konekto sukcesas.
  */
 class LudiElsendoReceivilo : BroadcastReceiver() {
-
-    private var controllerFuture: ListenableFuture<MediaController>? = null
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != NovajElsendojKontroloWorker.ACTION_LUDI_ELSENDON) return
@@ -31,6 +28,9 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
         if (fluo.isNullOrBlank()) { logw("LudiElsendo", "Neniu fluo-URL"); return }
 
         logi("LudiElsendo", "Ludi: $titolo")
+
+        // goAsync() tenas la Receivilon vivanta dum la nesinkrona konekto
+        val pendingResult = goAsync()
 
         val metadata = MediaMetadata.Builder().setTitle(titolo ?: "Nekonata elsendo").apply {
             intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO)?.let { setArtist(it) }
@@ -42,14 +42,15 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
         val mediaItem = MediaItem.Builder().setUri(fluo).setMediaMetadata(metadata).build()
         val sessionToken = SessionToken(context, ComponentName(context, "dk.nordfalk.esperanto.android.EsperantoLudadoServo"))
 
-        controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-        controllerFuture?.addListener({
+        val future = MediaController.Builder(context, sessionToken).buildAsync()
+        future.addListener({
             runCatching {
-                controllerFuture?.get()?.apply {
+                future.get()?.apply {
                     setMediaItem(mediaItem); prepare(); play()
                     logi("LudiElsendo", "Komencis ludi: $titolo")
-                }
+                } ?: logw("LudiElsendo", "MediaController estas null")
             }.onFailure { logw("LudiElsendo", "Eraro dum konektado", it) }
+            pendingResult.finish()
         }, Executors.newSingleThreadExecutor())
     }
 }

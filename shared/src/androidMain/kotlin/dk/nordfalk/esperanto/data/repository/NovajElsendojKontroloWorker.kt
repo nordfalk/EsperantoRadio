@@ -19,6 +19,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -48,6 +49,8 @@ class NovajElsendojKontroloWorker(
         const val EXTRA_ELSENDO_ID = "elsendo_id"
         const val EXTRA_ELSENDO_TITOLO = "elsendo_titolo"
         const val EXTRA_ELSENDO_FLUO = "elsendo_fluo"
+        const val EXTRA_ELSENDO_DATO = "elsendo_dato"
+        const val EXTRA_ELSENDO_PRISKRIBO = "elsendo_priskribo"
         const val EXTRA_KANALO_SLUG = "kanalo_slug"
         const val EXTRA_KANALO_NOMO = "kanalo_nomo"
         const val EXTRA_BILDO_URL = "bildo_url"
@@ -66,6 +69,13 @@ class NovajElsendojKontroloWorker(
             val sciigoj = settings.getBoolean("sciigoj", true)
             if (!sciigoj) {
                 logi("NovajElsendoj", "Sciigoj malŝaltitaj en agordoj — finas sen kontroli")
+                return Result.success()
+            }
+
+            // Kontrolu sciig-permeson (Android 13+)
+            if (!sciigPermesoDonita()) {
+                logw("NovajElsendoj", "Sciig-permeso (POST_NOTIFICATIONS) mankas — aŭtomate malŝaltas sciigojn")
+                settings.putBoolean("sciigoj", false)
                 return Result.success()
             }
 
@@ -88,7 +98,8 @@ class NovajElsendojKontroloWorker(
 
             val viditaj = settings.getString(VIDITAJ_KEY, "")
                 .let { if (it.isBlank()) mutableSetOf() else it.split(",").toMutableSet() }
-            logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj")
+            val unuaRulo = viditaj.isEmpty()
+            logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj (unuaRulo=$unuaRulo)")
 
             val httpKliento = HttpClient(CIO) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
@@ -104,6 +115,12 @@ class NovajElsendojKontroloWorker(
                     val elsendoj = parsilo.parsuRss(respondo, kanalo) { httpKliento.get(it).bodyAsText() }
                     logi("NovajElsendoj", "${kanalo.slug}: ${elsendoj.size} elsendoj en RSS-fluo")
                     val plejNovaj = elsendoj.take(5)
+                    // Unua rulo: semu viditajn SEN sciigi (evitas sciigo-ŝprucon pri ĉiuj ekzistantaj elsendoj)
+                    if (unuaRulo) {
+                        plejNovaj.forEach { viditaj.add(it.id) }
+                        logi("NovajElsendoj", "${kanalo.slug}: unua rulo — semas ${plejNovaj.size} viditajn, ne sciigas")
+                        continue
+                    }
                     val novaj = plejNovaj.filter { it.id !in viditaj }
                     logi("NovajElsendoj", "${kanalo.slug}: ${novaj.size} novaj el ${plejNovaj.size} kontrolitaj")
                     for (elsendo in novaj) {
@@ -146,6 +163,8 @@ class NovajElsendojKontroloWorker(
             putExtra(EXTRA_ELSENDO_ID, elsendo.id)
             putExtra(EXTRA_ELSENDO_TITOLO, elsendo.titolo)
             putExtra(EXTRA_ELSENDO_FLUO, elsendo.fluo)
+            putExtra(EXTRA_ELSENDO_DATO, elsendo.dato)
+            putExtra(EXTRA_ELSENDO_PRISKRIBO, elsendo.priskribo)
             putExtra(EXTRA_KANALO_SLUG, kanalo.slug)
             putExtra(EXTRA_KANALO_NOMO, kanalo.nomo)
             putExtra(EXTRA_BILDO_URL, elsendo.bildoUrl)

@@ -178,12 +178,14 @@ class NavigaTesto {
     }
 
     @Test
-    fun agordojMontrasSciigojn() = runComposeUiTest {
+    fun agordojNeMontrasSciigojnSurDesktop() = runComposeUiTest {
         val agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl()
         setContent { AgordojEkrano(agordojDeponejo = agordojDeponejo, onReen = {}) }
         waitForIdle()
-        onNodeWithText("Ricevi sciigojn").assertIsDisplayed()
-        onNodeWithText("Sciigo kiam aperas nova elsendo el ŝatata kanalo").assertIsDisplayed()
+        // Sur Desktop sciigoj ne estas subtenataj, do la sekcio ne devas aperi
+        if (!dk.nordfalk.esperanto.data.repository.subtenasSciigojn) {
+            org.junit.Assert.assertEquals(0, onAllNodesWithText("Ricevi sciigojn").fetchSemanticsNodes().size)
+        }
     }
 
     @Test

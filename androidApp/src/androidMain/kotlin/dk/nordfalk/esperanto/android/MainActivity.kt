@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Traktas la intenton kiam la uzanto klakas sur sciigo pri nova elsendo.
-     * Rekonstruas la Elsendo-objekton kaj komencas ludi ĝin.
+     * Rekonstruas la Elsendo-objekton, komencas ludi kaj navigas al la elsenda detalo.
      */
     private fun traktuMalfermiElsendon(intent: Intent) {
         val elsendoId = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_ID) ?: return
@@ -72,6 +72,8 @@ class MainActivity : ComponentActivity() {
         val kanaloSlug = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_SLUG) ?: ""
         val kanaloNomo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO)
         val bildoUrl = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_BILDO_URL)
+        val dato = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_DATO) ?: ""
+        val priskribo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_PRISKRIBO)
 
         logi("MainActivity", "Malfermi elsendon de sciigo: id=$elsendoId titolo=$titolo")
 
@@ -80,11 +82,13 @@ class MainActivity : ComponentActivity() {
             kanaloSlug = kanaloSlug,
             kanaloNomo = kanaloNomo,
             titolo = titolo,
+            priskribo = priskribo,
             fluo = fluo,
             bildoUrl = bildoUrl,
-            dato = "",
+            dato = dato,
         )
 
+        // Komencas ludi
         scope.launch {
             try {
                 ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo))
@@ -94,6 +98,9 @@ class MainActivity : ComponentActivity() {
                 logw("MainActivity", "Eraro dum ludi elsendon de sciigo", e)
             }
         }
+
+        // Signalu al la Compose-tavolo por navigi al la elsenda detalo
+        dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.setu(elsendo)
     }
 
     private fun traktuAlarmIntent(intent: Intent?) {

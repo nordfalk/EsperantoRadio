@@ -27,11 +27,13 @@ class BootReceivilo : BroadcastReceiver() {
         try {
             // Agordu appContext por AlarmoSkedilo kaj kreuSettings (cexe boot, MainActivity ne jam rulis)
             appContext = context.applicationContext
-
-            // Re-skedu la Worker por novaj-elsendoj-sciigoj
-            NovajElsendojSkedilo.skedu(context)
-
             val settings = kreuSettings()
+
+            // Re-skedu sciigojn nur se sciigoj ŝaltitaj kaj estas ŝatataj kanaloj
+            val sciigoj = settings.getBoolean("sciigoj", true)
+            val plejStr = settings.getString("plejŝatataj_kanaloj", "")
+            val plejŝatataj = if (plejStr.isBlank()) emptySet() else plejStr.split(",").toSet()
+            ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
             val str = settings.getString("alarmoj", "")
             if (str.isBlank()) {
                 logi("BootReceivilo", "Neniu persistita alarmo")

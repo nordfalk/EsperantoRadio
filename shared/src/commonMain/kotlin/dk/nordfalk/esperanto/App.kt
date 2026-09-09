@@ -122,6 +122,9 @@ fun EsperantoRadioApp(
             ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
         }
 
+        // Observi pending elsendo-navigadon (de sciigo-klako)
+        val pendingElsendo by dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.elsendo.collectAsState()
+
         fun switchTab(vojo: Vojo) {
             logi("Nav", "→ tab: $vojo")
             backStack.clear()
@@ -132,6 +135,14 @@ fun EsperantoRadioApp(
         fun push(vojo: Vojo) {
             logi("Nav", "→ push: $vojo")
             backStack.add(vojo)
+        }
+
+        LaunchedEffect(pendingElsendo) {
+            pendingElsendo?.let {
+                logi("Nav", "→ sciigo: malfermas elsendon ${it.id}")
+                push(Vojo.ElsendoDetalo(it))
+                dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.setu(null)
+            }
         }
 
         fun reen() {

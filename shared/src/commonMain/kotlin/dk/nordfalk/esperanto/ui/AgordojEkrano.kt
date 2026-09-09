@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
+import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
+import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,20 +61,35 @@ fun AgordojEkrano(
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-            Spacer(Modifier.height(24.dp))
-            Text("Sciigoj", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            ListItem(
-                headlineContent = { Text("Ricevi sciigojn") },
-                supportingContent = { Text("Sciigo kiam aperas nova elsendo el ŝatata kanalo") },
-                trailingContent = {
-                    Switch(
-                        checked = sciigoj,
-                        onCheckedChange = { logi("Klako", "sciigoj → $it"); agordojDeponejo.fiksiSciigojn(it) }
-                    )
+            // Sciigoj — nur sur platformoj kiuj subtenas ĝin (Android)
+            if (subtenasSciigojn) {
+                Spacer(Modifier.height(24.dp))
+                Text("Sciigoj", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(8.dp))
+                ListItem(
+                    headlineContent = { Text("Ricevi sciigojn") },
+                    supportingContent = { Text("Sciigo kiam aperas nova elsendo el ŝatata kanalo") },
+                    trailingContent = {
+                        Switch(
+                            checked = sciigoj,
+                            onCheckedChange = { logi("Klako", "sciigoj → $it"); agordojDeponejo.fiksiSciigojn(it) }
+                        )
+                    }
+                )
+                if (!sciigoj) {
+                    // Sciigoj estas malŝaltitaj — eble pro permes-rifuzo.
+                    // Montru butonon por reaktivigi (malfermas sistemajn sciig-agordojn).
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(onClick = {
+                        logi("Klako", "Aktivigu sciigojn → malfermas sistemajn agordojn")
+                        agordojDeponejo.fiksiSciigojn(true)
+                        malfermuSciigAgordojn()
+                    }) {
+                        Text("Aktivigu sciigojn")
+                    }
                 }
-            )
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            }
 
             Spacer(Modifier.height(24.dp))
             Text("Temo", style = MaterialTheme.typography.titleMedium)

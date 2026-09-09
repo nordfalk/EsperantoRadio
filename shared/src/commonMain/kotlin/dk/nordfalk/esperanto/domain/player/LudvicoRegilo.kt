@@ -2,13 +2,13 @@ package dk.nordfalk.esperanto.domain.player
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
-import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
@@ -45,7 +45,7 @@ import kotlinx.coroutines.sync.withLock
  * @param elsendoDeponejo por ŝargi elsendojn de kanalo (por priority 1)
  * @param kanaloDeponejo por trovi kanalon laŭ slug
  * @param plejsatatajDeponejo por scii kiuj kanaloj estas ŝatataj (priority 2)
- * @param ludantojDeponejo por persisto de pozicioj kaj finstato
+ * @param ludatojDeponejo por persisto de pozicioj kaj finstato
  * @param elshutDeponejo por kontrolado de loka dosiero (eksterreta ludado)
  */
 class LudvicoRegilo(
@@ -53,7 +53,7 @@ class LudvicoRegilo(
     private val elsendoDeponejo: ElsendoDeponejo,
     private val kanaloDeponejo: KanaloDeponejo,
     private val plejsatatajDeponejo: PlejsatatajDeponejo,
-    private val ludantojDeponejo: LudantojDeponejo,
+    private val ludatojDeponejo: LudatojDeponejo,
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
 ) {
@@ -95,7 +95,7 @@ class LudvicoRegilo(
                     else -> null
                 }
                 if (nunaElsendo != null) {
-                    ludantojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
+                    ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
                 }
                 // Forigu la finitan elsendon el la vico se ĝi estas tie
                 if (nunaElsendo != null) {
@@ -141,7 +141,7 @@ class LudvicoRegilo(
             else -> return
         }
         if (info.pozicioMs > 0) {
-            ludantojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, info.pozicioMs, info.dauroMs)
+            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, info.pozicioMs, info.dauroMs)
             logd("Ludvico", "Savis pozicion: ${elsendo.id} @ ${info.pozicioMs}ms")
         }
     }
@@ -157,10 +157,10 @@ class LudvicoRegilo(
             // Savu pozicion de la antaŭa elsendo
             savuPozicion()
 
-            val ludanto = ludantojDeponejo.getLudanto(elsendo.id)
-            val komencoPozicio = if (ludanto != null && !ludanto.finita && ludanto.pozicioMs > 0) {
-                logi("Ludvico", "Resumas: ${elsendo.id} @ ${ludanto.pozicioMs}ms")
-                ludanto.pozicioMs
+            val ludato = ludatojDeponejo.getLudato(elsendo.id)
+            val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
+                logi("Ludvico", "Resumas: ${elsendo.id} @ ${ludato.pozicioMs}ms")
+                ludato.pozicioMs
             } else {
                 0L
             }
@@ -175,7 +175,7 @@ class LudvicoRegilo(
 
             ludilo.fiksiFonton(fonto, komencoPozicio)
             ludilo.ludi()
-            ludantojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
+            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
         }
     }
 
@@ -250,14 +250,14 @@ class LudvicoRegilo(
 
             val cxiujElsendoj = cxiujSargitajElsendoj()
             val plejsatataj = plejsatatajDeponejo.observiPlejsatatajn().value
-            val ludantoj = ludantojDeponejo.observiLudantojn().value
+            val ludatoj = ludatojDeponejo.observiLudatojn().value
 
             val sekva = LudvicoLogiko.deciduSekvan(
                 nunaElsendo = nunaElsendo,
                 samkanalajElsendoj = samkanalaj,
                 cxiujElsendoj = cxiujElsendoj,
                 plejsatatajKanaloj = plejsatataj,
-                ludantoj = ludantoj,
+                ludatoj = ludatoj,
             )
 
             if (sekva != null) {

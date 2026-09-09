@@ -2,14 +2,14 @@ package dk.nordfalk.esperanto.domain.player
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
-import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
-import dk.nordfalk.esperanto.data.repository.LudantojDeponejoMaketo
+import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
 import dk.nordfalk.esperanto.data.repository.PlejsatatajDeponejoImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,10 +47,10 @@ class LudvicoRegiloTest {
         elsendoj: Map<String, List<Elsendo>> = emptyMap(),
         kanaloj: List<Kanalo> = emptyList(),
         plejsatataj: Set<String> = emptySet(),
-        ludantojDeponejo: LudantojDeponejo = LudantojDeponejoMaketo(),
+        ludatojDeponejo: LudatojDeponejo = LudatojDeponejoMaketo(),
         lokaDosiero: Map<String, String> = emptyMap(),
         scope: TestScope,
-    ): Triple<LudvicoRegilo, NoOpLudiloRegilo, LudantojDeponejo> {
+    ): Triple<LudvicoRegilo, NoOpLudiloRegilo, LudatojDeponejo> {
         val regiloScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
         val plejDeponejo = object : PlejsatatajDeponejo {
             private val _set = MutableStateFlow(plejsatataj)
@@ -79,11 +79,11 @@ class LudvicoRegiloTest {
             elsendoDeponejo = elsendoDeponejo,
             kanaloDeponejo = kanaloDeponejo,
             plejsatatajDeponejo = plejDeponejo,
-            ludantojDeponejo = ludantojDeponejo,
+            ludatojDeponejo = ludatojDeponejo,
             getLokaDosieroVojo = { id -> lokaDosiero[id] },
             scope = regiloScope,
         )
-        return Triple(regilo, ludilo, ludantojDeponejo)
+        return Triple(regilo, ludilo, ludatojDeponejo)
     }
 
     // =========================================================================
@@ -93,12 +93,12 @@ class LudvicoRegiloTest {
     @Test
     fun resumigxo_komencasDeSavitaPozicio() = runTest {
         val ludilo = NoOpLudiloRegilo()
-        val ludantoj = LudantojDeponejoMaketo()
+        val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1")
         // Simulas ke la uzanto antaŭe aŭskultis ĝis 30 sekundoj
-        ludantoj.registriPozicion(e.id, e.kanaloSlug, 30_000, 300_000)
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 30_000, 300_000)
 
-        val (regilo, _, _) = kreuRegilon(ludilo, ludantojDeponejo = ludantoj, scope = this)
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
 
         regilo.ludiElsendon(e)
 
@@ -122,13 +122,13 @@ class LudvicoRegiloTest {
     @Test
     fun resumigxo_komencasDeNuloSeFinita() = runTest {
         val ludilo = NoOpLudiloRegilo()
-        val ludantoj = LudantojDeponejoMaketo()
+        val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1")
         // Simulas ke la elsendo estis finita
-        ludantoj.registriPozicion(e.id, e.kanaloSlug, 280_000, 300_000)
-        ludantoj.markiFinita(e.id, e.kanaloSlug)
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 280_000, 300_000)
+        ludatoj.markiFinita(e.id, e.kanaloSlug)
 
-        val (regilo, _, _) = kreuRegilon(ludilo, ludantojDeponejo = ludantoj, scope = this)
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
 
         regilo.ludiElsendon(e)
 
@@ -248,7 +248,7 @@ class LudvicoRegiloTest {
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
         val ludilo = NoOpLudiloRegilo()
-        val (regilo, _, ludantoj) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+        val (regilo, _, ludatoj) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
 
         regilo.komenci()
 
@@ -265,7 +265,7 @@ class LudvicoRegiloTest {
         assertEquals("k1:2024-02-01", fonto.elsendo.id)
 
         // e1 devus esti markita finita
-        assertTrue(ludantoj.estasFinita(e1.id), "e1 devus esti markita finita")
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 devus esti markita finita")
     }
 
     @Test
@@ -335,13 +335,13 @@ class LudvicoRegiloTest {
     @Test
     fun auxtolodo_haltasSeNenioPorLudi() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val ludantoj = LudantojDeponejoMaketo()
+        val ludatoj = LudatojDeponejoMaketo()
         // Marku e1 kiel finita anticipe
-        ludantoj.markiFinita(e1.id, e1.kanaloSlug)
+        ludatoj.markiFinita(e1.id, e1.kanaloSlug)
         val elsendoj = mapOf("k1" to listOf(e1))
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
-            ludilo, elsendoj = elsendoj, ludantojDeponejo = ludantoj, scope = this
+            ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this
         )
 
         regilo.komenci()
@@ -363,23 +363,23 @@ class LudvicoRegiloTest {
     @Test
     fun pozicio_registritaKiamLudiElsendon() = runTest {
         val e = elsendo("e1")
-        val ludantoj = LudantojDeponejoMaketo()
-        val (regilo, _, _) = kreuRegilon(ludantojDeponejo = ludantoj, scope = this)
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(ludatojDeponejo = ludatoj, scope = this)
 
         regilo.ludiElsendon(e)
 
         // registriPozicio estas vokita en ludiElsendon
-        val ludanto = ludantoj.getLudanto(e.id)
-        assertTrue(ludanto != null, "Ludanto devus esti registrita")
-        assertEquals("e1", ludanto!!.elsendoId)
+        val ludato = ludatoj.getLudato(e.id)
+        assertTrue(ludato != null, "Ludanto devus esti registrita")
+        assertEquals("e1", ludato!!.elsendoId)
     }
 
     @Test
     fun pozicio_markitaFinitaKiamLudadoFinitas() = runTest {
         val e = elsendo("e1")
-        val ludantoj = LudantojDeponejoMaketo()
+        val ludatoj = LudatojDeponejoMaketo()
         val ludilo = NoOpLudiloRegilo()
-        val (regilo, _, _) = kreuRegilon(ludilo, ludantojDeponejo = ludantoj, scope = this)
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
 
         regilo.komenci()
 
@@ -391,7 +391,7 @@ class LudvicoRegiloTest {
         ludilo.simuluFinon()
 
 
-        assertTrue(ludantoj.estasFinita(e.id), "Elsendo devus esti markita finita")
+        assertTrue(ludatoj.estasFinita(e.id), "Elsendo devus esti markita finita")
     }
 
     // =========================================================================

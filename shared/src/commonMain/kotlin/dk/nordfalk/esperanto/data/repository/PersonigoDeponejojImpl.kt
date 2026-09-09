@@ -1,10 +1,10 @@
 package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LastAuxskultitajDeponejo
-import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
@@ -48,18 +48,18 @@ class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
 }
 
 /**
- * Memora LudantojDeponejo — sen persistaj flankaj efikoj.
- * Uzu nur dum Preview kaj testoj. Por produktado uzu PersistantaLudantojDeponejo.
+ * Memora LudatojDeponejo — sen persistaj flankaj efikoj.
+ * Uzu nur dum Preview kaj testoj. Por produktado uzu PersistantaLudatojDeponejo.
  */
 @OptIn(ExperimentalTime::class)
-class LudantojDeponejoMaketo : LudantojDeponejo {
-    private val _ludantoj = MutableStateFlow<Map<String, LudantaElsendo>>(emptyMap())
-    override fun observiLudantojn(): StateFlow<Map<String, LudantaElsendo>> = _ludantoj.asStateFlow()
+class LudatojDeponejoMaketo : LudatojDeponejo {
+    private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(emptyMap())
+    override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {
-        val nuna = _ludantoj.value.toMutableMap()
+        val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudantaElsendo(
+        nuna[elsendoId] = LudataElsendo(
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = pozicioMs,
@@ -67,13 +67,13 @@ class LudantojDeponejoMaketo : LudantojDeponejo {
             finita = ekzista?.finita ?: false,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
-        _ludantoj.value = nuna
+        _ludatoj.value = nuna
     }
 
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludantoj.value.toMutableMap()
+        val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudantaElsendo(
+        nuna[elsendoId] = LudataElsendo(
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = ekzista?.pozicioMs ?: 0,
@@ -81,12 +81,12 @@ class LudantojDeponejoMaketo : LudantojDeponejo {
             finita = true,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
-        _ludantoj.value = nuna
+        _ludatoj.value = nuna
     }
 
-    override suspend fun getLudanto(elsendoId: String): LudantaElsendo? = _ludantoj.value[elsendoId]
-    override suspend fun estasFinita(elsendoId: String): Boolean = _ludantoj.value[elsendoId]?.finita ?: false
-    override suspend fun getPozicio(elsendoId: String): Long? = _ludantoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }
+    override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]
+    override suspend fun estasFinita(elsendoId: String): Boolean = _ludatoj.value[elsendoId]?.finita ?: false
+    override suspend fun getPozicio(elsendoId: String): Long? = _ludatoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }
 }
 
 class SercxoDeponejoImpl(

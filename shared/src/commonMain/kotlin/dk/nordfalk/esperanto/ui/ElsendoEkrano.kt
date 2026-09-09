@@ -13,9 +13,9 @@ import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
-import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,12 +30,12 @@ fun ElsendoEkrano(
     onAldoniAlVico: () -> Unit = {},
     kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
-    ludantojDeponejo: LudantojDeponejo? = null,
+    ludatojDeponejo: LudatojDeponejo? = null,
 ) {
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
-    val ludantojMapo by (ludantojDeponejo?.observiLudantojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudantaElsendo>()) })
-    val ludanto = ludantojMapo[elsendo.id]
-    val savitaPozicio = ludanto?.pozicioMs?.takeIf { it > 0 && !ludanto.finita }
+    val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
+    val ludato = ludatojMapo[elsendo.id]
+    val savitaPozicio = ludato?.pozicioMs?.takeIf { it > 0 && !ludato.finita }
     Scaffold(
         topBar = {
             TopAppBar(

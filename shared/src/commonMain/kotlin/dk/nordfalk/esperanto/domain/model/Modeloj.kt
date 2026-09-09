@@ -83,7 +83,7 @@ data class LudantoInformo(
  * @param lasteLudita tempmarko (epoch ms) de la lasta ludado
  */
 @Serializable
-data class LudantaElsendo(
+data class LudataElsendo(
     val elsendoId: String,
     val kanaloSlug: String,
     val pozicioMs: Long = 0,

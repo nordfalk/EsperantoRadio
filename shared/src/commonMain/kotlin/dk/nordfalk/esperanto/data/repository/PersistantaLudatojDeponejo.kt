@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.data.repository
 
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
-import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.logi
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,19 +14,19 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 
 /**
- * Persistanta LudantojDeponejo. Uzas multiplatform-settings kun JSON-seriado.
+ * Persistanta LudatojDeponejo. Uzas multiplatform-settings kun JSON-seriado.
  *
- * Konservas Map<elsendoId, LudantaElsendo> kiel JSON-ĉeno en Settings.
+ * Konservas Map<elsendoId, LudataElsendo> kiel JSON-ĉeno en Settings.
  */
 @OptIn(ExperimentalTime::class)
-class PersistantaLudantojDeponejo(
+class PersistantaLudatojDeponejo(
     private val settings: Settings,
-) : LudantojDeponejo {
-    private val key = "ludantoj"
+) : LudatojDeponejo {
+    private val key = "ludatoj"
     private val json = Json { ignoreUnknownKeys = true }
-    private val serializer = MapSerializer(String.serializer(), LudantaElsendo.serializer())
+    private val serializer = MapSerializer(String.serializer(), LudataElsendo.serializer())
 
-    private fun legu(): Map<String, LudantaElsendo> {
+    private fun legu(): Map<String, LudataElsendo> {
         val str = settings.getString(key, "")
         if (str.isEmpty()) return emptyMap()
         return runCatching { json.decodeFromString(serializer, str) }.getOrElse {
@@ -35,17 +35,17 @@ class PersistantaLudantojDeponejo(
         }
     }
 
-    private fun skribu(value: Map<String, LudantaElsendo>) {
+    private fun skribu(value: Map<String, LudataElsendo>) {
         settings.putString(key, json.encodeToString(serializer, value))
     }
 
-    private val _ludantoj = MutableStateFlow<Map<String, LudantaElsendo>>(legu())
-    override fun observiLudantojn(): StateFlow<Map<String, LudantaElsendo>> = _ludantoj.asStateFlow()
+    private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(legu())
+    override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {
-        val nuna = _ludantoj.value.toMutableMap()
+        val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudantaElsendo(
+        nuna[elsendoId] = LudataElsendo(
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = pozicioMs,
@@ -54,13 +54,13 @@ class PersistantaLudantojDeponejo(
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
         skribu(nuna)
-        _ludantoj.value = nuna
+        _ludatoj.value = nuna
     }
 
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludantoj.value.toMutableMap()
+        val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudantaElsendo(
+        nuna[elsendoId] = LudataElsendo(
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = ekzista?.pozicioMs ?: 0,
@@ -69,15 +69,15 @@ class PersistantaLudantojDeponejo(
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
         skribu(nuna)
-        _ludantoj.value = nuna
+        _ludatoj.value = nuna
         logi("Ludantoj", "Markita finita: $elsendoId")
     }
 
-    override suspend fun getLudanto(elsendoId: String): LudantaElsendo? = _ludantoj.value[elsendoId]
+    override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]
 
     override suspend fun estasFinita(elsendoId: String): Boolean =
-        _ludantoj.value[elsendoId]?.finita ?: false
+        _ludatoj.value[elsendoId]?.finita ?: false
 
     override suspend fun getPozicio(elsendoId: String): Long? =
-        _ludantoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }
+        _ludatoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }
 }

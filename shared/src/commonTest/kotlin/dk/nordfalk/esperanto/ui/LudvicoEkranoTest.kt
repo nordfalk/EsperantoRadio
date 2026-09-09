@@ -63,7 +63,7 @@ class LudvicoEkranoTest {
                 override suspend fun getKanalo(slug: String) = null
             },
             plejsatatajDeponejo = dk.nordfalk.esperanto.data.repository.PlejsatatajDeponejoImpl(),
-            ludantojDeponejo = dk.nordfalk.esperanto.data.repository.LudantojDeponejoMaketo(),
+            ludatojDeponejo = dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo(),
         )
         komenceVico.forEach { runBlocking { regilo.aldoniAlVico(it) } }
         return regilo

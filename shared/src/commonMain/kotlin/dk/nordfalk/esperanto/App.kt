@@ -20,7 +20,7 @@ import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
-import dk.nordfalk.esperanto.data.repository.PersistantaLudantojDeponejo
+import dk.nordfalk.esperanto.data.repository.PersistantaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
@@ -111,14 +111,14 @@ fun EsperantoRadioApp(
         }
         val scope = rememberCoroutineScope()
 
-        val ludantojDeponejo = remember { PersistantaLudantojDeponejo(settings) }
+        val ludatojDeponejo = remember { PersistantaLudatojDeponejo(settings) }
         val ludvicoRegilo = remember {
             LudvicoRegilo(
                 ludilo = ludilo,
                 elsendoDeponejo = elsendoDeponejo,
                 kanaloDeponejo = kanaloDeponejo,
                 plejsatatajDeponejo = plejsatatajDeponejo,
-                ludantojDeponejo = ludantojDeponejo,
+                ludatojDeponejo = ludatojDeponejo,
                 getLokaDosieroVojo = { id -> elshutDeponejo.getLokaDosieroVojo(id) },
             )
         }
@@ -261,7 +261,7 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
                                 },
                                 elshutDeponejo = elshutDeponejo,
-                                ludantojDeponejo = ludantojDeponejo,
+                                ludatojDeponejo = ludatojDeponejo,
                             )
                         }
                     },

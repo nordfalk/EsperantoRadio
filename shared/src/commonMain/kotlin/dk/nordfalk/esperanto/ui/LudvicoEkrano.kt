@@ -129,7 +129,7 @@ fun LudvicoEkranoMalplenaPreview() {
             override suspend fun getKanalo(slug: String) = null
         },
         plejsatatajDeponejo = dk.nordfalk.esperanto.data.repository.PlejsatatajDeponejoImpl(),
-        ludantojDeponejo = dk.nordfalk.esperanto.data.repository.LudantojDeponejoMaketo(),
+        ludatojDeponejo = dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo(),
     )
     pTemo { LudvicoEkrano(ludvicoRegilo = regilo, onReen = {}) }
 }

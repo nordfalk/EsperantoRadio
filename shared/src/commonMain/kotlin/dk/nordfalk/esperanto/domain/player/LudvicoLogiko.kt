@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.domain.player
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.LudantaElsendo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 
 /**
  * Pura decidlogiko por aŭtomata sekva-ludado.
@@ -16,7 +16,7 @@ import dk.nordfalk.esperanto.domain.model.LudantaElsendo
  *    elsendo el iu el la plejŝatataj kanaloj.
  *
  * 3. **Plej freŝa elsendo, ankoraŭ ne ludata** — la plej nova elsendo el
- *    ĉiuj kanaloj, kiu neniam estis ludita (neniu LudantaElsendo ekzistas).
+ *    ĉiuj kanaloj, kiu neniam estis ludita (neniu LudataElsendo ekzistas).
  *
  * Se neniu kandidato troviĝas, liveras null (haltigu la ludadon).
  *
@@ -30,7 +30,7 @@ object LudvicoLogiko {
      * @param samkanalajElsendoj elsendoj de la sama kanalo, ordigitaj plej-freŝe-unue
      * @param cxiujElsendoj ĉiuj ŝargitaj elsendoj (por prioritatoj 2 kaj 3)
      * @param plejsatatajKanaloj aro de kanal-slugs kiuj estas plejŝatataj
-     * @param ludantoj mapo elsendoId → LudantaElsendo (ludstatuso)
+     * @param ludatoj mapo elsendoId → LudataElsendo (ludstatuso)
      * @return la sekva elsendo ludi, aŭ null se neniu kandidato
      */
     fun deciduSekvan(
@@ -38,20 +38,20 @@ object LudvicoLogiko {
         samkanalajElsendoj: List<Elsendo>,
         cxiujElsendoj: List<Elsendo>,
         plejsatatajKanaloj: Set<String>,
-        ludantoj: Map<String, LudantaElsendo>,
+        ludatoj: Map<String, LudataElsendo>,
     ): Elsendo? {
         // Priority 1: sekva elsendo de la sama kanalo
-        val sekvaSamkanala = trovSekvanSamkanalan(nunaElsendo, samkanalajElsendoj, ludantoj)
+        val sekvaSamkanala = trovSekvanSamkanalan(nunaElsendo, samkanalajElsendoj, ludatoj)
         if (sekvaSamkanala != null) return sekvaSamkanala
 
         val nunaId = nunaElsendo?.id
 
         // Priority 2: nefinita elsendo de ŝatata kanalo
-        val elSxatataj = trovNefinitanElSxatataj(cxiujElsendoj, plejsatatajKanaloj, ludantoj, nunaId)
+        val elSxatataj = trovNefinitanElSxatataj(cxiujElsendoj, plejsatatajKanaloj, ludatoj, nunaId)
         if (elSxatataj != null) return elSxatataj
 
         // Priority 3: plej freŝa elsendo ankoraŭ ne ludata
-        return trovPlejFresxanNeludatan(cxiujElsendoj, ludantoj, nunaId)
+        return trovPlejFresxanNeludatan(cxiujElsendoj, ludatoj, nunaId)
     }
 
     /**
@@ -64,7 +64,7 @@ object LudvicoLogiko {
     fun trovSekvanSamkanalan(
         nunaElsendo: Elsendo?,
         samkanalajElsendoj: List<Elsendo>,
-        ludantoj: Map<String, LudantaElsendo>,
+        ludatoj: Map<String, LudataElsendo>,
     ): Elsendo? {
         if (nunaElsendo == null) return null
         val indekso = samkanalajElsendoj.indexOfFirst { it.id == nunaElsendo.id }
@@ -73,8 +73,8 @@ object LudvicoLogiko {
         // Serĉu ekde la sekva indexo, saltante finitajn elsendojn
         for (i in indekso + 1 until samkanalajElsendoj.size) {
             val kandidato = samkanalajElsendoj[i]
-            val ludanto = ludantoj[kandidato.id]
-            if (ludanto?.finita != true) return kandidato
+            val ludato = ludatoj[kandidato.id]
+            if (ludato?.finita != true) return kandidato
         }
         return null
     }
@@ -87,28 +87,28 @@ object LudvicoLogiko {
     fun trovNefinitanElSxatataj(
         cxiujElsendoj: List<Elsendo>,
         plejsatatajKanaloj: Set<String>,
-        ludantoj: Map<String, LudantaElsendo>,
+        ludatoj: Map<String, LudataElsendo>,
         nunaElsendoId: String? = null,
     ): Elsendo? {
         return cxiujElsendoj
             .filter { it.kanaloSlug in plejsatatajKanaloj }
             .filter { it.id != nunaElsendoId }
-            .filter { ludantoj[it.id]?.finita != true }
+            .filter { ludatoj[it.id]?.finita != true }
             .maxByOrNull { it.dato }
     }
 
     /**
      * Priority 3: Trovas la plej freŝan elsendon kiu neniam estis ludita
-     * (neniu LudantaElsendo ekzistas por ĝi).
+     * (neniu LudataElsendo ekzistas por ĝi).
      */
     fun trovPlejFresxanNeludatan(
         cxiujElsendoj: List<Elsendo>,
-        ludantoj: Map<String, LudantaElsendo>,
+        ludatoj: Map<String, LudataElsendo>,
         nunaElsendoId: String? = null,
     ): Elsendo? {
         return cxiujElsendoj
             .filter { it.id != nunaElsendoId }
-            .filter { it.id !in ludantoj }
+            .filter { it.id !in ludatoj }
             .maxByOrNull { it.dato }
     }
 }

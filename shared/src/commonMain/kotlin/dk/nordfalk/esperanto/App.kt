@@ -164,6 +164,7 @@ fun EsperantoRadioApp(
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
+                                ludatojDeponejo = ludatojDeponejo,
                             )
                         }
                         entry<Vojo.Kanalaro> {

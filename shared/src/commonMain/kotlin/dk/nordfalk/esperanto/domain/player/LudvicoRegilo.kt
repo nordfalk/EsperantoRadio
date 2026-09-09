@@ -94,6 +94,12 @@ class LudvicoRegilo(
                     is Sonfonto.LokaElsendo -> nunaFonto.elsendo
                     else -> null
                 }
+                // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
+                if (nunaFonto is Sonfonto.RektaKanalo) {
+                    logi("Ludvico", "Rekta kanalo finiĝis — ne aŭtoludas")
+                    antauxaStato = stato
+                    return
+                }
                 if (nunaElsendo != null) {
                     ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
                 }

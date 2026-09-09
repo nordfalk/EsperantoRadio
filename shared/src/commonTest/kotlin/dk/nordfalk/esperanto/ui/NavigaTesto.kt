@@ -128,7 +128,7 @@ class NavigaTesto {
             PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
         }
         waitForIdle()
-        onNodeWithText("Neniu plej ŝatata kanalo. Premu ★ sur kanalo por aldoni.").assertIsDisplayed()
+        onNodeWithText("Neniu plej ŝatata kanalo. Premu ♡ sur kanalo por aldoni.").assertIsDisplayed()
     }
 
     @Test
@@ -150,8 +150,8 @@ class NavigaTesto {
             )
         }
         waitForIdle()
-        // ☆ = ne ŝatata
-        onNodeWithText("☆").assertIsDisplayed()
+        // ♡ = ne ŝatata
+        onNodeWithText("♡").assertIsDisplayed()
     }
 
     @Test
@@ -173,8 +173,8 @@ class NavigaTesto {
             )
         }
         waitForIdle()
-        // ★ = ŝatata
-        onNodeWithText("★").assertIsDisplayed()
+        // ♥ = ŝatata
+        onNodeWithText("♥").assertIsDisplayed()
     }
 
     @Test

@@ -87,7 +87,7 @@ fun KanaloEkrano(
                 },
                 actions = {
                     TextButton(onClick = {
-                        logi("Klako", "★ baskulas plejŝaton: ${kanalo.slug}")
+                        logi("Klako", "♥ baskulas plejŝaton: ${kanalo.slug}")
                         val antauxa = estasPlejŝatata
                         scope.launch {
                             plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug)
@@ -106,7 +106,7 @@ fun KanaloEkrano(
                             }
                         }
                     }) {
-                        Text(if (estasPlejŝatata) "★" else "☆", style = MaterialTheme.typography.headlineSmall)
+                        Text(if (estasPlejŝatata) "♥" else "♡", style = MaterialTheme.typography.headlineSmall)
                     }
                 }
             )

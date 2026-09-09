@@ -42,7 +42,7 @@ fun PlejŝatatajEkrano(
     ) { padding ->
         if (plejKanaloj.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                Text("Neniu plej ŝatata kanalo. Premu ★ sur kanalo por aldoni.")
+                Text("Neniu plej ŝatata kanalo. Premu ♡ sur kanalo por aldoni.")
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -60,10 +60,10 @@ fun PlejŝatatajEkrano(
                         supportingContent = { Text(if (kanalo.estasRekta) "Rekta elsendo" else "Podkasto") },
                         trailingContent = {
                             TextButton(onClick = {
-                                logi("Klako", "★ forigas plejŝaton: ${kanalo.slug}")
+                                logi("Klako", "♥ forigas plejŝaton: ${kanalo.slug}")
                                 scope.launch { plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug) }
                             }) {
-                                Text("★", style = MaterialTheme.typography.headlineSmall)
+                                Text("♥", style = MaterialTheme.typography.headlineSmall)
                             }
                         },
                         modifier = Modifier.clickable { logi("Klako", "plejŝatata kanalo ${kanalo.slug}"); onKanalo(kanalo) }

@@ -471,6 +471,26 @@ class LudvicoRegiloTest {
         assertEquals(60_000, savita, "Pozicio devus esti savita kiam paŭzigitas")
     }
 
+    @Test
+    fun pozicio_savitaKiamHaltigxas() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        regilo.ludiElsendon(e)
+        // Simulu pozicio-progreson
+        ludilo.simuluPozicion(90_000, 300_000)
+
+        // Haltigu — tio sxangxas staton al Haltita kaj forigas nunaFonto
+        // savuPozicion devus uzi la konservitan retroiron (lastaFonto/lastaPozicioMs)
+        ludilo.halti()
+
+        val savita = ludatoj.getPozicio(e.id)
+        assertEquals(90_000, savita, "Pozicio devus esti savita kiam haltigxas (per retroiro)")
+    }
+
     // =========================================================================
     // Konkurantaj aldoniAlVico-vokoj
     // =========================================================================

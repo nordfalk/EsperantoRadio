@@ -70,6 +70,11 @@ class LudvicoRegilo(
     private val ludMutex = Mutex()
     private var antauxaStato: LudantoStato = LudantoStato.Haltita
 
+    /** Lasta pozicio antaŭ ol halti() forigis nunaFonton — uzata de savuPozicion kiel retroiro. */
+    private var lastaFonto: Sonfonto? = null
+    private var lastaPozicioMs: Long = 0
+    private var lastaDauroMs: Long = 0
+
     /**
      * Komencas observi la ludilon-staton por detekti Finita kaj ĝisdatigi pozicion.
      * Vokata unufoje ĉe app-starto.
@@ -116,11 +121,12 @@ class LudvicoRegilo(
                 }
             }
             stato == LudantoStato.Ludas -> {
+                ghisdatiguLastaPozicion()
                 komenciPozicianSpuradon()
             }
             stato == LudantoStato.Haltita -> {
                 haltiPozicianSpuradon()
-                // Savu finan pozicion
+                // Savu pozicion — halti() povas forigi nunaFonto, do savuPozicion uzas lastaPozicioMs kiel retroiron
                 savuPozicion()
             }
             else -> {}
@@ -133,6 +139,7 @@ class LudvicoRegilo(
         pozicioSavanto = scope.launch {
             while (true) {
                 delay(POZICIO_SAV_INTERVALO_MS)
+                ghisdatiguLastaPozicion()
                 savuPozicion()
             }
         }
@@ -145,15 +152,27 @@ class LudvicoRegilo(
 
     private suspend fun savuPozicion() {
         val info = ludilo.stato.value
-        val elsendo = when (info.nunaFonto) {
-            is Sonfonto.ElsendoFonto -> info.nunaFonto.elsendo
-            is Sonfonto.LokaElsendo -> info.nunaFonto.elsendo
+        // Se nunaFonto estas null (halti forigis ĝin), uzu la konservitan retroiron
+        val fonto = info.nunaFonto ?: lastaFonto ?: return
+        val elsendo = when (fonto) {
+            is Sonfonto.ElsendoFonto -> fonto.elsendo
+            is Sonfonto.LokaElsendo -> fonto.elsendo
             else -> return
         }
-        if (info.pozicioMs > 0) {
-            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, info.pozicioMs, info.dauroMs)
-            logd("Ludvico", "Savis pozicion: ${elsendo.id} @ ${info.pozicioMs}ms")
+        val pozicio = if (info.pozicioMs > 0) info.pozicioMs else lastaPozicioMs
+        val dauro = if (info.dauroMs > 0) info.dauroMs else lastaDauroMs
+        if (pozicio > 0) {
+            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, pozicio, dauro)
+            logd("Ludvico", "Savis pozicion: ${elsendo.id} @ ${pozicio}ms")
         }
+    }
+
+    /** Ĝisdatigas la konservitan retroiron — vokata dum ludado. */
+    private fun ghisdatiguLastaPozicion() {
+        val info = ludilo.stato.value
+        lastaFonto = info.nunaFonto
+        lastaPozicioMs = info.pozicioMs
+        lastaDauroMs = info.dauroMs
     }
 
     /**
@@ -183,8 +202,12 @@ class LudvicoRegilo(
                 Sonfonto.ElsendoFonto(elsendo)
             }
 
-            ludilo.fiksiFonton(fonto, komencoPozicio)
-            ludilo.ludi()
+            try {
+                ludilo.fiksiFonton(fonto, komencoPozicio)
+                ludilo.ludi()
+            } catch (e: Exception) {
+                loge("Ludvico", "Malsukcesis ludi elsendon: ${elsendo.id}", e)
+            }
             ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
         }
     }

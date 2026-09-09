@@ -199,7 +199,16 @@ fun EsperantoRadioApp(
                                 onReen = { reen() },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas elŝutitan: $fonto")
-                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                    val elsendo = when (fonto) {
+                                        is Sonfonto.ElsendoFonto -> fonto.elsendo
+                                        is Sonfonto.LokaElsendo -> fonto.elsendo
+                                        is Sonfonto.RektaKanalo -> null
+                                    }
+                                    if (elsendo != null) {
+                                        scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
+                                    } else {
+                                        scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                    }
                                 },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                             )

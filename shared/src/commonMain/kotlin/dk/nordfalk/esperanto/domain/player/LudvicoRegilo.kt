@@ -11,6 +11,7 @@ import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
 import dk.nordfalk.esperanto.logd
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CoroutineScope
@@ -109,7 +110,10 @@ class LudvicoRegilo(
                 }
                 // Lanĉu sekvan en aparta korutino por eviti rekurson
                 val elsendoPorLudi = nunaElsendo
-                scope.launch { ludiSekvan(elsendoPorLudi) }
+                scope.launch {
+                    try { ludiSekvan(elsendoPorLudi) }
+                    catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
+                }
             }
             stato == LudantoStato.Ludas -> {
                 komenciPozicianSpuradon()
@@ -190,17 +194,19 @@ class LudvicoRegilo(
      * Se nenio ludas, tuj komencas ludi ĝin.
      */
     suspend fun aldoniAlVico(elsendo: Elsendo) {
-        val nunaVico = _vico.value.toMutableList()
-        if (elsendo.id !in nunaVico.map { it.id }) {
-            nunaVico.add(elsendo)
-            _vico.value = nunaVico
-        }
-        logi("Ludvico", "Aldonis al vico: ${elsendo.id} — vico nun ${nunaVico.size}")
+        ludMutex.withLock {
+            val nunaVico = _vico.value.toMutableList()
+            if (elsendo.id !in nunaVico.map { it.id }) {
+                nunaVico.add(elsendo)
+                _vico.value = nunaVico
+            }
+            logi("Ludvico", "Aldonis al vico: ${elsendo.id} — vico nun ${nunaVico.size}")
 
-        // Se nenio ludas, tuj komencu
-        val stato = ludilo.stato.value.stato
-        if (stato == LudantoStato.Haltita || stato == LudantoStato.Finita) {
-            ludiSekvan(null)
+            // Se nenio ludas, tuj komencu
+            val stato = ludilo.stato.value.stato
+            if (stato == LudantoStato.Haltita || stato == LudantoStato.Finita) {
+                ludiSekvanInterna(null)
+            }
         }
     }
 
@@ -229,7 +235,10 @@ class LudvicoRegilo(
      * 3. Se nenio troviĝas → haltigu
      */
     suspend fun ludiSekvan(nunaElsendo: Elsendo?) {
-        ludMutex.withLock {
+        ludMutex.withLock { ludiSekvanInterna(nunaElsendo) }
+    }
+
+    private suspend fun ludiSekvanInterna(nunaElsendo: Elsendo?) {
             // 1. Kontrolu la eksplicitan vicon
             val vico = _vico.value
             if (vico.isNotEmpty()) {
@@ -242,9 +251,13 @@ class LudvicoRegilo(
                 } else {
                     Sonfonto.ElsendoFonto(sekva)
                 }
-                ludilo.fiksiFonton(fonto, 0)
-                ludilo.ludi()
-                return@withLock
+                try {
+                    ludilo.fiksiFonton(fonto, 0)
+                    ludilo.ludi()
+                } catch (e: Exception) {
+                    loge("Ludvico", "Malsukcesis ludi sekvan el vico: ${sekva.id}", e)
+                }
+                return
             }
 
             // 2. Aŭtomata decido per LudvicoLogiko
@@ -274,13 +287,17 @@ class LudvicoRegilo(
                 } else {
                     Sonfonto.ElsendoFonto(sekva)
                 }
-                ludilo.fiksiFonton(fonto, 0)
-                ludilo.ludi()
+                try {
+                    ludilo.fiksiFonton(fonto, 0)
+                    ludilo.ludi()
+                } catch (e: Exception) {
+                    loge("Ludvico", "Malsukcesis ludi aŭtomatan sekvan: ${sekva.id}", e)
+                }
             } else {
                 logi("Ludvico", "Nenio por ludi sekve — haltas")
+                savuPozicion()
                 ludilo.halti()
             }
-        }
     }
 
     /**

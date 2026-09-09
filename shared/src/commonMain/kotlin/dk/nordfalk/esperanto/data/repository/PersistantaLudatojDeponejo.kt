@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +30,8 @@ class PersistantaLudatojDeponejo(
     private fun legu(): Map<String, LudataElsendo> {
         val str = settings.getString(key, "")
         if (str.isEmpty()) return emptyMap()
-        return runCatching { json.decodeFromString(serializer, str) }.getOrElse {
-            logi("Ludantoj", "Malsukcesis dekodi — komencas freŝe")
+        return runCatching { json.decodeFromString(serializer, str) }.getOrElse { e ->
+            loge("Ludatoj", "Malsukcesis dekodi — komencas freŝe", e)
             emptyMap()
         }
     }
@@ -70,7 +71,7 @@ class PersistantaLudatojDeponejo(
         )
         skribu(nuna)
         _ludatoj.value = nuna
-        logi("Ludantoj", "Markita finita: $elsendoId")
+        logi("Ludatoj", "Markita finita: $elsendoId")
     }
 
     override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]

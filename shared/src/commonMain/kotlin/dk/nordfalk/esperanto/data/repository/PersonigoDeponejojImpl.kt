@@ -49,7 +49,7 @@ class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
 
 /**
  * Memora LudatojDeponejo — sen persistaj flankaj efikoj.
- * Uzu nur dum Preview kaj testoj. Por produktado uzu PersistantaLudatojDeponejo.
+ * Uzu nur dum Preview kaj testoj. Por produktado uzu PersistaLudatojDeponejo.
  */
 @OptIn(ExperimentalTime::class)
 class LudatojDeponejoMaketo : LudatojDeponejo {

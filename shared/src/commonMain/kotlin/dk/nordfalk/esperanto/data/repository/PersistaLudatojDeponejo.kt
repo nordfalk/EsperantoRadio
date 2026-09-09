@@ -20,7 +20,7 @@ import kotlinx.serialization.builtins.serializer
  * Konservas Map<elsendoId, LudataElsendo> kiel JSON-ĉeno en Settings.
  */
 @OptIn(ExperimentalTime::class)
-class PersistantaLudatojDeponejo(
+class PersistaLudatojDeponejo(
     private val settings: Settings,
 ) : LudatojDeponejo {
     private val key = "ludatoj"

@@ -20,7 +20,7 @@ import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejsatatajDeponejo
-import dk.nordfalk.esperanto.data.repository.PersistantaLudatojDeponejo
+import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
@@ -111,7 +111,7 @@ fun EsperantoRadioApp(
         }
         val scope = rememberCoroutineScope()
 
-        val ludatojDeponejo = remember { PersistantaLudatojDeponejo(settings) }
+        val ludatojDeponejo = remember { PersistaLudatojDeponejo(settings) }
         val ludvicoRegilo = remember {
             LudvicoRegilo(
                 ludilo = ludilo,

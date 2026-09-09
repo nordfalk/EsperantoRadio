@@ -28,6 +28,7 @@ interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
     suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
     suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
+    suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)
     suspend fun getLudato(elsendoId: String): LudataElsendo?
     suspend fun estasFinita(elsendoId: String): Boolean
     suspend fun getPozicio(elsendoId: String): Long?

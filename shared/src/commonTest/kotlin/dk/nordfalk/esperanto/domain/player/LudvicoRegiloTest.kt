@@ -124,7 +124,6 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1")
-        // Simulas ke la elsendo estis finita
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 280_000, 300_000)
         ludatoj.markiFinita(e.id, e.kanaloSlug)
 
@@ -133,6 +132,7 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(e)
 
         assertEquals(0, ludilo.stato.value.pozicioMs, "Finita elsendo devus komenci de 0")
+        assertFalse(ludatoj.estasFinita(e.id), "Finita flago devus esti malmarkita post reludo")
     }
 
     // =========================================================================

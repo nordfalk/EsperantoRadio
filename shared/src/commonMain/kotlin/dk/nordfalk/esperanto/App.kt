@@ -124,6 +124,13 @@ fun EsperantoRadioApp(
         }
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
 
+        // Savu pozicion kiam la komponanto detruiĝas (ekz. app fermo)
+        DisposableEffect(ludvicoRegilo) {
+            onDispose {
+                scope.launch { ludvicoRegilo.savuPozicionNun() }
+            }
+        }
+
         val backStack = rememberNavBackStack(navConfig, Vojo.Hejmo)
         val kanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
         val ludantoStato by ludilo.stato.collectAsState()

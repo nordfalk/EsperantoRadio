@@ -74,6 +74,15 @@ class PersistaLudatojDeponejo(
         logi("Ludatoj", "Markita finita: $elsendoId")
     }
 
+    override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {
+        val nuna = _ludatoj.value.toMutableMap()
+        val ekzista = nuna[elsendoId] ?: return
+        nuna[elsendoId] = ekzista.copy(finita = false, pozicioMs = 0)
+        skribu(nuna)
+        _ludatoj.value = nuna
+        logi("Ludatoj", "Malmarkita finita: $elsendoId")
+    }
+
     override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]
 
     override suspend fun estasFinita(elsendoId: String): Boolean =

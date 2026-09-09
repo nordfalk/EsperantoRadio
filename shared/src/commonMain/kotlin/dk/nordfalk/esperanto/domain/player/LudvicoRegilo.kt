@@ -68,12 +68,12 @@ class LudvicoRegilo(
     private var observanto: Job? = null
     private var pozicioSavanto: Job? = null
     private val ludMutex = Mutex()
-    private var antauxaStato: LudantoStato = LudantoStato.Haltita
+    @Volatile private var antauxaStato: LudantoStato = LudantoStato.Haltita
 
     /** Lasta pozicio antaŭ ol halti() forigis nunaFonton — uzata de savuPozicion kiel retroiro. */
-    private var lastaFonto: Sonfonto? = null
-    private var lastaPozicioMs: Long = 0
-    private var lastaDauroMs: Long = 0
+    @Volatile private var lastaFonto: Sonfonto? = null
+    @Volatile private var lastaPozicioMs: Long = 0
+    @Volatile private var lastaDauroMs: Long = 0
 
     /**
      * Komencas observi la ludilon-staton por detekti Finita kaj ĝisdatigi pozicion.
@@ -191,32 +191,12 @@ class LudvicoRegilo(
      */
     suspend fun ludiElsendon(elsendo: Elsendo) {
         ludMutex.withLock {
-            // Savu pozicion de la antaŭa elsendo
             savuPozicion()
-
-            val ludato = ludatojDeponejo.getLudato(elsendo.id)
-            val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
-                logi("Ludvico", "Resumas: ${elsendo.id} @ ${ludato.pozicioMs}ms")
-                ludato.pozicioMs
-            } else {
-                0L
+            // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
+            if (ludatojDeponejo.estasFinita(elsendo.id)) {
+                ludatojDeponejo.malmarkiFinita(elsendo.id, elsendo.kanaloSlug)
             }
-
-            // Kontrolu ĉu ekzistas loka (elŝutita) dosiero
-            val lokaVojo = getLokaDosieroVojo(elsendo.id)
-            val fonto = if (lokaVojo != null) {
-                Sonfonto.LokaElsendo(elsendo, lokaVojo)
-            } else {
-                Sonfonto.ElsendoFonto(elsendo)
-            }
-
-            try {
-                ludilo.fiksiFonton(fonto, komencoPozicio)
-                ludilo.ludi()
-            } catch (e: Exception) {
-                loge("Ludvico", "Malsukcesis ludi elsendon: ${elsendo.id}", e)
-            }
-            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
+            ludiElsendonInterna(elsendo)
         }
     }
 

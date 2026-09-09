@@ -84,6 +84,13 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
         _ludatoj.value = nuna
     }
 
+    override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {
+        val nuna = _ludatoj.value.toMutableMap()
+        val ekzista = nuna[elsendoId] ?: return
+        nuna[elsendoId] = ekzista.copy(finita = false, pozicioMs = 0)
+        _ludatoj.value = nuna
+    }
+
     override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]
     override suspend fun estasFinita(elsendoId: String): Boolean = _ludatoj.value[elsendoId]?.finita ?: false
     override suspend fun getPozicio(elsendoId: String): Long? = _ludatoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }

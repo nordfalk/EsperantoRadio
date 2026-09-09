@@ -4,7 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
-import dk.nordfalk.esperanto.data.repository.LudantojDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.LudantojDeponejoMaketo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
 import kotlinx.coroutines.runBlocking
@@ -24,7 +24,7 @@ class ElsendoEkranoSavitaPozicioTest {
 
     @Test
     fun montrasDauxrigiKiamSavitaPozicioEkzistas() = runComposeUiTest {
-        val ludantoj = LudantojDeponejoImpl()
+        val ludantoj = LudantojDeponejoMaketo()
         runBlocking { ludantoj.registriPozicion("e1", "k1", 120_000, 300_000) } // 2:00 / 5:00
 
         setContent {
@@ -44,7 +44,7 @@ class ElsendoEkranoSavitaPozicioTest {
 
     @Test
     fun montrasAusklutiKiamNeniuSavitaPozicio() = runComposeUiTest {
-        val ludantoj = LudantojDeponejoImpl()
+        val ludantoj = LudantojDeponejoMaketo()
 
         setContent {
             pTemo {
@@ -62,7 +62,7 @@ class ElsendoEkranoSavitaPozicioTest {
 
     @Test
     fun montrasAusklutiKiamFinita() = runComposeUiTest {
-        val ludantoj = LudantojDeponejoImpl()
+        val ludantoj = LudantojDeponejoMaketo()
         runBlocking {
             ludantoj.registriPozicion("e1", "k1", 280_000, 300_000)
             ludantoj.markiFinita("e1", "k1")

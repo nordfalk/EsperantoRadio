@@ -57,7 +57,7 @@ class AndroidUiTest {
     }
 
     @Test
-    fun navigadoAlPlejsatataj() {
+    fun navigadoAlPlejŝatataj() {
         composeRule.waitForIdle()
         composeRule.waitUntil(timeoutMillis = 10000) {
             composeRule.onAllNodesWithText("Muzaiko").fetchSemanticsNodes().isNotEmpty()

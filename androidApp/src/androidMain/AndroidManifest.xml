@@ -46,5 +46,12 @@
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="dk.nordfalk.esperanto.data.repository.LudiElsendoReceivilo"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="dk.nordfalk.esperanto.LUDI_ELSENDON" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

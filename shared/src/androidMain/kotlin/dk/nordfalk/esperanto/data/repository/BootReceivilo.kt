@@ -22,13 +22,19 @@ class BootReceivilo : BroadcastReceiver() {
             intent.action != "android.intent.action.LOCKED_BOOT_COMPLETED"
         ) return
 
-        logi("BootReceivilo", "Boot ricevita — re-planas alarmojn")
+        logi("BootReceivilo", "Boot ricevita — re-planas alarmojn kaj sciigojn")
 
         try {
             // Agordu appContext por AlarmoSkedilo kaj kreuSettings (cexe boot, MainActivity ne jam rulis)
             appContext = context.applicationContext
             val settings = kreuSettings()
-            val str = settings.getString("alarmoj", "")
+
+            // Re-skedu sciigojn nur se sciigoj ŝaltitaj kaj estas ŝatataj kanaloj
+            val sciigoj = settings.getBoolean(SettingsKeys.SCIIGOJ, true)
+            val plejStr = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
+            val plejŝatataj = if (plejStr.isBlank()) emptySet() else plejStr.split(",").toSet()
+            ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
+            val str = settings.getString(SettingsKeys.ALARMOJ, "")
             if (str.isBlank()) {
                 logi("BootReceivilo", "Neniu persistita alarmo")
                 return

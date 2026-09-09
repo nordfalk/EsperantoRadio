@@ -7,10 +7,10 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface PlejsatatajDeponejo {
-    fun observiPlejsatatajn(): StateFlow<Set<String>>  // kanalo-slugs
-    suspend fun baskuliPlejsaton(kanaloSlug: String)
-    suspend fun estasPlejsatata(kanaloSlug: String): Boolean
+interface PlejŝatatajDeponejo {
+    fun observiPlejŝatatajn(): StateFlow<Set<String>>  // kanalo-slugs
+    suspend fun baskuliPlejŝaton(kanaloSlug: String)
+    suspend fun estasPlejŝatata(kanaloSlug: String): Boolean
 }
 
 interface LastAuxskultitajDeponejo {
@@ -27,9 +27,11 @@ interface AgordojDeponejo {
     val lingvo: StateFlow<String>
     val nurWifi: StateFlow<Boolean>
     val temo: StateFlow<String>
+    val sciigoj: StateFlow<Boolean>
     fun fiksiLingvon(lingvo: String)
     fun fiksiNurWifi(nurWifi: Boolean)
     fun fiksiTemon(temo: String)
+    fun fiksiSciigojn(sxaltita: Boolean)
 }
 
 /**

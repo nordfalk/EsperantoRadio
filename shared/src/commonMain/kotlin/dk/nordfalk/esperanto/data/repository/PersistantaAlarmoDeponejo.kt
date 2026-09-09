@@ -25,7 +25,6 @@ class PersistantaAlarmoDeponejo(
 ) : AlarmoDeponejo {
 
     private val json = Json { ignoreUnknownKeys = true }
-    private val key = "alarmoj"
 
     private val sugestoj = sugestoj.map { it.copy(aktiva = false) }
     private var nextId = 1000
@@ -35,7 +34,7 @@ class PersistantaAlarmoDeponejo(
     override fun observiAlarmojn(): StateFlow<List<Alarmo>> = _alarmoj.asStateFlow()
 
     private fun legu(): List<Alarmo> {
-        val str = settings.getString(key, "")
+        val str = settings.getString(SettingsKeys.ALARMOJ, "")
         if (str.isBlank()) {
             // Unua fojo — montru sugestojn
             if (sugestoj.isNotEmpty()) {
@@ -69,7 +68,7 @@ class PersistantaAlarmoDeponejo(
 
     private fun persistu() {
         val str = json.encodeToString(ListSerializer(Alarmo.serializer()), _alarmoj.value)
-        settings.putString(key, str)
+        settings.putString(SettingsKeys.ALARMOJ, str)
     }
 
     override suspend fun krei(alarmo: Alarmo) {

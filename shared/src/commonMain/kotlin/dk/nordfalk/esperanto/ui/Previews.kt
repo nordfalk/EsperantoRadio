@@ -40,6 +40,8 @@ fun PreviewKanaloEkrano() {
         KanaloEkrano(
             kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
+            plejŝatatajDeponejo = pPlejŝatatajDeponejo(),
+            agordojDeponejo = AgordojDeponejoImpl(),
             onReen = {},
         )
     }
@@ -61,11 +63,11 @@ fun PreviewSerchxo() {
     }
 }
 
-@Preview(name = "Plejsatataj", showBackground = true, heightDp = 250)
+@Preview(name = "Plejŝatataj", showBackground = true, heightDp = 250)
 @Composable
-fun PreviewPlejsatataj() {
+fun PreviewPlejŝatataj() {
     pTemo() {
-        PlejsatatajEkrano(plejsatatajDeponejo = pPlejsatatajDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onKanalo = {})
+        PlejŝatatajEkrano(plejŝatatajDeponejo = pPlejŝatatajDeponejo(), kanaloDeponejo = pKanaloDeponejo(), onKanalo = {})
     }
 }
 

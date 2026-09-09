@@ -22,6 +22,8 @@ import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
+import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,6 +58,8 @@ class KanaloViewModel(
 fun KanaloEkrano(
     kanalo: Kanalo,
     elsendoDeponejo: ElsendoDeponejoImpl,
+    plejŝatatajDeponejo: PlejŝatatajDeponejo,
+    agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
@@ -65,6 +69,10 @@ fun KanaloEkrano(
     val elsendoj by viewModel.elsendoj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
+    val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
+    val sciigoj by agordojDeponejo.sciigoj.collectAsState()
+    val estasPlejŝatata = kanalo.slug in plejŝatataj
+    val snackbarStato = remember { SnackbarHostState() }
 
     LaunchedEffect(kanalo.slug) {
         scope.launch { viewModel.sxargxi() }
@@ -76,9 +84,34 @@ fun KanaloEkrano(
                 title = { Text(kanalo.nomo) },
                 navigationIcon = {
                     TextButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Text("← Reen") }
+                },
+                actions = {
+                    TextButton(onClick = {
+                        logi("Klako", "★ baskulas plejŝaton: ${kanalo.slug}")
+                        val antauxa = estasPlejŝatata
+                        scope.launch {
+                            plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug)
+                            // Montru sciigon nur kiam oni ALDONAS ŝaton (ne kiam oni forigas)
+                            if (!antauxa && sciigoj) {
+                                snackbarStato.showSnackbar(
+                                    message = "Vi ricevos sciigon kiam aperas nova elsendo el ${kanalo.nomo}.",
+                                    actionLabel = "Malŝalti",
+                                    duration = SnackbarDuration.Long,
+                                )?.let { rezulto ->
+                                    if (rezulto == SnackbarResult.ActionPerformed) {
+                                        agordojDeponejo.fiksiSciigojn(false)
+                                        logi("Klako", "Malŝaltis sciigojn de Snackbar")
+                                    }
+                                }
+                            }
+                        }
+                    }) {
+                        Text(if (estasPlejŝatata) "★" else "☆", style = MaterialTheme.typography.headlineSmall)
+                    }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarStato) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -295,6 +328,8 @@ fun KanaloEkranoPreview() {
         KanaloEkrano(
             kanalo = pKanaloj[1],
             elsendoDeponejo = PreviewElsendoDeponejo(listOf(pElsendo)),
+            plejŝatatajDeponejo = pPlejŝatatajDeponejo(),
+            agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(),
             onReen = {},
         )
     }

@@ -1,29 +1,30 @@
 package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.repository.PlejsatatajDeponejo
+import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LastAuxskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class PlejsatatajDeponejoImpl : PlejsatatajDeponejo {
-    private val _plejsatataj = MutableStateFlow<Set<String>>(emptySet())
-    override fun observiPlejsatatajn(): StateFlow<Set<String>> = _plejsatataj.asStateFlow()
+class PlejŝatatajDeponejoImpl : PlejŝatatajDeponejo {
+    private val _plejŝatataj = MutableStateFlow<Set<String>>(emptySet())
+    override fun observiPlejŝatatajn(): StateFlow<Set<String>> = _plejŝatataj.asStateFlow()
 
-    override suspend fun baskuliPlejsaton(kanaloSlug: String) {
-        val nuna = _plejsatataj.value.toMutableSet()
+    override suspend fun baskuliPlejŝaton(kanaloSlug: String) {
+        val nuna = _plejŝatataj.value.toMutableSet()
         if (kanaloSlug in nuna) nuna.remove(kanaloSlug) else nuna.add(kanaloSlug)
-        _plejsatataj.value = nuna
-        logi("Plejsatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
+        _plejŝatataj.value = nuna
+        logi("Plejŝatataj", "Baskulas: $kanaloSlug → ${if (kanaloSlug in nuna) "aldonita" else "forigita"} (total ${nuna.size})")
     }
 
-    override suspend fun estasPlejsatata(kanaloSlug: String): Boolean = kanaloSlug in _plejsatataj.value
+    override suspend fun estasPlejŝatata(kanaloSlug: String): Boolean = kanaloSlug in _plejŝatataj.value
 }
 
 class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
@@ -53,7 +54,9 @@ class SercxoDeponejoImpl(
     }
 }
 
-class AgordojDeponejoImpl : AgordojDeponejo {
+class AgordojDeponejoImpl(
+    private val settings: Settings? = null,
+) : AgordojDeponejo {
     private val _lingvo = MutableStateFlow("eo")
     override val lingvo: StateFlow<String> = _lingvo.asStateFlow()
 
@@ -62,6 +65,9 @@ class AgordojDeponejoImpl : AgordojDeponejo {
 
     private val _temo = MutableStateFlow("ANTONIA")
     override val temo: StateFlow<String> = _temo.asStateFlow()
+
+    private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
+    override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
     override fun fiksiLingvon(lingvo: String) {
         _lingvo.value = lingvo
@@ -74,5 +80,10 @@ class AgordojDeponejoImpl : AgordojDeponejo {
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
+    }
+    override fun fiksiSciigojn(sxaltita: Boolean) {
+        _sciigoj.value = sxaltita
+        settings?.putBoolean(SettingsKeys.SCIIGOJ, sxaltita)
+        logi("Agordoj", "Sciigoj → $sxaltita")
     }
 }

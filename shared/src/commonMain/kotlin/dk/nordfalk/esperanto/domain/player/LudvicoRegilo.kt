@@ -152,6 +152,12 @@ class LudvicoRegilo(
 
     private suspend fun savuPozicion() {
         val info = ludilo.stato.value
+        // Konservi la lastan pozicion dum nunaFonto ankoraŭ ekzistas
+        if (info.nunaFonto != null) {
+            lastaFonto = info.nunaFonto
+            lastaPozicioMs = info.pozicioMs
+            lastaDauroMs = info.dauroMs
+        }
         // Se nunaFonto estas null (halti forigis ĝin), uzu la konservitan retroiron
         val fonto = info.nunaFonto ?: lastaFonto ?: return
         val elsendo = when (fonto) {
@@ -170,9 +176,11 @@ class LudvicoRegilo(
     /** Ĝisdatigas la konservitan retroiron — vokata dum ludado. */
     private fun ghisdatiguLastaPozicion() {
         val info = ludilo.stato.value
-        lastaFonto = info.nunaFonto
-        lastaPozicioMs = info.pozicioMs
-        lastaDauroMs = info.dauroMs
+        if (info.nunaFonto != null) {
+            lastaFonto = info.nunaFonto
+            lastaPozicioMs = info.pozicioMs
+            lastaDauroMs = info.dauroMs
+        }
     }
 
     /**
@@ -268,18 +276,7 @@ class LudvicoRegilo(
                 val sekva = vico.first()
                 _vico.value = vico.drop(1)
                 logi("Ludvico", "Ludas sekvan el vico: ${sekva.id}")
-                val lokaVojo = getLokaDosieroVojo(sekva.id)
-                val fonto = if (lokaVojo != null) {
-                    Sonfonto.LokaElsendo(sekva, lokaVojo)
-                } else {
-                    Sonfonto.ElsendoFonto(sekva)
-                }
-                try {
-                    ludilo.fiksiFonton(fonto, 0)
-                    ludilo.ludi()
-                } catch (e: Exception) {
-                    loge("Ludvico", "Malsukcesis ludi sekvan el vico: ${sekva.id}", e)
-                }
+                ludiElsendonInterna(sekva)
                 return
             }
 
@@ -304,23 +301,38 @@ class LudvicoRegilo(
 
             if (sekva != null) {
                 logi("Ludvico", "Aŭtomata sekva: ${sekva.id} — ${sekva.titolo}")
-                val lokaVojo = getLokaDosieroVojo(sekva.id)
-                val fonto = if (lokaVojo != null) {
-                    Sonfonto.LokaElsendo(sekva, lokaVojo)
-                } else {
-                    Sonfonto.ElsendoFonto(sekva)
-                }
-                try {
-                    ludilo.fiksiFonton(fonto, 0)
-                    ludilo.ludi()
-                } catch (e: Exception) {
-                    loge("Ludvico", "Malsukcesis ludi aŭtomatan sekvan: ${sekva.id}", e)
-                }
+                ludiElsendonInterna(sekva)
             } else {
                 logi("Ludvico", "Nenio por ludi sekve — haltas")
-                savuPozicion()
                 ludilo.halti()
             }
+    }
+
+    /**
+     * Interna helpilo: ludas elsendon kun resumigo kaj registri lasteLudita.
+     * Ne uzas mutex — vokenda el mutex-kunteksto.
+     */
+    private suspend fun ludiElsendonInterna(elsendo: Elsendo) {
+        val ludato = ludatojDeponejo.getLudato(elsendo.id)
+        val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
+            logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
+            ludato.pozicioMs
+        } else {
+            0L
+        }
+        val lokaVojo = getLokaDosieroVojo(elsendo.id)
+        val fonto = if (lokaVojo != null) {
+            Sonfonto.LokaElsendo(elsendo, lokaVojo)
+        } else {
+            Sonfonto.ElsendoFonto(elsendo)
+        }
+        try {
+            ludilo.fiksiFonton(fonto, komencoPozicio)
+            ludilo.ludi()
+        } catch (e: Exception) {
+            loge("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
+        }
+        ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
     }
 
     /**
@@ -343,6 +355,12 @@ class LudvicoRegilo(
         haltiPozicianSpuradon()
         observanto?.cancel()
         observanto = null
+    }
+
+    /** Eksplicite savu la nunan pozicion (ekz. antaŭ ol la apo fermigxas). */
+    suspend fun savuPozicionNun() {
+        ghisdatiguLastaPozicion()
+        savuPozicion()
     }
 
     companion object {

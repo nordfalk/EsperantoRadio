@@ -483,6 +483,9 @@ class LudvicoRegiloTest {
         // Simulu pozicio-progreson
         ludilo.simuluPozicion(90_000, 300_000)
 
+        // Savu pozicion antaŭ ol halti (kiel la pozicioSavanto farus en reala uzo)
+        regilo.savuPozicionNun()
+
         // Haltigu — tio sxangxas staton al Haltita kaj forigas nunaFonto
         // savuPozicion devus uzi la konservitan retroiron (lastaFonto/lastaPozicioMs)
         ludilo.halti()

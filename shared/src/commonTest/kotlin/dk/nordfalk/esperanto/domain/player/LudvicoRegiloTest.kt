@@ -425,4 +425,90 @@ class LudvicoRegiloTest {
         val fonto = ludilo.stato.value.nunaFonto
         assertTrue(fonto is Sonfonto.ElsendoFonto, "Devus uzi ElsendoFonton")
     }
+
+    // =========================================================================
+    // Pozicio-savo ĉe ŝanĝo inter elsendoj
+    // =========================================================================
+
+    @Test
+    fun pozicio_savitaKiamSxangxasAlAliaElsendo() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludatoj = LudatojDeponejoMaketo()
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e1)
+        // Simulu pozicio-progreson
+        ludilo.simuluPozicion(45_000, 300_000)
+
+        // Sxangxu al alia elsendo — tio devas savi la pozicion de e1
+        regilo.ludiElsendon(e2)
+
+        val savita = ludatoj.getPozicio(e1.id)
+        assertEquals(45_000, savita, "Pozicio de e1 devus esti savita antaux ol ludi e2")
+    }
+
+    // =========================================================================
+    // Pozicio-savo ĉe paŭzo
+    // =========================================================================
+
+    @Test
+    fun pozicio_savitaKiamPauxzigxas() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        regilo.ludiElsendon(e)
+        ludilo.simuluPozicion(60_000, 300_000)
+
+        // Pauxzigu — tio sxangxas staton al Haltita kaj savuPozicion estas vokita
+        ludilo.pauxzigi()
+
+        val savita = ludatoj.getPozicio(e.id)
+        assertEquals(60_000, savita, "Pozicio devus esti savita kiam paŭzigitas")
+    }
+
+    // =========================================================================
+    // Konkurantaj aldoniAlVico-vokoj
+    // =========================================================================
+
+    @Test
+    fun vico_konkurantajAldonojNeKauxzasDuoblanLudadon() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, scope = this)
+
+        // Aldonu ambaux unu post la alia (simulas preskaŭ-samtempan)
+        regilo.aldoniAlVico(e1)
+        regilo.aldoniAlVico(e2)
+
+        // Nur unu devus esti ludata, la alia restas en la vico
+        val vicoGrando = regilo.vico.value.size
+        assertTrue(vicoGrando <= 1, "Vico devus havi maksimume 1 eron (unu ludigxas, unu restas)")
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Io devus ludi")
+    }
+
+    // =========================================================================
+    // komenci kiam ludilo jam ludas
+    // =========================================================================
+
+    @Test
+    fun komenci_funkciasKiamLudiloJamLudas() = runTest {
+        val e = elsendo("e1")
+        val ludilo = NoOpLudiloRegilo()
+        // Simulu ke ludilo jam ludas (ekz. app restart dum ExoPlayer persistas)
+        kotlinx.coroutines.runBlocking { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e)) }
+        ludilo.ludi()
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, scope = this)
+        regilo.komenci()
+
+        // La regilo devus agnoski la ludantan staton kaj ne panei
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Ludado devus dauxri")
+    }
 }

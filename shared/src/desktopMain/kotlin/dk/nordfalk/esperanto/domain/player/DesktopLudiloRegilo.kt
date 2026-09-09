@@ -200,7 +200,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             if (ludas) {
                 // Fino de fluo — naturfino
                 ludas = false
-                _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
+                _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
             }
         }
     }

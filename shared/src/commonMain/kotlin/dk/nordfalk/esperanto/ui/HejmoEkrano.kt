@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.async
@@ -68,6 +70,7 @@ fun kalkuliNovectempon(
 class HejmoViewModel(
     private val kanaloDeponejo: KanaloDeponejo,
     private val elsendoDeponejo: ElsendoDeponejo,
+    private val ludatojDeponejo: LudatojDeponejo? = null,
 ) {
     val kanaloj: StateFlow<List<Kanalo>> = kanaloDeponejo.observiKanalojn()
 
@@ -76,6 +79,10 @@ class HejmoViewModel(
 
     private val _popularajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val popularajElsendoj = _popularajElsendoj.asStateFlow()
+
+    /** Lastatempe ludataj elsendoj — ordigitaj laŭ lasteLudita (plej freŝa unue). */
+    private val _lastatempeLudataj = MutableStateFlow<List<Elsendo>>(emptyList())
+    val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
@@ -110,6 +117,18 @@ class HejmoViewModel(
 
             // "Kio popularas" — hazardaj elsendoj (maksimume 20)
             _popularajElsendoj.value = ĉiujElsendoj.shuffled().take(20)
+
+            // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
+            if (ludatojDeponejo != null) {
+                val ludatoj = ludatojDeponejo.observiLudatojn().value
+                val lastatempe = ludatoj.values
+                    .filter { it.lasteLudita > 0 }
+                    .sortedByDescending { it.lasteLudita }
+                    .mapNotNull { ludato -> ĉiujElsendoj.find { it.id == ludato.elsendoId } }
+                    .take(20)
+                _lastatempeLudataj.value = lastatempe
+                logi("HejmoViewModel", "Lastatempe ludata: ${lastatempe.size} elsendoj")
+            }
         } catch (e: Exception) {
             loge("HejmoViewModel", "Malsukcesis ŝargi hejmon", e)
         } finally {
@@ -139,11 +158,13 @@ fun HejmoEkrano(
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
+    ludatojDeponejo: LudatojDeponejo? = null,
 ) {
-    val viewModel = remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo) }
+    val viewModel = remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
     val kanaloj by viewModel.kanaloj.collectAsState()
     val novajElsendoj by viewModel.novajElsendoj.collectAsState()
     val popularajElsendoj by viewModel.popularajElsendoj.collectAsState()
+    val lastatempeLudataj by viewModel.lastatempeLudataj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -200,8 +221,26 @@ fun HejmoEkrano(
                     }
                 }
 
-                // "Lastatempe ludata" — nur se ekzistas (estonte)
-                // lastatempeLuditaj — malplena por nun
+                // "Lastatempe ludata" — elsendoj kiuj estis luditaj
+                if (lastatempeLudataj.isNotEmpty()) {
+                    item { SekcioTitolo("Lastatempe ludata") }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(lastatempeLudataj) { elsendo ->
+                                val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
+                                ElsendoKarto(
+                                    elsendo = elsendo,
+                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
+                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
+                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                                )
+                            }
+                        }
+                    }
+                }
 
                 // "Kio popularas" — hazardaj elsendoj
                 if (popularajElsendoj.isNotEmpty()) {

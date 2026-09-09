@@ -19,6 +19,7 @@ sealed interface Vojo : NavKey {
     @Serializable data object Plejŝatataj : Vojo
     @Serializable data object Sercxo : Vojo
     @Serializable data object Elshutoj : Vojo
+    @Serializable data object Ludvico : Vojo
     @Serializable data object Alarmoj : Vojo
     @Serializable data object Agordoj : Vojo
     @Serializable data class KanaloDetalo(val kanalo: Kanalo) : Vojo

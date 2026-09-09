@@ -60,6 +60,7 @@ sealed interface LudantoStato {
     data object Haltita : LudantoStato
     data object Konektas : LudantoStato
     data object Ludas : LudantoStato
+    data object Finita : LudantoStato
     data class Eraro(val mesagho: String) : LudantoStato
 }
 
@@ -69,4 +70,24 @@ data class LudantoInformo(
     val pozicioMs: Long = 0,
     val dauroMs: Long = 0,
     val estasRekta: Boolean = false,
+)
+
+/**
+ * Spuras la ludstatuson de unuopa elsendo — por daŭra ludado kaj resumigo.
+ *
+ * @param elsendoId identigilo de la elsendo
+ * @param kanaloSlug kiu kanalo
+ * @param pozicioMs ĝis kiu pozicio (ms) la uzanto aŭskultis
+ * @param dauroMs totala dauro (ms), aŭ 0 se nekonata
+ * @param finita ĉu la elsendo estis tute ludita (naturfino)
+ * @param lasteLudita tempmarko (epoch ms) de la lasta ludado
+ */
+@Serializable
+data class LudataElsendo(
+    val elsendoId: String,
+    val kanaloSlug: String,
+    val pozicioMs: Long = 0,
+    val dauroMs: Long = 0,
+    val finita: Boolean = false,
+    val lasteLudita: Long = 0,
 )

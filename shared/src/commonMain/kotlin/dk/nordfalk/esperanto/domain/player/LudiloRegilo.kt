@@ -36,6 +36,7 @@ expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 
 /**
  * No-op ludilo — UI funkcias, stato-ŝanĝoj funkcias, sed neniu sono.
+ * Subtenas simuli naturfinon per [simuluFinon] por testoj.
  */
 class NoOpLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
@@ -56,4 +57,20 @@ class NoOpLudiloRegilo : LudiloRegilo {
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
     override fun fiksiLauxtecon(volumeno: Float) {}
+
+    /**
+     * Simulas naturfinon de la ludado — metas staton al Finita.
+     * Uzata en testoj.
+     */
+    fun simuluFinon() {
+        _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
+    }
+
+    /**
+     * Simulas pozicio-ŝanĝon — ŝajnigas ke la ludado progresis.
+     * Uzata en testoj.
+     */
+    fun simuluPozicion(pozicioMs: Long, dauroMs: Long = 0) {
+        _stato.value = _stato.value.copy(pozicioMs = pozicioMs, dauroMs = dauroMs)
+    }
 }

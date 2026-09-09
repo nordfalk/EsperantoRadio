@@ -32,6 +32,7 @@ fun MiniLudilbreto(
     ludilo: LudiloRegilo,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onLudvico: () -> Unit = {},
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -111,6 +112,7 @@ fun MiniLudilbreto(
                     is LudantoStato.Ludas -> if (info.estasRekta) "Rekta elsendo" else "Ludas"
                     is LudantoStato.Konektas -> "Konektas..."
                     is LudantoStato.Haltita -> if (info.estasRekta) "Haltita" else "Paŭzita"
+                    is LudantoStato.Finita -> "Finita"
                     is LudantoStato.Eraro -> "Eraro: ${(info.stato as LudantoStato.Eraro).mesagho}"
                 }
                 val plenaTeksto = if (subtitolo != null) "$subtitolo · $statTeksto" else statTeksto
@@ -139,6 +141,11 @@ fun MiniLudilbreto(
             // Halti-butono
             IconButton(onClick = { logi("Klako", "halti"); ludilo.halti() }) {
                 Text("■", style = MaterialTheme.typography.bodySmall)
+            }
+
+            // Ludvico-butono
+            IconButton(onClick = { logi("Klako", "ludvico"); onLudvico() }) {
+                Text("📋", style = MaterialTheme.typography.bodySmall)
             }
         }
 

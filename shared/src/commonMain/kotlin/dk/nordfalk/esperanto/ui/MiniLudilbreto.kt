@@ -32,6 +32,7 @@ fun MiniLudilbreto(
     ludilo: LudiloRegilo,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onLudvico: () -> Unit = {},
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -140,6 +141,11 @@ fun MiniLudilbreto(
             // Halti-butono
             IconButton(onClick = { logi("Klako", "halti"); ludilo.halti() }) {
                 Text("■", style = MaterialTheme.typography.bodySmall)
+            }
+
+            // Ludvico-butono
+            IconButton(onClick = { logi("Klako", "ludvico"); onLudvico() }) {
+                Text("📋", style = MaterialTheme.typography.bodySmall)
             }
         }
 

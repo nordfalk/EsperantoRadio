@@ -13,7 +13,9 @@ import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.LudantaElsendo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.LudantojDeponejo
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,8 +30,12 @@ fun ElsendoEkrano(
     onAldoniAlVico: () -> Unit = {},
     kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
+    ludantojDeponejo: LudantojDeponejo? = null,
 ) {
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
+    val ludantojMapo by (ludantojDeponejo?.observiLudantojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudantaElsendo>()) })
+    val ludanto = ludantojMapo[elsendo.id]
+    val savitaPozicio = ludanto?.pozicioMs?.takeIf { it > 0 && !ludanto.finita }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -97,6 +103,26 @@ fun ElsendoEkrano(
 
             Spacer(Modifier.height(24.dp))
 
+            // Savita pozicio — progresbreto kaj "daŭrigi de" teksto
+            if (savitaPozicio != null && savitaPozicio > 5000) {
+                val min = savitaPozicio / 60000
+                val sek = (savitaPozicio % 60000) / 1000
+                val pozicioTeksto = "${min}:${sek.toString().padStart(2, '0')}"
+                val dauroMs = (elsendo.dauro ?: 0L) * 1000
+                val progreso = if (dauroMs > 0) (savitaPozicio.toFloat() / dauroMs).coerceIn(0f, 1f) else 0f
+                LinearProgressIndicator(
+                    progress = { progreso },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Daŭrigi de $pozicioTeksto",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
             // Priskribo
             if (!elsendo.priskribo.isNullOrBlank()) {
                 Text(
@@ -108,11 +134,12 @@ fun ElsendoEkrano(
             Spacer(Modifier.height(24.dp))
 
             // Lud-butono
+            val ludButonoTeksto = if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti"
             Button(
                 onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("▶ Aŭskulti")
+                Text(ludButonoTeksto)
             }
 
             Spacer(Modifier.height(8.dp))

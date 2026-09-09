@@ -57,6 +57,7 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.Plejsatataj::class, Vojo.Plejsatataj.serializer())
             subclass(Vojo.Sercxo::class, Vojo.Sercxo.serializer())
             subclass(Vojo.Elshutoj::class, Vojo.Elshutoj.serializer())
+            subclass(Vojo.Ludvico::class, Vojo.Ludvico.serializer())
             subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
             subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
             subclass(Vojo.KanaloDetalo::class, Vojo.KanaloDetalo.serializer())
@@ -202,6 +203,13 @@ fun EsperantoRadioApp(
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                             )
                         }
+                        entry<Vojo.Ludvico> {
+                            LudvicoEkrano(
+                                ludvicoRegilo = ludvicoRegilo,
+                                onReen = { reen() },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                            )
+                        }
                         entry<Vojo.Alarmoj> {
                             AlarmoEkrano(
                                 alarmoDeponejo = alarmoDeponejo,
@@ -253,6 +261,7 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
                                 },
                                 elshutDeponejo = elshutDeponejo,
+                                ludantojDeponejo = ludantojDeponejo,
                             )
                         }
                     },
@@ -271,6 +280,7 @@ fun EsperantoRadioApp(
                             null -> {}
                         }
                     },
+                    onLudvico = { push(Vojo.Ludvico) },
                 )
                 MalsupraNavigaBreto(
                     nunaTab = when (nunaVojo) {

@@ -38,6 +38,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
 | — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
 | 6 | Pezaj platform-funkcioj (vekhoro, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro farita, aliaj venas) | #24-#30 |
+| — | Ludvico kaj daŭra ludado | ✅ Farita | #46 |
 
 ### Kio funkcias nun
 
@@ -49,13 +50,15 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
 - **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado, fallback ringtono, volumo-boost
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
-- **Testoj**: 56 testoj (KMP sur Desktop), ĉiuj pasas
+- **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per 📋-butono, "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
+- **Testoj**: 131 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 
 ### Kio NE funkcias ankoraŭ
 
 - Nur-WiFi-agordo ne estas konektita al elŝut-logiko (agordo ekzistas sed ne efikas)
 - Vekhorloĝo: podkastoj ne povas aŭtomate ludi ĉe alarmo (nur rekta radio)
+- Aŭtomata resumigo: pozicio-restarigo okazas nur kiam oni reiras al la elsendo kaj klakas "Aŭskulti"; ne aŭtomate kiam oni malfermas la apoon kaj la ludilo daŭras en fono
 - iOS-ludado (no-op, bezonas AVPlayer)
 - Hejmekrana widget, Chromecast, talesyntezo
 
@@ -180,6 +183,17 @@ EsperantoRadio/
   | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
   | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
 
+- **Ludvico kaj daŭra ludado**:
+  - `LudvicoLogiko` estas pura decidlogiko (sen flankaj efikoj) — tute testebla.
+  - `LudvicoRegilo` observas `LudantoStato.Finita` per `StateFlow.distinctUntilChanged()`
+    kaj lanĉas aŭtoludon en aparta korutino (`scope.launch`) por eviti rekurson.
+  - Pozicio estas savata ĉiu 5s per `delay()`-bazita korutino. Ĉe `halti()` la
+    `nunaFonto` estas forigita de la ludilo, do `LudvicoRegilo` konservas
+    `lastaFonto`/`lastaPozicioMs` (kun `@Volatile`) kiel retroiron.
+  - `malmarkiFinita()` estas vokata kiam la uzanto eksplicite reludas finitan elsendon.
+  - Mutex protektas `ludiElsendon`/`aldoniAlVico`/`ludiSekvan` kontraŭ konkurantaj vokoj.
+  - `LudatojDeponejoMaketo` estas la memora implemento por Preview kaj testoj (ne por produktado).
+
 ## Logcat (Android)
 
 `adb` jam haveblas en la medio (`/home/j/Android/Sdk/platform-tools/adb`) kaj la
@@ -206,8 +220,9 @@ La celo estas moderna podkasta apo-inspirita UI, bazita sur la Figma-dizajno
 - La nuna kanalaro (`LazyColumn` de `ListItem`-oj) iĝos la "Hejmo"-langeto
 
 ### Nuna stato
-- La nuna UI uzas `TopAppBar` kun emoji-butonoj (🔍 ★ ⬇ ⏰ ⚙) kaj `LazyColumn`
-- Tio funkcias sed ne aspektas kiel moderna podkasta apo
+- La hejmekrano havas horizontala rulantaj sekcioj (Kio novas, Lastatempe ludata, Kio popularas)
+- La malsupra naviga breto havas 4 langetoj (Hejmo, Kanaloj, Plej ŝatataj, Serĉi)
+- MiniLudilbreto montras la nunan elsendon kun ludi/paŭzi/halti-butonoj kaj 📋-butono por la ludvico
 - La Muzaiko-temo (koloroj, tiparo, formoj) estas jam implementita en `Temo.kt`
 
 ## Konstru-komandoj
@@ -219,7 +234,7 @@ La celo estas moderna podkasta apo-inspirita UI, bazita sur la Figma-dizajno
 java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
 
 # Nova apo
-./gradlew :shared:desktopTest        # rulas testojn (27 testoj)
+./gradlew :shared:desktopTest        # rulas testojn (131 testoj)
 ./gradlew :desktopApp:run            # rulas la desktop-apo
 ./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun  # rulas la web-apo en retumilo
@@ -266,15 +281,26 @@ La nova kodo vivas en `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/`:
 dk/nordfalk/esperanto/
 ├── App.kt                    # Radika Compose-funkcio (EsperantoRadioApp)
 ├── domain/
-│   ├── model/Modeloj.kt      # Kanal, Elsendo, Sonfonto, LudantoStato
-│   └── repository/Deponejoj.kt # KanalDeponejo, ElsendoDeponejo (interfacoj)
+│   ├── model/Modeloj.kt      # Kanal, Elsendo, Sonfonto, LudantoStato, LudataElsendo
+│   └── repository/Deponejoj.kt # KanalDeponejo, ElsendoDeponejo, LudatojDeponejo (interfacoj)
 ├── data/
 │   ├── config/KanalAgordoLeganto.kt  # JSONC-leganto (striptigas komentojn)
 │   ├── config/PlatformResource.kt   # expect/actual por legi resurcojn
 │   ├── parser/RssParsilo.kt         # RSS/Atom-parsilo (sep regoloj)
-│   └── repository/KanalDeponejoImpl.kt # Deponej-implementaĵo
+│   ├── repository/KanalDeponejoImpl.kt   # Deponej-implementaĵo
+│   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
+│   └── repository/PersonigoDeponejojImpl.kt  # Plejŝatataj, LudatojDeponejoMaketo, Agordoj
+├── player/
+│   ├── LudiloRegilo.kt       # Ludilo-interfaco + NoOpLudiloRegilo (kun simuluFinon)
+│   ├── LudvicoLogiko.kt      # Pura decidlogiko por aŭtoludo (3 prioritatoj)
+│   └── LudvicoRegilo.kt      # Kontrolilo: pozicio-spurado, resumigo, aŭtoludo, ludvico
 └── ui/
-    └── KanalaroEkrano.kt     # Kanalaro-ekrano (Compose UI)
+    ├── KanalaroEkrano.kt     # Kanalaro-ekrano
+    ├── HejmoEkrano.kt       # Hejmo (Kio novas + Lastatempe ludata + Kio popularas)
+    ├── KanalEkrano.kt       # Kanalvido (elsendlisto)
+    ├── ElsendoEkrano.kt     # Elsendodetalo (ludi, elŝuti, aldoni al ludvico)
+    ├── LudvicoEkrano.kt     # Ludvico-ekrano (forigi/malplenigi)
+    └── MiniLudilbreto.kt    # Malsupra ludilbreto (ludi/paŭzi/halti/ludvico)
 ```
 
 ## Stilo

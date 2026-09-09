@@ -129,7 +129,15 @@ fun LudvicoEkranoMalplenaPreview() {
             override suspend fun getKanalo(slug: String) = null
         },
         plejsatatajDeponejo = dk.nordfalk.esperanto.data.repository.PlejsatatajDeponejoImpl(),
-        ludantojDeponejo = dk.nordfalk.esperanto.data.repository.LudantojDeponejoImpl(),
+        ludantojDeponejo = object : dk.nordfalk.esperanto.domain.repository.LudantojDeponejo {
+            private val st = kotlinx.coroutines.flow.MutableStateFlow(emptyMap<String, dk.nordfalk.esperanto.domain.model.LudantaElsendo>())
+            override fun observiLudantojn() = st
+            override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {}
+            override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {}
+            override suspend fun getLudanto(elsendoId: String) = null
+            override suspend fun estasFinita(elsendoId: String) = false
+            override suspend fun getPozicio(elsendoId: String) = null
+        },
     )
     pTemo { LudvicoEkrano(ludvicoRegilo = regilo, onReen = {}) }
 }

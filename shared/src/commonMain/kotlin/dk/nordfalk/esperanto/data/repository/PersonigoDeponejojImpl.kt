@@ -66,7 +66,7 @@ class AgordojDeponejoImpl(
     private val _temo = MutableStateFlow("ANTONIA")
     override val temo: StateFlow<String> = _temo.asStateFlow()
 
-    private val _sciigoj = MutableStateFlow(settings?.getBoolean("sciigoj", true) ?: true)
+    private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
     override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
     override fun fiksiLingvon(lingvo: String) {
@@ -83,7 +83,7 @@ class AgordojDeponejoImpl(
     }
     override fun fiksiSciigojn(sxaltita: Boolean) {
         _sciigoj.value = sxaltita
-        settings?.putBoolean("sciigoj", sxaltita)
+        settings?.putBoolean(SettingsKeys.SCIIGOJ, sxaltita)
         logi("Agordoj", "Sciigoj → $sxaltita")
     }
 }

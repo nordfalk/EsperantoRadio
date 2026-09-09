@@ -18,15 +18,14 @@ import kotlinx.coroutines.flow.asStateFlow
 class PersistantaPlejŝatatajDeponejo(
     private val settings: Settings,
 ) : PlejŝatatajDeponejo {
-    private val key = "plejŝatataj_kanaloj"
 
     private fun legu(): Set<String> {
-        val str = settings.getString(key, "")
+        val str = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
         return if (str.isEmpty()) emptySet() else str.split(",").toSet()
     }
 
     private fun skribu(value: Set<String>) {
-        settings.putString(key, value.joinToString(","))
+        settings.putString(SettingsKeys.PLEJŜATATAJ_KANALOJ, value.joinToString(","))
     }
 
     private val _plejŝatataj = MutableStateFlow<Set<String>>(legu())

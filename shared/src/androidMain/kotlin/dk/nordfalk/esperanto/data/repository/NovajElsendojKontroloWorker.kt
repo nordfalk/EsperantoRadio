@@ -56,7 +56,7 @@ class NovajElsendojKontroloWorker(
         const val EXTRA_BILDO_URL = "bildo_url"
         const val ACTION_LUDI_ELSENDON = "dk.nordfalk.esperanto.LUDI_ELSENDON"
         const val ACTION_MALFERMI_ELSENDON = "dk.nordfalk.esperanto.MALFERMI_ELSENDON"
-        private const val VIDITAJ_KEY = "viditaj_elsendoj"
+        private const val VIDITAJ_KEY = SettingsKeys.VIDITAJ_ELSENDOJ
         private const val MAKS_VIDITAJ = 500
     }
 
@@ -66,7 +66,7 @@ class NovajElsendojKontroloWorker(
             val settings = kreuSettings()
 
             // Kontrolu ĉu sciigoj estas ŝaltitaj
-            val sciigoj = settings.getBoolean("sciigoj", true)
+            val sciigoj = settings.getBoolean(SettingsKeys.SCIIGOJ, true)
             if (!sciigoj) {
                 logi("NovajElsendoj", "Sciigoj malŝaltitaj en agordoj — finas sen kontroli")
                 return Result.success()
@@ -75,11 +75,11 @@ class NovajElsendojKontroloWorker(
             // Kontrolu sciig-permeson (Android 13+)
             if (!sciigPermesoDonita()) {
                 logw("NovajElsendoj", "Sciig-permeso (POST_NOTIFICATIONS) mankas — aŭtomate malŝaltas sciigojn")
-                settings.putBoolean("sciigoj", false)
+                settings.putBoolean(SettingsKeys.SCIIGOJ, false)
                 return Result.success()
             }
 
-            val plejStr = settings.getString("plejŝatataj_kanaloj", "")
+            val plejStr = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
             if (plejStr.isBlank()) {
                 logi("NovajElsendoj", "Neniu ŝatata kanalo — finas")
                 return Result.success()

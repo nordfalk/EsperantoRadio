@@ -30,11 +30,11 @@ class BootReceivilo : BroadcastReceiver() {
             val settings = kreuSettings()
 
             // Re-skedu sciigojn nur se sciigoj ŝaltitaj kaj estas ŝatataj kanaloj
-            val sciigoj = settings.getBoolean("sciigoj", true)
-            val plejStr = settings.getString("plejŝatataj_kanaloj", "")
+            val sciigoj = settings.getBoolean(SettingsKeys.SCIIGOJ, true)
+            val plejStr = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
             val plejŝatataj = if (plejStr.isBlank()) emptySet() else plejStr.split(",").toSet()
             ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
-            val str = settings.getString("alarmoj", "")
+            val str = settings.getString(SettingsKeys.ALARMOJ, "")
             if (str.isBlank()) {
                 logi("BootReceivilo", "Neniu persistita alarmo")
                 return

@@ -38,7 +38,7 @@ fun MalsupraNavigaBreto(
         NavigationBarItem(
             selected = nunaTab == EkranoLangeto.PLEJŜATATAJ,
             onClick = { logi("Klako", "plejŝatataj-tab"); onPlejŝatataj() },
-            icon = { Text("★") },
+            icon = { Text("♥") },
             label = { Text("Plej ŝatataj") }
         )
         NavigationBarItem(

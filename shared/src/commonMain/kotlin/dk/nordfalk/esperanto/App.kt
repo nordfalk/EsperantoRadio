@@ -20,6 +20,7 @@ import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
+import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ghisdatiguSciigSkedon
@@ -28,6 +29,7 @@ import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.navigation.Vojo
@@ -56,6 +58,7 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.Plejŝatataj::class, Vojo.Plejŝatataj.serializer())
             subclass(Vojo.Sercxo::class, Vojo.Sercxo.serializer())
             subclass(Vojo.Elshutoj::class, Vojo.Elshutoj.serializer())
+            subclass(Vojo.Ludvico::class, Vojo.Ludvico.serializer())
             subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
             subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
             subclass(Vojo.KanaloDetalo::class, Vojo.KanaloDetalo.serializer())
@@ -108,6 +111,26 @@ fun EsperantoRadioApp(
             PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
         }
         val scope = rememberCoroutineScope()
+
+        val ludatojDeponejo = remember { PersistaLudatojDeponejo(settings) }
+        val ludvicoRegilo = remember {
+            LudvicoRegilo(
+                ludilo = ludilo,
+                elsendoDeponejo = elsendoDeponejo,
+                kanaloDeponejo = kanaloDeponejo,
+                plejŝatatajDeponejo = plejŝatatajDeponejo,
+                ludatojDeponejo = ludatojDeponejo,
+                getLokaDosieroVojo = { id -> elshutDeponejo.getLokaDosieroVojo(id) },
+            )
+        }
+        LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
+
+        // Savu pozicion kiam la komponanto detruiĝas (ekz. app fermo)
+        DisposableEffect(ludvicoRegilo) {
+            onDispose {
+                scope.launch { ludvicoRegilo.savuPozicionNun() }
+            }
+        }
 
         val backStack = rememberNavBackStack(navConfig, Vojo.Hejmo)
         val kanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
@@ -167,6 +190,7 @@ fun EsperantoRadioApp(
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
+                                ludatojDeponejo = ludatojDeponejo,
                             )
                         }
                         entry<Vojo.Kanalaro> {
@@ -201,8 +225,24 @@ fun EsperantoRadioApp(
                                 onReen = { reen() },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas elŝutitan: $fonto")
-                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                    val elsendo = when (fonto) {
+                                        is Sonfonto.ElsendoFonto -> fonto.elsendo
+                                        is Sonfonto.LokaElsendo -> fonto.elsendo
+                                        is Sonfonto.RektaKanalo -> null
+                                    }
+                                    if (elsendo != null) {
+                                        scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
+                                    } else {
+                                        scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                    }
                                 },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                            )
+                        }
+                        entry<Vojo.Ludvico> {
+                            LudvicoEkrano(
+                                ludvicoRegilo = ludvicoRegilo,
+                                onReen = { reen() },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                             )
                         }
@@ -244,16 +284,7 @@ fun EsperantoRadioApp(
                                 onReen = { reen() },
                                 onLudi = {
                                     logi("Nav", "Ludas elsendon: ${elsendo.id}")
-                                    scope.launch {
-                                        val lokaVojo = elshutDeponejo.getLokaDosieroVojo(elsendo.id)
-                                        val fonto = if (lokaVojo != null) {
-                                            logi("Nav", "Ludas elŝutitan: $lokaVojo")
-                                            Sonfonto.LokaElsendo(elsendo, lokaVojo)
-                                        } else {
-                                            Sonfonto.ElsendoFonto(elsendo)
-                                        }
-                                        ludilo.fiksiFonton(fonto); ludilo.ludi()
-                                    }
+                                    scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
                                 },
                                 onElshuti = {
                                     logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
@@ -263,7 +294,12 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Forigas elŝuton: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.forigi(elsendo.id) }
                                 },
+                                onAldoniAlVico = {
+                                    logi("Nav", "Aldonas al ludvico: ${elsendo.id}")
+                                    scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
+                                },
                                 elshutDeponejo = elshutDeponejo,
+                                ludatojDeponejo = ludatojDeponejo,
                             )
                         }
                     },
@@ -282,6 +318,7 @@ fun EsperantoRadioApp(
                             null -> {}
                         }
                     },
+                    onLudvico = { push(Vojo.Ludvico) },
                 )
                 MalsupraNavigaBreto(
                     nunaTab = when (nunaVojo) {

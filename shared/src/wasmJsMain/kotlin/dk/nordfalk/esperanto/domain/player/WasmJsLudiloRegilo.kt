@@ -45,6 +45,9 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         audio!!.addEventListener("pause", { _ ->
             _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
         })
+        audio!!.addEventListener("ended", { _ ->
+            _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
+        })
         audio!!.addEventListener("error", { _ ->
             _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro"))
         })

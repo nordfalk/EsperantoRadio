@@ -111,7 +111,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         val ludantoStato = when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita
             Player.STATE_BUFFERING -> LudantoStato.Konektas
-            Player.STATE_ENDED -> LudantoStato.Haltita
+            Player.STATE_ENDED -> LudantoStato.Finita
             Player.STATE_IDLE -> LudantoStato.Haltita
             else -> LudantoStato.Haltita
         }

@@ -25,6 +25,7 @@ fun ElsendoEkrano(
     onElshuti: () -> Unit = {},
     onForigiElshuton: () -> Unit = {},
     onKanalo: (Kanalo) -> Unit = {},
+    onAldoniAlVico: () -> Unit = {},
     kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
 ) {
@@ -113,6 +114,14 @@ fun ElsendoEkrano(
             ) {
                 Text("▶ Aŭskulti")
             }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Aldoni al ludvico
+            OutlinedButton(
+                onClick = { logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico() },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("📋 Aldoni al ludvico") }
 
             Spacer(Modifier.height(8.dp))
 

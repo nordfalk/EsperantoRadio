@@ -4,6 +4,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.LudantaElsendo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,6 +17,19 @@ interface PlejsatatajDeponejo {
 interface LastAuxskultitajDeponejo {
     fun observiLastAuxskultitajn(): StateFlow<List<Elsendo>>
     suspend fun registri(elsendo: Elsendo)
+    suspend fun getPozicio(elsendoId: String): Long?
+}
+
+/**
+ * Spuras ludstatuson de elsendoj — pozicio, ĉu finita, tempmarko.
+ * Uzata de LudvicoRegilo por resumigo kaj aŭtomata sekva-ludado.
+ */
+interface LudantojDeponejo {
+    fun observiLudantojn(): StateFlow<Map<String, LudantaElsendo>>
+    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+    suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
+    suspend fun getLudanto(elsendoId: String): LudantaElsendo?
+    suspend fun estasFinita(elsendoId: String): Boolean
     suspend fun getPozicio(elsendoId: String): Long?
 }
 

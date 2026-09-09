@@ -11,23 +11,19 @@ import dk.nordfalk.esperanto.data.config.appContext
 
 actual val subtenasSciigojn: Boolean = true
 
-actual fun malfermuSciigAgordojn() {
-    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-        putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
-    appContext.startActivity(intent)
-}
-
-/**
- * Kontrolas ĉu la sciig-permeso (POST_NOTIFICATIONS) estas donita.
- * Antaŭ Android 13 (API 33), ne estas permeso-neceso — liveras true.
- */
-fun sciigPermesoDonita(): Boolean {
+actual fun sciigPermesoDonita(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
     } else {
         true
     }
+}
+
+actual fun malfermuSciigAgordojn() {
+    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    appContext.startActivity(intent)
 }

@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
+import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
 import dk.nordfalk.esperanto.logi
 
@@ -76,16 +77,14 @@ fun AgordojEkrano(
                         )
                     }
                 )
-                if (!sciigoj) {
-                    // Sciigoj estas malŝaltitaj — eble pro permes-rifuzo.
-                    // Montru butonon por reaktivigi (malfermas sistemajn sciig-agordojn).
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = {
-                        logi("Klako", "Aktivigu sciigojn → malfermas sistemajn agordojn")
-                        agordojDeponejo.fiksiSciigojn(true)
+                // Se la uzanto enŝaltis sciigojn sed la permeso mankas — montru ligilon
+                if (sciigoj && !sciigPermesoDonita()) {
+                    Spacer(Modifier.height(4.dp))
+                    TextButton(onClick = {
+                        logi("Klako", "Malfermas sistemajn sciig-agordojn")
                         malfermuSciigAgordojn()
                     }) {
-                        Text("Aktivigu sciigojn")
+                        Text("Vi devas doni permeson al la apo montri sciigojn")
                     }
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)

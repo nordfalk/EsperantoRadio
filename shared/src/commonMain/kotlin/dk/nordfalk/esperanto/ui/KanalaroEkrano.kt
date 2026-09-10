@@ -16,10 +16,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
+import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,16 +34,43 @@ import kotlinx.coroutines.launch
  */
 class KanalaroViewModel(
     private val deponejo: dk.nordfalk.esperanto.domain.repository.KanaloDeponejo,
+    private val elsendoDeponejo: ElsendoDeponejo? = null,
 ) {
     val kanaloj = deponejo.observiKanalojn()
 
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
+    /** Mapo: kanaloSlug → nombro da elsendoj */
+    private val _elsendoKontoj = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val elsendoKontoj = _elsendoKontoj.asStateFlow()
+
+    /** Mapo: kanaloSlug → plej nova elsendo (por ludi per la ludo-butono) */
+    private val _lastajElsendoj = MutableStateFlow<Map<String, Elsendo>>(emptyMap())
+    val lastajElsendoj = _lastajElsendoj.asStateFlow()
+
     suspend fun sxargxi() {
         _sxargxas.value = true
         try {
-            deponejo.getKanalojn()
+            val kanaloj = deponejo.getKanalojn()
+            // Ŝargi elsendojn por ĉiuj podkastaj kanaloj (se elsendoDeponejo haveblas)
+            if (elsendoDeponejo != null) {
+                val rezultoj = coroutineScope {
+                    kanaloj
+                        .filter { it.havasPodkastojn }
+                        .map { kanalo -> async { kanalo to elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo) } }
+                        .awaitAll()
+                }
+                val kontoj = mutableMapOf<String, Int>()
+                val lastaj = mutableMapOf<String, Elsendo>()
+                for ((kanalo, elsendoj) in rezultoj) {
+                    kontoj[kanalo.slug] = elsendoj.size
+                    elsendoj.maxByOrNull { it.dato }?.let { lastaj[kanalo.slug] = it }
+                }
+                _elsendoKontoj.value = kontoj
+                _lastajElsendoj.value = lastaj
+                logi("KanalaroViewModel", "Ŝargis ${kontoj.values.sum()} elsendojn por ${kontoj.size} kanaloj")
+            }
         } catch (e: Exception) {
             loge("KanalaroViewModel", "Malsukcesis sargi kanalojn", e)
         } finally {
@@ -59,6 +91,8 @@ fun KanalaroEkrano(
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
+    val elsendoKontoj by viewModel.elsendoKontoj.collectAsState()
+    val lastajElsendoj by viewModel.lastajElsendoj.collectAsState()
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -90,11 +124,15 @@ fun KanalaroEkrano(
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(kanaloj, key = { it.slug }) { kanalo ->
+                    val lastaElsendo = lastajElsendoj[kanalo.slug]
                     KanaloEro(
                         kanalo = kanalo,
+                        elsendoKonto = elsendoKontoj[kanalo.slug],
                         onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
-                        onLudi = if (kanalo.havasPodkastojn || kanalo.estasRekta) {
-                            { logi("Klako", "ludi ${kanalo.slug}"); onLudi(Sonfonto.RektaKanalo(kanalo)) }
+                        onLudi = if (kanalo.estasRekta) {
+                            { logi("Klako", "ludi rekte ${kanalo.slug}"); onLudi(Sonfonto.RektaKanalo(kanalo)) }
+                        } else if (lastaElsendo != null) {
+                            { logi("Klako", "ludi lastan elsendon de ${kanalo.slug}"); onLudi(Sonfonto.ElsendoFonto(lastaElsendo)) }
                         } else null
                     )
                 }
@@ -108,6 +146,7 @@ private fun KanaloEro(
     kanalo: Kanalo,
     onClick: () -> Unit,
     onLudi: (() -> Unit)? = null,
+    elsendoKonto: Int? = null,
 ) {
     ListItem(
         headlineContent = {
@@ -119,12 +158,18 @@ private fun KanaloEro(
             )
         },
         supportingContent = {
+            val tipo = when {
+                kanalo.estasRekta -> "Rekta elsendo"
+                kanalo.havasPodkastojn -> "Podkasto"
+                else -> "Neniu fluo"
+            }
+            val teksto = if (elsendoKonto != null && elsendoKonto > 0) {
+                "$tipo · $elsendoKonto elsendoj"
+            } else {
+                tipo
+            }
             Text(
-                when {
-                    kanalo.estasRekta -> "Rekta elsendo"
-                    kanalo.havasPodkastojn -> "Podkasto"
-                    else -> "Neniu fluo"
-                },
+                teksto,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

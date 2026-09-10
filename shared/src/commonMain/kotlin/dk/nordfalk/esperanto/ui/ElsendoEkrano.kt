@@ -14,8 +14,12 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
+import dk.nordfalk.esperanto.domain.model.LudantoInformo
+import dk.nordfalk.esperanto.domain.model.LudantoStato
+import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
+import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.logi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,11 +35,26 @@ fun ElsendoEkrano(
     kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
+    ludilo: LudiloRegilo? = null,
 ) {
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
     val ludato = ludatojMapo[elsendo.id]
     val savitaPozicio = ludato?.pozicioMs?.takeIf { it > 0 && !ludato.finita }
+
+    // Observi ĉu ĉi tiu elsendo estas nun ludata
+    val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
+    val nunaFonto = ludantoStato.nunaFonto
+    val tiuElsendoLudas = when (nunaFonto) {
+        is Sonfonto.ElsendoFonto -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Ludas
+        is Sonfonto.LokaElsendo -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Ludas
+        else -> false
+    }
+    val tiuElsendoPauxzita = when (nunaFonto) {
+        is Sonfonto.ElsendoFonto -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Haltita
+        is Sonfonto.LokaElsendo -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Haltita
+        else -> false
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -101,54 +120,27 @@ fun ElsendoEkrano(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Savita pozicio — progresbreto kaj "daŭrigi de" teksto
-            if (savitaPozicio != null && savitaPozicio > 5000) {
-                val min = savitaPozicio / 60000
-                val sek = (savitaPozicio % 60000) / 1000
-                val pozicioTeksto = "${min}:${sek.toString().padStart(2, '0')}"
-                val dauroMs = (elsendo.dauro ?: 0L) * 1000
-                val progreso = if (dauroMs > 0) (savitaPozicio.toFloat() / dauroMs).coerceIn(0f, 1f) else 0f
-                LinearProgressIndicator(
-                    progress = { progreso },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "Daŭrigi de $pozicioTeksto",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(Modifier.height(12.dp))
+            // Ludo-butono — ŝanĝas al paŭzo se ĉi tiu elsendo ludas
+            when {
+                tiuElsendoLudas -> Button(
+                    onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("⏸ Paŭzigi") }
+
+                tiuElsendoPauxzita -> Button(
+                    onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("▶ Daŭrigi") }
+
+                else -> Button(
+                    onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti")
+                }
             }
-
-            // Priskribo
-            if (!elsendo.priskribo.isNullOrBlank()) {
-                Text(
-                    text = elsendo.priskribo!!,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Lud-butono
-            val ludButonoTeksto = if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti"
-            Button(
-                onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(ludButonoTeksto)
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // Aldoni al ludvico
-            OutlinedButton(
-                onClick = { logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico() },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("📋 Aldoni al ludvico") }
 
             Spacer(Modifier.height(8.dp))
 
@@ -182,6 +174,44 @@ fun ElsendoEkrano(
                     onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti() },
                     modifier = Modifier.fillMaxWidth()
                 ) { Text("⏸ Paŭzita — reprovi") }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Aldoni al ludvico
+            OutlinedButton(
+                onClick = { logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico() },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("📋 Aldoni al ludvico") }
+
+            Spacer(Modifier.height(24.dp))
+
+            // Savita pozicio — progresbreto kaj "daŭrigi de" teksto
+            if (savitaPozicio != null && savitaPozicio > 5000) {
+                val min = savitaPozicio / 60000
+                val sek = (savitaPozicio % 60000) / 1000
+                val pozicioTeksto = "${min}:${sek.toString().padStart(2, '0')}"
+                val dauroMs = (elsendo.dauro ?: 0L) * 1000
+                val progreso = if (dauroMs > 0) (savitaPozicio.toFloat() / dauroMs).coerceIn(0f, 1f) else 0f
+                LinearProgressIndicator(
+                    progress = { progreso },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Daŭrigi de $pozicioTeksto",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
+            // Priskribo
+            if (!elsendo.priskribo.isNullOrBlank()) {
+                Text(
+                    text = elsendo.priskribo!!,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             // Retpoŝto-butono — nur se la kanalo havas retpoŝtadreson

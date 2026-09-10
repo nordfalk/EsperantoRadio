@@ -74,6 +74,40 @@ class NavigaTesto {
     }
 
     @Test
+    fun elsendoEkranoMontrasPauxzonSeLudas() = runComposeUiTest {
+        val ludilo = NavigaTestLudiloRegilo(
+            LudantoInformo(
+                stato = LudantoStato.Ludas,
+                nunaFonto = Sonfonto.ElsendoFonto(testElsendo),
+                pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            )
+        )
+        setContent {
+            ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, ludilo = ludilo)
+        }
+        waitForIdle()
+        // La ludo-butono ŝanĝiĝis al paŭzo
+        onNodeWithText("⏸ Paŭzigi").assertIsDisplayed()
+    }
+
+    @Test
+    fun elsendoEkranoMontrasDauxrigiSePauxzita() = runComposeUiTest {
+        val ludilo = NavigaTestLudiloRegilo(
+            LudantoInformo(
+                stato = LudantoStato.Haltita,
+                nunaFonto = Sonfonto.ElsendoFonto(testElsendo),
+                pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            )
+        )
+        setContent {
+            ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, ludilo = ludilo)
+        }
+        waitForIdle()
+        // La ludo-butono montras "Daŭrigi" ĉar la elsendo estas paŭzita
+        onNodeWithText("▶ Daŭrigi").assertIsDisplayed()
+    }
+
+    @Test
     fun montrasSerchon() = runComposeUiTest {
         val sercxoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SercxoDeponejo {
             override suspend fun sercxi(teksto: String, limo: Int) =

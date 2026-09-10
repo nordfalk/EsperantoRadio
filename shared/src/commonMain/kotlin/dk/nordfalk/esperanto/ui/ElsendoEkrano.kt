@@ -38,9 +38,11 @@ fun ElsendoEkrano(
     onReen: () -> Unit,
     onLudi: () -> Unit = {},
     onElshuti: () -> Unit = {},
+    onHaltigiElshuton: () -> Unit = {},
     onForigiElshuton: () -> Unit = {},
     onKanalo: (Kanalo) -> Unit = {},
     onAldoniAlVico: () -> Unit = {},
+    onMontriLudvicon: () -> Unit = {},
     kanalo: Kanalo? = null,
     elshutDeponejo: ElshutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -125,14 +127,17 @@ fun ElsendoEkrano(
                     IkonoButono(
                         ikono = when (elshutStato) {
                             is ElshutStato.Preta -> "✓"
-                            is ElshutStato.Elshutanta -> "⏳"
+                            is ElshutStato.Elshutanta -> "■"
                             else -> "⬇"
                         },
-                        label = "Elŝuti",
-                        enabled = elshutStato !is ElshutStato.Elshutanta,
+                        label = when (elshutStato) {
+                            is ElshutStato.Elshutanta -> "Haltigi elŝuton"
+                            else -> "Elŝuti"
+                        },
                         onClick = {
                             when (elshutStato) {
                                 is ElshutStato.NeElshutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") }
+                                is ElshutStato.Elshutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElshuton(); montruMesaĝon("Elŝuto haltigita") }
                                 is ElshutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton(); montruMesaĝon("Elŝuto forigita") }
                                 is ElshutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") }
                                 is ElshutStato.Pauxzita -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") }
@@ -206,87 +211,6 @@ fun ElsendoEkrano(
 
             Spacer(Modifier.height(16.dp))
 
-            // === Butonoj kun tekstoj en 2 kolumnoj ===
-            // Vico 1: Ludi/paŭzi | Elŝuti
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                when {
-                    tiuElsendoLudas -> Button(
-                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("⏸ Paŭzigi") }
-
-                    tiuElsendoPauxzita -> Button(
-                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("▶ Daŭrigi") }
-
-                    else -> Button(
-                        onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi() },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti")
-                    }
-                }
-
-                when (elshutStato) {
-                    is ElshutStato.NeElshutita -> OutlinedButton(
-                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("⬇ Elŝuti") }
-
-                    is ElshutStato.Elshutanta -> {
-                        val p = (elshutStato as ElshutStato.Elshutanta).progreso
-                        OutlinedButton(
-                            onClick = {}, enabled = false,
-                            modifier = Modifier.weight(1f)
-                        ) { Text("⏳ ${((p * 100).toInt())}%") }
-                    }
-
-                    is ElshutStato.Preta -> OutlinedButton(
-                        onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("✓ Elŝutita — Forigi") }
-
-                    is ElshutStato.Eraro -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("⚠ Eraro — reprovi") }
-
-                    is ElshutStato.Pauxzita -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti() },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("⏸ Paŭzita — reprovi") }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // Vico 2: Aldoni al ludvico | Komenti
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(
-                    onClick = { logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico() },
-                    modifier = Modifier.weight(1f)
-                ) { Text("📋 Aldoni al ludvico") }
-
-                if (kanalo?.retposhto != null) {
-                    OutlinedButton(
-                        onClick = {
-                            logi("Klako", "retpoŝto el elsendo ${elsendo.id}")
-                            malfermuRetposhton(
-                                retposhto = kanalo.retposhto,
-                                temo = "Pri ${kanalo.nomo}",
-                                teksto = "Mi aŭskultas la elsendon (${elsendo.titolo} — ${elsendo.dato}) kaj havas komenton",
-                            )
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("✉ Komenti") }
-                } else {
-                    Spacer(Modifier.weight(1f))
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
             // Savita pozicio
             if (savitaPozicio != null && savitaPozicio > 5000) {
                 val min = savitaPozicio / 60000
@@ -313,6 +237,99 @@ fun ElsendoEkrano(
                     text = elsendo.priskribo!!,
                     style = MaterialTheme.typography.bodyMedium
                 )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // === Butonoj kun tekstoj en 2 kolumnoj (malsupre) ===
+            // Vico 1: Ludi/paŭzi | Elŝuti
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                when {
+                    tiuElsendoLudas -> Button(
+                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi(); montruMesaĝon("Paŭzigita") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("⏸ Paŭzigi") }
+
+                    tiuElsendoPauxzita -> Button(
+                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi(); montruMesaĝon("Daŭriganta") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("▶ Daŭrigi") }
+
+                    else -> Button(
+                        onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi(); montruMesaĝon("Ludanta: ${elsendo.titolo}") },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti")
+                    }
+                }
+
+                when (elshutStato) {
+                    is ElshutStato.NeElshutita -> OutlinedButton(
+                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("⬇ Elŝuti") }
+
+                    is ElshutStato.Elshutanta -> {
+                        val p = (elshutStato as ElshutStato.Elshutanta).progreso
+                        OutlinedButton(
+                            onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElshuton(); montruMesaĝon("Elŝuto haltigita") },
+                            modifier = Modifier.weight(1f)
+                        ) { Text("■ ${((p * 100).toInt())}%") }
+                    }
+
+                    is ElshutStato.Preta -> OutlinedButton(
+                        onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton(); montruMesaĝon("Elŝuto forigita") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("✓ Elŝutita — Forigi") }
+
+                    is ElshutStato.Eraro -> OutlinedButton(
+                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("⚠ Eraro — reprovi") }
+
+                    is ElshutStato.Pauxzita -> OutlinedButton(
+                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("⏸ Paŭzita — reprovi") }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Vico 2: Aldoni al ludvico | Komenti
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico()
+                        scope.launch {
+                            val rezulto = snackbarStato.showSnackbar(
+                                message = "Aldonita al ludvico",
+                                actionLabel = "Montri",
+                                duration = SnackbarDuration.Short,
+                            )
+                            if (rezulto == SnackbarResult.ActionPerformed) {
+                                onMontriLudvicon()
+                            }
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("📋 Aldoni al ludvico") }
+
+                if (kanalo?.retposhto != null) {
+                    OutlinedButton(
+                        onClick = {
+                            logi("Klako", "retpoŝto el elsendo ${elsendo.id}")
+                            malfermuRetposhton(
+                                retposhto = kanalo.retposhto,
+                                temo = "Pri ${kanalo.nomo}",
+                                teksto = "Mi aŭskultas la elsendon (${elsendo.titolo} — ${elsendo.dato}) kaj havas komenton",
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("✉ Komenti") }
+                } else {
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }

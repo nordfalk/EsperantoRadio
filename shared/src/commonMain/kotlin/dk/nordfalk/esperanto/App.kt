@@ -296,6 +296,10 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.elshuti(elsendo) }
                                 },
+                                onHaltigiElshuton = {
+                                    logi("Nav", "Haltigas elŝuton: ${elsendo.id}")
+                                    scope.launch { elshutDeponejo.haltigi(elsendo.id) }
+                                },
                                 onForigiElshuton = {
                                     logi("Nav", "Forigas elŝuton: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.forigi(elsendo.id) }
@@ -303,6 +307,10 @@ fun EsperantoRadioApp(
                                 onAldoniAlVico = {
                                     logi("Nav", "Aldonas al ludvico: ${elsendo.id}")
                                     scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
+                                },
+                                onMontriLudvicon = {
+                                    logi("Nav", "Montri ludvicon")
+                                    push(Vojo.Ludvico)
                                 },
                                 elshutDeponejo = elshutDeponejo,
                                 ludatojDeponejo = ludatojDeponejo,

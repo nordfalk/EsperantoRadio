@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -74,7 +75,7 @@ class ElshutitajEkranoTest {
             )
         }
         waitForIdle()
-        onNodeWithText("Neniu elŝutita elsendo. Premu ⬇ sur elsendo por elŝuti.").assertIsDisplayed()
+        onNodeWithText("Neniu elŝutita elsendo. Premu la elŝutbutonon sur elsendo por elŝuti.").assertIsDisplayed()
     }
 
     @Test
@@ -203,7 +204,7 @@ class ElshutitajEkranoTest {
             )
         }
         waitForIdle()
-        onNodeWithText("⏸").assertIsDisplayed()
+        onNodeWithContentDescription("Paŭzigi").assertIsDisplayed()
     }
 
     @Test
@@ -238,6 +239,6 @@ class ElshutitajEkranoTest {
             )
         }
         waitForIdle()
-        onNodeWithText("▶").assertIsDisplayed()
+        onNodeWithContentDescription("Ludi").assertIsDisplayed()
     }
 }

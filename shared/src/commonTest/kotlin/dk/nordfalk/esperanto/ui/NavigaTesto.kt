@@ -4,6 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -88,7 +89,7 @@ class NavigaTesto {
         }
         waitForIdle()
         // La ludo-butono ŝanĝiĝis al paŭzo
-        onNodeWithText("⏸ Paŭzigi").assertIsDisplayed()
+        onNodeWithText(" Paŭzigi").assertIsDisplayed()
     }
 
     @Test
@@ -105,7 +106,7 @@ class NavigaTesto {
         }
         waitForIdle()
         // La ludo-butono montras "Daŭrigi" ĉar la elsendo estas paŭzita
-        onNodeWithText("▶ Daŭrigi").assertIsDisplayed()
+        onNodeWithText(" Daŭrigi").assertIsDisplayed()
     }
 
     @Test
@@ -163,7 +164,7 @@ class NavigaTesto {
             PlejŝatatajEkrano(plejŝatatajDeponejo = plejDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onKanalo = {})
         }
         waitForIdle()
-        onNodeWithText("Neniu plej ŝatata kanalo. Premu ♡ sur kanalo por aldoni.").assertIsDisplayed()
+        onNodeWithText("Neniu plej ŝatata kanalo. Premu la koron sur kanalo por aldoni.").assertIsDisplayed()
     }
 
     @Test
@@ -186,7 +187,7 @@ class NavigaTesto {
         }
         waitForIdle()
         // ♡ = ne ŝatata
-        onNodeWithText("♡").assertIsDisplayed()
+        onNodeWithContentDescription("Aldoni ŝaton").assertIsDisplayed()
     }
 
     @Test
@@ -209,7 +210,7 @@ class NavigaTesto {
         }
         waitForIdle()
         // ♥ = ŝatata
-        onNodeWithText("♥").assertIsDisplayed()
+        onNodeWithContentDescription("Forigi ŝaton").assertIsDisplayed()
     }
 
     @Test

@@ -39,7 +39,7 @@ class ElsendoEkranoSavitaPozicioTest {
         waitForIdle()
 
         onNodeWithText("Daŭrigi de 2:00").assertIsDisplayed()
-        onNodeWithText("▶ Daŭrigi").assertIsDisplayed()
+        onNodeWithText(" Daŭrigi").assertIsDisplayed()
     }
 
     @Test
@@ -57,7 +57,7 @@ class ElsendoEkranoSavitaPozicioTest {
         }
         waitForIdle()
 
-        onNodeWithText("▶ Aŭskulti").assertIsDisplayed()
+        onNodeWithText(" Aŭskulti").assertIsDisplayed()
     }
 
     @Test
@@ -79,6 +79,6 @@ class ElsendoEkranoSavitaPozicioTest {
         }
         waitForIdle()
 
-        onNodeWithText("▶ Aŭskulti").assertIsDisplayed()
+        onNodeWithText(" Aŭskulti").assertIsDisplayed()
     }
 }

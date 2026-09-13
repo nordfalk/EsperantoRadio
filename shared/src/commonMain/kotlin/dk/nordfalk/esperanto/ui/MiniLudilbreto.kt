@@ -3,6 +3,12 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -90,7 +96,7 @@ fun MiniLudilbreto(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("♪", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Icon(Icons.Filled.MusicNote, contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
             }
@@ -132,20 +138,20 @@ fun MiniLudilbreto(
                     if (ludas) ludilo.pauxzigi() else ludilo.ludi()
                 }
             }) {
-                Text(
-                    text = if (ludas) "⏸" else "▶",
-                    style = MaterialTheme.typography.headlineMedium
+                Icon(
+                    imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    contentDescription = if (ludas) "Paŭzigi" else "Ludi"
                 )
             }
 
             // Halti-butono
             IconButton(onClick = { logi("Klako", "halti"); ludilo.halti() }) {
-                Text("■", style = MaterialTheme.typography.bodySmall)
+                Icon(Icons.Filled.Stop, contentDescription = "Halti")
             }
 
             // Ludvico-butono
             IconButton(onClick = { logi("Klako", "ludvico"); onLudvico() }) {
-                Text("📋", style = MaterialTheme.typography.bodySmall)
+                Icon(Icons.Filled.QueueMusic, contentDescription = "Ludvico")
             }
         }
 

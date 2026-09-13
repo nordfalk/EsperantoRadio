@@ -6,6 +6,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,18 +42,24 @@ fun AlarmoEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("⏰ Vekhorloĝo (${alarmoj.size})") },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Alarm, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Vekhorloĝo (${alarmoj.size})")
+                    }
+                },
                 navigationIcon = {
-                    TextButton(onClick = {
+                    IconButton(onClick = {
                         logi("Klako", "reen (AlarmoEkrano)")
                         if (redaktoModo != null) redaktoModo = null
                         else if (kreiModo) kreiModo = false
                         else onReen()
-                    }) { Text("← Reen") }
+                    }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
                 },
                 actions = {
                     if (redaktoModo == null && !kreiModo) {
-                        TextButton(onClick = { logi("Klako", "nova alarmo"); kreiModo = true }) { Text("+") }
+                        IconButton(onClick = { logi("Klako", "nova alarmo"); kreiModo = true }) { Icon(Icons.Filled.Add, contentDescription = "Nova alarmo") }
                     }
                 }
             )
@@ -87,11 +99,15 @@ fun AlarmoEkrano(
                     Text("Neniu alarmo. Premu + por krei.")
                     if (!subtenasVekhorlogxn) {
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            "ℹ Alarmoj funkcias nur sur Android-telefonoj.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                "Alarmoj funkcias nur sur Android-telefonoj.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -99,12 +115,15 @@ fun AlarmoEkrano(
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
                     if (!subtenasVekhorlogxn) {
                         item {
-                            Text(
-                                "ℹ Alarmoj funkcias nur sur Android-telefonoj. Sur ĉi tiu platformo vi povas nur agordi ilin.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(8.dp)
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
+                                Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    "Alarmoj funkcias nur sur Android-telefonoj. Sur ĉi tiu platformo vi povas nur agordi ilin.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                     items(alarmoj) { alarmo ->
@@ -157,7 +176,7 @@ private fun AlarmoEro(
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(checked = alarmo.aktiva, onCheckedChange = { onBaskuli() })
-                TextButton(onClick = onForigi) { Text("🗑") }
+                IconButton(onClick = onForigi) { Icon(Icons.Filled.Delete, contentDescription = "Forigi") }
             }
         }
     )

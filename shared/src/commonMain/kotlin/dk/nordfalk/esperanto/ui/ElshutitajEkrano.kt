@@ -4,6 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,13 +43,13 @@ fun ElshutitajEkrano(
         topBar = {
             TopAppBar(
                 title = { Text("Elŝutitaj (${listo.size})") },
-                navigationIcon = { TextButton(onClick = { logi("Klako", "reen (ElshutitajEkrano)"); onReen() }) { Text("← Reen") } }
+                navigationIcon = { IconButton(onClick = { logi("Klako", "reen (ElshutitajEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") } }
             )
         }
     ) { padding ->
         if (listo.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Neniu elŝutita elsendo. Premu ⬇ sur elsendo por elŝuti.")
+                Text("Neniu elŝutita elsendo. Premu la elŝutbutonon sur elsendo por elŝuti.")
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -128,11 +134,11 @@ private fun ElshutitaEro(
                             },
                             modifier = Modifier.size(36.dp)
                         ) {
-                            Text(if (ludas) "⏸" else "▶")
+                            Icon(if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (ludas) "Paŭzigi" else "Ludi")
                         }
                     }
                     IconButton(onClick = onForigi, modifier = Modifier.size(36.dp)) {
-                        Text("🗑")
+                        Icon(Icons.Filled.Delete, contentDescription = "Forigi")
                     }
                 }
             }

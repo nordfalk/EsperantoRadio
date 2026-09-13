@@ -8,6 +8,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -297,9 +305,9 @@ fun HejmoEkrano(
             TopAppBar(
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
-                    TextButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Text("⬇") }
-                    TextButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Text("⏰") }
-                    TextButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Text("⚙") }
+                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
+                    IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
+                    IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }
             )
         }
@@ -488,7 +496,7 @@ private fun ElsendoKarto(
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("♪", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Icon(Icons.Filled.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
@@ -531,7 +539,7 @@ private fun ElsendoKarto(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("⋮", color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                            Icon(Icons.Filled.MoreVert, contentDescription = "Menuo", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                         DropdownMenu(
                             expanded = menuMontrata,
@@ -567,10 +575,11 @@ private fun ElsendoKarto(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = if (ludas) "⏸" else "▶",
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleSmall
+                        Icon(
+                            imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = if (ludas) "Paŭzigi" else "Ludi",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }

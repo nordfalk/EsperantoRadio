@@ -5,6 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -83,11 +91,11 @@ fun KanaloEkrano(
             TopAppBar(
                 title = { Text(kanalo.nomo) },
                 navigationIcon = {
-                    TextButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Text("← Reen") }
+                    IconButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
                 },
                 actions = {
-                    TextButton(onClick = {
-                        logi("Klako", "♥ baskulas plejŝaton: ${kanalo.slug}")
+                    IconButton(onClick = {
+                        logi("Klako", "baskulas plejŝaton: ${kanalo.slug}")
                         val antauxa = estasPlejŝatata
                         scope.launch {
                             plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug)
@@ -106,7 +114,11 @@ fun KanaloEkrano(
                             }
                         }
                     }) {
-                        Text(if (estasPlejŝatata) "♥" else "♡", style = MaterialTheme.typography.headlineSmall)
+                        Icon(
+                            imageVector = if (estasPlejŝatata) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = if (estasPlejŝatata) "Forigi ŝaton" else "Aldoni ŝaton",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             )
@@ -162,7 +174,7 @@ fun KanaloEkrano(
                                     modifier = Modifier.size(40.dp)
                                 ) {
                                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                        Text("▶", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleMedium)
+                                        Icon(Icons.Filled.PlayArrow, contentDescription = "Ludi", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                                     }
                                 }
                                 Spacer(Modifier.width(12.dp))
@@ -213,7 +225,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                 color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("♪", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Icon(Icons.Filled.MusicNote, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }
@@ -232,7 +244,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                     AssistChip(
                         onClick = { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) },
                         label = { Text("Retejo") },
-                        leadingIcon = { Text("🌐") }
+                        leadingIcon = { Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                     Spacer(Modifier.width(8.dp))
                 }
@@ -260,7 +272,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                             )
                         },
                         label = { Text("Retpoŝto") },
-                        leadingIcon = { Text("✉") }
+                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                 }
             }
@@ -311,7 +323,7 @@ private fun ElsendoEro(
                     color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("♪", color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        Icon(Icons.Filled.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
                     }
                 }
             }

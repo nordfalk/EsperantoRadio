@@ -101,39 +101,10 @@ class LudvicoRegilo(
     private suspend fun traktiStatoSxangxon(stato: LudantoStato) {
         when {
             stato == LudantoStato.Finita && antauxaStato != LudantoStato.Finita -> {
-                logi("Ludvico", "Ludado finiĝis (naturfino)")
-                val nunaFonto = ludilo.stato.value.nunaFonto
-                val nunaElsendo = when (nunaFonto) {
-                    is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
-                    is Sonfonto.LokaElsendo -> nunaFonto.elsendo
-                    else -> null
-                }
-                // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
-                if (nunaFonto is Sonfonto.RektaKanalo) {
-                    logi("Ludvico", "Rekta kanalo finiĝis — ne aŭtoludas")
-                    antauxaStato = stato
-                    return
-                }
-                if (nunaElsendo != null) {
-                    ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
-                }
-                // Forigu la finitan elsendon el la vico se ĝi estas tie
-                if (nunaElsendo != null) {
-                    _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
-                }
-                // Se aŭtomata daŭrigo estas malŝaltita, haltu post finio
-                if (!auxtomataDaurigo.value) {
-                    logi("Ludvico", "Aŭtomata daŭrigo malŝaltita — haltas")
-                    ludilo.halti()
-                    antauxaStato = stato
-                    return
-                }
-                // Lanĉu sekvan en aparta korutino por eviti rekurson
-                val elsendoPorLudi = nunaElsendo
-                scope.launch {
-                    try { ludiSekvan(elsendoPorLudi) }
-                    catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
-                }
+                traktiFinon(stato, erara = false)
+            }
+            stato is LudantoStato.Eraro && antauxaStato !is LudantoStato.Eraro -> {
+                traktiFinon(stato, erara = true)
             }
             stato == LudantoStato.Ludas -> {
                 ghisdatiguLastaPozicion()
@@ -147,6 +118,50 @@ class LudvicoRegilo(
             else -> {}
         }
         antauxaStato = stato
+    }
+
+    /**
+     * Komuna trakto por Finita kaj Eraro — markas la elsendon kaj aŭtoludas sekvan.
+     */
+    private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean) {
+        val nunaFonto = ludilo.stato.value.nunaFonto
+        val nunaElsendo = when (nunaFonto) {
+            is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
+            is Sonfonto.LokaElsendo -> nunaFonto.elsendo
+            else -> null
+        }
+        // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
+        if (nunaFonto is Sonfonto.RektaKanalo) {
+            logi("Ludvico", "Rekta kanalo ${if (erara) "eraris" else "finiĝis"} — ne aŭtoludas")
+            return
+        }
+        if (erara) {
+            logw("Ludvico", "Ludado eraris — markas erara kaj daŭrigas")
+            if (nunaElsendo != null) {
+                ludatojDeponejo.markiErara(nunaElsendo.id, nunaElsendo.kanaloSlug)
+            }
+        } else {
+            logi("Ludvico", "Ludado finiĝis (naturfino)")
+            if (nunaElsendo != null) {
+                ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
+            }
+        }
+        // Forigu la elsendon el la vico se ĝi estas tie
+        if (nunaElsendo != null) {
+            _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
+        }
+        // Se aŭtomata daŭrigo estas malŝaltita, haltu post finio
+        if (!auxtomataDaurigo.value) {
+            logi("Ludvico", "Aŭtomata daŭrigo malŝaltita — haltas")
+            ludilo.halti()
+            return
+        }
+        // Lanĉu sekvan en aparta korutino por eviti rekurson
+        val elsendoPorLudi = nunaElsendo
+        scope.launch {
+            try { ludiSekvan(elsendoPorLudi) }
+            catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
+        }
     }
 
     private fun komenciPozicianSpuradon() {

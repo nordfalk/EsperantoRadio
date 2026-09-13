@@ -89,5 +89,6 @@ data class LudataElsendo(
     val pozicioMs: Long = 0,
     val dauroMs: Long = 0,
     val finita: Boolean = false,
+    val erara: Boolean = false,
     val lasteLudita: Long = 0,
 )

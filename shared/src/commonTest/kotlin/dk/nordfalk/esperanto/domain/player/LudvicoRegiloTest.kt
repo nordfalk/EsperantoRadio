@@ -609,4 +609,83 @@ class LudvicoRegiloTest {
         // La regilo devus agnoski la ludantan staton kaj ne panei
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Ludado devus dauxri")
     }
+
+    // =========================================================================
+    // Eraro — ludanta eraro (ekz. 404) devas marki erara kaj daŭrigi
+    // =========================================================================
+
+    @Test
+    fun eraro_markasEraranKajDauxrigasKunSekva() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, ludatoj) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+
+
+        // Simulu ludantan eraron (ekz. 404)
+        ludilo.simuluEraron("Response code: 404")
+
+
+        // Devus ludi e2 (sekva samkanala) malgraŭ la eraro
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas dauxrigi kun sekva post eraro")
+        val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
+        assertEquals("k1:2024-02-01", fonto.elsendo.id)
+
+        // e1 devus esti markita kaj finita kaj erara
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 devus esti markita finita")
+        val ludato = ludatoj.getLudato(e1.id)
+        assertTrue(ludato?.erara == true, "e1 devus esti markita erara")
+    }
+
+    @Test
+    fun eraro_haltasSeNenioSekva() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val elsendoj = mapOf("k1" to listOf(e1))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, ludatoj) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+
+
+        ludilo.simuluEraron("404")
+
+
+        // Nenio sekva — devas halti
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Devas halti se nenio sekva post eraro")
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 devas esti markita finita")
+        assertTrue(ludatoj.getLudato(e1.id)?.erara == true, "e1 devas esti markita erara")
+    }
+
+    @Test
+    fun eraro_saltasEraranEnAuxtoludo() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val e3 = elsendo("k1:2024-01-01", "k1", "2024-01-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2, e3))
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        // Marku e2 kiel erara anticipe
+        ludatoj.markiErara(e2.id, e2.kanaloSlug)
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+
+
+        ludilo.simuluFinon()
+
+
+        // Devus salti eraran e2 kaj ludi e3
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+        val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
+        assertEquals("k1:2024-01-01", fonto.elsendo.id, "Devas salti eraran e2 kaj ludi e3")
+    }
 }

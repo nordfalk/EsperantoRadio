@@ -73,4 +73,12 @@ class NoOpLudiloRegilo : LudiloRegilo {
     fun simuluPozicion(pozicioMs: Long, dauroMs: Long = 0) {
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs, dauroMs = dauroMs)
     }
+
+    /**
+     * Simulas ludantan eraron — metas staton al Eraro.
+     * Uzata en testoj.
+     */
+    fun simuluEraron(mesagho: String = "Testa eraro") {
+        _stato.value = _stato.value.copy(stato = LudantoStato.Eraro(mesagho))
+    }
 }

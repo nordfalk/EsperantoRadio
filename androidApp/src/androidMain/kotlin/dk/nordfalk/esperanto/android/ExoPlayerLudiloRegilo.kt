@@ -53,16 +53,8 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         override fun onPlaybackStateChanged(playbackState: Int) { updateState() }
         override fun onIsPlayingChanged(isPlaying: Boolean) { updateState() }
         override fun onPlayerErrorChanged(error: PlaybackException?) {
-            if (error != null) {
-                loge("Ludilo", "Ludanta eraro", error)
-                _stato.value = LudantoInformo(
-                    stato = LudantoStato.Eraro(error.message ?: "Nekonata eraro"),
-                    nunaFonto = nunaFonto,
-                    estasRekta = nunaFonto is Sonfonto.RektaKanalo,
-                )
-            } else {
-                updateState()
-            }
+            if (error != null) loge("Ludilo", "Ludanta eraro", error)
+            updateState()
         }
     }
 
@@ -114,7 +106,13 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
 
     private fun updateState() {
         val c = controller ?: return
-        val ludantoStato = when (c.playbackState) {
+        // Se eraro ekzistas, konservu Eraro-staton — onPlaybackStateChanged(STATE_IDLE)
+        // vokas updateState() tuj post onPlayerErrorChanged kaj povus superskribi Eraro per Haltita.
+        // StateFlow estas conflated, do la kolektanto povus maltrafi Eraro se ni ne gardas ĝin ĉi tie.
+        val error = c.playerError
+        val ludantoStato = if (error != null) {
+            LudantoStato.Eraro(error.message ?: "Nekonata eraro")
+        } else when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita
             Player.STATE_BUFFERING -> LudantoStato.Konektas
             Player.STATE_ENDED -> LudantoStato.Finita
@@ -134,6 +132,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         nunaFonto = fonto
         konektita.await()
         val url = getStreamUrl(fonto)
+        logi("Ludilo", "Fiksas fonton al url: $url")
         val mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMediaMetadata(getMediaMetadata(fonto))

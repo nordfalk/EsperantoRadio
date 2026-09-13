@@ -77,6 +77,9 @@ class LudvicoRegilo(
     private val ludMutex = Mutex()
     @Volatile private var antauxaStato: LudantoStato = LudantoStato.Haltita
 
+    /** Nombro de sinsekvaj eraroj — haltas post MAKS_ERAROJ por eviti eternan buklon. */
+    @Volatile private var erarojSinsekvaj: Int = 0
+
     /** Lasta pozicio antaŭ ol halti() forigis nunaFonton — uzata de savuPozicion kiel retroiro. */
     @Volatile private var lastaFonto: Sonfonto? = null
     @Volatile private var lastaPozicioMs: Long = 0
@@ -136,7 +139,16 @@ class LudvicoRegilo(
             return
         }
         if (erara) {
-            logw("Ludvico", "Ludado eraris — markas erara kaj daŭrigas")
+            erarojSinsekvaj++
+            if (erarojSinsekvaj >= MAKS_ERAROJ) {
+                logw("Ludvico", "Atingis $MAKS_ERAROJ sinsekvajn erarojn — haltas por eviti eternan buklon")
+                if (nunaElsendo != null) {
+                    ludatojDeponejo.markiErara(nunaElsendo.id, nunaElsendo.kanaloSlug)
+                }
+                ludilo.halti()
+                return
+            }
+            logw("Ludvico", "Ludado eraris ($erarojSinsekvaj/$MAKS_ERAROJ) — markas erara kaj daŭrigas")
             if (nunaElsendo != null) {
                 ludatojDeponejo.markiErara(nunaElsendo.id, nunaElsendo.kanaloSlug)
             }
@@ -222,6 +234,7 @@ class LudvicoRegilo(
      */
     suspend fun ludiElsendon(elsendo: Elsendo) {
         ludMutex.withLock {
+            erarojSinsekvaj = 0
             savuPozicion()
             // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
             if (ludatojDeponejo.estasFinita(elsendo.id)) {
@@ -382,5 +395,7 @@ class LudvicoRegilo(
     companion object {
         /** Kiom ofte savas pozicion dum ludado (ms). */
         const val POZICIO_SAV_INTERVALO_MS = 5000L
+        /** Maksimumo de sinsekvaj eraroj antaŭ ol halti por eviti eternan buklon. */
+        const val MAKS_ERAROJ = 10
     }
 }

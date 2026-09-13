@@ -688,4 +688,52 @@ class LudvicoRegiloTest {
         val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
         assertEquals("k1:2024-01-01", fonto.elsendo.id, "Devas salti eraran e2 kaj ludi e3")
     }
+
+    @Test
+    fun eraro_haltasPostMaksimumoSinsekvajEraroj() = runTest {
+        val elsendoj = (1..12).map { i ->
+            elsendo("k1:2024-0$i-01", "k1", "2024-0$i-01")
+        }
+        val elsendojMap = mapOf("k1" to elsendoj)
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendojMap, scope = this)
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(elsendoj[0])
+
+
+        // Simulu 10 sinsekvajn erarojn — cxiu elsendo tuj eraras
+        repeat(LudvicoRegilo.MAKS_ERAROJ) {
+            ludilo.simuluEraron("404")
+        }
+
+
+        // Post 10 eraroj, devas esti haltita — ne dauxrigi al la 11-a
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Devas halti post ${LudvicoRegilo.MAKS_ERAROJ} sinsekvaj eraroj")
+    }
+
+    @Test
+    fun eraro_rekomencigasNombronKiamLudiElsendon() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+
+        regilo.komenci()
+
+        // Eraro 1 (e1 eraras, axtomato provas sekvan sed nur e2 haveblas kiu ludas)
+        regilo.ludiElsendon(e1)
+        ludilo.simuluEraron("404")
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+
+        // Haltu kaj ree ludi e1 eksplicite — tio rekomencigas erarojn al 0
+        ludilo.halti()
+        regilo.ludiElsendon(e1)
+        ludilo.simuluEraron("404")
+
+        // Tio estas eraro 1 post rekomencigxo — devas dauxrigi
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas dauxrigi cxe eraro 1 post rekomencigxo per ludiElsendon")
+    }
 }

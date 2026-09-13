@@ -207,10 +207,23 @@ fun EsperantoRadioApp(
                                 elsendoDeponejo = elsendoDeponejo,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onLudi = { elsendo ->
+                                    logi("Nav", "Hejmo: ludas elsendon ${elsendo.id}")
+                                    scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
+                                },
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
+                                onElshuti = { elsendo ->
+                                    logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
+                                    scope.launch { elshutDeponejo.elshuti(elsendo) }
+                                },
+                                onAldoniAlVico = { elsendo ->
+                                    logi("Nav", "Hejmo: aldonas al ludvico ${elsendo.id}")
+                                    scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
+                                },
                                 ludatojDeponejo = ludatojDeponejo,
+                                ludilo = ludilo,
                             )
                         }
                         entry<Vojo.Kanalaro> {

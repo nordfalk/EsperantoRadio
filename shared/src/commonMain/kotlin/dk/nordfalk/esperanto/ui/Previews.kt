@@ -1,11 +1,15 @@
 package dk.nordfalk.esperanto.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 
 // === Antaŭvidoj — pli malaltaj por eviti vakuon ===
 
@@ -136,6 +140,70 @@ fun PreviewHejmoNova() {
         HejmoEkrano(
             kanaloDeponejo = pKanaloDeponejo(),
             elsendoDeponejo = elsendoDeponejo,
+            ludatojDeponejo = pLudatojDeponejo(),
+            ludilo = PreviewLudiloRegilo(),
         )
     }
+}
+
+@Preview(name = "Malsupra naviga breto — Hejmo", showBackground = true, heightDp = 80)
+@Composable
+fun PreviewMalsupraNavigaBretoHejmo() {
+    pTemo() {
+        MalsupraNavigaBreto(
+            nunaTab = EkranoLangeto.HEJMO,
+            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
+        )
+    }
+}
+
+@Preview(name = "Malsupra naviga breto — Kanaloj", showBackground = true, heightDp = 80)
+@Composable
+fun PreviewMalsupraNavigaBretoKanaloj() {
+    pTemo() {
+        MalsupraNavigaBreto(
+            nunaTab = EkranoLangeto.KANALARO,
+            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
+        )
+    }
+}
+
+@Preview(name = "Malsupra naviga breto — Serĉo", showBackground = true, heightDp = 80)
+@Composable
+fun PreviewMalsupraNavigaBretoSercxo() {
+    pTemo() {
+        MalsupraNavigaBreto(
+            nunaTab = EkranoLangeto.SERCXO,
+            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
+        )
+    }
+}
+
+@Preview(name = "Ludvico — kun eroj", showBackground = true, heightDp = 400)
+@Composable
+fun PreviewLudvicoKunEroj() {
+    val regilo = LudvicoRegilo(
+        ludilo = dk.nordfalk.esperanto.domain.player.NoOpLudiloRegilo(),
+        elsendoDeponejo = object : dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo {
+            override fun observiElsendojn(kanaloSlug: String) = kotlinx.coroutines.flow.MutableStateFlow(emptyList<Elsendo>())
+            override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean) = emptyList<Elsendo>()
+            override suspend fun getElsendo(id: String): Elsendo? = null
+            override suspend fun sercxiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
+            override suspend fun sxargxiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
+        },
+        kanaloDeponejo = object : dk.nordfalk.esperanto.domain.repository.KanaloDeponejo {
+            override fun observiKanalojn() = kotlinx.coroutines.flow.MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Kanalo>())
+            override suspend fun getKanalojn(fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Kanalo>()
+            override suspend fun getKanalo(slug: String) = null
+        },
+        plejŝatatajDeponejo = dk.nordfalk.esperanto.data.repository.PlejŝatatajDeponejoImpl(),
+        ludatojDeponejo = dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo(),
+    )
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        regilo.aldoniAlVico(pElsendo)
+        val e2 = pElsendo.copy(id = "kernpunkto:2024-01-02", titolo = "KP205 Sekva epizodo en vico")
+        regilo.aldoniAlVico(e2)
+    }
+    pTemo() { LudvicoEkrano(ludvicoRegilo = regilo, onReen = {}) }
 }

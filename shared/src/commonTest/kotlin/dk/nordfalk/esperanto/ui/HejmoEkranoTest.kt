@@ -49,6 +49,9 @@ class HejmoEkranoTest {
         Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaux(12)),
         Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaux(3)),
         Elsendo(id = "vv:2", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", fluo = "", dato = datoAntaux(17)),
+        // Malnovaj elsendoj (>6 monatoj) — ne aperas en "Kio novas", nur en "Kio popularas"
+        Elsendo(id = "kp:malnova", kanaloSlug = "kernpunkto", titolo = "Kernpunkto malnova", fluo = "", dato = datoAntaux(200)),
+        Elsendo(id = "vv:malnova", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento malnova", fluo = "", dato = datoAntaux(220)),
     )
 
     private fun falsaKanaloDeponejo() = object : KanaloDeponejo {
@@ -84,7 +87,8 @@ class HejmoEkranoTest {
         }
         waitForIdle()
         onNodeWithText("Kio novas").assertIsDisplayed()
-        onNodeWithText("Kio popularas").assertIsDisplayed()
+        onNodeWithText("Aliaj elsendoj").assertIsDisplayed()
+        onNodeWithText("Kanaloj").assertIsDisplayed()
     }
 
     @Test
@@ -96,8 +100,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // "Kernpunkto" aperas en "Kio novas" (2 elsendoj) kaj "Kio popularas" (2 hazardaj) = 4x
-        // "Varsovia Vento" same 4x. Muzaiko ne havas podkastojn, do ĝi ne aperas en elsendoj.
+        // "Kernpunkto": kp:1 (Kio novas + Ĉiuj kanaloj), kp:2 (Kio novas), kp:malnova (Kio popularas) = 4x
+        // "Varsovia Vento": same 4x
         onAllNodesWithText("Kernpunkto").assertCountEquals(4)
         onAllNodesWithText("Varsovia Vento").assertCountEquals(4)
     }
@@ -111,12 +115,16 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // Ĉiuj 4 elsendoj aperas en "Kio novas" kaj ankaŭ en "Kio popularas"
-        // (nur 4 elsendoj, do take(20) prenas ĉiujn) = 2-foje po titolo
-        onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(2)
-        onAllNodesWithText("Kernpunkto epizodo 2").assertCountEquals(2)
-        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
-        onAllNodesWithText("Varsovia Vento epizodo 2").assertCountEquals(2)
+        // Novaj elsendoj (kp:1, kp:2, vv:1, vv:2) aperas en "Kio novas".
+        // La plej novaj (kp:1, vv:1) ankaŭ en "Ĉiuj kanaloj".
+        // Malnovaj (kp:malnova, vv:malnova) nur en "Kio popularas".
+        // Novaj ne aperas en "Kio popularas" (ekspluditaj).
+        onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(2) // Kio novas + Ĉiuj kanaloj
+        onAllNodesWithText("Kernpunkto epizodo 2").assertCountEquals(1) // Kio novas
+        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2) // Kio novas + Ĉiuj kanaloj
+        onAllNodesWithText("Varsovia Vento epizodo 2").assertCountEquals(1) // Kio novas
+        onAllNodesWithText("Kernpunkto malnova").assertCountEquals(1) // Kio popularas
+        onAllNodesWithText("Varsovia Vento malnova").assertCountEquals(1) // Kio popularas
     }
 
     @Test
@@ -128,12 +136,15 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // La flava emblemeto montras kiom nova la elsendo estas
-        // (aperas nur en "Kio novas", ne en "Kio popularas")
-        // 5 tagoj, 12 tagoj (<=14 restas tagoj), 3 tagoj, 17 tagoj (-> 2 semajnoj)
-        onNodeWithText("5 tagoj").assertIsDisplayed()
-        onNodeWithText("3 tagoj").assertIsDisplayed()
-        onNodeWithText("12 tagoj").assertIsDisplayed()
-        onNodeWithText("2 semajnoj").assertIsDisplayed()
+        // Flavaj emblemetoj montras kiom nova la elsendo estas — nur en "Kio novas" kaj "Ĉiuj kanaloj"
+        // (malnovaj elsendoj en "Kio popularas" estas >6 monatoj, do neniu emblemeto)
+        // kp:1 (5 tagoj, plej nova): Kio novas + Ĉiuj kanaloj = 2
+        // vv:1 (3 tagoj, plej nova): 2
+        // kp:2 (12 tagoj): Kio novas = 1
+        // vv:2 (17 tagoj → "2 semajnoj"): Kio novas = 1
+        onAllNodesWithText("5 tagoj").assertCountEquals(2)
+        onAllNodesWithText("3 tagoj").assertCountEquals(2)
+        onAllNodesWithText("12 tagoj").assertCountEquals(1)
+        onAllNodesWithText("2 semajnoj").assertCountEquals(1)
     }
 }

@@ -37,6 +37,8 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.async
@@ -136,12 +138,19 @@ class HejmoViewModel(
     val sxargxas = _sxargxas.asStateFlow()
 
     suspend fun sxargxi() {
+        val kanaloj = kanaloDeponejo.getKanalojn()
+        logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj")
+
+        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        val kashitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKashitajnElsendojn(kanaloj) ?: emptyList()
+        if (kashitaj.isNotEmpty()) {
+            plenigu(kanaloj, kashitaj)
+            logi("HejmoViewModel", "Diskkaŝmemoro: ${kashitaj.size} elsendoj — tuj montras")
+        }
+
+        // Paŝo 2: Reto-elŝuto (malrapida)
         _sxargxas.value = true
         try {
-            val kanaloj = kanaloDeponejo.getKanalojn()
-            logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj")
-
-            // Ŝargi ĉiujn RSS-fluojn samtempe (po unu async per kanalo kun podkasta RSS)
             val ĉiujElsendoj = coroutineScope {
                 kanaloj
                     .filter { it.havasPodkastojn }
@@ -150,53 +159,7 @@ class HejmoViewModel(
                     .flatten()
             }
             logi("HejmoViewModel", "Ŝargis ${ĉiujElsendoj.size} elsendojn entute")
-
-            val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
-
-            // "Kio novas" — nur pli novaj ol 6 monatoj, maks 7 per kanalo, maks 50 entute
-            val novaj = ĉiujElsendoj
-                .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
-                .groupBy { it.kanaloSlug }
-                .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
-                .sortedByDescending { it.dato }
-                .take(50)
-            _novajElsendoj.value = novaj
-            logi("HejmoViewModel", "Kio novas: ${novaj.size} elsendoj (post filtrado)")
-
-            // "Ĉiuj kanaloj" — unu karto po kanalo kun la plej nova elsendo
-            val cxiujKanalojKartog = kanaloj
-                .filter { it.havasPodkastojn }
-                .map { kanalo ->
-                    val plejNova = ĉiujElsendoj
-                        .filter { it.kanaloSlug == kanalo.slug }
-                        .sortedByDescending { it.dato }
-                        .firstOrNull()
-                    KanalKarto(kanalo, plejNova)
-                }
-                .filter { it.plejNovaElsendo != null }
-            _cxiujKanaloj.value = cxiujKanalojKartog
-            logi("HejmoViewModel", "Ĉiuj kanaloj: ${cxiujKanalojKartog.size} kanaloj")
-
-            // "Kio popularas" — hazardaj elsendoj, ekskludante la unuajn 20 novajn
-            // kaj la plej novan elsendon de ĉiu kanalo (jam montratajn supre)
-            val ekskluditaj = (novaj.take(20).map { it.id } +
-                cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
-            _popularajElsendoj.value = ĉiujElsendoj
-                .filter { it.id !in ekskluditaj }
-                .shuffled()
-                .take(20)
-
-            // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
-            if (ludatojDeponejo != null) {
-                val ludatoj = ludatojDeponejo.observiLudatojn().value
-                val lastatempe = ludatoj.values
-                    .filter { it.lasteLudita > 0 }
-                    .sortedByDescending { it.lasteLudita }
-                    .mapNotNull { ludato -> ĉiujElsendoj.find { it.id == ludato.elsendoId } }
-                    .take(20)
-                _lastatempeLudataj.value = lastatempe
-                logi("HejmoViewModel", "Lastatempe ludata: ${lastatempe.size} elsendoj")
-            }
+            plenigu(kanaloj, ĉiujElsendoj)
         } catch (e: Exception) {
             loge("HejmoViewModel", "Malsukcesis ŝargi hejmon", e)
         } finally {
@@ -232,6 +195,17 @@ class HejmoViewModel(
             .filter { it.id !in ekskluditaj }
             .shuffled()
             .take(20)
+
+        // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
+        if (ludatojDeponejo != null) {
+            val ludatoj = ludatojDeponejo.observiLudatojn().value
+            val lastatempe = ludatoj.values
+                .filter { it.lasteLudita > 0 }
+                .sortedByDescending { it.lasteLudita }
+                .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
+                .take(20)
+            _lastatempeLudataj.value = lastatempe
+        }
     }
 }
 
@@ -279,7 +253,7 @@ fun HejmoEkrano(
     ludilo: LudiloRegilo? = null,
     viewModel: HejmoViewModel? = null,
 ) {
-    val vm = viewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
+    val vm = viewModel ?: AppStato.hejmoViewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
     val kanaloj by vm.kanaloj.collectAsState()
     val novajElsendoj by vm.novajElsendoj.collectAsState()
     val popularajElsendoj by vm.popularajElsendoj.collectAsState()
@@ -305,6 +279,10 @@ fun HejmoEkrano(
             TopAppBar(
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
+                    if (sxargxas && novajElsendoj.isNotEmpty()) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }

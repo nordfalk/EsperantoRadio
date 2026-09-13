@@ -65,6 +65,7 @@ open class ElsendoDeponejoImpl(
             Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
             val respondo = httpKliento.get(url).bodyAsText()
             logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+            skribuKashon(kanalo.slug, respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
                 httpKliento.get(urlD).bodyAsText()
             }
@@ -88,6 +89,41 @@ open class ElsendoDeponejoImpl(
 
     override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
         sxargxiElsendojn(kanalo, fortoRefresigi)
+
+    /**
+     * Legas la krudan RSS-tekston el diskkaŝmemoro kaj re-parsas ĝin.
+     * Se neniu kaŝo ekzistas, revenigas null.
+     * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
+     */
+    fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
+        val respondo = leguKashon(kanalo.slug) ?: return null
+        logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
+        return try {
+            val elsendoj = parsilo.parsuRss(respondo, kanalo)
+            kaŝmemoro[kanalo.slug] = elsendoj
+            fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
+            logi("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
+            elsendoj
+        } catch (e: Exception) {
+            loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron", e)
+            null
+        }
+    }
+
+    /**
+     * Legas ĉiujn kaŝitajn RSS-dosierojn por la donitaj kanaloj kaj re-parsas ilin.
+     * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
+     * Redonas ĉiujn elsendojn kune (flat list).
+     */
+    fun leguĈiujnKashitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
+        val ĉiuj = mutableListOf<Elsendo>()
+        for (kanalo in kanaloj) {
+            if (!kanalo.havasPodkastojn) continue
+            leguKashitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
+        }
+        logi("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+        return ĉiuj
+    }
 
     override suspend fun getElsendo(id: String): Elsendo? {
         for ((_, elsendoj) in kaŝmemoro) {

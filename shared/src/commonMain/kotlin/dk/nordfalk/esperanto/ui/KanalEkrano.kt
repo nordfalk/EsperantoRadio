@@ -32,6 +32,7 @@ import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,14 @@ class KanaloViewModel(
     val sxargxas = _sxargxas.asStateFlow()
 
     suspend fun sxargxi() {
+        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        val kashitaj = elsendoDeponejo.leguKashitajnElsendojn(kanalo)
+        if (kashitaj != null && kashitaj.isNotEmpty()) {
+            _elsendoj.value = kashitaj
+            logi("KanaloViewModel", "${kanalo.slug}: diskkaŝmemoro — ${kashitaj.size} elsendoj")
+        }
+
+        // Paŝo 2: Reto-elŝuto (malrapida)
         _sxargxas.value = true
         try {
             val rezulto = elsendoDeponejo.sxargxiElsendojn(kanalo)
@@ -73,7 +82,9 @@ fun KanaloEkrano(
     onLudi: (Sonfonto) -> Unit = {},
     ludilo: LudiloRegilo? = null,
 ) {
-    val viewModel = remember(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
+    val viewModel = remember(kanalo.slug) {
+        AppStato.kanaloViewModelj.getOrPut(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
+    }
     val elsendoj by viewModel.elsendoj.collectAsState()
     val sxargxas by viewModel.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
@@ -155,6 +166,17 @@ fun KanaloEkrano(
                     }
                 }
             } else {
+                // Nebloka ŝarĝada indikilo (se ŝargas kaj jam havas elsendojn)
+                if (sxargxas) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        }
+                    }
+                }
                 // Rekta elsendo-butono se la kanalo havas livestream
                 if (kanalo.estasRekta) {
                     item {

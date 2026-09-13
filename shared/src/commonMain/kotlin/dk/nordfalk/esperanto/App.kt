@@ -101,7 +101,7 @@ fun EsperantoRadioApp(
             )
         }
         val elsendoDeponejo = remember { ElsendoDeponejoImpl(httpKliento) }
-        val kanalaroViewModel = remember { KanalaroViewModel(kanaloDeponejo) }
+        val kanalaroViewModel = remember { KanalaroViewModel(kanaloDeponejo, elsendoDeponejo) }
         val plejŝatatajDeponejo = remember { PersistantaPlejŝatatajDeponejo(settings) }
         val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
         val elshutDeponejo = remember { kreuElshutDeponejo(httpKliento) }
@@ -198,8 +198,14 @@ fun EsperantoRadioApp(
                                 viewModel = kanalaroViewModel,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                                 onLudi = { fonto ->
-                                    logi("Nav", "Ludas rekte: $fonto")
-                                    scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                    logi("Nav", "Ludas: $fonto")
+                                    scope.launch {
+                                        when (fonto) {
+                                            is Sonfonto.ElsendoFonto -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
+                                            is Sonfonto.LokaElsendo -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
+                                            is Sonfonto.RektaKanalo -> { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                        }
+                                    }
                                 },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
@@ -290,6 +296,10 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.elshuti(elsendo) }
                                 },
+                                onHaltigiElshuton = {
+                                    logi("Nav", "Haltigas elŝuton: ${elsendo.id}")
+                                    scope.launch { elshutDeponejo.haltigi(elsendo.id) }
+                                },
                                 onForigiElshuton = {
                                     logi("Nav", "Forigas elŝuton: ${elsendo.id}")
                                     scope.launch { elshutDeponejo.forigi(elsendo.id) }
@@ -298,8 +308,13 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Aldonas al ludvico: ${elsendo.id}")
                                     scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
                                 },
+                                onMontriLudvicon = {
+                                    logi("Nav", "Montri ludvicon")
+                                    push(Vojo.Ludvico)
+                                },
                                 elshutDeponejo = elshutDeponejo,
                                 ludatojDeponejo = ludatojDeponejo,
+                                ludilo = ludilo,
                             )
                         }
                     },

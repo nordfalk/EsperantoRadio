@@ -1,5 +1,10 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import dk.nordfalk.esperanto.logi
@@ -26,25 +31,25 @@ fun MalsupraNavigaBreto(
         NavigationBarItem(
             selected = nunaTab == EkranoLangeto.HEJMO,
             onClick = { logi("Klako", "hejmo-tab"); onHejmo() },
-            icon = { Text("🏠") },
+            icon = { Icon(Icons.Filled.Home, contentDescription = null) },
             label = { Text("Hejmo") }
         )
         NavigationBarItem(
             selected = nunaTab == EkranoLangeto.KANALARO,
             onClick = { logi("Klako", "kanalaro-tab"); onKanalaro() },
-            icon = { Text("🎵") },
+            icon = { Icon(Icons.Filled.MusicNote, contentDescription = null) },
             label = { Text("Kanaloj") }
         )
         NavigationBarItem(
             selected = nunaTab == EkranoLangeto.PLEJŜATATAJ,
             onClick = { logi("Klako", "plejŝatataj-tab"); onPlejŝatataj() },
-            icon = { Text("♥") },
+            icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
             label = { Text("Plej ŝatataj") }
         )
         NavigationBarItem(
             selected = nunaTab == EkranoLangeto.SERCXO,
             onClick = { logi("Klako", "sercxo-tab"); onSercxo() },
-            icon = { Text("🔍") },
+            icon = { Icon(Icons.Filled.Search, contentDescription = null) },
             label = { Text("Serĉi") }
         )
     }

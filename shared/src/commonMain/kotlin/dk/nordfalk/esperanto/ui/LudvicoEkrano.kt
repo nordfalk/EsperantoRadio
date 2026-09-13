@@ -3,6 +3,9 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +37,7 @@ fun LudvicoEkrano(
             TopAppBar(
                 title = { Text("Ludvico (${vico.size})") },
                 navigationIcon = {
-                    TextButton(onClick = { logi("Klako", "reen (LudvicoEkrano)"); onReen() }) { Text("← Reen") }
+                    IconButton(onClick = { logi("Klako", "reen (LudvicoEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
                 },
                 actions = {
                     if (vico.isNotEmpty()) {
@@ -104,7 +107,7 @@ private fun VicoEro(
         },
         trailingContent = {
             TextButton(onClick = onForigi) {
-                Text("✕", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(Icons.Filled.Close, contentDescription = "Forigi", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         modifier = Modifier.fillMaxWidth()

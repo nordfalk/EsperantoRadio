@@ -7,12 +7,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -78,7 +90,7 @@ fun ElsendoEkrano(
             TopAppBar(
                 title = { Text(elsendo.titolo, maxLines = 1) },
                 navigationIcon = {
-                    TextButton(onClick = { logi("Klako", "reen (ElsendoEkrano)"); onReen() }) { Text("← Reen") }
+                    IconButton(onClick = { logi("Klako", "reen (ElsendoEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
                 }
             )
         },
@@ -111,7 +123,7 @@ fun ElsendoEkrano(
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("♪", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Icon(Icons.Filled.MusicNote, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
@@ -126,9 +138,9 @@ fun ElsendoEkrano(
                 ) {
                     IkonoButono(
                         ikono = when (elshutStato) {
-                            is ElshutStato.Preta -> "✓"
-                            is ElshutStato.Elshutanta -> "■"
-                            else -> "⬇"
+                            is ElshutStato.Preta -> Icons.Filled.Check
+                            is ElshutStato.Elshutanta -> Icons.Filled.Stop
+                            else -> Icons.Filled.Download
                         },
                         label = when (elshutStato) {
                             is ElshutStato.Elshutanta -> "Haltigi elŝuton"
@@ -148,7 +160,7 @@ fun ElsendoEkrano(
                     )
 
                     IkonoButono(
-                        ikono = if (tiuElsendoLudas) "⏸" else "▶",
+                        ikono = if (tiuElsendoLudas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                         label = if (tiuElsendoLudas) "Paŭzigi" else "Ludi",
                         onClick = {
                             when {
@@ -161,7 +173,7 @@ fun ElsendoEkrano(
                     )
 
                     IkonoButono(
-                        ikono = "📋",
+                        ikono = Icons.Filled.QueueMusic,
                         label = "Aldoni al ludvico",
                         onClick = { logi("Klako", "aldoni al ludvico — ${elsendo.id}"); onAldoniAlVico(); montruMesaĝon("Aldonita al ludvico") },
                         onLongClick = { montruMesaĝon("Aldoni al ludvico") }
@@ -248,18 +260,19 @@ fun ElsendoEkrano(
                     tiuElsendoLudas -> Button(
                         onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi(); montruMesaĝon("Paŭzigita") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("⏸ Paŭzigi") }
+                    ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzigi") }
 
                     tiuElsendoPauxzita -> Button(
                         onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi(); montruMesaĝon("Daŭriganta") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("▶ Daŭrigi") }
+                    ) { Icon(Icons.Filled.PlayArrow, contentDescription = null); Text(" Daŭrigi") }
 
                     else -> Button(
                         onClick = { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi(); montruMesaĝon("Ludanta: ${elsendo.titolo}") },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (savitaPozicio != null && savitaPozicio > 5000) "▶ Daŭrigi" else "▶ Aŭskulti")
+                        Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                        Text(if (savitaPozicio != null && savitaPozicio > 5000) " Daŭrigi" else " Aŭskulti")
                     }
                 }
 
@@ -267,30 +280,30 @@ fun ElsendoEkrano(
                     is ElshutStato.NeElshutita -> OutlinedButton(
                         onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("⬇ Elŝuti") }
+                    ) { Icon(Icons.Filled.Download, contentDescription = null); Text(" Elŝuti") }
 
                     is ElshutStato.Elshutanta -> {
                         val p = (elshutStato as ElshutStato.Elshutanta).progreso
                         OutlinedButton(
                             onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElshuton(); montruMesaĝon("Elŝuto haltigita") },
                             modifier = Modifier.weight(1f)
-                        ) { Text("■ ${((p * 100).toInt())}%") }
+                        ) { Icon(Icons.Filled.Stop, contentDescription = null); Text(" ${((p * 100).toInt())}%") }
                     }
 
                     is ElshutStato.Preta -> OutlinedButton(
                         onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton(); montruMesaĝon("Elŝuto forigita") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("✓ Elŝutita — Forigi") }
+                    ) { Icon(Icons.Filled.Check, contentDescription = null); Text(" Elŝutita — Forigi") }
 
                     is ElshutStato.Eraro -> OutlinedButton(
                         onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("⚠ Eraro — reprovi") }
+                    ) { Icon(Icons.Filled.Warning, contentDescription = null); Text(" Eraro — reprovi") }
 
                     is ElshutStato.Pauxzita -> OutlinedButton(
                         onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("⏸ Paŭzita — reprovi") }
+                    ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzita — reprovi") }
                 }
             }
 
@@ -313,7 +326,7 @@ fun ElsendoEkrano(
                         }
                     },
                     modifier = Modifier.weight(1f)
-                ) { Text("📋 Aldoni al ludvico") }
+                ) { Icon(Icons.Filled.QueueMusic, contentDescription = null); Text(" Aldoni al ludvico") }
 
                 if (kanalo?.retposhto != null) {
                     OutlinedButton(
@@ -326,7 +339,7 @@ fun ElsendoEkrano(
                             )
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("✉ Komenti") }
+                    ) { Icon(Icons.Filled.Email, contentDescription = null); Text(" Komenti") }
                 } else {
                     Spacer(Modifier.weight(1f))
                 }
@@ -338,7 +351,7 @@ fun ElsendoEkrano(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun IkonoButono(
-    ikono: String,
+    ikono: ImageVector,
     label: String,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -356,10 +369,10 @@ private fun IkonoButono(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = ikono,
-            style = MaterialTheme.typography.titleLarge,
-            color = if (enabled) Color.White else Color.White.copy(alpha = 0.4f),
+        Icon(
+            imageVector = ikono,
+            contentDescription = label,
+            tint = if (enabled) Color.White else Color.White.copy(alpha = 0.4f),
         )
     }
 }

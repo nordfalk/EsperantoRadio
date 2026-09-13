@@ -4,6 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -42,7 +45,7 @@ fun PlejŝatatajEkrano(
     ) { padding ->
         if (plejKanaloj.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                Text("Neniu plej ŝatata kanalo. Premu ♡ sur kanalo por aldoni.")
+                Text("Neniu plej ŝatata kanalo. Premu la koron sur kanalo por aldoni.")
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -60,10 +63,10 @@ fun PlejŝatatajEkrano(
                         supportingContent = { Text(if (kanalo.estasRekta) "Rekta elsendo" else "Podkasto") },
                         trailingContent = {
                             TextButton(onClick = {
-                                logi("Klako", "♥ forigas plejŝaton: ${kanalo.slug}")
+                                logi("Klako", "forigas plejŝaton: ${kanalo.slug}")
                                 scope.launch { plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug) }
                             }) {
-                                Text("♥", style = MaterialTheme.typography.headlineSmall)
+                                Icon(Icons.Filled.Favorite, contentDescription = "Forigi ŝaton", tint = MaterialTheme.colorScheme.primary)
                             }
                         },
                         modifier = Modifier.clickable { logi("Klako", "plejŝatata kanalo ${kanalo.slug}"); onKanalo(kanalo) }

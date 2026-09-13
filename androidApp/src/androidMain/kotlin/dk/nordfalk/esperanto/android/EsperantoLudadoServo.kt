@@ -10,6 +10,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.logw
 
 /**
  * Fona ludado-servo per Media3 MediaSessionService.
@@ -41,6 +42,15 @@ class EsperantoLudadoServo : MediaSessionService() {
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(kreiMainActivityPendingIntent())
             .build()
+
+        // Evitas ke la servo haltiĝu kiam startForeground() malsukcesas pro
+        // Android 12+ restriktoj pri fona lanĉo de malfona servo.
+        // Tio okazas kiam aŭtoludo lanĉas novan elsendon dum la apo estas en fono.
+        setListener(object : MediaSessionService.Listener {
+            override fun onForegroundServiceStartNotAllowedException() {
+                logw("LudadoServo", "startForeground() malsukcesis (fono) — daŭrigas sen sciigo")
+            }
+        })
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {

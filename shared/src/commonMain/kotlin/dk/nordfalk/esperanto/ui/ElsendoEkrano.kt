@@ -4,6 +4,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -332,6 +334,72 @@ fun ElsendoEkrano(
                 }
             }
         }
+    }
+}
+
+/**
+ * Envolvas [ElsendoEkrano] en [HorizontalPager] por ebligi horizontalan svipon
+ * inter elsendoj de la sama kanalo.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ElsendoEkranoKunSvipo(
+    komencaElsendo: Elsendo,
+    elsendoj: List<Elsendo>,
+    onReen: () -> Unit,
+    onLudi: (Elsendo) -> Unit = {},
+    onElshuti: (Elsendo) -> Unit = {},
+    onHaltigiElshuton: (Elsendo) -> Unit = {},
+    onForigiElshuton: (Elsendo) -> Unit = {},
+    onKanalo: (Kanalo) -> Unit = {},
+    onAldoniAlVico: (Elsendo) -> Unit = {},
+    onMontriLudvicon: () -> Unit = {},
+    kanalo: Kanalo? = null,
+    elshutDeponejo: ElshutDeponejo? = null,
+    ludatojDeponejo: LudatojDeponejo? = null,
+    ludilo: LudiloRegilo? = null,
+) {
+    if (elsendoj.size <= 1) {
+        // Ne eblas svipi — montru nur la unuan elsendon
+        val e = elsendoj.firstOrNull() ?: komencaElsendo
+        ElsendoEkrano(
+            elsendo = e,
+            onReen = onReen,
+            onLudi = { onLudi(e) },
+            onElshuti = { onElshuti(e) },
+            onHaltigiElshuton = { onHaltigiElshuton(e) },
+            onForigiElshuton = { onForigiElshuton(e) },
+            onKanalo = onKanalo,
+            onAldoniAlVico = { onAldoniAlVico(e) },
+            onMontriLudvicon = onMontriLudvicon,
+            kanalo = kanalo,
+            elshutDeponejo = elshutDeponejo,
+            ludatojDeponejo = ludatojDeponejo,
+            ludilo = ludilo,
+        )
+        return
+    }
+
+    val komencaPagho = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
+    val paghoStato = rememberPagerState(initialPage = komencaPagho) { elsendoj.size }
+
+    HorizontalPager(state = paghoStato) { pagho ->
+        val e = elsendoj[pagho]
+        ElsendoEkrano(
+            elsendo = e,
+            onReen = onReen,
+            onLudi = { onLudi(e) },
+            onElshuti = { onElshuti(e) },
+            onHaltigiElshuton = { onHaltigiElshuton(e) },
+            onForigiElshuton = { onForigiElshuton(e) },
+            onKanalo = onKanalo,
+            onAldoniAlVico = { onAldoniAlVico(e) },
+            onMontriLudvicon = onMontriLudvicon,
+            kanalo = kanalo,
+            elshutDeponejo = elshutDeponejo,
+            ludatojDeponejo = ludatojDeponejo,
+            ludilo = ludilo,
+        )
     }
 }
 

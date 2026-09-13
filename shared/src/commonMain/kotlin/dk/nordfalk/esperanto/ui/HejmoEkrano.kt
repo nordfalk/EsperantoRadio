@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
@@ -39,9 +40,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
+import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
 
 /**
@@ -186,6 +189,27 @@ class HejmoViewModel(
             _sxargxas.value = false
         }
     }
+
+    /**
+     * Rekte plenigas la fluojn sen asinkrona ŝargado — uzata por antaŭvidoj.
+     */
+    @OptIn(ExperimentalTime::class)
+    fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
+        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+        _novajElsendoj.value = elsendoj
+            .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
+            .groupBy { it.kanaloSlug }
+            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
+            .sortedByDescending { it.dato }
+            .take(50)
+        _popularajElsendoj.value = elsendoj.take(20)
+        _cxiujKanaloj.value = kanaloj
+            .filter { it.havasPodkastojn }
+            .map { kanalo ->
+                KanalKarto(kanalo, elsendoj.filter { it.kanaloSlug == kanalo.slug }.maxByOrNull { it.dato })
+            }
+            .filter { it.plejNovaElsendo != null }
+    }
 }
 
 /**
@@ -230,27 +254,28 @@ fun HejmoEkrano(
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
+    viewModel: HejmoViewModel? = null,
 ) {
-    val viewModel = remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
-    val kanaloj by viewModel.kanaloj.collectAsState()
-    val novajElsendoj by viewModel.novajElsendoj.collectAsState()
-    val popularajElsendoj by viewModel.popularajElsendoj.collectAsState()
-    val lastatempeLudataj by viewModel.lastatempeLudataj.collectAsState()
-    val cxiujKanaloj by viewModel.cxiujKanaloj.collectAsState()
-    val sxargxas by viewModel.sxargxas.collectAsState()
+    val vm = viewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
+    val kanaloj by vm.kanaloj.collectAsState()
+    val novajElsendoj by vm.novajElsendoj.collectAsState()
+    val popularajElsendoj by vm.popularajElsendoj.collectAsState()
+    val lastatempeLudataj by vm.lastatempeLudataj.collectAsState()
+    val cxiujKanaloj by vm.cxiujKanaloj.collectAsState()
+    val sxargxas by vm.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
 
-    LaunchedEffect(Unit) {
-        scope.launch { viewModel.sxargxi() }
+    if (viewModel == null) {
+        LaunchedEffect(Unit) {
+            scope.launch { vm.sxargxi() }
+        }
     }
 
     /** Ludata teksto (se ludita) aŭ novectempo (se ne ludita). */
     fun montruTekston(elsendo: Elsendo, ludata: LudataElsendo?): String? =
         ludata?.let { ludataTeksto(it) } ?: kalkuliNovectempon(elsendo.dato)
-
 
     Scaffold(
         topBar = {
@@ -293,7 +318,6 @@ fun HejmoEkrano(
                                     elsendo = elsendo,
                                     kanalo = kanalo,
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludantoStato = ludantoStato,
                                     ludilo = ludilo,
                                     onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
@@ -319,7 +343,6 @@ fun HejmoEkrano(
                                     elsendo = elsendo,
                                     kanalo = kanalo,
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludantoStato = ludantoStato,
                                     ludilo = ludilo,
                                     onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
@@ -345,7 +368,6 @@ fun HejmoEkrano(
                                     elsendo = elsendo,
                                     kanalo = kanalo,
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludantoStato = ludantoStato,
                                     ludilo = ludilo,
                                     onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
@@ -372,7 +394,6 @@ fun HejmoEkrano(
                                     elsendo = elsendo,
                                     kanalo = kanalo,
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludantoStato = ludantoStato,
                                     ludilo = ludilo,
                                     onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
@@ -419,12 +440,12 @@ private fun ElsendoKarto(
     kanalo: Kanalo?,
     onClick: () -> Unit,
     montruTekston: String? = null,
-    ludantoStato: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita),
     ludilo: LudiloRegilo? = null,
     onLudi: (Elsendo) -> Unit = {},
     onElshuti: () -> Unit = {},
     onAldoniAlVico: () -> Unit = {},
 ) {
+    val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
     val kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug
     val bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl
     val (ludas, pauxzita) = elsendoLudas(elsendo.id, ludantoStato)
@@ -553,5 +574,90 @@ private fun ElsendoKarto(
                 maxLines = 2, overflow = TextOverflow.Ellipsis
             )
         }
+    }
+}
+
+@Preview(name = "ElsendoKarto — ne ludata", showBackground = true, heightDp = 220, widthDp = 170)
+@Composable
+private fun ElsendoKartoPreviewNeLudata() {
+    pTemo {
+        ElsendoKarto(
+            elsendo = pElsendo,
+            kanalo = pKanaloj[1],
+            montruTekston = "hodiaŭ",
+            onClick = {},
+        )
+    }
+}
+
+@Preview(name = "ElsendoKarto — ludata", showBackground = true, heightDp = 220, widthDp = 170)
+@Composable
+private fun ElsendoKartoPreviewLudata() {
+    val ludilo = PreviewLudiloRegilo(
+        LudantoInformo(
+            stato = LudantoStato.Ludas,
+            nunaFonto = Sonfonto.ElsendoFonto(pElsendo),
+            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+        )
+    )
+    pTemo {
+        ElsendoKarto(
+            elsendo = pElsendo,
+            kanalo = pKanaloj[1],
+            montruTekston = "aŭdis 42%",
+            ludilo = ludilo,
+            onClick = {},
+        )
+    }
+}
+
+@Preview(name = "ElsendoKarto — paŭzita", showBackground = true, heightDp = 220, widthDp = 170)
+@Composable
+private fun ElsendoKartoPreviewPauxzita() {
+    val ludilo = PreviewLudiloRegilo(
+        LudantoInformo(
+            stato = LudantoStato.Haltita,
+            nunaFonto = Sonfonto.ElsendoFonto(pElsendo),
+            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+        )
+    )
+    pTemo {
+        ElsendoKarto(
+            elsendo = pElsendo,
+            kanalo = pKanaloj[1],
+            montruTekston = "aŭdis 42%",
+            ludilo = ludilo,
+            onClick = {},
+        )
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Preview(name = "HejmoEkrano", showBackground = true, heightDp = 600)
+@Composable
+fun HejmoEkranoPreview() {
+    val hodiaŭ = Clock.System.todayIn(TimeZone.UTC).toString()
+    val hieraŭ = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 1)).toString()
+    val antaŭ3tagoj = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 3)).toString()
+
+    val previewElsendoj = listOf(
+        pElsendo.copy(id = "kernpunkto:nova1", kanaloSlug = "kernpunkto", dato = hodiaŭ, titolo = "KP300 Nova elsendo hodiaŭ"),
+        pElsendo.copy(id = "kernpunkto:nova2", kanaloSlug = "kernpunkto", dato = hieraŭ, titolo = "KP299 Hieraŭa elsendo"),
+        pElsendo.copy(id = "varsoviavento:nova1", kanaloSlug = "varsoviavento", dato = antaŭ3tagoj, titolo = "VV150 Antaŭ tri tagoj"),
+    )
+
+    val vm = HejmoViewModel(pKanaloDeponejo(), pElsendoDeponejo()).also {
+        it.plenigu(pKanaloj, previewElsendoj)
+    }
+
+    pTemo {
+        HejmoEkrano(
+            kanaloDeponejo = pKanaloDeponejo(),
+            elsendoDeponejo = pElsendoDeponejo(),
+            onLudi = {},
+            onElshuti = {},
+            onAldoniAlVico = {},
+            viewModel = vm,
+        )
     }
 }

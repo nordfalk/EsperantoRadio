@@ -131,3 +131,5 @@ internal class PreviewElsendoDeponejo(
         return elsendoj
     }
 }
+
+internal fun pElsendoDeponejo() = PreviewElsendoDeponejo(listOf(pElsendo))

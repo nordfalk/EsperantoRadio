@@ -85,6 +85,7 @@ class HejmoEkranoTest {
         waitForIdle()
         onNodeWithText("Kio novas").assertIsDisplayed()
         onNodeWithText("Kio popularas").assertIsDisplayed()
+        onNodeWithText("Ĉiuj kanaloj").assertIsDisplayed()
     }
 
     @Test
@@ -96,10 +97,10 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // "Kernpunkto" aperas en "Kio novas" (2 elsendoj) kaj "Kio popularas" (2 hazardaj) = 4x
-        // "Varsovia Vento" same 4x. Muzaiko ne havas podkastojn, do ĝi ne aperas en elsendoj.
-        onAllNodesWithText("Kernpunkto").assertCountEquals(4)
-        onAllNodesWithText("Varsovia Vento").assertCountEquals(4)
+        // "Kernpunkto" aperas en "Kio novas" (2), "Kio popularas" (2), "Ĉiuj kanaloj" (1) = 5x
+        // "Varsovia Vento" same 5x. Muzaiko ne havas podkastojn, do ĝi ne aperas en elsendoj.
+        onAllNodesWithText("Kernpunkto").assertCountEquals(5)
+        onAllNodesWithText("Varsovia Vento").assertCountEquals(5)
     }
 
     @Test
@@ -111,11 +112,15 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // Ĉiuj 4 elsendoj aperas en "Kio novas" kaj ankaŭ en "Kio popularas"
-        // (nur 4 elsendoj, do take(20) prenas ĉiujn) = 2-foje po titolo
-        onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(2)
+        // Ĉiuj 4 elsendoj aperas en "Kio novas" kaj "Kio popularas" (nur 4, do take(20) prenas ĉiujn).
+        // La plej nova elsendo de ĉiu kanalo ankaŭ aperas en "Ĉiuj kanaloj" (+1).
+        // kp:1 (5 tagoj) estas la plej nova de Kernpunkto: 3x
+        // kp:2 (12 tagoj): 2x
+        // vv:1 (3 tagoj) estas la plej nova de Varsovia Vento: 3x
+        // vv:2 (17 tagoj): 2x
+        onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(3)
         onAllNodesWithText("Kernpunkto epizodo 2").assertCountEquals(2)
-        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
+        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(3)
         onAllNodesWithText("Varsovia Vento epizodo 2").assertCountEquals(2)
     }
 
@@ -128,12 +133,15 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // La flava emblemeto montras kiom nova la elsendo estas
-        // (aperas nur en "Kio novas", ne en "Kio popularas")
-        // 5 tagoj, 12 tagoj (<=14 restas tagoj), 3 tagoj, 17 tagoj (-> 2 semajnoj)
-        onNodeWithText("5 tagoj").assertIsDisplayed()
-        onNodeWithText("3 tagoj").assertIsDisplayed()
-        onNodeWithText("12 tagoj").assertIsDisplayed()
-        onNodeWithText("2 semajnoj").assertIsDisplayed()
+        // La flava emblemeto montras kiom nova la elsendo estas — aperas en ĉiuj sekcioj
+        // 5 tagoj, 12 tagoj, 3 tagoj (ĉiuj en "Kio novas" + "Kio popularas"); la plej novaj ankaŭ en "Ĉiuj kanaloj"
+        // kp:1 (5 tagoj, plej nova): Kio novas + Kio popularas + Ĉiuj kanaloj = 3
+        // vv:1 (3 tagoj, plej nova): 3
+        // kp:2 (12 tagoj, ne plej nova): Kio novas + Kio popularas = 2
+        // vv:2 (17 tagoj → 2 semajnoj, ne plej nova): 2
+        onAllNodesWithText("5 tagoj").assertCountEquals(3)
+        onAllNodesWithText("3 tagoj").assertCountEquals(3)
+        onAllNodesWithText("12 tagoj").assertCountEquals(2)
+        onAllNodesWithText("2 semajnoj").assertCountEquals(2)
     }
 }

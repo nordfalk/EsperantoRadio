@@ -8,6 +8,7 @@ import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
+import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
@@ -77,6 +78,29 @@ internal fun pAlarmoDeponejo() = MemorAlarmoDeponejo(
         Alarmo(id = 2, horo = 22, minuto = 0, ripeto = 0, kanaloSlug = "kernpunkto", aktiva = false),
     )
 )
+
+internal fun pLudatojDeponejo(
+    ludatoj: Map<String, LudataElsendo> = mapOf(
+        pElsendo.id to LudataElsendo(
+            elsendoId = pElsendo.id,
+            kanaloSlug = "kernpunkto",
+            pozicioMs = 3_000_000,
+            dauroMs = 6_916_000,
+            finita = false,
+            lasteLudita = 1_704_067_200_000, // 2024-01-01
+        ),
+    ),
+) = object : dk.nordfalk.esperanto.domain.repository.LudatojDeponejo {
+    private val f = MutableStateFlow(ludatoj)
+    override fun observiLudatojn() = f.asStateFlow()
+    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {}
+    override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {}
+    override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {}
+    override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {}
+    override suspend fun getLudato(elsendoId: String) = f.value[elsendoId]
+    override suspend fun estasFinita(elsendoId: String) = f.value[elsendoId]?.finita ?: false
+    override suspend fun getPozicio(elsendoId: String) = f.value[elsendoId]?.pozicioMs
+}
 
 @Composable
 internal fun pTemo(temo: TemoNomo = TemoNomo.ANTONIA, content: @Composable () -> Unit) {

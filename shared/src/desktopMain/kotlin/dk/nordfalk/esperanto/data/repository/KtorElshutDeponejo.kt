@@ -62,7 +62,8 @@ class KtorElshutDeponejo(
         hejjo.listFiles { f -> f.name.endsWith(".json") }?.forEach { jsonDosiero ->
             try {
                 val elsendo = json.decodeFromString(Elsendo.serializer(), jsonDosiero.readText())
-                val mp3 = File(hejjo, "${elsendo.id}.mp3")
+                val dosiernomo = sanigiDosiernomon(elsendo.id)
+                val mp3 = File(hejjo, "$dosiernomo.mp3")
                 if (mp3.exists() && mp3.length() > 0) {
                     val stato = ElshutStato.Preta
                     _statoj[elsendo.id] = MutableStateFlow(stato)
@@ -87,11 +88,12 @@ class KtorElshutDeponejo(
 
     override suspend fun elshuti(elsendo: Elsendo) {
         val id = elsendo.id
+        val dosiernomo = sanigiDosiernomon(id)
         logi("ElshutDeponejo", "Elŝutas: ${elsendo.titolo} — ${elsendo.fluo}")
 
         val hejjo = elshuthejjo()
         hejjo.mkdirs()
-        val celdosiero = File(hejjo, "$id.mp3")
+        val celdosiero = File(hejjo, "$dosiernomo.mp3")
 
         val stato = _statoj.getOrPut(id) { MutableStateFlow(ElshutStato.NeElshutita) }
 
@@ -129,7 +131,7 @@ class KtorElshutDeponejo(
                 stato.value = ElshutStato.Preta
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
                 // Persistu metadatenojn por rekargxo ce restarto
-                val jsonDosiero = File(hejjo, "$id.json")
+                val jsonDosiero = File(hejjo, "$dosiernomo.json")
                 jsonDosiero.writeText(json.encodeToString(Elsendo.serializer(), elsendo))
                 logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
             } catch (e: Exception) {
@@ -168,7 +170,8 @@ class KtorElshutDeponejo(
             }
             // Forigu ankaŭ la JSON-metadatumbazon
             val hejjo = elshuthejjo()
-            val jsonDosiero = File(hejjo, "$elsendoId.json")
+            val dosiernomo = sanigiDosiernomon(elsendoId)
+            val jsonDosiero = File(hejjo, "$dosiernomo.json")
             if (jsonDosiero.exists()) jsonDosiero.delete()
         }
         _elshutoj.value = _elshutoj.value - elsendoId

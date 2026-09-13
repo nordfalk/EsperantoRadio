@@ -7,6 +7,26 @@ plugins {
     alias(libs.plugins.sentry.kmp.gradle)
 }
 
+// Generas ApoVersio.kt kun la versia konstanto el libs.versions.toml.
+// La fonto de vero por versionName (Android), packageVersion (Desktop) kaj Sentry release.
+val generuApoVersio by tasks.registering {
+    val versio = libs.versions.apoversio.get()
+    outputs.dir(layout.buildDirectory.dir("generated/sources/apoVersio/commonMain/kotlin"))
+    outputs.upToDateWhen { false }
+    doLast {
+        val dosiero = layout.buildDirectory.file("generated/sources/apoVersio/commonMain/kotlin/dk/nordfalk/esperanto/ApoVersio.kt").get().asFile
+        dosiero.parentFile.mkdirs()
+        dosiero.writeText("""
+            |package dk.nordfalk.esperanto
+            |
+            |object ApoVersio {
+            |    // NE ŜANĜŬ ĉi tie, anstataŭ redaktu en gradle/libs.versions.toml
+            |    const val VERSION = "$versio"
+            |}
+        """.trimMargin())
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -82,6 +102,8 @@ kotlin {
         }
     }
 }
+
+kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(generuApoVersio)
 
 android {
     namespace = "dk.nordfalk.esperanto.shared"

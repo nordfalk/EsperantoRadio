@@ -13,9 +13,12 @@ sealed interface ElshutStato {
 
 /**
  * Informo pri elŝutita elsendo — por la elŝutitaj-listo.
+ *
+ * @param dosierGrando grandeco de la dosiero en bitokoj (0 se nekonata)
  */
 data class ElshutitaElsendo(
     val elsendo: Elsendo,
     val dosieroVojo: String,
     val stato: ElshutStato,
+    val dosierGrando: Long = 0,
 )

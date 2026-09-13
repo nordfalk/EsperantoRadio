@@ -67,7 +67,7 @@ class KtorElshutDeponejo(
                 if (mp3.exists() && mp3.length() > 0) {
                     val stato = ElshutStato.Preta
                     _statoj[elsendo.id] = MutableStateFlow(stato)
-                    trovitaj[elsendo.id] = ElshutitaElsendo(elsendo, mp3.absolutePath, stato)
+                    trovitaj[elsendo.id] = ElshutitaElsendo(elsendo, mp3.absolutePath, stato, dosierGrando = mp3.length())
                     logi("ElshutDeponejo", "Reŝargis: ${elsendo.titolo} (${mp3.length()} bitokoj)")
                 } else {
                     logi("ElshutDeponejo", "Forigas orfan JSON: ${jsonDosiero.name} (MP3 mankas)")
@@ -129,7 +129,7 @@ class KtorElshutDeponejo(
                 }
 
                 stato.value = ElshutStato.Preta
-                _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
+                _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value, dosierGrando = celdosiero.length()))
                 // Persistu metadatenojn por rekargxo ce restarto
                 val jsonDosiero = File(hejjo, "$dosiernomo.json")
                 jsonDosiero.writeText(json.encodeToString(Elsendo.serializer(), elsendo))

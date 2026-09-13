@@ -62,7 +62,7 @@ internal fun pPlejŝatatajDeponejo() = object : PlejŝatatajDeponejo {
 }
 
 internal fun pElshutDeponejo() = object : ElshutDeponejo {
-    private val e = MutableStateFlow(mapOf(pElsendo.id to ElshutitaElsendo(pElsendo, "/tmp/test.mp3", ElshutStato.Preta)))
+    private val e = MutableStateFlow(mapOf(pElsendo.id to ElshutitaElsendo(pElsendo, "/tmp/test.mp3", ElshutStato.Preta, dosierGrando = 55_300_000)))
     override fun observiElshutojn() = e.asStateFlow()
     override fun observiElshutStaton(elsendoId: String) = MutableStateFlow(ElshutStato.Preta).asStateFlow()
     override suspend fun elshuti(elsendo: Elsendo) {}

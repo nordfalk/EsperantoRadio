@@ -12,7 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ElshutitajEkrano(
     elshutDeponejo: ElshutDeponejo,
+    ludilo: LudiloRegilo,
     onReen: () -> Unit,
     onLudi: (Sonfonto) -> Unit,
     onElsendo: (dk.nordfalk.esperanto.domain.model.Elsendo) -> Unit,
@@ -28,6 +31,7 @@ fun ElshutitajEkrano(
     val elshutoj by elshutDeponejo.observiElshutojn().collectAsState()
     val listo = elshutoj.values.toList()
     val scope = rememberCoroutineScope()
+    val ludantoInformo by ludilo.stato.collectAsState()
 
     Scaffold(
         topBar = {
@@ -44,9 +48,20 @@ fun ElshutitajEkrano(
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
                 items(listo, key = { it.elsendo.id }) { elshutita ->
+                    val elsendoId = elshutita.elsendo.id
+                    val nunaFonto = ludantoInformo.nunaFonto
+                    val ludiTiuCxi = when (nunaFonto) {
+                        is Sonfonto.LokaElsendo -> nunaFonto.elsendo.id == elsendoId
+                        is Sonfonto.ElsendoFonto -> nunaFonto.elsendo.id == elsendoId
+                        else -> false
+                    }
+                    val ludas = ludiTiuCxi && ludantoInformo.stato is LudantoStato.Ludas
+
                     ElshutitaEro(
                         elshutita = elshutita,
+                        ludas = ludas,
                         onLudi = { onLudi(Sonfonto.LokaElsendo(elshutita.elsendo, elshutita.dosieroVojo)) },
+                        onPauxzigi = { scope.launch { ludilo.pauxzigi() } },
                         onElsendo = { onElsendo(elshutita.elsendo) },
                         onForigi = {
                             logi("Klako", "forigi elŝuton ${elshutita.elsendo.id}")
@@ -63,7 +78,9 @@ fun ElshutitajEkrano(
 @Composable
 private fun ElshutitaEro(
     elshutita: ElshutitaElsendo,
+    ludas: Boolean,
     onLudi: () -> Unit,
+    onPauxzigi: () -> Unit,
     onElsendo: () -> Unit,
     onForigi: () -> Unit,
 ) {
@@ -76,22 +93,79 @@ private fun ElshutitaEro(
         is ElshutStato.Pauxzita -> "Paŭzita"
     }
 
+    // Grandeco: dum elŝuto montru la fluantan grandon; se preta, la konservitan grandon
+    val bitokoj = when (elshutita.stato) {
+        is ElshutStato.Elshutanta -> (elshutita.stato as ElshutStato.Elshutanta).elshutitajBitokoj
+        else -> elshutita.dosierGrando
+    }
+    val grandecoTeksto = formatiBitokojn(bitokoj)
+
+    val dauroTeksto = elsendo.dauro?.let { formatiDauron(it) }
+
     ListItem(
         headlineContent = { Text(elsendo.titolo, maxLines = 2, modifier = Modifier.clickable { onElsendo() }) },
         supportingContent = { Text(statoTeksto) },
         trailingContent = {
-            Row {
-                if (elshutita.stato is ElshutStato.Preta) {
-                    TextButton(onClick = { logi("Klako", "ludi elŝutitan — ${elsendo.id}"); onLudi() }) { Text("▶") }
+            Column(horizontalAlignment = Alignment.End) {
+                if (grandecoTeksto != null) {
+                    Text(grandecoTeksto, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                TextButton(onClick = onForigi) { Text("🗑") }
+                if (dauroTeksto != null) {
+                    Text(dauroTeksto, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Spacer(Modifier.height(2.dp))
+                Row {
+                    if (elshutita.stato is ElshutStato.Preta) {
+                        IconButton(
+                            onClick = {
+                                if (ludas) {
+                                    logi("Klako", "paŭzigi elŝutitan — ${elsendo.id}")
+                                    onPauxzigi()
+                                } else {
+                                    logi("Klako", "ludi elŝutitan — ${elsendo.id}")
+                                    onLudi()
+                                }
+                            },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Text(if (ludas) "⏸" else "▶")
+                        }
+                    }
+                    IconButton(onClick = onForigi, modifier = Modifier.size(36.dp)) {
+                        Text("🗑")
+                    }
+                }
             }
         }
     )
 }
 
+/** Formatu bitokojn al homlegebla teksto (KB, MB, GB). */
+private fun formatiBitokojn(bitokoj: Long): String? {
+    if (bitokoj <= 0) return null
+    val mb = bitokoj / (1024.0 * 1024.0)
+    return when {
+        mb >= 1024 -> "${(mb / 1024 * 10).toInt() / 10.0} GB"
+        mb >= 1 -> "${(mb * 10).toInt() / 10.0} MB"
+        bitokoj >= 1024 -> "${bitokoj / 1024} KB"
+        else -> "$bitokoj B"
+    }
+}
+
+/** Formatu daŭron en sekundoj al H:MM:SS aŭ M:SS. */
+private fun formatiDauron(sekundoj: Long): String {
+    val hor = sekundoj / 3600
+    val min = (sekundoj % 3600) / 60
+    val sek = sekundoj % 60
+    return if (hor > 0) {
+        "$hor:${min.toString().padStart(2, '0')}:${sek.toString().padStart(2, '0')}"
+    } else {
+        "$min:${sek.toString().padStart(2, '0')}"
+    }
+}
+
 @Preview(name = "ElshutitajEkrano", showBackground = true, heightDp = 250)
 @Composable
 fun ElshutitajEkranoPreview() {
-    pTemo { ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), onReen = {}, onLudi = {}, onElsendo = {}) }
+    pTemo { ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), ludilo = PreviewLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {}) }
 }

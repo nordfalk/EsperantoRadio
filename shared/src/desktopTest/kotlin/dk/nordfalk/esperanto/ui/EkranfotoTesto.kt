@@ -20,6 +20,7 @@ import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.domain.player.NoOpLudiloRegilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.ui.TemoNomo
@@ -170,7 +171,7 @@ class EkranfotoTesto {
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                ElshutitajEkrano(elshutDeponejo = elshutDeponejo, onReen = {}, onLudi = {}, onElsendo = {})
+                ElshutitajEkrano(elshutDeponejo = elshutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
             }
         }
         waitForIdle()

@@ -16,6 +16,7 @@ import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.domain.player.NoOpLudiloRegilo
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -236,7 +237,7 @@ class NavigaTesto {
             override suspend fun getLokaDosieroVojo(elsendoId: String) = "/tmp/test.mp3"
             override fun estasElshutita(elsendoId: String) = true
         }
-        setContent { ElshutitajEkrano(elshutDeponejo = elshutDeponejo, onReen = {}, onLudi = {}, onElsendo = {}) }
+        setContent { ElshutitajEkrano(elshutDeponejo = elshutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {}) }
         waitForIdle()
         onNodeWithText("KP204 Pigmentoj").assertIsDisplayed()
         onNodeWithText("Preta").assertIsDisplayed()

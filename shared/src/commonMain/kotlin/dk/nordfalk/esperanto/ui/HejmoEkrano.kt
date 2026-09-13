@@ -43,9 +43,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.todayIn
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.number
-import kotlin.time.Instant
 
 /**
  * Kalkulas kiom nova la elsendo estas, kiel homlegabla teksto.
@@ -72,16 +69,13 @@ fun kalkuliNovectempon(
 }
 
 /**
- * Formatas la ludatan tempon de elsendo kiel kompaktan tekston por la karto.
+ * Teksto pri ludata elsendo por montri sur karto.
  *
- * - Se finludita: "aŭdis MM-DD"
- * - Se parte ludita kun konata daŭro: "XX% MM-DD"
- * - Alie: "MM-DD"
- *
- * Redonas null se [ludata] ne havas lasteLudita.
+ * - Se finludita: "aŭdis"
+ * - Se parte ludita kun konata daŭro: "aŭdis XX%"
+ * - Alie: null (ne ludita aŭ mankas informo)
  */
-@OptIn(ExperimentalTime::class)
-private fun formatLudatanTempon(ludata: LudataElsendo): String? {
+private fun ludataTeksto(ludata: LudataElsendo): String? {
     if (ludata.lasteLudita <= 0) return null
     return when {
         ludata.finita -> "aŭdis"
@@ -195,6 +189,22 @@ class HejmoViewModel(
 }
 
 /**
+ * Determinas ĉu la donita elsendo nun ludas aŭ paŭzas, surbaze de la ludanto-stato.
+ * Redonas (ludas, pauxzita).
+ */
+private fun elsendoLudas(elsendoId: String, stato: LudantoInformo): Pair<Boolean, Boolean> {
+    val fonto = stato.nunaFonto
+    val kongruas = when (fonto) {
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.id == elsendoId
+        is Sonfonto.LokaElsendo -> fonto.elsendo.id == elsendoId
+        else -> false
+    }
+    val s = stato.stato
+    return Pair(kongruas && s is LudantoStato.Ludas, kongruas && s is LudantoStato.Haltita)
+}
+
+
+/**
  * Nova hejmekrano laux Figma-dizajno "Muzaiko — Antonia".
  *
  * Horizontalaj rulantaj sekcioj:
@@ -237,31 +247,10 @@ fun HejmoEkrano(
         scope.launch { viewModel.sxargxi() }
     }
 
-    /** Determinas ĉu la donita elsendo nun ludas aŭ paŭzas. */
-    fun elsendoLudas(elsendoId: String): Pair<Boolean, Boolean> {
-        val fonto = ludantoStato.nunaFonto
-        val stato = ludantoStato.stato
-        return when (fonto) {
-            is Sonfonto.ElsendoFonto -> {
-                val kongruas = fonto.elsendo.id == elsendoId
-                Pair(kongruas && stato is LudantoStato.Ludas, kongruas && stato is LudantoStato.Haltita)
-            }
-            is Sonfonto.LokaElsendo -> {
-                val kongruas = fonto.elsendo.id == elsendoId
-                Pair(kongruas && stato is LudantoStato.Ludas, kongruas && stato is LudantoStato.Haltita)
-            }
-            else -> Pair(false, false)
-        }
-    }
+    /** Ludata teksto (se ludita) aŭ novectempo (se ne ludita). */
+    fun montruTekston(elsendo: Elsendo, ludata: LudataElsendo?): String? =
+        ludata?.let { ludataTeksto(it) } ?: kalkuliNovectempon(elsendo.dato)
 
-    /** Ludo/paŭzo-butono logiko por specifa elsendo. */
-    fun ludiAuxPauxzigi(elsendo: Elsendo, ludas: Boolean, pauxzita: Boolean) {
-        when {
-            ludas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi() }
-            pauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() }
-            else -> { logi("Klako", "ludi — ${elsendo.id}"); onLudi(elsendo) }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -300,19 +289,16 @@ fun HejmoEkrano(
                         ) {
                             items(novajElsendoj) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
-                                val (ludas, pauxzita) = elsendoLudas(elsendo.id)
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
-                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
-                                    novectempo = kalkuliNovectempon(elsendo.dato),
-                                    ludata = ludatojMapo[elsendo.id],
-                                    ludas = ludas,
-                                    pauxzita = pauxzita,
-                                    onLudiToggled = { ludiAuxPauxzigi(elsendo, ludas, pauxzita) },
+                                    kanalo = kanalo,
+                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
+                                    ludantoStato = ludantoStato,
+                                    ludilo = ludilo,
+                                    onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
                             }
                         }
@@ -329,19 +315,16 @@ fun HejmoEkrano(
                         ) {
                             items(lastatempeLudataj) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
-                                val (ludas, pauxzita) = elsendoLudas(elsendo.id)
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
-                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
-                                    novectempo = kalkuliNovectempon(elsendo.dato),
-                                    ludata = ludatojMapo[elsendo.id],
-                                    ludas = ludas,
-                                    pauxzita = pauxzita,
-                                    onLudiToggled = { ludiAuxPauxzigi(elsendo, ludas, pauxzita) },
+                                    kanalo = kanalo,
+                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
+                                    ludantoStato = ludantoStato,
+                                    ludilo = ludilo,
+                                    onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
                             }
                         }
@@ -358,19 +341,16 @@ fun HejmoEkrano(
                         ) {
                             items(popularajElsendoj) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
-                                val (ludas, pauxzita) = elsendoLudas(elsendo.id)
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug,
-                                    bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl,
-                                    novectempo = kalkuliNovectempon(elsendo.dato),
-                                    ludata = ludatojMapo[elsendo.id],
-                                    ludas = ludas,
-                                    pauxzita = pauxzita,
-                                    onLudiToggled = { ludiAuxPauxzigi(elsendo, ludas, pauxzita) },
+                                    kanalo = kanalo,
+                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
+                                    ludantoStato = ludantoStato,
+                                    ludilo = ludilo,
+                                    onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) }
+                                    onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
                             }
                         }
@@ -385,22 +365,19 @@ fun HejmoEkrano(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(cxiujKanaloj) { kartoj ->
-                                val elsendo = kartoj.plejNovaElsendo ?: return@items
-                                val kanalo = kartoj.kanalo
-                                val (ludas, pauxzita) = elsendoLudas(elsendo.id)
+                            items(cxiujKanaloj) { karto ->
+                                val elsendo = karto.plejNovaElsendo ?: return@items
+                                val kanalo = karto.kanalo
                                 ElsendoKarto(
                                     elsendo = elsendo,
-                                    kanaloNomo = kanalo.nomo,
-                                    bildoUrl = elsendo.bildoUrl ?: kanalo.emblemoUrl,
-                                    novectempo = kalkuliNovectempon(elsendo.dato),
-                                    ludata = ludatojMapo[elsendo.id],
-                                    ludas = ludas,
-                                    pauxzita = pauxzita,
-                                    onLudiToggled = { ludiAuxPauxzigi(elsendo, ludas, pauxzita) },
+                                    kanalo = kanalo,
+                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
+                                    ludantoStato = ludantoStato,
+                                    ludilo = ludilo,
+                                    onLudi = onLudi,
                                     onElshuti = { onElshuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) }
+                                    onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
                                 )
                             }
                         }
@@ -424,25 +401,34 @@ private fun SekcioTitolo(titolo: String) {
     )
 }
 
+/** Ludo/paŭzo-logiko por specifa elsendo. */
+private fun ludiAuxPauxzigi(
+    elsendo: Elsendo, ludas: Boolean, pauxzita: Boolean,
+    ludilo: LudiloRegilo?, onLudi: (Elsendo) -> Unit,
+) {
+    when {
+        ludas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi() }
+        pauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() }
+        else -> { logi("Klako", "ludi — ${elsendo.id}"); onLudi(elsendo) }
+    }
+}
+
 @Composable
 private fun ElsendoKarto(
     elsendo: Elsendo,
-    kanaloNomo: String,
-    bildoUrl: String?,
+    kanalo: Kanalo?,
     onClick: () -> Unit,
-    novectempo: String? = null,
-    ludata: LudataElsendo? = null,
-    ludas: Boolean = false,
-    pauxzita: Boolean = false,
-    onLudiToggled: () -> Unit = {},
+    montruTekston: String? = null,
+    ludantoStato: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita),
+    ludilo: LudiloRegilo? = null,
+    onLudi: (Elsendo) -> Unit = {},
     onElshuti: () -> Unit = {},
     onAldoniAlVico: () -> Unit = {},
 ) {
+    val kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug
+    val bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl
+    val (ludas, pauxzita) = elsendoLudas(elsendo.id, ludantoStato)
     var menuMontrata by remember { mutableStateOf(false) }
-
-    // Aù la elsendo estis ludata, montru la ludatan tempon anstataŭ la novectempon
-    val ludataTeksto = ludata?.let { formatLudatanTempon(it) }
-    val montruTekston = ludataTeksto ?: novectempo
 
     Surface(
         onClick = onClick,
@@ -469,7 +455,7 @@ private fun ElsendoKarto(
                         }
                     }
                 }
-                // Insigno: novectempo aŭ ludata procento/dato
+                // Insigno: montruTekston (novectempo, ludata procento, ktp.)
                 if (montruTekston != null) {
                     Surface(
                         modifier = Modifier
@@ -540,7 +526,7 @@ private fun ElsendoKarto(
                             .background(Color.Black.copy(alpha = 0.55f))
                             .clickable {
                                 logi("Klako", "ludo-butono — ${elsendo.id}")
-                                onLudiToggled()
+                                ludiAuxPauxzigi(elsendo, ludas, pauxzita, ludilo, onLudi)
                             },
                         contentAlignment = Alignment.Center
                     ) {

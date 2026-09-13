@@ -20,7 +20,7 @@ fun initialiguSentry() {
         // options.debug = true
         options.attachThreads = false
         // Identigas la version en Sentry — ebligas spuradon de regreso inter versioj
-        // options.release = "esperantoradio@0.1"
+        options.release = "esperantoradio@${ApoVersio.VERSION}"
         // Disigas evoluon de produktado en la Sentry-fasado
         options.environment = "evoluo"
     }

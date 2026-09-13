@@ -24,7 +24,7 @@ compose.desktop {
         mainClass = "dk.nordfalk.esperanto.desktop.MainKt"
         nativeDistributions {
             packageName = "EsperantoRadio"
-            packageVersion = "1.0.0"
+            packageVersion = libs.versions.apoversio.get()
         }
     }
 }

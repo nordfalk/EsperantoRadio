@@ -261,6 +261,7 @@ fun EsperantoRadioApp(
                         entry<Vojo.Elshutoj> {
                             ElshutitajEkrano(
                                 elshutDeponejo = elshutDeponejo,
+                                ludilo = ludilo,
                                 onReen = { reen() },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas elŝutitan: $fonto")

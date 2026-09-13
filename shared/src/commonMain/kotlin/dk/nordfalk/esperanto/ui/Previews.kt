@@ -79,7 +79,7 @@ fun PreviewPlejŝatataj() {
 @Composable
 fun PreviewElshutitaj() {
     pTemo() {
-        ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), onReen = {}, onLudi = {}, onElsendo = {})
+        ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), ludilo = PreviewLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
     }
 }
 

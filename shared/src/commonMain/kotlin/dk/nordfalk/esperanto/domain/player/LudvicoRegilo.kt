@@ -10,10 +10,13 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
+import dk.nordfalk.esperanto.agorduSentryEtikedon
+import dk.nordfalk.esperanto.kaptuSentryMesagxon
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
+import io.sentry.kotlin.multiplatform.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -281,6 +284,11 @@ class LudvicoRegilo(
 
             if (sekva != null) {
                 logi("Ludvico", "Aŭtomata sekva: ${sekva.id} — ${sekva.titolo}")
+                kaptuSentryMesagxon(
+                    "Aŭtoludo: ${sekva.titolo}",
+                    nivelo = SentryLevel.INFO,
+                    etikedo = "kanalo" to sekva.kanaloSlug,
+                )
                 ludiElsendonInterna(sekva)
             } else {
                 logi("Ludvico", "Nenio por ludi sekve — haltas")
@@ -300,6 +308,8 @@ class LudvicoRegilo(
         } else {
             0L
         }
+        // Sentry-etikedo por la nuna ludata kanalo — apare cxe cxiuj sekvaj eventoj
+        agorduSentryEtikedon("nuna_kanalo", elsendo.kanaloSlug)
         val lokaVojo = getLokaDosieroVojo(elsendo.id)
         val fonto = if (lokaVojo != null) {
             Sonfonto.LokaElsendo(elsendo, lokaVojo)

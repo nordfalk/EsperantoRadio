@@ -18,8 +18,6 @@ fun AgordojEkrano(
     agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
 ) {
-    val lingvo by agordojDeponejo.lingvo.collectAsState()
-    val nurWifi by agordojDeponejo.nurWifi.collectAsState()
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
@@ -33,37 +31,6 @@ fun AgordojEkrano(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            Text("Lingvo", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            Row {
-                FilterChip(
-                    selected = lingvo == "eo",
-                    onClick = { logi("Klako", "lingvo → eo"); agordojDeponejo.fiksiLingvon("eo") },
-                    label = { Text("Esperanto") }
-                )
-                Spacer(Modifier.width(8.dp))
-                FilterChip(
-                    selected = lingvo == "da",
-                    onClick = { logi("Klako", "lingvo → da"); agordojDeponejo.fiksiLingvon("da") },
-                    label = { Text("Dana") }
-                )
-            }
-            Spacer(Modifier.height(24.dp))
-
-            Text("Reto", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            ListItem(
-                headlineContent = { Text("Nur per WiFi") },
-                trailingContent = {
-                    Switch(
-                        checked = nurWifi,
-                        onCheckedChange = { logi("Klako", "nurWifi → $it"); agordojDeponejo.fiksiNurWifi(it) }
-                    )
-                }
-            )
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(Modifier.height(24.dp))
-
             Text("Ludado", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             ListItem(

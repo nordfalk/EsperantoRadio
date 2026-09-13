@@ -126,12 +126,6 @@ class SercxoDeponejoImpl(
 class AgordojDeponejoImpl(
     private val settings: Settings? = null,
 ) : AgordojDeponejo {
-    private val _lingvo = MutableStateFlow("eo")
-    override val lingvo: StateFlow<String> = _lingvo.asStateFlow()
-
-    private val _nurWifi = MutableStateFlow(false)
-    override val nurWifi: StateFlow<Boolean> = _nurWifi.asStateFlow()
-
     private val _temo = MutableStateFlow("ANTONIA")
     override val temo: StateFlow<String> = _temo.asStateFlow()
 
@@ -141,14 +135,6 @@ class AgordojDeponejoImpl(
     private val _auxtomataDaurigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AUXTOMATA_DAURIGO, true) ?: true)
     override val auxtomataDaurigo: StateFlow<Boolean> = _auxtomataDaurigo.asStateFlow()
 
-    override fun fiksiLingvon(lingvo: String) {
-        _lingvo.value = lingvo
-        logi("Agordoj", "Lingvo → $lingvo")
-    }
-    override fun fiksiNurWifi(nurWifi: Boolean) {
-        _nurWifi.value = nurWifi
-        logi("Agordoj", "NurWifi → $nurWifi")
-    }
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")

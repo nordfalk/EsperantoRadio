@@ -40,13 +40,9 @@ interface SercxoDeponejo {
 }
 
 interface AgordojDeponejo {
-    val lingvo: StateFlow<String>
-    val nurWifi: StateFlow<Boolean>
     val temo: StateFlow<String>
     val sciigoj: StateFlow<Boolean>
     val auxtomataDaurigo: StateFlow<Boolean>
-    fun fiksiLingvon(lingvo: String)
-    fun fiksiNurWifi(nurWifi: Boolean)
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)

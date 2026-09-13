@@ -261,8 +261,8 @@ class NavigaTesto {
         setContent { AgordojEkrano(agordojDeponejo = agordojDeponejo, onReen = {}) }
         waitForIdle()
         onNodeWithText("Agordoj").assertIsDisplayed()
-        onNodeWithText("Lingvo").assertIsDisplayed()
-        onNodeWithText("Esperanto").assertIsDisplayed()
+        onNodeWithText("Ludado").assertIsDisplayed()
+        onNodeWithText("Temo").assertIsDisplayed()
     }
 
     @Test

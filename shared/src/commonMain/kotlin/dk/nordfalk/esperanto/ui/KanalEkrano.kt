@@ -1,9 +1,12 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -189,6 +192,55 @@ fun KanaloEkrano(
                 }
             }
         }
+    }
+}
+
+/**
+ * Envolvas [KanalEkrano] en [HorizontalPager] por ebligi horizontalan svipon
+ * inter kanaloj.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun KanalEkranoKunSvipo(
+    komencaKanalo: Kanalo,
+    kanaloj: List<Kanalo>,
+    elsendoDeponejo: ElsendoDeponejoImpl,
+    plejŝatatajDeponejo: PlejŝatatajDeponejo,
+    agordojDeponejo: AgordojDeponejo,
+    onReen: () -> Unit,
+    onElsendo: (Elsendo) -> Unit = {},
+    onLudi: (Sonfonto) -> Unit = {},
+    ludilo: LudiloRegilo? = null,
+) {
+    if (kanaloj.size <= 1) {
+        val k = kanaloj.firstOrNull() ?: komencaKanalo
+        KanaloEkrano(
+            kanalo = k,
+            elsendoDeponejo = elsendoDeponejo,
+            plejŝatatajDeponejo = plejŝatatajDeponejo,
+            agordojDeponejo = agordojDeponejo,
+            onReen = onReen,
+            onElsendo = onElsendo,
+            onLudi = onLudi,
+            ludilo = ludilo,
+        )
+        return
+    }
+
+    val komencaPagho = kanaloj.indexOfFirst { it.slug == komencaKanalo.slug }.let { if (it < 0) 0 else it }
+    val paghoStato = rememberPagerState(initialPage = komencaPagho) { kanaloj.size }
+
+    HorizontalPager(state = paghoStato) { pagho ->
+        KanaloEkrano(
+            kanalo = kanaloj[pagho],
+            elsendoDeponejo = elsendoDeponejo,
+            plejŝatatajDeponejo = plejŝatatajDeponejo,
+            agordojDeponejo = agordojDeponejo,
+            onReen = onReen,
+            onElsendo = onElsendo,
+            onLudi = onLudi,
+            ludilo = ludilo,
+        )
     }
 }
 

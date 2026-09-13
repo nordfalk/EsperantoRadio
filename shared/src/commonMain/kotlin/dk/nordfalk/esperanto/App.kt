@@ -300,8 +300,9 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.KanaloDetalo> { vojo ->
-                            KanaloEkrano(
-                                kanalo = vojo.kanalo,
+                            KanalEkranoKunSvipo(
+                                komencaKanalo = vojo.kanalo,
+                                kanaloj = kanaloj,
                                 elsendoDeponejo = elsendoDeponejo,
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                                 agordojDeponejo = agordojDeponejo,

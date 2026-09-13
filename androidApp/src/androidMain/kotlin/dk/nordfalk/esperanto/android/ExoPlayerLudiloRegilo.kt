@@ -42,8 +42,9 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
 
     private val cxefaFadeno = Handler(Looper.getMainLooper())
 
-    private val sessionToken = SessionToken(context, ComponentName(context, EsperantoLudadoServo::class.java))
-    private val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+    private val appContext = context.applicationContext
+    private val sessionToken = SessionToken(appContext, ComponentName(appContext, EsperantoLudadoServo::class.java))
+    private val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
     private var controller: MediaController? = null
 
     /** Pleniĝas kiam la MediaController sukcese konektiĝis al la servo. */
@@ -71,7 +72,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
                 logw("Ludilo", "Malsukcesis konekti MediaController", e)
                 konektita.completeExceptionally(e)
             }
-        }, ContextCompat.getMainExecutor(context))
+        }, ContextCompat.getMainExecutor(appContext))
     }
 
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
@@ -168,8 +169,12 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
      */
     fun release() {
         cxefaFadeno.post {
-            controller?.removeListener(listener)
-            MediaController.releaseFuture(controllerFuture)
+            try {
+                controller?.removeListener(listener)
+                MediaController.releaseFuture(controllerFuture)
+            } catch (e: Exception) {
+                logw("Ludilo", "Eraro dum release de MediaController", e)
+            }
         }
         controller = null
     }

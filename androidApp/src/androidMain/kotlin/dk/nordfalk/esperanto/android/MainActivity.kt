@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         }
         // La sciig-skedo estas mastrumata de App.kt per ghisdatiguSciigSkedon()
         traktuIntenton(intent)
-        testuSentry()
+        // testuSentry()
     }
 
     override fun onNewIntent(intent: Intent) {

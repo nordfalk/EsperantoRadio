@@ -155,8 +155,28 @@ class HejmoViewModel(
             _novajElsendoj.value = novaj
             logi("HejmoViewModel", "Kio novas: ${novaj.size} elsendoj (post filtrado)")
 
-            // "Kio popularas" — hazardaj elsendoj (maksimume 20)
-            _popularajElsendoj.value = ĉiujElsendoj.shuffled().take(20)
+            // "Ĉiuj kanaloj" — unu karto po kanalo kun la plej nova elsendo
+            val cxiujKanalojKartog = kanaloj
+                .filter { it.havasPodkastojn }
+                .map { kanalo ->
+                    val plejNova = ĉiujElsendoj
+                        .filter { it.kanaloSlug == kanalo.slug }
+                        .sortedByDescending { it.dato }
+                        .firstOrNull()
+                    KanalKarto(kanalo, plejNova)
+                }
+                .filter { it.plejNovaElsendo != null }
+            _cxiujKanaloj.value = cxiujKanalojKartog
+            logi("HejmoViewModel", "Ĉiuj kanaloj: ${cxiujKanalojKartog.size} kanaloj")
+
+            // "Kio popularas" — hazardaj elsendoj, ekskludante la unuajn 20 novajn
+            // kaj la plej novan elsendon de ĉiu kanalo (jam montratajn supre)
+            val ekskluditaj = (novaj.take(20).map { it.id } +
+                cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
+            _popularajElsendoj.value = ĉiujElsendoj
+                .filter { it.id !in ekskluditaj }
+                .shuffled()
+                .take(20)
 
             // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
             if (ludatojDeponejo != null) {
@@ -169,20 +189,6 @@ class HejmoViewModel(
                 _lastatempeLudataj.value = lastatempe
                 logi("HejmoViewModel", "Lastatempe ludata: ${lastatempe.size} elsendoj")
             }
-
-            // "Ĉiuj kanaloj" — unu karto po kanalo kun la plej nova elsendo
-            val cxiujKanalojKartoj = kanaloj
-                .filter { it.havasPodkastojn }
-                .map { kanalo ->
-                    val plejNova = ĉiujElsendoj
-                        .filter { it.kanaloSlug == kanalo.slug }
-                        .sortedByDescending { it.dato }
-                        .firstOrNull()
-                    KanalKarto(kanalo, plejNova)
-                }
-                .filter { it.plejNovaElsendo != null }
-            _cxiujKanaloj.value = cxiujKanalojKartoj
-            logi("HejmoViewModel", "Ĉiuj kanaloj: ${cxiujKanalojKartoj.size} kanaloj")
         } catch (e: Exception) {
             loge("HejmoViewModel", "Malsukcesis ŝargi hejmon", e)
         } finally {
@@ -196,19 +202,28 @@ class HejmoViewModel(
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
-        _novajElsendoj.value = elsendoj
+        val novaj = elsendoj
             .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
             .groupBy { it.kanaloSlug }
             .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
             .sortedByDescending { it.dato }
             .take(50)
-        _popularajElsendoj.value = elsendoj.take(20)
-        _cxiujKanaloj.value = kanaloj
+        _novajElsendoj.value = novaj
+
+        val cxiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
             .map { kanalo ->
                 KanalKarto(kanalo, elsendoj.filter { it.kanaloSlug == kanalo.slug }.maxByOrNull { it.dato })
             }
             .filter { it.plejNovaElsendo != null }
+        _cxiujKanaloj.value = cxiujKanalojKartog
+
+        val ekskluditaj = (novaj.take(20).map { it.id } +
+            cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
+        _popularajElsendoj.value = elsendoj
+            .filter { it.id !in ekskluditaj }
+            .shuffled()
+            .take(20)
     }
 }
 
@@ -304,6 +319,33 @@ fun HejmoEkrano(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
+
+                // "Kanaloj" — unu karto po kanalo kun la plej nova elsendo
+                if (cxiujKanaloj.isNotEmpty()) {
+                    item { SekcioTitolo("Kanaloj") }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(cxiujKanaloj) { karto ->
+                                val elsendo = karto.plejNovaElsendo ?: return@items
+                                val kanalo = karto.kanalo
+                                ElsendoKarto(
+                                    elsendo = elsendo,
+                                    kanalo = kanalo,
+                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
+                                    ludilo = ludilo,
+                                    onLudi = onLudi,
+                                    onElshuti = { onElshuti(elsendo) },
+                                    onAldoniAlVico = { onAldoniAlVico(elsendo) },
+                                    onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // "Kio novas"
                 if (novajElsendoj.isNotEmpty()) {
                     item { SekcioTitolo("Kio novas") }
@@ -356,7 +398,7 @@ fun HejmoEkrano(
 
                 // "Kio popularas" — hazardaj elsendoj
                 if (popularajElsendoj.isNotEmpty()) {
-                    item { SekcioTitolo("Kio popularas") }
+                    item { SekcioTitolo("Aliaj elsendoj") }
                     item {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -373,32 +415,6 @@ fun HejmoEkrano(
                                     onElshuti = { onElshuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // "Ĉiuj kanaloj" — unu karto po kanalo kun la plej nova elsendo
-                if (cxiujKanaloj.isNotEmpty()) {
-                    item { SekcioTitolo("Ĉiuj kanaloj") }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(cxiujKanaloj) { karto ->
-                                val elsendo = karto.plejNovaElsendo ?: return@items
-                                val kanalo = karto.kanalo
-                                ElsendoKarto(
-                                    elsendo = elsendo,
-                                    kanalo = kanalo,
-                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludilo = ludilo,
-                                    onLudi = onLudi,
-                                    onElshuti = { onElshuti(elsendo) },
-                                    onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
                                 )
                             }
                         }

@@ -1,7 +1,6 @@
 package dk.nordfalk.esperanto
 
 import io.sentry.kotlin.multiplatform.Sentry
-import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.SentryOptions
 
 /**
@@ -13,6 +12,8 @@ import io.sentry.kotlin.multiplatform.SentryOptions
 fun initialiguSentry() {
     Sentry.init { options: SentryOptions ->
         options.dsn = "https://764998823a401d936a5e227d1453951e@o4512078664564736.ingest.de.sentry.io/4512078868185168"
+
+        options.logs.enabled = true
         // Kaptu 100% de traktadoj por spurado (agordu malpli en produktado)
         options.tracesSampleRate = 1.0
         // Montru kion la SDK faras dum provado
@@ -25,27 +26,7 @@ fun initialiguSentry() {
 
     // Globaj etikedoj — apearas cxe cxiuj eventoj kaj estas filtreblaj en Sentry
     Sentry.configureScope { scope ->
-        scope.setTag("platformo", platformNomo)
         scope.setTag("apo", "EsperantoRadio")
-    }
-}
-
-/**
- * Kaptas mesaĝon en Sentry kun specifa nivelo kaj laŭvola etikedo.
- * Por gravaj ne-eraraj eventoj (ekz. "RSS-malsukcesa, uzas kaŝenitan datumon").
- *
- * @param mesagxo la mesaĝo
- * @param nivelo rangigo (INFO, WARNING, ERROR, ktp.)
- * @param etikedo laŭvola paro (ŝlosilo, valoro) por filtri en Sentry
- */
-fun kaptuSentryMesagxon(
-    mesagxo: String,
-    nivelo: SentryLevel = SentryLevel.INFO,
-    etikedo: Pair<String, String>? = null,
-) {
-    Sentry.captureMessage(mesagxo) { scope ->
-        scope.level = nivelo
-        if (etikedo != null) scope.setTag(etikedo.first, etikedo.second)
     }
 }
 

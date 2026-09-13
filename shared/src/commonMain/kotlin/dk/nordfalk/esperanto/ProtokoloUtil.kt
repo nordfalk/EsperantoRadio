@@ -26,32 +26,17 @@ fun logd(tag: String, msg: String) {
 
 fun logi(tag: String, msg: String) {
     platformLogi(tag, msg)
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.INFO
-        message = "[$tag] $msg"
-        category = tag
-    })
-    Sentry.captureMessage("I [$tag] $msg")
+    Sentry.logger.info("[$tag] $msg")
 }
 
 fun logw(tag: String, msg: String) {
     platformLogw(tag, msg)
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.WARNING
-        message = "[$tag] $msg"
-        category = tag
-    })
-    Sentry.captureMessage("W [$tag] $msg")
+    Sentry.logger.warn("[$tag] $msg")
 }
 
 fun loge(tag: String, msg: String) {
     platformLoge(tag, msg)
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.ERROR
-        message = "[$tag] $msg"
-        category = tag
-    })
-    Sentry.captureMessage("E [$tag] $msg")
+    Sentry.logger.error("[$tag] $msg")
 }
 
 /**

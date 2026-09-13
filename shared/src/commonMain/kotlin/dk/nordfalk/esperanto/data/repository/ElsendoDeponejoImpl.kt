@@ -1,7 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.data.parser.RssParsilo
-import dk.nordfalk.esperanto.kaptuSentryMesagxon
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
@@ -76,11 +75,12 @@ open class ElsendoDeponejoImpl(
         } catch (e: Exception) {
             loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
             // Raportu kiel averto (ne eraro) — la apo daŭrigas kun kaŝenita datumo
-            kaptuSentryMesagxon(
-                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
-                nivelo = SentryLevel.WARNING,
-                etikedo = "kanalo" to kanalo.slug,
-            )
+            Sentry.captureMessage(
+                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn"
+            ) { scope ->
+                scope.level = SentryLevel.WARNING
+                scope.setTag("kanalo", kanalo.slug)
+            }
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }

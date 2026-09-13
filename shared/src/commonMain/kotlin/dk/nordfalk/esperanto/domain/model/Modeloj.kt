@@ -34,7 +34,8 @@ data class Elsendo(
     val kanaloSlug: String,
     val kanaloNomo: String? = null,    // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,
-    val priskribo: String? = null,    // purigita HTML/teksto
+    val priskribo: String? = null,      // purigita plata teksto (por listoj, serĉo)
+    val priskriboHtml: String? = null,  // purigita HTML kun etikedoj (por detala vido)
     val bildoUrl: String? = null,
     val dato: String,                 // yyyy-MM-dd
     val dauro: Long? = null,          // sekundoj

@@ -159,7 +159,7 @@
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/21881729/21881729-1666809337563-63459cc26442b.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/830574e4/podcast/rss",
 			"montruTitolojn": "false",
-			"uziWebViewPorElsendo": false,
+			"uziWebViewPorElsendo": true,
 			"retpoŝto": "1822daniel@gmail.com",
 			"hejmpaĝoButono": "https://anchor.fm/bitmono"
 		}
@@ -188,6 +188,7 @@
 			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default",
 			"xxelsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
 			"retpoŝto": "retradio@aldone.de",
+			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}
 	],

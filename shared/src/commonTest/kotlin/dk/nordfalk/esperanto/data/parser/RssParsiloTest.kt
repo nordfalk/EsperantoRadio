@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.data.parser
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -498,5 +499,74 @@ class RssParsiloTest {
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(0, elsendoj.size, "Ero sen iframe devas esti saltita")
+    }
+
+    // === HTML-stripa bug-riparo ===
+
+    @Test
+    fun gxeneralaParsiloTraktasEntioEskapitanHtml() {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <item>
+                  <title>Test</title>
+                  <pubDate>Wed, 09 Nov 2022 20:59:06 +0000</pubDate>
+                  <enclosure url="https://x.com/a.mp3" type="audio/mpeg"/>
+                  <description>&lt;p&gt;Hello &lt;b&gt;world&lt;/b&gt;&lt;/p&gt;</description>
+                </item>
+              </channel>
+            </rss>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertEquals(1, elsendoj.size)
+        val priskribo = elsendoj[0].priskribo
+        assertNotNull(priskribo)
+        assertTrue(priskribo!!.contains("Hello"), "Priskribo devas enhavi 'Hello': $priskribo")
+        assertTrue(priskribo.contains("world"), "Priskribo devas enhavi 'world': $priskribo")
+        assertFalse(priskribo.contains("<"), "Priskribo ne enhavas HTML-etikedojn: $priskribo")
+        // priskriboHtml devas enhavi la etikedojn
+        val html = elsendoj[0].priskriboHtml
+        assertNotNull(html, "priskriboHtml ne estu nul")
+        assertTrue(html!!.contains("<p>"), "priskriboHtml devas enhavi <p>: $html")
+        assertTrue(html.contains("<b>"), "priskriboHtml devas enhavi <b>: $html")
+    }
+
+    @Test
+    fun puriguHtmlTraktasDuobleEskapitanEniron() {
+        val eniro = "&lt;p&gt;Test&lt;/p&gt;"
+        val rezulto = parsilo.puriguHtml(eniro)
+        assertEquals("Test", rezulto, "puriguHtml devas forigi duoble-eskapitan HTML-on: $rezulto")
+    }
+
+    @Test
+    fun vinilkosmoHavasNeMalplenanPriskribon() {
+        val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
+        val kanalo = Kanalo(
+            slug = "vinilkosmo",
+            nomo = "Vinilkosmo",
+            podkastaRssUrl = "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio"
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertTrue(elsendoj.isNotEmpty())
+        for (e in elsendoj) {
+            assertNotNull(e.priskribo, "Priskribo ne estu nul por ${e.id}")
+            assertTrue(e.priskribo!!.isNotEmpty(), "Priskribo ne estu malplena por ${e.id}")
+        }
+    }
+
+    @Test
+    fun puriguHtmlKunEtikedojnForigasDanĝerajnEtikedojn() {
+        val eniro = "<p>Hi</p><script>alert(1)</script><iframe src='evil.com'></iframe>"
+        val rezulto = parsilo.puriguHtmlKunEtikedojn(eniro)
+        assertFalse(rezulto.contains("<script"), " Rezulto ne enhavas <script>: $rezulto")
+        assertFalse(rezulto.contains("<iframe"), "Rezulto ne enhavas <iframe>: $rezulto")
+        assertTrue(rezulto.contains("Hi"), "Rezulto devas enhavi 'Hi': $rezulto")
+        assertTrue(rezulto.contains("<p>"), "Rezulto devas konservi <p>: $rezulto")
     }
 }

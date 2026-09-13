@@ -246,10 +246,12 @@ fun ElsendoEkrano(
             }
 
             // Priskribo
-            if (!elsendo.priskribo.isNullOrBlank()) {
-                Text(
-                    text = elsendo.priskribo!!,
-                    style = MaterialTheme.typography.bodyMedium
+            val html = elsendo.priskriboHtml ?: elsendo.priskribo
+            if (!html.isNullOrBlank()) {
+                HtmlVido(
+                    html = html,
+                    uzuWebView = kanalo?.uzuWebViewPorElsendo == true,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 

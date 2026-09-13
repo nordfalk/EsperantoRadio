@@ -113,7 +113,7 @@ data class KanaloDto(
     @SerialName("retpoŝto") val retposhto: String? = null,
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
-    val uziWebViewPorElsendo: Boolean = false,
+    val uziWebViewPorElsendo: Boolean = true,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(

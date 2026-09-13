@@ -13,23 +13,11 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.kreuSettings
-import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
-import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
-import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
-import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
-import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ghisdatiguSciigSkedon
-import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
-import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
-import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
-import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
@@ -41,15 +29,7 @@ import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
 import dk.nordfalk.esperanto.ui.temuKolorskemo
 import dk.nordfalk.esperanto.ui.TemoNomo
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -86,47 +66,20 @@ fun EsperantoRadioApp(
         typography = MuzaikoTiparo,
         shapes = MuzaikoFormoj,
     ) {
-        val httpKliento = remember {
-            HttpClient(CIO) {
-                install(Logging) { level = LogLevel.INFO }
-                install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
-                install(HttpTimeout) {
-                    requestTimeoutMillis = 30_000
-                    connectTimeoutMillis = 10_000
-                }
-            }
+        if (!AppStato.inicialigita()) {
+            AppStato.inicialigu(ludilo, settings, agordojDeponejo)
         }
-
-        val kanaloDeponejo = remember {
-            KanaloDeponejoImpl(
-                leganto = KanalAgordoLeganto(),
-                bundledTeksto = ::leguBundledKanalkonfiguron
-            )
-        }
-        val elsendoDeponejo = remember { ElsendoDeponejoImpl(httpKliento) }
-        val kanalaroViewModel = remember { KanalaroViewModel(kanaloDeponejo, elsendoDeponejo) }
-        val plejŝatatajDeponejo = remember { PersistantaPlejŝatatajDeponejo(settings) }
-        val sercxoDeponejo = remember { SercxoDeponejoImpl(elsendoDeponejo) }
-        val elshutDeponejo = remember { kreuElshutDeponejo(httpKliento) }
-        val alarmoDeponejo = remember {
-            val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
-            val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
-            PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
-        }
+        val kanaloDeponejo = AppStato.kanaloDeponejo!!
+        val elsendoDeponejo = AppStato.elsendoDeponejo!!
+        val kanalaroViewModel = AppStato.kanalaroViewModel!!
+        val plejŝatatajDeponejo = AppStato.plejŝatatajDeponejo!!
+        val sercxoDeponejo = AppStato.sercxoDeponejo!!
+        val elshutDeponejo = AppStato.elshutDeponejo!!
+        val alarmoDeponejo = AppStato.alarmoDeponejo!!
+        val ludatojDeponejo = AppStato.ludatojDeponejo!!
+        val ludvicoRegilo = AppStato.ludvicoRegilo!!
         val scope = rememberCoroutineScope()
 
-        val ludatojDeponejo = remember { PersistaLudatojDeponejo(settings) }
-        val ludvicoRegilo = remember {
-            LudvicoRegilo(
-                ludilo = ludilo,
-                elsendoDeponejo = elsendoDeponejo,
-                kanaloDeponejo = kanaloDeponejo,
-                plejŝatatajDeponejo = plejŝatatajDeponejo,
-                ludatojDeponejo = ludatojDeponejo,
-                getLokaDosieroVojo = { id -> elshutDeponejo.getLokaDosieroVojo(id) },
-                auxtomataDaurigo = agordojDeponejo.auxtomataDaurigo,
-            )
-        }
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
 
         // Konektu sciigo-kontrolon (Venonta) al LudvicoRegilo

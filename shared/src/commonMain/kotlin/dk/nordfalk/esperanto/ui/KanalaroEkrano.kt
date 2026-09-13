@@ -25,6 +25,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
+import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.async
@@ -55,10 +56,28 @@ class KanalaroViewModel(
     val lastajElsendoj = _lastajElsendoj.asStateFlow()
 
     suspend fun sxargxi() {
+        val kanaloj = deponejo.getKanalojn()
+
+        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        if (elsendoDeponejo != null) {
+            val kashitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKashitajnElsendojn(kanaloj) ?: emptyList()
+            if (kashitaj.isNotEmpty()) {
+                val kontoj = mutableMapOf<String, Int>()
+                val lastaj = mutableMapOf<String, Elsendo>()
+                for (kanalo in kanaloj.filter { it.havasPodkastojn }) {
+                    val els = kashitaj.filter { it.kanaloSlug == kanalo.slug }
+                    kontoj[kanalo.slug] = els.size
+                    els.maxByOrNull { it.dato }?.let { lastaj[kanalo.slug] = it }
+                }
+                _elsendoKontoj.value = kontoj
+                _lastajElsendoj.value = lastaj
+                logi("KanalaroViewModel", "Diskkaŝmemoro: ${kontoj.values.sum()} elsendoj por ${kontoj.size} kanaloj")
+            }
+        }
+
+        // Paŝo 2: Reto-elŝuto (malrapida)
         _sxargxas.value = true
         try {
-            val kanaloj = deponejo.getKanalojn()
-            // Ŝargi elsendojn por ĉiuj podkastaj kanaloj (se elsendoDeponejo haveblas)
             if (elsendoDeponejo != null) {
                 val rezultoj = coroutineScope {
                     kanaloj
@@ -109,6 +128,10 @@ fun KanalaroEkrano(
             TopAppBar(
                 title = { Text("Kanaloj") },
                 actions = {
+                    if (sxargxas && kanaloj.isNotEmpty()) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }

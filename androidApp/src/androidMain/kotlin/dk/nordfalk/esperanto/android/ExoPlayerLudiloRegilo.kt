@@ -3,6 +3,8 @@ package dk.nordfalk.esperanto.android
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -18,6 +20,8 @@ import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +39,8 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
 
     private var nunaFonto: Sonfonto? = null
+
+    private val cxefaFadeno = Handler(Looper.getMainLooper())
 
     private val sessionToken = SessionToken(context, ComponentName(context, EsperantoLudadoServo::class.java))
     private val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
@@ -124,7 +130,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         )
     }
 
-    override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
+    override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) = withContext(Dispatchers.Main) {
         nunaFonto = fonto
         konektita.await()
         val url = getStreamUrl(fonto)
@@ -143,16 +149,18 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         )
     }
 
-    override fun ludi() { controller?.play() }
-    override fun pauxzigi() { controller?.pause() }
+    override fun ludi() { cxefaFadeno.post { controller?.play() } }
+    override fun pauxzigi() { cxefaFadeno.post { controller?.pause() } }
     override fun halti() {
-        controller?.stop()
-        controller?.clearMediaItems()
+        cxefaFadeno.post {
+            controller?.stop()
+            controller?.clearMediaItems()
+        }
         nunaFonto = null
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
-    override fun saltiAl(pozicioMs: Long) { controller?.seekTo(pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) { controller?.volume = volumeno }
+    override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
+    override fun fiksiLauxtecon(volumeno: Float) { cxefaFadeno.post { controller?.volume = volumeno } }
 
     /**
      * Malkonektas la MediaController de la servo.
@@ -160,8 +168,10 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
      * Vokata en Activity.onDestroy().
      */
     fun release() {
-        controller?.removeListener(listener)
-        MediaController.releaseFuture(controllerFuture)
+        cxefaFadeno.post {
+            controller?.removeListener(listener)
+            MediaController.releaseFuture(controllerFuture)
+        }
         controller = null
     }
 }

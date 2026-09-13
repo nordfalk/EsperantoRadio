@@ -49,6 +49,7 @@ class LudvicoRegiloTest {
         plejŝatataj: Set<String> = emptySet(),
         ludatojDeponejo: LudatojDeponejo = LudatojDeponejoMaketo(),
         lokaDosiero: Map<String, String> = emptyMap(),
+        auxtomataDaurigo: Boolean = true,
         scope: TestScope,
     ): Triple<LudvicoRegilo, NoOpLudiloRegilo, LudatojDeponejo> {
         val regiloScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
@@ -81,6 +82,7 @@ class LudvicoRegiloTest {
             plejŝatatajDeponejo = plejDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             getLokaDosieroVojo = { id -> lokaDosiero[id] },
+            auxtomataDaurigo = MutableStateFlow(auxtomataDaurigo),
             scope = regiloScope,
         )
         return Triple(regilo, ludilo, ludatojDeponejo)
@@ -354,6 +356,79 @@ class LudvicoRegiloTest {
 
         // Devus esti haltita — nenio por ludi
         assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato)
+    }
+
+    // =========================================================================
+    // Aŭtomata daŭrigo — agordo
+    // =========================================================================
+
+    @Test
+    fun auxtomataDaurigo_haltasKiamMalshalitaKunSekvaElsendo() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, ludatoj) = kreuRegilon(
+            ludilo, elsendoj = elsendoj, auxtomataDaurigo = false, scope = this
+        )
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+
+
+        ludilo.simuluFinon()
+
+
+        // Malgraŭ ke e2 ekzistas kiel sekva, la apo devas halti
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Devas halti kiam aŭtomata daŭrigo malŝaltita")
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 tamen devas esti markita finita")
+    }
+
+    @Test
+    fun auxtomataDaurigo_dauxrigxasKiamEnshalitaKunSekvaElsendo() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = elsendoj, auxtomataDaurigo = true, scope = this
+        )
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+
+
+        ludilo.simuluFinon()
+
+
+        // Kun aŭtomata daŭrigo enŝaltita, devas ludi e2
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas daŭrigi kiam aŭtomata daŭrigo enŝaltita")
+        val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
+        assertEquals("k1:2024-02-01", fonto.elsendo.id)
+    }
+
+    @Test
+    fun auxtomataDaurigo_haltasKiamMalshalitaKunVicoNeMalplena() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, auxtomataDaurigo = false, scope = this
+        )
+
+        regilo.komenci()
+
+        regilo.ludiElsendon(e1)
+        regilo.aldoniAlVico(e2)
+
+
+        ludilo.simuluFinon()
+
+
+        // Eĉ kun elsendo en la vico, devas halti se aŭtomata daŭrigo malŝaltita
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Devas halti eĉ kun vico se malŝaltita")
     }
 
     // =========================================================================

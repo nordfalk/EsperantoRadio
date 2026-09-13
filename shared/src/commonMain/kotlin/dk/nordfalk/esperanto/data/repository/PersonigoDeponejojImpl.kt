@@ -122,6 +122,9 @@ class AgordojDeponejoImpl(
     private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
     override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
+    private val _auxtomataDaurigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AUXTOMATA_DAURIGO, true) ?: true)
+    override val auxtomataDaurigo: StateFlow<Boolean> = _auxtomataDaurigo.asStateFlow()
+
     override fun fiksiLingvon(lingvo: String) {
         _lingvo.value = lingvo
         logi("Agordoj", "Lingvo → $lingvo")
@@ -138,5 +141,10 @@ class AgordojDeponejoImpl(
         _sciigoj.value = sxaltita
         settings?.putBoolean(SettingsKeys.SCIIGOJ, sxaltita)
         logi("Agordoj", "Sciigoj → $sxaltita")
+    }
+    override fun fiksiAuxtomatanDaurigon(sxaltita: Boolean) {
+        _auxtomataDaurigo.value = sxaltita
+        settings?.putBoolean(SettingsKeys.AUXTOMATA_DAURIGO, sxaltita)
+        logi("Agordoj", "AuxtomataDaurigo → $sxaltita")
     }
 }

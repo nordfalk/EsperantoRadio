@@ -123,6 +123,7 @@ fun EsperantoRadioApp(
                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                 ludatojDeponejo = ludatojDeponejo,
                 getLokaDosieroVojo = { id -> elshutDeponejo.getLokaDosieroVojo(id) },
+                auxtomataDaurigo = agordojDeponejo.auxtomataDaurigo,
             )
         }
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }

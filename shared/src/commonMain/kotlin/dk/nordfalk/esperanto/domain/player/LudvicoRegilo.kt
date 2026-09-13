@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.concurrent.Volatile
 
 /**
  * LudvicoRegilo — kontrolas daŭran ludadon kun aŭtomata sekva-ludado.
@@ -51,6 +52,8 @@ import kotlinx.coroutines.sync.withLock
  * @param plejŝatatajDeponejo por scii kiuj kanaloj estas ŝatataj (priority 2)
  * @param ludatojDeponejo por persisto de pozicioj kaj finstato
  * @param elshutDeponejo por kontrolado de loka dosiero (eksterreta ludado)
+ * @param auxtomataDaurigo se true (defaŭlte), aŭtomate daŭrigas kun alia elsendo post fino;
+ *   se false, haltas post ĉiu finita elsendo
  */
 class LudvicoRegilo(
     private val ludilo: LudiloRegilo,
@@ -59,6 +62,7 @@ class LudvicoRegilo(
     private val plejŝatatajDeponejo: PlejŝatatajDeponejo,
     private val ludatojDeponejo: LudatojDeponejo,
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
+    private val auxtomataDaurigo: StateFlow<Boolean> = MutableStateFlow(true),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
 ) {
     /** Delegas la staton al la suba ludilo. */
@@ -116,6 +120,13 @@ class LudvicoRegilo(
                 // Forigu la finitan elsendon el la vico se ĝi estas tie
                 if (nunaElsendo != null) {
                     _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
+                }
+                // Se aŭtomata daŭrigo estas malŝaltita, haltu post finio
+                if (!auxtomataDaurigo.value) {
+                    logi("Ludvico", "Aŭtomata daŭrigo malŝaltita — haltas")
+                    ludilo.halti()
+                    antauxaStato = stato
+                    return
                 }
                 // Lanĉu sekvan en aparta korutino por eviti rekurson
                 val elsendoPorLudi = nunaElsendo

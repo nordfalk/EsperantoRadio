@@ -11,6 +11,9 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.sentry.kotlin.multiplatform.Sentry
+import io.sentry.kotlin.multiplatform.SentryLevel
+import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +62,7 @@ open class ElsendoDeponejoImpl(
 
         return try {
             logi("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
+            Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
             val respondo = httpKliento.get(url).bodyAsText()
             logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
             val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
@@ -70,6 +74,13 @@ open class ElsendoDeponejoImpl(
             elsendoj
         } catch (e: Exception) {
             loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
+            // Raportu kiel averto (ne eraro) — la apo daŭrigas kun kaŝenita datumo
+            Sentry.captureMessage(
+                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn"
+            ) { scope ->
+                scope.level = SentryLevel.WARNING
+                scope.setTag("kanalo", kanalo.slug)
+            }
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }

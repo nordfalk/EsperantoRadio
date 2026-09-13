@@ -10,10 +10,13 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
+import dk.nordfalk.esperanto.agorduSentryEtikedon
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
+import io.sentry.kotlin.multiplatform.Sentry
+import io.sentry.kotlin.multiplatform.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -73,6 +76,7 @@ class LudvicoRegilo(
     /** Lasta pozicio antaŭ ol halti() forigis nunaFonton — uzata de savuPozicion kiel retroiro. */
     @Volatile private var lastaFonto: Sonfonto? = null
     @Volatile private var lastaPozicioMs: Long = 0
+    @Volatile private var lastaSavitaPozicioMs: Long = 0
     @Volatile private var lastaDauroMs: Long = 0
 
     /**
@@ -167,8 +171,9 @@ class LudvicoRegilo(
         }
         val pozicio = if (info.pozicioMs > 0) info.pozicioMs else lastaPozicioMs
         val dauro = if (info.dauroMs > 0) info.dauroMs else lastaDauroMs
-        if (pozicio > 0) {
+        if (pozicio > 0 && lastaSavitaPozicioMs != pozicio) {
             ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, pozicio, dauro)
+            lastaSavitaPozicioMs = pozicio
             logd("Ludvico", "Savis pozicion: ${elsendo.id} @ ${pozicio}ms")
         }
     }
@@ -281,6 +286,10 @@ class LudvicoRegilo(
 
             if (sekva != null) {
                 logi("Ludvico", "Aŭtomata sekva: ${sekva.id} — ${sekva.titolo}")
+                Sentry.captureMessage("Aŭtoludo: ${sekva.titolo}") { scope ->
+                    scope.level = SentryLevel.INFO
+                    scope.setTag("kanalo", sekva.kanaloSlug)
+                }
                 ludiElsendonInterna(sekva)
             } else {
                 logi("Ludvico", "Nenio por ludi sekve — haltas")
@@ -300,6 +309,7 @@ class LudvicoRegilo(
         } else {
             0L
         }
+
         val lokaVojo = getLokaDosieroVojo(elsendo.id)
         val fonto = if (lokaVojo != null) {
             Sonfonto.LokaElsendo(elsendo, lokaVojo)

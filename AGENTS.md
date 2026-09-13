@@ -136,9 +136,11 @@ EsperantoRadio/
 3. Commit, push, kreu PR kun `gh pr create`.
 4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
    Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
-5. Faru commit malofte kaj kiel eble plej malfrue (kiam bezonas por la daŭrigo)
-6. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
+5. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
    kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
+6. **Ne commitu sen eksplicita peto de la uzanto.** La rajtigo por
+   unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
+   ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

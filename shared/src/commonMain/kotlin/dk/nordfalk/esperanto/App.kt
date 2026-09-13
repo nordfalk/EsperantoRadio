@@ -32,6 +32,8 @@ import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
+import io.sentry.kotlin.multiplatform.Sentry
+import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import dk.nordfalk.esperanto.navigation.Vojo
 import dk.nordfalk.esperanto.ui.*
 import dk.nordfalk.esperanto.ui.MuzaikoTiparo
@@ -149,14 +151,18 @@ fun EsperantoRadioApp(
         val pendingElsendo by dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.elsendo.collectAsState()
 
         fun switchTab(vojo: Vojo) {
+            val antauxa = nunaVojo?.javaClass?.simpleName ?: "nenio"
             logi("Nav", "→ tab: $vojo")
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo.javaClass.simpleName))
             backStack.clear()
             backStack.add(Vojo.Hejmo)
             if (vojo !is Vojo.Hejmo) backStack.add(vojo)
         }
 
         fun push(vojo: Vojo) {
+            val antauxa = nunaVojo?.javaClass?.simpleName ?: "nenio"
             logi("Nav", "→ push: $vojo")
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo.javaClass.simpleName))
             backStack.add(vojo)
         }
 

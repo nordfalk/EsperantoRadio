@@ -62,11 +62,8 @@ class RssParsilo {
 
     private fun parsuEroGxenerala(ero: Element, kanalo: Kanalo, indekso: Int): Elsendo? {
         val titolo = ero.selectFirst("title")?.text() ?: ""
-        val priskriboHtml = ero.selectFirst("content|encoded")?.html()
-            ?: ero.selectFirst("description")?.html()
-            ?: ""
-        val priskribo = ero.selectFirst("description")?.text()
-            ?: ero.selectFirst("content|encoded")?.text()
+        val priskriboKruda = ero.selectFirst("content|encoded")?.text()
+            ?: ero.selectFirst("description")?.text()
             ?: ero.selectFirst("itunes|summary")?.text()
             ?: ""
 
@@ -95,7 +92,7 @@ class RssParsilo {
         val retpaghoUrl = ero.selectFirst("link")?.text()
             ?: ero.selectFirst("link")?.attr("href")
 
-        val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskribo) else titolo
+        val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboKruda) else titolo
 
         // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
         val guid = ero.selectFirst("guid")?.text()
@@ -106,7 +103,8 @@ class RssParsilo {
             kanaloSlug = kanalo.slug,
             kanaloNomo = kanalo.nomo,
             titolo = finaTitolo,
-            priskribo = puriguHtml(priskriboHtml.ifEmpty { priskribo }),
+            priskribo = puriguHtml(priskriboKruda),
+            priskriboHtml = puriguHtmlKunEtikedojn(priskriboKruda),
             bildoUrl = bildoUrl,
             dato = dato,
             dauro = dauro,
@@ -144,6 +142,7 @@ class RssParsilo {
                     kanaloNomo = kanalo.nomo,
                     titolo = "$titolo ${i + 1}a parto",
                     priskribo = puriguHtml(htmlEnhavo),
+                    priskriboHtml = puriguHtmlKunEtikedojn(htmlEnhavo),
                     dato = dato,
                     fluo = fluo,
                 ))
@@ -217,6 +216,7 @@ class RssParsilo {
                 kanaloNomo = kanalo.nomo,
                 titolo = if (kanalo.ignoruTitolon) puriguHtml(priskribo).take(200) else titolo,
                 priskribo = priskribo,
+                priskriboHtml = puriguHtmlKunEtikedojn(htmlEsprimite),
                 bildoUrl = bildoUrl,
                 dato = dato,
                 fluo = fluo,
@@ -236,15 +236,16 @@ class RssParsilo {
                 ?: return@mapNotNull null
             val bildoUrl = ero.selectFirst("link[type=image/jpeg]")?.attr("href")
             val retpaghoUrl = ero.selectFirst("link[type=text/html]")?.attr("href")
-            val priskribo = ero.selectFirst("content")?.html() ?: ""
+            val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
             Elsendo(
                 id = id,
                 kanaloSlug = kanalo.slug,
                 kanaloNomo = kanalo.nomo,
-                titolo = puriguHtml(priskribo).take(200),
-                priskribo = puriguHtml(priskribo),
+                titolo = puriguHtml(priskriboKruda).take(200),
+                priskribo = puriguHtml(priskriboKruda),
+                priskriboHtml = puriguHtmlKunEtikedojn(priskriboKruda),
                 bildoUrl = bildoUrl,
                 dato = dato,
                 fluo = fluo,
@@ -288,5 +289,27 @@ class RssParsilo {
         return if (pura.length > 200) pura.take(200) else pura
     }
 
-    fun puriguHtml(html: String): String = Ksoup.parse(html).text()
+    fun puriguHtml(html: String): String {
+        val teksto = Ksoup.parse(html).text()
+        // Se la rezulto ankoraŭ enhavas HTML-etikedojn (duoble-eskapita enhavo),
+        // reprovu unu fojon
+        return if (teksto.contains('<') && teksto.contains('>'))
+            Ksoup.parse(teksto).text()
+        else teksto
+    }
+
+    fun puriguHtmlKunEtikedojn(html: String): String {
+        val doc = Ksoup.parse(html)
+        // Forigu danĝerajn etikedojn
+        doc.select("script, style, iframe, object, embed, form, input, button, meta, link").remove()
+        // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj)
+        for (el in doc.select("*")) {
+            for (attr in el.attributes().asList()) {
+                if (attr.key.startsWith("on") || attr.value.trim().startsWith("javascript:")) {
+                    el.removeAttr(attr.key)
+                }
+            }
+        }
+        return doc.body().html()
+    }
 }

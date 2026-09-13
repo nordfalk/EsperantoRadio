@@ -317,30 +317,37 @@ fun EsperantoRadioApp(
                         entry<Vojo.ElsendoDetalo> { vojo ->
                             val elsendo = vojo.elsendo
                             val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
-                            ElsendoEkrano(
-                                elsendo = elsendo,
+                            val elsendoj by elsendoDeponejo.observiElsendojn(elsendo.kanaloSlug).collectAsState()
+                            LaunchedEffect(kanalo?.slug) {
+                                if (kanalo != null && elsendoj.isEmpty()) {
+                                    elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo)
+                                }
+                            }
+                            ElsendoEkranoKunSvipo(
+                                komencaElsendo = elsendo,
+                                elsendoj = elsendoj,
                                 kanalo = kanalo,
                                 onKanalo = { k -> push(Vojo.KanaloDetalo(k)) },
                                 onReen = { reen() },
-                                onLudi = {
-                                    logi("Nav", "Ludas elsendon: ${elsendo.id}")
-                                    scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
+                                onLudi = { e ->
+                                    logi("Nav", "Ludas elsendon: ${e.id}")
+                                    scope.launch { ludvicoRegilo.ludiElsendon(e) }
                                 },
-                                onElshuti = {
-                                    logi("Nav", "Elŝutas elsendon: ${elsendo.id}")
-                                    scope.launch { elshutDeponejo.elshuti(elsendo) }
+                                onElshuti = { e ->
+                                    logi("Nav", "Elŝutas elsendon: ${e.id}")
+                                    scope.launch { elshutDeponejo.elshuti(e) }
                                 },
-                                onHaltigiElshuton = {
-                                    logi("Nav", "Haltigas elŝuton: ${elsendo.id}")
-                                    scope.launch { elshutDeponejo.haltigi(elsendo.id) }
+                                onHaltigiElshuton = { e ->
+                                    logi("Nav", "Haltigas elŝuton: ${e.id}")
+                                    scope.launch { elshutDeponejo.haltigi(e.id) }
                                 },
-                                onForigiElshuton = {
-                                    logi("Nav", "Forigas elŝuton: ${elsendo.id}")
-                                    scope.launch { elshutDeponejo.forigi(elsendo.id) }
+                                onForigiElshuton = { e ->
+                                    logi("Nav", "Forigas elŝuton: ${e.id}")
+                                    scope.launch { elshutDeponejo.forigi(e.id) }
                                 },
-                                onAldoniAlVico = {
-                                    logi("Nav", "Aldonas al ludvico: ${elsendo.id}")
-                                    scope.launch { ludvicoRegilo.aldoniAlVico(elsendo) }
+                                onAldoniAlVico = { e ->
+                                    logi("Nav", "Aldonas al ludvico: ${e.id}")
+                                    scope.launch { ludvicoRegilo.aldoniAlVico(e) }
                                 },
                                 onMontriLudvicon = {
                                     logi("Nav", "Montri ludvicon")

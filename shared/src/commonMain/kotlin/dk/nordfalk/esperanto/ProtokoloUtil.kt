@@ -16,12 +16,6 @@ import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
  */
 fun logd(tag: String, msg: String) {
     platformLogd(tag, msg)
-    /*
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.DEBUG
-        message = "[$tag] $msg"
-        category = tag
-    })*/
 }
 
 fun logi(tag: String, msg: String) {
@@ -52,11 +46,6 @@ fun loge(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLoge(tag, plenaMsg)
     platformLoge(tag, e.stackTraceToString())
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.ERROR
-        message = "[$tag] $plenaMsg"
-        category = tag
-    })
     Sentry.captureException(e)
 }
 
@@ -64,9 +53,4 @@ fun logw(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLogw(tag, plenaMsg)
     platformLogw(tag, e.stackTraceToString())
-    Sentry.addBreadcrumb(Breadcrumb().apply {
-        level = SentryLevel.WARNING
-        message = "[$tag] $plenaMsg"
-        category = tag
-    })
 }

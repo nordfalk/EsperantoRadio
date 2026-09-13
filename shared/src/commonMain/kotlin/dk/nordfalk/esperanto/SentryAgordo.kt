@@ -17,7 +17,8 @@ fun initialiguSentry() {
         // Kaptu 100% de traktadoj por spurado (agordu malpli en produktado)
         options.tracesSampleRate = 1.0
         // Montru kion la SDK faras dum provado
-        options.debug = true
+        // options.debug = true
+        options.attachThreads = false
         // Identigas la version en Sentry — ebligas spuradon de regreso inter versioj
         options.release = "esperantoradio@0.1"
         // Disigas evoluon de produktado en la Sentry-fasado

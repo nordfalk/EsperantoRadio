@@ -2,18 +2,18 @@ package dk.nordfalk.esperanto
 
 import platform.foundation.NSLog
 
-actual fun logi(tag: String, msg: String) {
+actual fun platformLogi(tag: String, msg: String) {
     NSLog("[$tag] $msg")
 }
 
-actual fun logd(tag: String, msg: String) {
+actual fun platformLogd(tag: String, msg: String) {
     NSLog("[$tag] $msg")
 }
 
-actual fun logw(tag: String, msg: String) {
+actual fun platformLogw(tag: String, msg: String) {
     NSLog("[$tag] WARN $msg")
 }
 
-actual fun loge(tag: String, msg: String) {
+actual fun platformLoge(tag: String, msg: String) {
     NSLog("[$tag] ERROR $msg")
 }

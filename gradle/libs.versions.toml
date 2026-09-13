@@ -20,6 +20,8 @@ agp = "8.9.1"
 androidx-activity-compose = "1.9.3"
 androidx-work-runtime = "2.10.1"
 multiplatform-nav3-ui = "1.1.1"
+sentry-kmp = "0.27.0"
+sentry-jvm-gradle = "6.22.0"
 
 [libraries]
 # Compose Multiplatform (rektaj referencoj — kaŝnomoj malrekomenditaj en 1.10)
@@ -84,3 +86,5 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-m
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+sentry-kmp-gradle = { id = "io.sentry.kotlin.multiplatform.gradle", version.ref = "sentry-kmp" }
+sentry-jvm-gradle = { id = "io.sentry.jvm.gradle", version.ref = "sentry-jvm-gradle" }

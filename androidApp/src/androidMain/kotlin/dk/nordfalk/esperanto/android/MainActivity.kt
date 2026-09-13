@@ -14,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
+import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
@@ -23,6 +24,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
+import dk.nordfalk.esperanto.testuSentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initialiguSentry()
         appContext = applicationContext
         petiSciigPermeson()
         ludilo = ExoPlayerLudiloRegilo(this)
@@ -43,6 +46,7 @@ class MainActivity : ComponentActivity() {
         }
         // La sciig-skedo estas mastrumata de App.kt per ghisdatiguSciigSkedon()
         traktuIntenton(intent)
+        testuSentry()
     }
 
     override fun onNewIntent(intent: Intent) {

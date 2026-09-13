@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.sentry.jvm.gradle)
 }
 
 kotlin {
@@ -26,4 +27,14 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+sentry {
+    // Generas JVM-fontpakaĵon kaj alŝutas fontkodon al Sentry.
+    // Ebligas fontkuntekston (source context) en stack traces.
+    includeSourceContext = true
+
+    org = "esperantoradio"
+    projectName = "kmp"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

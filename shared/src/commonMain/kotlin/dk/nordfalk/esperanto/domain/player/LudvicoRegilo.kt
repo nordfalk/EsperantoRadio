@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.concurrent.Volatile
 
 /**
  * LudvicoRegilo — kontrolas daŭran ludadon kun aŭtomata sekva-ludado.
@@ -51,6 +52,8 @@ import kotlinx.coroutines.sync.withLock
  * @param plejŝatatajDeponejo por scii kiuj kanaloj estas ŝatataj (priority 2)
  * @param ludatojDeponejo por persisto de pozicioj kaj finstato
  * @param elshutDeponejo por kontrolado de loka dosiero (eksterreta ludado)
+ * @param auxtomataDaurigo se true (defaŭlte), aŭtomate daŭrigas kun alia elsendo post fino;
+ *   se false, haltas post ĉiu finita elsendo
  */
 class LudvicoRegilo(
     private val ludilo: LudiloRegilo,
@@ -59,6 +62,7 @@ class LudvicoRegilo(
     private val plejŝatatajDeponejo: PlejŝatatajDeponejo,
     private val ludatojDeponejo: LudatojDeponejo,
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
+    private val auxtomataDaurigo: StateFlow<Boolean> = MutableStateFlow(true),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
 ) {
     /** Delegas la staton al la suba ludilo. */
@@ -72,6 +76,9 @@ class LudvicoRegilo(
     private var pozicioSavanto: Job? = null
     private val ludMutex = Mutex()
     @Volatile private var antauxaStato: LudantoStato = LudantoStato.Haltita
+
+    /** Nombro de sinsekvaj eraroj — haltas post MAKS_ERAROJ por eviti eternan buklon. */
+    @Volatile private var erarojSinsekvaj: Int = 0
 
     /** Lasta pozicio antaŭ ol halti() forigis nunaFonton — uzata de savuPozicion kiel retroiro. */
     @Volatile private var lastaFonto: Sonfonto? = null
@@ -97,32 +104,10 @@ class LudvicoRegilo(
     private suspend fun traktiStatoSxangxon(stato: LudantoStato) {
         when {
             stato == LudantoStato.Finita && antauxaStato != LudantoStato.Finita -> {
-                logi("Ludvico", "Ludado finiĝis (naturfino)")
-                val nunaFonto = ludilo.stato.value.nunaFonto
-                val nunaElsendo = when (nunaFonto) {
-                    is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
-                    is Sonfonto.LokaElsendo -> nunaFonto.elsendo
-                    else -> null
-                }
-                // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
-                if (nunaFonto is Sonfonto.RektaKanalo) {
-                    logi("Ludvico", "Rekta kanalo finiĝis — ne aŭtoludas")
-                    antauxaStato = stato
-                    return
-                }
-                if (nunaElsendo != null) {
-                    ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
-                }
-                // Forigu la finitan elsendon el la vico se ĝi estas tie
-                if (nunaElsendo != null) {
-                    _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
-                }
-                // Lanĉu sekvan en aparta korutino por eviti rekurson
-                val elsendoPorLudi = nunaElsendo
-                scope.launch {
-                    try { ludiSekvan(elsendoPorLudi) }
-                    catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
-                }
+                traktiFinon(stato, erara = false)
+            }
+            stato is LudantoStato.Eraro && antauxaStato !is LudantoStato.Eraro -> {
+                traktiFinon(stato, erara = true)
             }
             stato == LudantoStato.Ludas -> {
                 ghisdatiguLastaPozicion()
@@ -136,6 +121,59 @@ class LudvicoRegilo(
             else -> {}
         }
         antauxaStato = stato
+    }
+
+    /**
+     * Komuna trakto por Finita kaj Eraro — markas la elsendon kaj aŭtoludas sekvan.
+     */
+    private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean) {
+        val nunaFonto = ludilo.stato.value.nunaFonto
+        val nunaElsendo = when (nunaFonto) {
+            is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
+            is Sonfonto.LokaElsendo -> nunaFonto.elsendo
+            else -> null
+        }
+        // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
+        if (nunaFonto is Sonfonto.RektaKanalo) {
+            logi("Ludvico", "Rekta kanalo ${if (erara) "eraris" else "finiĝis"} — ne aŭtoludas")
+            return
+        }
+        if (erara) {
+            erarojSinsekvaj++
+            if (erarojSinsekvaj >= MAKS_ERAROJ) {
+                logw("Ludvico", "Atingis $MAKS_ERAROJ sinsekvajn erarojn — haltas por eviti eternan buklon")
+                if (nunaElsendo != null) {
+                    ludatojDeponejo.markiErara(nunaElsendo.id, nunaElsendo.kanaloSlug)
+                }
+                ludilo.halti()
+                return
+            }
+            logw("Ludvico", "Ludado eraris ($erarojSinsekvaj/$MAKS_ERAROJ) — markas erara kaj daŭrigas")
+            if (nunaElsendo != null) {
+                ludatojDeponejo.markiErara(nunaElsendo.id, nunaElsendo.kanaloSlug)
+            }
+        } else {
+            logi("Ludvico", "Ludado finiĝis (naturfino)")
+            if (nunaElsendo != null) {
+                ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
+            }
+        }
+        // Forigu la elsendon el la vico se ĝi estas tie
+        if (nunaElsendo != null) {
+            _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
+        }
+        // Se aŭtomata daŭrigo estas malŝaltita, haltu post finio
+        if (!auxtomataDaurigo.value) {
+            logi("Ludvico", "Aŭtomata daŭrigo malŝaltita — haltas")
+            ludilo.halti()
+            return
+        }
+        // Lanĉu sekvan en aparta korutino por eviti rekurson
+        val elsendoPorLudi = nunaElsendo
+        scope.launch {
+            try { ludiSekvan(elsendoPorLudi) }
+            catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
+        }
     }
 
     private fun komenciPozicianSpuradon() {
@@ -196,6 +234,7 @@ class LudvicoRegilo(
      */
     suspend fun ludiElsendon(elsendo: Elsendo) {
         ludMutex.withLock {
+            erarojSinsekvaj = 0
             savuPozicion()
             // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
             if (ludatojDeponejo.estasFinita(elsendo.id)) {
@@ -356,5 +395,7 @@ class LudvicoRegilo(
     companion object {
         /** Kiom ofte savas pozicion dum ludado (ms). */
         const val POZICIO_SAV_INTERVALO_MS = 5000L
+        /** Maksimumo de sinsekvaj eraroj antaŭ ol halti por eviti eternan buklon. */
+        const val MAKS_ERAROJ = 10
     }
 }

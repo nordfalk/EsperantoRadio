@@ -30,6 +30,7 @@ import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
+import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
 import dk.nordfalk.esperanto.logi
 import io.sentry.kotlin.multiplatform.Sentry
@@ -123,9 +124,22 @@ fun EsperantoRadioApp(
                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                 ludatojDeponejo = ludatojDeponejo,
                 getLokaDosieroVojo = { id -> elshutDeponejo.getLokaDosieroVojo(id) },
+                auxtomataDaurigo = agordojDeponejo.auxtomataDaurigo,
             )
         }
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
+
+        // Konektu sciigo-kontrolon (Venonta) al LudvicoRegilo
+        LaunchedEffect(Unit) {
+            SciigoKontroloj.onVenonta = {
+                val nunaElsendo = when (val fonto = ludvicoRegilo.stato.value.nunaFonto) {
+                    is Sonfonto.ElsendoFonto -> fonto.elsendo
+                    is Sonfonto.LokaElsendo -> fonto.elsendo
+                    else -> null
+                }
+                ludvicoRegilo.ludiSekvan(nunaElsendo)
+            }
+        }
 
         // Savu pozicion kiam la komponanto detruiĝas (ekz. app fermo)
         DisposableEffect(ludvicoRegilo) {

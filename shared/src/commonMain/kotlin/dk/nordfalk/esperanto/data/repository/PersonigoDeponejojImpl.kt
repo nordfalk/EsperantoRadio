@@ -66,6 +66,7 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
             pozicioMs = pozicioMs,
             dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
             finita = ekzista?.finita ?: false,
+            erara = ekzista?.erara ?: false,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
         _ludatoj.value = nuna
@@ -85,10 +86,25 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
         _ludatoj.value = nuna
     }
 
+    override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {
+        val nuna = _ludatoj.value.toMutableMap()
+        val ekzista = nuna[elsendoId]
+        nuna[elsendoId] = LudataElsendo(
+            elsendoId = elsendoId,
+            kanaloSlug = kanaloSlug,
+            pozicioMs = ekzista?.pozicioMs ?: 0,
+            dauroMs = ekzista?.dauroMs ?: 0,
+            finita = true,
+            erara = true,
+            lasteLudita = Clock.System.now().toEpochMilliseconds(),
+        )
+        _ludatoj.value = nuna
+    }
+
     override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {
         val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId] ?: return
-        nuna[elsendoId] = ekzista.copy(finita = false, pozicioMs = 0)
+        nuna[elsendoId] = ekzista.copy(finita = false, erara = false, pozicioMs = 0)
         _ludatoj.value = nuna
     }
 
@@ -122,6 +138,9 @@ class AgordojDeponejoImpl(
     private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
     override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
+    private val _auxtomataDaurigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AUXTOMATA_DAURIGO, true) ?: true)
+    override val auxtomataDaurigo: StateFlow<Boolean> = _auxtomataDaurigo.asStateFlow()
+
     override fun fiksiLingvon(lingvo: String) {
         _lingvo.value = lingvo
         logi("Agordoj", "Lingvo → $lingvo")
@@ -138,5 +157,10 @@ class AgordojDeponejoImpl(
         _sciigoj.value = sxaltita
         settings?.putBoolean(SettingsKeys.SCIIGOJ, sxaltita)
         logi("Agordoj", "Sciigoj → $sxaltita")
+    }
+    override fun fiksiAuxtomatanDaurigon(sxaltita: Boolean) {
+        _auxtomataDaurigo.value = sxaltita
+        settings?.putBoolean(SettingsKeys.AUXTOMATA_DAURIGO, sxaltita)
+        logi("Agordoj", "AuxtomataDaurigo → $sxaltita")
     }
 }

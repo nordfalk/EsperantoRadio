@@ -28,6 +28,7 @@ interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
     suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
     suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
+    suspend fun markiErara(elsendoId: String, kanaloSlug: String)
     suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)
     suspend fun getLudato(elsendoId: String): LudataElsendo?
     suspend fun estasFinita(elsendoId: String): Boolean
@@ -43,10 +44,12 @@ interface AgordojDeponejo {
     val nurWifi: StateFlow<Boolean>
     val temo: StateFlow<String>
     val sciigoj: StateFlow<Boolean>
+    val auxtomataDaurigo: StateFlow<Boolean>
     fun fiksiLingvon(lingvo: String)
     fun fiksiNurWifi(nurWifi: Boolean)
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
+    fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
 }
 
 /**

@@ -22,6 +22,7 @@ fun AgordojEkrano(
     val nurWifi by agordojDeponejo.nurWifi.collectAsState()
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
+    val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -57,6 +58,21 @@ fun AgordojEkrano(
                     Switch(
                         checked = nurWifi,
                         onCheckedChange = { logi("Klako", "nurWifi → $it"); agordojDeponejo.fiksiNurWifi(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(Modifier.height(24.dp))
+
+            Text("Ludado", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Aŭtomate daŭrigu kun alia elsendo") },
+                supportingContent = { Text("Kiam elsendo finiĝas, aŭtomate ludu la sekvan") },
+                trailingContent = {
+                    Switch(
+                        checked = auxtomataDaurigo,
+                        onCheckedChange = { logi("Klako", "auxtomataDaurigo → $it"); agordojDeponejo.fiksiAuxtomatanDaurigon(it) }
                     )
                 }
             )

@@ -52,6 +52,7 @@ class PersistaLudatojDeponejo(
             pozicioMs = pozicioMs,
             dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
             finita = ekzista?.finita ?: false,
+            erara = ekzista?.erara ?: false,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
         skribu(nuna)
@@ -74,10 +75,27 @@ class PersistaLudatojDeponejo(
         logi("Ludatoj", "Markita finita: $elsendoId")
     }
 
+    override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {
+        val nuna = _ludatoj.value.toMutableMap()
+        val ekzista = nuna[elsendoId]
+        nuna[elsendoId] = LudataElsendo(
+            elsendoId = elsendoId,
+            kanaloSlug = kanaloSlug,
+            pozicioMs = ekzista?.pozicioMs ?: 0,
+            dauroMs = ekzista?.dauroMs ?: 0,
+            finita = true,
+            erara = true,
+            lasteLudita = Clock.System.now().toEpochMilliseconds(),
+        )
+        skribu(nuna)
+        _ludatoj.value = nuna
+        logi("Ludatoj", "Markita erara: $elsendoId")
+    }
+
     override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {
         val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId] ?: return
-        nuna[elsendoId] = ekzista.copy(finita = false, pozicioMs = 0)
+        nuna[elsendoId] = ekzista.copy(finita = false, erara = false, pozicioMs = 0)
         skribu(nuna)
         _ludatoj.value = nuna
         logi("Ludatoj", "Malmarkita finita: $elsendoId")

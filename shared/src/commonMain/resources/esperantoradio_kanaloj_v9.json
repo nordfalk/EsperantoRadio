@@ -189,6 +189,22 @@
 			"retpoŝto": "retradio@aldone.de",
 			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}
+	,{
+			"kodo": "kaliningrada",
+			"nomo": "Kaliningrada E-radio",
+			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
+			"elsendojRssUrl": "http://la-ondo.rpod.ru/rss.xml",
+			"retpoŝto": "",
+			"hejmpaĝoButono": "http://la-ondo.rpod.ru/"
+		},
+		{
+			"kodo": "universeala-lindo",
+			"nomo": "Universeala Lindo, la argentina podkasto",
+			"emblemoUrl": "",
+			"elsendojRssUrl": "",
+			"retpoŝto": "",
+			"hejmpaĝoButono": ""
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [
@@ -246,17 +262,8 @@
 			"retpoŝto": "arono@radioverda.com",
 			"hejmpaĝoButono": "http://radioverda.com/"
 		}
-	,{
-			"kodo": "kaliningrada",
-			"nomo": "Kaliningrada E-radio",
-			//			"emblemoUrl": "http://esperanto.org/Ondo/Bildoj/Radioesp.jpg",
-			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
-			"elsendojRssUrl": "http://la-ondo.rpod.ru/rss.xml",
-			// RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
-			"hejmpaĝoButono": "http://la-ondo.rpod./ru/"
-		}
-	,{
-			"kodo": "vej",ĉ
+	{
+			"kodo": "vej",
 			"nomo": "Voĉoj el Japanio",
 			"emblemoUrl": "http://files.posterous.com/user_profile_pics/995825/VeJ40x40.png",
 			"elsendojRssUrl": "http://feeds.feedburner.com/vej",

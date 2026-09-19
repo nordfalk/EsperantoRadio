@@ -76,7 +76,7 @@
 			"nomo": "3ZZZ en Esperanto",
 			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
 			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
-			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
+			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
 			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
 			"retpoŝto": "leslie@heldzingen.com",

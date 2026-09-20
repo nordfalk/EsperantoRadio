@@ -11,4 +11,5 @@ object SettingsKeys {
     const val VIDITAJ_ELSENDOJ = "viditaj_elsendoj"
     const val ALARMOJ = "alarmoj"
     const val AUXTOMATA_DAURIGO = "auxtomata_daurigo"
+    const val EVOLO = "evoluo"
 }

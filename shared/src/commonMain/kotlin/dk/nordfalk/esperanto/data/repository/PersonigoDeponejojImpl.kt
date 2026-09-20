@@ -135,6 +135,9 @@ class AgordojDeponejoImpl(
     private val _auxtomataDaurigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AUXTOMATA_DAURIGO, true) ?: true)
     override val auxtomataDaurigo: StateFlow<Boolean> = _auxtomataDaurigo.asStateFlow()
 
+    private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
+    override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
+
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
@@ -148,5 +151,10 @@ class AgordojDeponejoImpl(
         _auxtomataDaurigo.value = sxaltita
         settings?.putBoolean(SettingsKeys.AUXTOMATA_DAURIGO, sxaltita)
         logi("Agordoj", "AuxtomataDaurigo → $sxaltita")
+    }
+    override fun fiksiEvoluon(sxaltita: Boolean) {
+        _evoluo.value = sxaltita
+        settings?.putBoolean(SettingsKeys.EVOLO, sxaltita)
+        logi("Agordoj", "Evoluo → $sxaltita")
     }
 }

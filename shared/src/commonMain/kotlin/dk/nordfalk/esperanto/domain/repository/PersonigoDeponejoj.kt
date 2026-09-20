@@ -43,9 +43,11 @@ interface AgordojDeponejo {
     val temo: StateFlow<String>
     val sciigoj: StateFlow<Boolean>
     val auxtomataDaurigo: StateFlow<Boolean>
+    val evoluo: StateFlow<Boolean>
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
+    fun fiksiEvoluon(sxaltita: Boolean)
 }
 
 /**

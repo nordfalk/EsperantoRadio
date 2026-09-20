@@ -310,6 +310,7 @@ fun EsperantoRadioApp(
                                 elshutDeponejo = elshutDeponejo,
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
+                                agordojDeponejo = agordojDeponejo,
                             )
                         }
                     },

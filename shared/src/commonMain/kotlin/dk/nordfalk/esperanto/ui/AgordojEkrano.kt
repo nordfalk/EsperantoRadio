@@ -23,6 +23,7 @@ fun AgordojEkrano(
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
+    val evoluo by agordojDeponejo.evoluo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -74,6 +75,21 @@ fun AgordojEkrano(
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
+
+            Spacer(Modifier.height(24.dp))
+            Text("Evoluo", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Evolua reĝimo") },
+                supportingContent = { Text("Montru elektilojn por priskribo-fonto kaj vidmaniero en elsendo-ekrano") },
+                trailingContent = {
+                    Switch(
+                        checked = evoluo,
+                        onCheckedChange = { logi("Klako", "evoluo → $it"); agordojDeponejo.fiksiEvoluon(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Spacer(Modifier.height(24.dp))
             Text("Temo", style = MaterialTheme.typography.titleMedium)

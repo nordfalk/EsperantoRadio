@@ -41,6 +41,7 @@ import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
+import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ fun ElsendoEkrano(
     elshutDeponejo: ElshutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
+    agordojDeponejo: AgordojDeponejo? = null,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
@@ -246,13 +248,76 @@ fun ElsendoEkrano(
             }
 
             // Priskribo
-            val html = elsendo.priskriboHtml ?: elsendo.priskribo
-            if (!html.isNullOrBlank()) {
-                HtmlVido(
-                    html = html,
-                    uzuWebView = kanalo?.uzuWebViewPorElsendo == true,
+            val evoluo = agordojDeponejo?.evoluo?.collectAsState()?.value ?: false
+            val defauxltaUzuWebView = kanalo?.uzuWebViewPorElsendo == true
+
+            // Evolua reĝimo: elektiloj por fonto kaj vidmaniero
+            if (evoluo) {
+                var fontoHtml by remember(elsendo.id) { mutableStateOf(true) }
+                var vidmaniero by remember(elsendo.id) { mutableStateOf(if (defauxltaUzuWebView) 0 else 1) }
+
+                Surface(
+                    tonalElevation = 2.dp,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()
-                )
+                ) {
+                    Column(Modifier.padding(8.dp)) {
+                        Text("Evoluo — priskribo-fonto", style = MaterialTheme.typography.labelMedium)
+                        Row {
+                            FilterChip(
+                                selected = fontoHtml,
+                                onClick = { fontoHtml = true },
+                                label = { Text("priskriboHtml") },
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                            FilterChip(
+                                selected = !fontoHtml,
+                                onClick = { fontoHtml = false },
+                                label = { Text("priskribo") },
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text("Evoluo — vidmaniero", style = MaterialTheme.typography.labelMedium)
+                        Row {
+                            FilterChip(
+                                selected = vidmaniero == 0,
+                                onClick = { vidmaniero = 0 },
+                                label = { Text("WebView") },
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                            FilterChip(
+                                selected = vidmaniero == 1,
+                                onClick = { vidmaniero = 1 },
+                                label = { Text("HtmlVido") },
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                            FilterChip(
+                                selected = vidmaniero == 2,
+                                onClick = { vidmaniero = 2 },
+                                label = { Text("Text (kruda)") },
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+
+                val evoluaHtml = if (fontoHtml) elsendo.priskriboHtml else elsendo.priskribo
+                if (!evoluaHtml.isNullOrBlank()) {
+                    when (vidmaniero) {
+                        0 -> HtmlVido(html = evoluaHtml, uzuWebView = true, modifier = Modifier.fillMaxWidth())
+                        1 -> HtmlVido(html = evoluaHtml, uzuWebView = false, modifier = Modifier.fillMaxWidth())
+                        2 -> Text(text = evoluaHtml, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            } else {
+                val html = elsendo.priskriboHtml ?: elsendo.priskribo
+                if (!html.isNullOrBlank()) {
+                    HtmlVido(
+                        html = html,
+                        uzuWebView = defauxltaUzuWebView,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -373,6 +438,7 @@ fun ElsendoEkranoKunSvipo(
     elshutDeponejo: ElshutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
+    agordojDeponejo: AgordojDeponejo? = null,
 ) {
     if (elsendoj.size <= 1) {
         // Ne eblas svipi — montru nur la unuan elsendon
@@ -391,6 +457,7 @@ fun ElsendoEkranoKunSvipo(
             elshutDeponejo = elshutDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
+            agordojDeponejo = agordojDeponejo,
         )
         return
     }
@@ -414,6 +481,7 @@ fun ElsendoEkranoKunSvipo(
             elshutDeponejo = elshutDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
+            agordojDeponejo = agordojDeponejo,
         )
     }
 }

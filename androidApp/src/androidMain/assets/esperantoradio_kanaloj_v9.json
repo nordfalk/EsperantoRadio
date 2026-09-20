@@ -193,9 +193,9 @@
 			"kodo": "kaliningrada",
 			"nomo": "Kaliningrada E-radio",
 			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
-			"elsendojRssUrl": "http://la-ondo.rpod.ru/rss.xml",
-			"retpoŝto": "",
-			"hejmpaĝoButono": "http://la-ondo.rpod.ru/"
+			"elsendojRssUrl": "https://radio.esperanto-ondo.ru/feed/podcast/radio-esperanto",
+			"retpoŝto": "sezonoj@mail.ru",
+			"hejmpaĝoButono": "https://radio.esperanto-ondo.ru/"
 		},
 		{
 			"kodo": "universeala-lindo",

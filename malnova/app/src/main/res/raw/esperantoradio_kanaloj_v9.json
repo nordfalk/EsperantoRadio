@@ -75,8 +75,7 @@
 			"kodo": "3zzzenesperanto",
 			"nomo": "3ZZZ en Esperanto",
 			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
-			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
-			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
+			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
 			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
 			"retpoŝto": "leslie@heldzingen.com",
@@ -190,6 +189,22 @@
 			"retpoŝto": "retradio@aldone.de",
 			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}
+	,{
+			"kodo": "kaliningrada",
+			"nomo": "Kaliningrada E-radio",
+			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
+			"elsendojRssUrl": "https://radio.esperanto-ondo.ru/feed/podcast/radio-esperanto",
+			"retpoŝto": "sezonoj@mail.ru",
+			"hejmpaĝoButono": "https://radio.esperanto-ondo.ru/"
+		},
+		{
+			"kodo": "universeala-lindo",
+			"nomo": "Universeala Lindo, la argentina podkasto",
+			"emblemoUrl": "",
+			"elsendojRssUrl": "https://universealalindo.wordpress.com/feed/",
+			"retpoŝto": "",
+			"hejmpaĝoButono": "https://universealalindo.wordpress.com/"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [
@@ -247,16 +262,7 @@
 			"retpoŝto": "arono@radioverda.com",
 			"hejmpaĝoButono": "http://radioverda.com/"
 		}
-	,{
-			"kodo": "kaliningrada",
-			"nomo": "Kaliningrada E-radio",
-			//			"emblemoUrl": "http://esperanto.org/Ondo/Bildoj/Radioesp.jpg",
-			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
-			"elsendojRssUrl": "http://la-ondo.rpod.ru/rss.xml",
-			// RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
-			"hejmpaĝoButono": "http://la-ondo.rpod.ru/"
-		}
-	,{
+	{
 			"kodo": "vej",
 			"nomo": "Voĉoj el Japanio",
 			"emblemoUrl": "http://files.posterous.com/user_profile_pics/995825/VeJ40x40.png",

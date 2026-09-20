@@ -96,7 +96,7 @@ fun main() {
         println("  radio.txt: ${rtEroj.size} elsendoj")
 
         val rssUrl = kanalo.podkastaRssUrl
-        if (rssUrl == null) {
+        if (rssUrl == null || rssUrl.isEmpty()) {
             println("  NENIU RSS-URL en konfiguro")
             println("  >> radio.txt havas ${rtEroj.size} elsendojn, kiujn ni ne povas kompari")
             println("  >> CIUJ ${rtEroj.size} elsendoj eble mankas (neniu RSS-fonto)")

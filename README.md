@@ -10,15 +10,6 @@ Por kontrui mian arkivon de Esperanto-elsendoj, mi uzas
 ./gradlew :parse:rssarkivserverJar
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 
-## Komparo kun https://esperanto-radio.com
-
-La malnova apo suplementis la parsadon kun informoj de https://esperanto-radio.com/radio.txt .  
-Indas esplori
-* Al kiuj kanaloj ne enhavas informojn de https://esperanto-radio.com/radio.txt ?
-* Ĉu estas iuj de la kanaloj kie https://esperanto-radio.com/radio.txt havas elsendojn kiujn ni ne havas?
-* Por ĉiu kanalo, ĉu elsendoj mankas.
-La programo radioTxtKomparilo povas doni tiun superrigardon
-
 
 # Dansk
 App'en er open source under GPL licensen og kan findes på https://github.com/nordfalk/EsperantoRadio 

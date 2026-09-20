@@ -53,7 +53,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per 📋-butono, "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
 - **Testoj**: 131 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
-- **radioTxtKomparilo**: ilo por kompari kanalkonfiguron kun esperanto-radio.com/radio.txt (PR #62) — identigas mankantajn kanalojn kaj elsendojn
+- **radioTxtKomparilo**: ilo por kompari kanalkonfiguron kun esperanto-radio.com/radio.txt (PR https://github.com/nordfalk/EsperantoRadio/pull/62) — identigas mankantajn kanalojn kaj elsendojn
 
 ### Kio NE funkcias ankoraŭ
 

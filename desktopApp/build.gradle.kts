@@ -29,6 +29,16 @@ compose.desktop {
     }
 }
 
+// Ilo por kompari kanalkonfiguron kun radio.txt
+// Rulu per: ./gradlew :desktopApp:radioTxtKomparilo
+val radioTxtKomparilo by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "Komparas kanalkonfiguron kun esperanto-radio.com/radio.txt"
+    classpath = kotlin.targets.getByName("desktop").compilations.getByName("main").output.allOutputs
+    classpath += configurations.getByName("desktopRuntimeClasspath")
+    mainClass.set("dk.nordfalk.esperanto.desktop.RadioTxtKompariloKt")
+}
+
 sentry {
     // Generas JVM-fontpakaĵon kaj alŝutas fontkodon al Sentry.
     // Ebligas fontkuntekston (source context) en stack traces.

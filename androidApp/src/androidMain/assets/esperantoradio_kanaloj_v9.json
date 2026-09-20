@@ -66,7 +66,7 @@
 			"kodo": "lamalfamuloj",
 			"nomo": "La Malfamuloj",
 			"elsendojRssUrl": "https://anchor.fm/s/1e1d5f38/podcast/rss",
-			"emblemoUrl": "https://s3-sa-east-1.amazonaws.com/loja2/d5ebcb3ceacc9f19599445f66e28caaa.png",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/4952414/4952414-1648816366276-df6671b0dc5a1.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "malkongreso@gmail.com",
 			"hejmpaĝoButono": "https://www.patreon.com/malfamuloj"
@@ -75,8 +75,7 @@
 			"kodo": "3zzzenesperanto",
 			"nomo": "3ZZZ en Esperanto",
 			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
-			// MONTRAS AL NEEKZITRANTAJ DOSIEROJ! Jacob 3.jan.2012
-			"elsendojRssUrlXXX27sept2018": "http://melburno.org.au/3ZZZradio/feed/",
+			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
 			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
 			"retpoŝto": "leslie@heldzingen.com",
@@ -159,7 +158,7 @@
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/21881729/21881729-1666809337563-63459cc26442b.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/830574e4/podcast/rss",
 			"montruTitolojn": "false",
-			"uziWebViewPorElsendo": true,
+			"uziWebViewPorElsendo": false,
 			"retpoŝto": "1822daniel@gmail.com",
 			"hejmpaĝoButono": "https://anchor.fm/bitmono"
 		}
@@ -188,8 +187,23 @@
 			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default",
 			"xxelsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
 			"retpoŝto": "retradio@aldone.de",
-			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "http://aldone.de/retradio"
+		}
+	,{
+			"kodo": "kaliningrada",
+			"nomo": "Kaliningrada E-radio",
+			"emblemoUrl": "https://radio.esperanto-ondo.ru/wp-content/uploads/2017/05/Re-banner-300x63.jpg",
+			"elsendojRssUrl": "https://radio.esperanto-ondo.ru/feed/podcast/radio-esperanto",
+			"retpoŝto": "sezonoj@mail.ru",
+			"hejmpaĝoButono": "https://radio.esperanto-ondo.ru/"
+		},
+		{
+			"kodo": "universeala-lindo",
+			"nomo": "Universeala Lindo, la argentina podkasto",
+			"emblemoUrl": "",
+			"elsendojRssUrl": "https://universealalindo.wordpress.com/feed/",
+			"retpoŝto": "",
+			"hejmpaĝoButono": "https://universealalindo.wordpress.com/"
 		}
 	],
 
@@ -248,16 +262,7 @@
 			"retpoŝto": "arono@radioverda.com",
 			"hejmpaĝoButono": "http://radioverda.com/"
 		}
-	,{
-			"kodo": "kaliningrada",
-			"nomo": "Kaliningrada E-radio",
-			//			"emblemoUrl": "http://esperanto.org/Ondo/Bildoj/Radioesp.jpg",
-			"emblemoUrl": "http://s.rpod.ru/data/users_avatars/00/00/01/21/53/ava_ava_1207503974.jpg",
-			"elsendojRssUrl": "http://la-ondo.rpod.ru/rss.xml",
-			// RSS-fluo havas nur la daton en la titolo. Tio estas jam videbla kaj tial ni ne montru tion
-			"hejmpaĝoButono": "http://la-ondo.rpod.ru/"
-		}
-	,{
+	{
 			"kodo": "vej",
 			"nomo": "Voĉoj el Japanio",
 			"emblemoUrl": "http://files.posterous.com/user_profile_pics/995825/VeJ40x40.png",

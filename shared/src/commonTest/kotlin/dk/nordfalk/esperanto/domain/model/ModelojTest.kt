@@ -75,7 +75,7 @@ class ModelojTest {
         assertEquals("test", kanalo.slug)
         assertFalse(kanalo.ignoruTitolon)
         assertTrue(kanalo.montruTitolojn)
-        assertFalse(kanalo.uzuWebViewPorElsendo)
+        assertTrue(kanalo.uzuWebViewPorElsendo)
     }
 
     @Test

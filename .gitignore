@@ -20,6 +20,9 @@ out/
 .gradle/
 build/
 
+# Release output (generated)
+androidApp/release/
+
 # Local configuration file (sdk path, etc)
 local.properties
 

@@ -11,6 +11,21 @@ Por kontrui mian arkivon de Esperanto-elsendoj, mi uzas
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 
+## Farota (notoj)
+Eldoni ĉe F-droid? aŭ Apptiode aŭ aliaj vendejoj?
+
+Ĉu eblas aŭtomate eldoni ĉe Google Play en iu maniero? Ĉu eble estas iu skill aŭ ilo por tio? 
+Kio pri f-droid? aŭ Apptiode aŭ aliaj vendejoj?
+
+
+Zorgu ke la alarmo estas ekzakta ĝis 10 minutoj (https://developer.android.com/develop/background-work/services/alarms)
+
+
+> **Neniu eksponenta repro-logiko** estis implementita. La malnova `Afspiller` havis
+> eksponentan backoff (gxis 10 provoj). Se reto perdigxas dum ludado, la uzanto devas
+> mane reprovi. Tio estas malfermita punkto.
+
+
 # Dansk
 App'en er open source under GPL licensen og kan findes på https://github.com/nordfalk/EsperantoRadio 
 

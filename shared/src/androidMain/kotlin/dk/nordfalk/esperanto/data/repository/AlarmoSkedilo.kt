@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.logi
@@ -25,19 +26,26 @@ actual class AlarmoSkedilo actual constructor() {
         val triggerAtMillis = kalkuluNexxtemTempon(alarmo)
         val pendingIntent = kreuPendingIntent(alarmo)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
-            )
-        } else {
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
-            )
+        // Ekde Android 12 (API 31), necesas kontroli ĉu la apo rajtas skedi precizajn alarmojn.
+        // Se la uzanto revokis la permeson, setExact* ĵetas SecurityException.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            logw("AlarmoSkedilo", "Ne rajtas skedi precizajn alarmojn — petu uzanton agordi permeson")
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                appContext.startActivity(intent)
+            } catch (e: Exception) {
+                logw("AlarmoSkedilo", "Ne povis malfermi agordojn por precizaj alarmoj", e)
+            }
+            return
         }
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerAtMillis,
+            pendingIntent
+        )
 
         logi("AlarmoSkedilo", "Skedis alarmon ${alarmo.id}: ${alarmo.tempoTeksto} ${alarmo.ripetoTeksto} → ${alarmo.kanaloSlug} (trigger en ${(triggerAtMillis - System.currentTimeMillis()) / 1000}s)")
     }

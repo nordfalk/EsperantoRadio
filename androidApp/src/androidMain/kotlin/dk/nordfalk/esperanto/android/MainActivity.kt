@@ -11,6 +11,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         initialiguSentry()
         appContext = applicationContext
         petiSciigPermeson()
@@ -190,12 +192,7 @@ class MainActivity : ComponentActivity() {
             // Vibradu 4 sekundojn
             val vibrator = getSystemService(VIBRATOR_SERVICE) as? Vibrator
             if (vibrator?.hasVibrator() == true) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(4000, VibrationEffect.DEFAULT_AMPLITUDE))
-                } else {
-                    @Suppress("DEPRECATION")
-                    vibrator.vibrate(4000)
-                }
+                vibrator.vibrate(VibrationEffect.createOneShot(4000, VibrationEffect.DEFAULT_AMPLITUDE))
                 logi("MainActivity", "Vibras 4s")
             }
         } catch (e: Exception) {

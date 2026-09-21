@@ -2,7 +2,7 @@ package dk.nordfalk.esperanto.android
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
+
 import android.os.Bundle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -122,10 +122,7 @@ class EsperantoLudadoServo : MediaSessionService() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        else
-            PendingIntent.FLAG_UPDATE_CURRENT
+        val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         return PendingIntent.getActivity(this, 0, intent, flags)
     }

@@ -15,6 +15,7 @@
 | 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | Reprodukto de la sep parsregoloj, golden-testoj, parser-kontrakto |
 | 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado |
 | 6 | [06_servilo_arkivo.md](./06_servilo_arkivo.md) | La podkasta arkiv-servilo: API, inkrementa konstruo, servado |
+| 7 | [07_eldonado.md](./07_eldonado.md) | Eldonado al Google Play, F-Droid, Aptoide + CI/CD (GitHub Actions) |
 
 ## La granda ideo en unu frazo
 

@@ -68,24 +68,32 @@ La ruĝo restas konstanta trans temoj — ĝi estas la marko. La fono varmiĝas
 
 ## Ekranoj
 
-### 1. Ĉefekrano (Kanalaro)
+### 1. Hejmo (ĉefekrano)
 
 ```
 ┌──────────────────────────────────┐
-│ ☰  EsperantoRadio     🔍 ⚙️       │  Trinkesto (ruĝa akcento)
+│  Kio novas                       │  Horizontala LazyRow de kartoj
+│  [karto] [karto] [karto] →       │  (emblemo, titolo, subtitolo)
 ├──────────────────────────────────┤
-│ [Mozaik-kaheloj de kanaloj]       │  Tablo de emblemoj; plejŝatataj unue
-│  ┌──┐ ┌──┐ ┌──┐                  │  (stango de 2-3 kolumnoj, adapteblas)
-│  │Mu│ │VV│ │LM│  ...              │
-│  └──┘ └──┘ └──┘                  │
+│  Lastatempe ludata                │  Horizontala LazyRow
+│  [karto] [karto] →               │  (kun ludprocento)
 ├──────────────────────────────────┤
-│  ▶ Nuna elsendo: Muzaiko - ...    │  Mini-ludilbreto (malvolvigita)
+│  Kio popularas                    │  Horizontala LazyRow
+│  [karto] [karto] →               │
+├──────────────────────────────────┤
+│  Ĉiuj kanaloj                     │  Vertikala LazyColumn
+│  • Kernpunkto                     │
+│  • Varsovia Vento                 │
+│  ...                             │
+├──────────────────────────────────┤
+│  [Hejmo] [Kanaloj] [★] [🔍]     │  Malsupra naviga breto (4 langetoj)
 └──────────────────────────────────┘
 ```
 
-- Langetoj aŭ glataj rulumo inter kanalaro kaj "lastaŭskultitaj"/"plejŝatataj".
-- Ĉiu kahelo montras emblemon + nomon + nombron da novaj elsendoj (ruĝa punkto).
-- Longa premo sur kahelo → kunteksta menuo (plejŝati/kunhavigi).
+- 4 langetoj en la malsupra naviga breto: Hejmo, Kanaloj, Plej ŝatataj, Serĉi.
+- Ĉiu karto en la horizontalaj sekcioj montras emblemon, titolon kaj subtitolon.
+- Kartoj en "Lastatempe ludata" montras ludprocenton.
+- Tripunkta menuo kaj ludbutono sur kartoj.
 
 ### 2. Kanalvido
 
@@ -98,9 +106,8 @@ La ruĝo restas konstanta trans temoj — ĝi estas la marko. La fono varmiĝas
 │ [▶ Ludu rektan] (se rekta)        │
 ├──────────────────────────────────┤
 │ Hodiaŭ                            │  Dato-grupigitaj elsendoj
-│  • VVE185 1a parto  [▶] [⬇]      │  (PinnedSectionList-stilo)
+│  • VVE185 1a parto  [▶] [⬇]      │
 │  • VVE185 2a parto  [▶] [⬇]      │
-│  • VVE185 3a parto  [▶] [⬇]      │
 │ Hieraŭ                            │
 │  • VVE184 ...                     │
 │ ...                               │
@@ -108,7 +115,8 @@ La ruĝo restas konstanta trans temoj — ĝi estas la marko. La fono varmiĝas
 ```
 
 - Elsendoj grupigitaj laŭ dato (hodiaŭ/hieraŭ/dato).
--Ĉiu ero: titolo, daŭro, ludbutono, elŝutbutono, plejŝat-stelo.
+- Ĉiu ero: titolo, daŭro, ludbutono, elŝutbutono, plejŝat-koro.
+- Horizontala svipo inter kanaloj (maldekstren/dekstren ŝanĝas kanalon).
 - Malsupren tiro refreŝigas.
 
 ### 3. Elsendodetalo
@@ -121,13 +129,21 @@ Plenekrana malvolo de la mini-ludilbreto:
 │ Kanalnomo · Dato · Daŭro          │
 │                                   │
 │        [▶]  ━━━━●━━━━━━  12:34   │  Ludregiloj + serĉbreto
-│        [⟵][⟳][⟶]                │  (antaŭa/restarta/sekva)
 │                                   │
-│ Priskribo (purigita HTML)         │
+│ Priskribo (riĉa HTML-vido)        │
 │                                   │
-│ [⬇ Elŝuti] [★ Plejŝati] [↗ Kunh.]│
+│ [⬇ Elŝuti] [♥ Plejŝati] [↗ Kunh.]│
+│ [Queueludvico]                   │
+│                                   │
+│ Daŭrigi de 12:34 [▶]             │  (se antaŭa pozicio ekzistas)
 └──────────────────────────────────┘
 ```
+
+- Horizontala svipo inter elsendoj de sama kanalo.
+- "Daŭrigi de X:XX" butono se antaŭa ludpozicio ekzistas.
+- Ludvico-butono (Material 3 ikono) por eksplicite aldoni al ludvico.
+- Riĉa HTML-vido de priskribo (`HtmlVido`/`HtmlTeksto`).
+- Evolua reĝimo: elektiloj por priskribo-fonto kaj vidmaniero.
 
 ### 4. Ludilbreto (mini, malsupre)
 
@@ -136,28 +152,29 @@ Konstanta malsupra breto:
 ┌──────────────────────────────────┐
 │ [emblemo] Tiu ĉi elsendo    ▶  ↕ │  titolo + ludbutono + volvigi
 │           ━━━━●━━━━━━ 12:34      │  (kaŝita por rekta fluo)
+│           [halti] [ludvico]      │
 └──────────────────────────────────┘
 ```
 Klako sur la breto → volvigas al elsendodetalo.
+Ludvico-butono montras la nunan ludvicon.
 
-### 5. Tirkesto (navigacio)
+### 5. Malsupra naviga breto
 
 ```
-┌────────────────────┐
-│  [Muzaiko-M]        │  Emblemo
-│  EsperantoRadio     │
-│  ─────────────      │
-│  ♪ Senest aŭskultitaj│
-│  ★ Plejŝatataj (3)  │  nombro da novaj
-│  ⬇ Elŝutitaj (5)    │
-│  ⏰ Vekhorloĝo      │  sekva alarmtempo
-│  ─────────────      │
-│  ℹ Pri / Kontakt    │
-│  ⚙ Agordoj          │
-│  ─────────────      │
-│  Elektu kanalon     │
-└────────────────────┘
+┌──────────────────────────────────┐
+│  [Hejmo]  [Kanaloj]  [♥]  [🔍]  │  4 langetoj
+└──────────────────────────────────┘
 ```
+
+- **Hejmo**: "Kio novas", "Lastatempe ludata", "Kio popularas", "Ĉiuj kanaloj"
+- **Kanaloj**: plena kanalaro (`LazyColumn` de `ListItem`-oj)
+- **Plej ŝatataj**: nur ŝatataj kanaloj
+- **Serĉi**: serĉo trans ĉiuj kanaloj
+
+La malnova plano havis `ModalNavigationDrawer`-tirkeston — tio estis anstataŭigita
+per la malsupra naviga breto (pli moderna, pli bona por unumana uzo).
+Aldonaj ekranoj (Alarmo, Agordoj, Elŝutitaj, Ludvico) estas atingeblaj per
+navigado ekde la ĉefekranoj.
 
 ### 6. Serĉo
 
@@ -173,38 +190,47 @@ Klako sur la breto → volvigas al elsendodetalo.
 ```
 Serĉo trans ĉiuj kanaloj (uzante `ElsendoDeponejo.sercxiElsendojn`).
 
-### 7. Agordoj
+### 7. Agordoj (aktuala stato)
 
-- Lingvo (Esperanto / Dana / aŭtomata)
-- Elŝuthejjo
-- Nur per WiFi
-- Son-efikoj (afspillerlyde)
-- Devigi portreton
-- Malpeza/malhela temo (aŭ sistemo)
+La agordoj estis simpligitaj ekde la originala plano. Nuna listo:
 
-## Navigado (Compose)
+- **Aŭtomate daŭrigu kun alia elsendo** (ŝaltilo)
+- **Ricevi sciigojn** (ŝaltilo, nur Android — kontrolas WorkManager-skedadon)
+- **Evolua reĝimo** (ŝaltilo — montras elektilojn por priskribo-fonto kaj vidmaniero en ElsendoEkrano)
+- **Temo** (hela/malhela/sistemo)
+
+> La originala plano havis lingvoelekton, elŝuthejmon, nur-WiFi, son-efikojn,
+> devigi portreton — tiuj estis forigitaj (#55, #37).
+
+## Navigado (navigation3)
+
+La apo uzas `androidx.navigation3` — **ne** la tradician `NavHost`/`composable`-DSL.
 
 ```kotlin
+// App.kt
 @Composable
-fun EsperantoRadioNavHost() {
-    val navController = rememberNavController()
-    NavHost(navController, startDestination = "kanalaro") {
-        composable("kanalaro") { KanalaroEkrano(onKanal = { navController.navigate("kanal/$it") }) }
-        composable("kanal/{slug}") { KanalEkrano(...) }
-        composable("elsendo/{id}") { ElsendoEkrano(...) }
-        composable("sercxi") { SercxiEkrano() }
-        composable("plejsatataj") { PlejsatatajEkrano() }
-        composable("elsutitaj") { ElsutitajEkrano() }
-        composable("lastauxskultitaj") { LastAuxskultitajEkrano() }
-        composable("alarmoj") { AlarmoEkrano() }
-        composable("agordoj") { AgordojEkrano() }
-        composable("pri") { PriEkrano() }
-    }
+fun EsperantoRadioApp() {
+    val backStack = rememberNavBackStack(Vojo.Hejmo)
+    NavDisplay(
+        backStack = backStack,
+        entryProvider = entryProvider {
+            entry<Vojo.Hejmo> { HejmoEkrano(...) }
+            entry<Vojo.Kanalaro> { KanalaroEkrano(...) }
+            entry<Vojo.KanaloDetalo> { KanalEkrano(...) }
+            entry<Vojo.ElsendoDetalo> { ElsendoEkrano(...) }
+            entry<Vojo.Sercxi> { SercxiEkrano(...) }
+            entry<Vojo.Plejsxatataj> { PlejstatatajEkrano(...) }
+            entry<Vojo.Elshutitaj> { ElshutitajEkrano(...) }
+            entry<Vojo.Alarmoj> { AlarmoEkrano(...) }
+            entry<Vojo.Agordoj> { AgordojEkrano(...) }
+            entry<Vojo.Ludvico> { LudvicoEkrano(...) }
+        },
+    )
 }
 ```
 
-Uzu **`ModalNavigationDrawer`** (Compose) por la tirkesto, **`BottomSheet`**
-aŭ malsupra daŭra breto por la mini-ludilo.
+`Vojo` estas `sealed`/`NavKey`-hierarkio en `navigation/Vojoj.kt`.
+Stato persistebla per `SavedStateConfiguration` kun `polymorphic` serializers.
 
 ## Movado / animacio
 

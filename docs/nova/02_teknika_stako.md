@@ -13,9 +13,10 @@
 | **kotlinx-datetime** | Datoj (anstataŭ Joda-Time) |
 | **ksoup** (`com.fleeksoft.ksoup`) | HTML/XML-purigado + iframe-skrapado (KMP) |
 | **Coil 3** | Bildoj — multiplatforma, defaŭlta memora+diska kaŝmemoro |
-| **multiplatform-settings** (+ DataStore sur Android) | Agordoj (lingvo, nur-WiFi, son-efikoj, ktp.) |
-| **Compose Navigation** (oficiala, Navigation 3) | Plursistema navigado, stak/backstack |
+| **multiplatform-settings** | Agordoj (daŭrigo, sciigoj, evoluo, temo) + JSON-persisto |
+| **Navigation 3** (`androidx.navigation3`) | Plursistema navigado — `NavKey`/`NavDisplay`/`entryProvider`, stato persistebla per `SavedStateConfiguration` |
 | **kotlin.test + Turbine** | Testado, Flow-asertoj |
+| **Sentry.io** (`sentry-kmp`) | Erarmonitorado trans ĉiuj platformoj |
 
 ## Platform-specifa
 
@@ -23,9 +24,9 @@
 
 | Teknologio | Kialo |
 |---|---|
-| **Media3 ExoPlayer 1.11** | Sonludado (HLS + MP3); `media3-ui-compose` por UI |
+| **Media3 ExoPlayer 1.5.1** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
 | **Media3 MediaSessionService** | Malfona ludado, mediasciigo, mediabutonoj, sonfokuso (ĉio "senpaga") |
-| **DownloadManager** / **WorkManager** | Elŝutoj |
+| **DownloadManager** / **WorkManager** | Elŝutoj / sciigoj pri novaj elsendoj |
 | **AlarmManager** | Vekhorloĝo |
 
 ### iOS
@@ -40,15 +41,18 @@
 
 | Teknologio | Kialo |
 |---|---|
-| **VLCJ** (aŭ Media3 JVM) | Sonludado — plej bona HLS-subteno |
-| **java.awt / JavaFX** | Sistempletoj, sciigoj |
+| **mp3spi + SourceDataLine** | Sonludado — pura Java, fluas MP3 super HTTP. Neniu nacia dependeco. Ne subtenas HLS nek seek |
+| **java.awt** | Sistempletoj (se necese) |
+
+> VLCJ estis origine planita sed forlasita — ĝi postulas VLC instalitan.
+> JavaFX MediaPlayer estis ankaŭ provita sed donas `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3 sur Linukso.
 
 ### Web (Wasm)
 
 | Teknologio | Kialo |
 |---|---|
 | **`HTMLAudioElement`** | Sonludado (MP3) |
-| **hls.js** | HLS por Muzaiko-livestream (se necesa) |
+| **retumilo** | HLS por Muzaiko-livestream (nativa en la retumilo) |
 
 Elŝutoj, malfona ludado, widget, vekhorloĝo ne haveblas sur Web.
 
@@ -86,7 +90,7 @@ La kliento ne bezonas datumbazon. Ĝi simple konservas la respondojn de la
 servilo (kanal-JSON, RSS-fluoj) kiel kaŝenitajn dosierojn — aŭ reŝarĝas ilin
 se la kaŝmemoro mankas aŭ estas malnova.
 
-- **multiplatform-settings** (+ DataStore sur Android) por agordoj (lingvo, nur-WiFi, son-efikoj, ktp.)
+- **multiplatform-settings** por agordoj (daŭrigo, sciigoj, evoluo, temo) + JSON-persisto (alarmoj, ludpozicioj, ludvico)
 - **dosierkaŝmemoro** por servil-respondoj (kiel la malnova `FilCache` — kun `If-Modified-Since`)
 - **en-memora `StateFlow`** por vivaj kanaloj/elsendoj (plenigitaj el kaŝmemoro + defora refreŝigo)
 
@@ -108,18 +112,24 @@ JSONC-parsilon.
 ## Versikatalogo
 
 Versioj rapide malaktualiĝas. Vidu la nunajn stabilajn versiojn dum efektivigado.
-Provizora `gradle/libs.versions.toml`:
+Nuna `gradle/libs.versions.toml` (septembro 2026):
 ```toml
 [versions]
-kotlin = "2.1+"
-compose-multiplatform = "1.7+"
-ktor = "3.1+"
-kotlinx-serialization = "1.7+"
-kotlinx-datetime = "0.6+"
-media3 = "1.11"
-ksoup = "0.4+"
-coil = "3.0+"
-multiplatform-settings = "1.2+"
-turbine = "1.2+"
-androidx-datastore = "1.1+"
+kotlin = "2.2.20"
+compose-multiplatform = "1.10.0"
+compose-material3 = "1.10.0-alpha05"
+ktor = "3.1.3"
+kotlinx-serialization = "1.7.3"
+kotlinx-datetime = "0.7.0"
+media3 = "1.5.1"
+ksoup = "0.2.2"
+coil = "3.0.4"
+multiplatform-settings = "1.2.0"
+turbine = "1.2.0"
+mp3spi = "1.9.5.4"
+sentry-kmp = "0.27.0"
+multiplatform-nav3 = "1.1.1"
 ```
+
+> **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
+> **Material3** havas apartan version (`1.10.0-alpha05`), ne la saman kiel `compose-multiplatform`.

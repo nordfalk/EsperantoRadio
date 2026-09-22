@@ -1,34 +1,37 @@
 # 3. Domajno kaj datumoj
 
-## Domajnmodeloj (pura Kotlin, `shared/domain/model`)
+> Tiu dokumento priskribas la efektivajn modelojn kaj interfacojn en la kodo.
+> Por la plej ĝisdatigitan liston de dosieroj, vidu la struktursekcion en `AGENTS.md`.
 
-### `Kanal` (`@Serializable`)
+## Domajnmodeloj (`shared/domain/model/Modeloj.kt`)
+
+### `Kanalo` (`@Serializable`)
 
 ```kotlin
 @Serializable
-data class Kanal(
-    val slug: String,                 // kodo — unika ŝlosilo (ekz. "muzaiko")
-    val nomo: String,                 // vidiga nomo
-    val priskribo: String? = null,
+data class Kanalo(
+    val slug: String,                         // kodo — unika ŝlosilo (ekz. "muzaiko")
+    val nomo: String,                         // vidiga nomo
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,   // livestream (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
+    val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,            // hejmpaĝoButono
     val retposhto: String? = null,
-    val datumFonto: String? = null,           // "rss" aŭ "radio.txt"
-    val ignoruTitolon: Boolean = false,       // elsendojRssIgnoruTitolon
+    val ignoruTitolon: Boolean = false,        // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
-    val rektaElsendaPriskriboUrl: String? = null,
-    // dateno-movitaj purig-modeloj (regulo 6.6)
-    val puriguModeloj: List<String> = emptyList(),
-    // dateno-movitaj iframe-gastigant-reguloj (regulo 6.3)
-    val iframeReguloj: Map<String, IframeRegulo> = emptyMap(),
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
     val havasPodkastojn: Boolean get() = podkastaRssUrl != null
 }
 ```
+
+> La malnova apo havis `puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`
+> kiel kampojn sur la kanal-modelo. En la nova apo tiuj estas traktataj rekte en la
+> parsilo (`RssParsilo`) laŭ la kanal-slug, ne kiel dateno-movitaj kampoj. Tio estas
+> malpli pura sed pli simpla — la parsreguloj estas malmolaj sed bone dokumentitaj
+> (vidu `04_parsado_kaj_arkivo.md`).
 
 ### `Elsendo` (`@Serializable`)
 
@@ -36,278 +39,227 @@ data class Kanal(
 @Serializable
 data class Elsendo(
     val id: String,                   // slug — vidu id-konvenciojn (04_parsado_kaj_arkivo.md)
-    val kanalSlug: String,
+    val kanaloSlug: String,
+    val kanaloNomo: String? = null,   // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,
-    val priskribo: String? = null,    // purigita HTML/teksto
-    val bildUrl: String? = null,
-    val dato: LocalDate,              // publikigdato, yyyy-MM-dd
-    val komencoTempo: Instant? = null,
-    val dauro: Long? = null,         // sekundoj
-    val stream: String,              // audio-URL — la plej grava kampo
+    val priskribo: String? = null,    // purigita plata teksto (por listoj, sercxo)
+    val priskriboHtml: String? = null, // purigita HTML kun etikedoj (por detala vido)
+    val bildoUrl: String? = null,
+    val dato: String,                 // yyyy-MM-dd
+    val dauro: Long? = null,          // sekundoj
+    val fluo: String,                 // audio-URL (mp3) — la plej grava kampo
     val retpaghoUrl: String? = null,
     val estasRekta: Boolean = false,
-) {
-    val formatoDato: String get() = ...
-    val finoTempo: Instant? get() = ...
-}
+)
 ```
 
-### `Sonfonto` (sealed — anstataŭigas la malnovan `Lydkilde`)
+### `Sonfonto` (sealed)
 
 ```kotlin
 @Serializable
 sealed interface Sonfonto {
-    @Serializable data class RektaKanalo(val kanal: Kanal) : Sonfonto        // livestream (Muzaiko)
-    @Serializable data class Elsendo(val elsendo: Elsendo) : Sonfonto         // podkast-epizodo
+    @Serializable data class RektaKanalo(val kanalo: Kanalo) : Sonfonto
+    @Serializable data class ElsendoFonto(val elsendo: Elsendo) : Sonfonto
+    @Serializable data class LokaElsendo(val elsendo: Elsendo, val dosieroVojo: String) : Sonfonto
 }
 ```
 
-Unuigas la du lud-reĝimojn (rekta vs podkast) en unu tipo, kiun la `LudiloRegilo`
-akceptas. La malnova apo havis `Lydkilde`-klason; ĉi tie ĝi iĝas sealed hierarkio.
+Unuigas tri lud-reĝimojn (rekta radio, podkast, eksterreta dosiero) en unu tipo,
+kiun la `LudiloRegilo` akceptas.
 
-### `LudantoStato`
+### `LudantoStato` / `LudantoInformo`
 
 ```kotlin
 sealed interface LudantoStato {
     data object Haltita : LudantoStato
     data object Konektas : LudantoStato
     data object Ludas : LudantoStato
+    data object Finita : LudantoStato
     data class Eraro(val mesagho: String) : LudantoStato
 }
 
 data class LudantoInformo(
     val stato: LudantoStato,
-    val nunaFonto: Sonfonto?,
-    val pozicioMs: Long,
-    val dauroMs: Long,
-    val bufroProcento: Int? = null,        // por Konektas-stato
-    val estasRekta: Boolean,
+    val nunaFonto: Sonfonto? = null,
+    val pozicioMs: Long = 0,
+    val dauroMs: Long = 0,
+    val estasRekta: Boolean = false,
 )
 ```
+
+### `LudataElsendo` (`@Serializable`)
+
+```kotlin
+@Serializable
+data class LudataElsendo(
+    val elsendoId: String,
+    val kanaloSlug: String,
+    val pozicioMs: Long = 0,
+    val dauroMs: Long = 0,
+    val finita: Boolean = false,
+    val erara: Boolean = false,
+    val lasteLudita: Long = 0,  // epoch ms
+)
+```
+
+Spuras la ludstatuson de unuopa elsendo — por daŭra ludado kaj resumigo.
+Uzata de `LudvicoRegilo`.
 
 ### Alikampo-modeloj
 
 ```kotlin
-@Serializable data class Alarmo(val id, val horo, val minuto, val ripeto, val kanalSlug, val aktiva)
-@Serializable data class ElsutoStato(val elsendoId, val stato, val progres, val dosieroPath)
-@Serializable data class Agordoj(val lingvo, val elsuthejjo, val nurWifi, val sonEfikoj, val devigiPortreton)
+@Serializable data class Alarmo(val id: Int, val horo: Int, val minuto: Int, val ripeto: String, val kanaloSlug: String, val aktiva: Boolean)
+@Serializable data class ElshutStato(val elsendoId: String, val stato: ElshutStatoEnum, val progres: Float, val dosieroVojo: String?)
+@Serializable data class ElshutitaElsendo(val elsendo: Elsendo, val dosieroVojo: String, val grandeco: Long, val dauroMs: Long?)
 ```
 
-## Deponej-interfacoj (`shared/domain/repository`)
+## Deponej-interfacoj (`shared/domain/repository/`)
 
 ```kotlin
-interface KanalDeponejo {
-    fun observiKanalojn(): Flow<List<Kanal>>
-    suspend fun getKanalojn(almiro: Boolean = false): List<Kanal>
-    suspend fun getKanal(slug: String): Kanal?
-    suspend fun refresigi(): List<Kanal>
+interface KanaloDeponejo {
+    fun observiKanalojn(): StateFlow<List<Kanalo>>
+    suspend fun getKanalojn(fortoRefresigi: Boolean = false): List<Kanalo>
+    suspend fun getKanalo(slug: String): Kanalo?
 }
 
 interface ElsendoDeponejo {
-    fun observiElsendojn(kanalSlug: String): Flow<List<Elsendo>>
-    suspend fun getElsendojn(kanalSlug: String, pagho: Int = 0, fortoRefresigi: Boolean = false): List<Elsendo>
+    fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>>
+    suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean = false): List<Elsendo>
     suspend fun getElsendo(id: String): Elsendo?
-    suspend fun sercxiElsendojn(taxto: String, limo: Int = 50): List<Elsendo>
-    suspend fun getPliajnElsendojn(kanalSlug: String, lastaElsendo: Elsendo): List<Elsendo>
+    suspend fun sercxiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo>
 }
+```
 
-interface LudantoDeponejo {
-    val stato: StateFlow<LudantoInformo>
-    suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)   // anstataŭ ludi()/ludiRektan()
-    suspend fun ludi(elsendo: Elsendo) = fiksiFonton(Sonfonto.Elsendo(elsendo))
-    suspend fun ludiRektan(kanal: Kanal) = fiksiFonton(Sonfonto.RektaKanalo(kanal))
-    suspend fun pauxzigi()
-    suspend fun daurigi()
-    suspend fun halti()
-    suspend fun saltiAl(pozicioMs: Long)
-    suspend fun antauxa()     // podkast: salti 5% malantaŭen; rekta: antaŭa kanal
-    suspend fun sekva()      // podkast: salti 5% antaŭen;   rekta: sekva kanal
-    suspend fun fiksiLauxtecon(volumeno: Float)
-}
+Personigo-interfacoj (`PersonigoDeponejoj.kt`):
 
-interface ElsutoDeponejo {
-    fun observiElsutojn(): Flow<List<ElsutoStato>>
-    suspend fun elsuti(elsendo: Elsendo)
-    suspend fun forigiElsuton(elsendoId: String)
-    suspend fun getElsutojn(): List<ElsutoStato>
-}
-
-interface PlejsatatajDeponejo {
-    fun observiPlejsatatajn(): Flow<List<String>>         // kanal-slugs
-    suspend fun baskuliPlejsaton(kanalSlug: String)
-    suspend fun estasPlejsatata(kanalSlug: String): Boolean
-    suspend fun getNombroNovajn(kanalSlug: String): Int
+```kotlin
+interface PlejŝatatajDeponejo {
+    fun observiPlejŝatatajn(): StateFlow<Set<String>>  // kanalo-slugs
+    suspend fun baskuliPlejsxaton(kanaloSlug: String)
+    suspend fun estasPlejsxatata(kanaloSlug: String): Boolean
 }
 
 interface LastAuxskultitajDeponejo {
-    fun observiLastAuxskultitajn(): Flow<List<Elsendo>>
-    suspend fun registri(elsendo: Elsendo, pozicioMs: Long)
+    fun observiLastAuxskultitajn(): StateFlow<List<Elsendo>>
+    suspend fun registri(elsendo: Elsendo)
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
-interface AlarmoDeponejo {
-    fun observiAlarmojn(): Flow<List<Alarmo>>
-    suspend fun krei(alarmo: Alarmo)
-    suspend fun forigi(id: String)
-    suspend fun getAktivajn(): List<Alarmo>
+interface LudatojDeponejo {
+    fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
+    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+    suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
+    suspend fun markiErara(elsendoId: String, kanaloSlug: String)
+    suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)
+    suspend fun getLudato(elsendoId: String): LudataElsendo?
+    suspend fun estasFinita(elsendoId: String): Boolean
+    suspend fun getPozicio(elsendoId: String): Long?
+}
+
+interface SercxoDeponejo {
+    suspend fun sercxi(teksto: String, limo: Int = 50): List<Elsendo>
 }
 
 interface AgordojDeponejo {
-    val agordoj: StateFlow<Agordoj>
-    suspend fun ghisdatigi(agordoj: Agordoj)
+    val temo: StateFlow<String>
+    val sciigoj: StateFlow<Boolean>
+    val auxtomataDaurigo: StateFlow<Boolean>
+    val evoluo: StateFlow<Boolean>
+    fun fiksiTemon(temo: String)
+    fun fiksiSciigojn(sxaltita: Boolean)
+    fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
+    fun fiksiEvoluon(sxaltita: Boolean)
+}
+
+interface ElshutDeponejo {
+    fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>>
+    fun observiElshutStaton(elsendoId: String): StateFlow<ElshutStato>
+    suspend fun elshuti(elsendo: Elsendo)
+    suspend fun haltigi(elsendoId: String)
+    suspend fun forigi(elsendoId: String)
+    suspend fun getLokaDosieroVojo(elsendoId: String): String?
+    fun estaElshutita(elsendoId: String): Boolean
+}
+
+interface AlarmoDeponejo {
+    fun observiAlarmojn(): StateFlow<List<Alarmo>>
+    suspend fun krei(alarmo: Alarmo)
+    suspend fun ghisdatigi(alarmo: Alarmo)
+    suspend fun forigi(alarmoId: Int)
+    suspend fun baskuliAktivon(alarmoId: Int)
 }
 ```
 
-## Uzkazoj (`shared/domain/usecase`)
+> **Neniu uzkaz-tavolo.** La malnova plano havis `GetKanalojnUseCase`,
+> `LudiFontonUseCase` ktp. Tiuj ne estis implementitaj. La logiko vivas rekte
+> en la deponej-implementajhoj kaj ViewModel-oj. `LudvicoLogiko` estas la sola
+> pura decidlogiko apartigita kiel klaso (por testeblo).
+
+## Datentavolo (`shared/data/`)
+
+La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
+`RadioApiServo`, `DeforaKanalDatumfonto`/`LokaKanalDatumfonto`, nek DTO+mapilo-tavolo.
+
+### Kanal-deponejo
+
+`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron (bundled resource) per
+`KanalAgordoLeganto` kaj liveras `StateFlow<List<Kanalo>>`.
+
+### Elsendo-deponejo
+
+`ElsendoDeponejoImpl` faras ĉion: Ktor-peto → RSS-parsado → diskkaŝmemoro.
+Ne ekzistas aparta reto-interfaco — la `HttpClient` estas enketigata rekte.
 
 ```kotlin
-class GetKanalojnUseCase(val dep: KanalDeponejo)
-class GetElsendojnUseCase(val dep: ElsendoDeponejo)
-class LudiFontonUseCase(val dep: LudantoDeponejo)
-class ElsutiElsendonUseCase(val dep: ElsutoDeponejo)
-class BaskuliPlejsatonUseCase(val dep: PlejsatatajDeponejo)
-class KreiAlarmoUseCase(val dep: AlarmoDeponejo)
-class SercxiElsendojnUseCase(val dep: ElsendoDeponejo)
-class GetLastauxskultitajnUseCase(val dep: LastAuxskultitajDeponejo)
-```
-
-Uzkazoj estas maldikaj envolvaĵoj — la logiko vivas en la deponejoj. Ili ĉefe
-helpas testmokadon kaj separas la deponejojn de la ViewModel-oj. Dependencaĵoj
-estas transdonitaj permane en konstruktiloj, sen DI-framintervalo.
-
-## Datentavolo (`shared/data`)
-
-### Reto
-
-```kotlin
-interface RadioApiServo {
-    suspend fun getKanalojn(): String          // la JSONC-konfiguro
-    suspend fun getRadioTxt(): String          // radio.txt
-    suspend fun getRssFluo(url: String): String
-}
-
-class RadioApiServoImpl(val http: HttpClient) : RadioApiServo { ... }
-```
-
-### DTOj + mapilo
-
-```kotlin
-@Serializable data class KanalDto(val kodo, val nomo, val emblemoUrl, val elsendojRssUrl, ...)
-@Serializable data class KanalAgordoDto(val android, val kanaloj, val FORPRENITAJ_KANALOJ, val elsendojUrl, ...)
-
-fun KanalDto.alKanal(): Kanal = ...
-```
-
-### Datumfontoj
-
-```kotlin
-class DeforaKanalDatumfonto(val api: RadioApiServo, val parsilo: KanalAgordoParsilo)
-class LokaKanalDatumfonto(val kaŝmemoro: KanalKaŝmemoro)
-```
-
-### Deponej-implementaĵoj
-
-```kotlin
-class KanalDeponejoImpl(
-    val defora: DeforaKanalDatumfonto,
-    val loka: LokaKanalDatumfonto,
-) : KanalDeponejo {
-    // Unue legas lokan kaŝmemoron, poste refreŝigas defore.
-    // Eraro en defora → liveri kaŝenitan (toleremeco).
-}
-
 class ElsendoDeponejoImpl(
-    val api: RadioApiServo,
-    val parsilo: ElsendoParsilo,        // vidu 04_parsado_kaj_arkivo.md
-    val kaŝmemoro: ElsendoKaŝmemoro,
+    val httpKliento: HttpClient,
+    val dosierKasho: DosierKasho,
 ) : ElsendoDeponejo { ... }
 ```
 
-### Kaŝmemoro
+### Persisto
 
-```kotlin
-class KanalKaŝmemoro {
-    private val kanaloj = MutableStateFlow<List<Kanal>>(emptyList())
-    fun get(): List<Kanal> = kanaloj.value
-    fun observi(): Flow<List<Kanal>> = kanaloj
-    fun set(kanaloj: List<Kanal>) { kanaloj.value = kanaloj }
-}
-```
+- **multiplatform-settings** por agordoj (temo, sciigoj, daŭrigo, evoluo)
+- **JSON-dosieroj** (legitaj/skribitaj per Settings + kotlinx.serialization) por:
+  alarmoj, ludpozicioj (`LudataElsendo`), elŝutitaj elsendoj, plejŝatataj
+- **dosierkaŝmemoro** (`DosierKasho`, expect/actual) por servil-respondoj
 
 ## Toleremeco al putrantaj fontoj
 
-Ĉiu deponejo-implementaĵo devas:
-1. Kapti retajn erarojn kaj **liveri kaŝenitan datumon** (ne ĵeti).
-2. Se unu kanal-fluo malsukcesas, marki tiun kanalon kiel `erara` sed **ne haltigi la aliajn**.
-3. Refreŝigi malsinkrone — la UI montras datumojn tuj el kaŝmemoro dum refreŝigo kuras.
-
-```kotlin
-// Skema ekzemplo
-suspend fun getElsendojn(kanalSlug: String, fortoRefresigi: Boolean): List<Elsendo> {
-    val kaŝenitaj = kaŝmemoro.get(kanalSlug)
-    if (kaŝenitaj.isNotEmpty() && !fortoRefresigi) {
-        refresigiFone(kanalSlug)  // ne blokas
-        return kaŝenitaj
-    }
-    return try {
-        val fluo = api.getRssFluo(kanal.podkastaRssUrl)
-        val elsendoj = parsilo.parsRss(fluo, kanal)
-        kaŝmemoro.set(kanalSlug, elsendoj)
-        elsendoj
-    } catch (e: Exception) {
-        protokolo("Kanalo $kanalSlug fiaskis: ${e.message}")
-        kaŝenitaj  // aŭ malplena listo — UI montras erar-indikilon por tiu kanal
-    }
-}
-```
+Vidu regulojn 4 kaj 8 en `AGENTS.md`. Mallonge: ĉiu deponejo kaptas retajn
+erarojn kaj liveras kaŝenitan datumon; unu kanal-eraro ne haltigas la aliajn;
+ĉiu `catch` devas protokoli per `loge`/`logw`.
 
 ## Platform-ludila abstraktado (`LudiloRegilo`, expect/actual)
 
-La `LudantoDeponejo` estas la domajn-interfaco; la efektiva sonludado estas
-platform-specifa kaj vivas kiel `expect`/`actual`:
+La sonludado estas platform-specifa kaj vivas kiel `expect`/`actual`:
 
 ```kotlin
-// commonMain — expect
-expect class LudiloRegilo {
+// commonMain — interfaco
+interface LudiloRegilo {
     val stato: StateFlow<LudantoInformo>
-    fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
-    fun ludi(); fun pauxzigi(); fun halti()
-    fun saltiAl(ms: Long); fun fiksiLauxtecon(v: Float)
-    fun antauxa(); fun sekva()
+    suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
+    fun ludi()
+    fun pauxzigi()
+    fun halti()
+    fun saltiAl(pozicioMs: Long)
+    fun fiksiLauxtecon(volumeno: Float)
 }
+
+// commonMain — expect-fabriko
+expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 ```
 
-- **Android:** Media3 ExoPlayer + `MediaSessionService` → malfona ludado,
-  mediasciigo, mediabutonoj, sonfokuso, kapaŭskultil/alvok-traktado ĉio "senpaga".
-- **iOS:** AVPlayer + AVAudioSession + MPNowPlayingInfoCenter + RemoteCommandCenter.
-- **Desktop:** VLCJ (plej bona HLS-subteno) aŭ Media3 (JVM).
-- **Web:** `HTMLAudioElement` (+ hls.js por HLS se necesa).
+- **Android:** Media3 ExoPlayer + `MediaSessionService` → malfona ludado, mediasciigo, mediabutonoj.
+- **Desktop:** `DesktopLudiloRegilo` — mp3spi + SourceDataLine (pura Java, fluas MP3 super HTTP).
+- **Web (wasmJs):** `WasmJsLudiloRegilo` — HTMLAudioElement.
+- **iOS:** `NoOpLudiloRegilo` (estonte: AVPlayer).
+- **Testoj/Preview:** `NoOpLudiloRegilo` — kun `simuluFinon()`/`simuluPozicion()` por testoj.
 
-## Erar-trakto en ludado (heredaĵo)
+> **Neniu eksponenta repro-logiko** estis implementita. La malnova `Afspiller` havis
+> eksponentan backoff (gxis 10 provoj). Se reto perdigxas dum ludado, la uzanto devas
+> mane reprovi. Tio estas malfermita punkto.
 
-La malnova `Afspiller` havis eksponentan backoff (ĝis 10 provoj) kaj rekomencis
-se la konekto perdiĝis dum malpli ol 5 minutoj. Tiu konduto devas esti konservita:
-
-```kotlin
-// Skema
-suspend fun ludiKunRepro(fonto: Sonfonto, maxProvoj: Int = 10) {
-    var provo = 0
-    var prokrasto = 1000L  // 1s, duoblita ĉiu provo
-    while (provo < maxProvoj) {
-        try {
-            regilo.fiksiFonton(fonto)
-            regilo.ludi()
-            return
-        } catch (e: Exception) {
-            provo++
-            protokolo("Ludado fiaskis (provo $provo): ${e.message}")
-            delay(prokrasto)
-            prokrasto = minOf(prokrasto * 2, 30_000)  // maks 30s
-        }
-    }
-    // transdonu eraron al UI
-}
-```
-
-Se la reto perdiĝis dum ludado kaj revenas ene de 5 minutoj, rekomencu el la
-lasta pozicio. Se pli longe, traktu kiel novan ludadon.
+> Detalojn pri ludvica logiko, pozicio-spurado kaj aŭtoludo vidu en
+> `AGENTS.md` (sekcio "Ludvico kaj daŭra ludado").

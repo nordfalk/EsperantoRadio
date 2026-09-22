@@ -1,20 +1,24 @@
-# docs/nova — Plano por la nova EsperantoRadio
+# docs/nova — Plano kaj arkitekturo de la nova EsperantoRadio
 
-> La nova aplikaĵo estos konstruita en **Compose Multiplatform** (Android +
-> iOS, opcie Desktop), kune kun memstara **servilo** kiu funkcias kiel arkivo
-> de Esperanto-podkastoj. Ĉi tiu dosierujo priskribas la celan arkitekturon,
-> teknikan stakon, domajnan modelon, parsadon, UI-dizajnon kaj la servilon.
+> La nova aplikaĵo estas konstruita en **Compose Multiplatform** (Android +
+> Desktop + Web/Wasm; iOS ankoraŭ ne havas Xcode-projekton). Kune kun estonta
+> memstara **servilo** kiu funkcios kiel arkivo de Esperanto-podkastoj.
+> Ĉi tiu dosierujo priskribas la celan arkitekturon, teknikan stakon, domajnan
+> modelon, parsadon, UI-dizajnon kaj la servilon.
+>
+> Por la plej ĝisdatigitan staton de la projekto, vidu `AGENTS.md` en la radiko.
 
 ## Legu-ordo
 
 | # | Dokumento | Enhavo |
 |---|---|---|
-| 1 | [01_celoj_kaj_arkitekturo.md](./01_celoj_kaj_arkitekturo.md) | Celoj, principoj, tavoligita arkitekturo, modulo-strukturo |
-| 2 | [02_teknika_stako.md](./02_teknika_stako.md) | Kotlin Multiplatform, Compose, Ktor, Media3/AVPlayer, ktp |
-| 3 | [03_domajno_kaj_datumoj.md](./03_domajno_kaj_datumoj.md) | Domajnmodeloj, deponej-interfacoj, uzkazoj, datentavolo |
-| 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | Reprodukto de la sep parsregoloj, golden-testoj, parser-kontrakto |
-| 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado |
-| 6 | [06_servilo_arkivo.md](./06_servilo_arkivo.md) | La podkasta arkiv-servilo: API, inkrementa konstruo, servado |
+| 1 | [01_celoj_kaj_arkitekturo.md](./01_celoj_kaj_arkitekturo.md) | Celoj, principoj, tavoligita arkitekturo, modulo-strukturo, faza stato |
+| 2 | [02_teknika_stako.md](./02_teknika_stako.md) | Kotlin Multiplatform, Compose, Ktor, Media3/mp3spi, versioj |
+| 3 | [03_domajno_kaj_datumoj.md](./03_domajno_kaj_datumoj.md) | Domajnmodeloj, deponej-interfacoj, datentavolo, ludila abstraktado |
+| 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | La sep parsregoloj, golden-testoj, parser-kontrakto |
+| 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado (navigation3) |
+| 6 | [06_servilo_arkivo.md](./06_servilo_arkivo.md) | La podkasta arkiv-servilo (plano — ankoraŭ ne implementita) |
+| — | [GHISDATIGO_COMPOSE_1.10.md](./GHISDATIGO_COMPOSE_1.10.md) | Lernitaj lecionoj de la ĝisdatigo al Compose 1.10 / Kotlin 2.2.20 |
 
 ## La granda ideo en unu frazo
 

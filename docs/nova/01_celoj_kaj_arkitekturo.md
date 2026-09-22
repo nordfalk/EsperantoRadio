@@ -57,46 +57,52 @@ EsperantoRadio/
 ├── shared/                          # Komuna KMP-modulo
 │   ├── src/
 │   │   ├── commonMain/kotlin/dk/nordfalk/esperanto/
-│   │   │   ├── app/                 # eniro, komponado de dependencaĵoj (permana)
-│   │   │   ├── common/              # komunaj utilaĵoj
-│   │   │   ├── data/                # kaŝmemoro, dto, mapilo, reto, deponejo, fonto
-│   │   │   │   ├── network/         # Ktor-kliento, RSS-parsilo
-│   │   │   │   ├── parser/          # la sep parsregoloj (04_parsado_kaj_arkivo.md)
-│   │   │   │   ├── repository/      # deponej-implementaĵoj
-│   │   │   │   └── cache/           # kanal-kaŝmemoro
-│   │   │   ├── domain/              # model, repository (interfacoj), usecase
-│   │   │   └── ui/                  # komuna Compose (komponantoj, temo, navigado)
-│   │   ├── commonTest/              # golden-testoj (kontraŭ fiksaĵoj)
-│   │   ├── androidMain/             # platform/
-│   │   ├── iosMain/                 # platform/
-│   │   ├── desktopMain/             # platform/ (JVM)
-│   │   └── wasmJsMain/             # platform/ (Web)
+│   │   │   ├── App.kt               # radika Compose-funkcio (EsperantoRadioApp, navigation3)
+│   │   │   ├── AppStato.kt          # proceznivela unuopulo: deponejoj + ViewModel-oj
+│   │   │   ├── Protokolo.kt         # protokol-funkcioj (logi/logd/logw/loge) — expect/actual
+│   │   │   ├── navigation/Vojoj.kt  # NavKey-oj (Hejmo, Kanalaro, KanaloDetalo, ElsendoDetalo, …)
+│   │   │   ├── data/
+│   │   │   │   ├── config/          # JSONC-leganto + PlatformResource + KreuSettings
+│   │   │   │   ├── parser/          # RssParsilo (la sep parsregoloj — 04_parsado_kaj_arkivo.md)
+│   │   │   │   └── repository/     # deponej-implementaĵoj (Ktor, diskkaŝmemoro, persisto)
+│   │   │   ├── domain/
+│   │   │   │   ├── model/           # Kanalo, Elsendo, Sonfonto, LudantoStato, Alarmo, ElshutStato
+│   │   │   │   ├── player/          # LudiloRegilo, LudvicoLogiko, LudvicoRegilo
+│   │   │   │   └── repository/     # deponej-interfacoj (Deponejoj, PersonigoDeponejoj)
+│   │   │   └── ui/                  # Compose-ekranoj, Temo, HtmlVido, MiniLudilbreto, ktp
+│   │   ├── commonTest/              # golden-testoj (kontraŭ fiksaĵoj) + desktopTest
+│   │   ├── androidMain/             # ExoPlayer, AlarmManager, WorkManager, Receiviloj
+│   │   ├── iosMain/                 # NoOp-ludilo (Xcode-projekto ankoraŭ ne kreita)
+│   │   ├── desktopMain/             # mp3spi + SourceDataLine-ludilo
+│   │   └── wasmJsMain/             # HTMLAudioElement-ludilo
 │   ├── src/commonTest/resources/feeds/  # frostigitaj golden-fiksaĵoj
 │   └── build.gradle.kts
 ├── androidApp/                      # Android-aplikaĵo (MainActivity, res/, AndroidManifest)
-├── iosApp/                          # iOS-Xcode-projekto (App.swift, ContentView.swift, Info.plist)
 ├── desktopApp/                      # Desktop-JVM-aplikaĵo
-├── webApp/                          # Web-aplikaĵo (JS + Wasm)
-├── server/                          # podkasta arkiv-servilo (06_servilo_arkivo.md)
+├── webApp/                          # Web-aplikaĵo (nur Wasm — la JS-celo havis Skia-eraron)
 ├── malnova/                         # Malnova Android-apo (heredaĵo, ne tuŝebla)
 │   ├── app/
 │   ├── parse/
 │   └── data/
-├── settings.gradle.kts              # Unuigita Kotlin-DSL-build (ankaŭ inkluzivas malnova/*)
+├── settings.gradle.kts              # Unuigita Kotlin-DSL-build (iosApp/server komentitaj)
 ├── build.gradle.kts
 ├── gradle/libs.versions.toml
 └── gradle.properties
 ```
+
+> `iosApp/` (Xcode-projekto) kaj `server/` ankoraŭ ne estas kreitaj. La iOS-kodo
+> ekzistas en `shared/src/iosMain/`, sed mankas Xcode-projekto. Vidu
+> `06_servilo_arkivo.md` por la servila plano.
 
 ### Kial tiu strukturo
 
 - La **parsado** vivas en `shared/data/parser/` — komuna, pura, testebla.
 - La **UI-temo kaj komunaj komponantoj** vivas en `shared/ui/` — reuzeblaj
   trans Android/iOS/Desktop.
-- Platform-specifaj aferoj (ExoPlayer, AVPlayer, sciigoj) vivas en
-  `androidMain`/`iosMain`/`desktopMain` kiel `expect`/`actual`.
-- La **servilo** estas aparta modulo — povas esti Ktor-server-aplikaĵo aŭ
-  Kotlin-script (vidu `06_servilo_arkivo.md`).
+- Platform-specifaj aferoj (ExoPlayer, sciigoj, mp3spi) vivas en
+  `androidMain`/`desktopMain`/`wasmJsMain` kiel `expect`/`actual`.
+- Neniu DI-framintervalo — dependencaĵoj transdonitaj permane en konstruktiloj.
+- Neniu datumbazo — la kliento kaŝenas servil-respondojn kiel dosierojn.
 
 ## Kion konservi el la malnova apo, kion reenrigardi
 
@@ -111,70 +117,28 @@ EsperantoRadio/
 | Varsovia-Vento-plurparto | Malmolaj per-kanalaj apartaĵoj en kodo |
 | Golden fixtures (`RssArkivServer-filcache/`) | |
 
-## Plursistema cel-matrico
+## Plursistema cel-matrico (stato 22a de septembro 2026)
 
-| Funkcio | Android | iOS | Desktop | Web |
-|---|:--:|:--:|:--:|:--:|
+| Funkcio                        | Android | iOS | Desktop | Web |
+|--------------------------------|:--:|:--:|:--:|:--:|
 | Kanalaro, elsendlistoj, detalo | ✅ | ✅ | ✅ | ✅ |
-| Livestream + podkast-ludado | ✅ | ✅ | ✅ | ✅ |
-| Serĉo, plejŝatataj, lastaŭskultitaj | ✅ | ✅ | ✅ | ✅ |
-| Live "nun ludas"-metadateno | ✅ | ✅ | ✅ | ✅ |
-| Malfona ludado + mediasciigo | ✅ | ✅ | ➖ | ❌ |
-| Mediabutonoj / kapaŭskultilo / alvok | ✅ | ✅ | ➖ | ➖ |
-| Elŝutoj (eksterrete) | ✅ | ✅ | ✅ | ❌ |
-| Hejmekrana/ŝlosoekrana widget | ✅ | ➖ | ❌ | ❌ |
-| Vekhorloĝo | ✅ | ❌ | ➖ | ❌ |
-| Chromecast | ✅ | ➖ | ❌ | ❌ |
-| Talesyntezo (kanalŝanĝo) | ✅ | ✅ | ✅ | ➖ |
+| MP3-ludado                     | ✅ ExoPlayer | no-op | ✅ mp3spi | ✅ HTMLAudioElement |
+| HLS (Muzaiko livestream)       | ✅ ExoPlayer | no-op | ❌ | retumilo |
+| Serĉo, plejŝatataj             | ✅ | ✅ | ✅ | ✅ |
+| Ludvico + daŭra ludado         | ✅ | ✅ | ✅ | ✅ |
+| Malfona ludado + mediasciigo   | ✅ | no-op | ❌ | ❌ |
+| Sciigoj pri novaj elsendoj     | ✅ WorkManager | ❌ | ❌ | ❌ |
+| Elŝutoj (eksterrete)           | ✅ | no-op | ✅ | ❌ |
+| Vekhorloĝo                     | ✅ | ❌ | ❌ | ❌ |
+| Sentry.io erarmonitorado       | ✅ | ✅ | ✅ | ✅ |
+| Hejmekrana widget              | ❌ | ❌ | ❌ | ❌ |
+| Chromecast                     | ❌ | ❌ | ❌ | ❌ |
+| Parolsintezo                   | ❌ | ❌ | ❌ | ❌ |
 
-✅ = en celo · ➖ = ebla sed malalta prioritato · ❌ = ne sensenca/ne ebla
+✅ = funkcias · ❌ = ne implementita · no-op = kodo ekzistas sed ne ludas
 
-## Faza koureplano
+## Faza stato
 
-### Fazoj 0–1b — Faritaj ✅
-
-- **Fazo 0 — Fundamento** ✅ (PR #5): KMP-strukturo (`shared` + androidApp + desktopApp + webApp),
-  versikatalogo, ĉiuj celoj kompilas "Saluton". JSONC-leganto + kanalkonfiguro kiel bundled resource.
-- **Fazo 1a — Domajnmodeloj kaj kanalaro** ✅ (PR #6): `Kanal`, `Elsendo`, `Sonfonto` modeloj,
-  `KanalDeponejo` interfaco + implementaĵo, `KanalaroEkrano` (Compose UI), 14 testoj.
-- **Fazo 1b — RSS-parsilo** ✅ (PR #7): `RssParsilo` kun reguloj 6.1 (ĝenerala), 6.2 (Varsovia Vento),
-  6.4 (Vinilkosmo), 6.5 (titol-derivado), 6.6 (HTML-purigado), 6.7 (paĝigo). 13 golden-testoj
-  kontraŭ realaj fiksaĵoj el `RssArkivServer-filcache/`. 27 testoj totalo.
-
-### Fazoj 1c–3 — MVP (kerno, restanta)
-- **Fazo 1c — Kanalvido + Ktor**: Kanalvido (`LazyColumn` + gluaj dat-kapoj) kaj elsendodetalo
-  (sen ludado ankoraŭ). Ktor-kliento (CIO-motoro) por defora elŝuto de RSS-fluoj. Coil 3 por emblemoj.
-- **Fazo 1d — Peranto**: archive.org-embed-skrapado, Google Drive-rekonstruo (regulo 6.3).
-- **Fazo 2 — Ludado**: `LudiloRegilo` (expect/actual): Android (Media3) + Desktop
-  (VLCJ) unue, poste iOS (AVPlayer), poste Web (`HTMLAudioElement`). Mini-ludilbreto,
-  serĉbreto, ludi/paŭzi/antaŭa/sekva. Livestream (Muzaiko) + podkastoj. Live
-  "nun ludas"-metadatena pridemandado.
-- **Fazo 3 — Personigo**: plejŝatataj (+ novaj-elsendoj-signo), lastaŭskultitaj
-  (+ daŭriga pozicio), serĉo, agordoj. Persisto per dosierkaŝmemoro + multiplatform-settings.
-
-### Fazoj 4–6 — Plena eldono
-- **Fazo 4 — Malfono & mediaintegriĝo (Android/iOS)**: Android MediaSessionService
-  + mediasciigo + mediabutonoj + kapaŭskultil/alvok-traktado (sonfokuso).
-  iOS: malfona sono + Now Playing + remote commands.
-- **Fazo 5 — Elŝutoj**: elŝut-abstraktado (Android DownloadManager/Ktor, iOS
-  URLSession, Desktop Ktor→dosiero). Web preterlasita. Eksterreta listo, stato,
-  ludado-el-dosiero, nur-WiFi-agordo.
-- **Fazo 6 — pezaj platform-funkcioj (prokrastitaj, Android unue)**: vekhorloĝo
-  (AlarmManager), hejmekrana widget, Chromecast (moderna Cast SDK), talesyntezo.
-
-### Daŭra
-- `server` (arkiv-servilo) ĝisdatigita por dividi modelon/parsilon kun la nova projekto.
-
-## Riskoj kaj malfermitaj punktoj
-
-- **Rompiĝemaj fluoj** (Google Drive/archive.org-skrapado) estas la plej granda
-  prizorga risko — konsideru servil-normigon por la plej malbonaj fontoj.
-- **Muzaiko livestream** eble ankoraŭ estas malfunkcia; kontrolu HLS-URL frue
-  (influas Desktop/Web-ludil-elekton pro HLS).
-- **HLS sur Desktop/Web**: bezonas VLCJ/hls.js — testu frue.
-- **iOS malfona sono** bezonas ĝustan AVAudioSession-kategorion + capability.
-- **Cleartext HTTP**: migru fontojn al HTTPS kie eble; alikaze per-platformaj esceptoj.
-- **Mortaj kanaloj**: purigu kanal-JSON kiel parto de Fazoj 1 (forigu
-  `FORPRENITAJ_KANALOJ` / `_malbona`-fluoj).
-- **Web-limigoj**: neniu elŝuto, neniu malfono, neniu widget/vekhoro — UI devas
-  elegante kaŝi tiujn.
+La plej ĝisdatigitan fazo-tabelon vidu en `AGENTS.md` (sekcio "Stato de la projekto").
+Resumo: fazoj 0–5 estas kompletaj; fazo 6 (pezaj platform-funkcioj) estas parte farita
+(vekhoro + sciigoj; widget/Chromecast/TTS ankoraŭ venas).

@@ -5,7 +5,10 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.swipeDown
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
@@ -20,6 +23,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * UI-testoj por HejmoEkrano — testas plurajn tavolojn (UI + deponejo).
@@ -61,6 +66,9 @@ class HejmoEkranoTest {
         override suspend fun getKanalo(slug: String) = f.value.find { it.slug == slug }
     }
 
+    /** Registras la `fortoRefresigi`-parametron de ĉiu voko al sxargxiElsendojnPorKanal. */
+    private val refresxigoVokoj = mutableListOf<Boolean>()
+
     private fun falsaElsendoDeponejo() = object : ElsendoDeponejo {
         override fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>> =
             MutableStateFlow(testElsendoj.filter { it.kanaloSlug == kanaloSlug }).asStateFlow()
@@ -73,8 +81,29 @@ class HejmoEkranoTest {
         override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> =
             testElsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
 
-        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
-            testElsendoj.filter { it.kanaloSlug == kanalo.slug }
+        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
+            refresxigoVokoj += fortoRefresigi
+            return testElsendoj.filter { it.kanaloSlug == kanalo.slug }
+        }
+    }
+
+    @Test
+    fun malsuprenTiroRefresxigasKunForto() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+            )
+        }
+        waitForIdle()
+        // Unua ŝargo: 2 podkastaj kanaloj, sen forto
+        assertEquals(listOf(false, false), refresxigoVokoj)
+
+        // Tiru de la supro de la listo ĝis la fundo (la sojlo estas ~80dp post rezisto)
+        onRoot().performTouchInput { swipeDown(startY = top + height * 0.2f, endY = bottom) }
+        waitForIdle()
+        assertTrue(refresxigoVokoj.drop(2).isNotEmpty(), "Malsupren-tiro ne ekigis refreŝigon: $refresxigoVokoj")
+        assertTrue(refresxigoVokoj.drop(2).all { it }, "Refreŝigo devas uzi fortoRefresigi=true: $refresxigoVokoj")
     }
 
     @Test

@@ -16,26 +16,28 @@ Eldoni ĉe F-droid, Apptiode kaj aliaj vendejoj.
 Vidu https://github.com/nordfalk/EsperantoRadio/pull/66
 
 
-Zorgu ke la alarmo estas ekzakta ĝis 10 minutoj (https://developer.android.com/develop/background-work/services/alarms) ?
+Uzkazoj el la malnova apo (`malnova/app/src/main/res/values/eo_strings.xml`) kiujn la nova ne kovras:
+- Konigi (kunhavigi) elsendon
+- Agordo por tuj ludi kiam la apo malfermiĝas
+- Elekti lokon de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`)
+- Konfirmo antaŭ forigo de elŝuto
+- "Ĉu ĉesi ludi? / Daŭrigi fone" ĉe fermo de la apo
+- Nombro da novaj elsendoj ĉe plej ŝatataj kanaloj
+- "Nun estas ludata" por la rekta elsendo — `rektaElsendaPriskriboUrl` (muzaiko.info/data.json) estas legata sed ne montrata
+- Pri / Kontakto-ekrano
+- Averto ke vekhorloĝo ne povas garantii kontraŭ teknikaj problemoj
 
 
-Mankas eksponenta repro-logiko. La malnova `Afspiller` havis eksponentan backoff (gxis 10 provoj).
-Se reto perdigxas dum ludado, la uzanto devas mane reprovi (gxis 10 provoj) kaj poste raporti ke ne eblas, kaj daŭrigi per alia
-Aldone, la malnova apo montris tre klare kio okazas (ekzemple 'Konaktas'). Tion la nova ankaŭ faru.
-
-Rigardi la malnova apo eo_strings.xml ĉu estas iuj uzkazoj kiujn ni ne kovras?
+- **HLS sur Desktop/Web**: bezonas VLCJ/hls.js. (La Muzaiko-livestream mem funkcias — kontrolita 2026-09-23; sur Android necesis `media3-exoplayer-hls`.)
+- Eksponenta reprovo ne atendas je reta reveno (la malnova `venterPåAtKommeOnline`) — ĝi rezignas post ~3 minutoj.
+- Web: plej multaj RSS-fluoj estas blokitaj de CORS; bildoj ne aperas. Bezonas servilon/prokurilon.
 
 
-Vekhorloĝo: podkastoj ne povas aŭtomate ludi ĉe alarmo (nur rekta radio — alarmo lanĉas la kanal-livestreamon, ne specifan elsendon)
+legi kanalkonfiguro de la reto ?
 
+post aŭtomata ludado de 5 elsendoj la ludado iru al la rektaj elsendoj?
 
-- **Muzaiko livestream** eble ankoraŭ estas malfunkcia; kontrolu HLS-URL frue
-  (influas Desktop/Web-ludil-elekton pro HLS).
-- **HLS sur Desktop/Web**: bezonas VLCJ/hls.js — testu frue.
-
-
-- Malsupren tiro refreŝigas. Ĉe frontpaĝo kaj ĉe kanaloj. Mankas indiko ke la apo estas refreŝiĝanta.
-
+Faru PRojn kiun la ŝanĝoj (se eblas, faru apartajn PRojn, tamen vi povas kunmeti plurajn aferojn en unu PR se tiel estas pli simple)
 
 ### 5. Tirkesto (navigacio)
 La malnova plano havis `ModalNavigationDrawer`-tirkeston

@@ -43,6 +43,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 | — | Sentry.io erarmonitorado | ✅ Farita | #51 |
 | — | Riĉa HTML-vidigo, horizontala svipo, evolua reĝimo, konservi dum ekranturnoj | ✅ Farita | #53,#56-#63 |
 | — | radioTxtKomparilo + 2 novaj kanaloj (Kaliningrada E-radio, Universeala Lindo) | ✅ Farita | #62 |
+| — | Malsupren-tiro, ekzaktaj alarmoj, podkasto ĉe alarmo, eksponenta reprovo, HLS sur Android | ✅ Farita | — |
 
 ### Kio funkcias nun
 
@@ -52,7 +53,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado, fallback ringtono, volumo-boost
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` kiam ekzaktaj alarmoj permesataj, alie `setWindow` kun 10-minuta fenestro + averto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
 - **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
@@ -60,15 +61,19 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — gestoj**: horizontala svipo inter elsendoj de sama kanalo (ElsendoEkrano) kaj inter kanaloj (KanalEkrano)
 - **Nova apo — evolua reĝimo**: ŝaltilo en agordoj + elektiloj por priskribo-fonto kaj vidmaniero
 - **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
-- **Testoj**: 166 testoj (KMP sur Desktop), ĉiuj pasas
-- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
+- **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
+- **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
+- **Testoj**: 195 testoj (KMP sur Desktop), ĉiuj pasas
+- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
+  Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
 
 ### Kio NE funkcias ankoraŭ
 
-- Vekhorloĝo: podkastoj ne povas aŭtomate ludi ĉe alarmo (nur rekta radio — alarmo lanĉas la kanal-livestreamon, ne specifan elsendon)
 - Aŭtomata resumigo: pozicio-restarigo okazas nur kiam oni reiras al la elsendo kaj klakas "Aŭskulti"; ne aŭtomate kiam oni malfermas la apoon kaj la ludilo daŭras en fono
 - iOS-ludado (no-op, bezonas AVPlayer)
+- Web: plej multaj RSS-fluoj estas blokitaj de CORS (neniu `Access-Control-Allow-Origin`) — bezonas
+  servilon/prokurilon (vidu `docs/nova/06_servilo_arkivo.md`); bildoj ankaŭ ne aperas
 - Hejmekrana widget, Chromecast, parolsintezo
 
 ## Granda plano
@@ -96,7 +101,7 @@ EsperantoRadio/
 │   ├── src/desktopMain/   #   Desktop-specifa (JVM)
 │   ├── src/iosMain/        #   iOS-specifa (kodo ekzistas; iosApp/ Xcode-projekto ankoraŭ ne kreita — malkomentu `include(":iosApp")` en settings.gradle.kts sur Mac)
 │   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
-│   └── src/commonTest/    #   Testoj + desktopTest (166 testoj, ĉiuj pasas)
+│   └── src/commonTest/    #   Testoj + desktopTest (195 testoj, ĉiuj pasas)
 ├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
 ├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
@@ -161,12 +166,33 @@ EsperantoRadio/
 - **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
   La API: `Ksoup.parseXml(teksto, "")` por XML, `Ksoup.parse(teksto)` por HTML.
   `selectFirst(...)` ekzistas (ne nur `select(...).firstOrNull()`).
-- **Ktor 3 CIO-motoro** funkcias trans ĉiuj platformoj (JVM/Android/Native/WasmJs) sen
-  `expect`/`actual`. Nur HTTP/1.x sed sufiĉas por JSON+RSS.
+- **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
+  NE estas liberigita en `onDestroy`. `AppStato.ludvicoRegilo` tenas ĝin dum la tuta procezo. La nuna `Sonfonto`
+  estas JSON en `MediaMetadata.extras` (`SonfontoKodilo`), do ludado komencita de alia MediaController
+  (ekz. `LudiElsendoReceivilo`) estas rekonata. Vidu `SXANGXOJ.md`.
+- **Instrumentitaj Compose-testoj** bezonas `GrantPermissionRule` por `POST_NOTIFICATIONS` (vidu
+  `AndroidUiTest`): alie `MainActivity.petiSciigPermeson()` montras la permes-dialogon, MainActivity estas
+  paŭzita, kaj la Compose-testregistro (nur RESUMED-radikoj) raportas "No compose hierarchies found".
+  `connectedAndroidTest` malinstalas la apon post ĉiu rulo, do la permeso ĉiam mankas komence.
+  Rulu ĉiujn: `./gradlew :androidApp:connectedDebugAndroidTest` (5 testoj).
+- **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` — sen ĝi la MediaSession silente
+  malsukcesas (`ClassNotFoundException: HlsMediaSource$Factory` en logcat, `MediaSessionStub`).
+- **Ktor 3**: CIO sur Android/Desktop/iOS, sed **ne en la retumilo** — CIO en wasmJs bezonas la
+  `net`-modulon de Node.js ("Node.js net module is not available"). Uzu `httpMotoro` (expect/actual:
+  CIO, aŭ `Js` = fetch sur wasmJs), ne `HttpClient(CIO)` rekte. La Js-motoro ĵetas `kotlin.Error`
+  (ne Exception) ĉe reteraroj/CORS — kaptu `Throwable` (kaj reĵetu `CancellationException`).
 - **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
 - **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
 - **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per
-  `./gradlew :webApp:wasmJsBrowserDevelopmentRun`.
+  `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (kun la defaŭlta
+  1,5 GB la Wasm-ligilo ĵetas OutOfMemoryError). Enirpunkto: `ComposeViewport` (CanvasBasedWindow
+  estas malrekomendita-kiel-eraro en Compose 1.10).
+- **Klib-ABI kaj Kotlin-versio**: Wasm/Native-bibliotekoj (`.klib`) kompilitaj per pli nova Kotlin ne
+  legeblas de Kotlin 2.2.20 → "Unresolved reference" nur sur wasmJs (JVM/Android uzas jar kaj funkcias).
+  Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`. Tial navigation3 estas
+  `1.1.0-alpha02` (1.1.1 = Kotlin 2.3.10). Ĝisdatigu nur kune kun Kotlin 2.3.
+- **Kanalkonfiguro sur wasmJs/iOS** estas enigita kiel Kotlin-ĉeno dum la konstruo
+  (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`) — la fonto restas la JSONC-dosiero.
 - **JSONC-parsado**: la kanalkonfiguro havas `//`-komentojn kaj plurliniajn ĉenojn kun
   `\` ĉe lini-fino. La `KanalAgordoLeganto.striptiguKomentojn` traktas ambaŭ.
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en `<content:encoded>`.
@@ -233,6 +259,10 @@ adb logcat -d | grep FATAL                 # nur kraŝoj
 adb logcat -d | grep -E "dk.nordfalk.esperanto.android"  # nur apo
 ```
 
+La debug-APK instaliĝas kiel `dk.nordfalk.esperanto.radio.alfa` (applicationId + `.alfa`) — ne konfuzu
+kun malnovaj pakoj (`dk.nordfalk.esperanto.android`, `.radio.beta`) kiuj eble ankaŭ estas en la emulilo:
+`adb shell monkey -p dk.nordfalk.esperanto.radio.alfa -c android.intent.category.LAUNCHER 1`
+
 ## UI-dizajno (celo)
 
 La celo estas moderna podkasta apo-inspirita UI, bazita sur la Figma-dizajno
@@ -254,10 +284,11 @@ ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
 java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
 
 # Nova apo
-./gradlew :shared:desktopTest        # rulas testojn (166 testoj)
+./gradlew :shared:desktopTest        # rulas testojn (195 testoj)
 ./gradlew :desktopApp:run            # rulas la desktop-apo
 ./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
-./gradlew :webApp:wasmJsBrowserDevelopmentRun  # rulas la web-apo en retumilo
+./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g  # rulas la web-apo en retumilo
+./gradlew :androidApp:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dk.nordfalk.esperanto.android.SciigoLudiTest
 ./gradlew :desktopApp:radioTxtKomparilo  # komparas kanalkonfiguron kun esperanto-radio.com/radio.txt
 ```
 

@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.domain.player
 
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -70,7 +71,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
         if (url.isBlank()) {
             log("fiksiFonton: ERARO — malplena sono-URL")
             _stato.value = LudantoInformo(
-                stato = LudantoStato.Eraro("Malplena sono-URL"),
+                stato = LudantoStato.Eraro("Malplena sono-URL", reprovebla = false),
                 nunaFonto = fonto,
                 estasRekta = fonto is Sonfonto.RektaKanalo
             )
@@ -151,7 +152,11 @@ class DesktopLudiloRegilo : LudiloRegilo {
             log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace(System.err)
             _stato.value = _stato.value.copy(
-                stato = LudantoStato.Eraro("Ne eblis sxargxi: ${e.message}")
+                // Retaj eraroj estas pasemaj; FileNotFoundException (HTTP 404) kaj nesubtenata formato ne
+                stato = LudantoStato.Eraro(
+                    "Ne eblis sxargxi: ${e.message}",
+                    reprovebla = e is java.io.IOException && e !is java.io.FileNotFoundException,
+                )
             )
         }
     }
@@ -168,6 +173,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
 
             val buffer = ByteArray(4096)
             totalBytesLuditaj = 0L
+            var legoEraro: Exception? = null
 
             while (isActive && ludas) {
                 if (pauxzita) {
@@ -177,8 +183,8 @@ class DesktopLudiloRegilo : LudiloRegilo {
                 val read = try {
                     fluo.read(buffer)
                 } catch (e: Exception) {
-                    log("ludi: eraro legante fluon: ${e.message}")
-                    e.printStackTrace(System.err)
+                    loge("DesktopLudilo", "ludi: eraro legante fluon", e)
+                    legoEraro = e
                     -1
                 }
                 if (read <= 0) {
@@ -198,9 +204,12 @@ class DesktopLudiloRegilo : LudiloRegilo {
             line.stop()
             log("ludi: SourceDataLine haltigita")
             if (ludas) {
-                // Fino de fluo — naturfino
                 ludas = false
-                _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
+                // Reta eraro mez-flue estas Eraro (por ke LudvicoRegilo reprovu), ne naturfino
+                val eraro = legoEraro
+                _stato.value = _stato.value.copy(
+                    stato = if (eraro != null) LudantoStato.Eraro("Reta eraro: ${eraro.message}") else LudantoStato.Finita
+                )
             }
         }
     }

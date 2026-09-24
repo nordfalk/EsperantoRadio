@@ -49,7 +49,9 @@ class WasmJsLudiloRegilo : LudiloRegilo {
             _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
         })
         audio!!.addEventListener("error", { _ ->
-            _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro"))
+            // MEDIA_ERR_NETWORK (2) estas pasema; aliaj (ekz. 4 = nesubtenata/404) estas daŭraj
+            val kodo = audio?.error?.code?.toInt()
+            _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro ($kodo)", reprovebla = kodo == 2))
         })
         _stato.value = LudantoInformo(
             stato = LudantoStato.Konektas,

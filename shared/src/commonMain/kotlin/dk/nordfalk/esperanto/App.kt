@@ -121,18 +121,18 @@ fun EsperantoRadioApp(
         val pendingElsendo by dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.elsendo.collectAsState()
 
         fun switchTab(vojo: Vojo) {
-            val antauxa = nunaVojo?.javaClass?.simpleName ?: "nenio"
+            val antauxa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ tab: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo.javaClass.simpleName))
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo::class.simpleName ?: "?"))
             backStack.clear()
             backStack.add(Vojo.Hejmo)
             if (vojo !is Vojo.Hejmo) backStack.add(vojo)
         }
 
         fun push(vojo: Vojo) {
-            val antauxa = nunaVojo?.javaClass?.simpleName ?: "nenio"
+            val antauxa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ push: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo.javaClass.simpleName))
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo::class.simpleName ?: "?"))
             backStack.add(vojo)
         }
 
@@ -321,8 +321,10 @@ fun EsperantoRadioApp(
             }
 
             if (montruSubanBreton) {
+                val reprovo by ludvicoRegilo.reprovo.collectAsState()
                 MiniLudilbreto(
                     ludilo = ludilo,
+                    reprovo = reprovo,
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {

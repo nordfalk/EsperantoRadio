@@ -24,3 +24,18 @@ expect class AlarmoSkedilo() {
  * - Desktop/wasmJs/iOS: false (nur UI, ne vere vekas)
  */
 expect val subtenasVekhorlogxn: Boolean
+
+/**
+ * Ĉu la apo rajtas skedi ekzaktajn alarmojn.
+ * - Android 12+: `AlarmManager.canScheduleExactAlarms()` (permeso SCHEDULE_EXACT_ALARM)
+ * - aliaj: ĉiam true
+ * Sen permeso la alarmo tamen ekigas, sed eble ĝis 10 minutoj malfrue.
+ */
+expect fun ekzaktajAlarmojPermesataj(): Boolean
+
+/**
+ * Malfermas la sistemajn agordojn por permesi ekzaktajn alarmojn.
+ * - Android 12+: ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+ * - aliaj: NoOp
+ */
+expect fun malfermuEkzaktajnAlarmAgordojn()

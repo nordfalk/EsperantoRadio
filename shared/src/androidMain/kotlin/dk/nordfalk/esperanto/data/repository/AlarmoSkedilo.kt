@@ -4,13 +4,19 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
-import java.util.Calendar
+import dk.nordfalk.esperanto.domain.model.sekvaEkigo
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 actual class AlarmoSkedilo actual constructor() {
 
@@ -26,26 +32,21 @@ actual class AlarmoSkedilo actual constructor() {
         val triggerAtMillis = kalkuluNexxtemTempon(alarmo)
         val pendingIntent = kreuPendingIntent(alarmo)
 
-        // Ekde Android 12 (API 31), necesas kontroli ĉu la apo rajtas skedi precizajn alarmojn.
-        // Se la uzanto revokis la permeson, setExact* ĵetas SecurityException.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            logw("AlarmoSkedilo", "Ne rajtas skedi precizajn alarmojn — petu uzanton agordi permeson")
-            try {
-                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                appContext.startActivity(intent)
-            } catch (e: Exception) {
-                logw("AlarmoSkedilo", "Ne povis malfermi agordojn por precizaj alarmoj", e)
-            }
-            return
+        // Ekde Android 12 (API 31) ekzaktaj alarmoj postulas permeson SCHEDULE_EXACT_ALARM, kiun la
+        // uzanto povas revoki. Sen ĝi ni uzas setWindow() kun 10-minuta fenestro — ne postulas permeson,
+        // kaj la alarmo tamen ekigas ene de 10 minutoj. La UI (AlarmoEkrano) montras averton.
+        if (ekzaktajAlarmojPermesataj()) {
+            // setAlarmClock: escepto de Doze, kaj la sistemo montras alarm-ikonon en la statusbreto
+            val montroIntent = PendingIntent.getActivity(
+                appContext, alarmo.id,
+                Intent().setClassName(appContext, "dk.nordfalk.esperanto.android.MainActivity"),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAtMillis, montroIntent), pendingIntent)
+        } else {
+            logw("AlarmoSkedilo", "Ne rajtas skedi ekzaktajn alarmojn — uzas 10-minutan fenestron")
+            alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
         }
-
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            triggerAtMillis,
-            pendingIntent
-        )
 
         logi("AlarmoSkedilo", "Skedis alarmon ${alarmo.id}: ${alarmo.tempoTeksto} ${alarmo.ripetoTeksto} → ${alarmo.kanaloSlug} (trigger en ${(triggerAtMillis - System.currentTimeMillis()) / 1000}s)")
     }
@@ -86,50 +87,34 @@ actual class AlarmoSkedilo actual constructor() {
         )
     }
 
-    /**
-     * Kalkulas la sekvan tempon kiam la alarmo devas ekigi.
-     * Se ripeto == 0 (unufoje), ĝi ekigas hodiaŭ aŭ morgaŭ.
-     * Se ripeto != 0, ĝi trovas la sekvan tagon kiu kongruas kun la bitmasko.
-     */
+    @OptIn(ExperimentalTime::class)
     private fun kalkuluNexxtemTempon(alarmo: Alarmo): Long {
-        val now = Calendar.getInstance()
-        val target = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, alarmo.horo)
-            set(Calendar.MINUTE, alarmo.minuto)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
+        val tz = TimeZone.currentSystemDefault()
+        return alarmo.sekvaEkigo(Clock.System.now().toLocalDateTime(tz)).toInstant(tz).toEpochMilliseconds()
+    }
 
-        if (alarmo.ripeto == 0) {
-            // Unufoje — se la tempo jam pasis hodiaŭ, planu por morgaŭ
-            if (target.timeInMillis <= now.timeInMillis) {
-                target.add(Calendar.DAY_OF_YEAR, 1)
-            }
-        } else {
-            // Ripeto — trovu la sekvan taŭgan tagon
-            // Bitmasko: 0x01=Lundo(Calendar.MONDAY=2) ... 0x40=Dimanĉo(Calendar.SUNDAY=1)
-            val mapo = intArrayOf(0x40, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20) // Dimanĉo..Sabato
-            for (i in 0..7) {
-                val testCal = target.clone() as Calendar
-                testCal.add(Calendar.DAY_OF_YEAR, i)
-                val calTago = testCal.get(Calendar.DAY_OF_WEEK) - 1 // 1=Dimanĉo -> 0, 2=Lundo -> 1...
-                val bito = if (calTago == 0) 0x40 else 1 shl (calTago - 1) // Dimanĉo=0x40, Lundo=0x01...
-                if (alarmo.ripeto and bito != 0) {
-                    if (testCal.timeInMillis > now.timeInMillis || i == 0 && target.timeInMillis > now.timeInMillis) {
-                        return testCal.timeInMillis
-                    }
-                    if (i == 0 && target.timeInMillis <= now.timeInMillis) {
-                        // Hodiaux la tempo pasis — provu morgauxu
-                        continue
-                    }
-                    return testCal.timeInMillis
-                }
-            }
-            // Se neniu tago kongruas en 7 tagoj (ne devus okazi), planu por morgaŭ
-            target.add(Calendar.DAY_OF_YEAR, 1)
-        }
-
-        return target.timeInMillis
+    private companion object {
+        /** Maksimuma malfruo kiam ekzaktaj alarmoj ne estas permesataj. */
+        const val FENESTRO_MS = 10 * 60 * 1000L
     }
 }
 actual val subtenasVekhorlogxn: Boolean = true
+
+actual fun ekzaktajAlarmojPermesataj(): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
+    val alarmManager = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    return alarmManager.canScheduleExactAlarms()
+}
+
+actual fun malfermuEkzaktajnAlarmAgordojn() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+    try {
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+            data = Uri.parse("package:${appContext.packageName}")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        appContext.startActivity(intent)
+    } catch (e: Exception) {
+        logw("AlarmoSkedilo", "Ne povis malfermi agordojn por ekzaktaj alarmoj", e)
+    }
+}

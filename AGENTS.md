@@ -109,6 +109,9 @@ EsperantoRadio/
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
+├── .github/workflows/       # CI (changelog-kontrolo)
+├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
+├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
 └── AGENTS.md               # Tiu ĉi dosiero
 ```
 
@@ -140,6 +143,13 @@ EsperantoRadio/
 9. **Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
    uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
    La commit-mesaĝo estu la titolo de la PR + ligo al la PR
+10. **Ĝisdatigu `CHANGELOG.md` en ĉiu PR kun uzantvidebla ŝanĝo.** Aldonu
+   **unu linion** al la `## [Neeldonita]`-sekcio **ene de la sama PR**: konciza
+   priskribo sen teknikaj detaloj + ligilo al la PR, ekz.:
+   `- Vekhorloĝo ludas ankaŭ podkastojn (https://github.com/nordfalk/EsperantoRadio/pull/123)`.
+   Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; se la
+   CI-kontrolo erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
+   la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
 
 ## Git-laborfluo
 
@@ -154,6 +164,39 @@ EsperantoRadio/
 6. **Ne commitu sen eksplicita peto de la uzanto.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
+
+## Ŝanĝoprotokolo (CHANGELOG.md)
+
+[`CHANGELOG.md`](CHANGELOG.md) estas la konkiza, uzantvida resumo de ĉiuj
+rimarkindaj ŝanĝoj. La formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/)
+kun esperantaj kategorioj (**Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**,
+**Sekureco**). Ĉiu eniro estas **unu linio**: konciza priskribo sen teknikaj
+detaloj + ligilo al la PR (regulo 10). Rilato al [`SXANGXOJ.md`](SXANGXOJ.md):
+CHANGELOG = "kio ŝanĝiĝis por la uzanto", SXANGXOJ = detala teknika
+labortaglibro (problem-analizo, kialoj, kontrolrezultoj). La samo ne devas
+aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
+
+**Laborfluo (kiu tenas ĝin ĝisdatigata):**
+
+1. Ĉiu PR, kiu ŝanĝas uzantvideblan konduton, aldonas sian eniron al
+   `## [Neeldonita]` en la sama PR (regulo 10).
+2. La CI (`.github/workflows/changelog-kontrolo.yaml`) rifuzas PR-ojn, kiuj
+   ŝanĝas la ĉefan fontkodon (`*Main`-dosierujoj) sen ŝanĝo de `CHANGELOG.md`.
+   Preterpaso: PR-etikedo `preterlasu-changelog` (puraj internaj ŝanĝoj).
+3. Eldono de nova versio:
+   1. `apoversio` en `gradle/libs.versions.toml` ricevas la novan nombron
+      (ĝi estas la unu fonto de vero por `versionName`/Sentry — `ApoVersio.kt`
+      estas generata el ĝi).
+   2. Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT` kaj malfermu novan
+      malplenan `## [Neeldonita]`-sekcion.
+   3. Kreu git-tagon `vX.Y.Z` sur la eldona komito kaj puŝu ĝin
+      (`git tag vX.Y.Z && git push origin vX.Y.Z`). La malnova deponejo uzis la
+      etikedon `fresxa_versio` por la fina 2.x-eldono (2.0.12f, 2018) — se tiu
+      konvencio devas daŭri, movu ĝin al la sama komito; alikaze `vX.Y.Z` sufiĉas.
+   4. Aldonu kompar-ligojn malsupre en CHANGELOG.md
+      (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
+      Noto: `3.0.0` ne havas etikedon — la ligo en CHANGELOG.md uzas la eldonan
+      komiton (`294834b`).
 
 ## Teknikaj scioj lernitaj dum la laboro
 

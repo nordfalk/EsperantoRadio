@@ -16,6 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- La versio de la apo nun estas videbla en la agordoj (https://github.com/nordfalk/EsperantoRadio/pull/74)
 - Eksponenta reprovo: pasemaj ludo-eraroj reproviĝas aŭtomate (ĝis 10 fojojn) (https://github.com/nordfalk/EsperantoRadio/pull/68)
 - Malsupren-tiro por refreŝigi sur Hejmo, Kanaloj kaj kanalvido (https://github.com/nordfalk/EsperantoRadio/pull/69)
 - Vekhorloĝo ludas la plej freŝan neaŭskultitan podkaston de la kanalo, ne nur la rektsendon (https://github.com/nordfalk/EsperantoRadio/pull/68)

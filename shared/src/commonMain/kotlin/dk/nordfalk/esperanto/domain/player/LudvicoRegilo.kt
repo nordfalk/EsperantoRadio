@@ -64,6 +64,8 @@ class LudvicoRegilo(
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
     private val auxtomataDaurigo: StateFlow<Boolean> = MutableStateFlow(true),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
+    /** Atendo antaŭ reprovo n (null = rezignu). Anstataŭigebla en testoj. */
+    private val reprovoAtendo: (Int) -> Long? = ReprovoLogiko::atendoMs,
 ) {
     /** Delegas la staton al la suba ludilo. */
     val stato: StateFlow<LudantoInformo> get() = ludilo.stato
@@ -76,6 +78,16 @@ class LudvicoRegilo(
     private var pozicioSavanto: Job? = null
     private val ludMutex = Mutex()
     @Volatile private var antauxaStato: LudantoStato = LudantoStato.Haltita
+
+    /**
+     * Numero de la nuna reprovo de la sama fonto post eraro (0 = neniu reprovo).
+     * La UI montras ĝin ("Reprovas 3/10…"). Nuliĝas kiam ludado sukcesas aŭ fonto ŝanĝiĝas.
+     */
+    private val _reprovo = MutableStateFlow(0)
+    val reprovo: StateFlow<Int> = _reprovo.asStateFlow()
+    private var reprovoJob: Job? = null
+    /** Pliiĝas por ĉiu planita reprovo — por ke nur la plej lasta reprovo agu. */
+    @Volatile private var reprovoGeneracio: Int = 0
 
     /** Nombro de sinsekvaj eraroj — haltas post MAKS_ERAROJ por eviti eternan buklon. */
     @Volatile private var erarojSinsekvaj: Int = 0
@@ -107,9 +119,11 @@ class LudvicoRegilo(
                 traktiFinon(stato, erara = false)
             }
             stato is LudantoStato.Eraro && antauxaStato !is LudantoStato.Eraro -> {
-                traktiFinon(stato, erara = true)
+                if (!stato.reprovebla || !provuReprovi()) traktiFinon(stato, erara = true)
             }
             stato == LudantoStato.Ludas -> {
+                if (_reprovo.value > 0) logi("Ludvico", "Reprovo ${_reprovo.value} sukcesis")
+                _reprovo.value = 0
                 ghisdatiguLastaPozicion()
                 komenciPozicianSpuradon()
             }
@@ -121,6 +135,67 @@ class LudvicoRegilo(
             else -> {}
         }
         antauxaStato = stato
+    }
+
+    /**
+     * Post eraro: reprovas la saman fonton kun eksponenta atendo ([ReprovoLogiko]).
+     * Por podkasto la ludado daŭras de la lasta pozicio. Lokaj dosieroj ne estas reprovataj
+     * (reta problemo ne povas esti la kaŭzo).
+     *
+     * @return true se reprovo estas planita; false se oni rezignu (tiam traktiFinon)
+     */
+    private fun provuReprovi(): Boolean {
+        val info = ludilo.stato.value
+        val fonto = info.nunaFonto ?: lastaFonto ?: return false
+        if (fonto is Sonfonto.LokaElsendo) return false
+        val provo = _reprovo.value + 1
+        val atendo = reprovoAtendo(provo)
+        if (atendo == null) {
+            logw("Ludvico", "Rezignas post ${ReprovoLogiko.MAKS_PROVOJ} reprovoj")
+            _reprovo.value = 0
+            return false
+        }
+        val pozicio = when {
+            fonto is Sonfonto.RektaKanalo -> 0L
+            info.pozicioMs > 0 -> info.pozicioMs
+            else -> lastaPozicioMs
+        }
+        _reprovo.value = provo
+        logw("Ludvico", "Ludo-eraro — reprovo $provo/${ReprovoLogiko.MAKS_PROVOJ} post ${atendo}ms")
+        reprovoJob?.cancel()
+        val generacio = ++reprovoGeneracio
+        reprovoJob = scope.launch {
+            delay(atendo)
+            // La uzanto eble haltigis aŭ elektis ion alian dume — tiam ne reprovu
+            val nun = ludilo.stato.value
+            if (generacio != reprovoGeneracio || nun.stato !is LudantoStato.Eraro ||
+                (nun.nunaFonto != null && nun.nunaFonto != fonto)) {
+                logi("Ludvico", "Reprovo nuligita — stato ${nun.stato}")
+                _reprovo.value = 0
+                return@launch
+            }
+            try {
+                ludilo.fiksiFonton(fonto, pozicio)
+                ludilo.ludi()
+            } catch (e: Exception) {
+                loge("Ludvico", "Reprovo $provo ĵetis escepton", e)
+            }
+            // Sinkrona malsukceso (ekz. Desktop): la stato restas Eraro kaj la observanto ne vidas
+            // novan ŝanĝon (distinctUntilChanged) — do planu la sekvan reprovon mem
+            val poste = ludilo.stato.value.stato
+            if (poste is LudantoStato.Eraro && generacio == reprovoGeneracio) {
+                if (!poste.reprovebla || !provuReprovi()) traktiFinon(poste, erara = true)
+            }
+        }
+        return true
+    }
+
+    /** Nuligas planitan reprovon — vokata kiam la uzanto mem elektas ion por ludi. */
+    private fun nuliguReprovon() {
+        reprovoGeneracio++
+        reprovoJob?.cancel()
+        reprovoJob = null
+        _reprovo.value = 0
     }
 
     /**
@@ -235,6 +310,7 @@ class LudvicoRegilo(
     suspend fun ludiElsendon(elsendo: Elsendo) {
         ludMutex.withLock {
             erarojSinsekvaj = 0
+            nuliguReprovon()
             savuPozicion()
             // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
             if (ludatojDeponejo.estasFinita(elsendo.id)) {
@@ -382,6 +458,7 @@ class LudvicoRegilo(
 
     fun halti() {
         haltiPozicianSpuradon()
+        nuliguReprovon()
         observanto?.cancel()
         observanto = null
     }

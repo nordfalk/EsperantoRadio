@@ -20,7 +20,7 @@ import dk.nordfalk.esperanto.ui.KanalaroViewModel
 import dk.nordfalk.esperanto.ui.KanaloViewModel
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -78,7 +78,7 @@ object AppStato {
 
         logi("AppStato", "Inicialigas deponejojn kaj ViewModel-ojn")
 
-        httpKliento = HttpClient(CIO) {
+        httpKliento = HttpClient(httpMotoro) {
             install(Logging) { level = LogLevel.INFO }
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
             install(HttpTimeout) {

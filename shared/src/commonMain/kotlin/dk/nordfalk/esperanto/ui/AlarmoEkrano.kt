@@ -22,8 +22,11 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
+import dk.nordfalk.esperanto.data.repository.ekzaktajAlarmojPermesataj
+import dk.nordfalk.esperanto.data.repository.malfermuEkzaktajnAlarmAgordojn
 import dk.nordfalk.esperanto.data.repository.subtenasVekhorlogxn
 import dk.nordfalk.esperanto.logi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,6 +116,9 @@ fun AlarmoEkrano(
             }
             else -> {
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    if (subtenasVekhorlogxn && alarmoj.any { it.aktiva }) {
+                        item { EkzaktajAlarmojAverto() }
+                    }
                     if (!subtenasVekhorlogxn) {
                         item {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
@@ -147,6 +153,39 @@ fun AlarmoEkrano(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Averto kiam la apo ne rajtas skedi ekzaktajn alarmojn (Android 12+). La alarmoj tamen
+ * ekigas, sed eble ĝis 10 minutoj malfrue. Rekontrolas periode, ĉar la uzanto donas la
+ * permeson en la sistemaj agordoj kaj poste revenas.
+ */
+@Composable
+private fun EkzaktajAlarmojAverto() {
+    var permesata by remember { mutableStateOf(ekzaktajAlarmojPermesataj()) }
+    LaunchedEffect(permesata) {
+        while (!permesata) {
+            delay(2000)
+            permesata = ekzaktajAlarmojPermesataj()
+        }
+    }
+    if (permesata) return
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                "La apo ne rajtas skedi ekzaktajn alarmojn. Alarmoj povas malfrui ĝis 10 minutoj.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            TextButton(onClick = {
+                logi("Klako", "permesi ekzaktajn alarmojn")
+                malfermuEkzaktajnAlarmAgordojn()
+            }) { Text("Permesi") }
         }
     }
 }
@@ -266,7 +305,9 @@ private fun AlarmoRedaktilo(
                     minuto = minuto,
                     ripeto = ripeto,
                     kanaloSlug = elektitaKanaloSlug,
-                    aktiva = ekzistanta?.aktiva ?: true
+                    aktiva = ekzistanta?.aktiva ?: true,
+                    // La redaktilo ne havas kampon por la etikedo — konservu la ekzistantan
+                    etikedo = ekzistanta?.etikedo,
                 ))
             }) { Text(if (ekzistanta != null) "Konservi" else "Krei") }
             Spacer(Modifier.width(8.dp))

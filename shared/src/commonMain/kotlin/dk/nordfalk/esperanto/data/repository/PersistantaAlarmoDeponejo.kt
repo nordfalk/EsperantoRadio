@@ -106,4 +106,28 @@ class PersistantaAlarmoDeponejo(
         }
         logi("AlarmoDeponejo", "Baskulis: id=$alarmoId tempo=${alarmo?.tempoTeksto} → ${if (alarmo?.aktiva == true) "aktiva" else "malaktiva"}")
     }
+
+    /**
+     * Vokata kiam alarmo ĵus ekigis (el AlarmoReceivilo).
+     * - Unufoja alarmo (ripeto == 0): malaktivigita kaj persistita — alie la UI montrus ĝin kiel ŝaltitan.
+     * - Ripetanta alarmo: skedita por la sekva okazo (AlarmManager-alarmoj estas unufojaj).
+     *
+     * Ne `suspend` — vokebla sinkrone el BroadcastReceiver.onReceive.
+     */
+    fun ekigis(alarmoId: Int) {
+        val alarmo = _alarmoj.value.find { it.id == alarmoId }
+        when {
+            alarmo == null -> logw("AlarmoDeponejo", "Ekigis nekonatan alarmon $alarmoId")
+            !alarmo.aktiva -> logi("AlarmoDeponejo", "Ekigis malaktivan alarmon $alarmoId — nenio farenda")
+            alarmo.ripeto == 0 -> {
+                _alarmoj.value = _alarmoj.value.map { if (it.id == alarmoId) it.copy(aktiva = false) else it }
+                persistu()
+                logi("AlarmoDeponejo", "Unufoja alarmo $alarmoId ekigis — malaktivigita")
+            }
+            else -> {
+                skedilo?.skedi(alarmo)
+                logi("AlarmoDeponejo", "Ripetanta alarmo $alarmoId ekigis — skedita por la sekva okazo")
+            }
+        }
+    }
 }

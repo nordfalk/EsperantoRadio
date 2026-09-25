@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 /**
  * UI-testoj por AlarmoEkrano — testas plurajn tavolojn (UI + deponejo).
@@ -81,5 +83,25 @@ class AlarmoEkranoTest {
         onNodeWithText("Cxiutage").assertIsDisplayed()
         onNodeWithText("22:00").assertIsDisplayed()
         onNodeWithText("Unufoje").assertIsDisplayed()
+    }
+
+    @Test
+    fun redaktadoKonservasEtikedon() = runComposeUiTest {
+        val deponejo = FalsaAlarmoDeponejo(listOf(
+            Alarmo(id = 1, horo = 6, minuto = 45, ripeto = 0x1f, kanaloSlug = "muzaiko", etikedo = "Muzaiko matene labortage"),
+        ))
+        setContent {
+            AlarmoEkrano(
+                alarmoDeponejo = deponejo,
+                kanaloDeponejo = FalsaKanaloDeponejo(testKanaloj),
+                onReen = {}
+            )
+        }
+        waitForIdle()
+        onNodeWithText("06:45").performClick()
+        waitForIdle()
+        onNodeWithText("Konservi").performClick()
+        waitForIdle()
+        assertEquals("Muzaiko matene labortage", deponejo.observiAlarmojn().value.single().etikedo)
     }
 }

@@ -1,0 +1,42 @@
+# Kontrolas ke PR-oj kun uzantvideblaj ŝanĝoj ankaŭ ĝisdatigu CHANGELOG.md.
+# Preterlasebla per la PR-etikedo `preterlasu-changelog` (puraj internaj ŝanĝoj:
+# testoj, refaktorado, dokumentaro).
+# Detaloj: AGENTS.md, sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
+name: changelog-kontrolo
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ĉu CHANGELOG.md estas ĝisdatigata?
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'preterlasu-changelog') }}
+        env:
+          BAZO: origin/${{ github.base_ref }}
+        run: |
+          # Fontkodo ŝanĝita? (test-dosierujoj ne kalkuliĝas — nur *Main)
+          fontoj=$(git diff --name-only "$BAZO...HEAD" -- \
+            'shared/src/commonMain' 'shared/src/androidMain' 'shared/src/desktopMain' \
+            'shared/src/wasmJsMain' 'shared/src/iosMain' \
+            'androidApp/src/androidMain' 'desktopApp/src/desktopMain' \
+            'webApp/src/wasmJsMain')
+          if [ -z "$fontoj" ]; then
+            echo "Neniu ŝanĝo en la ĉefa fontkodo — CHANGELOG ne necesas."
+            exit 0
+          fi
+          if git diff --name-only "$BAZO...HEAD" -- CHANGELOG.md | grep -q .; then
+            echo "CHANGELOG.md estas ĝisdatigata. Ŝanĝitaj fontoj:"
+            echo "$fontoj"
+          else
+            echo "::error::La PR ŝanĝas ĉefan fontkodon sed ne CHANGELOG.md. Aldonu koncizan eniron al la [Neeldonita]-sekcio, aŭ aldonu la etikedon 'preterlasu-changelog' se la ŝanĝo ne estas uzantvidebla."
+            exit 1
+          fi

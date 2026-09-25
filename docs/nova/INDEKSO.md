@@ -15,6 +15,7 @@
 | 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | Reprodukto de la sep parsregoloj, golden-testoj, parser-kontrakto |
 | 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado |
 | 6 | [06_servilo_arkivo.md](./06_servilo_arkivo.md) | La podkasta arkiv-servilo: API, inkrementa konstruo, servado |
+| 7 | [07_cri_esperanto_kanalo.md](./07_cri_esperanto_kanalo.md) | CRI Esperanto: situacio, HLS-sonformatoj, solvo-propono (peranto) kaj demonstra transkodilo |
 
 ## La granda ideo en unu frazo
 

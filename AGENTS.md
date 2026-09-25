@@ -51,9 +51,10 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado, fallback ringtono, volumo-boost
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per 📋-butono, "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
-- **Testoj**: 131 testoj (KMP sur Desktop), ĉiuj pasas
+- **Testoj**: 168 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 - **radioTxtKomparilo**: ilo por kompari kanalkonfiguron kun esperanto-radio.com/radio.txt (PR https://github.com/nordfalk/EsperantoRadio/pull/62) — identigas mankantajn kanalojn kaj elsendojn
+- **criTranskodaDemo**: demonstro de CRI-peranto (HLS→MP3-transkoda servo por esperanto.cri.cn) — `./gradlew :desktopApp:criTranskodaDemo` (bezonas ffmpeg); vidu `docs/nova/07_cri_esperanto_kanalo.md`
 
 ### Kio NE funkcias ankoraŭ
 

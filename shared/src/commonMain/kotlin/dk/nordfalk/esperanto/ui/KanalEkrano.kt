@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +53,8 @@ class KanaloViewModel(
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
-    suspend fun sxargxi() {
+    /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu la fluon denove (malsupren-tiro). */
+    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         val kashitaj = elsendoDeponejo.leguKashitajnElsendojn(kanalo)
         if (kashitaj != null && kashitaj.isNotEmpty()) {
@@ -63,7 +65,7 @@ class KanaloViewModel(
         // Paŝo 2: Reto-elŝuto (malrapida)
         _sxargxas.value = true
         try {
-            val rezulto = elsendoDeponejo.sxargxiElsendojn(kanalo)
+            val rezulto = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi)
             _elsendoj.value = rezulto
         } catch (e: Exception) {
             loge("KanaloViewModel", "Malsukcesis sargi elsendojn por ${kanalo.slug}", e)
@@ -138,9 +140,14 @@ fun KanaloEkrano(
             )
         },
         snackbarHost = { SnackbarHost(snackbarStato) }
-    ) { padding ->
+    ) { padding -> PullToRefreshBox(
+        // La granda spinilo en la listo montras la unuan ŝarĝon; ĉi tiu nur kiam jam estas elsendoj
+        isRefreshing = sxargxas && elsendoj.isNotEmpty(),
+        onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); scope.launch { viewModel.sxargxi(fortoRefresigi = true) } },
+        modifier = Modifier.fillMaxSize().padding(padding),
+    ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp)
         ) {
             // Kanalinformoj: emblemo, nomo, retejo, retpoŝto
@@ -169,17 +176,6 @@ fun KanaloEkrano(
                     }
                 }
             } else {
-                // Nebloka ŝarĝada indikilo (se ŝargas kaj jam havas elsendojn)
-                if (sxargxas) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                        }
-                    }
-                }
                 // Rekta elsendo-butono se la kanalo havas livestream
                 if (kanalo.estasRekta) {
                     item {
@@ -226,6 +222,7 @@ fun KanaloEkrano(
                 }
             }
         }
+    }
     }
 }
 

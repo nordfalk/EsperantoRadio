@@ -114,6 +114,10 @@ data class KanaloDto(
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
+    /** Platformo sur kiu la kanalo estas videbla; null = ĉie (vidu Kanalo.videblaNurSur) */
+    val videblaNurSur: String? = null,
+    /** CRI-stilaj sekci-URL-oj — aktivigas la CRI-parsilon (regulo 6.8), vidu Kanalo.elsendojApiSekcioj */
+    val elsendojApiSekcioj: List<String>? = null,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -128,6 +132,8 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     ignoruTitolon = elsendojRssIgnoruTitolon,
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
+    videblaNurSur = videblaNurSur,
+    elsendojApiSekcioj = elsendojApiSekcioj,
 )
 
 /**

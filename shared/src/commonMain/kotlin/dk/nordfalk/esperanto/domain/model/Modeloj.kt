@@ -20,9 +20,21 @@ data class Kanalo(
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
+    /**
+     * Platformo sur kiu la kanalo estas videbla ("android", "desktop", "web", "ios").
+     * null = videbla ĉie. Uzata por kanaloj kies fluoj funkcias nur sur unu
+     * platformo (ekz. CRI: HLS kiun nur ExoPlayer subtenas).
+     */
+    val videblaNurSur: String? = null,
+    /**
+     * CRI-stilaj sekci-URL-oj (regulo 6.8): la elsendoj venas per POST al la
+     * CRI-API, ne el RSS-fluo. Ne-null aktivigas la CRI-parsilon.
+     */
+    val elsendojApiSekcioj: List<String>? = null,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
-    val havasPodkastojn: Boolean get() = podkastaRssUrl != null
+    val havasPodkastojn: Boolean
+        get() = podkastaRssUrl != null || !elsendojApiSekcioj.isNullOrEmpty()
 }
 
 /**

@@ -67,6 +67,10 @@ fun ElsendoEkrano(
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
 
+    // HLS-fluo (m3u8, ekz. CRI): ludebla nur per ExoPlayer (Android) —
+    // elŝuto ne eblas, ĉar la fluo estas ludlisto, ne dosiero
+    val estasHlsFluo = elsendo.fluo.endsWith(".m3u8")
+
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
     val ludato = ludatojMapo[elsendo.id]
@@ -140,6 +144,7 @@ fun ElsendoEkrano(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (!estasHlsFluo) {
                     IkonoButono(
                         ikono = when (elshutStato) {
                             is ElshutStato.Preta -> Icons.Filled.Check
@@ -162,6 +167,7 @@ fun ElsendoEkrano(
                         },
                         onLongClick = { montruMesaĝon("Elŝuti") }
                     )
+                    }
 
                     IkonoButono(
                         ikono = if (tiuElsendoLudas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -345,7 +351,8 @@ fun ElsendoEkrano(
                     }
                 }
 
-                when (elshutStato) {
+                // HLS-fluoj ne elŝuteblas (ludlisto, ne dosiero) — vidu estasHlsFluo
+                if (!estasHlsFluo) when (elshutStato) {
                     is ElshutStato.NeElshutita -> OutlinedButton(
                         onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
                         modifier = Modifier.weight(1f)

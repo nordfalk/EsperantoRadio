@@ -51,10 +51,11 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado, fallback ringtono, volumo-boost
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per 📋-butono, "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
-- **Testoj**: 168 testoj (KMP sur Desktop), ĉiuj pasas
+- **Testoj**: 176 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 - **radioTxtKomparilo**: ilo por kompari kanalkonfiguron kun esperanto-radio.com/radio.txt (PR https://github.com/nordfalk/EsperantoRadio/pull/62) — identigas mankantajn kanalojn kaj elsendojn
 - **criTranskodaDemo**: demonstro de CRI-peranto (HLS→MP3-transkoda servo por esperanto.cri.cn) — `./gradlew :desktopApp:criTranskodaDemo` (bezonas ffmpeg); vidu `docs/nova/07_cri_esperanto_kanalo.md`
+- **CRI-kanalo**: "CRI — Ĉina Radio Internacia" (regulo 6.8: POST al la CRI-API, HLS-ludado per ExoPlayer) — videbla NUR sur Android (`videblaNurSur`); la aliaj platformoj ĝin kaŝas ĝis ekzistas transkoda servo; elŝutoj ne eblas por HLS (butono kaŝita)
 
 ### Kio NE funkcias ankoraŭ
 
@@ -107,7 +108,7 @@ EsperantoRadio/
    La celo estas rekreado, ne riparado.
 2. **La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
    `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-   La sep parsregoloj kaj la skip-listo devas esti konservitaj.
+   La sep originaj parsregoloj (6.1–6.7) devas esti konservitaj; 6.8 (CRI) estas nova aldono.
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
    determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
@@ -290,7 +291,8 @@ dk/nordfalk/esperanto/
 ├── data/
 │   ├── config/KanalAgordoLeganto.kt  # JSONC-leganto (striptigas komentojn)
 │   ├── config/PlatformResource.kt   # expect/actual por legi resurcojn
-│   ├── parser/RssParsilo.kt         # RSS/Atom-parsilo (sep regoloj)
+│   ├── parser/RssParsilo.kt         # RSS/Atom-parsilo (reguloj 6.1–6.7)
+│   ├── parser/CriParsilo.kt         # Regulo 6.8: CRI-JSON-API → Elsendo (HLS-fluo)
 │   ├── repository/KanalDeponejoImpl.kt   # Deponej-implementaĵo
 │   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
 │   └── repository/PersonigoDeponejojImpl.kt  # Plejŝatataj, LudatojDeponejoMaketo, Agordoj

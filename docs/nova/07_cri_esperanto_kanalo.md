@@ -64,26 +64,29 @@ ankaŭ norvegajn/finnajn/svedajn videojn. Kanalo devas do aŭ limiĝi al
 
 ## 3. Ĉu la Androida apo povas ludi sen ekstra servilo?
 
-**Ludado: jes. Elsendolisto kaj elŝutoj: ne (sen plia laboro).**
+**Ludado: jes. Elsendolisto: jes — per parsregulo 6.8. Elŝutoj: ne (kaj la
+butono estas kaŝita). Aliaj platformoj: la kanalo estas kaŝita.**
 
 - ExoPlayer (Media3) subtenas HLS denaske — la apo jam ludas la Muzaiko-
-  rektan fluon (`https://fluo.muzaiko.info/hls/muzaiko/live.m3u8`) per la
-  sama mekanismo. La CRI-m3u8-oj (po 600k–2000k, AAC-sono) do ludeblus sur
-  Android sen ia transkodado.
-- Sed por alveni al la elsendolisto la apo bezonas RSS, kaj CRI ne havas
-  RSS. Sen servilo la apo devus mem parsi la CRI-JSON-API-on — t.e. nova
-  **parsregulo 6.8** (POST-voko al `/api/getData` + JSON-mapaado al
-  `Elsendo`), kiu nur funkcias por tiu ĉi kanalo.
-- Desktop (mp3spi) kaj Web (HTMLAudioElement) **ne povas ludi HLS**. Sen
-  servilo la kanalo do estus Android-ekskluziva.
-- La elŝut-funkcio (Ktor→`FileOutputStream`) povas elŝuti nur ordinaran
-  dosieron, ne HLS-ludliston. Elŝuto de HLS postulus ExoPlayer
-  `DownloadService` aŭ apartan HLS-elŝutilon.
+  rektan fluon per la sama mekanismo. **Rimarko:** tio postulas la
+  `media3-exoplayer-hls`-dependaĵon, kiu mankis ĝis 2026-09-25 — sen ĝi
+  ExoPlayer ĵetas `ClassNotFoundException: HlsMediaSource$Factory` kaj la
+  ludvico saltas de eraro al eraro. Ĝi estas nun aldonita.
+- Por la elsendolisto mankis RSS, do la apo nun mem demandas la CRI-API-on:
+  **parsregulo 6.8** (`CriParsilo`, `ElsendoDeponejoImpl.sxargxiCriElsendojn`)
+  — POST al `/api/getData` por ĉiu sekcio el `elsendojApiSekcioj` en la
+  kanalkonfiguro. La fluo estas la m3u8/mp4 el `card.video.url`.
+- Desktop (mp3spi) kaj Web (HTMLAudioElement) **ne povas ludi HLS**, kaj la
+  elŝut-funkcio (Ktor→`FileOutputStream`) povas elŝuti nur ordinaran
+  dosieron, ne ludliston. Tial:
+  - `"videblaNurSur": "android"` en la konfiguro — `KanaloDeponejoImpl`
+    filtras la kanalon for sur la aliaj platformoj;
+  - la elŝut-butono estas kaŝita por `.m3u8`-fluoj (`ElsendoEkrano`).
 
-**Konkludo:** Android-nura solvo sen servilo estas *ebla* (nova parsregulo +
-ExoPlayer-HLS), sed ĝi lasas la kanalon nefunkciema sur 3 el 4 platformoj
-kaj sen elŝutoj. La transkoda servo solvas ĉiujn problemojn per unu
-kanal-enskribo en la JSONC-agordo — sen ia nova kodo en la apo.
+**Konkludo:** la Androida apo nun povas ludi la CRI-elsendojn tute sen
+servilo — kanalaro, elsendolisto kaj ludado funkcias (testite sur la
+emulilo 2026-09-25: 24 elsendoj, HLS-ludado konfirmita). La transkoda
+servo (sekcio 4) restas la plano por la aliaj platformoj kaj elŝutoj.
 
 ## 4. Solvo-propono: CRI-peranto (transkoda servo)
 
@@ -184,8 +187,25 @@ La generita RSS estas kovrita de ora testo
 ## 7. Decidoj kiuj restas malfermaj
 
 1. Ĉu la kanalo montru nur `aktualajo` (ĉiutagaj novaĵoj) aŭ ankaŭ la
-   programojn de `LuciaStudio`/`eklubo`?
+   programojn de `LuciaStudio`/`eklubo`? (Nuntempe la sekcioj estas en la
+   agordo `elsendojApiSekcioj` — ŝanĝo estas pura agordo-ŝanĝo.)
 2. Kie ruli la servon — sur la sama servilo kiel la estonta podkasta
    arkivo (`server/`), aŭ kiel simpla cron-skripto + statikaj dosieroj?
-3. Ĉu enkonduki parsregulon 6.8 (CRI-API-parsilo en la apo) kiel
-   Android-ekskluzivan retroiron se la servo iam mortos?
+3. Kiam la servo ekzistos: ĉu anstataŭigi la rektan Android-vojon (regulo
+   6.8) per la serva RSS (regulo 6.1) por elŝutoj sur Android, aŭ
+   konservi ambaŭ (rekta vojo kiel retroiro)?
+
+## 8. Realigita stato (2026-09-25)
+
+- **Regulo 6.8** (`CriParsilo`) realigita kaj testita per oraj fiksaĵoj
+  el realaj API-respondoj (`CriParsiloTesto`, `cri_aktualajo.json`).
+- **La kanalo estas en `esperantoradio_kanaloj_v9.json`** kun
+  `"videblaNurSur": "android"` kaj tri sekcioj — sur Android ĝi
+  aperas en la kanalaro kaj la elsendoj ŝargeblas kaj ludeblas.
+- `KanaloDeponejoImpl` filtras platform-limigitajn kanalojn for
+  (`nunaPlatformo` — expect/actual por Android/Desktop/Web/iOS).
+- `media3-exoplayer-hls` aldonita — sen ĝi ankaŭ la Muzaiko-rekta
+  fluo estis rompita (`ClassNotFoundException` por `HlsMediaSource$Factory`).
+- La elŝut-butono estas kaŝita por HLS-fluoj.
+- `CriPerantoRssTesto` + `CriTranskodaDemo` pruntas la estontan
+  servan vojon (RSS + MP3).

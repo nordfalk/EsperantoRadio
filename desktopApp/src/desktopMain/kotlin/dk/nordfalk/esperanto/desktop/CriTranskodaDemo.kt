@@ -51,6 +51,7 @@ private val RETUMILA_IDENTIGO = "EsperantoRadio/CriTranskodaDemo (podkasta peran
 /** Artikolkarto el sekcipaĝo, kun sono. */
 private data class CriKarto(
     val id: String,
+    val sekcio: String,
     val link: String,
     val titolo: String,
     val brief: String,
@@ -79,12 +80,16 @@ fun main(args: Array<String>) {
     // 1. Kolektu la kartojn el la sekcioj
     val kartoj = mutableMapOf<String, CriKarto>() // id → karto (dedupe)
     for (sekcio in CRI_SEKCIOJ) {
-        print("Demandas $sekcio ... ")
+        val etikedo = sekcioEtikedo(sekcio)
+        print("Demandas [$etikedo] $sekcio ... ")
         try {
             val json = httpPostJson(CRI_API, "{\"id\":\"$sekcio\"}")
-            val trovitaj = kolektuKartojnKunSono(json)
+            val trovitaj = kolektuKartojnKunSono(json, etikedo)
             println("${trovitaj.size} kun sono")
-            for (k in trovitaj) kartoj[k.id] = k
+            // Dedupe: artikolo povas aperi en pluraj sekcioj — gardu la unuan
+            // (ekz. ĉiutagaj novaĵoj aperas kaj en aktualajo kaj en LuciaStudio;
+            // la etikedo de la unua sekcio estas la plej ĝusta)
+            for (k in trovitaj) if (k.id !in kartoj) kartoj[k.id] = k
         } catch (e: Exception) {
             println("ERARO: ${e.message} — daŭrigas sen tiu sekcio")
         }
@@ -98,7 +103,7 @@ fun main(args: Array<String>) {
     sonujo.mkdirs()
     val elsendoj = mutableListOf<CriElsendo>()
     for ((i, karto) in elektitaj.withIndex()) {
-        print("[${i + 1}/${elektitaj.size}] ${karto.titolo.take(50)} ... ")
+        print("[${i + 1}/${elektitaj.size}] ${karto.sekcio}: ${karto.titolo.take(46)} ... ")
         val mp3 = File(sonujo, "${karto.id}.mp3")
         try {
             if (!mp3.exists()) {
@@ -125,7 +130,8 @@ fun main(args: Array<String>) {
     println("\n=== Resumo de la datumoj ===")
     for (e in elsendoj) {
         println(
-            "  ${e.karto.link.takeLast(24).padEnd(24)} " +
+            "  ${e.karto.sekcio.padEnd(12)} " +
+                "${e.karto.link.takeLast(24).padEnd(24)} " +
                 "${e.karto.titolo.take(45).padEnd(45)} " +
                 "${formatuDaton(e.karto.publishedMs)} " +
                 "${(e.dauroSekundoj ?: 0).toString().padStart(4)} s " +
@@ -145,7 +151,7 @@ fun main(args: Array<String>) {
  * Rekurzive trairas la paĝ-JSON-on kaj redonas ĉiujn `card`-objektojn kiuj
  * reprezentas artikolon kun sono: isPlay=1 kaj ligilo al artikolo (/202jaro/...).
  */
-private fun kolektuKartojnKunSono(jsonTeksto: String): List<CriKarto> {
+private fun kolektuKartojnKunSono(jsonTeksto: String, sekcioEtikedo: String): List<CriKarto> {
     val radiko = Json.parseToJsonElement(jsonTeksto).jsonObject
     val kartoj = mutableListOf<JsonObject>()
     fun trairi(elemento: JsonElement) {
@@ -169,6 +175,7 @@ private fun kolektuKartojnKunSono(jsonTeksto: String): List<CriKarto> {
         val video = (karto["video"] as? JsonObject)
         CriKarto(
             id = karto["id"]?.jsonPrimitive?.content ?: link.substringAfterLast('/'),
+            sekcio = sekcioEtikedo,
             link = link,
             titolo = karto["title"]?.jsonPrimitive?.content?.trim().orEmpty(),
             brief = karto["brief"]?.jsonPrimitive?.content?.trim().orEmpty(),
@@ -326,6 +333,20 @@ $eroj
 }
 
 // === Helpiloj ===
+
+/**
+ * Mallonga etikedo por sekci-paĝo — montras en la konzola eligo de kiu
+ * paĝo ĉiu elsendo venas (ekz. "Aktuala", "LuciaStudio", "E-klubo").
+ */
+private fun sekcioEtikedo(sekcioUrl: String): String {
+    val vojo = sekcioUrl.substringBefore("/page.shtml").substringAfterLast('/')
+    return when (vojo.lowercase()) {
+        "aktualajo" -> "Aktuala"
+        "luciastudio" -> "LuciaStudio"
+        "eklubo" -> "E-klubo"
+        else -> vojo.ifEmpty { sekcioUrl }
+    }
+}
 
 /** HTTP POST kun JSON-korpo (tiel funkcias la CRI-API). */
 private fun httpPostJson(url: String, korpo: String): String {

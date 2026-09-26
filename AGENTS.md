@@ -55,7 +55,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 - **radioTxtKomparilo**: ilo por kompari kanalkonfiguron kun esperanto-radio.com/radio.txt (PR https://github.com/nordfalk/EsperantoRadio/pull/62) — identigas mankantajn kanalojn kaj elsendojn
 - **criTranskodaDemo**: demonstro de CRI-peranto (HLS→MP3-transkoda servo por esperanto.cri.cn) — `./gradlew :desktopApp:criTranskodaDemo` (bezonas ffmpeg); vidu `docs/nova/07_cri_esperanto_kanalo.md`
-- **CRI-kanalo**: "CRI — Ĉina Radio Internacia" (regulo 6.8: POST al la CRI-API, HLS-ludado per ExoPlayer) — videbla NUR sur Android (`videblaNurSur`); la aliaj platformoj ĝin kaŝas ĝis ekzistas transkoda servo; elŝutoj ne eblas por HLS (butono kaŝita); la elsendoj estas videoj kaj la filmotrako montriĝas en ElsendoEkrano (`VideoVido` + `VideoLudiloPonto`); 10 sekcioj → 129 unikaj elsendoj kun sekci-etikedo en la titolo ("Aktuala: …", "LuciaStudio: …") kaj per-elsenda bildo el `photo.thurm`
+- **CRI-kanalo**: "CRI — Ĉina Radio Internacia" (regulo 6.8: POST al la CRI-API, HLS-ludado per ExoPlayer) — videbla NUR sur Android (`videblaNurSur`); la aliaj platformoj ĝin kaŝas ĝis ekzistas transkoda servo; elŝutoj ne eblas por HLS (butono kaŝita); la elsendoj estas videoj kaj la filmotrako montriĝas en ElsendoEkrano (`VideoVido` + `VideoLudiloPonto`); 10 sekcioj → 129 unikaj elsendoj kun sekci-etikedo; klako sur la filmo malfermas plenekranan vidon (`PlenekranaVido`) en la titolo ("Aktuala: …", "LuciaStudio: …") kaj per-elsenda bildo el `photo.thurm`
 
 ### Kio NE funkcias ankoraŭ
 

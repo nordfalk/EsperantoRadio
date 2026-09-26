@@ -231,6 +231,15 @@ La generita RSS estas kovrita de ora testo
   la sekci-URL estas konservata en la kaŝmemoro kun la respondo
   (`"<URL>\n<JSON>"` po peco). shanny (angla) kaj pliajlingvoj (aliaj
   lingvoj) estas konscie preterlasitaj.
+- **Plenekrana filmo (2026-09-26)**: klako sur la filmeto en
+  `ElsendoEkrano` malfermas plenekranan vidon (`PlenekranaVido`-stato +
+  kovrilo en `App.kt`, kiu kovras ankaŭ la mini-ludilon kaj la navigan
+  breton; klako sur la filmo aŭ la ✕-butono fermas). La sama ludilo kaj
+  pozicio daŭras. La `PlayerView` uzas TextureView
+  (`res/layout/videovido.xml`, `surface_type="texture_view"`) — la bildo
+  tiam iras tra la normala vido-hierarkio kaj pluvivas surfac-ŝanĝojn,
+  kio kun SurfaceView ne bildiĝis fidinde (aparte en Dialog-fenestroj kaj
+  sur emuliloj).
 - **Per-elsendaj bildoj**: `photo.large` preskaŭ ĉiam malplenas, sed
   `photo.thurm` estas la artikolo-miniaturo — nun `bildoUrl` uzas ĝin
   (kun la kanal-emblemo kiel retroiro), do ĉiu elsendo havas sian propran

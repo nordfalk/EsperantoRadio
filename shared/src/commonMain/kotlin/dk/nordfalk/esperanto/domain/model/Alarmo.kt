@@ -1,5 +1,10 @@
 package dk.nordfalk.esperanto.domain.model
 
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.plus
 import kotlinx.serialization.Serializable
 
 /**
@@ -38,4 +43,23 @@ data class Alarmo(
     }
 
     val tempoTeksto: String get() = "${horo.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}"
+}
+
+/**
+ * Kalkulas la sekvan lokan tempon (post [nun]) kiam la alarmo ekigu.
+ * - ripeto == 0 (unufoje): hodiaŭ se la tempo ankoraŭ ne pasis, alie morgaŭ.
+ * - ripeto != 0: la unua tago (hodiaŭ inkluzive) kies bito estas en la bitmasko
+ *   (0x01=lundo ... 0x40=dimanĉo) kaj kies tempo estas post [nun].
+ */
+fun Alarmo.sekvaEkigo(nun: LocalDateTime): LocalDateTime {
+    val tempo = LocalTime(horo, minuto)
+    for (i in 0..7) {
+        val tago = nun.date.plus(i, DateTimeUnit.DAY)
+        val kandidato = LocalDateTime(tago, tempo)
+        if (kandidato <= nun) continue
+        val bito = 1 shl (tago.dayOfWeek.isoDayNumber - 1)
+        if (ripeto == 0 || ripeto and bito != 0) return kandidato
+    }
+    // Ne atingebla por valida bitmasko (0x01..0x7f); sekurece: morgaŭ
+    return LocalDateTime(nun.date.plus(1, DateTimeUnit.DAY), tempo)
 }

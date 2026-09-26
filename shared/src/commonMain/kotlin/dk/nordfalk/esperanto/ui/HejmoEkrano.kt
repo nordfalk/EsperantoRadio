@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -137,9 +138,10 @@ class HejmoViewModel(
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
-    suspend fun sxargxi() {
+    /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
+    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
         val kanaloj = kanaloDeponejo.getKanalojn()
-        logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj")
+        logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         val kashitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKashitajnElsendojn(kanaloj) ?: emptyList()
@@ -154,7 +156,7 @@ class HejmoViewModel(
             val ĉiujElsendoj = coroutineScope {
                 kanaloj
                     .filter { it.havasPodkastojn }
-                    .map { kanalo -> async { elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo) } }
+                    .map { kanalo -> async { elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo, fortoRefresigi) } }
                     .awaitAll()
                     .flatten()
             }
@@ -279,10 +281,6 @@ fun HejmoEkrano(
             TopAppBar(
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
-                    if (sxargxas && novajElsendoj.isNotEmpty()) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                        Spacer(Modifier.width(8.dp))
-                    }
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
@@ -300,9 +298,13 @@ fun HejmoEkrano(
                     Text("Ŝarĝas elsendojn...", modifier = Modifier.padding(8.dp))
                 }
             }
-        } else {
+        } else PullToRefreshBox(
+            isRefreshing = sxargxas,
+            onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); scope.launch { vm.sxargxi(fortoRefresigi = true) } },
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 

@@ -42,11 +42,11 @@ val radioTxtKomparilo by tasks.registering(JavaExec::class) {
 
 // Demonstra programo por la estonta CRI-peranto (transkoda servo).
 // Elŝutas kaj transkodas la 20 plej novajn CRI-Esperanto-elsendojn al MP3 kaj
-// generas RSS-fluon. Vidu docs/nova/07_cri_esperanto_kanalo.md.
+// generas RSS-fluon. Vidu docs/nova/08_cri_esperanto_kanalo.md.
 // Rulu per: ./gradlew :desktopApp:criTranskodaDemo   (bezonas ffmpeg en $PATH)
 val criTranskodaDemo by tasks.registering(JavaExec::class) {
     group = "verification"
-    description = "Demonstras CRI-HLS→MP3-transkodadon kaj RSS-generadon (vidu docs/nova/07)"
+    description = "Demonstras CRI-HLS→MP3-transkodadon kaj RSS-generadon (vidu docs/nova/08_cri)"
     classpath = kotlin.targets.getByName("desktop").compilations.getByName("main").output.allOutputs
     classpath += configurations.getByName("desktopRuntimeClasspath")
     mainClass.set("dk.nordfalk.esperanto.desktop.CriTranskodaDemoKt")

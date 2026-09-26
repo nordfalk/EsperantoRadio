@@ -22,7 +22,7 @@ import kotlin.time.Instant
  * CRI ne havas RSS-n; la elsendoj venas per POST al la nedokumentita API
  * `POST /api/getData` kun korpo `{"id": "<sekcio-URL>"}`. La respondo estas
  * JSON kun `result.modules[].cardgroups[].cards[].card{...}`; `isPlay:"1"`
- * markas artikolojn kun sono. Vidu docs/nova/07_cri_esperanto_kanalo.md.
+ * markas artikolojn kun sono. Vidu docs/nova/08_cri_esperanto_kanalo.md.
  *
  * La sono estas HLS-video (m3u8) — ĝin povas ludi nur ExoPlayer (Android);
  * tial la kanalo havas `videblaNurSur: "android"` en la konfiguro.

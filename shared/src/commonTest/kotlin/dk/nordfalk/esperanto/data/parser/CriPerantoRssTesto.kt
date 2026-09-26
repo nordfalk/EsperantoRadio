@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 
 /**
  * Ortesto por la CRI-peranto: la RSS kiun la estonta transkoda servo
- * generos (vidu docs/nova/07_cri_esperanto_kanalo.md kaj
+ * generos (vidu docs/nova/08_cri_esperanto_kanalo.md kaj
  * desktopApp/…/CriTranskodaDemo.kt) devas esti konsumebla de la apo per
  * la ĝenerala parsregulo 6.1 — sen aparta CRI-parsilo.
  *

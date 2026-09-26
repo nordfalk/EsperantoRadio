@@ -7,61 +7,63 @@
 ## Kerno-principo: dateno-movita, ne malmola
 
 La malnova apo malmole kodas per-kanalajn branĉojn (`if slug == "varsoviavento"`).
-La nova apo devas fari tion **dateno-movite** kie eble:
+La nova apo **ankaŭ** uzas malmolan `when (kanalo.slug)` por la parsbranĉo —
+tio estis simpligita el la originala plano kiu havis `parsStrategio`-kampon.
+La kampo ne estis aldonita al la `Kanalo`-modelo; la enkursigo restas slug-bazita.
 
-- La **parsbranĉo** (ĝenerala / VarsoviaVento / Peranto) estas elektata laŭ
-  agorda kampo `parsStrategio` po kanal.
-- La **purig-modeloj** (regulo 6.6) estas en `puriguModeloj: List<String>`.
-- La **iframe-gastigant-reguloj** (regulo 6.3) estas en `iframeReguloj: Map<String, IframeRegulo>`.
-- La **kernpunkto-https-korekto** estas agorda flago `forceHttps: Boolean`.
+Tamen, iuj aferoj restas dateno-movitaj:
+- La **kernpunkto-https-korekto** estas endosita en la ĝenerala parsilo (ĉiam `https://`).
+- La **salto-listo** de neeltireblaj gastigantoj (youtube/soundcloud/vimeo/...) estas konstanto en la parsilo.
+- Kelkaj aferoj restas kodigitaj (saltoj de konataj malplenaj datoj en Peranto,
+  `orkestro_sklavidojj`-korekto) ĉar ili estas tro specifaj. Documentu ilin.
 
-Tamen kelkaj aferoj restas kodigitaj (saltoj de konataj malplenaj datoj en
-Peranto, `orkestro_sklavidojj`-korekto) ĉar ili estas tro specifaj. Documentu ilin.
-
-## La parsilo (`shared/data/parser/ElsendoParsilo.kt`)
+## La parsilo (`shared/data/parser/RssParsilo.kt`)
 
 ```kotlin
-class ElsendoParsilo(
-    val radioTxtParsilo: RadioTxtParsilo,
-    val htmlPurigilo: HtmlPurigilo,
-    val httpKliento: HttpClient,   // por archive.org-embed-skrapado
-) {
-    suspend fun parsRss(fluoTeksto: String, kanal: Kanal): List<Elsendo> {
-        val deArkivo = kanal.podkastaRssUrl?.contains("podkasta_arkivo") == true
-        return when {
-            deArkivo -> parsGenerel(fluoTeksto, kanal)   // jam normigita
-            kanal.parsStrategio == "varsoviavento" -> parsVarsoviaVento(fluoTeksto, kanal)
-            kanal.parsStrategio == "peranto" -> parsPeranto(fluoTeksto, kanal)
-            else -> parsGenerel(fluoTeksto, kanal)
+class RssParsilo {
+    fun parsuRss(
+        fluoTeksto: String,
+        kanalo: Kanalo,
+        httpKliento: suspend (String) -> String = { "" }  // por archive.org-embed-skrapado
+    ): List<Elsendo> {
+        val doc = Ksoup.parseXml(fluoTeksto, "")
+        val deArkivo = kanalo.podkastaRssUrl?.contains("podkasta_arkivo") == true
+        return if (deArkivo) {
+            parsuGxenerala(doc, kanalo)   // jam normigita
+        } else when (kanalo.slug) {
+            "varsoviavento" -> parsuVarsoviaVento(doc, kanalo)
+            "peranto" -> parsuPeranto(doc, kanalo, httpKliento)
+            "vinilkosmo" -> parsuVinilkosmo(doc, kanalo)
+            else -> parsuGxenerala(doc, kanalo)
         }
     }
 }
 ```
 
-`parsStrategio` estas nova agorda kampo (apud la ekzistantaj `kodo`/`nomo`/...)
-en la kanal-konfiguro. La malnova apo derivas ĝin el la slug; la nova apo
-eksplicitigas ĝin.
+La enkursigo estas slug-bazita (`when (kanalo.slug)`), ne dateno-movita.
+La `httpKliento`-parametro (defaŭlta `{ "" }` = no-op) estas necesa nur por la
+Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝin.
 
 ## La regoloj — kiel reprodukti (6.1–6.7 el la malnova apo, 6.8 nova)
 
-### Regulo 6.1 — Ĝenerala (`parsGenerel`)
+### Regulo 6.1 — Ĝenerala (`parsuGxenerala`)
 
 Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
-1. `id = entry.uri` aŭ `<kanal.slug>:<dato>`.
+1. `id = entry.uri` aŭ `<kanalo.slug>:<dato>`.
 2. Legu iTunes-modulon: `summary`, `duration`, `image`.
 3. `priskribo` = `<description>` aŭ iTunes-`summary`; se `<content:encoded>` ĉeestas, uzu ĝin.
-4. `stream` = `<enclosure type="audio/*" url>`. Se neniu: parsu priskribo-HTML, prenu `<audio><source src>`. Se ankoraŭ neniu → **forĵetu**.
-5. `dauro` el iTunes; `bildUrl` el iTunes-bildo.
-6. Se `kanal.forceHttps` kaj `stream` komenciĝas per `http://` → `https://`.
-7. Se `kanal.ignoruTitolon` → derivu titolon el priskribo (regulo 6.5).
+4. `fluo` = `<enclosure type="audio/*" url>`. Se neniu: parsu priskribo-HTML, prenu `<audio><source src>`. Se ankoraŭ neniu → **forĵetu**.
+5. `dauro` el iTunes; `bildoUrl` el iTunes-bildo.
+6. Se `fluo` komenciĝas per `http://` → `https://` (ĉiam https-korekto).
+7. Se `kanalo.ignoruTitolon` → derivu titolon el priskribo (regulo 6.5).
 
-### Regulo 6.2 — Varsovia Vento (`parsVarsoviaVento`)
+### Regulo 6.2 — Varsovia Vento (`parsuVarsoviaVento`)
 
 1. Purigu enhavo-HTML per `kanal.puriguModeloj` (regulo 6.6).
 2. Por **ĉiu** `<audio>`-elemento: prenu `<source src>`, faru po unu elsendo.
 3. `titolo = entry.titolo + " " + partnum + "a parto"`, `id = <slug>:<dato>:<partnum>`.
 
-### Regulo 6.3 — Peranto (`parsPeranto`)
+### Regulo 6.3 — Peranto (`parsuPeranto`)
 
 1. Saltu konatajn malplenajn datojn (konstanta aro: `2019-11-08`, `2019-09-29`).
 2. Eltiru `bildUrl` el unua `<img>`; forigu `<img>`, `<iframe>`, `<div class="separator">`.
@@ -72,7 +74,7 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
    - Neniu iframe → saltu.
 4. `id = peranto:<dato>` (aŭ `entry.uri` se ĉeestas).
 
-### Regulo 6.4 — Vinilkosmo (`parsVinilkosmo`)
+### Regulo 6.4 — Vinilkosmo (`parsuVinilkosmo`)
 
 Pura Atom-parsado. `<link rel="enclosure" type="audio/mpeg">` → stream;
 `<link type="image/jpeg">` → bildo; `<link type="text/html">` → ligo;
@@ -100,34 +102,40 @@ URL (`rss_nextLink`). Uzata de la arkiva servilo por marŝi malantaŭen.
 Ne temas pri RSS: CRI (esperanto.cri.cn) havas neniun fluon; la elsendoj venas
 per `POST https://esperanto.cri.cn/api/getData` kun korpo `{"id": "<sekci-URL>"}`
 (la sekci-URL-oj staras en la kanalkonfiguro kiel `elsendojApiSekcioj`).
-Vidu [07_cri_esperanto_kanalo.md](./07_cri_esperanto_kanalo.md).
+Vidu [08_cri_esperanto_kanalo.md](./08_cri_esperanto_kanalo.md).
 
 1. Rekurzive kolektu ĉiujn `card`-objektojn el la paĝa JSON-arbo.
 2. Ludebla karto: `isPlay == "1"` kaj `link` kongruas al `/20\d\d/\d\d/\d\d/`.
 3. `fluo` = `card.video.url` (m3u8-HLS aŭ mp4) — sen ĝi forĵetu la karton.
 4. `dato` el `card.date` (epoko-ms, UTC); `dauro` el `video.duration` (> 0).
 5. `id = "<slug>:<dato>:<artikol-id>"`, `priskribo` el `brief`, bildo el
-   `photo.large` (alie la kanal-emblemo).
-6. Dedupu laŭ id, ordigu de la plej nova; sekcia eraro ne haltigu la ceterajn
+   `photo.large`/`photo.thurm` (alie la kanal-emblemo).
+6. Dedupu laŭ id (gardu la unuan — la sekci-etikedo de la unua paĝo estas la
+   plej ĝusta); ordigu de la plej nova; sekcia eraro ne haltigu la ceterajn
    (regulo 4).
 
 La HLS-fluon povas ludi nur ExoPlayer (Android) — tial la kanalo portas
 `"videblaNurSur": "android"` kaj `KanaloDeponejoImpl` kaŝas ĝin sur
 Desktop/Web/iOS. La elŝut-butono estas kaŝita por `.m3u8`-fluoj.
 
-## radio.txt-parsilo (`RadioTxtParsilo`)
+## radio.txt-parsilo
 
+> **Ne implementita kiel aparta klaso.** La `RadioTxtParsilo` priskribita en la
+> originala plano ne ekzistas en la kodo. La radio.txt-datumoj estas difinitaj en
+> la kanalkonfiguro (`esperantoradio_kanaloj_v9.json`), ne parsataj dise.
+>
+> Ekzistas tamen `RadioTxtKomparilo` (en `desktopApp/`) kiu komparas la kanalkonfiguron
+> kun la reala `esperanto-radio.com/radio.txt` por identigi mankantajn kanalojn
+> kaj elsendojn. Rulu per `./gradlew :desktopApp:radioTxtKomparilo`.
+
+La radio.txt-formato (por referenco):
 ```kotlin
-class RadioTxtParsilo {
-    fun parsRadioTxt(teksto: String, ekzistantajKanaloj: Map<String, Kanal>): Pair<List<Kanal>, Map<String, List<Elsendo>>> {
-        // Eroj apartigitaj per malplena linio. Unua ero = kapo (ignorita).
-        // Ĉiu sekva ero = 4 linioj: kanalnomo / dato / mp3-url / priskribo.
-        // nomo→slug: forigu spacojn, minuskligu, ĉ→cx. Speciala: movadavidpunkto→movada-vidpunkto.
-        // "Esperanta Retradio" kongruas kun slug "peranto".
-        // Nekonata nomo → kreu novan kanalon dinamike (datumFonto="radio.txt").
-        // Antaŭeco: se kanal jam havas datumFonto="rss", ignoru radio.txt-elsendojn por ĝi.
-    }
-}
+// Eroj apartigitaj per malplena linio. Unua ero = kapo (ignorita).
+// Ĉiu sekva ero = 4 linioj: kanalnomo / dato / mp3-url / priskribo.
+// nomo→slug: forigu spacojn, minuskligu, ĉ→cx. Speciala: movadavidpunkto→movada-vidpunkto.
+// "Esperanta Retradio" kongruas kun slug "peranto".
+// Nekonata nomo → kreu novan kanalon dinamike (datumFonto="radio.txt").
+// Antaŭeco: se kanal jam havas datumFonto="rss", ignoru radio.txt-elsendojn por ĝi.
 ```
 
 ## Id-konvencioj (devas esti precize reproduktitaj)
@@ -182,7 +190,8 @@ Nova parsilo estas "ĝusta" kiam por ĉiu fiksaĵo ĝi produktas:
 
 ## Kion NE fari
 
-- Ne malmole kodu `if slug == "kernpunkto"` en la nova kodo — uzu `forceHttps`-flagon.
+- Ne malmole kodu `if slug == "kernpunkto"` en nova kodo ekster la parsilo —
+  la https-korekto estas jam endosita en la ĝenerala parsilo.
 - Ne dependu de reto en testoj.
 - Ne lasu unu kanal-eraro haltigi la parsadon de aliaj.
 - Ne forĵetu la konatajn saltojn (malplenaj datoj, neeltireblaj gastigantoj) — ili estas intencitaj.

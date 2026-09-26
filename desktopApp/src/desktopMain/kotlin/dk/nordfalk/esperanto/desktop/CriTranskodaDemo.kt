@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Demonstra programo por la estonta CRI-peranto (transkoda servo).
- * Vidu docs/nova/07_cri_esperanto_kanalo.md.
+ * Vidu docs/nova/08_cri_esperanto_kanalo.md.
  *
  * La programo montras la tutan servan logikon en unu rulado:
  *

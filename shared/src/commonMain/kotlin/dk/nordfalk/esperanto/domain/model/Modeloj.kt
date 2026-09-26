@@ -81,7 +81,12 @@ sealed interface LudantoStato {
     data object Konektas : LudantoStato
     data object Ludas : LudantoStato
     data object Finita : LudantoStato
-    data class Eraro(val mesagho: String) : LudantoStato
+    /**
+     * @param reprovebla true se la eraro eble estas pasema (reto perdiĝis, tempolimo) kaj
+     *   [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] reprovu; false por daŭraj eraroj
+     *   (HTTP 404, nesubtenata formato) — tiam tuj saltu al la sekva.
+     */
+    data class Eraro(val mesagho: String, val reprovebla: Boolean = true) : LudantoStato
 }
 
 data class LudantoInformo(

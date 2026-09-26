@@ -22,7 +22,11 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -32,6 +36,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 class MainActivity : ComponentActivity() {
     private lateinit var ludilo: ExoPlayerLudiloRegilo
@@ -45,7 +51,8 @@ class MainActivity : ComponentActivity() {
         // Por la plenekrana filmo: ŝanĝi la orientiĝon bezonas Activity-referencon
         AktivecoPonto.aktiveco = this
         petiSciigPermeson()
-        ludilo = ExoPlayerLudiloRegilo(this)
+        // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity
+        ludilo = ExoPlayerLudiloRegilo.akiru(this)
         setContent {
             EsperantoRadioApp(ludilo = ludilo)
         }
@@ -148,20 +155,22 @@ class MainActivity : ComponentActivity() {
 
                 logi("MainActivity", "Komencas ludi: ${kanalo.nomo}")
 
-                // Se rekta kanalo: ludi rekte
-                // Se podkasto: bezonas RSS-fluon — tro komplika cxi tie, ludi rekte se eblas
-                val fonto = if (kanalo.rektaElsendaSonoUrl != null) {
-                    Sonfonto.RektaKanalo(kanalo)
+                if (kanalo.rektaElsendaSonoUrl != null) {
+                    ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
+                    ludilo.ludi()
                 } else {
-                    // Por podkastoj: bezonas elsendon, sed ni ne sxargxis RSS fluon.
-                    // Fallback al ringtono por nun.
-                    logw("MainActivity", "Kanalo $kanaloSlug ne estas rekta — ne eblas auxtomate ludi podkaston")
-                    luduFallbackRingtonon()
-                    return@launch
+                    // Podkasto: ludu la plej freŝan neaŭskultitan elsendon
+                    val elsendo = trovuAlarmElsendon(kanalo)
+                    val ludvicoRegilo = AppStato.ludvicoRegilo
+                    if (elsendo == null || ludvicoRegilo == null) {
+                        logw("MainActivity", "Neniu ludebla elsendo por $kanaloSlug — ludas fallback ringtonon")
+                        luduFallbackRingtonon()
+                        return@launch
+                    }
+                    logi("MainActivity", "Alarmo ludas podkaston: ${elsendo.id} (${elsendo.dato})")
+                    // ludiElsendon preferas elŝutitan dosieron kaj resumas de savita pozicio
+                    ludvicoRegilo.ludiElsendon(elsendo)
                 }
-
-                ludilo.fiksiFonton(fonto)
-                ludilo.ludi()
 
                 // Post 10 sekundoj: se la stato estas Eraro, ludu fallback ringtonon
                 delay(10_000)
@@ -175,6 +184,29 @@ class MainActivity : ComponentActivity() {
                 luduFallbackRingtonon()
             }
         }
+    }
+
+    /**
+     * Trovas la elsendon kiun alarmo ludu por podkasta kanalo. Provas laŭvice:
+     * reton (freŝa RSS), diskkaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
+     * la reto ofte ankoraŭ ne pretas.
+     */
+    private suspend fun trovuAlarmElsendon(kanalo: Kanalo): Elsendo? = withContext(Dispatchers.IO) {
+        // AppStato estas inicialigita de la Compose-tavolo; atendu ĝin se la alarmo lanĉis la apon
+        withTimeoutOrNull(5_000) { while (!AppStato.inicialigita()) delay(100) }
+        val elsendoDeponejo = AppStato.elsendoDeponejo ?: run {
+            logw("MainActivity", "AppStato ne inicialigita — ne eblas trovi elsendon por alarmo")
+            return@withContext null
+        }
+        val elsendoj = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi = true)
+            .ifEmpty { elsendoDeponejo.leguKashitajnElsendojn(kanalo) ?: emptyList() }
+            .ifEmpty {
+                AppStato.elshutDeponejo?.observiElshutojn()?.value?.values
+                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElshutStato.Preta }
+                    ?.map { it.elsendo } ?: emptyList()
+            }
+        val ludatoj = AppStato.ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        elektuAlarmElsendon(elsendoj, ludatoj)
     }
 
     /**
@@ -205,8 +237,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // NUR malkonektas la MediaController — la servo pluvivas kaj daŭre ludas en la fono
-        ludilo.release()
+        // La ludilo (kaj ĝia MediaController) NE estas liberigita — ĝi estas procez-nivela kaj
+        // uzata de AppStato.ludvicoRegilo kaj de la sekva Activity-instanco.
     }
 
     /**

@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.android
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.core.content.ContextCompat
@@ -15,7 +16,10 @@ import androidx.media3.session.SessionToken
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.repository.LudiElsendoReceivilo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -33,8 +37,27 @@ import kotlinx.coroutines.flow.asStateFlow
  * Tiu ĉi klaso estas maldika prokso: ĝi konektiĝas al la servo per
  * MediaController kaj plusendas komandojn. Tiel la ludado daŭras en la fono
  * eĉ kiam la Activity detruiĝas.
+ *
+ * Estas **unu instanco por la tuta procezo** ([akiru]) — ne po Activity. [AppStato] kaj
+ * [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] tenas referencon dum la tuta procezo;
+ * se ĉiu Activity kreus propran instancon (kaj liberigus ĝin en onDestroy), post rekreo la
+ * LudvicoRegilo sendus komandojn al malkonektita MediaController kaj la UI observus instancon
+ * kiu ne scias kion la servo ludas.
+ *
+ * La nuna [Sonfonto] vojaĝas kun la MediaItem (en `MediaMetadata.extras`, vidu [SonfontoKodilo]),
+ * do ĉi tiu klaso rekonas ludadon komencitan de alia MediaController (ekz. [LudiElsendoReceivilo]).
  */
-class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
+class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo {
+
+    companion object {
+        @Volatile private var instanco: ExoPlayerLudiloRegilo? = null
+
+        /** La procez-nivela instanco — kreita ĉe la unua voko. */
+        fun akiru(context: Context): ExoPlayerLudiloRegilo =
+            instanco ?: synchronized(this) {
+                instanco ?: ExoPlayerLudiloRegilo(context.applicationContext).also { instanco = it }
+            }
+    }
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
 
@@ -57,7 +80,20 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
             if (error != null) loge("Ludilo", "Ludanta eraro", error)
             updateState()
         }
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            // Alia MediaController (ekz. la sciigo "Ludi") eble ŝanĝis la ludatan aĵon
+            val fonto = fontoDe(mediaItem)
+            if (fonto != null && fonto != nunaFonto) {
+                logi("Ludilo", "Ludata aĵo ŝanĝiĝis ekstere — nun: ${fonto::class.simpleName}")
+                nunaFonto = fonto
+            }
+            updateState()
+        }
     }
+
+    /** Legas la Sonfonton el la ekstraĵoj de MediaItem (null se mankas — ekz. malnova aĵo). */
+    private fun fontoDe(mediaItem: MediaItem?): Sonfonto? =
+        SonfontoKodilo.malkodigu(mediaItem?.mediaMetadata?.extras?.getString(SonfontoKodilo.SXLOSILO))
 
     init {
         controllerFuture.addListener({
@@ -65,6 +101,11 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
                 val c = controllerFuture.get()
                 controller = c
                 c.addListener(listener)
+                // La servo eble jam ludas (ekz. komencita de la sciigo) — rekonu kion
+                if (nunaFonto == null) {
+                    nunaFonto = fontoDe(c.currentMediaItem)
+                    nunaFonto?.let { logi("Ludilo", "Servo jam ludas: ${it::class.simpleName}") }
+                }
                 updateState()
                 konektita.complete(Unit)
                 logi("Ludilo", "MediaController konektita al servo")
@@ -86,6 +127,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
      */
     private fun getMediaMetadata(fonto: Sonfonto): MediaMetadata {
         val builder = MediaMetadata.Builder()
+            .setExtras(Bundle().apply { putString(SonfontoKodilo.SXLOSILO, SonfontoKodilo.kodigu(fonto)) })
         when (fonto) {
             is Sonfonto.RektaKanalo -> {
                 builder.setTitle(fonto.kanalo.nomo)
@@ -112,7 +154,7 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
         // StateFlow estas conflated, do la kolektanto povus maltrafi Eraro se ni ne gardas ĝin ĉi tie.
         val error = c.playerError
         val ludantoStato = if (error != null) {
-            LudantoStato.Eraro(error.message ?: "Nekonata eraro")
+            LudantoStato.Eraro(error.message ?: "Nekonata eraro", reprovebla = estasReprovebla(error.errorCode))
         } else when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita
             Player.STATE_BUFFERING -> LudantoStato.Konektas
@@ -162,20 +204,15 @@ class ExoPlayerLudiloRegilo(context: Context) : LudiloRegilo {
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
     override fun fiksiLauxtecon(volumeno: Float) { cxefaFadeno.post { controller?.volume = volumeno } }
 
-    /**
-     * Malkonektas la MediaController de la servo.
-     * NE haltigas la servon — la servo pluvivas kaj daŭre ludas en la fono.
-     * Vokata en Activity.onDestroy().
-     */
-    fun release() {
-        cxefaFadeno.post {
-            try {
-                controller?.removeListener(listener)
-                MediaController.releaseFuture(controllerFuture)
-            } catch (e: Exception) {
-                logw("Ludilo", "Eraro dum release de MediaController", e)
-            }
-        }
-        controller = null
+    /** Pasemaj eraroj (reto, tempolimo) estas reprovataj; daŭraj (HTTP-stato, formato, malkodilo) ne. */
+    private fun estasReprovebla(kodo: Int): Boolean = when (kodo) {
+        PlaybackException.ERROR_CODE_UNSPECIFIED,
+        PlaybackException.ERROR_CODE_REMOTE_ERROR,
+        PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW,
+        PlaybackException.ERROR_CODE_TIMEOUT,
+        PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> true
+        else -> false
     }
 }

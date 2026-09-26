@@ -27,6 +27,36 @@ val generuApoVersio by tasks.registering {
     }
 }
 
+// Enigas la kanalkonfiguron (JSONC) kiel Kotlin-ĉenon por platformoj kie la resurco ne legeblas
+// sinkrone (wasmJs: nur nesinkrona fetch; iOS: ankoraŭ neniu resurco-mekanismo).
+// La fonto restas la sama dosiero — neniu duobligita konfiguro.
+val generuEnigitanKanalkonfiguron by tasks.registering {
+    val fonto = layout.projectDirectory.file("src/commonMain/resources/esperantoradio_kanaloj_v9.json")
+    val celDosierujo = layout.buildDirectory.dir("generated/sources/kanalkonfiguro/kotlin")
+    inputs.file(fonto)
+    outputs.dir(celDosierujo)
+    doLast {
+        val teksto = fonto.asFile.readText()
+        val eskapita = buildString {
+            for (c in teksto) when (c) {
+                '\\' -> append("\\\\")
+                '"' -> append("\\\"")
+                '$' -> append("\\$")
+                '\n' -> append("\\n")
+                '\r' -> {}
+                else -> append(c)
+            }
+        }
+        val dosiero = celDosierujo.get().file("dk/nordfalk/esperanto/data/config/EnigitaKanalkonfiguro.kt").asFile
+        dosiero.parentFile.mkdirs()
+        dosiero.writeText(
+            "package dk.nordfalk.esperanto.data.config\n\n" +
+            "// GENERITA de la Gradle-tasko generuEnigitanKanalkonfiguron el esperantoradio_kanaloj_v9.json — NE REDAKTU\n" +
+            "internal val ENIGITA_KANALKONFIGURO: String = \"" + eskapita + "\"\n"
+        )
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -75,6 +105,10 @@ kotlin {
             implementation(libs.navigation3.ui)
         }
 
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.compose.ui.test)
@@ -106,6 +140,10 @@ kotlin {
 }
 
 kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(generuApoVersio)
+// iosMain ekzistas nur kiam la iOS-celoj estas agorditaj — do `matching` anstataŭ `getByName`
+kotlin.sourceSets.matching { it.name == "wasmJsMain" || it.name == "iosMain" }.configureEach {
+    kotlin.srcDir(generuEnigitanKanalkonfiguron)
+}
 
 android {
     namespace = "dk.nordfalk.esperanto.shared"

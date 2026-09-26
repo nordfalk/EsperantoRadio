@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.domain.player
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
+import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
@@ -43,7 +44,7 @@ class LudvicoRegiloTest {
 
     /** Kreas la LudvicoRegilo kun memoraj deponejoj. */
     private fun kreuRegilon(
-        ludilo: NoOpLudiloRegilo = NoOpLudiloRegilo(),
+        ludilo: LudiloRegilo = NoOpLudiloRegilo(),
         elsendoj: Map<String, List<Elsendo>> = emptyMap(),
         kanaloj: List<Kanalo> = emptyList(),
         plejŝatataj: Set<String> = emptySet(),
@@ -51,7 +52,8 @@ class LudvicoRegiloTest {
         lokaDosiero: Map<String, String> = emptyMap(),
         auxtomataDaurigo: Boolean = true,
         scope: TestScope,
-    ): Triple<LudvicoRegilo, NoOpLudiloRegilo, LudatojDeponejo> {
+        reprovoAtendo: (Int) -> Long? = { null },
+    ): Triple<LudvicoRegilo, LudiloRegilo, LudatojDeponejo> {
         val regiloScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
         val plejDeponejo = object : PlejŝatatajDeponejo {
             private val _set = MutableStateFlow(plejŝatataj)
@@ -84,6 +86,7 @@ class LudvicoRegiloTest {
             getLokaDosieroVojo = { id -> lokaDosiero[id] },
             auxtomataDaurigo = MutableStateFlow(auxtomataDaurigo),
             scope = regiloScope,
+            reprovoAtendo = reprovoAtendo,
         )
         return Triple(regilo, ludilo, ludatojDeponejo)
     }
@@ -735,5 +738,131 @@ class LudvicoRegiloTest {
 
         // Tio estas eraro 1 post rekomencigxo — devas dauxrigi
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas dauxrigi cxe eraro 1 post rekomencigxo per ludiElsendon")
+    }
+
+    // =========================================================================
+    // Reprovo — pasemaj eraroj (reto) estas reprovataj kun eksponenta atendo
+    // =========================================================================
+
+    /** Ludilo kiu ĉiam malsukcesas sinkrone per pasema eraro (kiel Desktop sen reto). */
+    private class CxiamEraraLudilo : LudiloRegilo {
+        private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
+        override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+        var fiksoj = 0
+        override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
+            fiksoj++
+            _stato.value = LudantoInformo(stato = LudantoStato.Konektas, nunaFonto = fonto, pozicioMs = komencoPozicioMs)
+        }
+        override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Reto mankas", reprovebla = true)) }
+        override fun pauxzigi() {}
+        override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
+        override fun saltiAl(pozicioMs: Long) {}
+        override fun fiksiLauxtecon(volumeno: Float) {}
+    }
+
+    @Test
+    fun reprovo_pasemaEraroReprovasSamanElsendonDePozicio() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, ludatoj) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1, e2)), scope = this, reprovoAtendo = { 0L },
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        ludilo.simuluPozicion(60_000)
+
+        ludilo.simuluEraron("Reto perdiĝis", reprovebla = true)
+
+        // Reprovis e1 (ne saltis al e2), de la sama pozicio
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+        assertEquals("e1", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id)
+        assertEquals(60_000, ludilo.stato.value.pozicioMs)
+        assertEquals(0, regilo.reprovo.value, "Sukcesa reprovo nuligas la nombrilon")
+        assertFalse(ludatoj.getLudato(e1.id)?.erara == true, "Reprovita elsendo ne estu markita erara")
+    }
+
+    @Test
+    fun reprovo_dauxraEraroNeEstasReprovata() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludilo = NoOpLudiloRegilo()
+        var demanditaj = 0
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1, e2)), scope = this,
+            reprovoAtendo = { demanditaj++; 0L },
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+
+        ludilo.simuluEraron("HTTP 404", reprovebla = false)
+
+        assertEquals(0, demanditaj, "404 ne estu reprovata")
+        assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id)
+    }
+
+    @Test
+    fun reprovo_rezignasPostMaksKajSaltasAlSekva() = runTest {
+        val e1 = elsendo("e1")
+        val ludilo = CxiamEraraLudilo()
+        val (regilo, _, ludatoj) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1)), scope = this,
+            reprovoAtendo = { n -> if (n <= 3) 0L else null },
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+
+        // 1 komenca + 3 reprovoj, poste rezigno → markita erara, nenio sekva → haltita
+        assertEquals(4, ludilo.fiksoj)
+        assertEquals(0, regilo.reprovo.value)
+        assertTrue(ludatoj.getLudato(e1.id)?.erara == true, "Post rezigno la elsendo estu markita erara")
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato)
+    }
+
+    @Test
+    fun reprovo_rektaKanaloEstasReprovata() = runTest {
+        val kanalo = Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x/live.m3u8")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, scope = this, reprovoAtendo = { 0L })
+        regilo.komenci()
+        ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
+        ludilo.ludi()
+
+        ludilo.simuluEraron("Reto perdiĝis", reprovebla = true)
+
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+        assertTrue(ludilo.stato.value.nunaFonto is Sonfonto.RektaKanalo)
+    }
+
+    @Test
+    fun reprovo_nuligitaSeUzantoHaltigas() = runTest {
+        val e1 = elsendo("e1")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1)), scope = this,
+            reprovoAtendo = { 50L },
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        ludilo.simuluEraron("Reto perdiĝis", reprovebla = true)
+        assertEquals(1, regilo.reprovo.value, "Reprovo 1 planita")
+
+        ludilo.halti()
+        // Atendu (reala tempo — la regilo uzas propran skopon) ĝis la reprovo estus okazinta
+        kotlinx.coroutines.withContext(Dispatchers.Default) { kotlinx.coroutines.delay(200) }
+
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Reprovo ne rekomencu post halti")
+        assertNull(ludilo.stato.value.nunaFonto)
+    }
+
+    @Test
+    fun reprovoLogiko_eksponentaKunMaksimumo() {
+        assertEquals(1_000, ReprovoLogiko.atendoMs(1))
+        assertEquals(2_000, ReprovoLogiko.atendoMs(2))
+        assertEquals(16_000, ReprovoLogiko.atendoMs(5))
+        assertEquals(30_000, ReprovoLogiko.atendoMs(6))
+        assertEquals(30_000, ReprovoLogiko.atendoMs(ReprovoLogiko.MAKS_PROVOJ))
+        assertNull(ReprovoLogiko.atendoMs(ReprovoLogiko.MAKS_PROVOJ + 1))
+        assertNull(ReprovoLogiko.atendoMs(0))
     }
 }

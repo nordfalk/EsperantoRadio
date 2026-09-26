@@ -78,7 +78,7 @@ class NoOpLudiloRegilo : LudiloRegilo {
      * Simulas ludantan eraron — metas staton al Eraro.
      * Uzata en testoj.
      */
-    fun simuluEraron(mesagho: String = "Testa eraro") {
-        _stato.value = _stato.value.copy(stato = LudantoStato.Eraro(mesagho))
+    fun simuluEraron(mesagho: String = "Testa eraro", reprovebla: Boolean = false) {
+        _stato.value = _stato.value.copy(stato = LudantoStato.Eraro(mesagho, reprovebla))
     }
 }

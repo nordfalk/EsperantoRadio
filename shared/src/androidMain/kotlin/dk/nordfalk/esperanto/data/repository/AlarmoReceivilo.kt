@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
+import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 
@@ -32,6 +35,20 @@ class AlarmoReceivilo : BroadcastReceiver() {
             PowerManager.PARTIAL_WAKE_LOCK,
             WAKELOCK_TAG
         ).apply { acquire(WAKELOCK_TIMEOUT) }
+
+        // Unufoja → malaktivigu; ripetanta → skedu la sekvan okazon. PLI ANTAŬE ol lanĉi la
+        // aktivon: se la alarmo lanĉas freŝan procezon, la skribo al Settings devas okazi antaŭ
+        // ol la startanta AppStato legas la liston (aliaflanke ĝi povus persisti ŝtalan liston).
+        // Se la apo vivas, uzu ĝian deponejon (por ke la UI tuj vidu la ŝanĝon kaj ne poste
+        // superskribu ĝin per malnova listo); alie kreu provizoran deponejon rekte sur Settings.
+        try {
+            appContext = context.applicationContext
+            val deponejo = AppStato.alarmoDeponejo
+                ?: PersistantaAlarmoDeponejo(kreuSettings(), skedilo = AlarmoSkedilo())
+            deponejo.ekigis(alarmoId)
+        } catch (e: Exception) {
+            logw("AlarmoReceivilo", "Eraro ĝisdatigante alarmon $alarmoId post ekigo", e)
+        }
 
         try {
             // Lanĉu la ĉefaktivon por ke la uzanto vidu la apot

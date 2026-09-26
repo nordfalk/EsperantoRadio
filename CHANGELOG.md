@@ -12,7 +12,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 2.0.12f) estas en la git-historio; ĝian finan eldonaĵon markas la etikedo
 [`fresxa_versio`](https://github.com/nordfalk/EsperantoRadio/releases/tag/fresxa_versio).
 
-## [Neeldonita] — iĝos 3.0.1
+## [3.0.1] - 2026-09-26
 
 ### Aldonita
 
@@ -61,5 +61,5 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
-[Neeldonita]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master
+[3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master
 [3.0.0]: https://github.com/nordfalk/EsperantoRadio/compare/fresxa_versio...294834b

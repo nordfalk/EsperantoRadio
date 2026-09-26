@@ -55,7 +55,7 @@ private val CRI_SEKCIOJ = listOf(
     "https://esperanto.cri.cn/LuciaStudio/highlight/page.shtml",
     "https://esperanto.cri.cn/LuciaStudio/OpiniojdeLucia/page.shtml",
 )
-private const val NOMBRO_DA_ELSENDOJ = 20
+private const val NOMBRO_DA_ELSENDOJ = 200
 private val RETUMILA_IDENTIGO = "EsperantoRadio/CriTranskodaDemo (podkasta peranto; GPL)"
 
 /** Artikolkarto el sekcipaĝo, kun sono. */

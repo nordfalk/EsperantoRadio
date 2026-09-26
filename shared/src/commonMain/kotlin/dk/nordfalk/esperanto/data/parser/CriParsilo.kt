@@ -99,6 +99,17 @@ class CriParsilo {
             vojo.startsWith("LuciaStudio/", ignoreCase = true) ||
             vojo.startsWith("luciastudio/", ignoreCase = true)
 
+    /**
+     * Ĉu la kombinita kaŝmemoro uzas la MALNOVAN formaton (pecoj sen
+     * sekci-URL — el la tempo antaŭ la sekci-etikedoj)? Tiajn kaŝmemorojn
+     * la deponejo devas trakti kiel mankantajn, por devigi freŝan retan
+     * alŝuton kun ĝustaj etikedoj.
+     */
+    internal fun estasMalnovaFormato(kombinita: String): Boolean =
+        kombinita.split(SEKCIO_APARTIGILON)
+            .filter { it.isNotBlank() }
+            .any { !it.substringBefore('\n').startsWith("http") }
+
     /** Parsas unu sekci-respondon (JSON) kaj redonas la ludeblajn kartojn. */
     internal fun parsuSekcion(teksto: String, kanalo: Kanalo, sekcioEtikedo: String): List<Elsendo> {
         val radiko = json.parseToJsonElement(teksto).jsonObject

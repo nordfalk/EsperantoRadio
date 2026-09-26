@@ -148,6 +148,17 @@ open class ElsendoDeponejoImpl(
         logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
             val elsendoj = if (!kanalo.elsendojApiSekcioj.isNullOrEmpty()) {
+                // Malnova kaŝmemoro-formato (el la tempo antaŭ la sekci-etikedoj)
+                // havas pecojn sen URL — ĝiaj etikedoj ĉiuj estus "CRI".
+                // Traktu ĝin kiel mankantan, por ke la sekva reta alŝuto
+                // regeneru ĝin kun ĝustaj etikedoj.
+                if (criParsilo.estasMalnovaFormato(respondo)) {
+                    logi(
+                        "ElsendoDeponejo",
+                        "${kanalo.slug}: diskkaŝmemoro en malnova formato (sen sekci-etikedoj) — regeneros per reta alŝuto"
+                    )
+                    return null
+                }
                 criParsilo.parsu(respondo, kanalo)
             } else {
                 parsilo.parsuRss(respondo, kanalo)

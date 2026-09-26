@@ -4,6 +4,7 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -114,5 +115,26 @@ class CriParsiloTesto {
     fun formuDatonKonvertasEpokonAlUtc() {
         assertEquals("2026-09-22", parsilo.formuDaton(1790076173000L))
         assertEquals("1970-01-01", parsilo.formuDaton(0L))
+    }
+
+    @Test
+    fun malnovaKashmemoroFormatoEstasRekonata() {
+        val novaFormato =
+            "https://esperanto.cri.cn/aktualajo/page.shtml\n{\"a\":1}" +
+                CriParsilo.SEKCIO_APARTIGILON +
+                "https://esperanto.cri.cn/LuciaStudio/page.shtml\n{\"a\":2}"
+        assertFalse(parsilo.estasMalnovaFormato(novaFormato), "Nova formato kun URL-oj ne estas malnova")
+
+        // Malnova formato: nura JSON sen sekci-URL (el la tempo antaŭ la etikedoj)
+        assertTrue(parsilo.estasMalnovaFormato(leguFiksaĵon()), "Nura JSON = malnova formato")
+
+        // Miksita (ekz. fiasko meze de ĝisdatigo) ankaŭ estas traktata kiel malnova
+        val miksita =
+            "https://esperanto.cri.cn/aktualajo/page.shtml\n{\"a\":1}" +
+                CriParsilo.SEKCIO_APARTIGILON + "{\"a\":2}"
+        assertTrue(parsilo.estasMalnovaFormato(miksita), "Neniu peco sen URL rajtas resti")
+
+        // Malplena kaŝmemoro ne estu traktata kiel malnova (nur kiel malplena)
+        assertFalse(parsilo.estasMalnovaFormato(""), "Malplena kaŝmemoro ne estas malnova formato")
     }
 }

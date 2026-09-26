@@ -40,10 +40,20 @@ import java.util.concurrent.TimeUnit
  *             defaŭlte: build/cri-demo  kaj  https://ekzemplo.eo/cri
  */
 private const val CRI_API = "https://esperanto.cri.cn/api/getData"
+// Ordo gravas: ĉe dedupe la unua sekcio venkas (ekz. novaĵoj aperas kaj en
+// aktualajo kaj en LuciaStudio — la etikedo "Aktuala" estas pli ĝusta).
+// shanny (angla) kaj pliajlingvoj (aliaj lingvoj) ne estas Esperanto — preterlasitaj.
 private val CRI_SEKCIOJ = listOf(
     "https://esperanto.cri.cn/aktualajo/page.shtml",
     "https://esperanto.cri.cn/LuciaStudio/page.shtml",
     "https://esperanto.cri.cn/eklubo/page.shtml",
+    "https://esperanto.cri.cn/mirinda/page.shtml",
+    "https://esperanto.cri.cn/news/page.shtml",
+    "https://esperanto.cri.cn/komento/page.shtml",
+    "https://esperanto.cri.cn/recomended/page.shtml",
+    "https://esperanto.cri.cn/LuciaStudio/CommentwithLucia/page.shtml",
+    "https://esperanto.cri.cn/LuciaStudio/highlight/page.shtml",
+    "https://esperanto.cri.cn/LuciaStudio/OpiniojdeLucia/page.shtml",
 )
 private const val NOMBRO_DA_ELSENDOJ = 20
 private val RETUMILA_IDENTIGO = "EsperantoRadio/CriTranskodaDemo (podkasta peranto; GPL)"
@@ -58,6 +68,7 @@ private data class CriKarto(
     val publishedMs: Long,
     val m3u8: String?,
     val dauroSekundoj: Long?,
+    val bildo: String?,
 )
 
 /** Finpretigita elsendo por la RSS. */
@@ -103,13 +114,13 @@ fun main(args: Array<String>) {
     sonujo.mkdirs()
     val elsendoj = mutableListOf<CriElsendo>()
     for ((i, karto) in elektitaj.withIndex()) {
-        print("[${i + 1}/${elektitaj.size}] ${karto.sekcio}: ${karto.titolo.take(46)} ... ")
+        print("[${i + 1}/${elektitaj.size}] ${karto.sekcio}: ${karto.titolo.take(46)} ... " + karto.link)
         val mp3 = File(sonujo, "${karto.id}.mp3")
         try {
             if (!mp3.exists()) {
                 val m3u8 = karto.m3u8 ?: leguM3u8DeArtikolo(karto.link)
                     ?: throw IllegalStateException("neniu m3u8 trovita")
-                transkodigu(m3u8, mp3, karto.titolo)
+                // transkodigu(m3u8, mp3, karto.titolo)
             } else {
                 print("(jam en kaŝmemoro) ")
             }
@@ -184,6 +195,12 @@ private fun kolektuKartojnKunSono(jsonTeksto: String, sekcioEtikedo: String): Li
             m3u8 = video?.get("url")?.jsonPrimitive?.content?.takeIf { it.endsWith(".m3u8") },
             dauroSekundoj = video?.get("duration")?.jsonPrimitive?.content
                 ?.toDoubleOrNull()?.toLong()?.takeIf { it > 0 },
+            // photo.large preskaŭ ĉiam malplenas; photo.thurm estas la
+            // miniaturo de la artikolo — ĝi diferencas je ĉiu elsendo
+            bildo = (karto["photo"] as? JsonObject)?.let { p ->
+                (p["large"]?.jsonPrimitive?.content?.takeIf { it.isNotEmpty() }
+                    ?: p["thurm"]?.jsonPrimitive?.content?.takeIf { it.isNotEmpty() })
+            },
         )
     }
 }
@@ -314,7 +331,7 @@ private fun generuRss(elsendoj: List<CriElsendo>, bazoUrl: String): String {
         |  <pubDate>${formatuDaton(e.karto.publishedMs)}</pubDate>
         |  <enclosure url="${xmlEstigu("$bazoUrl/sonoj/${e.karto.id}.mp3")}" length="${e.grandecoBajtoj}" type="audio/mpeg"/>
         |  <itunes:duration>$dauro</itunes:duration>
-        |  <itunes:image href="${xmlEstigu("$bazoUrl/cri.png")}"/>
+        |  <itunes:image href="${xmlEstigu(e.karto.bildo ?: "$bazoUrl/cri.png")}"/>
         |</item>""".trimMargin()
     }
 
@@ -339,12 +356,20 @@ $eroj
  * paĝo ĉiu elsendo venas (ekz. "Aktuala", "LuciaStudio", "E-klubo").
  */
 private fun sekcioEtikedo(sekcioUrl: String): String {
-    val vojo = sekcioUrl.substringBefore("/page.shtml").substringAfterLast('/')
-    return when (vojo.lowercase()) {
-        "aktualajo" -> "Aktuala"
-        "luciastudio" -> "LuciaStudio"
-        "eklubo" -> "E-klubo"
-        else -> vojo.ifEmpty { sekcioUrl }
+    val vojo = sekcioUrl.substringBefore("/page.shtml")
+        .substringAfter("esperanto.cri.cn/").trim('/')
+    return when {
+        vojo.equals("LuciaStudio", ignoreCase = true) ||
+            vojo.startsWith("luciastudio/", ignoreCase = true) -> "LuciaStudio"
+        else -> when (vojo.lowercase()) {
+            "aktualajo" -> "Aktuala"
+            "eklubo" -> "E-klubo"
+            "mirinda" -> "Mirinda"
+            "news" -> "Novaĵo"
+            "komento" -> "Komento"
+            "recomended" -> "Rekomendita"
+            else -> vojo.ifEmpty { sekcioUrl }
+        }
     }
 }
 

@@ -31,7 +31,7 @@ class BundledAgordoTesto {
         val cri = agordo.kanaloj.find { it.kodo == "cri" }
         assertNotNull(cri, "cri devas esti en la kanaloj-tabelo (ne en FORPRENITAJ_KANALOJ)")
         assertEquals("android", cri.videblaNurSur, "CRI estas HLS — nur ExoPlayer (Android)")
-        assertEquals(3, cri.elsendojApiSekcioj!!.size, "Sekcioj: aktualajo, LuciaStudio, eklubo")
+        assertEquals(10, cri.elsendojApiSekcioj!!.size, "10 sekcioj — por atingi 100+ unikajn elsendojn")
         assertTrue(
             cri.elsendojApiSekcioj!!.all { it.startsWith("https://esperanto.cri.cn/") },
             "Sekci-URL-oj devas esti CRI-paĝoj"

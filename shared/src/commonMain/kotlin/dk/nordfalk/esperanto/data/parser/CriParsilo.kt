@@ -41,28 +41,66 @@ class CriParsilo {
 
     /**
      * Parsas la kombinitan respondon de ĉiuj sekcioj al elsendolisto,
-     * ordigita de la plej nova. Unuopa sekcio erara ne paneigu la tuton —
-     * ĝi estas protokolita kaj preterlasata (regulo 4).
+     * ordigita de la plej nova. Ĉiu peco havas la formaton
+     * `"<sekci-URL>\n<JSON>"` (la URL-o donas la sekci-etikedon; malnovaj
+     * kaŝmemoroj sen URL-o ankaŭ akceptiĝas kun la etikedo "CRI").
+     *
+     * Unuopa sekcio erara ne paneigu la tuton — ĝi estas protokolita kaj
+     * preterlasata (regulo 4).
      */
     fun parsu(kombinita: String, kanalo: Kanalo): List<Elsendo> {
-        val sekcioj = kombinita.split(SEKCIO_APARTIGILON).filter { it.isNotBlank() }
+        val pecoj = kombinita.split(SEKCIO_APARTIGILON).filter { it.isNotBlank() }
         val kartoj = LinkedHashMap<String, Elsendo>() // id → elsendo (dedupe)
-        for ((i, sekcio) in sekcioj.withIndex()) {
+        for ((i, peco) in pecoj.withIndex()) {
             try {
-                for (elsendo in parsuSekcion(sekcio, kanalo)) {
-                    kartoj[elsendo.id] = elsendo
+                val url = peco.substringBefore('\n').takeIf { it.startsWith("http") }
+                val korpo = if (url != null) peco.substringAfter('\n') else peco
+                val etikedo = url?.let { sekcioEtikedo(it) } ?: "CRI"
+                for (elsendo in parsuSekcion(korpo, kanalo, etikedo)) {
+                    // Dedupe: gardu la unuan — artikolo povas aperi en pluraj
+                    // sekcioj (ekz. la plej novaj novaĵoj aperas kaj en
+                    // aktualajo kaj en LuciaStudio); la etikedo de la unua
+                    // sekcio estas la plej ĝusta
+                    if (elsendo.id !in kartoj) kartoj[elsendo.id] = elsendo
                 }
             } catch (e: Exception) {
                 logw("CriParsilo", "${kanalo.slug}: sekcio ${i + 1} neparsebla — preterlasas", e)
             }
         }
         val elsendoj = kartoj.values.sortedByDescending { it.dato }
-        logi("CriParsilo", "${kanalo.slug}: ${elsendoj.size} elsendoj el ${sekcioj.size} sekcioj")
+        logi("CriParsilo", "${kanalo.slug}: ${elsendoj.size} elsendoj el ${pecoj.size} sekcioj")
         return elsendoj
     }
 
+    /**
+     * Mallonga etikedo por sekci-paĝo — fariĝas prefikso de la elsendo-titolo
+     * (ekz. "Aktuala: …", "LuciaStudio: …", "E-klubo: …") por ke oniu vidas
+     * de kiu paĝo la elsendo venas.
+     */
+    internal fun sekcioEtikedo(sekcioUrl: String): String {
+        val vojo = sekcioUrl.substringBefore("/page.shtml")
+            .substringAfter("esperanto.cri.cn/").trim('/').trim()
+        return when {
+            vojiEqualsLuciaStudio(vojo) -> "LuciaStudio"
+            else -> when (vojo.lowercase()) {
+                "aktualajo" -> "Aktuala"
+                "eklubo" -> "E-klubo"
+                "mirinda" -> "Mirinda"
+                "news" -> "Novaĵo"
+                "komento" -> "Komento"
+                "recomended" -> "Rekomendita"
+                else -> vojo.ifEmpty { sekcioUrl }
+            }
+        }
+    }
+
+    private fun vojiEqualsLuciaStudio(vojo: String): Boolean =
+        vojo.equals("LuciaStudio", ignoreCase = true) ||
+            vojo.startsWith("LuciaStudio/", ignoreCase = true) ||
+            vojo.startsWith("luciastudio/", ignoreCase = true)
+
     /** Parsas unu sekci-respondon (JSON) kaj redonas la ludeblajn kartojn. */
-    internal fun parsuSekcion(teksto: String, kanalo: Kanalo): List<Elsendo> {
+    internal fun parsuSekcion(teksto: String, kanalo: Kanalo, sekcioEtikedo: String): List<Elsendo> {
         val radiko = json.parseToJsonElement(teksto).jsonObject
         val kartoj = mutableListOf<JsonObject>()
         trairiKartojn(radiko, kartoj)
@@ -87,13 +125,18 @@ class CriParsilo {
                 ?: karto.str("modifyDate")?.toLongOrNull() ?: return@mapNotNull null
             val dato = formuDaton(publishedMs)
             val artikoloId = karto.str("id") ?: link.substringAfterLast('/')
-            val bildo = (karto["photo"] as? JsonObject)?.str("large")?.takeIf { it.isNotEmpty() }
+            // photo.large preskaŭ ĉiam malplenas; photo.thurm estas la
+            // miniaturo de la artikolo — ĝi diferencas je ĉiu elsendo
+            val photo = karto["photo"] as? JsonObject
+            val bildo = photo?.str("large")?.takeIf { it.isNotEmpty() }
+                ?: photo?.str("thurm")?.takeIf { it.isNotEmpty() }
 
             Elsendo(
                 id = "${kanalo.slug}:$dato:$artikoloId",
                 kanaloSlug = kanalo.slug,
                 kanaloNomo = kanalo.nomo,
-                titolo = karto.str("title")?.trim().orEmpty(),
+                // La sekci-etikedo montras de kiu paĝo la elsendo venas
+                titolo = "$sekcioEtikedo: ${karto.str("title")?.trim().orEmpty()}",
                 priskribo = karto.str("brief")?.trim()?.takeIf { it.isNotEmpty() },
                 priskriboHtml = null,
                 bildoUrl = bildo ?: kanalo.emblemoUrl,

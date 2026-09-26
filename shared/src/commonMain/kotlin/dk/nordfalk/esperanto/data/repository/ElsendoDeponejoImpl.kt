@@ -114,13 +114,17 @@ open class ElsendoDeponejoImpl(
                     httpKliento.post(CriParsilo.CRI_API) {
                         contentType(ContentType.Application.Json)
                         setBody("""{"id":"$sekcio"}""")
-                    }.bodyAsText()
+                    }.bodyAsText().let { korpo -> sekcio to korpo }
                 } catch (e: Exception) {
                     logw("ElsendoDeponejo", "${kanalo.slug}: sekcio $sekcio malsukcesa — preterlasas", e)
                     null
                 }
             }
-            val kombinita = respondoj.joinToString(CriParsilo.SEKCIO_APARTIGILON)
+            // Ĉiu peco: "<sekci-URL>\n<JSON>" — la URL-o donas la sekci-etikedon
+            // de la elsendo-titolo (vidu CriParsilo.sekcioEtikedo)
+            val kombinita = respondoj.joinToString(CriParsilo.SEKCIO_APARTIGILON) { (sekcio, korpo) ->
+                "$sekcio\n$korpo"
+            }
             logi("ElsendoDeponejo", "${kanalo.slug}: CRI-respondoj ricevitaj — ${kombinita.length} signoj")
             skribuKashon(kanalo.slug, kombinita)
             val elsendoj = criParsilo.parsu(kombinita, kanalo)

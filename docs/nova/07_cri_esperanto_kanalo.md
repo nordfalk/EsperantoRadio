@@ -224,3 +224,14 @@ La generita RSS estas kovrita de ora testo
   aktualigojn (CRI kaŝita tie).
 - `CriPerantoRssTesto` + `CriTranskodaDemo` pruntas la estontan
   servan vojon (RSS + MP3).
+- **Sekci-etikedoj kaj 100+ elsendoj (2026-09-26)**: la kanalo kolektas el
+  10 sekcioj (aktualajo, LuciaStudio + 3 subpaĝoj, eklubo, mirinda, news,
+  komento, recomended) — **129 unikaj elsendoj**. Ĉiu elsendo-titolo ricevas
+  la etikedon de sia paĝo ("Aktuala: …", "LuciaStudio: …", "Novaĵo: …") —
+  la sekci-URL estas konservata en la kaŝmemoro kun la respondo
+  (`"<URL>\n<JSON>"` po peco). shanny (angla) kaj pliajlingvoj (aliaj
+  lingvoj) estas konscie preterlasitaj.
+- **Per-elsendaj bildoj**: `photo.large` preskaŭ ĉiam malplenas, sed
+  `photo.thurm` estas la artikolo-miniaturo — nun `bildoUrl` uzas ĝin
+  (kun la kanal-emblemo kiel retroiro), do ĉiu elsendo havas sian propran
+  bildon anstataŭ la sama kanal-emblemo.

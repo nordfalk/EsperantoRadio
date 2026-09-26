@@ -215,10 +215,20 @@
 			"nomo": "CRI — Ĉina Radio Internacia",
 			"emblemoUrl": "https://p1crires.cri.cn/upload/images/2024/08/30/9736359ffa8045eab15a875f993825e5/d9151a6c197d4a75abbaceb4d4e90285.jpg",
 			"videblaNurSur": "android",
+			// Ordo gravas: ĉe dedupe la unua sekcio venkas (la plej novaj novaĵoj
+			// aperas kaj en aktualajo kaj en LuciaStudio — "Aktuala" estas pli ĝusta).
+			// shanny (angla) kaj pliajlingvoj (aliaj lingvoj) estas preterlasitaj.
 			"elsendojApiSekcioj": [
 				"https://esperanto.cri.cn/aktualajo/page.shtml",
 				"https://esperanto.cri.cn/LuciaStudio/page.shtml",
-				"https://esperanto.cri.cn/eklubo/page.shtml"
+				"https://esperanto.cri.cn/eklubo/page.shtml",
+				"https://esperanto.cri.cn/mirinda/page.shtml",
+				"https://esperanto.cri.cn/news/page.shtml",
+				"https://esperanto.cri.cn/komento/page.shtml",
+				"https://esperanto.cri.cn/recomended/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/CommentwithLucia/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/highlight/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/OpiniojdeLucia/page.shtml"
 			],
 			"hejmpaĝoButono": "https://esperanto.cri.cn/"
 		}

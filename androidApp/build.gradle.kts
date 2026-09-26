@@ -21,6 +21,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.material3)
             implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.exoplayer.hls)
             implementation(libs.androidx.media3.session)
             implementation(libs.androidx.work.runtime)
         }
@@ -85,4 +86,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:rules:1.6.1") // GrantPermissionRule
 }

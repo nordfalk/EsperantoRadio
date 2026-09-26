@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
+import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
@@ -73,7 +74,11 @@ open class ElsendoDeponejoImpl(
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             elsendoj
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
+            // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo 4).
             loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
             // Raportu kiel averto (ne eraro) — la apo daŭrigas kun kaŝenita datumo
             Sentry.captureMessage(

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +56,8 @@ class KanalaroViewModel(
     private val _lastajElsendoj = MutableStateFlow<Map<String, Elsendo>>(emptyMap())
     val lastajElsendoj = _lastajElsendoj.asStateFlow()
 
-    suspend fun sxargxi() {
+    /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
+    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
         val kanaloj = deponejo.getKanalojn()
 
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
@@ -82,7 +84,7 @@ class KanalaroViewModel(
                 val rezultoj = coroutineScope {
                     kanaloj
                         .filter { it.havasPodkastojn }
-                        .map { kanalo -> async { kanalo to elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo) } }
+                        .map { kanalo -> async { kanalo to elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo, fortoRefresigi) } }
                         .awaitAll()
                 }
                 val kontoj = mutableMapOf<String, Int>()
@@ -128,10 +130,6 @@ fun KanalaroEkrano(
             TopAppBar(
                 title = { Text("Kanaloj") },
                 actions = {
-                    if (sxargxas && kanaloj.isNotEmpty()) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                        Spacer(Modifier.width(8.dp))
-                    }
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
@@ -146,9 +144,13 @@ fun KanalaroEkrano(
             ) {
                 CircularProgressIndicator()
             }
-        } else {
+        } else PullToRefreshBox(
+            isRefreshing = sxargxas,
+            onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); scope.launch { viewModel.sxargxi(fortoRefresigi = true) } },
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(kanaloj, key = { it.slug }) { kanalo ->

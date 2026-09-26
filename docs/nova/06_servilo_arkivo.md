@@ -1,7 +1,14 @@
 # 6. La podkasta arkiv-servilo
 
-> La nova projekto inkluzivas memstaran **servilon** kiu funkcias kiel arkivo
-> de Esperanto-podkastoj. Ĝi estas la spirit-ido de la malnova `RssArkivServer`
+> **ANKORAŬ NE IMPLEMENTITA.** La `server/`-modulo ne ekzistas en la kodo.
+> Tiu ĉi dokumento estas plano por estonta implementado. La `iosApp/`- kaj
+> `server/`-linioj en `settings.gradle.kts` estas komentitaj.
+>
+> La malnova `RssArkivServer` (Java-jar en `malnova/parse/`) ankoraŭ funkcias
+> kaj estas priskribita en `docs/malnova/05_arkiva_servilo.md`.
+
+> La nova projekto inkluzivos memstaran **servilon** kiu funkcios kiel arkivo
+> de Esperanto-podkastoj. Ĝi estos la spirit-ido de la malnova `RssArkivServer`
 > (vidu `../malnova/05_arkiva_servilo.md`), sed reverkita en Kotlin kaj pli
 > kapabla: ne nur konstruu arkivajn fluojn, sed ankaŭ **servu** ilin per HTTP API.
 

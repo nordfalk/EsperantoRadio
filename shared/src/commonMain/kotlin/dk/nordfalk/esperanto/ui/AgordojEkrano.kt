@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
+import dk.nordfalk.esperanto.ApoVersio
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
 import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
@@ -103,6 +104,15 @@ fun AgordojEkrano(
                     Text(temo.etikedo)
                 }
             }
+
+            // Versio de la apo — el ApoVersio, generata el `apoversio` en libs.versions.toml
+            Spacer(Modifier.height(32.dp))
+            Text(
+                "Versio ${ApoVersio.VERSION}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)
+            )
         }
     }
 }

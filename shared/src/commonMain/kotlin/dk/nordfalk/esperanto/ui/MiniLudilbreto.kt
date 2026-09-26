@@ -13,6 +13,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,7 @@ import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
+import dk.nordfalk.esperanto.domain.player.ReprovoLogiko
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 
@@ -39,6 +42,8 @@ fun MiniLudilbreto(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onLudvico: () -> Unit = {},
+    /** Nuna reprovo-numero el [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.reprovo] (0 = neniu). */
+    reprovo: Int = 0,
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -114,12 +119,16 @@ fun MiniLudilbreto(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                val statTeksto = when (info.stato) {
-                    is LudantoStato.Ludas -> if (info.estasRekta) "Rekta elsendo" else "Ludas"
-                    is LudantoStato.Konektas -> "Konektas..."
-                    is LudantoStato.Haltita -> if (info.estasRekta) "Haltita" else "Paŭzita"
-                    is LudantoStato.Finita -> "Finita"
-                    is LudantoStato.Eraro -> "Eraro: ${(info.stato as LudantoStato.Eraro).mesagho}"
+                val statTeksto = when {
+                    reprovo > 0 && (info.stato is LudantoStato.Eraro || info.stato is LudantoStato.Konektas) ->
+                        "Konektas… (provo $reprovo/${ReprovoLogiko.MAKS_PROVOJ})"
+                    else -> when (info.stato) {
+                        is LudantoStato.Ludas -> if (info.estasRekta) "Rekta elsendo" else "Ludas"
+                        is LudantoStato.Konektas -> "Konektas…"
+                        is LudantoStato.Haltita -> if (info.estasRekta) "Haltita" else "Paŭzita"
+                        is LudantoStato.Finita -> "Finita"
+                        is LudantoStato.Eraro -> "Ne eblas ludi — kontrolu la retkonekton"
+                    }
                 }
                 val plenaTeksto = if (subtitolo != null) "$subtitolo · $statTeksto" else statTeksto
                 Text(
@@ -138,10 +147,19 @@ fun MiniLudilbreto(
                     if (ludas) ludilo.pauxzigi() else ludilo.ludi()
                 }
             }) {
-                Icon(
-                    imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                    contentDescription = if (ludas) "Paŭzigi" else "Ludi"
-                )
+                val konektas = info.stato is LudantoStato.Konektas ||
+                    (reprovo > 0 && info.stato is LudantoStato.Eraro)
+                if (konektas) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp).semantics { contentDescription = "Konektas" },
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Icon(
+                        imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                        contentDescription = if (ludas) "Paŭzigi" else "Ludi"
+                    )
+                }
             }
 
             // Halti-butono

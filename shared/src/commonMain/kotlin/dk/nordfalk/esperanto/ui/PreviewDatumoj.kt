@@ -19,7 +19,7 @@ import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import dk.nordfalk.esperanto.data.repository.httpMotoro
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -124,7 +124,7 @@ internal class PreviewLudiloRegilo(initial: LudantoInformo = LudantoInformo(stat
 
 internal class PreviewElsendoDeponejo(
     private val elsendoj: List<Elsendo>,
-) : ElsendoDeponejoImpl(HttpClient(CIO)) {
+) : ElsendoDeponejoImpl(HttpClient(httpMotoro)) {
     override suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
         kaŝmemoro[kanalo.slug] = elsendoj
         fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj

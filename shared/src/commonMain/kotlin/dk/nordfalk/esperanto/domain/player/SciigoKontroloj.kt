@@ -1,5 +1,7 @@
 package dk.nordfalk.esperanto.domain.player
 
+import kotlin.concurrent.Volatile
+
 /**
  * Statika tenilo por sciigo-kontroloj (Venonta).
  *

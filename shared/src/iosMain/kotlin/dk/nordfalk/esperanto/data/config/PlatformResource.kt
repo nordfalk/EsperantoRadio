@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.data.config
 
-actual fun leguBundledKanalkonfiguron(): String {
-    // TODO: Legi el iOS-framework-resurco
-    error("leguBundledKanalkonfiguron ne jam implementita por iOS")
-}
+/**
+ * La resurco ne legeblas sinkrone sur ĉi tiu platformo, do la kanalkonfiguro estas enigita
+ * en la kodon dum la konstruo (Gradle-tasko `generuEnigitanKanalkonfiguron` en shared/build.gradle.kts).
+ */
+actual fun leguBundledKanalkonfiguron(): String = ENIGITA_KANALKONFIGURO

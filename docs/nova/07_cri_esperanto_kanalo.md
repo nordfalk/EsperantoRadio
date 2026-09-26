@@ -240,6 +240,21 @@ La generita RSS estas kovrita de ora testo
   tiam iras tra la normala vido-hierarkio kaj pluvivas surfac-ŝanĝojn,
   kio kun SurfaceView ne bildiĝis fidinde (aparte en Dialog-fenestroj kaj
   sur emuliloj).
+- **Rotacio kaj pinĉ-zomo (2026-09-26)**: la plenekrana filmo aŭtomate
+  turnas la ekranon horizontalan (kaj redonas la originan orientiĝon je
+  fermo — `platformaPlenekranaOrientigo` + `AktivecoPonto`); la manifesto
+  deklaras `configChanges`, do rotacio ne plu rekreas la aktivecon (tio
+  antaŭe fermis la plenekranon per la `DisposableEffect`-purigo). En la
+  plenekrana reĝimo: **pinĉ-zomo 1×–5×** kaj trenado per du fingroj;
+  duobla klako restarigas 1×; unuobla klako fermas (nur je 1×); ✕-butono
+  (kun `statusBarsPadding`, ĉar sen ĝi ĝi falis sub la stato-breto kaj
+  ne reagis).
+- **Konata limigo de emuliloj**: la programara malkodilo (goldfish OMX) de
+  la senkapa emulilo ne bildigas kadrojn al **ŝanĝita** video-surfaco
+  meze de ludado — la plenekrana filmo tial aspektas nigra sur la emulilo
+  (la sono kaj ĉiuj kontroloj funkcias; la malgranda filmeto ja bildiĝas).
+  Sur realaj aparatoj surfac-ŝanĝo estas normala kaj subtenata
+  operacio — kontroli sur fizika telefono.
 - **Per-elsendaj bildoj**: `photo.large` preskaŭ ĉiam malplenas, sed
   `photo.thurm` estas la artikolo-miniaturo — nun `bildoUrl` uzas ĝin
   (kun la kanal-emblemo kiel retroiro), do ĉiu elsendo havas sian propran

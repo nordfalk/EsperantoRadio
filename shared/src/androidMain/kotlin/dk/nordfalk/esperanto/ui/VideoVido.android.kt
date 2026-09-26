@@ -8,6 +8,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import dk.nordfalk.esperanto.shared.R
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.logd
 
 /**
  * Android-aktualigo: ligas [PlayerView] al la ExoPlayer de la ludado-servo
@@ -23,10 +24,16 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 actual fun VideoVido(elsendo: Elsendo, modifier: Modifier, montru: Boolean) {
     if (!montru) return
 
-    val ludilo = VideoLudiloPonto.ludilo ?: return
+    val ludilo = VideoLudiloPonto.ludilo ?: run {
+        logd("VideoVido", "preterlasas: neniu ludilo en la ponto")
+        return
+    }
     // Ligu nur se la servo efektive ludas ĉi tiun fluon (ne ekz. alian elsendon)
     val nunaFluo = ludilo.currentMediaItem?.localConfiguration?.uri?.toString()
-    if (nunaFluo != elsendo.fluo) return
+    if (nunaFluo != elsendo.fluo) {
+        logd("VideoVido", "preterlasas: alia fluo — $nunaFluo ≠ ${elsendo.fluo}")
+        return
+    }
 
     AndroidView(
         factory = { ctx ->

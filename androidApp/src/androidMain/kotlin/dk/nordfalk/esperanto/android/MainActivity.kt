@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.ui.AktivecoPonto
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
@@ -41,6 +42,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         initialiguSentry()
         appContext = applicationContext
+        // Por la plenekrana filmo: ŝanĝi la orientiĝon bezonas Activity-referencon
+        AktivecoPonto.aktiveco = this
         petiSciigPermeson()
         ludilo = ExoPlayerLudiloRegilo(this)
         setContent {

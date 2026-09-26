@@ -22,9 +22,18 @@ object PlenekranaVido {
 
     fun malfermu(elsendo: Elsendo) {
         this.elsendo = elsendo
+        platformaPlenekranaOrientigo(malfermita = true)
     }
 
     fun fermu() {
+        if (elsendo != null) platformaPlenekranaOrientigo(malfermita = false)
         elsendo = null
     }
 }
+
+/**
+ * Platforma hoko: turnu la ekranon horizontala kiam la plenekrana filmo
+ * malfermiĝas, kaj redonu la originan orientiĝon kiam ĝi fermiĝas.
+ * Sur Android: `Activity.requestedOrientation`; aliloke: nenio.
+ */
+internal expect fun platformaPlenekranaOrientigo(malfermita: Boolean)

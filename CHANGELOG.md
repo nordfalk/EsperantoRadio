@@ -25,6 +25,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- "Malapero de aktoro Benda (3/3)" kaj 6 pluaj Esperanta Retradio-elsendoj ne ludeblis: la apo divenis la dosiernomon ĉe archive.org anstataŭ demandi (https://github.com/nordfalk/EsperantoRadio/pull/75)
 - La mini-ludilbreto malaperis post rekreo de la aktiveco, kaj nova ludado silente ne funkciis (https://github.com/nordfalk/EsperantoRadio/pull/68)
 - La "Ludi"-butono en sciigoj pri novaj elsendoj neniam funkciis (kraŝis) (https://github.com/nordfalk/EsperantoRadio/pull/68)
 - La Muzaiko-livestream ne ludis sur Android (https://github.com/nordfalk/EsperantoRadio/pull/68)

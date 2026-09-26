@@ -137,8 +137,14 @@ kaj Android ambaŭ bone ludas MP3-on. 64k MP3 sufiĉas por parolo.
 La pruvitan koncepton oni povas reproducigi per:
 
 ```
-./gradlew :desktopApp:criTranskodaDemo        # bezonas ffmpeg en $PATH
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+  ./gradlew :desktopApp:criTranskodaDemo      # bezonas ankaŭ ffmpeg en $PATH
 ```
+
+> JDK 17 estas necesa: la sistema defaŭlta `java` estas JRE 21 **sen
+> `javac`** — sen `JAVA_HOME` Gradle fiaskas per
+> "Toolchain installation … does not provide the required capabilities:
+> [JAVA_COMPILER]".
 
 La programo (`desktopApp/src/desktopMain/kotlin/dk/nordfalk/esperanto/desktop/CriTranskodaDemo.kt`)
 demontras la tutan servan logikon en unu rulado:
@@ -207,5 +213,14 @@ La generita RSS estas kovrita de ora testo
 - `media3-exoplayer-hls` aldonita — sen ĝi ankaŭ la Muzaiko-rekta
   fluo estis rompita (`ClassNotFoundException` por `HlsMediaSource$Factory`).
 - La elŝut-butono estas kaŝita por HLS-fluoj.
+- **Videa vidigo (2026-09-26)**: la CRI-elsendoj estas efektive **videoj**
+  (H.264 + AAC); ĝis nun la apo ludis nur ilian sontrakon. Nun
+  `ElsendoEkrano` montras la filmotrackon dum ludado: la nova
+  `VideoVido`-komponanto (expect/actual) ligas `PlayerView` al la
+  ExoPlayer de la ludado-servo per `VideoLudiloPonto` (ponto, ĉar la servo
+  vivas en `androidApp` kaj la UI en `shared`). La video aperas nur kiam
+  la elsendo ludas aŭ paŭzas; navigi for malkonektas la surfacon kaj la
+  ludado daŭras kiel pura sono. Desktop/Web/iOS havas malplenajn
+  aktualigojn (CRI kaŝita tie).
 - `CriPerantoRssTesto` + `CriTranskodaDemo` pruntas la estontan
   servan vojon (RSS + MP3).

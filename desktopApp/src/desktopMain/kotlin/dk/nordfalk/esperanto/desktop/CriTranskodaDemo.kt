@@ -32,7 +32,10 @@ import java.util.concurrent.TimeUnit
  * Unu erara elsendo ne haltigas la programon (regulo 4: toleremo al
  * putrantaj fontoj) — la elsendo simple mankas en la RSS.
  *
- * Rulu per: ./gradlew :desktopApp:criTranskodaDemo   (bezonas ffmpeg en $PATH)
+ * Rulu per: JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+ *            ./gradlew :desktopApp:criTranskodaDemo
+ *            (bezonas ankaŭ ffmpeg en $PATH; JDK 17 ĉar la defaŭlta
+ *            sistema Java estas JRE 21 sen javac)
  * Argumentoj: [eligaDosierujo] [bazoUrlPorEnclosure]
  *             defaŭlte: build/cri-demo  kaj  https://ekzemplo.eo/cri
  */
@@ -205,7 +208,7 @@ private fun leguM3u8DeArtikolo(artikolUrl: String): String? {
  * la saman AAC-sontrakon.
  */
 private fun elektuPlejMalaltanVarianton(m3u8: String): String {
-    val teksto = try { httpGet(m3u8) } catch (e: Exception) { return m3u8 }
+    val teksto = try { leguLudliston(m3u8) } catch (e: Exception) { return m3u8 }
     if (!teksto.contains("#EXT-X-STREAM-INF")) return m3u8
 
     var plejBona: Pair<Long, String>? = null // (bendlarĝo, URL)
@@ -223,8 +226,8 @@ private fun elektuPlejMalaltanVarianton(m3u8: String): String {
     return plejBona?.second?.let { URL(m3u8).toURI().resolve(it).toString() } ?: m3u8
 }
 
-/** HTTP GET (por legi HLS-ludlistojn). */
-private fun httpGet(url: String): String {
+/** HTTP GET (por legi HLS-ludlistojn). Alinomita ĉar httpGet jam ekzistas en RadioTxtKomparilo.kt (sama pako). */
+private fun leguLudliston(url: String): String {
     val conn = URL(url).openConnection() as HttpURLConnection
     conn.connectTimeout = 15000
     conn.readTimeout = 30000

@@ -54,7 +54,14 @@ data class Elsendo(
     val fluo: String,              // audio-URL (mp3) — la plej grava kampo
     val retpaghoUrl: String? = null,
     val estasRekta: Boolean = false,
-)
+) {
+    /**
+     * Ĉu la fluo estas video (HLS-ludlisto aŭ MP4) anstataŭ pura sono —
+     * ekz. CRI-elsendoj. Nur ExoPlayer (Android) povas ludi ĝin; elŝuto ne
+     * eblas (ludlisto, ne dosiero), sed Android povas ankaŭ montri la bildon.
+     */
+    val estasVideaFluo: Boolean get() = fluo.endsWith(".m3u8") || fluo.endsWith(".mp4")
+}
 
 /**
  * Sonfonto — unuigas rekta ludado, podkast-ludado kaj eksterreta ludado.

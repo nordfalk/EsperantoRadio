@@ -67,9 +67,9 @@ fun ElsendoEkrano(
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
 
-    // HLS-fluo (m3u8, ekz. CRI): ludebla nur per ExoPlayer (Android) —
-    // elŝuto ne eblas, ĉar la fluo estas ludlisto, ne dosiero
-    val estasHlsFluo = elsendo.fluo.endsWith(".m3u8")
+    // Videa fluo (HLS/MP4, ekz. CRI): ludebla nur per ExoPlayer (Android);
+    // ĝi ankaŭ povas montri sian filmotrackon per VideoVido
+    val estasVideaFluo = elsendo.estasVideaFluo
 
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
@@ -136,6 +136,17 @@ fun ElsendoEkrano(
                     }
                 }
 
+                // Videaj elsendoj (ekz. CRI): kiam la fluo ludas aŭ paŭzas,
+                // montru la filmotrackon super la statika bildo (nur Android)
+                if (estasVideaFluo) {
+                    VideoVido(
+                        elsendo = elsendo,
+                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
+                        montru = tiuElsendoLudas || tiuElsendoPauxzita,
+                    )
+                }
+
                 // Ikonoj sur la bildo: Elŝuti maldekstre, Ludi/paŭzi meze, Aldoni al ludvico dekstre
                 Row(
                     modifier = Modifier
@@ -144,7 +155,7 @@ fun ElsendoEkrano(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (!estasHlsFluo) {
+                    if (!estasVideaFluo) {
                     IkonoButono(
                         ikono = when (elshutStato) {
                             is ElshutStato.Preta -> Icons.Filled.Check
@@ -351,8 +362,8 @@ fun ElsendoEkrano(
                     }
                 }
 
-                // HLS-fluoj ne elŝuteblas (ludlisto, ne dosiero) — vidu estasHlsFluo
-                if (!estasHlsFluo) when (elshutStato) {
+                // HLS-fluoj ne elŝuteblas (ludlisto, ne dosiero) — vidu estasVideaFluo
+                if (!estasVideaFluo) when (elshutStato) {
                     is ElshutStato.NeElshutita -> OutlinedButton(
                         onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
                         modifier = Modifier.weight(1f)

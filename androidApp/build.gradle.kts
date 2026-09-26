@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    // Gradle Play Publisher — aŭtomata eldonado al Google Play
+    // Dokumentaro: https://github.com/Triple-T/gradle-play-publisher
+    id("com.github.triplet.play") version "3.12.2"
 }
 
 kotlin {
@@ -42,7 +45,7 @@ android {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
         targetSdk = 36
-        versionCode = 244
+        versionCode = 245
         versionName = libs.versions.apoversio.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,6 +64,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+// Gradle Play Publisher — agordo por Google Play-eldonado
+// Vidu docs/nova/07_eldonado.md por plena gvidilo
+play {
+    // Servila konto-JSON — metu ĉe androidApp/play-service-account.json (NE versiigu)
+    // aŭ agordu per env-variablej: PLAY_SERVICE_ACCOUNT_JSON_PATH
+    serviceAccountCredentials.set(
+        file(System.getenv("PLAY_SERVICE_ACCOUNT_JSON_PATH") ?: "play-service-account.json")
+    )
+    // Kiu track eldoni: "internal", "alpha", "beta", "production"
+    track.set("internal")
+    // Aŭtomate pliigi versionCode estas malaktiva — ni mastrumas versionCode permane
+    // Nur eldoni AAB (App Bundle), ne APK
+    defaultToAppBundles.set(true)
 }
 
 dependencies {

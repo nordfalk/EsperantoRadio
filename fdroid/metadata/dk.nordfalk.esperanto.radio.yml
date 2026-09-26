@@ -1,0 +1,79 @@
+# F-Droid-metadateno por EsperantoRadio
+#
+# Ĉi tiu dosiero estas ŝablono. Por efektive eldoni ĉe F-Droid:
+# 1. Kreu GitLab-konton (aŭ uz ekzistan) ĉe https://gitlab.com
+# 2. Forku https://gitlab.com/fdroid/fdroiddata
+# 3. Kopiu ĉi tiun dosieron al fdroiddata/metadata/dk.nordfalk.esperanto.radio.yml
+# 4. Kreu merge request kun ĉi tiu dosiero
+# 5. La F-Droid-teamo revizios kaj aldonos la apon
+#
+# Plena gvidilo: https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/
+# Metadatena referenco: https://f-droid.org/docs/Build_Metadata_Reference/
+
+Categories:
+  - Internet
+  - Multimedia
+
+License: GPL-3.0-or-later
+
+AuthorName: Jacob Nordfalk
+AuthorEmail: jacob@nordfalk.dk
+WebSite: https://github.com/nordfalk/EsperantoRadio
+SourceCode: https://github.com/nordfalk/EsperantoRadio
+IssueTracker: https://github.com/nordfalk/EsperantoRadio/issues
+Changelog: https://github.com/nordfalk/EsperantoRadio/releases
+
+# Priskribo en la ap-store (pluaj lingvoj povas esti en Description-kampoj)
+Summary: Esperanto-radioj kaj podkastoj en unu apo
+Description: |-
+  EsperantoRadio kunigas ĉirkaŭ 15 disajn Esperanto-radiajn kaj podkastajn fontojn
+  en unu unuecan sperton: kanal-superrigardo, livestreno, podkastoj, elŝutoj,
+  plej ŝatataj, serĉo, vekhorloĝo.
+
+  Konstruita per Compose Multiplatform (Android + iOS + Desktop + Web).
+
+  Fork de la dana DR Radio-apo (GPL), prizorgata de Jacob Nordfalk.
+
+# Postuloj / permesoj
+RequiresRoot: false
+
+# Aŭtomata ĝisdatigo: serĉu novajn git-etikedojn
+# Kiam vi kreos etikedon kiel v3.0.1, F-Droid aŭtomate detektos kaj rekonstruos
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 3.0.0
+CurrentVersionCode: 244
+
+# Build-instrukcioj — F-Droid konstruas la apon mem el fonto
+# La apo uzas JDK 17 (ne JDK 21 — mankas jlink)
+Builds:
+  - versionName: 3.0.0
+    versionCode: 244
+    commit: v3.0.0
+    subdir: androidApp
+    gradle:
+      - yes
+    # JDK 17 necesa — alie jlink mankas
+    # Agordu en fdroid-build: sudo apt install openjdk-17-jdk
+    srclibs:
+      - NoExternalLibs
+    # La subskribo de F-Droid mem okazas — ne necesas keystore ĉi tie
+    # Sed la apo devas esti reproduktebla:
+    #   - isMinifyEnabled = false (jam agordita)
+    #   - Neniuj dinamikaj dependecoj kiuj varias inter konstruoj
+    #   - Versio-kodoj kaj nomoj devas esti kongruaj inter git-etikedo kaj build.gradle
+
+# Permesoj postulataj de la apo
+# (F-Droid montros ilin aŭtomate el la APK-manifesto)
+
+# Reproduktebleco
+# Por certigi ke F-Droid povas reprodukti la konstruitaĵon:
+# 1. Kreu release-konstruon: ./gradlew :androidApp:assembleRelease
+# 2. Komparu la SHA-256 de la rezulta APK kun tiu de F-Droid
+# 3. Se ili kongruas, la apo estas reproduktebla
+# Vidu: https://f-droid.org/docs/Reproducible_Builds/
+
+# Signatura kontrolŝlosilo (SHA-256 de la subskriba atestilo)
+# Se vi volas reprodukteblajn konstruojn, komentu ĉi tion kun la SHA-256
+# de via propra subskriba ŝlosilo:
+# AllowedAPKSigningKeys: SHA256:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

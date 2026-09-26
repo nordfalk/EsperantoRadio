@@ -18,6 +18,7 @@
 | 4 | [04_parsado_kaj_arkivo.md](./04_parsado_kaj_arkivo.md) | La sep parsregoloj, golden-testoj, parser-kontrakto |
 | 5 | [05_dizajno_kaj_ui.md](./05_dizajno_kaj_ui.md) | Muzaiko-temo, koloroj, tiparo, ekranoj, navigado (navigation3) |
 | 6 | [06_servilo_arkivo.md](./06_servilo_arkivo.md) | La podkasta arkiv-servilo (plano — ankoraŭ ne implementita) |
+| 7 | [07_eldonado.md](./07_eldonado.md) | Eldonado al Google Play, F-Droid, Aptoide + CI/CD (GitHub Actions) |
 | — | [GHISDATIGO_COMPOSE_1.10.md](./GHISDATIGO_COMPOSE_1.10.md) | Lernitaj lecionoj de la ĝisdatigo al Compose 1.10 / Kotlin 2.2.20 |
 
 ## La granda ideo en unu frazo

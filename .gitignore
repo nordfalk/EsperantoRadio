@@ -44,6 +44,13 @@ captures/
 
 # Keystore files
 *.jks
+*.keystore
+
+# Eldonado — sekretaj dosieroj (NENIAM versiigu!)
+play-service-account.json
+androidApp/play-service-account.json
+*.p8
+google-services.json
 /.nb-gradle/
 /arkiv/
 /feed1/

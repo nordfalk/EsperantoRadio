@@ -1,0 +1,64 @@
+(English text in the bottom, after the Esperanto text)
+
+Aŭskultu pli ol 10 diversajn radio-kanalojn en Esperanto!
+
+- Muzaiko, la tuttempa tutmonda tutmojosa retradio en Esperanto, kun muziko, novaĵoj, informoj, raportoj, arkivaĵoj kaj multe pli.
+- Kaliningrada E-radio (Rusio)
+- 3ZZZ en Esperanto (Aŭstalio)
+- Krokoloko (Ĉilio)
+- Pola Retradio (Pollando)
+- Radio Havano Kubo (Kubo)
+- Radio Vatikana
+- Radio Verda (Kanado)
+- Varsovia Vento (Pollando)
+- Verda Stacio (Ĉeĥio / Slovakio)
+- Vinilkosmo (Francio)
+- Herzberg am Harz - la Esperanto-urbo (Germanio)
+
+(Peranto, Ĉina Radio Internacia kaj Voĉoj el Japanio (Japanio) ne elekteblas, ĉar ili elsendas en ne-kongruaj formatoj)
+
+Por ĉiu kanalo oni povas elekti ne nur inter la diversaj lastatempaj podkastoj, sed ankaŭ legi pri la podkasto kaj spekti la hejmpaĝojn de ili.
+
+Vi povas eĉ uzi la programon kiel vekhorloĝo, tiel ke via preferata kanalo aŭtomate ekludiĝos je via preferata horo.
+
+Kelkaj havas problemojn ludi la rektajn elsendojn de Muzaiko. Tiuj povas ludi Muzaikon tra TuneIn (vd. la agordoj)
+
+"La androjda radioprogramo estas tre utila, ja multe-multe simpligas la aŭskultadon de Esperantaj radioelsendoj. "
+- Eventoj / Ret-Info
+
+Se vi estas kontenta pri la programo, mi petas vin enŝalti la reklamojn de la programo kaj/aŭ donaci 1 aŭ 2 eŭrojn per https://market.android.com/details?id=dk.nordfalk.esperanto.donacoj2 
+
+
+Demandoj kaj proponoj por plibonigoj estas ege bonvenaj. 
+
+En la programo vi povas uzi la butonon 'Pri' por fari sugestojn aŭ demandojn kaj sendi propgramprotokolon al mi por ke mi povu solvi eventualajn problemojn.
+
+La programo estas malfermfonta. Tiel aliaj rajtas kopii kaj kontribui al la programo. La fontokodo troviĝas ĉe http://code.google.com/p/esperanto-telefono/wiki/EsperantoRadio . 
+Tiuj kiuj ne uzas Guglo Play povas elŝuti la programon de tie.
+
+
+--- ENGLISH ---
+
+Listen to radio stations in the international language of Esperanto!
+
+This app gives you access to 9 radio stations in the international language of Esperanto on your television from the comfort of your couch. These stations come from all over the world, from Australia to Cuba, and even the Vatican! Also featured is the international Internet radio station Muzaiko, which broadcasts Esperanto music, interviews and news non-stop.
+
+Esperanto-radio Muzaiko lets you listen to the latest content from these stations or dig into their archives to access specific programs. Some interesting examples:
+- Interview with Kimo J. Henriksen, native Esperanto speaker and well-known singer (Varsovia Vento).
+- Swedish train conductors took off their pants at work (Radio Verda).
+- Protect Japan against tsunamis (Pola Retradio).
+- Arkones, an Esperanto cultural festival in Poland (Kaliningrada E-radio).
+- The latest Esperanto artists and albums (Vinilkosmo).
+
+The radio station Muzaiko was founded by a workgroup at the British Congress of Esperanto in April 2011 with a common vision to create a 24/7 online radio station in Esperanto. The team quickly grew and chose the name Muzaiko, a combination of the Esperanto words “mozaiko” and “muziko.” They started broadcasting in July 2011, offering a 3-hour program repeated throughout the day, containing at least an hour of fresh content everyday.
+
+Complete list of Esperanto stations:
+- Muzaiko (International)
+- Pola Retradio (Poland)
+- 3ZZZ en Esperanto (Australia)
+- Radio Havano Kubo (Cuba)
+- Radio Vatikana (Vatican)
+- Radio Verda (Canada)
+- Varsovia Vento (Poland)
+- Kaliningrada E-radio (Russia)
+- Vinilkosmo (France)

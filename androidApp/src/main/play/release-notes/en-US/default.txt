@@ -1,0 +1,12 @@
+Kio novas en 3.0.1:
+• Versio de la apo videbla en la agordoj
+• Malsupren-tiro por refreŝigi (Hejmo, Kanaloj, kanalvido)
+• Vekhorloĝo povas ludi la plej freŝan neaŭskultitan podkaston de la kanalo
+• Averto kun "Permesi"-butono kiam mankas permeso por ekzaktaj alarmoj
+• Aŭtomata reprovo ĉe ludo-eraroj
+
+Riparitaj:
+• Mini-ludilbreto malaperis post rekreo de la aktiveco
+• "Ludi"-butono en sciigoj kraŝis
+• Muzaiko-livestream ne ludis
+• Unu mortinta kanal-fluo blokis la ŝargadon de aliaj kanaloj

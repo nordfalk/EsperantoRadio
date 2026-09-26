@@ -21,7 +21,7 @@ class RssParsiloTest {
     // === Regulo 6.1 — Ĝenerala parsado (Kernpunkto) ===
 
     @Test
-    fun parsasKernpunkton() {
+    fun parsasKernpunkton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(
             slug = "kernpunkto",
@@ -50,7 +50,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun kernpunktoHavasHttpsNeHttp() {
+    fun kernpunktoHavasHttpsNeHttp() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(
             slug = "kernpunkto",
@@ -67,7 +67,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun kernpunktoIdFormato() {
+    fun kernpunktoIdFormato() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(slug = "kernpunkto", nomo = "Kernpunkto")
 
@@ -81,7 +81,7 @@ class RssParsiloTest {
     // === Regulo 6.2 — Varsovia Vento (pluraj <audio> po ero) ===
 
     @Test
-    fun parsasVarsoviaVenton() {
+    fun parsasVarsoviaVenton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("varsoviavento_feed.xml")
         val kanalo = Kanalo(
             slug = "varsoviavento",
@@ -113,7 +113,7 @@ class RssParsiloTest {
     // === Regulo 6.4 — Vinilkosmo (ipernity-Atom) ===
 
     @Test
-    fun parsasVinilkosmon() {
+    fun parsasVinilkosmon() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
         val kanalo = Kanalo(
             slug = "vinilkosmo",
@@ -138,7 +138,7 @@ class RssParsiloTest {
     // === Regulo 6.5 — Titol-derivado ===
 
     @Test
-    fun ignoruTitolonDerivasTitolonElPriskribo() {
+    fun ignoruTitolonDerivasTitolonElPriskribo() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -171,7 +171,7 @@ class RssParsiloTest {
     // === Regulo 6.7 — Paĝigo ===
 
     @Test
-    fun leguNextLinkElKernpunkto() {
+    fun leguNextLinkElKernpunkto() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("kernpunkto_feed.xml")
 
         val nextLink = parsilo.leguNextLink(fluo)
@@ -183,7 +183,7 @@ class RssParsiloTest {
     // === Sen fluo → forĵetu ===
 
     @Test
-    fun eroSenStreamEstasForjxetita() {
+    fun eroSenStreamEstasForjxetita() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -213,7 +213,7 @@ class RssParsiloTest {
     // === Dat-normigo ===
 
     @Test
-    fun normigasRfc822Daton() {
+    fun normigasRfc822Daton() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -236,7 +236,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun normigasDatonKunDupunktaTempzono() {
+    fun normigasDatonKunDupunktaTempzono() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -259,7 +259,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun normigasIso8601Daton() {
+    fun normigasIso8601Daton() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -282,7 +282,7 @@ class RssParsiloTest {
     // === iTunes-daŭro ===
 
     @Test
-    fun legasDauronFormatoHhMmSs() {
+    fun legasDauronFormatoHhMmSs() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -306,7 +306,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun legasDauronFormatoSekundoj() {
+    fun legasDauronFormatoSekundoj() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -332,7 +332,7 @@ class RssParsiloTest {
     // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
 
     @Test
-    fun parsasPeranton() {
+    fun parsasPeranton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("peranto_feed.xml")
         val kanalo = Kanalo(
             slug = "peranto",
@@ -356,7 +356,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoArchiveOrgRekonstruasMallonganUrlon() {
+    fun perantoArchiveOrgRekonstruasMallonganUrlon() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -378,7 +378,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoKorektasOrkestroSkavidojj() {
+    fun perantoKorektasOrkestroSkavidojj() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -398,7 +398,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoRekonstruasGoogleDriveUrlon() {
+    fun perantoRekonstruasGoogleDriveUrlon() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -418,7 +418,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoSaltasNesubtenatajnGastigantojn() {
+    fun perantoSaltasNesubtenatajnGastigantojn() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -453,7 +453,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoSaltasKonatajnMalplenajnDatojn() {
+    fun perantoSaltasKonatajnMalplenajnDatojn() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -483,7 +483,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun perantoSenIframeEstasSaltita() {
+    fun perantoSenIframeEstasSaltita() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -501,10 +501,96 @@ class RssParsiloTest {
         assertEquals(0, elsendoj.size, "Ero sen iframe devas esti saltita")
     }
 
+    /**
+     * La MP3-dosiernomo ene de archive.org-arkivaĵo ne ĉiam egalas al la identigilo:
+     * `malapero-benda-3` enhavas `Malapero_Benda3.mp3`. La parsilo devas demandi
+     * la metadaten-API kaj uzi la veran dosiernomon (regulo 6.3).
+     */
+    @Test
+    fun perantoArchiveOrgUzasVeraDosiernomonElMetadatenoj() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Malapero de aktoro Benda (3/3)</title>
+                <published>2026-09-13T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/malapero-benda-3&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo) { url ->
+            // Falsa httpKliento: nur metadaten-petoj estas atendataj
+            assertEquals("https://archive.org/metadata/malapero-benda-3", url)
+            """
+                {"files":[
+                  {"name":"Malapero_Benda3.mp3","source":"original","format":"VBR MP3"},
+                  {"name":"Malapero_Benda3.png","source":"derivative","format":"PNG"},
+                  {"name":"Malapero_Benda3_spectrogram.png","source":"derivative","format":"Spectrogram"}
+                ]}
+            """.trimIndent()
+        }
+
+        assertEquals(1, elsendoj.size)
+        assertEquals(
+            "https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3",
+            elsendoj[0].fluo,
+            "Devas uzi la veran dosiernomon el la metadatenoj, ne la divenitan"
+        )
+    }
+
+    /** Se la metadaten-peto eraras (CORS, senrete), la elsendo tamen aperas kun la divenita URL (regulo 4). */
+    @Test
+    fun perantoArchiveOrgTolerasMetadatanEraron() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Test</title>
+                <published>2026-09-13T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/malapero-benda-3&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        // Kiel la Js-motoro: ĵetas kotlin.Error (ne Exception) ĉe reteraroj
+        val elsendoj = parsilo.parsuRss(fluo, kanalo) { throw Error("Fail to fetch") }
+
+        assertEquals(1, elsendoj.size)
+        assertEquals(
+            "https://archive.org/download/malapero-benda-3/malapero-benda-3.mp3",
+            elsendoj[0].fluo,
+            "Reteraro devas retrofali al la divenita dosiernomo"
+        )
+    }
+
+    /** Malplena aŭ rompita metadaten-respondo → retrofalo al la divenita dosiernomo. */
+    @Test
+    fun perantoArchiveOrgMalplenajMetadatenojRetrotrofas() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Test</title>
+                <published>2026-09-13T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/neniomp3-arkivo&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo) { "{}" }
+
+        assertEquals(1, elsendoj.size)
+        assertTrue(elsendoj[0].fluo.endsWith("/neniomp3-arkivo.mp3"), "Devas retrofali al la divenita nomo: ${elsendoj[0].fluo}")
+    }
+
     // === HTML-stripa bug-riparo ===
 
     @Test
-    fun gxeneralaParsiloTraktasEntioEskapitanHtml() {
+    fun gxeneralaParsiloTraktasEntioEskapitanHtml() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -536,14 +622,14 @@ class RssParsiloTest {
     }
 
     @Test
-    fun puriguHtmlTraktasDuobleEskapitanEniron() {
+    fun puriguHtmlTraktasDuobleEskapitanEniron() = kotlinx.coroutines.test.runTest {
         val eniro = "&lt;p&gt;Test&lt;/p&gt;"
         val rezulto = parsilo.puriguHtml(eniro)
         assertEquals("Test", rezulto, "puriguHtml devas forigi duoble-eskapitan HTML-on: $rezulto")
     }
 
     @Test
-    fun vinilkosmoHavasNeMalplenanPriskribon() {
+    fun vinilkosmoHavasNeMalplenanPriskribon() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
         val kanalo = Kanalo(
             slug = "vinilkosmo",
@@ -561,7 +647,7 @@ class RssParsiloTest {
     }
 
     @Test
-    fun puriguHtmlKunEtikedojnForigasDanĝerajnEtikedojn() {
+    fun puriguHtmlKunEtikedojnForigasDanĝerajnEtikedojn() = kotlinx.coroutines.test.runTest {
         val eniro = "<p>Hi</p><script>alert(1)</script><iframe src='evil.com'></iframe>"
         val rezulto = parsilo.puriguHtmlKunEtikedojn(eniro)
         assertFalse(rezulto.contains("<script"), " Rezulto ne enhavas <script>: $rezulto")

@@ -100,7 +100,7 @@ open class ElsendoDeponejoImpl(
      * Se neniu kaŝo ekzistas, revenigas null.
      * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      */
-    fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
+    suspend fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
         val respondo = leguKashon(kanalo.slug) ?: return null
         logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
@@ -120,7 +120,7 @@ open class ElsendoDeponejoImpl(
      * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      * Redonas ĉiujn elsendojn kune (flat list).
      */
-    fun leguĈiujnKashitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
+    suspend fun leguĈiujnKashitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
         val ĉiuj = mutableListOf<Elsendo>()
         for (kanalo in kanaloj) {
             if (!kanalo.havasPodkastojn) continue

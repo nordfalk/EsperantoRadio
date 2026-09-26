@@ -12,6 +12,13 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 2.0.12f) estas en la git-historio; ĝian finan eldonaĵon markas la etikedo
 [`fresxa_versio`](https://github.com/nordfalk/EsperantoRadio/releases/tag/fresxa_versio).
 
+## [Neeldonita]
+
+### Aldonita
+
+- Nova kanalo "CRI — Ĉina Radio Internacia": ĉiutagaj novaĵoj kaj programoj el esperanto.cri.cn (nur Android, ĉar la fluoj estas HLS-video) (https://github.com/nordfalk/EsperantoRadio/pull/72)
+- La CRI-elsendoj estas videoj kaj montras sian filmotrakon; klako sur la filmo malfermas plenekranan vidon kun aŭtomata horizontala rotacio kaj pinĉ-zomo (https://github.com/nordfalk/EsperantoRadio/pull/72)
+
 ## [3.0.1] - 2026-09-26
 
 ### Aldonita

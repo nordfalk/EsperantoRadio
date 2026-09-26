@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -12,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.MusicNote
@@ -66,6 +68,19 @@ fun ElsendoEkrano(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
+
+    // Videa fluo (HLS/MP4, ekz. CRI): ludebla nur per ExoPlayer (Android);
+    // ĝi ankaŭ povas montri sian filmotrackon per VideoVido
+    val estasVideaFluo = elsendo.estasVideaFluo
+    // La plenekrana stato vivas en PlenekranaVido (ap-nivelo) — la kovrilo
+    // devas kovri ankaŭ la mini-ludilon kaj la navigan breton
+    val plenekrane = PlenekranaVido.elsendo?.id == elsendo.id
+
+    // Se oni navigas for de la elsendo dum la plenekrana filmo estas
+    // malfermita, fermu ĝin — la kovrilo vivas super la tuta apo
+    DisposableEffect(elsendo.id) {
+        onDispose { if (PlenekranaVido.elsendo?.id == elsendo.id) PlenekranaVido.fermu() }
+    }
 
     val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
@@ -132,6 +147,18 @@ fun ElsendoEkrano(
                     }
                 }
 
+                // Videaj elsendoj (ekz. CRI): kiam la fluo ludas aŭ paŭzas,
+                // montru la filmotrackon super la statika bildo (nur Android)
+                if (estasVideaFluo && !plenekrane) {
+                    VideoVido(
+                        elsendo = elsendo,
+                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .clickable { logi("Klako", "plenekrana video — ${elsendo.id}"); PlenekranaVido.malfermu(elsendo) },
+                        montru = tiuElsendoLudas || tiuElsendoPauxzita,
+                    )
+                }
+
                 // Ikonoj sur la bildo: Elŝuti maldekstre, Ludi/paŭzi meze, Aldoni al ludvico dekstre
                 Row(
                     modifier = Modifier
@@ -140,6 +167,7 @@ fun ElsendoEkrano(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (!estasVideaFluo) {
                     IkonoButono(
                         ikono = when (elshutStato) {
                             is ElshutStato.Preta -> Icons.Filled.Check
@@ -162,6 +190,7 @@ fun ElsendoEkrano(
                         },
                         onLongClick = { montruMesaĝon("Elŝuti") }
                     )
+                    }
 
                     IkonoButono(
                         ikono = if (tiuElsendoLudas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -345,7 +374,8 @@ fun ElsendoEkrano(
                     }
                 }
 
-                when (elshutStato) {
+                // HLS-fluoj ne elŝuteblas (ludlisto, ne dosiero) — vidu estasVideaFluo
+                if (!estasVideaFluo) when (elshutStato) {
                     is ElshutStato.NeElshutita -> OutlinedButton(
                         onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
                         modifier = Modifier.weight(1f)

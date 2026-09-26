@@ -205,6 +205,33 @@
 			"retpoŝto": "",
 			"hejmpaĝoButono": "https://universealalindo.wordpress.com/"
 		}
+	,{
+			// CRI — Ĉina Radio Internacia (esperanto.cri.cn). Neniu RSS ekzistas;
+			// la elsendoj venas per POST al la nedokumentita CRI-API (regulo 6.8).
+			// La sono estas HLS-video (m3u8) — ludebla NUR per ExoPlayer (Android);
+			// tial la kanalo estas kaŝita sur la aliaj platformoj.
+			// Vidu docs/nova/07_cri_esperanto_kanalo.md.
+			"kodo": "cri",
+			"nomo": "CRI — Ĉina Radio Internacia",
+			"emblemoUrl": "https://p1crires.cri.cn/upload/images/2024/08/30/9736359ffa8045eab15a875f993825e5/d9151a6c197d4a75abbaceb4d4e90285.jpg",
+			"videblaNurSur": "android",
+			// Ordo gravas: ĉe dedupe la unua sekcio venkas (la plej novaj novaĵoj
+			// aperas kaj en aktualajo kaj en LuciaStudio — "Aktuala" estas pli ĝusta).
+			// shanny (angla) kaj pliajlingvoj (aliaj lingvoj) estas preterlasitaj.
+			"elsendojApiSekcioj": [
+				"https://esperanto.cri.cn/aktualajo/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/page.shtml",
+				"https://esperanto.cri.cn/eklubo/page.shtml",
+				"https://esperanto.cri.cn/mirinda/page.shtml",
+				"https://esperanto.cri.cn/news/page.shtml",
+				"https://esperanto.cri.cn/komento/page.shtml",
+				"https://esperanto.cri.cn/recomended/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/CommentwithLucia/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/highlight/page.shtml",
+				"https://esperanto.cri.cn/LuciaStudio/OpiniojdeLucia/page.shtml"
+			],
+			"hejmpaĝoButono": "https://esperanto.cri.cn/"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [

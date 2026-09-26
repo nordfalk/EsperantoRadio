@@ -1,16 +1,28 @@
 package dk.nordfalk.esperanto
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -151,6 +163,7 @@ fun EsperantoRadioApp(
 
         val montruSubanBreton = nunaVojo !is Vojo.Agordoj && nunaVojo !is Vojo.Alarmoj
 
+        Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
             Box(modifier = Modifier.weight(1f)) {
                 NavDisplay(
@@ -350,6 +363,67 @@ fun EsperantoRadioApp(
                     onSercxo = { switchTab(Vojo.Sercxo) },
                 )
             }
+        }
+
+        // Plenekrana filmo (malfermita per klako sur la filmeto en
+        // ElsendoEkrano): kovras la tutan ekranon, ankaŭ la mini-ludilon
+        // kaj la navigan breton. Sama fenestro — ne Dialogo — ĉar la
+        // videa SurfaceView ne bildiĝas fideble en subfenestroj.
+        PlenekranaVido.elsendo?.let { plenaElsendo ->
+            // Pinĉ-zomo (1×…5×) kaj trenado per du fingroj; duobla klako
+            // restarigas 1×; unuobla klako fermas (nur je 1×)
+            var skalo by remember { mutableStateOf(1f) }
+            var ofseto by remember { mutableStateOf(Offset.Zero) }
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black)
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zomo, _ ->
+                            val novaSkalo = (skalo * zomo).coerceIn(1f, 5f)
+                            skalo = novaSkalo
+                            ofseto = if (novaSkalo > 1f) ofseto + pan else Offset.Zero
+                        }
+                    },
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .graphicsLayer {
+                            scaleX = skalo
+                            scaleY = skalo
+                            translationX = ofseto.x
+                            translationY = ofseto.y
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    if (skalo <= 1f) {
+                                        logi("Klako", "fermu plenekranan — ${plenaElsendo.id}")
+                                        PlenekranaVido.fermu()
+                                    }
+                                },
+                                onDoubleTap = {
+                                    logi("Klako", "zomo restarigita — ${plenaElsendo.id}")
+                                    skalo = 1f
+                                    ofseto = Offset.Zero
+                                },
+                            )
+                        },
+                ) {
+                    VideoVido(
+                        elsendo = plenaElsendo,
+                        modifier = Modifier.fillMaxSize(),
+                        montru = true,
+                    )
+                }
+                IconButton(
+                    onClick = { PlenekranaVido.fermu() },
+                    // status-breta paddo: sen ĝi la butono falas sub la stata
+                    // breto en horizontala reĝimo kaj ne reagas al klakoj
+                    modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding(),
+                ) {
+                    Icon(Icons.Filled.Close, contentDescription = "Fermi plenekranan vidon", tint = Color.White)
+                }
+            }
+        }
         }
     }
 }

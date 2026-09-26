@@ -19,6 +19,7 @@ import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
+import dk.nordfalk.esperanto.ui.VideoLudiloPonto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -55,6 +56,9 @@ class EsperantoLudadoServo : MediaSessionService() {
             .setAudioAttributes(audioAttributes, true) // true = aŭtomata sonfokuso
             .setHandleAudioBecomingNoisy(true)          // paŭzas kiam kapaŭskultiloj malkonektiĝas
             .build()
+
+        // Publikigu la ludilon por videa vidigo (ElsendoEkrano → VideoVido)
+        VideoLudiloPonto.ludilo = player
 
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(kreiMainActivityPendingIntent())
@@ -144,6 +148,7 @@ class EsperantoLudadoServo : MediaSessionService() {
 
     override fun onDestroy() {
         logi("LudadoServo", "Servo detruata")
+        VideoLudiloPonto.ludilo = null
         mediaSession?.run {
             player.release()
             release()

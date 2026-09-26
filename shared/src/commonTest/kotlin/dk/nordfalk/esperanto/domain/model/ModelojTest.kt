@@ -91,6 +91,19 @@ class ModelojTest {
         assertEquals("kernpunkto:2022-11-09", elsendo.id)
         assertEquals(6916, elsendo.dauro)
         assertFalse(elsendo.estasRekta)
+        assertFalse(elsendo.estasVideaFluo, "MP3-elsendoj ne estas videaj")
+    }
+
+    @Test
+    fun elsendoVideaFluoRekonasHlsKAjMp4() {
+        // CRI-elsendoj estas HLS- aŭ MP4-video
+        val hls = Elsendo(id = "cri:2026-09-25:ARTI1", kanaloSlug = "cri", titolo = "Novaĵoj", fluo = "https://38vodres.cgtn.com/.../1790328153055.m3u8", dato = "2026-09-25")
+        val mp4 = Elsendo(id = "cri:2021-10-26:ARTIw", kanaloSlug = "cri", titolo = "Suflorilo", fluo = "https://mim-img3.cctv.cn/.../c5405f6b.mp4", dato = "2021-10-26")
+        val mp3 = Elsendo(id = "kernpunkto:2026-09-22:1", kanaloSlug = "kernpunkto", titolo = "KP", fluo = "https://kern.punkto.info/kp226.mp3", dato = "2026-09-22")
+
+        assertTrue(hls.estasVideaFluo, "m3u8 estas videa fluo")
+        assertTrue(mp4.estasVideaFluo, "mp4 estas videa fluo")
+        assertFalse(mp3.estasVideaFluo, "mp3 estas pura sono")
     }
 
     @Test

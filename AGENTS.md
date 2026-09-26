@@ -63,10 +63,12 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
 - **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
-- **Testoj**: 195 testoj (KMP sur Desktop), ĉiuj pasas
+- **Testoj**: 209 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
   Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
+- **criTranskodaDemo**: demonstro de CRI-peranto (HLS→MP3-transkoda servo por esperanto.cri.cn) — `./gradlew :desktopApp:criTranskodaDemo` (bezonas ffmpeg); vidu `docs/nova/08_cri_esperanto_kanalo.md`
+- **CRI-kanalo**: "CRI — Ĉina Radio Internacia" (regulo 6.8: POST al la CRI-API, HLS-ludado per ExoPlayer) — videbla NUR sur Android (`videblaNurSur`); la aliaj platformoj ĝin kaŝas ĝis ekzistas transkoda servo; elŝutoj ne eblas por HLS (butono kaŝita); la elsendoj estas videoj kaj la filmotrako montriĝas en ElsendoEkrano (`VideoVido` + `VideoLudiloPonto`); 10 sekcioj → 129 unikaj elsendoj kun sekci-etikedo en la titolo ("Aktuala: …", "LuciaStudio: …") kaj per-elsenda bildo el `photo.thurm`; klako sur la filmo malfermas plenekranan vidon (`PlenekranaVido`) kun aŭtomata horizontala rotacio kaj pinĉ-zomo
 
 ### Kio NE funkcias ankoraŭ
 
@@ -121,7 +123,7 @@ EsperantoRadio/
    La celo estas rekreado, ne riparado.
 2. **La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
    `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-   La sep parsregoloj kaj la skip-listo devas esti konservitaj.
+   La sep originaj parsregoloj (6.1–6.7) devas esti konservitaj; 6.8 (CRI) estas nova aldono.
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
    determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
@@ -391,9 +393,11 @@ dk/nordfalk/esperanto/
 │   ├── config/KanalAgordoLeganto.kt   # JSONC-leganto (striptigas komentojn) + sugestoj por alarmoj
 │   ├── config/PlatformResource.kt    # expect/actual por legi resurcojn
 │   ├── config/KreuSettings.kt        # expect/actual por Settings
-│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep regoloj)
-│   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo
-│   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
+│   ├── config/Platformo.kt           # expect/actual nunaPlatformo (android/desktop/web/ios)
+│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (reguloj 6.1–6.7)
+│   ├── parser/CriParsilo.kt           # Regulo 6.8: CRI-JSON-API → Elsendo (HLS-fluo, sekci-etikedoj)
+│   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo (filtras laŭ videblaNurSur)
+│   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro; CRI-vojo per POST)
 │   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
 │   ├── repository/PersistantaPlejŝatatajDeponejo.kt
 │   ├── repository/PersistantaAlarmoDeponejo.kt # Alarmoj (Settings+JSON)

@@ -44,7 +44,7 @@ La enkursigo estas slug-bazita (`when (kanalo.slug)`), ne dateno-movita.
 La `httpKliento`-parametro (defaŭlta `{ "" }` = no-op) estas necesa nur por la
 Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝin.
 
-## La sep regoloj — kiel reprodukti
+## La regoloj — kiel reprodukti (6.1–6.7 el la malnova apo, 6.8 nova)
 
 ### Regulo 6.1 — Ĝenerala (`parsuGxenerala`)
 
@@ -96,6 +96,27 @@ Vinilkosmo) iĝas agordaj datumoj.
 
 Sekvu `<atom:link rel="next" href=...>` ĝis ne plu paĝoj. Konservu la sekva-paĝan
 URL (`rss_nextLink`). Uzata de la arkiva servilo por marŝi malantaŭen.
+
+### Regulo 6.8 — CRI (`CriParsilo`)
+
+Ne temas pri RSS: CRI (esperanto.cri.cn) havas neniun fluon; la elsendoj venas
+per `POST https://esperanto.cri.cn/api/getData` kun korpo `{"id": "<sekci-URL>"}`
+(la sekci-URL-oj staras en la kanalkonfiguro kiel `elsendojApiSekcioj`).
+Vidu [08_cri_esperanto_kanalo.md](./08_cri_esperanto_kanalo.md).
+
+1. Rekurzive kolektu ĉiujn `card`-objektojn el la paĝa JSON-arbo.
+2. Ludebla karto: `isPlay == "1"` kaj `link` kongruas al `/20\d\d/\d\d/\d\d/`.
+3. `fluo` = `card.video.url` (m3u8-HLS aŭ mp4) — sen ĝi forĵetu la karton.
+4. `dato` el `card.date` (epoko-ms, UTC); `dauro` el `video.duration` (> 0).
+5. `id = "<slug>:<dato>:<artikol-id>"`, `priskribo` el `brief`, bildo el
+   `photo.large`/`photo.thurm` (alie la kanal-emblemo).
+6. Dedupu laŭ id (gardu la unuan — la sekci-etikedo de la unua paĝo estas la
+   plej ĝusta); ordigu de la plej nova; sekcia eraro ne haltigu la ceterajn
+   (regulo 4).
+
+La HLS-fluon povas ludi nur ExoPlayer (Android) — tial la kanalo portas
+`"videblaNurSur": "android"` kaj `KanaloDeponejoImpl` kaŝas ĝin sur
+Desktop/Web/iOS. La elŝut-butono estas kaŝita por `.m3u8`-fluoj.
 
 ## radio.txt-parsilo
 

@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
+import dk.nordfalk.esperanto.data.parser.CriParsilo
 import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
@@ -12,6 +13,7 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 open class ElsendoDeponejoImpl(
     private val httpKliento: HttpClient,
     private val parsilo: RssParsilo = RssParsilo(),
+    private val criParsilo: CriParsilo = CriParsilo(),
 ) : ElsendoDeponejo {
 
     protected val kaŝmemoro = mutableMapOf<String, List<Elsendo>>()
@@ -50,15 +53,20 @@ open class ElsendoDeponejoImpl(
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
     open suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
-        val url = kanalo.podkastaRssUrl ?: run {
-            logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
-            return kaŝmemoro[kanalo.slug] ?: emptyList()
-        }
         val kaŝenitaj = kaŝmemoro[kanalo.slug]
-
         if (kaŝenitaj != null && !fortoRefresigi) {
             logd("ElsendoDeponejo", "${kanalo.slug}: uzas kaŝenitan datumon (${kaŝenitaj.size} elsendoj)")
             return kaŝenitaj
+        }
+
+        // Regulo 6.8 — CRI: la elsendoj venas per POST al la CRI-API (neniu RSS)
+        if (!kanalo.elsendojApiSekcioj.isNullOrEmpty()) {
+            return sxargxiCriElsendojn(kanalo, fortoRefresigi)
+        }
+
+        val url = kanalo.podkastaRssUrl ?: run {
+            logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
+            return kaŝmemoro[kanalo.slug] ?: emptyList()
         }
 
         return try {
@@ -96,6 +104,46 @@ open class ElsendoDeponejoImpl(
         sxargxiElsendojn(kanalo, fortoRefresigi)
 
     /**
+     * Regulo 6.8 — ŝargas CRI-elsendojn el la (nedokumentita) CRI-API per
+     * POST-petoj, po unu por ĉiu sekcio el la kanalkonfiguro
+     * (`elsendojApiSekcioj`). Tolerema: unu sekcio erara ne paneigu la tuton —
+     * la ceteraj sekcioj tamen estas uzataj (regulo 4).
+     */
+    private suspend fun sxargxiCriElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
+        val sekcioj = kanalo.elsendojApiSekcioj!!
+        return try {
+            logi("ElsendoDeponejo", "${kanalo.slug}: demandas CRI-API-on por ${sekcioj.size} sekcioj")
+            val respondoj = sekcioj.mapNotNull { sekcio ->
+                try {
+                    Sentry.addBreadcrumb(Breadcrumb.http(sekcio, "POST"))
+                    httpKliento.post(CriParsilo.CRI_API) {
+                        contentType(ContentType.Application.Json)
+                        setBody("""{"id":"$sekcio"}""")
+                    }.bodyAsText().let { korpo -> sekcio to korpo }
+                } catch (e: Exception) {
+                    logw("ElsendoDeponejo", "${kanalo.slug}: sekcio $sekcio malsukcesa — preterlasas", e)
+                    null
+                }
+            }
+            // Ĉiu peco: "<sekci-URL>\n<JSON>" — la URL-o donas la sekci-etikedon
+            // de la elsendo-titolo (vidu CriParsilo.sekcioEtikedo)
+            val kombinita = respondoj.joinToString(CriParsilo.SEKCIO_APARTIGILON) { (sekcio, korpo) ->
+                "$sekcio\n$korpo"
+            }
+            logi("ElsendoDeponejo", "${kanalo.slug}: CRI-respondoj ricevitaj — ${kombinita.length} signoj")
+            skribuKashon(kanalo.slug, kombinita)
+            val elsendoj = criParsilo.parsu(kombinita, kanalo)
+            logi("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
+            kaŝmemoro[kanalo.slug] = elsendoj
+            fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
+            elsendoj
+        } catch (e: Exception) {
+            loge("ElsendoDeponejo", "${kanalo.slug}: CRI-elŝuto malsukcesa", e)
+            kaŝmemoro[kanalo.slug] ?: emptyList()
+        }
+    }
+
+    /**
      * Legas la krudan RSS-tekston el diskkaŝmemoro kaj re-parsas ĝin.
      * Se neniu kaŝo ekzistas, revenigas null.
      * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
@@ -104,7 +152,22 @@ open class ElsendoDeponejoImpl(
         val respondo = leguKashon(kanalo.slug) ?: return null
         logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
-            val elsendoj = parsilo.parsuRss(respondo, kanalo)
+            val elsendoj = if (!kanalo.elsendojApiSekcioj.isNullOrEmpty()) {
+                // Malnova kaŝmemoro-formato (el la tempo antaŭ la sekci-etikedoj)
+                // havas pecojn sen URL — ĝiaj etikedoj ĉiuj estus "CRI".
+                // Traktu ĝin kiel mankantan, por ke la sekva reta alŝuto
+                // regeneru ĝin kun ĝustaj etikedoj.
+                if (criParsilo.estasMalnovaFormato(respondo)) {
+                    logi(
+                        "ElsendoDeponejo",
+                        "${kanalo.slug}: diskkaŝmemoro en malnova formato (sen sekci-etikedoj) — regeneros per reta alŝuto"
+                    )
+                    return null
+                }
+                criParsilo.parsu(respondo, kanalo)
+            } else {
+                parsilo.parsuRss(respondo, kanalo)
+            }
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             logi("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")

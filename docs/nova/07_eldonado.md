@@ -37,26 +37,31 @@ Agordita track: `internal` (interna testado — ŝanĝu al `alpha`, `beta` aŭ `
    export PLAY_SERVICE_ACCOUNT_JSON_PATH=/loko/de/servila-konto.json
    ```
 
-3. **Konstruu kaj subskribu AAB**:
+3. **Konstruu kaj subskribu APK**:
    ```bash
    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-   ./gradlew :androidApp:bundleRelease
+   ./gradlew :androidApp:assembleRelease
    ```
-   La AAB aperos ĉe `androidApp/build/outputs/bundle/release/`.
+   La APK aperos ĉe `androidApp/build/outputs/apk/release/`.
 
 4. **Eldonu al Google Play**:
    ```bash
-   ./gradlew :androidApp:publishReleaseBundle
+   KEYSTORE_PASSWORD=xxxxxx ./gradlew :androidApp:publishReleaseApk
    ```
-   Tio alŝutas la AAB al la track agordita en `build.gradle.kts` (defaŭlte `internal`).
+   Tio alŝutas la APK-on al la track agordita en `build.gradle.kts` (defaŭlte `internal`).
+
+> **Kial APK, ne AAB?** AAB-alŝuto postulas enskribiĝon en **Play App Signing**
+> (eraro: "For uploading an AppBundle you must be enrolled in Play Signing").
+> La apo ankoraŭ ne estas enskribita, do ni eldonas APK-on. Kiam la enskribiĝo
+> estos farita (Setup → App signing → Enroll, eksportu la ekzistan ŝlosilon per
+> la PEPK-ilo), ŝanĝu al `publishReleaseBundle` — ambaŭ taskoj ekzistas flankantde.
 
 ### Utilaj GPP-taskoj
 
 | Tasko | Priskribo |
 |---|---|
-| `:androidApp:publishReleaseBundle` | Konstruas AAB + alŝutas al Play Store (release-varianto) |
-| `:androidApp:publishBundle` | Same, por ĉiuj variantoj |
-| `:androidApp:publishReleaseApk` | Konstruas APK + alŝutas (malrekomendita — AAB estas pli bona) |
+| `:androidApp:publishReleaseApk` | Konstruas APK + alŝutas al Play Store (release-varianto) — **nia nuna vojo** |
+| `:androidApp:publishReleaseBundle` | Konstruas AAB + alŝutas — postulas Play App Signing-enskribiĝon |
 | `:androidApp:promoteArtifact` | Plipromocias eldonon de unu track al alia |
 | `:androidApp:publishListing` | Alŝutas ap-priskribon, screenshot-ojn, ktp. |
 
@@ -208,7 +213,7 @@ Aptoide havas API por aŭtomata alŝuto de APK/AAB.
 
 La workflow-dosiero `.github/workflows/eldonado.yml` aŭtomate konstruas kaj eldonas:
 
-- **Ĉe `git tag v*`**: konstruas subskribitan AAB + APK, eldonas al Google Play (internal track)
+- **Ĉe `git tag v*`**: konstruas subskribitan APK-on, eldonas al Google Play (internal track)
 - La APK estas alŝutita kiel GitHub-artefakto (por permana alŝuto al Aptoide)
 - F-Droid ne estas en la CI — ĝi konstruas mem el la git-etikedo
 
@@ -242,7 +247,7 @@ Agordu ilin ĉe: GitHub → Deponejo → Settings → Secrets and variables → 
 1. **Google Play**:
    - Kreu servilan konton en Play Console
    - Metu JSON ĉe `androidApp/play-service-account.json`
-   - `./gradlew :androidApp:publishReleaseBundle`
+   - `KEYSTORE_PASSWORD=xxxxxx ./gradlew :androidApp:publishReleaseApk`
 
 2. **F-Droid**:
    - Forku `fdroiddata` ĉe GitLab

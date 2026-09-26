@@ -43,14 +43,10 @@ jobs:
           echo '${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}' > $HOME/play-service-account.json
           echo "PLAY_SERVICE_ACCOUNT_JSON_PATH=$HOME/play-service-account.json" >> $GITHUB_ENV
 
-      - name: Konstruu AAB (App Bundle)
-        run: ./gradlew :androidApp:bundleRelease
-
-      - name: Konstruu APK (por Aptoide)
-        run: ./gradlew :androidApp:assembleRelease
-
-      - name: Alŝutu AAB al Google Play
-        run: ./gradlew :androidApp:publishReleaseBundle
+      - name: Publikigu APK-on al Google Play (internal track)
+        # APK, ne AAB: la apo ne estas enskribita en Play App Signing,
+        # kaj AAB-alŝuto postulas tion (403 "must be enrolled in Play Signing").
+        run: ./gradlew :androidApp:publishReleaseApk
 
       - name: Alŝutu APK kiel artefakto (por permana alŝuto al Aptoide)
         uses: actions/upload-artifact@v4

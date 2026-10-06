@@ -22,7 +22,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Elfaldebla ludilbreto (sago dekstre, kiel en la malnova apo): ŝovebla serĉbreto, reen-/antaŭen-butonoj (5% de la elsendo) kaj laŭteco-regilo
+- Elfaldebla ludilbreto (sago dekstre, kiel en la malnova apo): ŝovebla serĉbreto, reen-/antaŭen-butonoj (5% de la elsendo) kaj laŭteco-regilo (https://github.com/nordfalk/EsperantoRadio/pull/77)
 
 ## [3.0.1] - 2026-09-26
 

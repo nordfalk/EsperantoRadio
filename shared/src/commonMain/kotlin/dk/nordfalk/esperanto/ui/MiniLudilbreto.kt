@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
+import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
@@ -307,7 +308,7 @@ fun MiniLudilbreto(
 }
 
 /** Saltas [direkto]-foje 5% de la elsendo-daŭro (negativa = reen), kiel en la malnova apo. */
-private fun saltuDiference(ludilo: LudiloRegilo, info: dk.nordfalk.esperanto.domain.model.LudantoInformo, direkto: Int) {
+private fun saltuDiference(ludilo: LudiloRegilo, info: LudantoInformo, direkto: Int) {
     val diferenco = (info.dauroMs * SALTA_KVOCOTO).toLong() * direkto
     val celo = (info.pozicioMs + diferenco).coerceIn(0L, info.dauroMs)
     logi("Klako", "salti ${if (direkto < 0) "reen" else "antaŭen"} ${(SALTA_KVOCOTO * 100).toInt()}% al $celo ms (de ${info.pozicioMs} ms)")

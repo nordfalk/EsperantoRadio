@@ -202,7 +202,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
-    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f); cxefaFadeno.post { controller?.volume = volumeno } }
+    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f); cxefaFadeno.post { controller?.volume = lauxteco } }
     override fun leguLauxtecon(): Float = lauxteco
 
     /** Laŭteco konservata aparte — leginda el ĉiu fadeno sen tuŝi la MediaController. */

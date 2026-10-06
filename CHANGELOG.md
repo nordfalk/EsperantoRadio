@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva
+- Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva (https://github.com/nordfalk/EsperantoRadio/pull/76)
 
 ## [3.0.1] - 2026-09-26
 

@@ -18,6 +18,12 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 - Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva (https://github.com/nordfalk/EsperantoRadio/pull/76)
 
+## [Neeldonita]
+
+### Aldonita
+
+- Elfaldebla ludilbreto (sago dekstre, kiel en la malnova apo): ŝovebla serĉbreto, reen-/antaŭen-butonoj (5% de la elsendo) kaj laŭteco-regilo
+
 ## [3.0.1] - 2026-09-26
 
 ### Aldonita

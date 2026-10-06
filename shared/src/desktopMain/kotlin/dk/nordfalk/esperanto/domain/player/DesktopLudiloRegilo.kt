@@ -36,6 +36,9 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
 
+    /** mp3spi-fluado ne subtenas saltadon — la UI montras nur pozicio-indikilon. */
+    override val subtenasSaltadon: Boolean get() = false
+
     private var ludaJob: Job? = null
     private var sourceDataLine: SourceDataLine? = null
     private var audioInputStream: AudioInputStream? = null
@@ -264,6 +267,8 @@ class DesktopLudiloRegilo : LudiloRegilo {
         log("saltiAl($pozicioMs ms) — ne implementita por mp3spi (streaming)")
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
     }
+
+    override fun leguLauxtecon(): Float = volumeno
 
     override fun fiksiLauxtecon(volumeno: Float) {
         val v = volumeno.coerceIn(0f, 1f)

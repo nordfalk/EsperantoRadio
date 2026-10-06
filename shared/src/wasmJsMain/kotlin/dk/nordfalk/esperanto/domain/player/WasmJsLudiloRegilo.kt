@@ -16,6 +16,7 @@ import org.w3c.dom.events.Event
  */
 class WasmJsLudiloRegilo : LudiloRegilo {
     private var audio: HTMLAudioElement? = null
+    private var lauxteco = 1f
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
     private var nunaFonto: Sonfonto? = null
@@ -32,6 +33,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         val url = getStreamUrl(fonto)
         audio = document.createElement("audio") as HTMLAudioElement
         audio!!.src = url
+        audio!!.volume = lauxteco.toDouble() // reapliku la laŭtecon ankaŭ al nova fonto
         audio!!.currentTime = (komencoPozicioMs / 1000.0)
         audio!!.addEventListener("playing", { _ ->
             _stato.value = LudantoInformo(
@@ -66,5 +68,6 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     override fun pauxzigi() { audio?.pause() }
     override fun halti() { audio?.pause(); audio = null; nunaFonto = null; _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { audio?.currentTime = pozicioMs / 1000.0 }
-    override fun fiksiLauxtecon(volumeno: Float) { audio?.volume = volumeno.toDouble() }
+    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f); audio?.volume = lauxteco.toDouble() }
+    override fun leguLauxtecon(): Float = lauxteco
 }

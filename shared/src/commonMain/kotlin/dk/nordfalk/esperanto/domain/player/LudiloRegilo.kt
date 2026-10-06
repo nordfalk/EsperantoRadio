@@ -17,12 +17,25 @@ import kotlinx.coroutines.flow.asStateFlow
 interface LudiloRegilo {
     val stato: StateFlow<LudantoInformo>
 
+    /**
+     * Ĉu tiu ĉi ludilo efektive kapablas salti (tio estas, ĉu [saltiAl] movas
+     * la ludpozicion). Se false, la UI montras nur neinteragan pozicio-indikilon.
+     * false ekz. ĉe Desktop (mp3spi-fluado ne subtenas saltadon).
+     */
+    val subtenasSaltadon: Boolean get() = true
+
     suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
     fun ludi()
     fun pauxzigi()
     fun halti()
     fun saltiAl(pozicioMs: Long)
     fun fiksiLauxtecon(volumeno: Float)
+
+    /**
+     * Legas la nunan laŭtecon de la ludilo (0 = mutigita … 1 = maksimume).
+     * Bazo por la laŭteco-regilo en la mini-ludilbreto. Defaŭlte 1.
+     */
+    fun leguLauxtecon(): Float = 1f
 }
 
 /**
@@ -41,6 +54,7 @@ expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 class NoOpLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+    private var lauxteco = 1f
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(
@@ -56,7 +70,8 @@ class NoOpLudiloRegilo : LudiloRegilo {
     override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
+    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f) }
+    override fun leguLauxtecon(): Float = lauxteco
 
     /**
      * Simulas naturfinon de la ludado — metas staton al Finita.

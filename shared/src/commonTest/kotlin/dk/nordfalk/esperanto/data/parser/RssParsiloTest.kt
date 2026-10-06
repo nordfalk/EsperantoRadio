@@ -568,7 +568,7 @@ class RssParsiloTest {
 
     /** Malplena aŭ rompita metadaten-respondo → retrofalo al la divenita dosiernomo. */
     @Test
-    fun perantoArchiveOrgMalplenajMetadatenojRetrotrofas() = kotlinx.coroutines.test.runTest {
+    fun perantoArchiveOrgMalplenajMetadatenojRetrofalas() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -585,6 +585,35 @@ class RssParsiloTest {
 
         assertEquals(1, elsendoj.size)
         assertTrue(elsendoj[0].fluo.endsWith("/neniomp3-arkivo.mp3"), "Devas retrofali al la divenita nomo: ${elsendoj[0].fluo}")
+    }
+
+    /** Metadaten-peto kiu daŭras tro longe → tempolimo, retrofalo al la divenita dosiernomo. */
+    @Test
+    fun perantoArchiveOrgMetadatenPetoTranslimas() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <title>Test</title>
+                <published>2026-09-13T08:00:00.000+02:00</published>
+                <content type='html'>&lt;iframe src=&quot;https://archive.org/embed/malapero-benda-3&quot;&gt;&lt;/iframe&gt;</content>
+              </entry>
+            </feed>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
+        // La falsa kliento pendegas preter la limtempo (runTest uzas virtualan horloĝon)
+        val elsendoj = parsilo.parsuRss(fluo, kanalo) { _ ->
+            kotlinx.coroutines.delay(RssParsilo.METADATEN_LIMTEMPO_MS + 1_000)
+            """{"files":[{"name":"Malapero_Benda3.mp3","source":"original"}]}"""
+        }
+
+        assertEquals(1, elsendoj.size)
+        assertEquals(
+            "https://archive.org/download/malapero-benda-3/malapero-benda-3.mp3",
+            elsendoj[0].fluo,
+            "Translima metadaten-peto devas retrofali al la divenita nomo"
+        )
     }
 
     // === HTML-stripa bug-riparo ===

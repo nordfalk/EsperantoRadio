@@ -33,9 +33,13 @@ MP3-URL-on el ĝia HTML — ĝi neniam divenis.
 La rezulto estas persistata en nova
 `ArchiveOrgDosiernomoKasho` (Settings+JSON, ŝablono de
 `PersistaLudatojDeponejo`) — unu metadaten-peto po identigilo por ĉiam, ankaŭ
-trans restartoj. Reteraro (inkl. `kotlin.Error` de la Js-motoro ĉe CORS) aŭ
-forestata MP3 → retrofalo al la divenita nomo; fiaskoj ne estas kaŝitaj, do oni
-reprovas kiam la reto revenas (regulo 4: unu arkivaĵo ne paneigas la fluon).
+trans restartoj (uzata kaj de `AppStato` kaj de `NovajElsendojKontroloWorker`).
+Reteraro (inkl. `kotlin.Error` de la Js-motoro ĉe CORS) aŭ forestata MP3 →
+retrofalo al la divenita nomo; fiaskoj ne estas kaŝitaj, do oni reprovas kiam
+la reto revenas (regulo 4: unu arkivaĵo ne paneigas la fluon). Ĉiu
+metadaten-peto estas limigita al 5 s (`withTimeoutOrNull`,
+`RssParsilo.METADATEN_LIMTEMPO_MS`), por ke eksterreta unua parsado ne bloku
+la fluon ĝis la 30-s-klienta tempolimo.
 
 **Apriora dezajnodiskuto.** Ripari nur en `sxargxiElsendojn` (retvojo) ne
 sufiĉus: je starto `leguKashitajnElsendojn` plenigas la memoran kaŝmemoron el

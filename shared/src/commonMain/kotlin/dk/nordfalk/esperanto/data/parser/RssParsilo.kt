@@ -15,6 +15,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
@@ -31,6 +32,11 @@ import kotlinx.serialization.json.jsonPrimitive
 class RssParsilo(
     private val archiveOrgKasho: ArchiveOrgDosiernomoKasho? = null,
 ) {
+
+    companion object {
+        /** Maksimuma tempo por unu archive.org-metadaten-peto (la respondo estas ~1-2 KB). */
+        const val METADATEN_LIMTEMPO_MS = 5_000L
+    }
 
     suspend fun parsuRss(
         fluoTeksto: String,
@@ -296,7 +302,16 @@ class RssParsilo(
         archiveOrgKasho?.leguDosiernomon(identigilo)?.let { return it }
         val divenita = "$identigilo.mp3"
         return try {
-            val teksto = httpKliento("https://archive.org/metadata/$identigilo")
+            // Limigu la metadaten-peton: ĝi estas aldonaĵo al la RSS-parsado kaj ne
+            // devas bloki ĝin longe (ekz. eksterrete, kiam nur retrofalas al la diveno).
+            // Kun la sama kasho ĝi sukcesos poste.
+            val teksto = withTimeoutOrNull(METADATEN_LIMTEMPO_MS) {
+                httpKliento("https://archive.org/metadata/$identigilo")
+            }
+            if (teksto == null) {
+                logw("RssParsilo", "archive.org/$identigilo: metadaten-peto translimis — uzas divenitan nomon $divenita")
+                return divenita
+            }
             val dosiernomo = eltiruMp3DosiernomonElMetadatenoj(teksto)
             if (dosiernomo == null) {
                 logw("RssParsilo", "archive.org/$identigilo: neniu MP3 en metadatenoj — uzas divenitan nomon $divenita")

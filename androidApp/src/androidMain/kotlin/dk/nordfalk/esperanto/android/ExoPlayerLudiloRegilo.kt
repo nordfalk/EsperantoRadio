@@ -154,7 +154,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         // StateFlow estas conflated, do la kolektanto povus maltrafi Eraro se ni ne gardas ĝin ĉi tie.
         val error = c.playerError
         val ludantoStato = if (error != null) {
-            LudantoStato.Eraro(error.message ?: "Nekonata eraro", reprovebla = estasReprovebla(error.errorCode))
+            LudantoStato.Eraro(error.message ?: "Nekonata eraro", reprovebla = estasReproveblaEraro(error))
         } else when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita
             Player.STATE_BUFFERING -> LudantoStato.Konektas
@@ -203,16 +203,4 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
     }
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
     override fun fiksiLauxtecon(volumeno: Float) { cxefaFadeno.post { controller?.volume = volumeno } }
-
-    /** Pasemaj eraroj (reto, tempolimo) estas reprovataj; daŭraj (HTTP-stato, formato, malkodilo) ne. */
-    private fun estasReprovebla(kodo: Int): Boolean = when (kodo) {
-        PlaybackException.ERROR_CODE_UNSPECIFIED,
-        PlaybackException.ERROR_CODE_REMOTE_ERROR,
-        PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW,
-        PlaybackException.ERROR_CODE_TIMEOUT,
-        PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
-        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> true
-        else -> false
-    }
 }

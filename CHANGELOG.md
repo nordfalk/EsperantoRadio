@@ -12,6 +12,12 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 2.0.12f) estas en la git-historio; ĝian finan eldonaĵon markas la etikedo
 [`fresxa_versio`](https://github.com/nordfalk/EsperantoRadio/releases/tag/fresxa_versio).
 
+## [Neeldonita]
+
+### Ŝanĝita
+
+- Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva
+
 ## [3.0.1] - 2026-09-26
 
 ### Aldonita

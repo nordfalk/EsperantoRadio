@@ -11,8 +11,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -74,7 +75,7 @@ class CriParsilo {
 
     /**
      * Mallonga etikedo por sekci-paĝo — fariĝas prefikso de la elsendo-titolo
-     * (ekz. "Aktuala: …", "LuciaStudio: …", "E-klubo: …") por ke oniu vidas
+     * (ekz. "Aktuala: …", "LuciaStudio: …", "E-klubo: …") por ke oni vidas
      * de kiu paĝo la elsendo venas.
      */
     internal fun sekcioEtikedo(sekcioUrl: String): String {
@@ -172,8 +173,13 @@ class CriParsilo {
         }
     }
 
+    /**
+     * Sekura lego de JSON-ĉena kampo: redonas null se la kampo mankas aŭ
+     * ne estas primitivo (ekz. objekto) — unu misformita karto ne
+     * nuligu la tutan sekcion (regulo 4).
+     */
     private fun JsonObject.str(ŝlosilo: String): String? =
-        this[ŝlosilo]?.jsonPrimitive?.content
+        (this[ŝlosilo] as? JsonPrimitive)?.takeIf { it !is JsonNull }?.content
 
     /** Epoko-milisekundoj → "yyyy-MM-dd" (UTC), kongrue kun RssParsilo.normigiDaton. */
     @OptIn(ExperimentalTime::class)

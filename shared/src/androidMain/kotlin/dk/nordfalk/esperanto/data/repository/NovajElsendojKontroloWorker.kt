@@ -104,7 +104,7 @@ class NovajElsendojKontroloWorker(
             val httpKliento = HttpClient(CIO) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
             }
-            val parsilo = RssParsilo()
+            val parsilo = RssParsilo(ArchiveOrgDosiernomoKasho(settings))
             var totalNovaj = 0
 
             for (kanalo in kanaloj) {

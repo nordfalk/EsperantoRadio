@@ -1,3 +1,25 @@
+# Ŝanĝoj — 2026-09-26
+
+## Peranto: vera MP3-dosiernomo el archive.org-metadatenoj (PR #75)
+
+La Peranto-parsilo divensis la MP3-dosiernomon de archive.org (`<identigilo>.mp3`);
+en 4 el la 25 videblaj elsendoj (7 el la lastaj 50) la vera nomo estis alia
+(ekz. `malapero-benda-3` → `Malapero_Benda3.mp3`) → HTTP 404, do ne ludeblis.
+
+- `parsuPeranto` nun demandas `https://archive.org/metadata/<id>` (paralele,
+  5-s-tempolimo, unufoje po identigilo) kaj uzas la veran originalan `.mp3`-nomon;
+  rezulto persistata en `ArchiveOrgDosiernomoKasho` (Settings+JSON; uzata de
+  `AppStato` kaj `NovajElsendojKontroloWorker`). Reteraro → retrofalo al la diveno.
+- **API-ŝanĝo**: `parsuRss`, `parsuPeranto`, `leguKashitajnElsendojn`,
+  `leguĈiujnKashitajnElsendojn` iĝis `suspend`; neniuj alvokantoj ŝanĝiĝis.
+- Kontrolo: 202 labortablaj + 5 instrumentitaj testoj, 0 fiaskoj; Android/
+  Desktop/wasmJs kompilas. Detala problem-analizo kaj kialoj: PR #75.
+- **Sciate ne nia cimo**: archive.org intermite redonas 500 por kelkaj
+  arkivaĵoj (difektaj edge-nodoj, ekz. `auskultu_ripetu120`); Android tiam
+  klasas ĝin kiel daŭran eraron kaj saltas al la sekva elsendo.
+
+---
+
 # Ŝanĝoj — 2026-09-23
 
 Ĉi tiu dokumento priskribas ĉiujn ŝanĝojn faritajn surbaze de la "Farota"-listo en `README.md`,

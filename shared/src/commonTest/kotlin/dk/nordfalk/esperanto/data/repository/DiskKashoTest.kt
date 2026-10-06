@@ -30,12 +30,12 @@ class DiskKashoTest {
     }
 
     @AfterTest
-    fun purigu() {
+    fun purigu() = kotlinx.coroutines.test.runTest {
         AppStato.reset()
     }
 
     @Test
-    fun skribuKajLeguKashon() {
+    fun skribuKajLeguKashon() = kotlinx.coroutines.test.runTest {
         val nomo = "test_diskkasho_roundtrip"
         val enhavo = "<rss><channel><title>Testo</title></channel></rss>"
         try {
@@ -49,13 +49,13 @@ class DiskKashoTest {
     }
 
     @Test
-    fun leguNeekzistantanKashonRedonasNull() {
+    fun leguNeekzistantanKashonRedonasNull() = kotlinx.coroutines.test.runTest {
         val rezulto = leguKashon("neniam_ekzistinta_kasho_$$")
         assertNull(rezulto, "Legu neekzistantan kaŝon devas redoni null")
     }
 
     @Test
-    fun leguKashitajnElsendojnReParsasKorekte() {
+    fun leguKashitajnElsendojnReParsasKorekte() = kotlinx.coroutines.test.runTest {
         val slug = "test_diskkasho_kernpunkto"
         val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(
@@ -85,7 +85,7 @@ class DiskKashoTest {
     }
 
     @Test
-    fun leguKashitajnElsendojnSenKashoRedonasNull() {
+    fun leguKashitajnElsendojnSenKashoRedonasNull() = kotlinx.coroutines.test.runTest {
         val kanalo = Kanalo(
             slug = "neniam_kasita_kanalo_$$",
             nomo = "Neniam Kaŝita",
@@ -97,7 +97,7 @@ class DiskKashoTest {
     }
 
     @Test
-    fun leguĈiujnKashitajnElsendojnKolektasPlurajnKanalojn() {
+    fun leguĈiujnKashitajnElsendojnKolektasPlurajnKanalojn() = kotlinx.coroutines.test.runTest {
         val slug1 = "test_diskkasho_kp1"
         val slug2 = "test_diskkasho_kp2"
         val rss1 = leguFiksaĵon("kernpunkto_feed.xml")

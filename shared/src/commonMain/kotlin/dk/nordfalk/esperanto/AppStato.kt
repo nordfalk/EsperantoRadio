@@ -3,7 +3,9 @@ package dk.nordfalk.esperanto
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
+import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
@@ -92,7 +94,7 @@ object AppStato {
             bundledTeksto = ::leguBundledKanalkonfiguron
         )
 
-        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!)
+        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKasho(settings)))
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 

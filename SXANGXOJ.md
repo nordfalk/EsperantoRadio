@@ -2,77 +2,21 @@
 
 ## Peranto: vera MP3-dosiernomo el archive.org-metadatenoj (PR #75)
 
-**Problemo.** 'Malapero de aktoro Benda (3/3)' ludeblis ĉe
-https://esperantaretradio.blogspot.com/ sed ne en la apo. La Peranto-parsilo
-(regulo 6.3, `RssParsilo.parsuPeranto`) konstruis la fluo-URL-on per la supozo
-"la MP3-dosiero nomiĝas same kiel la arkivaĵo":
+La Peranto-parsilo divensis la MP3-dosiernomon de archive.org (`<identigilo>.mp3`);
+en 4 el la 25 videblaj elsendoj (7 el la lastaj 50) la vera nomo estis alia
+(ekz. `malapero-benda-3` → `Malapero_Benda3.mp3`) → HTTP 404, do ne ludeblis.
 
-```
-archive.org/embed/malapero-benda-3 → archive.org/download/malapero-benda-3/malapero-benda-3.mp3
-```
-
-Sed la arkivaĵo `malapero-benda-3` entenas `Malapero_Benda3.mp3` → la kunstruita
-URL redonis HTTP 404. La ero aperis en la listo (validaj titolo/dato), do la
-uzanto vidis ĝin, sed ludo/elŝuto fiaskis. Sistemeca kontrolo de ĉiuj 50
-archive.org-eroj en la fluo (`curl -L archive.org/download/<id>/<id>.mp3`)
-trovis **7 rompitajn** pro alia dosiernomo: `malapero-benda-2`,
-`malapero-benda-3`, `fulmo-diasendito`, `konkursa-travivajxo`, `murd-atenco`,
-`plenluno-superplenluno`, `tragedio-universo`. La malnova apo ne havis tiun
-cimon: `RomePodcastParser.kt` elŝutis la embed-paĝon kaj eltiris la veran
-MP3-URL-on el ĝia HTML — ĝi neniam divenis.
-
-**Riparo.** `parsuPeranto` iĝis dufaza:
-
-1. kolekto — kiel antaŭe, sed por archive.org la dosiernomo estas nur divenita;
-2. korekto — ĉiuj identigiloj estas demandataj ĉe
-   `https://archive.org/metadata/<id>` (paralele per `coroutineScope/async`,
-   unufoje po identigilo); la unua *originala* `.mp3`-dosiero el `files` uziĝas;
-3. konstruado — la elsendoj ricevas la korektitan URL-on
-   (`encodeURLPathPart` por la dosiernomo).
-
-La rezulto estas persistata en nova
-`ArchiveOrgDosiernomoKasho` (Settings+JSON, ŝablono de
-`PersistaLudatojDeponejo`) — unu metadaten-peto po identigilo por ĉiam, ankaŭ
-trans restartoj (uzata kaj de `AppStato` kaj de `NovajElsendojKontroloWorker`).
-Reteraro (inkl. `kotlin.Error` de la Js-motoro ĉe CORS) aŭ forestata MP3 →
-retrofalo al la divenita nomo; fiaskoj ne estas kaŝitaj, do oni reprovas kiam
-la reto revenas (regulo 4: unu arkivaĵo ne paneigas la fluon). Ĉiu
-metadaten-peto estas limigita al 5 s (`withTimeoutOrNull`,
-`RssParsilo.METADATEN_LIMTEMPO_MS`), por ke eksterreta unua parsado ne bloku
-la fluon ĝis la 30-s-klienta tempolimo.
-
-**Apriora dezajnodiskuto.** Ripari nur en `sxargxiElsendojn` (retvojo) ne
-sufiĉus: je starto `leguKashitajnElsendojn` plenigas la memoran kaŝmemoron el
-la diskkaŝo kaj `sxargxiElsendojn` tiam frue revenas sen la reto — la uzanto
-vidus malĝustajn URL-ojn ĝis malsupren-tiro. Ĉar la korekto okazas en la
-parsilo mem, ĝi kovras ĉiujn vojojn (kanalvido, Hejmo, elŝutoj, alarmoj,
-sciigoj), kaj ankaŭ la diskkaŝan re-parsadon.
-
-**API-ŝanĝo.** `parsuRss`, `parsuPeranto`, `leguKashitajnElsendojn` kaj
-`leguĈiujnKashitajnElsendojn` iĝis `suspend` (necesaj por la metadaten-petoj).
-Ĉiuj alvokantoj jam estis suspend-kuntekstoj (`KanaloViewModel`,
-`HejmoViewModel`, `KanalaroViewModel`, `MainActivity.trovuAlarmElsendon`,
-`NovajElsendojKontroloWorker`, `RadioTxtKomparilo` en `runBlocking`), do neniuj
-alvokantoj devis ŝanĝiĝi. La 24 parsilaj testoj kaj la DiskKasho-testoj estis
-mekanike envolvitaj per `runTest` (sen kondutŝanĝo).
-
-**Kontrolo.**
-
-- 201 testoj, 0 fiaskoj (`./gradlew :shared:desktopTest`), inkluzive 3 novajn
-  parsilajn testojn (vera dosiernomo el metadatenoj; tolero de `Error("Fail to
-  fetch")`; malplenaj metadatenoj `{}`) kaj 2 plurtavolajn kestajn testojn
-  (`ArchiveOrgDosiernomoKashoTest`, desktopTest kun vera persisto:
-  unufoja peto ankaŭ post "restarto", fiasko ne kaŝiĝas).
-- `./gradlew :androidApp:assembleDebug` (JDK 17), `:desktopApp:compileKotlinDesktop`
-  kaj `:webApp:compileKotlinWasmJs` pasas.
-- La metadaten-formato estas kontrolita kontraŭ la reala arkivaĵo:
-  `curl https://archive.org/metadata/malapero-benda-3` → `files` kun
-  `{"name":"Malapero_Benda3.mp3","source":"original","format":"VBR MP3",...}`.
-
-**Sciate ne riparita.** `auskultu_ripetu120`, `ekulturaj_eventoj` kaj
-`transdono_inteligenteco` havas ĝustan dosiernomon, sed la ĉefa datennodo de
-archive.org redonas 500 (transira problemo ĉe archive.org; alia nodo havas la
-dosieron). Ne nia cimo; resaniĝos ĉe archive.org.
+- `parsuPeranto` nun demandas `https://archive.org/metadata/<id>` (paralele,
+  5-s-tempolimo, unufoje po identigilo) kaj uzas la veran originalan `.mp3`-nomon;
+  rezulto persistata en `ArchiveOrgDosiernomoKasho` (Settings+JSON; uzata de
+  `AppStato` kaj `NovajElsendojKontroloWorker`). Reteraro → retrofalo al la diveno.
+- **API-ŝanĝo**: `parsuRss`, `parsuPeranto`, `leguKashitajnElsendojn`,
+  `leguĈiujnKashitajnElsendojn` iĝis `suspend`; neniuj alvokantoj ŝanĝiĝis.
+- Kontrolo: 202 labortablaj + 5 instrumentitaj testoj, 0 fiaskoj; Android/
+  Desktop/wasmJs kompilas. Detala problem-analizo kaj kialoj: PR #75.
+- **Sciate ne nia cimo**: archive.org intermite redonas 500 por kelkaj
+  arkivaĵoj (difektaj edge-nodoj, ekz. `auskultu_ripetu120`); Android tiam
+  klasas ĝin kiel daŭran eraron kaj saltas al la sekva elsendo.
 
 ---
 

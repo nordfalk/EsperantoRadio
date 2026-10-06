@@ -1,3 +1,20 @@
+# Ŝanĝoj — 2026-10-06
+
+## Reprovo ĉe servileraroj 5xx sur Android (PR #76)
+
+`ERROR_CODE_IO_BAD_HTTP_STATUS` estis klasata kiel daŭra eraro, do la ludvico
+tuj saltis al la sekva elsendo — ankaŭ kiam la eraro estis pasema HTTP 500
+(archive.org-Edge-nodoj intermite redonas 500 por sanaj dosieroj; dua provo
+kutime sukcesas ĉar la redirekto elektas alian nodon).
+
+Nova `EraroKlasifiko.kt` (androidApp): 5xx en la kaŭz-ĉeno
+(`InvalidResponseCodeException.responseCode`) → reprovebla (la ekzista
+eksponenta reprovo ĝis 10 fojojn); 4xx, formato kaj malkodiloj restas daŭraj.
+6 novaj instrumentitaj testoj (`EraroKlasifikoTest`); 11 instrumentitaj
+testoj entute, 0 fiaskoj.
+
+---
+
 # Ŝanĝoj — 2026-09-26
 
 ## Peranto: vera MP3-dosiernomo el archive.org-metadatenoj (PR #75)

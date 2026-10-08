@@ -1,5 +1,51 @@
 # Ŝanĝoj — 2026-10-08
 
+## Diagnoza ekrano + aŭtomata daŭrigo en la fono (PR: #79)
+
+### Aŭtomata daŭrigo el la fono (servo)
+
+Uzanto raportis, ke ludado ne daŭris al la venonta elsendo kiam unu finiĝis
+dum la apo estis en la fono. Logcat montris, ke nek la servo nek la apo
+reagis al `STATE_ENDED` — sur Samsung la ludilo estas mortigita en la fono
+(bateri-optimumado/MARs; krome privata DNS rompis la DNS-rezolvon).
+
+- `EsperantoLudadoServo` ricevis `Player.Listener`: ĉe `STATE_ENDED` ĝi vokas
+  `AppStato.ludvicoRegilo?.traktiFinonPublika(LudantoStato.Finita, erara = false)`
+  en `serviceScope` — la sekva elsendo lanĉiĝas eĉ se la apo-procezo dormas
+  aŭ estis mortigita.
+- `LudvicoRegilo`: nova `@Volatile lastaTraktitaFontoId` gardas kontraŭ duobla
+  traktado de la sama fino (kaj servo kaj apo povas vidi `STATE_ENDED`);
+  nova publika `traktiFinonPublika()` + privata `fontoId()`; la gardilo
+  estas nuligita en `ludiElsendon`.
+- Testoj: `servoVoko_traktiFinonPublika_vokasAuxtoludon`,
+  `servoVoko_duoblaTraktadoDeSamaFonto_estasIgnorata`.
+
+### Diagnoza ekrano
+
+La uzanto ne sciis, kiujn sistem-agordojn kontroli — do la apo mem kontrolas
+ilin kaj gvidas al la ĝusta paĝo.
+
+- `DiagnozoRegilo` (expect/actual): kontrolas bateri-optimumadon
+  (`PowerManager.isIgnoringBatteryOptimizations`), sciig-permeson
+  (`NotificationManagerCompat`), ekzaktajn alarmojn
+  (`AlarmManager.canScheduleExactAlarms`) kaj DNS (`archive.org`; nur en la
+  plena kontrolo). `malfermiSistemAgordon(intenco)` malfermas la ĝustan
+  sistem-paĝon. Desktop/wasmJs/iOS: no-op.
+- `Vojo.Diagnozo` + `DiagnozoEkrano`: kartoj kun ikono laŭ severeco
+  (INFO/AVERTO/ERARO), butono al la sistem-agordo kaj "Re-kontroli".
+- Avertosigno sur la ĉefekrano (ruĝa avert-ikono en la supra breto, nur se
+  estas problemo kun severeco AVERTO/ERARO) kondukas rekte al la diagnozo;
+  kroma ligilo en Agordoj → Sistemo → Diagnozo. `AgordojEkrano` nun estas
+  rulebla (antaŭe ne).
+- `AppStato` kreas la `DiagnozoRegilon` kaj lanĉas fonan `kontroliRapide()`
+  ĉe starto.
+- Testoj: `DiagnozoTest` (7 testoj: modeloj + desktop no-op).
+
+### Kontrolo
+
+`./gradlew :shared:desktopTest` — ĉiuj testoj pasas (inkluzive de la novaj);
+`./gradlew :androidApp:assembleDebug` — sukcesa.
+
 ## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: #78)
 
 La "Kanaloj"-vico sur la frontpaĝo dividas la kanalojn: aktivaj (kun elsendo

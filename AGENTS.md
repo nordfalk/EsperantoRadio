@@ -161,7 +161,7 @@ EsperantoRadio/
    Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
 5. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
    kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
-6. **Ne commitu sen eksplicita peto de la uzanto.** La rajtigo por
+6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
 

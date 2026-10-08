@@ -17,6 +17,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - 7 novaj podkastaj kanaloj: Fremdulo 3, Usone Persone, Ne Parolu pri Esperanto, Radikala tenero, Esperanto Stories, Le Monde diplomatique en Esperanto kaj Rakonta Tempo (https://github.com/nordfalk/EsperantoRadio/pull/83)
+- Luditaj elsendoj malaperas de "Kio novas" kaj tuj aperas en "Lastatempe ludata" (https://github.com/nordfalk/EsperantoRadio/pull/85)
+- "Kio novas" montras maksimume 5 elsendojn po kanalo por lasi spacon al aliaj (https://github.com/nordfalk/EsperantoRadio/pull/85)
+- Varsovia Vento kaj Kernpunkto estas defaŭlte ŝatataj (sciigoj pri novaj elsendoj) (https://github.com/nordfalk/EsperantoRadio/pull/85)
 
 ## [3.0.2] - 2026-10-08
 

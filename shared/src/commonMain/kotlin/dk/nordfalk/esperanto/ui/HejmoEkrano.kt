@@ -189,6 +189,9 @@ class HejmoViewModel(
     private val _lastatempeLudataj = MutableStateFlow<List<Elsendo>>(emptyList())
     val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
+    /** Kruda listo de ĉiuj elsendoj — uzata por reaktualigi kiam ludatoj ŝanĝiĝas. */
+    private var cxiujElsendoj: List<Elsendo> = emptyList()
+
     /** Aktivaj kanaloj — kun elsendo dum la pasinta jaro (montrataj unue). */
     private val _aktivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
     val aktivajKanaloj = _aktivajKanaloj.asStateFlow()
@@ -236,14 +239,8 @@ class HejmoViewModel(
      */
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
+        cxiujElsendoj = elsendoj
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
-        val novaj = elsendoj
-            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) }
-            .groupBy { it.kanaloSlug }
-            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
-            .sortedByDescending { it.dato }
-            .take(50)
-        _novajElsendoj.value = novaj
 
         val cxiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
@@ -255,23 +252,54 @@ class HejmoViewModel(
         _aktivajKanaloj.value = aktivaj
         _arkivajKanaloj.value = arkivaj
 
-        val ekskluditaj = (novaj.take(20).map { it.id } +
-            cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
+        aktualigiuLudatajn()
+    }
+
+    /**
+     * Reaktualigas "Kio novas", "Lastatempe ludata" kaj "Kio popularas" surbaze
+     * de la nunaj ludatoj. Vokata post [plenigu] kaj kiam ludatoj ŝanĝiĝas.
+     *
+     * - Luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata"
+     * - Maksimume 5 plej novaj elsendoj po kanalo en "Kio novas"
+     */
+    @OptIn(ExperimentalTime::class)
+    fun aktualigiuLudatajn() {
+        val elsendoj = cxiujElsendoj
+        if (elsendoj.isEmpty()) return
+        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+
+        val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        val luditajIdj = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .map { it.elsendoId }
+            .toSet()
+
+        // "Kio novas" — ekskludu luditajn, maks 5 po kanalo
+        val novaj = elsendoj
+            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) && it.id !in luditajIdj }
+            .groupBy { it.kanaloSlug }
+            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(5) }
+            .sortedByDescending { it.dato }
+            .take(50)
+        _novajElsendoj.value = novaj
+
+        // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
+        val lastatempe = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .sortedByDescending { it.lasteLudita }
+            .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
+            .take(20)
+        _lastatempeLudataj.value = lastatempe
+
+        // "Kio popularas" — ekskludu novajn, kanalajn kaj luditajn
+        val kanalajIdj = (aktivajKanaloj.value + arkivajKanaloj.value)
+            .mapNotNull { it.plejNovaElsendo?.id }
+            .toSet()
+        val ekskluditaj = (novaj.take(20).map { it.id } + kanalajIdj + luditajIdj).toSet()
         _popularajElsendoj.value = elsendoj
             .filter { it.id !in ekskluditaj }
             .shuffled()
             .take(20)
-
-        // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
-        if (ludatojDeponejo != null) {
-            val ludatoj = ludatojDeponejo.observiLudatojn().value
-            val lastatempe = ludatoj.values
-                .filter { it.lasteLudita > 0 }
-                .sortedByDescending { it.lasteLudita }
-                .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
-                .take(20)
-            _lastatempeLudataj.value = lastatempe
-        }
     }
 }
 
@@ -334,6 +362,11 @@ fun HejmoEkrano(
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
+
+    // Reaktualigu "Kio novas" kaj "Lastatempe ludata" kiam ludatoj ŝanĝiĝas
+    LaunchedEffect(ludatojMapo) {
+        vm.aktualigiuLudatajn()
+    }
 
     if (viewModel == null) {
         LaunchedEffect(Unit) {

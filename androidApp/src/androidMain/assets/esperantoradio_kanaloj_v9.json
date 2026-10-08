@@ -60,7 +60,8 @@
 			"emblemoUrl": "https://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
-			"hejmpaĝoButono": "https://podkasto.net/"
+			"hejmpaĝoButono": "https://podkasto.net/",
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "lamalfamuloj",
@@ -107,7 +108,8 @@
 			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝoButono": "https://kern.punkto.info/"
+			"hejmpaĝoButono": "https://kern.punkto.info/",
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "movada-vidpunkto",

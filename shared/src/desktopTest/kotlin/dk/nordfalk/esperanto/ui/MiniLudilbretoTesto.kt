@@ -10,6 +10,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -115,6 +118,57 @@ class MiniLudilbretoTesto {
         assertTrue(
             abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs / 100,
             "saltiAl devas celi 25% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
+        )
+    }
+
+    @Test
+    fun sercxbreto_tuŝetas_por_salti() = runComposeUiTest {
+        val dauroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+            }
+        }
+        waitForIdle()
+
+        // Tuŝeto je 50% de la larĝo
+        onNodeWithTag("sercxbreto").performTouchInput {
+            click(percentOffset(0.5f, 0.5f))
+        }
+        waitForIdle()
+
+        assertEquals(1, ludilo.saltVokoj.size, "saltiAl devas esti vokita unufoje post la tuŝeto")
+        val atendaPozicio = dauroMs / 2
+        assertTrue(
+            abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs / 100,
+            "saltiAl devas celi ~50% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
+        )
+    }
+
+    @Test
+    fun sercxbreto_ŝovas_per_treno() = runComposeUiTest {
+        val dauroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+            }
+        }
+        waitForIdle()
+
+        // Treno sur la serĉbreto de 75% ĝis 50% de la larĝo. La norma Slider finas
+        // la valoron kelkajn rastrumerojn (tuŝ-slop) post la fingro, do tolero 3%.
+        onNodeWithTag("sercxbreto").performTouchInput {
+            swipe(percentOffset(0.75f, 0.5f), percentOffset(0.5f, 0.5f))
+        }
+        waitForIdle()
+
+        assertEquals(1, ludilo.saltVokoj.size, "saltiAl devas esti vokita unufoje post la treno")
+        val atendaPozicio = dauroMs / 2
+        assertTrue(
+            abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs * 3 / 100,
+            "saltiAl devas celi ~50% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
         )
     }
 

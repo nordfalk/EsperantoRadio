@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 data class Kanalo(
     val slug: String,                         // kodo — unika ŝlosilo
     val nomo: String,                          // vidiga nomo
+    val priskribo: String? = null,              // mallonga priskribo (1-2 linioj) el la kanalkonfiguro
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,   // livestream (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl

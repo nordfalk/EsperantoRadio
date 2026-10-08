@@ -105,6 +105,7 @@ data class KanalAgordo(
 data class KanaloDto(
     val kodo: String,
     val nomo: String,
+    val priskribo: String? = null,
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
@@ -119,6 +120,7 @@ data class KanaloDto(
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     slug = kodo,
     nomo = nomo,
+    priskribo = priskribo,
     emblemoUrl = emblemoUrl,
     rektaElsendaSonoUrl = rektaElsendaSonoUrl,
     podkastaRssUrl = elsendojRssUrl,

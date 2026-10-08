@@ -198,11 +198,23 @@ private fun KanaloEro(
             } else {
                 tipo
             }
-            Text(
-                teksto,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column {
+                // Mallonga priskribo el la kanalkonfiguro (nedeviga)
+                if (!kanalo.priskribo.isNullOrBlank()) {
+                    Text(
+                        kanalo.priskribo,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Text(
+                    teksto,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         },
         leadingContent = {
             if (kanalo.emblemoUrl != null) {

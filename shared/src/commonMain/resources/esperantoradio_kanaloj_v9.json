@@ -255,6 +255,23 @@
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/36957757/36957757-1679199549737-8589e88bbf25b.jpg",
 			"hejmpaĝoButono": "https://podcasters.spotify.com/pod/show/au016dsteno"
 		}
+	,{
+			"kodo": "iro",
+			"nomo": "Internacia Afrika Retradio",
+			// AzuraCast-fluo sur la sama servilo kiel Muzaiko (fluo.muzaiko.info); la fluo listas la epizodojn plej malnovajn unue
+			"elsendojRssUrl": "https://fluo.muzaiko.info/public/3/podcast/1f03f904-19e7-65ca-a948-01e45d8a6a2f/feed",
+			"emblemoUrl": "https://fluo.muzaiko.info/api/station/3/public/podcast/1f03f904-19e7-65ca-a948-01e45d8a6a2f/art-1748854925.jpg",
+			"retpoŝto": "tjero.johanego@gmail.com",
+			"hejmpaĝoButono": "https://internaciaretradio.wordpress.com/"
+		}
+	,{
+			"kodo": "tuluzo",
+			"nomo": "Esp. Magazino Tuluzo",
+			// WordPress-blog-fluo; la ĝenerala parsilo preterlasas blogaĵojn sen MP3-enclosure (restas nur la magazenaj elsendoj)
+			"elsendojRssUrl": "https://toulouse.occeo.net/eo/feed/",
+			"emblemoUrl": "",
+			"hejmpaĝoButono": "https://toulouse.occeo.net/eo/radio/"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [

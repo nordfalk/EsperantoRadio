@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
+import dk.nordfalk.esperanto.data.config.nunaPlatformo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.logd
@@ -32,7 +33,14 @@ class KanaloDeponejoImpl(
         logi("KanaloDeponejo", "Legas kanalkonfiguron el bundled resource")
         val teksto = bundledTeksto()
         val agordo = leganto.legu(teksto)
-        val kanaloj = agordo.kanaloj.map { it.alKanalo() }
+        val ĉiuj = agordo.kanaloj.map { it.alKanalo() }
+        // Kaŝu kanalojn kiuj ne funkcias sur ĉi tiu platformo (ekz. CRI:
+        // HLS-fluojn nur ExoPlayer povas ludi — vidu Kanalo.videblaNurSur)
+        val kaŝitaj = ĉiuj.count { it.videblaNurSur != null && it.videblaNurSur != nunaPlatformo }
+        if (kaŝitaj > 0) {
+            logi("KanaloDeponejo", "Kaŝas $kaŝitaj kanalojn nevideblajn sur '$nunaPlatformo'")
+        }
+        val kanaloj = ĉiuj.filter { it.videblaNurSur == null || it.videblaNurSur == nunaPlatformo }
         _kanaloj.value = kanaloj
         logi("KanaloDeponejo", "Ŝargis ${kanaloj.size} kanalojn")
         return kanaloj

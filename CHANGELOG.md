@@ -19,6 +19,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Elfaldebla ludilbreto, ŝovebla serĉbreto, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
 - Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo) kontrolas la aparaton por oftaj problemoj (bateri-optimumado, sciig-permeso, ekzaktaj alarmoj, DNS) kaj gvidas al la ĝustaj sistem-agordoj (https://github.com/nordfalk/EsperantoRadio/pull/79)
 - Avertosigno pri detektitaj problemoj aperas sur la ĉefekrano kaj kondukas rekte al la diagnozo (https://github.com/nordfalk/EsperantoRadio/pull/79)
+- Nova kanalo "CRI — Ĉina Radio Internacia": ĉiutagaj novaĵoj kaj programoj el esperanto.cri.cn (nur Android, ĉar la fluoj estas HLS-video) (https://github.com/nordfalk/EsperantoRadio/pull/72)
+- La CRI-elsendoj estas videoj kaj montras sian filmotrakon; klako sur la filmo malfermas plenekranan vidon kun aŭtomata horizontala rotacio kaj pinĉ-zomo (https://github.com/nordfalk/EsperantoRadio/pull/72)
 
 ### Ŝanĝita
 

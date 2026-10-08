@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+  <title>CRI — Ĉina Radio Internacia (Esperanto)</title>
+  <link>https://esperanto.cri.cn/</link>
+  <language>eo</language>
+  <description>Ĉiutagaj Esperanto-elsendoj de Ĉina Radio Internacia, transkodataj el HLS al MP3 far la CRI-peranto.</description>
+  <image><url>https://ekzemplo.eo/cri/cri.png</url><title>CRI</title><link>https://esperanto.cri.cn/</link></image>
+<item>
+  <title>Ĉina-usona kunlaboro kreas novan modelon por rilatoj inter grandaj landoj</title>
+  <description>Ĉina-usona kunlaboro kreas novan modelon por rilatoj inter grandaj landoj. Por grandaj landoj, harmonio profitigas ambaŭ flankojn, dum konflikto damaĝas ambaŭ.
+En majo, ĉina kaj usona ŝtatestroj</description>
+  <link>https://esperanto.cri.cn/2026/09/25/ARTI1790328553999767</link>
+  <guid isPermaLink="false">ARTI1790328553999767</guid>
+  <pubDate>Fri, 25 Sep 2026 09:29:15 GMT</pubDate>
+  <enclosure url="https://ekzemplo.eo/cri/sonoj/ARTI1790328553999767.mp3" length="1098735" type="audio/mpeg"/>
+  <itunes:duration>0:02:17</itunes:duration>
+  <itunes:image href="https://ekzemplo.eo/cri/cri.png"/>
+</item>
+<item>
+  <title>Ekonomiaj kaj komercaj interŝanĝoj firmigas fundamenton de stabilaj ĉina-usonaj rilatoj</title>
+  <description>Ekonomia kaj komerca kunlaboro estas la stabiliga ŝtono de ĉina-usonaj rilatoj. La interesoj de la du landoj estas profunde interplektitaj. Post la ŝtatestra renkontiĝo en majo, la duflankaj komercaj</description>
+  <link>https://esperanto.cri.cn/2026/09/24/ARTI1790239670094477</link>
+  <guid isPermaLink="false">ARTI1790239670094477</guid>
+  <pubDate>Thu, 24 Sep 2026 08:47:52 GMT</pubDate>
+  <enclosure url="https://ekzemplo.eo/cri/sonoj/ARTI1790239670094477.mp3" length="1243783" type="audio/mpeg"/>
+  <itunes:duration>0:02:35</itunes:duration>
+  <itunes:image href="https://ekzemplo.eo/cri/cri.png"/>
+</item>
+<item>
+  <title>An Open China, Shared Opportunities</title>
+  <description>This autumn, three major national trade fairs took place back to back, the Shanghai International Fisheries Expo, the China International Fair for Investment and Trade in Xiamen, and the China</description>
+  <link>https://esperanto.cri.cn/2026/09/23/ARTI1790140276423680</link>
+  <guid isPermaLink="false">ARTI1790140276423680</guid>
+  <pubDate>Wed, 23 Sep 2026 05:11:19 GMT</pubDate>
+  <enclosure url="https://ekzemplo.eo/cri/sonoj/ARTI1790140276423680.mp3" length="2649743" type="audio/mpeg"/>
+  <itunes:duration>0:05:31</itunes:duration>
+  <itunes:image href="https://ekzemplo.eo/cri/cri.png"/>
+</item>
+</channel>
+</rss>

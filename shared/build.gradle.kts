@@ -119,6 +119,7 @@ kotlin {
             implementation(libs.androidx.work.runtime)
             implementation(libs.androidx.media3.exoplayer)
             implementation(libs.androidx.media3.session)
+            implementation(libs.androidx.media3.ui) // PlayerView por videa elsendo-vidigo
         }
 
         val desktopMain by getting {

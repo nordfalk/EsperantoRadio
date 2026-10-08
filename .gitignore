@@ -48,7 +48,7 @@ captures/
 
 # Eldonado — sekretaj dosieroj (NENIAM versiigu!)
 play-service-account.json
-androidApp/play-service-account.json
+secrets.properties
 *.p8
 google-services.json
 /.nb-gradle/

@@ -154,6 +154,11 @@ EsperantoRadio/
     precipe post eraro, incidento aŭ neatendita rezulto — skribu koncizan
     lecionon (kun dato kaj ekzemplo) en la sekcion "Teknikaj scioj lernitaj
     dum la laboro". Celo: neniam ripeti la saman eraron.
+12. **Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
+    Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
+    esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
+    de `.gitignore`. Se vi trovas ili en la deponejo, tuj forigu ilin kun `git rm`
+    kaj informu la deponejan posedanton.
 
 ## Git-laborfluo
 

@@ -32,12 +32,21 @@ android {
     namespace = "dk.nordfalk.esperanto.android"
     compileSdk = 36
 
+    // Ŝargu sekretajn agordojn el secrets.properties en la radiko (NENIAM commit!)
+    val keystoreProperties = java.util.Properties().apply {
+        file("../secrets.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+    }
+
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-            keyAlias = System.getenv("KEYSTORE_ALIAS") ?: "jacobnordfalk"
-            keyPassword = System.getenv("KEYSTORE_KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
+            storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")
+            storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = keystoreProperties.getProperty("KEYSTORE_ALIAS") ?: System.getenv("KEYSTORE_ALIAS") ?: "jacobnordfalk"
+            keyPassword = keystoreProperties.getProperty("KEYSTORE_KEY_PASSWORD") 
+                ?: keystoreProperties.getProperty("KEYSTORE_PASSWORD") 
+                ?: System.getenv("KEYSTORE_KEY_PASSWORD") 
+                ?: System.getenv("KEYSTORE_PASSWORD") 
+                ?: ""
         }
     }
 
@@ -69,10 +78,12 @@ android {
 // Gradle Play Publisher — agordo por Google Play-eldonado
 // Vidu docs/nova/07_eldonado.md por plena gvidilo
 play {
-    // Servila konto-JSON — metu ĉe androidApp/play-service-account.json (NE versiigu)
+    // Servila konto-JSON — metebla en secrets.properties kiel PLAY_SERVICE_ACCOUNT_JSON_PATH
     // aŭ agordu per env-variablej: PLAY_SERVICE_ACCOUNT_JSON_PATH
     serviceAccountCredentials.set(
-        file(System.getenv("PLAY_SERVICE_ACCOUNT_JSON_PATH") ?: "play-service-account.json")
+        file(keystoreProperties.getProperty("PLAY_SERVICE_ACCOUNT_JSON_PATH") 
+            ?: System.getenv("PLAY_SERVICE_ACCOUNT_JSON_PATH") 
+            ?: "play-service-account.json")
     )
     // Kiu track eldoni: "internal", "alpha", "beta", "production"
     track.set("internal")

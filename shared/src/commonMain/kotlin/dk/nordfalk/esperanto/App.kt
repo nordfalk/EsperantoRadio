@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +11,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
@@ -111,6 +116,10 @@ fun EsperantoRadioApp(
         val ludantoStato by ludilo.stato.collectAsState()
 
         val nunaVojo = backStack.lastOrNull()
+
+        // Hoistita elfaldita-ŝtato de la mini-ludilbreto — por ke reen-butono kaj
+        // klako ekstere povu kolapsi ĝin
+        var elfaldita by rememberSaveable { mutableStateOf(false) }
 
         // Observi ŝanĝojn de ŝatoj kaj sciigoj por ĝisdatigi la fonan skedon
         val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
@@ -329,13 +338,79 @@ fun EsperantoRadioApp(
                         }
                     },
                 )
+
+                // Scrim-overlay: klakoj ekstere kolapsas la elfalditan ludilbreton
+                if (elfaldita) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                logi("Klako", "scrim → enfoldigi la ludilon")
+                                elfaldita = false
+                            }
+                    )
+                }
+
+                // Kaptu reen-butonon por enfoldigi la ludilbreton — devas esti post
+                // NavDisplay por havi prioritaton (laste komponita handler venkas)
+                val kolapsoStato = rememberNavigationEventState(NavigationEventInfo.None)
+                NavigationBackHandler(
+                    state = kolapsoStato,
+                    isBackEnabled = elfaldita,
+                    onBackCompleted = {
+                        logi("Nav", "← reen: enfoldigas ludilbreton (NavigationBackHandler)")
+                        elfaldita = false
+                    },
+                )
             }
 
             if (montruSubanBreton) {
                 val reprovo by ludvicoRegilo.reprovo.collectAsState()
+
+                // Sekvanta enhavo — kiam nenio ludas, la breto sekvas la navigadon
+                val sekvantaTitolo: String?
+                val sekvantaSubtitolo: String?
+                val sekvantaBildoUrl: String?
+                val onLudiSekvantan: () -> Unit
+                when (val vojo = nunaVojo) {
+                    is Vojo.KanaloDetalo -> {
+                        sekvantaTitolo = vojo.kanalo.nomo
+                        sekvantaSubtitolo = "Kanalo"
+                        sekvantaBildoUrl = vojo.kanalo.emblemoUrl
+                        onLudiSekvantan = {
+                            val fonto = vojo.kanalo.rektaElsendaSonoUrl?.let { Sonfonto.RektaKanalo(vojo.kanalo) }
+                            if (fonto != null) {
+                                logi("Nav", "Sekvanta: ludas rekte ${vojo.kanalo.slug}")
+                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                            }
+                        }
+                    }
+                    is Vojo.ElsendoDetalo -> {
+                        sekvantaTitolo = vojo.elsendo.titolo
+                        sekvantaSubtitolo = vojo.elsendo.kanaloNomo
+                        sekvantaBildoUrl = vojo.elsendo.bildoUrl
+                        onLudiSekvantan = {
+                            logi("Nav", "Sekvanta: ludas elsendon ${vojo.elsendo.id}")
+                            scope.launch { ludvicoRegilo.ludiElsendon(vojo.elsendo) }
+                        }
+                    }
+                    else -> {
+                        sekvantaTitolo = null
+                        sekvantaSubtitolo = null
+                        sekvantaBildoUrl = null
+                        onLudiSekvantan = {}
+                    }
+                }
+
                 MiniLudilbreto(
                     ludilo = ludilo,
                     reprovo = reprovo,
+                    elfaldita = elfaldita,
+                    onElfalditaSxangxo = { elfaldita = it },
+                    sekvantaTitolo = sekvantaTitolo,
+                    sekvantaSubtitolo = sekvantaSubtitolo,
+                    sekvantaBildoUrl = sekvantaBildoUrl,
+                    onLudiSekvantan = onLudiSekvantan,
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {

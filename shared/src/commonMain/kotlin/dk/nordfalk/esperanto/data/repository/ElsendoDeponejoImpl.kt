@@ -120,7 +120,9 @@ open class ElsendoDeponejoImpl(
                         contentType(ContentType.Application.Json)
                         setBody("""{"id":"$sekcio"}""")
                     }.bodyAsText().let { korpo -> sekcio to korpo }
-                } catch (e: Exception) {
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
                     logw("ElsendoDeponejo", "${kanalo.slug}: sekcio $sekcio malsukcesa — preterlasas", e)
                     null
                 }
@@ -137,9 +139,11 @@ open class ElsendoDeponejoImpl(
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             elsendoj
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
             loge("ElsendoDeponejo", "${kanalo.slug}: CRI-elŝuto malsukcesa", e)
-            kaŝmemoro[kanalo.slug] ?: emptyList()
+            kaŝmemoro[kanalo.slug] ?: leguKashitajnElsendojn(kanalo) ?: emptyList()
         }
     }
 

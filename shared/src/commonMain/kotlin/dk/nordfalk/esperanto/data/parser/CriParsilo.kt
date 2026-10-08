@@ -97,8 +97,7 @@ class CriParsilo {
 
     private fun vojiEqualsLuciaStudio(vojo: String): Boolean =
         vojo.equals("LuciaStudio", ignoreCase = true) ||
-            vojo.startsWith("LuciaStudio/", ignoreCase = true) ||
-            vojo.startsWith("luciastudio/", ignoreCase = true)
+            vojo.startsWith("LuciaStudio/", ignoreCase = true)
 
     /**
      * Ĉu la kombinita kaŝmemoro uzas la MALNOVAN formaton (pecoj sen

@@ -239,6 +239,8 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         // La ludilo (kaj ĝia MediaController) NE estas liberigita — ĝi estas procez-nivela kaj
         // uzata de AppStato.ludvicoRegilo kaj de la sekva Activity-instanco.
+        // Sed la Activity-referenco de la ponto devas malaperi — ĝi likus.
+        if (AktivecoPonto.aktiveco === this) AktivecoPonto.aktiveco = null
     }
 
     /**

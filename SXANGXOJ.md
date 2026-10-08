@@ -1,6 +1,6 @@
 # Ŝanĝoj — 2026-10-08
 
-## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: pendi)
+## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: #78)
 
 La "Kanaloj"-vico sur la frontpaĝo dividas la kanalojn: aktivaj (kun elsendo
 dum la pasinta jaro) aperas unue, poste dividilo kun la etikedo "Arkivo",
@@ -24,7 +24,7 @@ ludprogreson ("aŭdis X%").
 - Ĝisdatigo (nekomitita, laŭ peto de la uzanto): la sojlo aktiva/arkiva ŝanĝita
   de 6 monatoj al 1 jaro (365 tagoj) — "Kio novas" restas je 6 monatoj (180 tagoj).
 
-## Malnova apo: Sentry 5.3.0 → 8.41.0 por 16 KB-paĝoj (PR: pendi)
+## Malnova apo: Sentry 5.3.0 → 8.41.0 por 16 KB-paĝoj (PR: #78)
 
 La malnova apo ne instaliĝis sur 16 KB-aparatoj (Android 15+): la
 `libsentry.so`/`libsentry-android.so` el `sentry-android-ndk:5.3.0` havis LOAD-segmentojn
@@ -39,7 +39,7 @@ sentry-android 8.41.0 (per sentry-kmp 0.27.0) kaj estas en ordo.
 - Kontrolo: ELF-kontrolo de la .so en la nova `app-debug.apk` — ĉiuj LOAD-segmentoj
   0x4000 (arm64-v8a kaj x86_64); 5.3.0 havis 0x1000. La nova apo (8.41.0) same en ordo.
 
-## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: pendi)
+## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: #78)
 
 Regulo 6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
 PR) antaŭ ol la uzanto trarigardis kaj aprobis la ŝanĝojn — eĉ se la uzanto petas

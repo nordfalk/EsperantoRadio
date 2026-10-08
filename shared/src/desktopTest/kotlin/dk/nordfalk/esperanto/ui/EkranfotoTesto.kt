@@ -228,7 +228,7 @@ class EkranfotoTesto {
         )
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize(), komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize(), elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()

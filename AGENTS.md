@@ -316,6 +316,15 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
   uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
   CHANGELOG.md — konservita en la stash, ne enmetita.)
+- **Nova kanalo = ŝanĝu ambaŭ kopiojn de la konfiguro**: `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json`
+  KAJ `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` (identikaj). Kaj atentu: la JSONC havas
+  DU arojn — `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ` (referencataj, de la kodo NE legataj). Novaj kanaloj
+  devas iri en `kanaloj`; la dosiero FINIĜAS per la forprenitaj, do "aldonu ĉe la fino" estas la malĝusta loko.
+  (2026-10-08: la 7 novaj podkastoj unue erare surteriĝis en FORPRENITAJ_KANALOJ.)
+- **iTunes Search-API eldonas la kanonikan RSS-URL-on de podkasto**: `https://itunes.apple.com/lookup?id=<appleId>`
+  liveras JSON kun `feedUrl`, `artworkUrl600`, `releaseDate` kaj `trackCount`; `https://itunes.apple.com/search?term=Esperanto&entity=podcast&limit=25`
+  listigas ĉiujn ĉe Apple indeksitajn Esperanto-podkastojn. Uzebla por trovi fluojn kaj kontroli aktivecon sen
+  skrapado de Apple-retejoj. (2026-10-08: tiel kolektiĝis la fluoj de la 7 novaj kanaloj.)
 
 ## Logcat (Android)
 

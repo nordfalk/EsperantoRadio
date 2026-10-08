@@ -17,7 +17,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Ŝanĝita
 
 - Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva (https://github.com/nordfalk/EsperantoRadio/pull/76)
-- Frontpaĝo: la kanala vico montras unue la aktivajn kanalojn (kun elsendoj dum la pasintaj 6 monatoj), poste dividilon "Arkivo" kaj la arkivajn kanalojn; la flava markilo ĉiam montras la aĝon de la elsendo — sur kanaloj tiun de la plej nova elsendo, neniam la ludprogreson
+- Frontpaĝo: la kanala vico montras unue la aktivajn kanalojn (kun elsendoj dum la pasinta jaro), poste dividilon "Arkivo" kaj la kanalojn kies lasta elsendo estas pli aĝa ol unu jaro; la flava markilo ĉiam montras la aĝon de la elsendo — sur kanaloj tiun de la plej nova elsendo, neniam la ludprogreson
 
 ## [3.0.1] - 2026-09-26
 

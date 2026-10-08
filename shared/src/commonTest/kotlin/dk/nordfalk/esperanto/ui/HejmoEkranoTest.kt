@@ -185,10 +185,14 @@ class HejmoEkranoTest {
     fun montrasArkivajnKanalojnPostAktivajKunDividilo() = runComposeUiTest {
         val kanaloj = listOf(
             Kanalo(slug = "nova", nomo = "Nova Kanalo", podkastaRssUrl = "https://x.com/n.rss"),
+            Kanalo(slug = "meznova", nomo = "Meznova Kanalo", podkastaRssUrl = "https://x.com/m.rss"),
             Kanalo(slug = "antikva", nomo = "Antikva Kanalo", podkastaRssUrl = "https://x.com/a.rss"),
         )
         val elsendoj = listOf(
             Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaux(5)),
+            // Antaŭ 200 tagoj: pli aĝa ol 6 monatoj (ne en "Kio novas"), sed ene de unu jaro (aktiva)
+            Elsendo(id = "meznova:1", kanaloSlug = "meznova", titolo = "Meznova epizodo", fluo = "", dato = datoAntaux(200)),
+            // Pli aĝa ol unu jaro: arkiva
             Elsendo(id = "antikva:1", kanaloSlug = "antikva", titolo = "Antikva epizodo", fluo = "", dato = datoAntaux(400)),
         )
         setContent {
@@ -198,17 +202,21 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // Ambaŭ kanaloj aperas en la "Kanaloj"-vico: la aktiva ("Nova Kanalo" ankaŭ en "Kio novas"),
-        // la arkiva ("Antikva Kanalo" nur en la kanala vico)
+        // Ĉiuj tri kanaloj aperas en la "Kanaloj"-vico: "Nova Kanalo" ankaŭ en "Kio novas",
+        // "Meznova Kanalo" kaj "Antikva Kanalo" nur en la kanala vico
         onAllNodesWithText("Nova Kanalo").assertCountEquals(2)
+        onAllNodesWithText("Meznova Kanalo").assertCountEquals(1)
         onAllNodesWithText("Antikva Kanalo").assertCountEquals(1)
         // Dividilo kun "Arkivo" inter la aktivaj kaj arkivaj kanaloj
         onNodeWithText("Arkivo").assertIsDisplayed()
-        // La flava markilo sur la arkiva kanalo montras la aĝon de la plej nova elsendo
-        onAllNodesWithText("1 jaro").assertCountEquals(1)
-        // La aktivaj kanaloj staras maldekstre de la dividilo, la arkivaj dekstre
+        // La flavaj markiloj montras la aĝon de la plej nova elsendo de ĉiu kanalo
+        onAllNodesWithText("5 tagoj").assertCountEquals(2) // "Kio novas" + "Kanaloj"
+        onAllNodesWithText("6 monatoj").assertCountEquals(1) // meznova (200 tagoj)
+        onAllNodesWithText("1 jaro").assertCountEquals(1) // antikva (400 tagoj)
+        // La aktivaj kanaloj staras maldekstre de la dividilo, la arkiva dekstre
         fun xDe(teksto: String) = onAllNodesWithText(teksto).fetchSemanticsNodes().first().positionInRoot.x
-        assertTrue(xDe("Nova Kanalo") < xDe("Arkivo"), "aktiva kanalo devas esti maldekstre de la dividilo")
+        assertTrue(xDe("Nova Kanalo") < xDe("Meznova Kanalo"), "aktivaj kanaloj aperas en vico")
+        assertTrue(xDe("Meznova Kanalo") < xDe("Arkivo"), "aktiva kanalo devas esti maldekstre de la dividilo")
         assertTrue(xDe("Arkivo") < xDe("Antikva Kanalo"), "arkiva kanalo devas esti dekstre de la dividilo")
     }
 

@@ -40,8 +40,8 @@ class HejmoLogikoTest {
     }
 
     @Test
-    fun sesMonatoj_limo_por_aktiva_kaj_kioNovas() {
-        // aktiva = ene de 180 tagoj (kio ankaŭ regas "Kio novas")
+    fun estasEneDeSesMonatoj_limo() {
+        // Regas "Kio novas": ene de 180 tagoj
         assertTrue(estasEneDeSesMonatoj(datoAntaux(179), hodiaux))
         assertFalse(estasEneDeSesMonatoj(datoAntaux(180), hodiaux))
         assertFalse(estasEneDeSesMonatoj("ne-dato", hodiaux))
@@ -52,17 +52,31 @@ class HejmoLogikoTest {
         assertEquals("1 jaro", kalkuliAĝon(datoAntaux(364), hodiaux))
     }
 
+    @Test
+    fun estasEneDeUnuJaro_limo() {
+        // Regas aktivan kontraŭ arkivan kanalon: ene de 365 tagoj
+        assertTrue(estasEneDeUnuJaro(datoAntaux(364), hodiaux))
+        assertFalse(estasEneDeUnuJaro(datoAntaux(365), hodiaux))
+        assertFalse(estasEneDeUnuJaro("ne-dato", hodiaux))
+        // estonta dato validas kiel "aktiva"
+        assertTrue(estasEneDeUnuJaro(datoAntaux(-3), hodiaux))
+        // la markilo montras la aĝon ankaŭ trans la limo
+        assertEquals("1 jaro", kalkuliAĝon(datoAntaux(365), hodiaux))
+        assertEquals("2 jaroj", kalkuliAĝon(datoAntaux(800), hodiaux))
+    }
+
     private fun karto(slug: String, dato: String) = KanalKarto(
         kanalo = Kanalo(slug = slug, nomo = slug, podkastaRssUrl = "https://x.com/$slug.rss"),
         plejNovaElsendo = Elsendo(id = "$slug:1", kanaloSlug = slug, titolo = "e", fluo = "", dato = dato),
     )
 
     @Test
-    fun dividuKanalojn_aktiva_estas_ene_de_ses_monatoj() {
+    fun dividuKanalojn_aktiva_estas_ene_de_unu_jaro() {
+        // aktiva = ene de 365 tagoj; arkiva = pli aĝa ol unu jaro
         val kartoj = listOf(
             karto("nova", datoAntaux(5)),
-            karto("limo", datoAntaux(179)),
-            karto("arkivo", datoAntaux(180)),
+            karto("limo", datoAntaux(364)),
+            karto("arkivo", datoAntaux(365)),
             karto("malnova", datoAntaux(900)),
         )
         val (aktivaj, arkivaj) = dividuKanalojn(kartoj, hodiaux)

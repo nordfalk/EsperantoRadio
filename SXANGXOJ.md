@@ -3,21 +3,26 @@
 ## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: pendi)
 
 La "Kanaloj"-vico sur la frontpaĝo dividas la kanalojn: aktivaj (kun elsendo
-dum la pasintaj 6 monatoj) aperas unue, poste dividilo kun la etikedo "Arkivo",
-poste la arkivaj kanaloj. La flava markilo sur kanalo ĉiam montras la tempon de
-la plej nova elsendo — neniam la ludprogreson ("aŭdis X%").
+dum la pasinta jaro) aperas unue, poste dividilo kun la etikedo "Arkivo",
+poste la arkivaj kanaloj (lasta elsendo pli aĝa ol unu jaro). La flava markilo
+sur kanalo ĉiam montras la tempon de la plej nova elsendo — neniam la
+ludprogreson ("aŭdis X%").
 
 - `HejmoViewModel` liveras `aktivajKanaloj`/`arkivajKanaloj` (anstataŭ `cxiujKanaloj`);
-  la divido okazas en la pura funkcio `dividuKanalojn` (limo 180 tagoj).
+  la divido okazas en la pura funkcio `dividuKanalojn` (limo 365 tagoj).
 - `kalkuliNovectempon` forigita; `kalkuliAĝon` (ĉiam redonas la aĝon: "hodiaŭ" …
   "11 monatoj", "1 jaro", "2 jaroj") estas uzata por la markilo sur kanaloj kaj sur
-  elsendo-kartoj. La 6-monata limo nun estas la klara predikato `estasEneDeSesMonatoj`
-  (uzata de "Kio novas" kaj de `dividuKanalojn`; sama semantiko kiel la malnova null-kontrolo).
+  elsendo-kartoj. Du predikatoj super la ĝenerala `estasEneDe(dato, tagoj)`:
+  `estasEneDeSesMonatoj` (180 tagoj — regas "Kio novas") kaj `estasEneDeUnuJaro`
+  (365 tagoj — regas aktivan kontraŭ arkivan en `dividuKanalojn`).
 - `ArkivoDividilo`: vertikala linio + etikedo "Arkivo" dekstre de ĝi; aperas nur se
-  estas arkivaj kanaloj. Antaŭvido ĝisdatigita (arkiva kanalo "Antikva Radio").
-- Testoj: 4 puraj (`HejmoLogikoTest`: aĝo, limo 179/180 tagoj, divido) + 2 UI
-  (`HejmoEkranoTest`: dividilo kaj ordo maldekstre/dekstre; markilo "5 tagoj" eĉ se
-  42% aŭdita). 208 labortablaj testoj, 0 fiaskoj; Android-APK konstruiĝas.
+  estas arkivaj kanaloj. Antaŭvido ĝisdatigita (aktiva "Meznova Radio" + arkiva
+  "Antikva Radio").
+- Testoj: 5 puraj (`HejmoLogikoTest`: aĝo, limoj 179/180 kaj 364/365 tagoj, divido)
+  + 2 UI (`HejmoEkranoTest`: dividilo kaj ordo inter nova/meznova/arkiva kanaloj;
+  markilo "5 tagoj" eĉ se 42% aŭdita).
+- Ĝisdatigo (nekomitita, laŭ peto de la uzanto): la sojlo aktiva/arkiva ŝanĝita
+  de 6 monatoj al 1 jaro (365 tagoj) — "Kio novas" restas je 6 monatoj (180 tagoj).
 
 ## Malnova apo: Sentry 5.3.0 → 8.41.0 por 16 KB-paĝoj (PR: pendi)
 

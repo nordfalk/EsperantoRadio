@@ -748,6 +748,7 @@ class LudvicoRegiloTest {
     private class CxiamEraraLudilo : LudiloRegilo {
         private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+        override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
         var fiksoj = 0
         override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
             fiksoj++

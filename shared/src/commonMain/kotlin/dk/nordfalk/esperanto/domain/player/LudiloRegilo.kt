@@ -17,12 +17,28 @@ import kotlinx.coroutines.flow.asStateFlow
 interface LudiloRegilo {
     val stato: StateFlow<LudantoInformo>
 
+    /**
+     * Ĉu tiu ĉi ludilo efektive kapablas salti (tio estas, ĉu [saltiAl] movas
+     * la ludpozicion). Se false, la UI montras nur neinteragan pozicio-indikilon.
+     * false ekz. ĉe Desktop (mp3spi-fluado ne subtenas saltadon).
+     */
+    val subtenasSaltadon: Boolean get() = true
+
     suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
     fun ludi()
     fun pauxzigi()
     fun halti()
     fun saltiAl(pozicioMs: Long)
     fun fiksiLauxtecon(volumeno: Float)
+
+    /**
+     * La nuna laŭteco (0 = mutigita … 1 = maksimume), kiun la laŭteco-regilo
+     * de la mini-ludilbreto montras kaj sekvas. Platform-dependinge:
+     * - Android: la **sistema** media laŭteco (AudioManager.STREAM_MUSIC), kiel en la
+     *   malnova apo — enketata ĉiun sekundon, do la montrilo sekvas la hardvarajn klavojn
+     * - aliaj platformoj: la laŭteco de la ludilo mem (HTMLAudioElement.volume ktp.)
+     */
+    val lauxteco: StateFlow<Float>
 }
 
 /**
@@ -41,6 +57,8 @@ expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 class NoOpLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+    private val _lauxteco = MutableStateFlow(1f)
+    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(
@@ -56,7 +74,7 @@ class NoOpLudiloRegilo : LudiloRegilo {
     override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
+    override fun fiksiLauxtecon(volumeno: Float) { _lauxteco.value = volumeno.coerceIn(0f, 1f) }
 
     /**
      * Simulas naturfinon de la ludado — metas staton al Finita.

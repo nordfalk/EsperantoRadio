@@ -220,6 +220,20 @@ class EkranfotoTesto {
         waitForIdle()
         kaptuKajSavu(this, "08_mini_ludilbreto")
     }
+
+    @Test
+    fun ekranfoto_mini_ludilbreto_elfaldita() = runComposeUiTest {
+        val ludilo = EkranfotoLudiloRegilo(
+            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
+        )
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize(), komenceElfaldita = true)
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "09_mini_ludilbreto_elfaldita")
+    }
 }
 
 private class EkranfotoLudiloRegilo(initial: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita)) : LudiloRegilo {
@@ -233,4 +247,5 @@ private class EkranfotoLudiloRegilo(initial: LudantoInformo = LudantoInformo(sta
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
     override fun fiksiLauxtecon(volumeno: Float) {}
+    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
 }

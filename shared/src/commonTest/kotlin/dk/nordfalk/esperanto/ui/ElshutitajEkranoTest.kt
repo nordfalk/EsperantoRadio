@@ -180,6 +180,7 @@ class ElshutitajEkranoTest {
             )
         )
         val ludilo = object : LudiloRegilo {
+            override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
             private val s = MutableStateFlow(
                 LudantoInformo(
                     stato = LudantoStato.Ludas,
@@ -215,6 +216,7 @@ class ElshutitajEkranoTest {
             )
         )
         val ludilo = object : LudiloRegilo {
+            override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
             private val s = MutableStateFlow(
                 LudantoInformo(
                     stato = LudantoStato.Haltita,

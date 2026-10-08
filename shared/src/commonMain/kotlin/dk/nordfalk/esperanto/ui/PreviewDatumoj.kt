@@ -120,6 +120,7 @@ internal class PreviewLudiloRegilo(initial: LudantoInformo = LudantoInformo(stat
     override fun halti() { s.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { s.value = s.value.copy(pozicioMs = pozicioMs) }
     override fun fiksiLauxtecon(volumeno: Float) {}
+    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
 }
 
 internal class PreviewElsendoDeponejo(

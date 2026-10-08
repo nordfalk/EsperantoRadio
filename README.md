@@ -31,6 +31,7 @@ Uzkazoj el la malnova apo (`malnova/app/src/main/res/values/eo_strings.xml`) kiu
 - **HLS sur Desktop/Web**: bezonas VLCJ/hls.js. (La Muzaiko-livestream mem funkcias — kontrolita 2026-09-23; sur Android necesis `media3-exoplayer-hls`.)
 - Eksponenta reprovo ne atendas je reta reveno (la malnova `venterPåAtKommeOnline`) — ĝi rezignas post ~3 minutoj.
 - Web: plej multaj RSS-fluoj estas blokitaj de CORS; bildoj ne aperas. Bezonas servilon/prokurilon.
+- Animacioj ĉie en la apo (nur la mini-ludilbreto havas; mankas ekz. ĉe ekrano-ŝanĝoj, listo-ŝanĝoj, sciigoj pri ŝargado)
 
 
 legi kanalkonfiguro de la reto ?

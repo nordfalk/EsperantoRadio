@@ -71,7 +71,7 @@ dependencies {
     implementation project(path: ':parse')
 
     implementation 'com.android.volley:volley:1.2.1'
-    implementation 'io.sentry:sentry-android:5.3.0'
+    implementation 'io.sentry:sentry-android:8.41.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'

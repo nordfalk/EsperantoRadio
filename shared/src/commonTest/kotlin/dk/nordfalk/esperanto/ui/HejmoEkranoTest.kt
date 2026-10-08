@@ -9,11 +9,13 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.test.swipeDown
+import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.time.Clock
@@ -59,8 +61,8 @@ class HejmoEkranoTest {
         Elsendo(id = "vv:malnova", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento malnova", fluo = "", dato = datoAntaux(220)),
     )
 
-    private fun falsaKanaloDeponejo() = object : KanaloDeponejo {
-        private val f = MutableStateFlow(testKanaloj)
+    private fun falsaKanaloDeponejo(kanaloj: List<Kanalo> = testKanaloj) = object : KanaloDeponejo {
+        private val f = MutableStateFlow(kanaloj)
         override fun observiKanalojn() = f.asStateFlow()
         override suspend fun getKanalojn(fortoRefresigi: Boolean) = f.value
         override suspend fun getKanalo(slug: String) = f.value.find { it.slug == slug }
@@ -69,21 +71,21 @@ class HejmoEkranoTest {
     /** Registras la `fortoRefresigi`-parametron de ĉiu voko al sxargxiElsendojnPorKanal. */
     private val refresxigoVokoj = mutableListOf<Boolean>()
 
-    private fun falsaElsendoDeponejo() = object : ElsendoDeponejo {
+    private fun falsaElsendoDeponejo(elsendoj: List<Elsendo> = testElsendoj) = object : ElsendoDeponejo {
         override fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>> =
-            MutableStateFlow(testElsendoj.filter { it.kanaloSlug == kanaloSlug }).asStateFlow()
+            MutableStateFlow(elsendoj.filter { it.kanaloSlug == kanaloSlug }).asStateFlow()
 
         override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> =
-            testElsendoj.filter { it.kanaloSlug == kanaloSlug }
+            elsendoj.filter { it.kanaloSlug == kanaloSlug }
 
-        override suspend fun getElsendo(id: String): Elsendo? = testElsendoj.find { it.id == id }
+        override suspend fun getElsendo(id: String): Elsendo? = elsendoj.find { it.id == id }
 
         override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> =
-            testElsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
+            elsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
 
         override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
             refresxigoVokoj += fortoRefresigi
-            return testElsendoj.filter { it.kanaloSlug == kanalo.slug }
+            return elsendoj.filter { it.kanaloSlug == kanalo.slug }
         }
     }
 
@@ -157,7 +159,7 @@ class HejmoEkranoTest {
     }
 
     @Test
-    fun montrasNovectempajnEmblemetojn() = runComposeUiTest {
+    fun montrasAĝajnEmblemetojn() = runComposeUiTest {
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(),
@@ -165,15 +167,81 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
-        // Flavaj emblemetoj montras kiom nova la elsendo estas — nur en "Kio novas" kaj "Ĉiuj kanaloj"
-        // (malnovaj elsendoj en "Kio popularas" estas >6 monatoj, do neniu emblemeto)
+        // Flavaj emblemetoj montras la aĝon de la elsendo — en "Kio novas", "Ĉiuj kanaloj" kaj "Kio popularas"
         // kp:1 (5 tagoj, plej nova): Kio novas + Ĉiuj kanaloj = 2
         // vv:1 (3 tagoj, plej nova): 2
         // kp:2 (12 tagoj): Kio novas = 1
         // vv:2 (17 tagoj → "2 semajnoj"): Kio novas = 1
+        // kp:malnova (200 tagoj → "6 monatoj") kaj vv:malnova (220 tagoj → "7 monatoj"): Kio popularas = 1 po
         onAllNodesWithText("5 tagoj").assertCountEquals(2)
         onAllNodesWithText("3 tagoj").assertCountEquals(2)
         onAllNodesWithText("12 tagoj").assertCountEquals(1)
         onAllNodesWithText("2 semajnoj").assertCountEquals(1)
+        onAllNodesWithText("6 monatoj").assertCountEquals(1)
+        onAllNodesWithText("7 monatoj").assertCountEquals(1)
+    }
+
+    @Test
+    fun montrasArkivajnKanalojnPostAktivajKunDividilo() = runComposeUiTest {
+        val kanaloj = listOf(
+            Kanalo(slug = "nova", nomo = "Nova Kanalo", podkastaRssUrl = "https://x.com/n.rss"),
+            Kanalo(slug = "meznova", nomo = "Meznova Kanalo", podkastaRssUrl = "https://x.com/m.rss"),
+            Kanalo(slug = "antikva", nomo = "Antikva Kanalo", podkastaRssUrl = "https://x.com/a.rss"),
+        )
+        val elsendoj = listOf(
+            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaux(5)),
+            // Antaŭ 200 tagoj: pli aĝa ol 6 monatoj (ne en "Kio novas"), sed ene de unu jaro (aktiva)
+            Elsendo(id = "meznova:1", kanaloSlug = "meznova", titolo = "Meznova epizodo", fluo = "", dato = datoAntaux(200)),
+            // Pli aĝa ol unu jaro: arkiva
+            Elsendo(id = "antikva:1", kanaloSlug = "antikva", titolo = "Antikva epizodo", fluo = "", dato = datoAntaux(400)),
+        )
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
+                elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
+            )
+        }
+        waitForIdle()
+        // Ĉiuj tri kanaloj aperas en la "Kanaloj"-vico: "Nova Kanalo" ankaŭ en "Kio novas",
+        // "Meznova Kanalo" kaj "Antikva Kanalo" nur en la kanala vico
+        onAllNodesWithText("Nova Kanalo").assertCountEquals(2)
+        onAllNodesWithText("Meznova Kanalo").assertCountEquals(1)
+        onAllNodesWithText("Antikva Kanalo").assertCountEquals(1)
+        // Dividilo kun "Arkivo" inter la aktivaj kaj arkivaj kanaloj
+        onNodeWithText("Arkivo").assertIsDisplayed()
+        // La flavaj markiloj montras la aĝon de la plej nova elsendo de ĉiu kanalo
+        onAllNodesWithText("5 tagoj").assertCountEquals(2) // "Kio novas" + "Kanaloj"
+        onAllNodesWithText("6 monatoj").assertCountEquals(1) // meznova (200 tagoj)
+        onAllNodesWithText("1 jaro").assertCountEquals(1) // antikva (400 tagoj)
+        // La aktivaj kanaloj staras maldekstre de la dividilo, la arkiva dekstre
+        fun xDe(teksto: String) = onAllNodesWithText(teksto).fetchSemanticsNodes().first().positionInRoot.x
+        assertTrue(xDe("Nova Kanalo") < xDe("Meznova Kanalo"), "aktivaj kanaloj aperas en vico")
+        assertTrue(xDe("Meznova Kanalo") < xDe("Arkivo"), "aktiva kanalo devas esti maldekstre de la dividilo")
+        assertTrue(xDe("Arkivo") < xDe("Antikva Kanalo"), "arkiva kanalo devas esti dekstre de la dividilo")
+    }
+
+    @Test
+    fun kanalaMarkiloMontrasAĝonAnkaŭSeLudita() = runComposeUiTest {
+        val kanaloj = listOf(
+            Kanalo(slug = "nova", nomo = "Nova Kanalo", podkastaRssUrl = "https://x.com/n.rss"),
+        )
+        val elsendoj = listOf(
+            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaux(5)),
+        )
+        // La uzanto aŭskultis 42% de la plej nova elsendo
+        val ludatoj = LudatojDeponejoMaketo()
+        runBlocking { ludatoj.registriPozicion("nova:1", "nova", pozicioMs = 252_000, dauroMs = 600_000) }
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
+                elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
+                ludatojDeponejo = ludatoj,
+            )
+        }
+        waitForIdle()
+        // La flava markilo sur la kanalo montras la aĝon de la plej nova elsendo ("5 tagoj"),
+        // neniam la ludprogreson — "aŭdis 42%" aperas nur sur la elsendo-kartoj
+        onAllNodesWithText("5 tagoj").assertCountEquals(1)
+        onAllNodesWithText("aŭdis 42%").assertCountEquals(2) // "Kio novas" + "Lastatempe ludata"
     }
 }

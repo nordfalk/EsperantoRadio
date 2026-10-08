@@ -59,26 +59,64 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
 
 /**
- * Kalkulas kiom nova la elsendo estas, kiel homlegabla teksto.
- * Redonas null se la elsendo estas pli malnova ol 6 monatoj.
- *
- * Ekzemploj: "hodiaux", "1 tago", "3 tagoj", "1 semajno", "2 semajnoj", "1 monato", "4 monatoj"
+ * Ĉu la dato estas ene de la donita nombro da tagoj?
+ * Hodiaŭaj kaj estontaj datoj validas; neparseblaj datoj ne.
  */
 @OptIn(ExperimentalTime::class)
-fun kalkuliNovectempon(
+fun estasEneDe(
+    dato: String,
+    eneDeTagoj: Int,
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
+): Boolean {
+    val tagoj = runCatching { LocalDate.parse(dato) }.getOrNull()?.daysUntil(nunaDatumo) ?: return false
+    return tagoj < eneDeTagoj
+}
+
+/**
+ * Ĉu la dato estas ene de la pasintaj 6 monatoj (180 tagoj)?
+ * Regas kiuj elsendoj aperas en "Kio novas".
+ */
+@OptIn(ExperimentalTime::class)
+fun estasEneDeSesMonatoj(
+    dato: String,
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
+): Boolean = estasEneDe(dato, 180, nunaDatumo)
+
+/**
+ * Ĉu la dato estas ene de la pasinta jaro (365 tagoj)?
+ * Regas kiuj kanaloj estas "aktivaj" (kontraŭe: arkivaj, pli aĝaj ol unu jaro).
+ */
+@OptIn(ExperimentalTime::class)
+fun estasEneDeUnuJaro(
+    dato: String,
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
+): Boolean = estasEneDe(dato, 365, nunaDatumo)
+
+/**
+ * Kalkulas la aĝon de elsendo kiel homlegebla teksto — ĉiam redonas tekston,
+ * ankaŭ por elsendoj pli malnovaj ol 6 monatoj ("6 monatoj", "1 jaro", ktp.).
+ * Redonas null nur se la dato ne parseblas.
+ *
+ * Uzata por la flava markilo sur la kartoj: ĝi ĉiam montras la aĝon de la
+ * elsendo, neniam kiom multe oni aŭskultis.
+ */
+@OptIn(ExperimentalTime::class)
+fun kalkuliAĝon(
     dato: String,
     nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
 ): String? {
     val parsita = runCatching { LocalDate.parse(dato) }.getOrNull() ?: return null
     val tagoj = maxOf(0, parsita.daysUntil(nunaDatumo))
-
+    val monatoj = tagoj / 30
+    val jaroj = tagoj / 365
     return when {
         tagoj == 0 -> "hodiaŭ"
         tagoj == 1 -> "hieraŭ"
         tagoj <= 14 -> "$tagoj tagoj"
         tagoj < 60 -> "${tagoj / 7} semajnoj"
-        tagoj < 180 -> "${tagoj / 30} monatoj"
-        else -> null
+        monatoj < 12 -> "$monatoj monatoj"
+        jaroj <= 1 -> "1 jaro"
+        else -> "$jaroj jaroj"
     }
 }
 
@@ -107,11 +145,27 @@ private fun ludataTeksto(ludata: LudataElsendo): String? {
 data class KanalKarto(val kanalo: Kanalo, val plejNovaElsendo: Elsendo?)
 
 /**
+ * Dividas kanalkartojn en aktivaj kaj arkivaj.
+ * Aktiva = la kanalo havas elsendon dum la pasinta jaro
+ * (la plej nova elsendo estas malpli ol 365 tagojn for);
+ * arkiva = la plej nova elsendo estas pli aĝa ol unu jaro.
+ */
+@OptIn(ExperimentalTime::class)
+fun dividuKanalojn(
+    kartaro: List<KanalKarto>,
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
+): Pair<List<KanalKarto>, List<KanalKarto>> =
+    kartaro.partition { karto ->
+        karto.plejNovaElsendo?.let { estasEneDeUnuJaro(it.dato, nunaDatumo) } == true
+    }
+
+/**
  * Stato por la hejmekrano. Dum starto ĝi ŝargas ĉiujn kanalojn kaj iliajn
  * RSS-fluojn, kolektas ĉiujn elsendojn, kaj disponigas:
  * - [novajElsendoj] — ĉiuj elsendoj ordigitaj laŭ dato (plej nova unue) por "Kio novas"
  * - [popularajElsendoj] — hazardaj elsendoj por "Kio popularas"
- * - [cxiujKanaloj] — unu karto po kanalo kun la plej nova elsendo
+ * - [aktivajKanaloj] / [arkivajKanaloj] — unu karto po kanalo kun la plej nova elsendo,
+ *   dividitaj laŭ ĉu la kanalo aktivas (elsendo dum la pasinta jaro; arkivo = pli aĝa ol unu jaro)
  */
 @OptIn(ExperimentalTime::class)
 class HejmoViewModel(
@@ -131,9 +185,13 @@ class HejmoViewModel(
     private val _lastatempeLudataj = MutableStateFlow<List<Elsendo>>(emptyList())
     val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
-    /** Ĉiuj kanaloj — unu karto po kanalo kun la plej nova elsendo. */
-    private val _cxiujKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
-    val cxiujKanaloj = _cxiujKanaloj.asStateFlow()
+    /** Aktivaj kanaloj — kun elsendo dum la pasinta jaro (montrataj unue). */
+    private val _aktivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
+    val aktivajKanaloj = _aktivajKanaloj.asStateFlow()
+
+    /** Arkivaj kanaloj — kies plej nova elsendo estas pli aĝa ol unu jaro (post la dividilo). */
+    private val _arkivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
+    val arkivajKanaloj = _arkivajKanaloj.asStateFlow()
 
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
@@ -176,7 +234,7 @@ class HejmoViewModel(
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
         val novaj = elsendoj
-            .filter { kalkuliNovectempon(it.dato, nunaDatumo) != null }
+            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) }
             .groupBy { it.kanaloSlug }
             .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
             .sortedByDescending { it.dato }
@@ -189,7 +247,9 @@ class HejmoViewModel(
                 KanalKarto(kanalo, elsendoj.filter { it.kanaloSlug == kanalo.slug }.maxByOrNull { it.dato })
             }
             .filter { it.plejNovaElsendo != null }
-        _cxiujKanaloj.value = cxiujKanalojKartog
+        val (aktivaj, arkivaj) = dividuKanalojn(cxiujKanalojKartog, nunaDatumo)
+        _aktivajKanaloj.value = aktivaj
+        _arkivajKanaloj.value = arkivaj
 
         val ekskluditaj = (novaj.take(20).map { it.id } +
             cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
@@ -260,7 +320,8 @@ fun HejmoEkrano(
     val novajElsendoj by vm.novajElsendoj.collectAsState()
     val popularajElsendoj by vm.popularajElsendoj.collectAsState()
     val lastatempeLudataj by vm.lastatempeLudataj.collectAsState()
-    val cxiujKanaloj by vm.cxiujKanaloj.collectAsState()
+    val aktivajKanaloj by vm.aktivajKanaloj.collectAsState()
+    val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -272,9 +333,28 @@ fun HejmoEkrano(
         }
     }
 
-    /** Ludata teksto (se ludita) aŭ novectempo (se ne ludita). */
+    /** Ludata teksto (se ludita) aŭ aĝo de la elsendo (se ne ludita). */
     fun montruTekston(elsendo: Elsendo, ludata: LudataElsendo?): String? =
-        ludata?.let { ludataTeksto(it) } ?: kalkuliNovectempon(elsendo.dato)
+        ludata?.let { ludataTeksto(it) } ?: kalkuliAĝon(elsendo.dato)
+
+    /**
+     * Karto de kanalo en la "Kanaloj"-vico. La flava markilo ĉiam montras la
+     * tempon de la plej nova elsendo — neniam kiom multe oni aŭskultis ĝin.
+     */
+    @Composable
+    fun kanaloKarto(kanto: KanalKarto) {
+        val elsendo = kanto.plejNovaElsendo ?: return
+        ElsendoKarto(
+            elsendo = elsendo,
+            kanalo = kanto.kanalo,
+            montruTekston = kalkuliAĝon(elsendo.dato),
+            ludilo = ludilo,
+            onLudi = onLudi,
+            onElshuti = { onElshuti(elsendo) },
+            onAldoniAlVico = { onAldoniAlVico(elsendo) },
+            onClick = { logi("Klako", "kanalo ${kanto.kanalo.slug}"); onKanalo(kanto.kanalo) },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -308,28 +388,20 @@ fun HejmoEkrano(
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 
-                // "Kanaloj" — unu karto po kanalo kun la plej nova elsendo
-                if (cxiujKanaloj.isNotEmpty()) {
+                // "Kanaloj" — unue la aktivaj kanaloj (elsendo en la pasinta jaro),
+                // poste dividilo kun "Arkivo" kaj la arkivaj (pli ol jaron malnovaj)
+                if (aktivajKanaloj.isNotEmpty() || arkivajKanaloj.isNotEmpty()) {
                     item { SekcioTitolo("Kanaloj") }
                     item {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(cxiujKanaloj) { karto ->
-                                val elsendo = karto.plejNovaElsendo ?: return@items
-                                val kanalo = karto.kanalo
-                                ElsendoKarto(
-                                    elsendo = elsendo,
-                                    kanalo = kanalo,
-                                    montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
-                                    ludilo = ludilo,
-                                    onLudi = onLudi,
-                                    onElshuti = { onElshuti(elsendo) },
-                                    onAldoniAlVico = { onAldoniAlVico(elsendo) },
-                                    onClick = { logi("Klako", "kanalo ${kanalo.slug}"); onKanalo(kanalo) },
-                                )
+                            items(aktivajKanaloj) { karto -> kanaloKarto(kanto = karto) }
+                            if (arkivajKanaloj.isNotEmpty()) {
+                                item { ArkivoDividilo() }
                             }
+                            items(arkivajKanaloj) { karto -> kanaloKarto(kanto = karto) }
                         }
                     }
                 }
@@ -426,6 +498,30 @@ private fun SekcioTitolo(titolo: String) {
     )
 }
 
+/**
+ * Dividilo inter la aktivaj kaj arkivaj kanaloj en la "Kanaloj"-vico:
+ * vertikala linio kun la etikedo "Arkivo" dekstre de ĝi.
+ */
+@Composable
+private fun ArkivoDividilo() {
+    Row(
+        modifier = Modifier.height(200.dp).padding(horizontal = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        VerticalDivider(
+            modifier = Modifier.fillMaxHeight(0.75f),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
+        Text(
+            text = "Arkivo",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+    }
+}
+
 /** Ludo/paŭzo-logiko por specifa elsendo. */
 private fun ludiAuxPauxzigi(
     elsendo: Elsendo, ludas: Boolean, pauxzita: Boolean,
@@ -480,7 +576,7 @@ private fun ElsendoKarto(
                         }
                     }
                 }
-                // Insigno: montruTekston (novectempo, ludata procento, ktp.)
+                // Insigno: montruTekston (aĝo, ludata procento, ktp.)
                 if (montruTekston != null) {
                     Surface(
                         modifier = Modifier
@@ -644,15 +740,24 @@ fun HejmoEkranoPreview() {
     val hodiaŭ = Clock.System.todayIn(TimeZone.UTC).toString()
     val hieraŭ = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 1)).toString()
     val antaŭ3tagoj = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 3)).toString()
+    val antaŭ200tagoj = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 200)).toString()
+    val antaŭJaro = (Clock.System.todayIn(TimeZone.UTC) - DatePeriod(days = 400)).toString()
+
+    // Meznova kanalo (lasta elsendo antaŭ 200 tagoj) — aktiva, ĉar ene de unu jaro
+    val meznovaKanalo = Kanalo(slug = "meznova", nomo = "Meznova Radio", podkastaRssUrl = "https://x.com/m.rss")
+    // Arkiva kanalo (lasta elsendo pli aĝa ol unu jaro) por montri la "Arkivo"-dividilon
+    val arkivaKanalo = Kanalo(slug = "antikva", nomo = "Antikva Radio", podkastaRssUrl = "https://x.com/a.rss")
 
     val previewElsendoj = listOf(
         pElsendo.copy(id = "kernpunkto:nova1", kanaloSlug = "kernpunkto", dato = hodiaŭ, titolo = "KP300 Nova elsendo hodiaŭ"),
         pElsendo.copy(id = "kernpunkto:nova2", kanaloSlug = "kernpunkto", dato = hieraŭ, titolo = "KP299 Hieraŭa elsendo"),
         pElsendo.copy(id = "varsoviavento:nova1", kanaloSlug = "varsoviavento", dato = antaŭ3tagoj, titolo = "VV150 Antaŭ tri tagoj"),
+        pElsendo.copy(id = "meznova:meznova", kanaloSlug = "meznova", dato = antaŭ200tagoj, titolo = "MR50 Antaŭ 200 tagoj"),
+        pElsendo.copy(id = "antikva:malnova", kanaloSlug = "antikva", dato = antaŭJaro, titolo = "AR100 Longa paŭzo"),
     )
 
     val vm = HejmoViewModel(pKanaloDeponejo(), pElsendoDeponejo()).also {
-        it.plenigu(pKanaloj, previewElsendoj)
+        it.plenigu(pKanaloj + meznovaKanalo + arkivaKanalo, previewElsendoj)
     }
 
     pTemo {

@@ -1,3 +1,53 @@
+# Ŝanĝoj — 2026-10-08
+
+## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: #78)
+
+La "Kanaloj"-vico sur la frontpaĝo dividas la kanalojn: aktivaj (kun elsendo
+dum la pasinta jaro) aperas unue, poste dividilo kun la etikedo "Arkivo",
+poste la arkivaj kanaloj (lasta elsendo pli aĝa ol unu jaro). La flava markilo
+sur kanalo ĉiam montras la tempon de la plej nova elsendo — neniam la
+ludprogreson ("aŭdis X%").
+
+- `HejmoViewModel` liveras `aktivajKanaloj`/`arkivajKanaloj` (anstataŭ `cxiujKanaloj`);
+  la divido okazas en la pura funkcio `dividuKanalojn` (limo 365 tagoj).
+- `kalkuliNovectempon` forigita; `kalkuliAĝon` (ĉiam redonas la aĝon: "hodiaŭ" …
+  "11 monatoj", "1 jaro", "2 jaroj") estas uzata por la markilo sur kanaloj kaj sur
+  elsendo-kartoj. Du predikatoj super la ĝenerala `estasEneDe(dato, tagoj)`:
+  `estasEneDeSesMonatoj` (180 tagoj — regas "Kio novas") kaj `estasEneDeUnuJaro`
+  (365 tagoj — regas aktivan kontraŭ arkivan en `dividuKanalojn`).
+- `ArkivoDividilo`: vertikala linio + etikedo "Arkivo" dekstre de ĝi; aperas nur se
+  estas arkivaj kanaloj. Antaŭvido ĝisdatigita (aktiva "Meznova Radio" + arkiva
+  "Antikva Radio").
+- Testoj: 5 puraj (`HejmoLogikoTest`: aĝo, limoj 179/180 kaj 364/365 tagoj, divido)
+  + 2 UI (`HejmoEkranoTest`: dividilo kaj ordo inter nova/meznova/arkiva kanaloj;
+  markilo "5 tagoj" eĉ se 42% aŭdita).
+- Ĝisdatigo (nekomitita, laŭ peto de la uzanto): la sojlo aktiva/arkiva ŝanĝita
+  de 6 monatoj al 1 jaro (365 tagoj) — "Kio novas" restas je 6 monatoj (180 tagoj).
+
+## Malnova apo: Sentry 5.3.0 → 8.41.0 por 16 KB-paĝoj (PR: #78)
+
+La malnova apo ne instaliĝis sur 16 KB-aparatoj (Android 15+): la
+`libsentry.so`/`libsentry-android.so` el `sentry-android-ndk:5.3.0` havis LOAD-segmentojn
+laŭliniajn nur al 4 KB (0x1000) — precize la du bibliotekoj el la erarmesaĝo.
+Sentry Android SDK 8.0.0 aldonis plenan 16 KB-subtenon; la nova apo jam uzas
+sentry-android 8.41.0 (per sentry-kmp 0.27.0) kaj estas en ordo.
+
+- `malnova/app/build.gradle`: `io.sentry:sentry-android:5.3.0` → `8.41.0` (memversio
+  kun la nova apo). La uzata API (`SentryAndroid.init` + `setDsn` + `setBeforeSend`,
+  `Sentry.captureException`/`captureMessage`, `SentryLevel`) estas stabila en 8.x;
+  minSdk 26 ≥ 21 (postulo de 8.x); compileSdk 35 ✓.
+- Kontrolo: ELF-kontrolo de la .so en la nova `app-debug.apk` — ĉiuj LOAD-segmentoj
+  0x4000 (arm64-v8a kaj x86_64); 5.3.0 havis 0x1000. La nova apo (8.41.0) same en ordo.
+
+## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: #78)
+
+Regulo 6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
+PR) antaŭ ol la uzanto trarigardis kaj aprobis la ŝanĝojn — eĉ se la uzanto petas
+commit/push/PR; nur eksplicita "commit sen mia trarigardo" preterpasas tion.
+La sama regulo aplikita en la tri lokaj klonoj (mobile-app4, EsperantoRadio, EsperantoRadio2).
+
+---
+
 # Ŝanĝoj — 2026-10-06
 
 ## Reprovo ĉe servileraroj 5xx sur Android (PR #76)

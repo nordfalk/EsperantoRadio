@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
@@ -15,6 +16,8 @@ import androidx.media3.session.SessionCommands
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
@@ -59,6 +62,30 @@ class EsperantoLudadoServo : MediaSessionService() {
 
         // Publikigu la ludilon por videa vidigo (ElsendoEkrano → VideoVido)
         VideoLudiloPonto.ludilo = player
+
+        // Aŭtoludo en la servo mem: kiam elsendo finiĝas (STATE_ENDED), la servo
+        // vokas LudvicoRegilo rekte — tiel la aŭtoludo funkcias eĉ se la aplika
+        // procezo estas en kaŝmemoro aŭ la MediaController estas malrapida.
+        // La protekto en LudvicoRegilo (lastaTraktitaFontoId) evitas duoblan traktadon.
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_ENDED) {
+                    logi("LudadoServo", "STATE_ENDED — vokas aŭtoludon en servo")
+                    serviceScope.launch {
+                        try {
+                            val regilo = AppStato.ludvicoRegilo
+                            if (regilo != null) {
+                                regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+                            } else {
+                                logw("LudadoServo", "AppStato.ludvicoRegilo estas null — ne povas aŭtoludi")
+                            }
+                        } catch (e: Exception) {
+                            logw("LudadoServo", "Malsukcesis voki traktiFinonPublika", e)
+                        }
+                    }
+                }
+            }
+        })
 
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(kreiMainActivityPendingIntent())

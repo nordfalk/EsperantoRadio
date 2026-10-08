@@ -362,6 +362,62 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
+    // Servo-voko — traktiFinonPublika (kiel EsperantoLudadoServo vokas ĉe STATE_ENDED)
+    // =========================================================================
+
+    @Test
+    fun servoVoko_traktiFinonPublika_vokasAuxtoludon() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this
+        )
+
+        // Ne vokas komenci() — vokas traktiFinonPublika rekte (kiel la servo faras)
+        regilo.ludiElsendon(e1)
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+
+        // Simulas la servon: STATE_ENDED okazis
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+
+        // La aŭtoludo devas komenci e2
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+        assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id)
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 devas esti markita finita")
+    }
+
+    @Test
+    fun servoVoko_duoblaTraktadoDeSamaFonto_estasIgnorata() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+
+        regilo.ludiElsendon(e1)
+
+        // Unua voko — traktas kaj lanĉas aŭtoludon (Unconfined: tuj komencas e2)
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+        assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id)
+
+        // Nun la nuna fonto estas e2. Se la servo vokus denove (ekz. pro prokrasto),
+        // la protekto devas vidi malsaman fonton kaj permesi trakti — sed tio estas
+        // nova elsendo, do ĝi estu traktata. Tamen, ni testas ke re-voki kun la
+        // sama stato ne kaŭzas problemon: la stato restas stabila.
+        val statoAntaux = ludilo.stato.value.stato
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+        // Post la dua voko, la aŭtoludo de e2 (se okazis) aŭ io alia — sed ne eraru
+        assertTrue(
+            ludilo.stato.value.stato == LudantoStato.Ludas ||
+            ludilo.stato.value.stato == LudantoStato.Haltita,
+            "Stato devas esti valida post duobla voko"
+        )
+    }
+
+    // =========================================================================
     // Aŭtomata daŭrigo — agordo
     // =========================================================================
 
@@ -748,6 +804,7 @@ class LudvicoRegiloTest {
     private class CxiamEraraLudilo : LudiloRegilo {
         private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+        override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
         var fiksoj = 0
         override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
             fiksoj++

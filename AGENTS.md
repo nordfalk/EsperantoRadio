@@ -63,7 +63,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
 - **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
-- **Testoj**: 209 testoj (KMP sur Desktop), ĉiuj pasas
+- **Testoj**: 242 testoj (KMP sur Desktop), ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
   Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
@@ -103,7 +103,7 @@ EsperantoRadio/
 │   ├── src/desktopMain/   #   Desktop-specifa (JVM)
 │   ├── src/iosMain/        #   iOS-specifa (kodo ekzistas; iosApp/ Xcode-projekto ankoraŭ ne kreita — malkomentu `include(":iosApp")` en settings.gradle.kts sur Mac)
 │   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
-│   └── src/commonTest/    #   Testoj + desktopTest (195 testoj, ĉiuj pasas)
+│   └── src/commonTest/    #   Testoj + desktopTest (242 testoj, ĉiuj pasas)
 ├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
 ├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
@@ -152,6 +152,10 @@ EsperantoRadio/
    Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; se la
    CI-kontrolo erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
    la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
+11. **Aŭtomate aldonu viajn lecionojn al ĉi tiu dosiero.** Post ĉiu laboro —
+    precipe post eraro, incidento aŭ neatendita rezulto — skribu koncizan
+    lecionon (kun dato kaj ekzemplo) en la sekcion "Teknikaj scioj lernitaj
+    dum la laboro". Celo: neniam ripeti la saman eraron.
 
 ## Git-laborfluo
 
@@ -163,7 +167,7 @@ EsperantoRadio/
    Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
 5. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
    kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
-6. **Ne commitu sen eksplicita peto de la uzanto.** La rajtigo por
+6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
 
@@ -199,6 +203,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
       (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
       Noto: `3.0.0` ne havas etikedon — la ligo en CHANGELOG.md uzas la eldonan
       komiton (`294834b`).
+   5. **Release-notes por Google Play** estas intence en Esperanto — kreu
+      `androidApp/src/main/play/release-notes/en-US/X.Y.Z.txt` (malgraŭ la
+      `en-US`-dosierujo, la enhavo estas en Esperanto; Play Store montras ĝin
+      kiel "Kio novas" por ĉiuj uzantoj). Maksimumo 500 signoj.
 
 ## Teknikaj scioj lernitaj dum la laboro
 
@@ -292,6 +300,24 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 - **Navigado**: uzas `navigation3` (`androidx.navigation3`) — `NavKey` ( sealed `Vojo`),
   `rememberNavBackStack`, `entryProvider`, `NavDisplay`. Stato persistebla per `SavedStateConfiguration`
   kun `polymorphic` serializers por ĉiu `Vojo`-subklaso. Detaloj: `docs/nova/05_dizajno_kaj_ui.md`.
+- **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
+  precipe `gh pr create --body "..."`: bash plenumas la backtick-enhavon kiel
+  komand-anstataŭigon. (2026-10-08, PR #80: la kodo-pecoj de la PR-teksto plenumiĝis —
+  akcidentaj `git tag v3.0.1`/`v3.0.2` + `git push` + `./gradlew`; la etikedoj
+  kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
+  `--body-file <dosiero>` aŭ
+  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
+  projectCards-malrekomendo) — uzu la REST API (vidu supre).
+- **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
+  atendatas, serĉu nereatingeblajn komitojn per
+  `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
+  2–3 gepatroj, mesaĝo "On <branĉo>: ...") kaj reakiru per
+  `git stash store -m "..." <hash>`. (2026-10-08: la stash "eldono 3.0.2" tiel reakiriĝis.)
+- **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
+  `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
+  uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
+  CHANGELOG.md — konservita en la stash, ne enmetita.)
 
 ## Logcat (Android)
 
@@ -329,7 +355,7 @@ ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
 java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
 
 # Nova apo
-./gradlew :shared:desktopTest        # rulas testojn (195 testoj)
+./gradlew :shared:desktopTest        # rulas testojn (242 testoj)
 ./gradlew :desktopApp:run            # rulas la desktop-apo
 ./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g  # rulas la web-apo en retumilo

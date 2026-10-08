@@ -1,3 +1,166 @@
+# Ŝanĝoj — 2026-10-08
+
+## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)
+
+Du incidentoj okazis dum la laboro pri PR #79/#80 kaj la eldono 3.0.2 — ambaŭ
+riparitaj; la lecionoj estas registritaj en AGENTS.md (nova regulo 11 kaj kvar
+novaj eroj en "Teknikaj scioj lernitaj dum la laboro").
+
+1. **Stash-perdo kaj reakiro.** `git stash list` estis malplena kvankam la stash
+   "eldono 3.0.2" (versio + release-notes + CHANGELOG) ekzistis. La komito troviĝis
+   inter la nereatingeblaj objektoj (`git fsck --unreachable --no-reflogs`; kunfando
+   kun 3 gepatroj, mesaĝo "On master: eldono 3.0.2 ...") kaj estis reakirita per
+   `git stash store -m "..." <hash>`. Enhavo kontrolita antaŭ uzo: apoversio 3.0.2,
+   versionCode 246, release-notes, CHANGELOG-sekcio; teknikaj dosieroj identaj al
+   la laborarbo.
+2. **Backtick-katastrofo en `gh pr create --body "..."`.** Bash interpretis la
+   kodo-pecojn de la PR-teksto kiel komand-anstataŭigojn kaj plenumis ilin —
+   inkluzive de `git tag v3.0.1`/`v3.0.2`, `git push origin v3.0.1`/`v3.0.2` kaj
+   `./gradlew :androidApp:assembleDebug`. Tio kreis ambaŭ etikedojn sur la malĝusta
+   komito (16ae6d6 — la kompar-ligo estus malplena) kaj plenigis la PR-korpon per
+   gradle-eliro. Riparo: forigo de ambaŭ etikedoj (fore kaj loke), rekreo sur la
+   ĝustaj komitoj (`v3.0.1` → 8c5ed4c, la vera fino de la eldono 3.0.1; `v3.0.2` →
+   16ae6d6, la versio-ŝanĝa komito) kaj puŝo; la PR-korpo estis reverkita per
+   `gh api -X PATCH` (`gh pr edit` fiaskas: GraphQL projectCards-malrekomendo).
+   Leciono: neniam kodo-pecoj en komandoj kun duoblaj citiloj — uzu `--body-file`.
+3. **Laborarbo de la uzanto.** La laborarbo povas enhavi la proprajn nekomititajn
+   ŝanĝojn de la uzanto (troviĝis provizora "notu"-fragmento en CHANGELOG.md —
+   verŝajne la komenco de la instrukcio "notu viajn problemojn…"). Ĝi estis
+   konservita flanke (stash + patch) kaj ne enmetita en la commitojn.
+
+## Diagnoza ekrano + aŭtomata daŭrigo en la fono (PR: #79)
+
+### Aŭtomata daŭrigo el la fono (servo)
+
+Uzanto raportis, ke ludado ne daŭris al la venonta elsendo kiam unu finiĝis
+dum la apo estis en la fono. Logcat montris, ke nek la servo nek la apo
+reagis al `STATE_ENDED` — sur Samsung la ludilo estas mortigita en la fono
+(bateri-optimumado/MARs; krome privata DNS rompis la DNS-rezolvon).
+
+- `EsperantoLudadoServo` ricevis `Player.Listener`: ĉe `STATE_ENDED` ĝi vokas
+  `AppStato.ludvicoRegilo?.traktiFinonPublika(LudantoStato.Finita, erara = false)`
+  en `serviceScope` — la sekva elsendo lanĉiĝas eĉ se la apo-procezo dormas
+  aŭ estis mortigita.
+- `LudvicoRegilo`: nova `@Volatile lastaTraktitaFontoId` gardas kontraŭ duobla
+  traktado de la sama fino (kaj servo kaj apo povas vidi `STATE_ENDED`);
+  nova publika `traktiFinonPublika()` + privata `fontoId()`; la gardilo
+  estas nuligita en `ludiElsendon`.
+- Testoj: `servoVoko_traktiFinonPublika_vokasAuxtoludon`,
+  `servoVoko_duoblaTraktadoDeSamaFonto_estasIgnorata`.
+
+### Diagnoza ekrano
+
+La uzanto ne sciis, kiujn sistem-agordojn kontroli — do la apo mem kontrolas
+ilin kaj gvidas al la ĝusta paĝo.
+
+- `DiagnozoRegilo` (expect/actual): kontrolas bateri-optimumadon
+  (`PowerManager.isIgnoringBatteryOptimizations`), sciig-permeson
+  (`NotificationManagerCompat`), ekzaktajn alarmojn
+  (`AlarmManager.canScheduleExactAlarms`) kaj DNS (`archive.org`; nur en la
+  plena kontrolo). `malfermiSistemAgordon(intenco)` malfermas la ĝustan
+  sistem-paĝon. Desktop/wasmJs/iOS: no-op.
+- `Vojo.Diagnozo` + `DiagnozoEkrano`: kartoj kun ikono laŭ severeco
+  (INFO/AVERTO/ERARO), butono al la sistem-agordo kaj "Re-kontroli".
+- Avertosigno sur la ĉefekrano (ruĝa avert-ikono en la supra breto, nur se
+  estas problemo kun severeco AVERTO/ERARO) kondukas rekte al la diagnozo;
+  kroma ligilo en Agordoj → Sistemo → Diagnozo. `AgordojEkrano` nun estas
+  rulebla (antaŭe ne).
+- `AppStato` kreas la `DiagnozoRegilon` kaj lanĉas fonan `kontroliRapide()`
+  ĉe starto.
+- Testoj: `DiagnozoTest` (7 testoj: modeloj + desktop no-op).
+
+### Kontrolo
+
+`./gradlew :shared:desktopTest` — ĉiuj testoj pasas (inkluzive de la novaj);
+`./gradlew :androidApp:assembleDebug` — sukcesa.
+
+## Frontpaĝo: aktivaj kanaloj, "Arkivo"-dividilo; markilo ĉiam montras la aĝon (PR: #78)
+
+La "Kanaloj"-vico sur la frontpaĝo dividas la kanalojn: aktivaj (kun elsendo
+dum la pasinta jaro) aperas unue, poste dividilo kun la etikedo "Arkivo",
+poste la arkivaj kanaloj (lasta elsendo pli aĝa ol unu jaro). La flava markilo
+sur kanalo ĉiam montras la tempon de la plej nova elsendo — neniam la
+ludprogreson ("aŭdis X%").
+
+- `HejmoViewModel` liveras `aktivajKanaloj`/`arkivajKanaloj` (anstataŭ `cxiujKanaloj`);
+  la divido okazas en la pura funkcio `dividuKanalojn` (limo 365 tagoj).
+- `kalkuliNovectempon` forigita; `kalkuliAĝon` (ĉiam redonas la aĝon: "hodiaŭ" …
+  "11 monatoj", "1 jaro", "2 jaroj") estas uzata por la markilo sur kanaloj kaj sur
+  elsendo-kartoj. Du predikatoj super la ĝenerala `estasEneDe(dato, tagoj)`:
+  `estasEneDeSesMonatoj` (180 tagoj — regas "Kio novas") kaj `estasEneDeUnuJaro`
+  (365 tagoj — regas aktivan kontraŭ arkivan en `dividuKanalojn`).
+- `ArkivoDividilo`: vertikala linio + etikedo "Arkivo" dekstre de ĝi; aperas nur se
+  estas arkivaj kanaloj. Antaŭvido ĝisdatigita (aktiva "Meznova Radio" + arkiva
+  "Antikva Radio").
+- Testoj: 5 puraj (`HejmoLogikoTest`: aĝo, limoj 179/180 kaj 364/365 tagoj, divido)
+  + 2 UI (`HejmoEkranoTest`: dividilo kaj ordo inter nova/meznova/arkiva kanaloj;
+  markilo "5 tagoj" eĉ se 42% aŭdita).
+- Ĝisdatigo (nekomitita, laŭ peto de la uzanto): la sojlo aktiva/arkiva ŝanĝita
+  de 6 monatoj al 1 jaro (365 tagoj) — "Kio novas" restas je 6 monatoj (180 tagoj).
+
+## Malnova apo: Sentry 5.3.0 → 8.41.0 por 16 KB-paĝoj (PR: #78)
+
+La malnova apo ne instaliĝis sur 16 KB-aparatoj (Android 15+): la
+`libsentry.so`/`libsentry-android.so` el `sentry-android-ndk:5.3.0` havis LOAD-segmentojn
+laŭliniajn nur al 4 KB (0x1000) — precize la du bibliotekoj el la erarmesaĝo.
+Sentry Android SDK 8.0.0 aldonis plenan 16 KB-subtenon; la nova apo jam uzas
+sentry-android 8.41.0 (per sentry-kmp 0.27.0) kaj estas en ordo.
+
+- `malnova/app/build.gradle`: `io.sentry:sentry-android:5.3.0` → `8.41.0` (memversio
+  kun la nova apo). La uzata API (`SentryAndroid.init` + `setDsn` + `setBeforeSend`,
+  `Sentry.captureException`/`captureMessage`, `SentryLevel`) estas stabila en 8.x;
+  minSdk 26 ≥ 21 (postulo de 8.x); compileSdk 35 ✓.
+- Kontrolo: ELF-kontrolo de la .so en la nova `app-debug.apk` — ĉiuj LOAD-segmentoj
+  0x4000 (arm64-v8a kaj x86_64); 5.3.0 havis 0x1000. La nova apo (8.41.0) same en ordo.
+
+## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: #78)
+
+Regulo 6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
+PR) antaŭ ol la uzanto trarigardis kaj aprobis la ŝanĝojn — eĉ se la uzanto petas
+commit/push/PR; nur eksplicita "commit sen mia trarigardo" preterpasas tion.
+La sama regulo aplikita en la tri lokaj klonoj (mobile-app4, EsperantoRadio, EsperantoRadio2).
+
+---
+
+# Ŝanĝoj — 2026-10-06
+
+## Reprovo ĉe servileraroj 5xx sur Android (PR #76)
+
+`ERROR_CODE_IO_BAD_HTTP_STATUS` estis klasata kiel daŭra eraro, do la ludvico
+tuj saltis al la sekva elsendo — ankaŭ kiam la eraro estis pasema HTTP 500
+(archive.org-Edge-nodoj intermite redonas 500 por sanaj dosieroj; dua provo
+kutime sukcesas ĉar la redirekto elektas alian nodon).
+
+Nova `EraroKlasifiko.kt` (androidApp): 5xx en la kaŭz-ĉeno
+(`InvalidResponseCodeException.responseCode`) → reprovebla (la ekzista
+eksponenta reprovo ĝis 10 fojojn); 4xx, formato kaj malkodiloj restas daŭraj.
+6 novaj instrumentitaj testoj (`EraroKlasifikoTest`); 11 instrumentitaj
+testoj entute, 0 fiaskoj.
+
+---
+
+# Ŝanĝoj — 2026-09-26
+
+## Peranto: vera MP3-dosiernomo el archive.org-metadatenoj (PR #75)
+
+La Peranto-parsilo divensis la MP3-dosiernomon de archive.org (`<identigilo>.mp3`);
+en 4 el la 25 videblaj elsendoj (7 el la lastaj 50) la vera nomo estis alia
+(ekz. `malapero-benda-3` → `Malapero_Benda3.mp3`) → HTTP 404, do ne ludeblis.
+
+- `parsuPeranto` nun demandas `https://archive.org/metadata/<id>` (paralele,
+  5-s-tempolimo, unufoje po identigilo) kaj uzas la veran originalan `.mp3`-nomon;
+  rezulto persistata en `ArchiveOrgDosiernomoKasho` (Settings+JSON; uzata de
+  `AppStato` kaj `NovajElsendojKontroloWorker`). Reteraro → retrofalo al la diveno.
+- **API-ŝanĝo**: `parsuRss`, `parsuPeranto`, `leguKashitajnElsendojn`,
+  `leguĈiujnKashitajnElsendojn` iĝis `suspend`; neniuj alvokantoj ŝanĝiĝis.
+- Kontrolo: 202 labortablaj + 5 instrumentitaj testoj, 0 fiaskoj; Android/
+  Desktop/wasmJs kompilas. Detala problem-analizo kaj kialoj: PR #75.
+- **Sciate ne nia cimo**: archive.org intermite redonas 500 por kelkaj
+  arkivaĵoj (difektaj edge-nodoj, ekz. `auskultu_ripetu120`); Android tiam
+  klasas ĝin kiel daŭran eraron kaj saltas al la sekva elsendo.
+
+---
+
 # Ŝanĝoj — 2026-09-23
 
 Ĉi tiu dokumento priskribas ĉiujn ŝanĝojn faritajn surbaze de la "Farota"-listo en `README.md`,

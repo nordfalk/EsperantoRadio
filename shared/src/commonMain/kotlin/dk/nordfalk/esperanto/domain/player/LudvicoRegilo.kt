@@ -97,6 +97,8 @@ class LudvicoRegilo(
     @Volatile private var lastaPozicioMs: Long = 0
     @Volatile private var lastaSavitaPozicioMs: Long = 0
     @Volatile private var lastaDauroMs: Long = 0
+    /** ID de la laste traktita fonto — por eviti duoblan traktadon de la sama fino. */
+    @Volatile private var lastaTraktitaFontoId: String? = null
 
     /**
      * Komencas observi la ludilon-staton por detekti Finita kaj ĝisdatigi pozicion.
@@ -203,6 +205,14 @@ class LudvicoRegilo(
      */
     private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean) {
         val nunaFonto = ludilo.stato.value.nunaFonto
+        // Protekto kontraŭ duobla traktado — la servo (EsperantoLudadoServo) kaj la
+        // aplika procezo (traktiStatoSxangxon) ambaŭ povas vidi la saman finon.
+        val fontoId = fontoId(nunaFonto)
+        if (fontoId != null && fontoId == lastaTraktitaFontoId) {
+            logd("Ludvico", "Fonto jam traktita: $fontoId — ignoras duoblan vokon")
+            return
+        }
+        if (fontoId != null) lastaTraktitaFontoId = fontoId
         val nunaElsendo = when (nunaFonto) {
             is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
             is Sonfonto.LokaElsendo -> nunaFonto.elsendo
@@ -249,6 +259,22 @@ class LudvicoRegilo(
             try { ludiSekvan(elsendoPorLudi) }
             catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
         }
+    }
+
+    /**
+     * Publika versio de [traktiFinon] — vokata de la servo (EsperantoLudadoServo)
+     * kiam STATE_ENDED okazas, por ke la aŭtoludo funkciu eĉ se la aplika
+     * procezo estas en kaŝmemoro aŭ la MediaController estas malrapida.
+     * La interna protekto (lastaTraktitaFontoId) evitas duoblan traktadon.
+     */
+    suspend fun traktiFinonPublika(stato: LudantoStato, erara: Boolean) = traktiFinon(stato, erara)
+
+    /** Redonas unikan ID por la fonto — uzata por eviti duoblan traktadon de la sama fino. */
+    private fun fontoId(fonto: Sonfonto?): String? = when (fonto) {
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.id
+        is Sonfonto.LokaElsendo -> fonto.elsendo.id
+        is Sonfonto.RektaKanalo -> "rekta:${fonto.kanalo.slug}"
+        null -> null
     }
 
     private fun komenciPozicianSpuradon() {
@@ -311,6 +337,7 @@ class LudvicoRegilo(
         ludMutex.withLock {
             erarojSinsekvaj = 0
             nuliguReprovon()
+            lastaTraktitaFontoId = null // nova elsendo — permesu trakti ĝian finon
             savuPozicion()
             // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
             if (ludatojDeponejo.estasFinita(elsendo.id)) {

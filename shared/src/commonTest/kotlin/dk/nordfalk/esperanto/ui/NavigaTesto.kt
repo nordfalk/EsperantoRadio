@@ -282,6 +282,7 @@ class NavigaTesto {
 internal class NavigaTestLudiloRegilo(initial: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita)) : LudiloRegilo {
     private val _stato = MutableStateFlow(initial)
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = fonto, pozicioMs = komencoPozicioMs, estasRekta = fonto is Sonfonto.RektaKanalo)
     }

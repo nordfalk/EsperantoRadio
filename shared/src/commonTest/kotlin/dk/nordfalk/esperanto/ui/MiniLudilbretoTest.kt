@@ -104,6 +104,7 @@ class MiniLudilbretoTest {
 private class TestLudiloRegilo(initial: LudantoInformo) : LudiloRegilo {
     private val _stato = MutableStateFlow(initial)
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(

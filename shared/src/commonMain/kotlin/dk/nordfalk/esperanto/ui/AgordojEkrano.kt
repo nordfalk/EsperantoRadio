@@ -1,8 +1,12 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,6 +24,7 @@ import dk.nordfalk.esperanto.logi
 fun AgordojEkrano(
     agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
+    onDiagnozo: () -> Unit = {},
 ) {
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
@@ -34,7 +39,7 @@ fun AgordojEkrano(
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp).verticalScroll(rememberScrollState())) {
             Text("Ludado", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             ListItem(
@@ -47,6 +52,16 @@ fun AgordojEkrano(
                     )
                 }
             )
+            Spacer(Modifier.height(24.dp))
+            Text("Sistemo", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Diagnozo") },
+                supportingContent = { Text("Kontroli ĉu la aparato estas bone agordita por fona ludado kaj aŭtomata daŭrigo") },
+                trailingContent = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                modifier = Modifier.clickable { logi("Klako", "Diagnozo"); onDiagnozo() }
+            )
+
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Sciigoj — nur sur platformoj kiuj subtenas ĝin (Android)
@@ -104,6 +119,8 @@ fun AgordojEkrano(
                     Text(temo.etikedo)
                 }
             }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Versio de la apo — el ApoVersio, generata el `apoversio` en libs.versions.toml
             Spacer(Modifier.height(32.dp))

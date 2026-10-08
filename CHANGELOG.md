@@ -16,8 +16,17 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Elfaldebla ludilbreto, ŝovebla serĉbreto, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
+- Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo) kontrolas la aparaton por oftaj problemoj (bateri-optimumado, sciig-permeso, ekzaktaj alarmoj, DNS) kaj gvidas al la ĝustaj sistem-agordoj (https://github.com/nordfalk/EsperantoRadio/pull/79)
+- Avertosigno pri detektitaj problemoj aperas sur la ĉefekrano kaj kondukas rekte al la diagnozo (https://github.com/nordfalk/EsperantoRadio/pull/79)
 - Nova kanalo "CRI — Ĉina Radio Internacia": ĉiutagaj novaĵoj kaj programoj el esperanto.cri.cn (nur Android, ĉar la fluoj estas HLS-video) (https://github.com/nordfalk/EsperantoRadio/pull/72)
 - La CRI-elsendoj estas videoj kaj montras sian filmotrakon; klako sur la filmo malfermas plenekranan vidon kun aŭtomata horizontala rotacio kaj pinĉ-zomo (https://github.com/nordfalk/EsperantoRadio/pull/72)
+
+### Ŝanĝita
+
+- Elsendoj ne rezignas tuj kiam arkiva servilo eraras (HTTP 5xx): la ludvico reprovas anstataŭ salti al la sekva (https://github.com/nordfalk/EsperantoRadio/pull/76)
+- Frontpaĝo: la kanala vico montras unue la aktivajn kanalojn (kun elsendoj dum la pasinta jaro), poste dividilon "Arkivo" kaj la kanalojn kies lasta elsendo estas pli aĝa ol unu jaro; la flava markilo ĉiam montras la aĝon de la elsendo — sur kanaloj tiun de la plej nova elsendo, neniam la ludprogreson (https://github.com/nordfalk/EsperantoRadio/pull/78)
+- Aŭtomata daŭrigo al la sekva elsendo funkcias ankaŭ kiam la apo estas en la fono (la servo mem lanĉas la sekvan elsendon) (https://github.com/nordfalk/EsperantoRadio/pull/79)
 
 ## [3.0.1] - 2026-09-26
 
@@ -32,6 +41,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- "Malapero de aktoro Benda (3/3)" kaj 6 pluaj Esperanta Retradio-elsendoj ne ludeblis: la apo divenis la dosiernomon ĉe archive.org anstataŭ demandi (https://github.com/nordfalk/EsperantoRadio/pull/75)
 - La mini-ludilbreto malaperis post rekreo de la aktiveco, kaj nova ludado silente ne funkciis (https://github.com/nordfalk/EsperantoRadio/pull/68)
 - La "Ludi"-butono en sciigoj pri novaj elsendoj neniam funkciis (kraŝis) (https://github.com/nordfalk/EsperantoRadio/pull/68)
 - La Muzaiko-livestream ne ludis sur Android (https://github.com/nordfalk/EsperantoRadio/pull/68)

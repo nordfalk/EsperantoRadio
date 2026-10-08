@@ -3,7 +3,9 @@ package dk.nordfalk.esperanto
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
+import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
@@ -12,6 +14,8 @@ import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
+import dk.nordfalk.esperanto.domain.DiagnozoRegilo
+import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
@@ -20,6 +24,10 @@ import dk.nordfalk.esperanto.ui.KanalaroViewModel
 import dk.nordfalk.esperanto.ui.KanaloViewModel
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -55,6 +63,8 @@ object AppStato {
     var ludatojDeponejo: PersistaLudatojDeponejo? = null
         private set
     var ludvicoRegilo: LudvicoRegilo? = null
+        private set
+    var diagnozoRegilo: DiagnozoRegilo? = null
         private set
 
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
@@ -92,7 +102,7 @@ object AppStato {
             bundledTeksto = ::leguBundledKanalkonfiguron
         )
 
-        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!)
+        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKasho(settings)))
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
@@ -120,6 +130,17 @@ object AppStato {
             auxtomataDaurigo = agordojDeponejo.auxtomataDaurigo,
         )
 
+        diagnozoRegilo = kreuDiagnozoRegilon()
+
+        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano
+        CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
+            try {
+                diagnozoRegilo?.kontroliRapide()
+            } catch (e: Exception) {
+                logw("AppStato", "Malsukcesis kontroli diagnozon", e)
+            }
+        }
+
         logi("AppStato", "Inicialigito completa")
     }
 
@@ -138,6 +159,7 @@ object AppStato {
         alarmoDeponejo = null
         ludatojDeponejo = null
         ludvicoRegilo = null
+        diagnozoRegilo = null
         kanaloViewModelj.clear()
     }
 }

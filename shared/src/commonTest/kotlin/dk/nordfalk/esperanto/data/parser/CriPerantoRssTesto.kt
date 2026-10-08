@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.data.parser
 
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -27,7 +28,7 @@ class CriPerantoRssTesto {
     }
 
     @Test
-    fun criRssParsasPerRegulo61() {
+    fun criRssParsasPerRegulo61() = runTest {
         val fluo = leguFiksaĵon()
         val kanalo = Kanalo(
             slug = "cri",
@@ -56,7 +57,7 @@ class CriPerantoRssTesto {
     }
 
     @Test
-    fun criRssHavasDaurojnKajBildon() {
+    fun criRssHavasDaurojnKajBildon() = runTest {
         val elsendoj = parsilo.parsuRss(leguFiksaĵon(), Kanalo(slug = "cri", nomo = "CRI"))
 
         val unua = elsendoj.first()

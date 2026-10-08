@@ -58,6 +58,7 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.Ludvico::class, Vojo.Ludvico.serializer())
             subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
             subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
+            subclass(Vojo.Diagnozo::class, Vojo.Diagnozo.serializer())
             subclass(Vojo.KanaloDetalo::class, Vojo.KanaloDetalo.serializer())
             subclass(Vojo.ElsendoDetalo::class, Vojo.ElsendoDetalo.serializer())
         }
@@ -92,6 +93,7 @@ fun EsperantoRadioApp(
         val alarmoDeponejo = AppStato.alarmoDeponejo!!
         val ludatojDeponejo = AppStato.ludatojDeponejo!!
         val ludvicoRegilo = AppStato.ludvicoRegilo!!
+        val diagnozoRegilo = AppStato.diagnozoRegilo!!
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
@@ -182,6 +184,8 @@ fun EsperantoRadioApp(
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
+                                onDiagnozo = { push(Vojo.Diagnozo) },
+                                diagnozoProblemoj = diagnozoRegilo.problemoj,
                                 onElshuti = { elsendo ->
                                     logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
                                     scope.launch { elshutDeponejo.elshuti(elsendo) }
@@ -264,6 +268,13 @@ fun EsperantoRadioApp(
                         entry<Vojo.Agordoj> {
                             AgordojEkrano(
                                 agordojDeponejo = agordojDeponejo,
+                                onReen = { reen() },
+                                onDiagnozo = { push(Vojo.Diagnozo) },
+                            )
+                        }
+                        entry<Vojo.Diagnozo> {
+                            DiagnozoEkrano(
+                                diagnozoRegilo = diagnozoRegilo,
                                 onReen = { reen() },
                             )
                         }

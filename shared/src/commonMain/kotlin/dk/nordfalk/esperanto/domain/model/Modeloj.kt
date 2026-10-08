@@ -20,6 +20,7 @@ data class Kanalo(
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
+    val defaltSxatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
     val havasPodkastojn: Boolean get() = podkastaRssUrl != null

@@ -106,13 +106,18 @@ object AppStato {
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
-        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings)
+        // Legu kanalkonfiguron unufoje — por defaŭltaj ŝatataj kaj alarm-sugestoj
+        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
+        val defaltajSxatataj = agordo.kanaloj
+            .filter { it.defaltSxatata }
+            .map { it.kodo }
+            .toSet()
+        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings, defaltajSxatataj)
 
         sercxoDeponejo = SercxoDeponejoImpl(elsendoDeponejo!!)
 
         elshutDeponejo = kreuElshutDeponejo(httpKliento!!)
 
-        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
         val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
         alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 

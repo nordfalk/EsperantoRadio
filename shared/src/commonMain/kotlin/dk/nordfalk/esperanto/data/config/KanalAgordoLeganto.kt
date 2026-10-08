@@ -114,6 +114,7 @@ data class KanaloDto(
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
+    @SerialName("defaŭltŜatata") val defaltSxatata: Boolean = false,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -128,6 +129,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     ignoruTitolon = elsendojRssIgnoruTitolon,
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
+    defaltSxatata = defaltSxatata,
 )
 
 /**

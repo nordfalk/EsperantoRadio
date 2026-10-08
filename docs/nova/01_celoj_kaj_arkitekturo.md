@@ -4,7 +4,7 @@
 
 1. **Konservi ĉiun funkcion** de la malnova apo (kanaloj, livestreno, podkastoj,
    elŝutoj, plej ŝatataj, lastaŭskultitaj, serĉo, vekhorloĝo).
-2. **Konservi la pars-scio** — la sep parsregoloj, skip-listo, kanalkonfiguro
+2. **Konservi la pars-scio** — la sep parsreguloj, skip-listo, kanalkonfiguro
    (vidu `04_parsado_kaj_arkivo.md`).
 3. **Plursistema** — Android + iOS + Desktop (JVM) + Web (Wasm). Funkcioj
    malfacilaj sur iu platformo estas preterlasitaj tie ("graceful degradation").
@@ -63,7 +63,7 @@ EsperantoRadio/
 │   │   │   ├── navigation/Vojoj.kt  # NavKey-oj (Hejmo, Kanalaro, KanaloDetalo, ElsendoDetalo, …)
 │   │   │   ├── data/
 │   │   │   │   ├── config/          # JSONC-leganto + PlatformResource + KreuSettings
-│   │   │   │   ├── parser/          # RssParsilo (la sep parsregoloj — 04_parsado_kaj_arkivo.md)
+│   │   │   │   ├── parser/          # RssParsilo (la sep parsreguloj — 04_parsado_kaj_arkivo.md)
 │   │   │   │   └── repository/     # deponej-implementaĵoj (Ktor, diskkaŝmemoro, persisto)
 │   │   │   ├── domain/
 │   │   │   │   ├── model/           # Kanalo, Elsendo, Sonfonto, LudantoStato, Alarmo, ElshutStato
@@ -109,7 +109,7 @@ EsperantoRadio/
 | Konservi (kono) | Reenrigardi (implementaĵo) |
 |---|---|
 | La kanallisto kaj agordo (`esperantoradio_kanaloj_v9.json`) | RssArkivServer Java-jar |
-| La sep parsregoloj | Fragment-bazita UI |
+| La sep parsreguloj | Fragment-bazita UI |
 | La skip-listo de neeltireblaj gastigantoj | Singletona `App`-stato |
 | radio.txt-formato kaj antaŭeco | Volley |
 | archive.org/Google Drive-skraptrikoj | ExoMedia |

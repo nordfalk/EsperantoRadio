@@ -1,6 +1,6 @@
 # 4. Parsado kaj arkivo (la kerno)
 
-> Ĉi tiu dokumento specifas kiel la nova apo reproduktas la sep parsregolojn de
+> Ĉi tiu dokumento specifas kiel la nova apo reproduktas la sep parsregulojn de
 > la malnova apo. La parsado estas la plej malfacila kaj plej valora parto.
 > Por la plena fono legu `../malnova/03_parsado_kaj_fontoj.md`.
 
@@ -44,7 +44,7 @@ La enkursigo estas slug-bazita (`when (kanalo.slug)`), ne dateno-movita.
 La `httpKliento`-parametro (defaŭlta `{ "" }` = no-op) estas necesa nur por la
 Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝin.
 
-## La sep regoloj — kiel reprodukti
+## La sep reguloj — kiel reprodukti
 
 ### Regulo 6.1 — Ĝenerala (`parsuGxenerala`)
 

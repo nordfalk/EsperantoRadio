@@ -100,7 +100,7 @@ datumbazon nur se la datumo vere kreskas.
 
 ## RSS-parsado
 
-Parsregoloj kaj parser-kontrakto estas en `04_parsado_kaj_arkivo.md`. La parsilo
+Parsreguloj kaj parser-kontrakto estas en `04_parsado_kaj_arkivo.md`. La parsilo
 uzas **ksoup** por RSS/Atom + HTML-purigado/iframe-skrapado. Per-kanalaj
 apartaĵoj estas **dateno-movitaj** el la kanalagordo (JSON-kampoj
 `puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`).

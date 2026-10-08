@@ -172,7 +172,7 @@ implementaĵo devas plenigi la samajn kampojn:
   RFC-822-datojn fortike (inkluzive `GMT`, `+0000`, kaj `+02:00`-variaĵoj).
 - Atom-datoj estas ISO-8601 (`2018-03-21T17:00:56+00:00`); dato = teksto antaŭ `T`.
 
-## La sep parsregoloj (kun konkretaj fluo-elfragmentoj)
+## La sep parsreguloj (kun konkretaj fluo-elfragmentoj)
 
 La parsado **branĉiĝas laŭ kanal-slug**:
 

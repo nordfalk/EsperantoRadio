@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.multiplatform)
@@ -6,6 +8,11 @@ plugins {
     // Gradle Play Publisher — aŭtomata eldonado al Google Play
     // Dokumentaro: https://github.com/Triple-T/gradle-play-publisher
     id("com.github.triplet.play") version "3.12.2"
+}
+
+// Ŝargu sekretajn agordojn el secrets.properties en la radiko (NENIAM commitu aŭ legu)
+val keystoreProperties = Properties().apply {
+    file("../secrets.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
 kotlin {
@@ -31,11 +38,6 @@ kotlin {
 android {
     namespace = "dk.nordfalk.esperanto.android"
     compileSdk = 36
-
-    // Ŝargu sekretajn agordojn el secrets.properties en la radiko (NENIAM commit!)
-    val keystoreProperties = java.util.Properties().apply {
-        file("../secrets.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
-    }
 
     signingConfigs {
         create("release") {

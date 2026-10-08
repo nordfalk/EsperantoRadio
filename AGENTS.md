@@ -197,6 +197,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
       (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
       Noto: `3.0.0` ne havas etikedon — la ligo en CHANGELOG.md uzas la eldonan
       komiton (`294834b`).
+   5. **Release-notes por Google Play** estas intence en Esperanto — kreu
+      `androidApp/src/main/play/release-notes/en-US/X.Y.Z.txt` (malgraŭ la
+      `en-US`-dosierujo, la enhavo estas en Esperanto; Play Store montras ĝin
+      kiel "Kio novas" por ĉiuj uzantoj). Maksimumo 500 signoj.
 
 ## Teknikaj scioj lernitaj dum la laboro
 

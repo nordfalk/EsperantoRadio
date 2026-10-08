@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -28,8 +30,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.tooling.preview.Preview
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -309,6 +313,8 @@ fun HejmoEkrano(
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
+    onDiagnozo: () -> Unit = {},
+    diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
     onElshuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -323,6 +329,8 @@ fun HejmoEkrano(
     val aktivajKanaloj by vm.aktivajKanaloj.collectAsState()
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
+    val problemoj by diagnozoProblemoj.collectAsState()
+    val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
@@ -387,6 +395,13 @@ fun HejmoEkrano(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
+
+                // Avertosigno pri detektitaj problemoj — supre, nur se estas
+                if (problemojGravaj.isNotEmpty()) {
+                    item {
+                        DiagnozoAvertoKarto(problemoj = problemojGravaj, onDiagnozo = onDiagnozo)
+                    }
+                }
 
                 // "Kanaloj" — unue la aktivaj kanaloj (elsendo en la pasinta jaro),
                 // poste dividilo kun "Arkivo" kaj la arkivaj (pli ol jaron malnovaj)
@@ -730,6 +745,57 @@ private fun ElsendoKartoPreviewPauxzita() {
             ludilo = ludilo,
             onClick = {},
         )
+    }
+}
+
+/**
+ * Averto-karto pri detektitaj problemoj — montrata supre de la ĉefekrano.
+ * Klako kondukas rekte al la diagnoza ekrano.
+ */
+@Composable
+private fun DiagnozoAvertoKarto(
+    problemoj: List<DiagnozoRezulto>,
+    onDiagnozo: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { logi("Klako", "diagnozo-karto (Hejmo)"); onDiagnozo() },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                Icons.Filled.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "${problemoj.size} problemo(j) detektitaj",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+                Text(
+                    problemoj.first().titolo,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onErrorContainer,
+            )
+        }
     }
 }
 

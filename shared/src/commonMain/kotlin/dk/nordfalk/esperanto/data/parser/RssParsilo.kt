@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * La ĝenerala RSS/Atom-parsilo. Traktas la sep parsregolojn.
+ * La ĝenerala RSS/Atom-parsilo. Traktas la sep parsregulojn.
  * Vidu docs/malnova/03_parsado_kaj_fontoj.md kaj docs/nova/04_parsado_kaj_arkivo.md.
  *
  * @param archiveOrgKasho persista kesto de archive.org-dosiernomoj (regulo 6.3);

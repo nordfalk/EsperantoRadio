@@ -14,7 +14,7 @@
 |---|---|---|
 | 1 | [01_strukturo_kaj_konstruo.md](./01_strukturo_kaj_konstruo.md) | Moduloj, Gradle, dependencoj, manifest |
 | 2 | [02_datumfluo.md](./02_datumfluo.md) | Pakoj, enirejoj, datumfluo reto→UI, ŝlosilaj klasoj |
-| 3 | [03_parsado_kaj_fontoj.md](./03_parsado_kaj_fontoj.md) | **Plej grava.** Kanal-konfiguro, radio.txt, la sep parsregoloj, skip-listo |
+| 3 | [03_parsado_kaj_fontoj.md](./03_parsado_kaj_fontoj.md) | **Plej grava.** Kanal-konfiguro, radio.txt, la sep parsreguloj, skip-listo |
 | 4 | [04_ui_kaj_funkcioj.md](./04_ui_kaj_funkcioj.md) | Fragmentoj, navigado, ludilo, elŝutoj, plej ŝatataj, vekhorloĝo |
 | 5 | [05_arkiva_servilo.md](./05_arkiva_servilo.md) | RssArkivServer — la memstara CLI-servilo kiu konstruas la arkivon |
 

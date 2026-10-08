@@ -26,7 +26,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 |---|---|---|---|
 | 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
 | 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
-| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + 13 golden-testoj | ✅ Farita | #7 |
+| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + golden-testoj | ✅ Farita | #7 |
 | 1c | Kanalvido (elsendlisto) + elsendodetalo + Ktor + Coil 3 | ✅ Farita | #9 |
 | 1d | Peranto-parsilo (archive.org + Google Drive, regulo 6.3) | ✅ Farita | #10 |
 | 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
@@ -49,7 +49,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 
 - **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
 - **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
-- **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregolojn (inkl. Peranto/archive.org)
+- **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregulojn (inkl. Peranto/archive.org)
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
@@ -63,7 +63,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
 - **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
-- **Testoj**: 195 testoj (KMP sur Desktop), ĉiuj pasas
+- **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
   Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
@@ -101,7 +101,7 @@ EsperantoRadio/
 │   ├── src/desktopMain/   #   Desktop-specifa (JVM)
 │   ├── src/iosMain/        #   iOS-specifa (kodo ekzistas; iosApp/ Xcode-projekto ankoraŭ ne kreita — malkomentu `include(":iosApp")` en settings.gradle.kts sur Mac)
 │   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
-│   └── src/commonTest/    #   Testoj + desktopTest (195 testoj, ĉiuj pasas)
+│   └── src/commonTest/    #   Testoj + desktopTest (ĉiuj pasas)
 ├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
 ├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
@@ -121,7 +121,7 @@ EsperantoRadio/
    La celo estas rekreado, ne riparado.
 2. **La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
    `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-   La sep parsregoloj kaj la skip-listo devas esti konservitaj.
+   La sep parsreguloj kaj la skip-listo devas esti konservitaj.
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
    determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
@@ -213,6 +213,11 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 
 ## Teknikaj scioj lernitaj dum la laboro
 
+- **Ĉiam konstruu post kunfando.** La CI (`changelog-kontrolo`) nur kontrolas
+  CHANGELOG-ŝanĝojn — ĝi NE konstruas la apon. PR #81 pasis CI sed rompis
+  `androidApp/build.gradle.kts` (import mankis, `Properties` nevidebla en
+  `play {}`). Post ĉiu kunfando, rulu `./gradlew :androidApp:assembleDebug`
+  antaŭ ol publikigi aŭ daŭrigi.
 - **JDK 17** estas necesa por konstrui la Android-apk (la defaŭlta JDK 21 mankas `jlink`).
   Uzu: `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`
 - **Versioj**: Kotlin 2.2.20, Compose Multiplatform 1.10.0, Material3 1.10.0-alpha05,
@@ -230,7 +235,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `AndroidUiTest`): alie `MainActivity.petiSciigPermeson()` montras la permes-dialogon, MainActivity estas
   paŭzita, kaj la Compose-testregistro (nur RESUMED-radikoj) raportas "No compose hierarchies found".
   `connectedAndroidTest` malinstalas la apon post ĉiu rulo, do la permeso ĉiam mankas komence.
-  Rulu ĉiujn: `./gradlew :androidApp:connectedDebugAndroidTest` (5 testoj).
+  Rulu ĉiujn: `./gradlew :androidApp:connectedDebugAndroidTest`.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` — sen ĝi la MediaSession silente
   malsukcesas (`ClassNotFoundException: HlsMediaSource$Factory` en logcat, `MediaSessionStub`).
 - **Ktor 3**: CIO sur Android/Desktop/iOS, sed **ne en la retumilo** — CIO en wasmJs bezonas la
@@ -367,7 +372,7 @@ ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
 java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
 
 # Nova apo
-./gradlew :shared:desktopTest        # rulas testojn (195 testoj)
+./gradlew :shared:desktopTest        # rulas la testojn
 ./gradlew :desktopApp:run            # rulas la desktop-apo
 ./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g  # rulas la web-apo en retumilo
@@ -431,7 +436,7 @@ dk/nordfalk/esperanto/
 │   ├── config/KanalAgordoLeganto.kt   # JSONC-leganto (striptigas komentojn) + sugestoj por alarmoj
 │   ├── config/PlatformResource.kt    # expect/actual por legi resurcojn
 │   ├── config/KreuSettings.kt        # expect/actual por Settings
-│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep regoloj)
+│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep reguloj)
 │   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo
 │   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
 │   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
@@ -483,3 +488,4 @@ dk/nordfalk/esperanto/
   per Esperanto en nova kodo (ekz. `ElsutitajElsendoj`, `Ludilo`, `Elsendo`). La malnova
   kodo uzas dano/esperanto-miksaĵon — ne renomigu ĝin.
 - Mallonga, teknike akra stilo. Sen plenigaj vortoj.
+- Ne menciu la nombron de testoj en la dokumentado — ĝi konstante ŝanĝiĝas.

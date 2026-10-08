@@ -43,7 +43,7 @@ server/
 
 - **Ktor Server** (pura Kotlin, KMP/JVM) — HTTP-servado, malpeza.
 - **Kotlinx Serialization** — JSON-API-respondoj.
-- Reuzu la komunajn parsregolojn el `shared/data/parser` (la **sama** parsilo
+- Reuzu la komunajn parsregulojn el `shared/data/parser` (la **sama** parsilo
   kiel la apo — tio estas la avantaĝo de KMP).
 - Stokado: unue JSON-dosieroj (simile al `RssArkivServer.ser`), poste SQLite
   se la datumo kreskas.
@@ -181,7 +181,7 @@ rekta font-fluo.
 | Java-seriigo (`RssArkivServer.ser`) | JSON/SQLite-stokado |
 | Rome-biblioteko por skribi fluojn | `FluSkribilo.kt` (pura Kotlin) |
 | `FilCache` por kaŝeni fontfluojn | reuzo de Ktor-`HttpCache` + `RssArkivServer-filcache/` |
-| Malmolaj parsbranĉoj | komunaj parsregoloj el `shared/data/parser` (unu kodo, du uzoj) |
+| Malmolaj parsbranĉoj | komunaj parsreguloj el `shared/data/parser` (unu kodo, du uzoj) |
 
 La plej grava avantaĝo: **la servilo kaj la apo dividas la saman parsilon**.
 Kiam la fonto-kono estas ĝisdatigita (ekz. nova iframe-regulo), ĝi estas

@@ -278,9 +278,11 @@ fun MiniLudilbreto(
                     }
                 }
 
-                // Laŭteco-regilo (funkcias kaj por rekta kaj por podkasto)
+                // Laŭteco-regilo (funkcias kaj por rekta kaj por podkasto).
+                // La fluo sekvas ankaŭ eksterajn ŝanĝojn (ekz. hardvaraj laŭteco-klavoj sur Android).
+                val lauxtecoFluo by ludilo.lauxteco.collectAsState()
                 var sxtiraLauxteco by remember(ludilo) { mutableStateOf<Float?>(null) }
-                val lauxteco = sxtiraLauxteco ?: ludilo.leguLauxtecon().coerceIn(0f, 1f)
+                val lauxteco = (sxtiraLauxteco ?: lauxtecoFluo).coerceIn(0f, 1f)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

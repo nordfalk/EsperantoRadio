@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
@@ -50,7 +51,8 @@ class MiniLudilbretoTesto {
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
         val saltVokoj = mutableListOf<Long>()
         val lauxtecoVokoj = mutableListOf<Float>()
-        private var lauxteco = 1f
+        private val _lauxteco = MutableStateFlow(1f)
+        override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
         override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {}
         override fun ludi() {}
         override fun pauxzigi() {}
@@ -61,9 +63,11 @@ class MiniLudilbretoTesto {
         }
         override fun fiksiLauxtecon(volumeno: Float) {
             lauxtecoVokoj.add(volumeno)
-            lauxteco = volumeno
+            _lauxteco.value = volumeno
         }
-        override fun leguLauxtecon(): Float = lauxteco
+
+        /** Simulas eksteran laŭteco-ŝanĝon (ekz. hardvaran klavon). */
+        fun simuluEksteranLauxtecon(volumeno: Float) { _lauxteco.value = volumeno }
     }
 
     private fun ludilo(pozicioMs: Long = 0, dauroMs: Long = 1_200_000L) = TestaLudiloRegilo(
@@ -230,6 +234,31 @@ class MiniLudilbretoTesto {
         assertTrue(
             abs(ludilo.lauxtecoVokoj[0] - 0.4f) < 0.05f,
             "fiksiLauxtecon devas ricevi ~0,4, estis ${ludilo.lauxtecoVokoj[0]}",
+        )
+    }
+
+    @Test
+    fun lauxtecobreto_sekvas_eksterajn_sxangxojn() = runComposeUiTest {
+        val ludilo = ludilo()
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+            }
+        }
+        waitForIdle()
+
+        // La montrilo komenciĝas je la defaŭlta laŭteco (1)
+        assertEquals(
+            1f,
+            onNodeWithTag("lauxteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
+        )
+
+        // Ekstera ŝanĝo (ekz. hardvara laŭteco-klavo sur Android) devas speguliĝi en la regilo
+        ludilo.simuluEksteranLauxtecon(0.3f)
+        waitForIdle()
+        assertEquals(
+            0.3f,
+            onNodeWithTag("lauxteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
     }
 }

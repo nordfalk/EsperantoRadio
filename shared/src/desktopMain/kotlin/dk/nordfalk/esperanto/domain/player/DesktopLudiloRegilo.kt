@@ -35,6 +35,8 @@ class DesktopLudiloRegilo : LudiloRegilo {
 
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+    private val _lauxteco = MutableStateFlow(1f)
+    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
 
     /** mp3spi-fluado ne subtenas saltadon — la UI montras nur pozicio-indikilon. */
     override val subtenasSaltadon: Boolean get() = false
@@ -268,11 +270,10 @@ class DesktopLudiloRegilo : LudiloRegilo {
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
     }
 
-    override fun leguLauxtecon(): Float = volumeno
-
     override fun fiksiLauxtecon(volumeno: Float) {
         val v = volumeno.coerceIn(0f, 1f)
         this.volumeno = v
+        _lauxteco.value = v
         log("fiksiLauxtecon($v)")
         try {
             val line = sourceDataLine ?: return

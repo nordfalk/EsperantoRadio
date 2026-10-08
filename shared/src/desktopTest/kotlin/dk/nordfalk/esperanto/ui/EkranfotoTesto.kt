@@ -247,4 +247,5 @@ private class EkranfotoLudiloRegilo(initial: LudantoInformo = LudantoInformo(sta
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
     override fun fiksiLauxtecon(volumeno: Float) {}
+    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
 }

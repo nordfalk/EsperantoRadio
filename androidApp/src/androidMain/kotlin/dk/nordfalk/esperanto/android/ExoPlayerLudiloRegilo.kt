@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.android
 
 import android.content.ComponentName
 import android.content.Context
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -24,11 +25,18 @@ import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.roundToInt
 
 /**
  * Android-implemento de LudiloRegilo per Media3 MediaController.
@@ -202,9 +210,81 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
-    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f); cxefaFadeno.post { controller?.volume = lauxteco } }
-    override fun leguLauxtecon(): Float = lauxteco
 
-    /** Laŭteco konservata aparte — leginda el ĉiu fadeno sen tuŝi la MediaController. */
-    @Volatile private var lauxteco = 1f
+    /**
+     * La laŭteco-regilo uzas la **sisteman** median laŭtecon (AudioManager.STREAM_MUSIC),
+     * kiel en la malnova apo — ne la ludilan laŭtecon de ExoPlayer. Tiel la montrilo
+     * kongruas kun tio, kion faras la hardvaraj laŭteco-klavoj.
+     */
+    private val audioManager get() = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    /** Frakcio (0..1) de la sistema media laŭteco. */
+    private fun leguSistemanLauxtecon(): Float {
+        val maks = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        if (maks <= 0) return 1f
+        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / maks
+    }
+
+    private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val _lauxteco = MutableStateFlow(leguSistemanLauxtecon())
+    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+    private var lauxtecoEnketoJob: Job? = null
+    private var pozicioEnketoJob: Job? = null
+
+    init {
+        // Enketu la sisteman laŭtecon ĉiun sekundon dum la UI observas ĝin,
+        // por ke la regilo sekvu ŝanĝojn de la hardvaraj klavoj (kiel la malnova apo).
+        skopo.launch {
+            _lauxteco.subscriptionCount.collect { n ->
+                if (n > 0 && lauxtecoEnketoJob == null) {
+                    lauxtecoEnketoJob = skopo.launch {
+                        while (isActive) {
+                            _lauxteco.value = leguSistemanLauxtecon()
+                            delay(1000)
+                        }
+                    }
+                } else if (n == 0) {
+                    lauxtecoEnketoJob?.cancel()
+                    lauxtecoEnketoJob = null
+                }
+            }
+        }
+
+        // Pozicio-ĝisdatigo: updateState() vokiĝas nur ĉe ludant-eventoj, do dum
+        // normala ludado la pozicio frostus. Enketu ĉiun sekundon dum la UI observas
+        // la staton kaj la ludilo ludas — tio movigas la serĉbreton kaj ankaŭ
+        // ĝustigas la pozicio-persistigon de LudvicoRegilo (ĉiu 5 s).
+        skopo.launch {
+            _stato.subscriptionCount.collect { n ->
+                if (n > 0 && pozicioEnketoJob == null) {
+                    pozicioEnketoJob = skopo.launch {
+                        while (isActive) {
+                            cxefaFadeno.post { if (controller?.isPlaying == true) updateState() }
+                            delay(1000)
+                        }
+                    }
+                } else if (n == 0) {
+                    pozicioEnketoJob?.cancel()
+                    pozicioEnketoJob = null
+                }
+            }
+        }
+    }
+
+    override fun fiksiLauxtecon(volumeno: Float) {
+        val frakcio = volumeno.coerceIn(0f, 1f)
+        cxefaFadeno.post {
+            try {
+                val maks = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    (frakcio * maks).roundToInt(),
+                    AudioManager.FLAG_SHOW_UI,
+                )
+            } catch (e: Exception) {
+                loge("Ludilo", "Ne eblis agordi la sisteman laŭtecon", e)
+            }
+        }
+        _lauxteco.value = frakcio
+    }
 }

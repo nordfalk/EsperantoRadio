@@ -32,10 +32,13 @@ interface LudiloRegilo {
     fun fiksiLauxtecon(volumeno: Float)
 
     /**
-     * Legas la nunan laŭtecon de la ludilo (0 = mutigita … 1 = maksimume).
-     * Bazo por la laŭteco-regilo en la mini-ludilbreto. Defaŭlte 1.
+     * La nuna laŭteco (0 = mutigita … 1 = maksimume), kiun la laŭteco-regilo
+     * de la mini-ludilbreto montras kaj sekvas. Platform-dependinge:
+     * - Android: la **sistema** media laŭteco (AudioManager.STREAM_MUSIC), kiel en la
+     *   malnova apo — enketata ĉiun sekundon, do la montrilo sekvas la hardvarajn klavojn
+     * - aliaj platformoj: la laŭteco de la ludilo mem (HTMLAudioElement.volume ktp.)
      */
-    fun leguLauxtecon(): Float = 1f
+    val lauxteco: StateFlow<Float>
 }
 
 /**
@@ -54,7 +57,8 @@ expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 class NoOpLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-    private var lauxteco = 1f
+    private val _lauxteco = MutableStateFlow(1f)
+    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(
@@ -70,8 +74,7 @@ class NoOpLudiloRegilo : LudiloRegilo {
     override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) { lauxteco = volumeno.coerceIn(0f, 1f) }
-    override fun leguLauxtecon(): Float = lauxteco
+    override fun fiksiLauxtecon(volumeno: Float) { _lauxteco.value = volumeno.coerceIn(0f, 1f) }
 
     /**
      * Simulas naturfinon de la ludado — metas staton al Finita.

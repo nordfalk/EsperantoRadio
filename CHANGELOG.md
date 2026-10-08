@@ -14,6 +14,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+## [3.0.2] - 2026-10-08
+
 ### Aldonita
 
 - Elfaldebla ludilbreto, ŝovebla serĉbreto, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
@@ -76,5 +78,6 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master
 [3.0.0]: https://github.com/nordfalk/EsperantoRadio/compare/fresxa_versio...294834b

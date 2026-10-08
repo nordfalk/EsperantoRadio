@@ -1,6 +1,6 @@
 # Ŝanĝoj — 2026-10-08
 
-## Agentaj incidentoj kaj iliaj lecionoj (PR: #81)
+## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)
 
 Du incidentoj okazis dum la laboro pri PR #79/#80 kaj la eldono 3.0.2 — ambaŭ
 riparitaj; la lecionoj estas registritaj en AGENTS.md (nova regulo 11 kaj kvar

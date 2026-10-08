@@ -1,6 +1,10 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -178,6 +182,34 @@ class MiniLudilbretoTesto {
         val kvinProcentoj = dauroMs / 20
         assertEquals(600_000 - kvinProcentoj, ludilo.saltVokoj[0], "reen devas salti 5% de la dauro")
         assertEquals(600_000, ludilo.saltVokoj[1], "antaŭen devas resalti al la origina pozicio")
+    }
+
+    @Test
+    fun elfoldighas_glate() = runComposeUiTest {
+        val ludilo = ludilo()
+        setContent {
+            MaterialTheme {
+                // Malsupra alcentrigo: la pozicio de la breto moviĝas kiam ĝia alteco ŝanĝiĝas
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
+                    MiniLudilbreto(ludilo = ludilo)
+                }
+            }
+        }
+        waitForIdle()
+        mainClock.autoAdvance = false
+
+        val yEnfoldigita = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
+        onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
+        mainClock.advanceTimeBy(100) // mezo de la 250-ms tween
+        val yMeza = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
+        mainClock.advanceTimeBy(400) // preter la fino de la animacio
+        val yElfaldigita = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
+
+        assertTrue(
+            yMeza < yEnfoldigita && yElfaldigita < yMeza,
+            "la supra rando de la breto devas supreniri glate: " +
+                "$yEnfoldigita → $yMeza → $yElfaldigita",
+        )
     }
 
     @Test

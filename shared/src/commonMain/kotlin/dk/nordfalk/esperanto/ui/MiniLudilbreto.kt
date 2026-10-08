@@ -1,12 +1,14 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.FastRewind
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -92,7 +95,13 @@ fun MiniLudilbreto(
         tonalElevation = 3.dp,
         shadowElevation = 8.dp,
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                // Glata malfermo/firmo de la elfalda areo
+                .animateContentSize(animationSpec = tween(durationMillis = 250))
+                .testTag("ludilbreto")
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,14 +197,19 @@ fun MiniLudilbreto(
                     Icon(Icons.Filled.QueueMusic, contentDescription = "Ludvico")
                 }
 
-                // Elfaldi/enfoldigi-sago (kiel en la malnova apo)
+                // Elfaldi/enfoldigi-sago (kiel en la malnova apo — turniĝas, ne ŝanĝas piktogramon)
+                val sagoRotacio by animateFloatAsState(
+                    targetValue = if (elfaldita) 180f else 0f,
+                    animationSpec = tween(durationMillis = 250),
+                )
                 IconButton(onClick = {
                     logi("Klako", if (elfaldita) "enfoldigi la ludilon" else "elfaldi la ludilon")
                     elfaldita = !elfaldita
                 }) {
                     Icon(
-                        imageVector = if (elfaldita) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                        imageVector = Icons.Filled.KeyboardArrowUp,
                         contentDescription = if (elfaldita) "Enfoldigi la ludilon" else "Elfaldigi la ludilon",
+                        modifier = Modifier.rotate(sagoRotacio),
                     )
                 }
             }

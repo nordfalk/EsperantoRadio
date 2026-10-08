@@ -205,6 +205,56 @@
 			"retpoŝto": "",
 			"hejmpaĝoButono": "https://universealalindo.wordpress.com/"
 		}
+	,{
+			"kodo": "fremdulo",
+			"nomo": "Fremdulo 3",
+			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/9230236/9230236-1693648078634-efd5a4a43c6ca.jpg",
+			"hejmpaĝoButono": "https://tkubisiowski.eu/fremdulo"
+		}
+	,{
+			"kodo": "usonepersone",
+			"nomo": "Usone Persone",
+			"elsendojRssUrl": "https://api.substack.com/feed/podcast/2849224.rss",
+			"emblemoUrl": "https://substackcdn.com/feed/podcast/2849224/8b30d0ee41ed14027db9a6edcdd3e57f.jpg",
+			"hejmpaĝoButono": "https://usonepersone.substack.com"
+		}
+	,{
+			"kodo": "neparolupriesperanto",
+			"nomo": "Ne Parolu pri Esperanto",
+			"elsendojRssUrl": "https://www.spreaker.com/show/5202159/episodes/feed",
+			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/70e4cc48a445832bdc21f89ac01c9fd5.jpg",
+			"retpoŝto": "manchapod@gmail.com",
+			"hejmpaĝoButono": "https://www.spreaker.com/show/neparolupriesperanto"
+		}
+	,{
+			"kodo": "radikalatenero",
+			"nomo": "Radikala tenero",
+			"elsendojRssUrl": "https://api.substack.com/feed/podcast/5055769.rss",
+			"emblemoUrl": "https://substackcdn.com/feed/podcast/5055769/7b0e667ffbedc29246a115ab93771102.jpg",
+			"hejmpaĝoButono": "https://radikalatenero.substack.com"
+		}
+	,{
+			"kodo": "esperantostories",
+			"nomo": "Esperanto Stories",
+			"elsendojRssUrl": "https://anchor.fm/s/10eda9620/podcast/rss",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/45341736/45341736-1770662297336-865b100360be.jpg",
+			"hejmpaĝoButono": "https://esperantostories.carrd.co"
+		}
+	,{
+			"kodo": "lemondediplomatique",
+			"nomo": "Le Monde diplomatique en Esperanto",
+			"elsendojRssUrl": "https://feeds.acast.com/public/shows/65d51e18498c29001629f76a",
+			"emblemoUrl": "https://assets.pippa.io/shows/65d51e18498c29001629f76a/1708557804240-b5140bc6380aa3a1f37046ff1202e541.jpeg",
+			"hejmpaĝoButono": "https://shows.acast.com/diploesperanto"
+		}
+	,{
+			"kodo": "rakontatempo",
+			"nomo": "Rakonta Tempo",
+			"elsendojRssUrl": "https://anchor.fm/s/dce1a654/podcast/rss",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/36957757/36957757-1679199549737-8589e88bbf25b.jpg",
+			"hejmpaĝoButono": "https://podcasters.spotify.com/pod/show/au016dsteno"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [

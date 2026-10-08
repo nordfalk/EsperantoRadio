@@ -18,6 +18,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 - 7 novaj podkastaj kanaloj: Fremdulo 3, Usone Persone, Ne Parolu pri Esperanto, Radikala tenero, Esperanto Stories, Le Monde diplomatique en Esperanto kaj Rakonta Tempo (https://github.com/nordfalk/EsperantoRadio/pull/83)
 - 2 pliaj kanaloj: Internacia Retradio (IRo) kaj Esp. Magazino Tuluzo (https://github.com/nordfalk/EsperantoRadio/pull/86)
+- Mallongaj priskriboj de ĉiuj kanaloj videblaj en la kanalaro kaj en la kanala paĝo (https://github.com/nordfalk/EsperantoRadio/pull/88)
 
 ## [3.0.2] - 2026-10-08
 

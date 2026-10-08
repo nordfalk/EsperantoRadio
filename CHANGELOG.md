@@ -22,8 +22,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Elfaldebla ludilbreto (sago dekstre, kiel en la malnova apo, kun glata malfermo-/fermo-animacio): ŝovebla serĉbreto, reen-/antaŭen-butonoj (5% de la elsendo) kaj laŭteco-regilo — sur Android ligita al la sistema laŭteco, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
-- La pozicio en la serĉbreto nun avanzas dum la ludado (antaŭe ĝi frostis ĝis la sekva klako) (https://github.com/nordfalk/EsperantoRadio/pull/77)
+- Elfaldebla ludilbreto, ŝovebla serĉbreto, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
 
 ## [3.0.1] - 2026-09-26
 

@@ -17,6 +17,9 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
@@ -153,12 +156,6 @@ fun EsperantoRadioApp(
         }
 
         fun reen() {
-            // Se la ludilbreto estas elfaldita, unue enfoldigu ĝin anstataŭ navigi reen
-            if (elfaldita) {
-                logi("Nav", "← reen: enfoldigas ludilbreton")
-                elfaldita = false
-                return
-            }
             logi("Nav", "← reen")
             if (backStack.size > 1) backStack.removeLastOrNull()
         }
@@ -353,6 +350,18 @@ fun EsperantoRadioApp(
                             }
                     )
                 }
+
+                // Kaptu reen-butonon por enfoldigi la ludilbreton — devas esti post
+                // NavDisplay por havi prioritaton (laste komponita handler venkas)
+                val kolapsoStato = rememberNavigationEventState(NavigationEventInfo.None)
+                NavigationBackHandler(
+                    state = kolapsoStato,
+                    isBackEnabled = elfaldita,
+                    onBackCompleted = {
+                        logi("Nav", "← reen: enfoldigas ludilbreton (NavigationBackHandler)")
+                        elfaldita = false
+                    },
+                )
             }
 
             if (montruSubanBreton) {

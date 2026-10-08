@@ -150,6 +150,10 @@ EsperantoRadio/
    Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; se la
    CI-kontrolo erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
    la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
+11. **Aŭtomate aldonu viajn lecionojn al ĉi tiu dosiero.** Post ĉiu laboro —
+    precipe post eraro, incidento aŭ neatendita rezulto — skribu koncizan
+    lecionon (kun dato kaj ekzemplo) en la sekcion "Teknikaj scioj lernitaj
+    dum la laboro". Celo: neniam ripeti la saman eraron.
 
 ## Git-laborfluo
 
@@ -294,6 +298,24 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 - **Navigado**: uzas `navigation3` (`androidx.navigation3`) — `NavKey` ( sealed `Vojo`),
   `rememberNavBackStack`, `entryProvider`, `NavDisplay`. Stato persistebla per `SavedStateConfiguration`
   kun `polymorphic` serializers por ĉiu `Vojo`-subklaso. Detaloj: `docs/nova/05_dizajno_kaj_ui.md`.
+- **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
+  precipe `gh pr create --body "..."`: bash plenumas la backtick-enhavon kiel
+  komand-anstataŭigon. (2026-10-08, PR #80: la kodo-pecoj de la PR-teksto plenumiĝis —
+  akcidentaj `git tag v3.0.1`/`v3.0.2` + `git push` + `./gradlew`; la etikedoj
+  kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
+  `--body-file <dosiero>` aŭ
+  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
+  projectCards-malrekomendo) — uzu la REST API (vidu supre).
+- **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
+  atendatas, serĉu nereatingeblajn komitojn per
+  `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
+  2–3 gepatroj, mesaĝo "On <branĉo>: ...") kaj reakiru per
+  `git stash store -m "..." <hash>`. (2026-10-08: la stash "eldono 3.0.2" tiel reakiriĝis.)
+- **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
+  `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
+  uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
+  CHANGELOG.md — konservita en la stash, ne enmetita.)
 
 ## Logcat (Android)
 

@@ -1,5 +1,33 @@
 # Ŝanĝoj — 2026-10-08
 
+## Agentaj incidentoj kaj iliaj lecionoj (PR: #81)
+
+Du incidentoj okazis dum la laboro pri PR #79/#80 kaj la eldono 3.0.2 — ambaŭ
+riparitaj; la lecionoj estas registritaj en AGENTS.md (nova regulo 11 kaj kvar
+novaj eroj en "Teknikaj scioj lernitaj dum la laboro").
+
+1. **Stash-perdo kaj reakiro.** `git stash list` estis malplena kvankam la stash
+   "eldono 3.0.2" (versio + release-notes + CHANGELOG) ekzistis. La komito troviĝis
+   inter la nereatingeblaj objektoj (`git fsck --unreachable --no-reflogs`; kunfando
+   kun 3 gepatroj, mesaĝo "On master: eldono 3.0.2 ...") kaj estis reakirita per
+   `git stash store -m "..." <hash>`. Enhavo kontrolita antaŭ uzo: apoversio 3.0.2,
+   versionCode 246, release-notes, CHANGELOG-sekcio; teknikaj dosieroj identaj al
+   la laborarbo.
+2. **Backtick-katastrofo en `gh pr create --body "..."`.** Bash interpretis la
+   kodo-pecojn de la PR-teksto kiel komand-anstataŭigojn kaj plenumis ilin —
+   inkluzive de `git tag v3.0.1`/`v3.0.2`, `git push origin v3.0.1`/`v3.0.2` kaj
+   `./gradlew :androidApp:assembleDebug`. Tio kreis ambaŭ etikedojn sur la malĝusta
+   komito (16ae6d6 — la kompar-ligo estus malplena) kaj plenigis la PR-korpon per
+   gradle-eliro. Riparo: forigo de ambaŭ etikedoj (fore kaj loke), rekreo sur la
+   ĝustaj komitoj (`v3.0.1` → 8c5ed4c, la vera fino de la eldono 3.0.1; `v3.0.2` →
+   16ae6d6, la versio-ŝanĝa komito) kaj puŝo; la PR-korpo estis reverkita per
+   `gh api -X PATCH` (`gh pr edit` fiaskas: GraphQL projectCards-malrekomendo).
+   Leciono: neniam kodo-pecoj en komandoj kun duoblaj citiloj — uzu `--body-file`.
+3. **Laborarbo de la uzanto.** La laborarbo povas enhavi la proprajn nekomititajn
+   ŝanĝojn de la uzanto (troviĝis provizora "notu"-fragmento en CHANGELOG.md —
+   verŝajne la komenco de la instrukcio "notu viajn problemojn…"). Ĝi estis
+   konservita flanke (stash + patch) kaj ne enmetita en la commitojn.
+
 ## Diagnoza ekrano + aŭtomata daŭrigo en la fono (PR: #79)
 
 ### Aŭtomata daŭrigo el la fono (servo)

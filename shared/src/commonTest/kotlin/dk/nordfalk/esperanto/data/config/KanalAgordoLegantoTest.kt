@@ -40,6 +40,33 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
+    fun legasPriskribonKajPlueAlKanalo() {
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "muzaiko",
+                        "nomo": "Muzaiko",
+                        "priskribo": "24-hora Esperanto-retradio: muziko kaj parolataj programeroj.",
+                        "elsendojRssUrl": "https://ekzemplo.com/feed/"
+                    },
+                    {
+                        "kodo": "senpriskribo",
+                        "nomo": "Sen priskribo",
+                        "elsendojRssUrl": "https://ekzemplo.com/alia/"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertEquals("24-hora Esperanto-retradio: muziko kaj parolataj programeroj.", agordo.kanaloj[0].priskribo)
+        assertEquals("24-hora Esperanto-retradio: muziko kaj parolataj programeroj.", agordo.kanaloj[0].alKanalo().priskribo)
+        assertNull(agordo.kanaloj[1].priskribo)
+    }
+
+    @Test
     fun legasRektaElsendaSonoUrl() {
         val jsonc = """
             {

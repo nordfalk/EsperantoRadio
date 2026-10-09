@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
@@ -57,8 +56,14 @@ fun MiniLudilbreto(
     onLudvico: () -> Unit = {},
     /** Nuna reprovo-numero el [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.reprovo] (0 = neniu). */
     reprovo: Int = 0,
-    /** Komence en la elfaldigita stato — por antaŭvidoj kaj testoj. */
-    komenceElfaldita: Boolean = false,
+    /** Ĉu la ludilbreto estas elfaldigita (hoistita ŝtato — regata de App.kt). */
+    elfaldita: Boolean = false,
+    onElfalditaSxangxo: (Boolean) -> Unit = {},
+    /** Sekvanta enhavo kiam nenio ludas — la breto sekvas la navigadon. */
+    sekvantaTitolo: String? = null,
+    sekvantaSubtitolo: String? = null,
+    sekvantaBildoUrl: String? = null,
+    onLudiSekvantan: () -> Unit = {},
     /**
      * Haltigas la ludadon — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.haltuLudadon].
      * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (FAROTA K3).
@@ -69,9 +74,24 @@ fun MiniLudilbreto(
     val info = stato
     val fonto = info.nunaFonto
 
-    if (fonto == null) return // Nenio ludiĝas — ne montru la breton
+    // Se nenio ludas kaj ne estas sekvanta enhavo, ne montru la breton
+    if (fonto == null && sekvantaTitolo == null) return
 
-    var elfaldita by rememberSaveable { mutableStateOf(komenceElfaldita) }
+    val ludas = info.stato is LudantoStato.Ludas
+    val scope = rememberCoroutineScope()
+
+    // Se nenio ludas, montru la sekvantan enhavon (navigad-sekvado)
+    if (fonto == null) {
+        MiniLudilbretoSekvanta(
+            titolo = sekvantaTitolo!!,
+            subtitolo = sekvantaSubtitolo,
+            bildoUrl = sekvantaBildoUrl,
+            onLudi = onLudiSekvantan,
+            onClick = onClick,
+            modifier = modifier,
+        )
+        return
+    }
 
     val titolo = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanalo.nomo
@@ -91,8 +111,6 @@ fun MiniLudilbreto(
         is Sonfonto.LokaElsendo -> fonto.elsendo.bildoUrl
     }
 
-    val ludas = info.stato is LudantoStato.Ludas
-    val scope = rememberCoroutineScope()
     val estasPodkasto = !info.estasRekta && info.dauroMs > 0
 
     Surface(
@@ -209,7 +227,7 @@ fun MiniLudilbreto(
                 )
                 IconButton(onClick = {
                     logi("Klako", if (elfaldita) "enfoldigi la ludilon" else "elfaldi la ludilon")
-                    elfaldita = !elfaldita
+                    onElfalditaSxangxo(!elfaldita)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
@@ -328,6 +346,72 @@ fun MiniLudilbreto(
     }
 }
 
+/**
+ * Mini-ludilbreto en sekvanta-reĝimo — montras la nunan navigan celon (kanalo/elsendo)
+ * kun ludi-butono, kiam nenio aktive ludas.
+ */
+@Composable
+private fun MiniLudilbretoSekvanta(
+    titolo: String,
+    subtitolo: String?,
+    bildoUrl: String?,
+    onLudi: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        tonalElevation = 3.dp,
+        shadowElevation = 8.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { logi("Klako", "mini-ludilbreto (sekvanta) → detalo"); onClick() }
+                .padding(8.dp)
+                .testTag("ludilbreto"),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Bildeto
+            if (bildoUrl != null) {
+                AsyncImage(
+                    model = bildoUrl,
+                    contentDescription = "Bildeto de nuna kanalo/elsendo",
+                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.MusicNote, contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                }
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
+                Text(titolo, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (subtitolo != null) {
+                    Text(subtitolo, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            // Ludi-butono — komencas ludi la nunan navigan celon
+            IconButton(onClick = { logi("Klako", "ludi sekvantan"); onLudi() }) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = "Ludi")
+            }
+        }
+    }
+}
+
 /** Saltas [direkto]-foje 5% de la elsendo-daŭro (negativa = reen), kiel en la malnova apo. */
 private fun saltuDiference(ludilo: LudiloRegilo, info: LudantoInformo, direkto: Int) {
     val diferenco = (info.dauroMs * SALTA_KVOCOTO).toLong() * direkto
@@ -372,5 +456,28 @@ fun MiniLudilbretoElfalditaPreview() {
             pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
         )
     )
-    pTemo { MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true) }
+    pTemo {
+        var elfaldita by remember { mutableStateOf(true) }
+        MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
+    }
+}
+
+@Preview(name = "MiniLudilbreto — sekvanta (nenio ludas)", showBackground = true, heightDp = 80)
+@Composable
+fun MiniLudilbretoSekvantaPreview() {
+    val ludilo = PreviewLudiloRegilo(
+        dk.nordfalk.esperanto.domain.model.LudantoInformo(
+            stato = dk.nordfalk.esperanto.domain.model.LudantoStato.Haltita,
+            nunaFonto = null,
+        )
+    )
+    pTemo {
+        MiniLudilbreto(
+            ludilo = ludilo,
+            sekvantaTitolo = "Varsovia Vento",
+            sekvantaSubtitolo = "Kanalo",
+            sekvantaBildoUrl = null,
+            onLudiSekvantan = {},
+        )
+    }
 }

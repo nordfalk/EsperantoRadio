@@ -40,6 +40,7 @@
 		{
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
+			"priskribo": "24-hora Esperanto-retradio: muziko kaj parolataj programeroj. Aŭskultu rete aŭ podkaste.",
 			"rektaElsendaSonoUrl": "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
             "xxxrektaElsendoPriskbUrl": "https://fluo.muzaiko.info/api/nowplaying/1",
             "rektaElsendaPriskriboUrl": "https://muzaiko.info/data.json",
@@ -56,6 +57,7 @@
 	,{
 			"kodo": "varsoviavento",
 			"nomo": "Varsovia Vento",
+			"priskribo": "Klassika Esperanto-podkasto ekde 2006: muziko, movadaj novaĵoj kaj intervjuoj el Varsovio.",
 			"elsendojRssUrl": "https://www.podkasto.net/feed/",
 			"emblemoUrl": "https://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
@@ -65,6 +67,7 @@
 	,{
 			"kodo": "lamalfamuloj",
 			"nomo": "La Malfamuloj",
+			"priskribo": "Karlos kaj Pietro, «du fuŝuloj» el Meksiko kaj Brazilo, kaj ilia podkastaro La Kompanio: skeĉoj, «Mondaj Sekretoj Ne Tiom Sekretaj», «Mitoj» kaj pli.",
 			"elsendojRssUrl": "https://anchor.fm/s/1e1d5f38/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/4952414/4952414-1648816366276-df6671b0dc5a1.jpg",
 			"montruTitolojn": "true",
@@ -74,6 +77,7 @@
 	,{
 			"kodo": "3zzzenesperanto",
 			"nomo": "3ZZZ en Esperanto",
+			"priskribo": "Semajnja unuhora programo de la Melburna Esperanto-komunumo ĉe la komunuma radio 3ZZZ.",
 			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
 			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
@@ -84,6 +88,7 @@
 	,{
 			"kodo": "polaretradio",
 			"nomo": "Pola Retradio",
+			"priskribo": "Volontula daŭrigo de la historia pola radio-elsendo (1959-2011). Nova elsendo ĉiun kvinan tagon.",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
 			"emblemoUrl": "https://esperanto-radio.com/_polaretradio.png",
 			"elsendojRssUrl": "https://pola-retradio.org/feed/",
@@ -95,6 +100,7 @@
 	,{
 			"kodo": "babibejo",
 			"nomo": "BabiBEJO",
+			"priskribo": "Podkasto de la Brazila Esperantista Junularo pri junulara vivo, kulturo kaj agadoj en Brazilo.",
 			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
 			"elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
 			"retpoŝto": "babibejopodcast@gmail.com",
@@ -103,6 +109,7 @@
 	,{
 			"kodo": "kernpunkto",
 			"nomo": "Kernpunkto",
+			"priskribo": "Eva kaj Johannes pri scienco, kulturo kaj socio - profundaj babiladoj kun gastoj.",
 			"emblemoUrl": "https://esperanto-radio.com/_kernpunkto.png",
 			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
@@ -112,6 +119,7 @@
 	,{
 			"kodo": "movada-vidpunkto",
 			"nomo": "Movada Vidpunkto",
+			"priskribo": "Intervjuoj pri la Esperanto-movado mem: organizoj, eventoj kaj personoj. De la teamo de Kernpunkto.",
 			"emblemoUrl": "https://movada-vid.punkto.info/wp-content/uploads/sites/2/2015/12/logotipo-movada-1.png",
 			"elsendojRssUrl": "https://movada-vid.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
@@ -121,6 +129,7 @@
 	,{
 			"kodo": "radioscienca",
 			"nomo": "Radio Scienca",
+			"priskribo": "Sciencaj temoj - de kosmo ĝis korpo - klarigitaj en Esperanto.",
 			"emblemoUrl": "http://www.radioscienca.com/wp/wp-content/uploads/2017/01/bg-1.jpg",
 			"elsendojRssUrl": "http://www.radioscienca.com/feed/",
 			"montruTitolojn": "true",
@@ -130,6 +139,7 @@
 	,{
 			"kodo": "radiovatikana",
 			"nomo": "Radio Vatikana",
+			"priskribo": "Novaĵoj pri la Papo kaj la Eklezio el Vatikano; Esperanto-elsendoj ekde 1977, trifoje semajne.",
 			"emblemoUrl": "https://esperanto-radio.com/_radiovatikana.png",
 			"elsendojRssUrl": "https://www.vaticannews.va/eo/podcast/esperanto-programo.podcast.xml",
 			"retpoŝto": "info@vaticannews.va",
@@ -138,6 +148,7 @@
 	,{
 			"kodo": "spiritismavocxo",
 			"nomo": "Spiritisma Voĉo",
+			"priskribo": "Voĉlegitaj spiritismaj tekstoj (tradicio de Allan Kardec) en Esperanto, el Brazilo.",
 			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/t_square_limited_320/images.spreaker.com/original/8baa9d2b387b75be75a1356240351e09.jpg",
 			"elsendojRssUrl": "https://www.spreaker.com/user/8650988/episodes/feed",
 			"retpoŝto": "leo.cassanho@yahoo.com.br",
@@ -146,6 +157,7 @@
 	,{
 			"kodo": "vinilkosmo",
 			"nomo": "Vinilkosmo",
+			"priskribo": "Podkasto de la samnoma Esperanto-muzikeldonejo: novaĵoj kaj novaĵaroj pri Esperanto-muziko.",
 			"emblemoUrl": "http://www.vinilkosmo-mp3.com/images/banniere_300.jpg",
 			"elsendojRssUrl": "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
 			"montruTitolojn": "true",
@@ -155,6 +167,7 @@
 	,{
 			"kodo": "bitmono",
 			"nomo": "Bitmono",
+			"priskribo": "Pri bitmono kaj kriptovalutoj - klarigitaj simple, en Esperanto.",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/21881729/21881729-1666809337563-63459cc26442b.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/830574e4/podcast/rss",
 			"montruTitolojn": "false",
@@ -165,6 +178,7 @@
 	,{
 			"kodo": "sano",
 			"nomo": "Pri Sano",
+			"priskribo": "Kuracisto Daniel pri sanaj temoj kaj ĉiutaga bonfarto, en Esperanto.",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/6998773/6998773-1593998832730-95ad6d8e45a0a.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/2a4fde34/podcast/rss",
 			"montruTitolojn": "false",
@@ -175,6 +189,7 @@
 	,{
 			"kodo": "radiofrei",
 			"nomo": "Radio Frei",
+			"priskribo": "Esperanto-podkastoj de la germana liberaj-tema radio «Radio Frei».",
 			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
 			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
 			"uziWebViewPorElsendo": false,
@@ -183,6 +198,7 @@
 	,{
 			"kodo": "peranto",
 			"nomo": "Esperanta Retradio",
+			"priskribo": "Ĉiutagaj «sonartikoloj»: voĉlegitaj tekstoj de la blogo Esperanta Retradio. Bona por lernantoj.",
 			"emblemoUrl": "http://wp11081574.server-he.de/peranto/retradiologo.gif",
 			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default",
 			"xxelsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
@@ -192,6 +208,7 @@
 	,{
 			"kodo": "kaliningrada",
 			"nomo": "Kaliningrada E-radio",
+			"priskribo": "Sonprogramoj el Kaliningrado de Aleksandro Korĵenkov kaj Halina Gorecka (La Ondo de Esperanto).",
 			"emblemoUrl": "https://radio.esperanto-ondo.ru/wp-content/uploads/2017/05/Re-banner-300x63.jpg",
 			"elsendojRssUrl": "https://radio.esperanto-ondo.ru/feed/podcast/radio-esperanto",
 			"retpoŝto": "sezonoj@mail.ru",
@@ -200,6 +217,7 @@
 		{
 			"kodo": "universeala-lindo",
 			"nomo": "Universeala Lindo, la argentina podkasto",
+			"priskribo": "Argentina podkasto pri Esperanto kaj la vivo en Sudameriko.",
 			"emblemoUrl": "",
 			"elsendojRssUrl": "https://universealalindo.wordpress.com/feed/",
 			"retpoŝto": "",
@@ -208,6 +226,7 @@
 	,{
 			"kodo": "fremdulo",
 			"nomo": "Fremdulo 3",
+			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto - kun buntaj gastoj.",
 			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/9230236/9230236-1693648078634-efd5a4a43c6ca.jpg",
 			"hejmpaĝoButono": "https://tkubisiowski.eu/fremdulo"
@@ -215,6 +234,7 @@
 	,{
 			"kodo": "usonepersone",
 			"nomo": "Usone Persone",
+			"priskribo": "Rafa, Brandono kaj Hanso priparolas literaturon, politikon kaj la movadon, trione el Usono.",
 			"elsendojRssUrl": "https://api.substack.com/feed/podcast/2849224.rss",
 			"emblemoUrl": "https://substackcdn.com/feed/podcast/2849224/8b30d0ee41ed14027db9a6edcdd3e57f.jpg",
 			"hejmpaĝoButono": "https://usonepersone.substack.com"
@@ -222,6 +242,7 @@
 	,{
 			"kodo": "neparolupriesperanto",
 			"nomo": "Ne Parolu pri Esperanto",
+			"priskribo": "ManchaPod klarigas ĉion amuze: de vikingoj ĝis Mesopotamio - ĉiam en Esperanto.",
 			"elsendojRssUrl": "https://www.spreaker.com/show/5202159/episodes/feed",
 			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/70e4cc48a445832bdc21f89ac01c9fd5.jpg",
 			"retpoŝto": "manchapod@gmail.com",
@@ -230,6 +251,7 @@
 	,{
 			"kodo": "radikalatenero",
 			"nomo": "Radikala tenero",
+			"priskribo": "Carolin kaj Stela: feminismaj babiladoj pri la vivo, la movado kaj la mondo.",
 			"elsendojRssUrl": "https://api.substack.com/feed/podcast/5055769.rss",
 			"emblemoUrl": "https://substackcdn.com/feed/podcast/5055769/7b0e667ffbedc29246a115ab93771102.jpg",
 			"hejmpaĝoButono": "https://radikalatenero.substack.com"
@@ -237,6 +259,7 @@
 	,{
 			"kodo": "esperantostories",
 			"nomo": "Esperanto Stories",
+			"priskribo": "Mallongaj rakontoj en facila Esperanto por lernantoj; transskriboj haveblas rete.",
 			"elsendojRssUrl": "https://anchor.fm/s/10eda9620/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/45341736/45341736-1770662297336-865b100360be.jpg",
 			"hejmpaĝoButono": "https://esperantostories.carrd.co"
@@ -244,6 +267,7 @@
 	,{
 			"kodo": "lemondediplomatique",
 			"nomo": "Le Monde diplomatique en Esperanto",
+			"priskribo": "Voĉlegitaj artikoloj el la mondfama revuo Le Monde diplomatique.",
 			"elsendojRssUrl": "https://feeds.acast.com/public/shows/65d51e18498c29001629f76a",
 			"emblemoUrl": "https://assets.pippa.io/shows/65d51e18498c29001629f76a/1708557804240-b5140bc6380aa3a1f37046ff1202e541.jpeg",
 			"hejmpaĝoButono": "https://shows.acast.com/diploesperanto"
@@ -251,6 +275,7 @@
 	,{
 			"kodo": "rakontatempo",
 			"nomo": "Rakonta Tempo",
+			"priskribo": "Aŭsteno legas novelojn kaj fabelojn - ĉiu epizodo unu rakonto en Esperanto.",
 			"elsendojRssUrl": "https://anchor.fm/s/dce1a654/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/36957757/36957757-1679199549737-8589e88bbf25b.jpg",
 			"hejmpaĝoButono": "https://podcasters.spotify.com/pod/show/au016dsteno"
@@ -258,6 +283,7 @@
 	,{
 			"kodo": "iro",
 			"nomo": "Internacia Afrika Retradio",
+			"priskribo": "Novaĵbultenoj kaj kulturaj kaj mitologiaj elsendoj de la internacia ĵurnalista teamo (eks. Afrika Retradio).",
 			// AzuraCast-fluo sur la sama servilo kiel Muzaiko (fluo.muzaiko.info); la fluo listas la epizodojn plej malnovajn unue
 			"elsendojRssUrl": "https://fluo.muzaiko.info/public/3/podcast/1f03f904-19e7-65ca-a948-01e45d8a6a2f/feed",
 			"emblemoUrl": "https://fluo.muzaiko.info/api/station/3/public/podcast/1f03f904-19e7-65ca-a948-01e45d8a6a2f/art-1748854925.jpg",
@@ -267,6 +293,7 @@
 	,{
 			"kodo": "tuluzo",
 			"nomo": "Esp. Magazino Tuluzo",
+			"priskribo": "Semajnja unuhora magazino de Canal Sud (Tuluzo), parte en Esperanto, parte en la franca.",
 			// WordPress-blog-fluo; la ĝenerala parsilo preterlasas blogaĵojn sen MP3-enclosure (restas nur la magazenaj elsendoj)
 			"elsendojRssUrl": "https://toulouse.occeo.net/eo/feed/",
 			"emblemoUrl": "",

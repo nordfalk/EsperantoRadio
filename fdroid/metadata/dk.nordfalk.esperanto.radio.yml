@@ -41,15 +41,15 @@ RequiresRoot: false
 # Kiam vi kreos etikedon kiel v3.0.1, F-Droid aŭtomate detektos kaj rekonstruos
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 3.0.0
-CurrentVersionCode: 244
+CurrentVersion: 3.0.2
+CurrentVersionCode: 246
 
 # Build-instrukcioj — F-Droid konstruas la apon mem el fonto
 # La apo uzas JDK 17 (ne JDK 21 — mankas jlink)
 Builds:
-  - versionName: 3.0.0
-    versionCode: 244
-    commit: v3.0.0
+  - versionName: 3.0.2
+    versionCode: 246
+    commit: v3.0.2
     subdir: androidApp
     gradle:
       - yes

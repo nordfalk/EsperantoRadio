@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
+import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -62,7 +63,7 @@ class EsperantoLudadoServo : MediaSessionService() {
         // Aŭtoludo en la servo mem: kiam elsendo finiĝas (STATE_ENDED), la servo
         // vokas LudvicoRegilo rekte — tiel la aŭtoludo funkcias eĉ se la aplika
         // procezo estas en kaŝmemoro aŭ la MediaController estas malrapida.
-        // La protekto en LudvicoRegilo (lastaTraktitaFontoId) evitas duoblan traktadon.
+        // La protekto en LudvicoRegilo (dedup-fenestro) evitas duoblan traktadon.
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
@@ -71,7 +72,13 @@ class EsperantoLudadoServo : MediaSessionService() {
                         try {
                             val regilo = AppStato.ludvicoRegilo
                             if (regilo != null) {
-                                regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+                                // Transdonu la FINANTAN fonton (FAROTA G8) — ne relegu ĝin en
+                                // LudvicoRegilo, kie la aŭtoludo eble jam avancis al la sekva
+                                val finantaFonto = SonfontoKodilo.malkodigu(
+                                    player.currentMediaItem?.mediaMetadata?.extras
+                                        ?.getString(SonfontoKodilo.SXLOSILO)
+                                )
+                                regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = finantaFonto)
                             } else {
                                 logw("LudadoServo", "AppStato.ludvicoRegilo estas null — ne povas aŭtoludi")
                             }

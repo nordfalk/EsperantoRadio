@@ -155,18 +155,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
             val ripeto = partoj[i + 4].toInt()
             // partoj[i + 5] = time (malnova, ne uzata)
             val kanaloSlug = partoj[i + 6].removePrefix("=")
-            val etikedo = partoj[i + 7].removePrefix("=")
-                .replace("+", " ")
-                .replace("%0A", "\n")
-                .replace("%C4%88", "Ĉ")
-                .replace("%C4%A5", "ĵ")
-                .replace("%C5%9C", "ŝ")
-                .replace("%C5%AD", "ŭ")
-                .replace("%C4%9C", "Ĝ")
-                .replace("%C4%89", "ĉ")
-                .replace("%C4%B4", "Ĵ")
-                .replace("%C5%AC", "Ŝ")
-                .replace("%C5%AC", "Ŝ")
+            val etikedo = malkoduUrlKoditajxon(partoj[i + 7].removePrefix("="))
             rezulto.add(Alarmo(
                 id = id,
                 horo = horo,
@@ -182,4 +171,79 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
         i += 8
     }
     return rezulto
+}
+
+/**
+ * Malkodas URL-koditan tekston: `+` → spaco, `%XX` → UTF-8-signo.
+ *
+ * Anstataŭas la antaŭan permanan supersignan tabelon, kiu estis erara:
+ * `%C4%A5` estas **ĥ** (ne ĵ), `%C5%9C` estas **Ŝ** (ne ŝ), `%C5%AC` estas **Ŭ**
+ * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (FAROTA K5).
+ * Jam-malkoditaj signoj (kodo > 127) estas trairataj senŝanĝe.
+ */
+internal fun malkoduUrlKoditajxon(teksto: String): String {
+    val rezulto = StringBuilder()
+    val bajtoj = mutableListOf<Int>()
+    fun elfluigu() {
+        if (bajtoj.isNotEmpty()) {
+            rezulto.append(malkoduUtf8(bajtoj))
+            bajtoj.clear()
+        }
+    }
+    var i = 0
+    while (i < teksto.length) {
+        val c = teksto[i]
+        when {
+            c == '+' -> { elfluigu(); rezulto.append(' '); i++ }
+            c == '%' && i + 2 < teksto.length -> {
+                val alta = hexCifero(teksto[i + 1])
+                val malalta = hexCifero(teksto[i + 2])
+                if (alta != null && malalta != null) {
+                    bajtoj.add((alta shl 4) or malalta)
+                    i += 3
+                } else {
+                    elfluigu(); rezulto.append(c); i++
+                }
+            }
+            else -> { elfluigu(); rezulto.append(c); i++ }
+        }
+    }
+    elfluigu()
+    return rezulto.toString()
+}
+
+/** Heksa cifero → valoro 0-15, aŭ null se ne heksa. */
+private fun hexCifero(c: Char): Int? = when (c) {
+    in '0'..'9' -> c - '0'
+    in 'a'..'f' -> c - 'a' + 10
+    in 'A'..'F' -> c - 'A' + 10
+    else -> null
+}
+
+/** Malkodas UTF-8-bajtosekvencon al signoĉeno (subtenas 1-4-bajtajn signojn). */
+private fun malkoduUtf8(bajtoj: List<Int>): String {
+    val sb = StringBuilder()
+    var i = 0
+    while (i < bajtoj.size) {
+        val b = bajtoj[i]
+        when {
+            b < 0x80 -> { sb.append(b.toChar()); i += 1 }
+            b and 0xE0 == 0xC0 && i + 1 < bajtoj.size -> {
+                sb.append((((b and 0x1F) shl 6) or (bajtoj[i + 1] and 0x3F)).toChar()); i += 2
+            }
+            b and 0xF0 == 0xE0 && i + 2 < bajtoj.size -> {
+                sb.append((((b and 0x0F) shl 12) or ((bajtoj[i + 1] and 0x3F) shl 6) or (bajtoj[i + 2] and 0x3F)).toChar()); i += 3
+            }
+            b and 0xF8 == 0xF0 && i + 3 < bajtoj.size -> {
+                val kodo = ((b and 0x07) shl 18) or ((bajtoj[i + 1] and 0x3F) shl 12) or
+                    ((bajtoj[i + 2] and 0x3F) shl 6) or (bajtoj[i + 3] and 0x3F)
+                val m = kodo - 0x10000
+                sb.append((0xD800 + (m shr 10)).toChar())
+                sb.append((0xDC00 + (m and 0x3FF)).toChar())
+                i += 4
+            }
+            else -> { sb.append('\uFFFD'); i += 1 }
+        }
+    }
+    return sb.toString()
 }

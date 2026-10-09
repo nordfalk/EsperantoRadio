@@ -12,7 +12,7 @@ tio estis simpligita el la originala plano kiu havis `parsStrategio`-kampon.
 La kampo ne estis aldonita al la `Kanalo`-modelo; la enkursigo restas slug-bazita.
 
 Tamen, iuj aferoj restas dateno-movitaj:
-- La **kernpunkto-https-korekto** estas endosita en la ĝenerala parsilo (ĉiam `https://`).
+- La **kernpunkto-https-korekto** estas endosita en la ĝenerala parsilo (nur por `kernpunkto`).
 - La **salto-listo** de neeltireblaj gastigantoj (youtube/soundcloud/vimeo/...) estas konstanto en la parsilo.
 - Kelkaj aferoj restas kodigitaj (saltoj de konataj malplenaj datoj en Peranto,
   `orkestro_sklavidojj`-korekto) ĉar ili estas tro specifaj. Documentu ilin.
@@ -54,7 +54,9 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 3. `priskribo` = `<description>` aŭ iTunes-`summary`; se `<content:encoded>` ĉeestas, uzu ĝin.
 4. `fluo` = `<enclosure type="audio/*" url>`. Se neniu: parsu priskribo-HTML, prenu `<audio><source src>`. Se ankoraŭ neniu → **forĵetu**.
 5. `dauro` el iTunes; `bildoUrl` el iTunes-bildo.
-6. Se `fluo` komenciĝas per `http://` → `https://` (ĉiam https-korekto).
+6. Se `fluo` komenciĝas per `http://` → `https://` (**nur por `kernpunkto`** — historia korekto,
+   ĉar la malnova Rome-biblioteko reskribis https→http; aliaj kanaloj ricevas la URL-on el la fluo
+   sen ŝanĝo kaj la cleartext-esceptoj staras en `network_security_config.xml`).
 7. Se `kanalo.ignoruTitolon` → derivu titolon el priskribo (regulo 6.5).
 
 ### Regulo 6.2 — Varsovia Vento (`parsuVarsoviaVento`)

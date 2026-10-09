@@ -105,16 +105,22 @@ class RssParsilo(
             fluo = ero.selectFirst("audio source")?.attr("src") ?: ""
         }
         if (fluo.isEmpty()) return null
+        // Nur http(s) permesataj — file://, content://, javascript:// ktp. el nefidinda RSS ne (FAROTA G2)
+        fluo = saniguRetUrlon(fluo) ?: return null
 
         if (kanalo.slug == "kernpunkto" && fluo.startsWith("http://")) {
             fluo = "https://" + fluo.removePrefix("http://")
         }
 
         val dauro = leguDauron(ero.selectFirst("itunes|duration")?.text())
-        val bildoUrl = ero.selectFirst("itunes|image")?.attr("href")
-            ?: ero.selectFirst("image url")?.text()
-        val retpaghoUrl = ero.selectFirst("link")?.text()
-            ?: ero.selectFirst("link")?.attr("href")
+        val bildoUrl = saniguRetUrlon(
+            ero.selectFirst("itunes|image")?.attr("href")
+                ?: ero.selectFirst("image url")?.text()
+        )
+        val retpaghoUrl = saniguRetUrlon(
+            ero.selectFirst("link")?.text()?.ifEmpty { null }
+                ?: ero.selectFirst("link")?.attr("href")
+        )
 
         val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboKruda) else titolo
 
@@ -158,8 +164,7 @@ class RssParsilo(
             if (audioj.isEmpty()) continue
 
             for ((i, source) in audioj.withIndex()) {
-                val fluo = source.attr("src")
-                if (fluo.isEmpty()) continue
+                val fluo = saniguRetUrlon(source.attr("src")) ?: continue
                 rezulto.add(Elsendo(
                     id = "${kanalo.slug}:$dato:${i + 1}",
                     kanaloSlug = kanalo.slug,
@@ -211,7 +216,7 @@ class RssParsilo(
             val htmlDoc = Ksoup.parse(htmlEsprimite)
 
             // Eltiru bildon el la unua <img>
-            val bildoUrl = htmlDoc.selectFirst("img")?.attr("src")
+            val bildoUrl = saniguRetUrlon(htmlDoc.selectFirst("img")?.attr("src"))
 
             // Forigu <img>, <iframe>, <div class="separator"> el priskribo
             htmlDoc.select("img").remove()
@@ -256,7 +261,7 @@ class RssParsilo(
                 priskribo = priskribo,
                 priskriboHtml = puriguHtmlKunEtikedojn(htmlEsprimite),
                 bildoUrl = bildoUrl,
-                retpaghoUrl = ero.selectFirst("link[rel=alternate]")?.attr("href"),
+                retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[rel=alternate]")?.attr("href")),
                 arkivaIdentigilo = arkivaIdentigilo,
                 fluo = fluo,
             )
@@ -358,10 +363,10 @@ class RssParsilo(
             val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
             val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
 
-            val fluo = ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href")
+            val fluo = saniguRetUrlon(ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href"))
                 ?: return@mapNotNull null
-            val bildoUrl = ero.selectFirst("link[type=image/jpeg]")?.attr("href")
-            val retpaghoUrl = ero.selectFirst("link[type=text/html]")?.attr("href")
+            val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
+            val retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
@@ -380,6 +385,22 @@ class RssParsilo(
         }
 
     // === Helpiloj ===
+
+    /**
+     * Validigas URL-on el nefidinda RSS-enhavo: nur `http://`/`https://` permesataj.
+     *
+     * Defendo kontraŭ skemoj kiel `file://`, `content://`, `javascript:`, `intent://`:
+     * ExoPlayer/Coil denaske scipovas malfermi `file://` kaj `content://` — malica aŭ
+     * difektita fluo devas ne igi nin ludi/montri lokan enhavon (FAROTA G2).
+     *
+     * @return la trimmed URL, aŭ null se la skemo ne estas permesata
+     */
+    fun saniguRetUrlon(url: String?): String? {
+        if (url.isNullOrBlank()) return null
+        val pura = url.trim()
+        val malalta = pura.lowercase()
+        return if (malalta.startsWith("http://") || malalta.startsWith("https://")) pura else null
+    }
 
     fun normigiDaton(datStr: String?): String? {
         if (datStr.isNullOrBlank()) return null
@@ -428,10 +449,23 @@ class RssParsilo(
         val doc = Ksoup.parse(html)
         // Forigu danĝerajn etikedojn
         doc.select("script, style, iframe, object, embed, form, input, button, meta, link").remove()
-        // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj)
+        // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj).
+        // BLANKA LISTO por href/src: nur http(s), mailto, #-ankroj kaj /-relativaj vojoj
+        // permesataj — `intent://`, `data:`, `file://` kaj obfuskigita `java\tscript:`
+        // (usklec-miksita) tiel ne trafluas (FAROTA G4).
         for (el in doc.select("*")) {
             for (attr in el.attributes().asList()) {
-                if (attr.key.startsWith("on") || attr.value.trim().startsWith("javascript:")) {
+                val sxlosilo = attr.key.lowercase()
+                val valoro = attr.value.trim()
+                val malalta = valoro.lowercase()
+                val danxeraAtributo = sxlosilo.startsWith("on") ||
+                    malalta.startsWith("javascript:") ||
+                    malalta.startsWith("data:") ||
+                    ((sxlosilo == "href" || sxlosilo == "src") && !(
+                        malalta.startsWith("http://") || malalta.startsWith("https://") ||
+                        malalta.startsWith("mailto:") || valoro.startsWith("#") || valoro.startsWith("/")
+                    ))
+                if (danxeraAtributo) {
                     el.removeAttr(attr.key)
                 }
             }

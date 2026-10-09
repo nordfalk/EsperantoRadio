@@ -315,6 +315,11 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
   `--body-file <dosiero>` aŭ
   `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — `CoroutineScope(Dispatchers.IO …)`
+  en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
+  expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
+  ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
+  estu parto de estonta testa CI, vidu FAROTA.md G24.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash

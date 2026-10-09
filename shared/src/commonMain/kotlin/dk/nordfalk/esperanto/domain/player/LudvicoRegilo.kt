@@ -17,6 +17,7 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -25,8 +26,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -97,8 +98,24 @@ class LudvicoRegilo(
     @Volatile private var lastaPozicioMs: Long = 0
     @Volatile private var lastaSavitaPozicioMs: Long = 0
     @Volatile private var lastaDauroMs: Long = 0
-    /** ID de la laste traktita fonto — por eviti duoblan traktadon de la sama fino. */
-    @Volatile private var lastaTraktitaFontoId: String? = null
+    /**
+     * Dedup-fenestro de la lastaj traktitaj fontoj — protektas kontraŭ malfruaj
+     * duoblaj vokoj de la sama fino (servo + stato-observanto, eĉ post kiam la
+     * aŭtoludo jam avancis al la sekva elsendo). Atoma per Mutex (FAROTA G8).
+     */
+    private val traktitajFontoj = ArrayDeque<String>()
+    private val traktitajMutex = Mutex()
+
+    /** Atome markas fonton traktita; redonas true se ĝi jam estis traktita lastatempe. */
+    private suspend fun markuTraktita(fontoId: String): Boolean = traktitajMutex.withLock {
+        if (fontoId in traktitajFontoj) return@withLock true
+        traktitajFontoj.addLast(fontoId)
+        while (traktitajFontoj.size > TRAKTITAJ_FONTOJ_MAKS) traktitajFontoj.removeFirst()
+        false
+    }
+
+    /** Malplenigas la dedup-fenestron — la uzanto eksplicite reludas, do la fino estu re-traktebla. */
+    private suspend fun malpleniguTraktitajnFontojn() = traktitajMutex.withLock { traktitajFontoj.clear() }
 
     /**
      * Komencas observi la ludilon-staton por detekti Finita kaj ĝisdatigi pozicion.
@@ -107,21 +124,21 @@ class LudvicoRegilo(
     fun komenci() {
         if (observanto != null) return
         observanto = ludilo.stato
-            .map { it.stato }
-            .distinctUntilChanged()
-            .onEach { stato ->
-                traktiStatoSxangxon(stato)
+            .distinctUntilChangedBy { it.stato }
+            .onEach { info ->
+                traktiStatoSxangxon(info)
             }
             .launchIn(scope)
     }
 
-    private suspend fun traktiStatoSxangxon(stato: LudantoStato) {
+    private suspend fun traktiStatoSxangxon(info: LudantoInformo) {
+        val stato = info.stato
         when {
             stato == LudantoStato.Finita && antauxaStato != LudantoStato.Finita -> {
-                traktiFinon(stato, erara = false)
+                traktiFinon(stato, erara = false, finantaFonto = info.nunaFonto)
             }
             stato is LudantoStato.Eraro && antauxaStato !is LudantoStato.Eraro -> {
-                if (!stato.reprovebla || !provuReprovi()) traktiFinon(stato, erara = true)
+                if (!stato.reprovebla || !provuReprovi()) traktiFinon(stato, erara = true, finantaFonto = info.nunaFonto)
             }
             stato == LudantoStato.Ludas -> {
                 if (_reprovo.value > 0) logi("Ludvico", "Reprovo ${_reprovo.value} sukcesis")
@@ -148,7 +165,10 @@ class LudvicoRegilo(
      */
     private fun provuReprovi(): Boolean {
         val info = ludilo.stato.value
-        val fonto = info.nunaFonto ?: lastaFonto ?: return false
+        // NunaFonto == null en Eraro-stato signifas ke la fonto estis forigita
+        // (ekz. ĵus post halti()) — ne reprovu, alikaze la muziko rekomenciĝus
+        // post ol la uzanto premis "Halti" (FAROTA K3).
+        val fonto = info.nunaFonto ?: return false
         if (fonto is Sonfonto.LokaElsendo) return false
         val provo = _reprovo.value + 1
         val atendo = reprovoAtendo(provo)
@@ -171,7 +191,7 @@ class LudvicoRegilo(
             // La uzanto eble haltigis aŭ elektis ion alian dume — tiam ne reprovu
             val nun = ludilo.stato.value
             if (generacio != reprovoGeneracio || nun.stato !is LudantoStato.Eraro ||
-                (nun.nunaFonto != null && nun.nunaFonto != fonto)) {
+                nun.nunaFonto != fonto) {
                 logi("Ludvico", "Reprovo nuligita — stato ${nun.stato}")
                 _reprovo.value = 0
                 return@launch
@@ -179,14 +199,17 @@ class LudvicoRegilo(
             try {
                 ludilo.fiksiFonton(fonto, pozicio)
                 ludilo.ludi()
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                // Throwable, ne Exception: la retumila ludilo ĵetas kotlin.Error (FAROTA G26)
                 loge("Ludvico", "Reprovo $provo ĵetis escepton", e)
             }
             // Sinkrona malsukceso (ekz. Desktop): la stato restas Eraro kaj la observanto ne vidas
             // novan ŝanĝon (distinctUntilChanged) — do planu la sekvan reprovon mem
             val poste = ludilo.stato.value.stato
             if (poste is LudantoStato.Eraro && generacio == reprovoGeneracio) {
-                if (!poste.reprovebla || !provuReprovi()) traktiFinon(poste, erara = true)
+                if (!poste.reprovebla || !provuReprovi()) traktiFinon(poste, erara = true, finantaFonto = fonto)
             }
         }
         return true
@@ -202,24 +225,36 @@ class LudvicoRegilo(
 
     /**
      * Komuna trakto por Finita kaj Eraro — markas la elsendon kaj aŭtoludas sekvan.
+     *
+     * @param finantaFonto la fonto kiu EFIKTIVE finiĝis — portata de la vokanto (la
+     *   stato-emiso aŭ la servo), NE relegata el `ludilo.stato`: inter la fino kaj
+     *   la traktado la aŭtoludo eble jam avancis al la sekva elsendo, kaj tiam ni
+     *   markus la MALĜUSTAN elsendon (FAROTA G8).
      */
-    private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean) {
-        val nunaFonto = ludilo.stato.value.nunaFonto
+    private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean, finantaFonto: Sonfonto?) {
+        if (finantaFonto == null) {
+            // Fonto nekonata (ekz. rosta playerError post halti() sur Android, aŭ eraro en
+            // fiksiFonton sur Desktop) — neniu elsendo finiĝis, do nenion marku kaj ne aŭtoludu
+            // (alie "plej freŝa neludata" ekflus tuj post ol la uzanto premis "Halti") — FAROTA K3.
+            logw("Ludvico", "Fino/eraro sen konata fonto — ignoras (neniu aŭtoludo)")
+            return
+        }
         // Protekto kontraŭ duobla traktado — la servo (EsperantoLudadoServo) kaj la
-        // aplika procezo (traktiStatoSxangxon) ambaŭ povas vidi la saman finon.
-        val fontoId = fontoId(nunaFonto)
-        if (fontoId != null && fontoId == lastaTraktitaFontoId) {
+        // stato-observanto ambaŭ povas vidi la saman finon, ankaŭ MALFRUE (post kiam
+        // la aŭtoludo jam avancis al la sekva elsendo). Atoma, ŝlosita sur la FINANTA
+        // fonto (FAROTA G8).
+        val fontoId = fontoId(finantaFonto) ?: return
+        if (markuTraktita(fontoId)) {
             logd("Ludvico", "Fonto jam traktita: $fontoId — ignoras duoblan vokon")
             return
         }
-        if (fontoId != null) lastaTraktitaFontoId = fontoId
-        val nunaElsendo = when (nunaFonto) {
-            is Sonfonto.ElsendoFonto -> nunaFonto.elsendo
-            is Sonfonto.LokaElsendo -> nunaFonto.elsendo
+        val nunaElsendo = when (finantaFonto) {
+            is Sonfonto.ElsendoFonto -> finantaFonto.elsendo
+            is Sonfonto.LokaElsendo -> finantaFonto.elsendo
             else -> null
         }
         // Ne aŭtoludi post rekta kanalo — rekta elsendo ne havas sekvan
-        if (nunaFonto is Sonfonto.RektaKanalo) {
+        if (finantaFonto is Sonfonto.RektaKanalo) {
             logi("Ludvico", "Rekta kanalo ${if (erara) "eraris" else "finiĝis"} — ne aŭtoludas")
             return
         }
@@ -239,6 +274,9 @@ class LudvicoRegilo(
             }
         } else {
             logi("Ludvico", "Ludado finiĝis (naturfino)")
+            // Vera sukceso — la eraroj ne plu estas sinsekvaj (FAROTA G27: sen tio
+            // 10 akumulitaj eraroj dum longa seanco haltegus la aŭtoludon)
+            erarojSinsekvaj = 0
             if (nunaElsendo != null) {
                 ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
             }
@@ -257,7 +295,8 @@ class LudvicoRegilo(
         val elsendoPorLudi = nunaElsendo
         scope.launch {
             try { ludiSekvan(elsendoPorLudi) }
-            catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Throwable) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
         }
     }
 
@@ -265,9 +304,11 @@ class LudvicoRegilo(
      * Publika versio de [traktiFinon] — vokata de la servo (EsperantoLudadoServo)
      * kiam STATE_ENDED okazas, por ke la aŭtoludo funkciu eĉ se la aplika
      * procezo estas en kaŝmemoro aŭ la MediaController estas malrapida.
-     * La interna protekto (lastaTraktitaFontoId) evitas duoblan traktadon.
+     * La servo devas transdoni la finantan fonton (el `currentMediaItem.mediaMetadata.extras`
+     * per [SonfontoKodilo]) — la dedup-fenestro [markuTraktita] evitas duoblan traktadon.
      */
-    suspend fun traktiFinonPublika(stato: LudantoStato, erara: Boolean) = traktiFinon(stato, erara)
+    suspend fun traktiFinonPublika(stato: LudantoStato, erara: Boolean, finantaFonto: Sonfonto?) =
+        traktiFinon(stato, erara, finantaFonto)
 
     /** Redonas unikan ID por la fonto — uzata por eviti duoblan traktadon de la sama fino. */
     private fun fontoId(fonto: Sonfonto?): String? = when (fonto) {
@@ -337,13 +378,28 @@ class LudvicoRegilo(
         ludMutex.withLock {
             erarojSinsekvaj = 0
             nuliguReprovon()
-            lastaTraktitaFontoId = null // nova elsendo — permesu trakti ĝian finon
+            malpleniguTraktitajnFontojn() // nova eksplicita ludado — permesu trakti ĝian finon
             savuPozicion()
             // Se la elsendo estis finita, malmarku ĝin — la uzanto eksplicite reludas
             if (ludatojDeponejo.estasFinita(elsendo.id)) {
                 ludatojDeponejo.malmarkiFinita(elsendo.id, elsendo.kanaloSlug)
             }
             ludiElsendonInterna(elsendo)
+        }
+    }
+
+    /**
+     * Eksplicite haltigas la ludadon — la ĝusta vojo por la "Halti"-butono.
+     *
+     * Kontraŭe al rekta `ludilo.halti()` tio ankaŭ nuligas planitan reprovon
+     * (aliaflanke la reprovo rekomencigus la ludadon post la atendo — FAROTA K3)
+     * kaj savas la pozicion antaŭ ol halti() forigas la fonton.
+     */
+    suspend fun haltuLudadon() {
+        ludMutex.withLock {
+            nuliguReprovon()
+            savuPozicion()
+            ludilo.halti()
         }
     }
 
@@ -461,7 +517,9 @@ class LudvicoRegilo(
         try {
             ludilo.fiksiFonton(fonto, komencoPozicio)
             ludilo.ludi()
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
             loge("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
         }
         ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
@@ -476,7 +534,9 @@ class LudvicoRegilo(
         return kanaloj.flatMap { kanalo ->
             try {
                 elsendoDeponejo.getElsendojn(kanalo.slug)
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
                 logw("Ludvico", "Malsukcesis akiri elsendojn por ${kanalo.slug}", e)
                 emptyList()
             }
@@ -501,5 +561,7 @@ class LudvicoRegilo(
         const val POZICIO_SAV_INTERVALO_MS = 5000L
         /** Maksimumo de sinsekvaj eraroj antaŭ ol halti por eviti eternan buklon. */
         const val MAKS_ERAROJ = 10
+        /** Grandeco de la dedup-fenestro por finoj (FAROTA G8). */
+        const val TRAKTITAJ_FONTOJ_MAKS = 4
     }
 }

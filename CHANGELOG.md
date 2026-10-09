@@ -14,6 +14,23 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Riparita
+
+- Ne plu perdiĝas jam elŝutita kanal-enhavo kiam la servilo respondas per eraro-paĝo aŭ kaptiva portalo
+- La sciigoj pri novaj elsendoj nun funkcias ankaŭ kiam la apo estas fermita (la fonprocezo antaŭe havis neniun kuntekston)
+- Sur Android la ludado ne plu povas rekomenciĝi per si mem post kiam oni premis "Halti"
+- Klako sur ero en la ludvico nun malfermas la elsendon (antaŭe la klako faris nenion)
+- Alarmo-sugestoj montras ĝustajn supersignojn (ĥ, Ŝ, Ŭ ktp.)
+- Kanaloj kun plej-malnovaj-unue fluoj (ekz. Internacia Retradio) montras la plej novajn elsendojn supre kaj aŭtoludas en la ĝusta direkto
+
+### Sekureco
+
+- HTTP (klara teksto) estas nun permesata nur por la heredaĵaj gastigantoj kiuj bezonas ĝin — ne por la tuta trafiko
+- Fluo- kaj bildligiloj el la radi-fluoj estas kontrolataj: nur http/https estas ludebla (ne ekz. file://)
+- Falsitaj sciigo-intencoj de aliaj aplikoj estas rifuzataj (privata po-instala kodo)
+- Ligiloj en la elsendo-priskriboj malfermiĝas ekstere, ne ene de la priskribo-vido; danĝeraj skemoj (intent://, data:, javascript:) estas forigitaj
+- Aŭskult-historio kaj alarmoj ne plu estas aŭtomate sekurkopiataj al la nubo
+
 ### Aldonita
 
 - 7 novaj podkastaj kanaloj: Fremdulo 3, Usone Persone, Ne Parolu pri Esperanto, Radikala tenero, Esperanto Stories, Le Monde diplomatique en Esperanto kaj Rakonta Tempo (https://github.com/nordfalk/EsperantoRadio/pull/83)

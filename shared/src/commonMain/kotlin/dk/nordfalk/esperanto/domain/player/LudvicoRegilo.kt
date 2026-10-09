@@ -17,6 +17,7 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -148,7 +149,10 @@ class LudvicoRegilo(
      */
     private fun provuReprovi(): Boolean {
         val info = ludilo.stato.value
-        val fonto = info.nunaFonto ?: lastaFonto ?: return false
+        // NunaFonto == null en Eraro-stato signifas ke la fonto estis forigita
+        // (ekz. ĵus post halti()) — ne reprovu, alikaze la muziko rekomenciĝus
+        // post ol la uzanto premis "Halti" (FAROTA K3).
+        val fonto = info.nunaFonto ?: return false
         if (fonto is Sonfonto.LokaElsendo) return false
         val provo = _reprovo.value + 1
         val atendo = reprovoAtendo(provo)
@@ -171,7 +175,7 @@ class LudvicoRegilo(
             // La uzanto eble haltigis aŭ elektis ion alian dume — tiam ne reprovu
             val nun = ludilo.stato.value
             if (generacio != reprovoGeneracio || nun.stato !is LudantoStato.Eraro ||
-                (nun.nunaFonto != null && nun.nunaFonto != fonto)) {
+                nun.nunaFonto != fonto) {
                 logi("Ludvico", "Reprovo nuligita — stato ${nun.stato}")
                 _reprovo.value = 0
                 return@launch
@@ -179,7 +183,10 @@ class LudvicoRegilo(
             try {
                 ludilo.fiksiFonton(fonto, pozicio)
                 ludilo.ludi()
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                // Throwable, ne Exception: la retumila ludilo ĵetas kotlin.Error (FAROTA G26)
                 loge("Ludvico", "Reprovo $provo ĵetis escepton", e)
             }
             // Sinkrona malsukceso (ekz. Desktop): la stato restas Eraro kaj la observanto ne vidas
@@ -205,6 +212,13 @@ class LudvicoRegilo(
      */
     private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean) {
         val nunaFonto = ludilo.stato.value.nunaFonto
+        // Fonto nekonata (ekz. rosta playerError post halti() sur Android, aŭ eraro en
+        // fiksiFonton sur Desktop) — neniu elsendo finiĝis, do nenion marku kaj ne aŭtoludu
+        // (alie "plej freŝa neludata" ekflus tuj post ol la uzanto premis "Halti") — FAROTA K3.
+        if (nunaFonto == null) {
+            logw("Ludvico", "Fino/eraro sen konata fonto — ignoras (neniu aŭtoludo)")
+            return
+        }
         // Protekto kontraŭ duobla traktado — la servo (EsperantoLudadoServo) kaj la
         // aplika procezo (traktiStatoSxangxon) ambaŭ povas vidi la saman finon.
         val fontoId = fontoId(nunaFonto)
@@ -239,6 +253,9 @@ class LudvicoRegilo(
             }
         } else {
             logi("Ludvico", "Ludado finiĝis (naturfino)")
+            // Vera sukceso — la eraroj ne plu estas sinsekvaj (FAROTA G27: sen tio
+            // 10 akumulitaj eraroj dum longa seanco haltegus la aŭtoludon)
+            erarojSinsekvaj = 0
             if (nunaElsendo != null) {
                 ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
             }
@@ -257,7 +274,8 @@ class LudvicoRegilo(
         val elsendoPorLudi = nunaElsendo
         scope.launch {
             try { ludiSekvan(elsendoPorLudi) }
-            catch (e: Exception) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Throwable) { loge("Ludvico", "Malsukcesis ludi sekvan", e) }
         }
     }
 
@@ -344,6 +362,21 @@ class LudvicoRegilo(
                 ludatojDeponejo.malmarkiFinita(elsendo.id, elsendo.kanaloSlug)
             }
             ludiElsendonInterna(elsendo)
+        }
+    }
+
+    /**
+     * Eksplicite haltigas la ludadon — la ĝusta vojo por la "Halti"-butono.
+     *
+     * Kontraŭe al rekta `ludilo.halti()` tio ankaŭ nuligas planitan reprovon
+     * (aliaflanke la reprovo rekomencigus la ludadon post la atendo — FAROTA K3)
+     * kaj savas la pozicion antaŭ ol halti() forigas la fonton.
+     */
+    suspend fun haltuLudadon() {
+        ludMutex.withLock {
+            nuliguReprovon()
+            savuPozicion()
+            ludilo.halti()
         }
     }
 
@@ -461,7 +494,9 @@ class LudvicoRegilo(
         try {
             ludilo.fiksiFonton(fonto, komencoPozicio)
             ludilo.ludi()
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
             loge("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
         }
         ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
@@ -476,7 +511,9 @@ class LudvicoRegilo(
         return kanaloj.flatMap { kanalo ->
             try {
                 elsendoDeponejo.getElsendojn(kanalo.slug)
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
                 logw("Ludvico", "Malsukcesis akiri elsendojn por ${kanalo.slug}", e)
                 emptyList()
             }

@@ -132,8 +132,10 @@ object AppStato {
 
         diagnozoRegilo = kreuDiagnozoRegilon()
 
-        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano
-        CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
+        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano.
+        // Dispatchers.Default, ne IO: IO ne ekzistas sur wasmJs (la DNS-testo de la
+        // Android-implemento rulas en propra fadeno interne).
+        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
             try {
                 diagnozoRegilo?.kontroliRapide()
             } catch (e: Exception) {

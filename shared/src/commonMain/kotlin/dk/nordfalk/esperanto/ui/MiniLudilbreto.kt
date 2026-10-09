@@ -59,6 +59,11 @@ fun MiniLudilbreto(
     reprovo: Int = 0,
     /** Komence en la elfaldigita stato — por antaŭvidoj kaj testoj. */
     komenceElfaldita: Boolean = false,
+    /**
+     * Haltigas la ludadon — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.haltuLudadon].
+     * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (FAROTA K3).
+     */
+    onHaltigi: suspend () -> Unit = { ludilo.halti() },
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -188,7 +193,7 @@ fun MiniLudilbreto(
                 }
 
                 // Halti-butono
-                IconButton(onClick = { logi("Klako", "halti"); ludilo.halti() }) {
+                IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
                     Icon(Icons.Filled.Stop, contentDescription = "Halti")
                 }
 

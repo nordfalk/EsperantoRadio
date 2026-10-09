@@ -336,6 +336,7 @@ fun EsperantoRadioApp(
                 MiniLudilbreto(
                     ludilo = ludilo,
                     reprovo = reprovo,
+                    onHaltigi = { ludvicoRegilo.haltuLudadon() },
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Klara teksto (HTTP) estas malpermesata tutmonde — nur por la heredaĵaj
+    gastigantoj el la kanalkonfiguro, kiuj ankoraŭ ne subtenas HTTPS (FAROTA G1).
+    Antaŭe `usesCleartextTraffic="true"` malfermis HTTP por la tuta trafiko:
+    retatacanto (MITM) povis anstataŭigi la tutan RSS-enhavon, ankaŭ
+    enclosure-URL-ojn, kiujn ExoPlayer poste ludas.
+
+    La listo devenas de ĉiuj http://-URL-oj en esperantoradio_kanaloj_v9.json
+    (elsendojRssUrl, emblemoUrl, rektaElsendaSonoUrl, hejmpaĝoButono).
+    Novaj kanaloj devas uzi HTTPS.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">aldone.de</domain>
+        <domain includeSubdomains="false">api.ipernity.com</domain>
+        <domain includeSubdomains="false">esperanto-tv.com</domain>
+        <domain includeSubdomains="false">feeds.djpod.com</domain>
+        <domain includeSubdomains="false">feeds.feedburner.com</domain>
+        <domain includeSubdomains="false">files.posterous.com</domain>
+        <domain includeSubdomains="false">javabog.dk</domain>
+        <domain includeSubdomains="false">melburno.org.au</domain>
+        <domain includeSubdomains="false">radiohc.cu</domain>
+        <domain includeSubdomains="false">radioverda.com</domain>
+        <domain includeSubdomains="false">radioverda.squarespace.com</domain>
+        <domain includeSubdomains="false">vej.posterous.com</domain>
+        <domain includeSubdomains="false">wp11081574.server-he.de</domain>
+        <domain includeSubdomains="false">www.ameriko.org</domain>
+        <domain includeSubdomains="false">www.krokoloko.cl</domain>
+        <domain includeSubdomains="false">www.radioscienca.com</domain>
+        <domain includeSubdomains="false">www.verdastacio.net</domain>
+        <domain includeSubdomains="false">www.vinilkosmo-mp3.com</domain>
+    </domain-config>
+</network-security-config>

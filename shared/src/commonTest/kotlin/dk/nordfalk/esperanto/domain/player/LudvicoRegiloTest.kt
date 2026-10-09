@@ -922,4 +922,69 @@ class LudvicoRegiloTest {
         assertNull(ReprovoLogiko.atendoMs(ReprovoLogiko.MAKS_PROVOJ + 1))
         assertNull(ReprovoLogiko.atendoMs(0))
     }
+
+    // =========================================================================
+    // FAROTA K3 — rosta Eraro post halti() ne rekomencigu la ludadon
+    // =========================================================================
+
+    /**
+     * Simulas la ExoPlayer-konduton post `halti()` (FAROTA K3): Media3 1.5.1 ne
+     * nuligas `playerError` per stop()/clearMediaItems(), kaj `onMediaItemTransition(null)`
+     * eligas Eraron **sen** nunaFonto.
+     */
+    private class PostHaltiEraraLudilo : LudiloRegilo {
+        private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
+        override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
+        private val _lauxteco = MutableStateFlow(1f)
+        override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+
+        /** Kiom ofte fiksiFonton estis vokita — kreskas se reprovo/aŭtoludo erare lanĉiĝas. */
+        var fiksoj = 0
+            private set
+
+        override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
+            fiksoj++
+            _stato.value = LudantoInformo(
+                stato = LudantoStato.Ludas,
+                nunaFonto = fonto,
+                pozicioMs = komencoPozicioMs,
+            )
+        }
+        override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
+        override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+        override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
+        override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
+        override fun fiksiLauxtecon(volumeno: Float) { _lauxteco.value = volumeno }
+
+        /** Simulas la rostan Eraron post halti() — sen nunaFonto (kia sur Android). */
+        fun simuluEraronPostHalti() {
+            _stato.value = LudantoInformo(
+                stato = LudantoStato.Eraro("rosta playerError", reprovebla = true)
+            )
+        }
+    }
+
+    @Test
+    fun eraroPostHaltiNeRekomencigasLudadon() = runTest {
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val ludilo = PostHaltiEraraLudilo()
+        val (regilo, _, ludatoj) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1, e2)), scope = this,
+            reprovoAtendo = { 0L }, // reprovo tuj plenumiĝus, se ĝi estus planita
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        assertEquals(1, ludilo.fiksoj)
+
+        // La uzanto premis "Halti" — kaj la ludilo eligas rostan Eraron sen nunaFonto
+        ludilo.halti()
+        ludilo.simuluEraronPostHalti()
+        kotlinx.coroutines.withContext(Dispatchers.Default) { kotlinx.coroutines.delay(50) }
+
+        assertEquals(1, ludilo.fiksoj, "Neniu reprovo kaj neniu aŭtoludo de e2 post halti")
+        assertEquals(0, regilo.reprovo.value, "Neniu reprovo estu planita")
+        assertNull(ludatoj.getLudato(e2.id), "e2 ne estu ludita/finiĝinta")
+        assertFalse(ludatoj.getLudato(e1.id)?.erara == true, "e1 ne estu markita erara")
+    }
 }

@@ -110,4 +110,44 @@ class KanalAgordoLegantoTest {
 
         assertTrue(agordo.kanaloj.isEmpty())
     }
+
+    // === FAROTA K5 — ĝusta percent-malkodado de supersignoj ===
+
+    @Test
+    fun malkoduUrlKoditajxonCxiujSupersignoj() {
+        // %C4%A5 = ĥ (la malnova tabelo erare mapis ĝin al ĵ),
+        // %C5%9C = Ŝ (ne ŝ), %C5%AC = Ŭ (ne Ŝ — kaj la linio aperis dufoje)
+        assertEquals(
+            "ĈĉĜĝĤĥĴĵŜŝŬŭ",
+            malkoduUrlKoditajxon("%C4%88%C4%89%C4%9C%C4%9D%C4%A4%C4%A5%C4%B4%C4%B5%C5%9C%C5%9D%C5%AC%C5%AD")
+        )
+    }
+
+    @Test
+    fun malkoduUrlKoditajxonPlusKajLinisalto() {
+        assertEquals("Muzaiko matene\nlabortago", malkoduUrlKoditajxon("Muzaiko+matene%0Alabortago"))
+        // Jam-malkoditaj signoj estas trairataj senŝanĝe
+        assertEquals("Ĥoro Ŭato", malkoduUrlKoditajxon("Ĥoro Ŭato"))
+        // Ne-heksa %-sekvenco restas senŝanĝe
+        assertEquals("100% certa", malkoduUrlKoditajxon("100%+certa"))
+        // %25 = %
+        assertEquals("100%", malkoduUrlKoditajxon("100%25"))
+    }
+
+    @Test
+    fun malkoduUrlKoditajxonKun4BajtaSigno() {
+        // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bajtajn UTF-8-signojn
+        assertEquals("😀", malkoduUrlKoditajxon("%F0%9F%98%80"))
+    }
+
+    @Test
+    fun parsuSugestojnPorAlarmojKunSupersignoj() {
+        val sugestoj = "10000/0/6/45/31/0/=muzaiko/=Matena+%C4%A5oro+de+%C5%ACato/"
+
+        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
+
+        assertEquals(1, alarmoj.size)
+        assertEquals("Matena ĥoro de Ŭato", alarmoj[0].etikedo)
+        assertEquals("muzaiko", alarmoj[0].kanaloSlug)
+    }
 }

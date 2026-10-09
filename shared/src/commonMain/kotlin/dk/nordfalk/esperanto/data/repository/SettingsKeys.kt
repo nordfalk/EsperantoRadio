@@ -12,4 +12,6 @@ object SettingsKeys {
     const val ALARMOJ = "alarmoj"
     const val AUXTOMATA_DAURIGO = "auxtomata_daurigo"
     const val EVOLO = "evoluo"
+    /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (FAROTA G3). */
+    const val INTENT_NONCE = "intent_nonce"
 }

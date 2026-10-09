@@ -10,6 +10,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.sentry.kotlin.multiplatform.Sentry
@@ -64,12 +65,16 @@ open class ElsendoDeponejoImpl(
         return try {
             logi("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
             Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
-            val respondo = httpKliento.get(url).bodyAsText()
+            // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch sube redonas la kaŝitan
+            // datumon. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
+            // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
+            val respondo = httpKliento.get(url) { expectSuccess = true }.bodyAsText()
+            kontroluFluecon(respondo)
             logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
             skribuKashon(kanalo.slug, respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
-                httpKliento.get(urlD).bodyAsText()
-            }
+                httpKliento.get(urlD) { expectSuccess = true }.bodyAsText()
+            }.ordigitajPlejFreshajUnue()
             logi("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
@@ -104,12 +109,14 @@ open class ElsendoDeponejoImpl(
         val respondo = leguKashon(kanalo.slug) ?: return null
         logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
-            val elsendoj = parsilo.parsuRss(respondo, kanalo)
+            val elsendoj = parsilo.parsuRss(respondo, kanalo).ordigitajPlejFreshajUnue()
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             logi("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
             loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron", e)
             null
         }
@@ -147,4 +154,26 @@ open class ElsendoDeponejoImpl(
         logi("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
         return rezulto
     }
+
+    /**
+     * Kontrolas ke la respondo aspektas kiel RSS/Atom-fluo. Fiaskpaĝo kun HTTP 200
+     * (prokura servilo, kaptiva portalo) ne devas anstataŭigi la kaŝon.
+     * Ĵetas [IllegalArgumentException] se ne — la vokanto kaptas kaj konservas la kaŝon.
+     */
+    private fun kontroluFluecon(respondo: String) {
+        val malalta = respondo.lowercase()
+        require("<rss" in malalta || "<feed" in malalta || "<rdf" in malalta) {
+            "La respondo ne estas RSS/Atom-fluo"
+        }
+    }
 }
+
+/**
+ * Ordigas elsendojn plej-freŝe-unue.
+ *
+ * La dato estas "yyyy-MM-dd"-ĉeno, do leksikografia ordo estas kronologia ordo.
+ * Ne ĉiuj fluoj estas plej-freŝe-unue (ekz. IRo listigas plej-malnovajn unue;
+ * `LudvicoLogiko` kaj la kanal-vido supozas plej-freŝe-unue) — tial la deponejo
+ * devigas la ordon ĉe unu loko.
+ */
+internal fun List<Elsendo>.ordigitajPlejFreshajUnue(): List<Elsendo> = sortedByDescending { it.dato }

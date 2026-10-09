@@ -41,8 +41,10 @@ class KtorElshutDeponejo(
     private val _elshutoj = MutableStateFlow<Map<String, ElshutitaElsendo>>(emptyMap())
     override fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>> = _elshutoj.asStateFlow()
 
-    private val _statoj = mutableMapOf<String, MutableStateFlow<ElshutStato>>()
-    private val joboj = mutableMapOf<String, Job>()
+    // ConcurrentHashMap, ne LinkedHashMap: la mapoj estas alirataj samtempe el la
+    // IO-korutinoj de elŝutoj kaj el la UI-fadeno (FAROTA G11)
+    private val _statoj = java.util.concurrent.ConcurrentHashMap<String, MutableStateFlow<ElshutStato>>()
+    private val joboj = java.util.concurrent.ConcurrentHashMap<String, Job>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
@@ -80,6 +82,16 @@ class KtorElshutDeponejo(
 
         _elshutoj.value = trovitaj
         logi("ElshutDeponejo", "Reŝargis ${trovitaj.size} elŝutojn")
+
+        // G11: forigu orfajn partajn MP3-ojn — la JSON estas skribata NUR post kompleta
+        // elŝuto, do MP3 sen JSON estas frue rompita parta dosiero el pasinta eraro/paŭzo
+        hejjo.listFiles { f -> f.name.endsWith(".mp3") }?.forEach { mp3 ->
+            val jsonNomo = mp3.name.removeSuffix(".mp3") + ".json"
+            if (!File(hejjo, jsonNomo).exists()) {
+                logi("ElshutDeponejo", "Forigas orphan partan dosieron: ${mp3.name} (${mp3.length()} bitokoj)")
+                mp3.delete()
+            }
+        }
     }
 
     override fun observiElshutStaton(elsendoId: String): StateFlow<ElshutStato> {
@@ -126,6 +138,11 @@ class KtorElshutDeponejo(
                         val progreso = if (totalajBitokoj > 0) elshutitaj.toFloat() / totalajBitokoj else 0f
                         stato.value = ElshutStato.Elshutanta(progreso, elshutitaj, totalajBitokoj)
                     }
+                    // G10: frua EOF (servilo fermis la konekton) — ne marku triligitan
+                    // dosieron "Preta"; ĝi estus persistita kaj neniam re-elŝutata
+                    if (totalajBitokoj > 0 && elshutitaj < totalajBitokoj) {
+                        throw java.io.IOException("Triligita: ricevitaj $elshutitaj el $totalajBitokoj bajtoj")
+                    }
                 }
 
                 stato.value = ElshutStato.Preta
@@ -134,10 +151,22 @@ class KtorElshutDeponejo(
                 val jsonDosiero = File(hejjo, "$dosiernomo.json")
                 jsonDosiero.writeText(json.encodeToString(Elsendo.serializer(), elsendo))
                 logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
-            } catch (e: Exception) {
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                // haltigi() — la stato (Pauxzita) estas agordata de haltigi mem;
+                // forigu la partan dosieron (G11: partaj dosieroj ne akumuliĝu)
+                try { celdosiero.delete() } catch (e2: Exception) {
+                    loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                }
+                throw e
+            } catch (e: Throwable) {
+                // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (FAROTA G26)
                 loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
+                // G11: forigu la partan dosieron — ĝi estas nemankebla kaj okupus spacon por eterne
+                try { celdosiero.delete() } catch (e2: Exception) {
+                    loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                }
             }
         }
         joboj[id] = job

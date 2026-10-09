@@ -106,7 +106,7 @@
 ### Ludilo
 
 #### G8 — `traktiFinon`: dup-traktada gardilo neatoma kaj ŝlosita sur la malĝusta fonto
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/domain/player/LudvicoRegilo.kt:206-215`; servo-voko: `androidApp/.../EsperantoLudadoServo.kt:62-83` (`traktiFinonPublika` vokata:74)
 - **Priskribo**: La gardilo (`lastaTraktitaFontoId`, linioj 211/215) komparas la ID de la fonto **legata nun** (`ludilo.stato.value.nunaFonto`), ne la fonton kiu efektive finiĝis. La servo vokatatas sur `Dispatchers.Main`, la observanto sur `Dispatchers.Default`. Se la dua voko alvenas **post** kiam la aŭtoludo jam avancis al e2, la gardilo vidas `e2 != e1`, preterlasas, kaj poste markas **e2 kiel finita (neniam ludita!)** kaj haltigas la ludadon — ĝuste post la aŭtomata daŭrigo, la celo de la tuta ŝanĝo (PR #79). Krome la check-then-set sur `@Volatile` kampo ne estas atoma (du fadenoj povas ambaŭ trapasi → duobla `ludiSekvan` → la sekva elsendo restartiĝas de 0). La parametro `stato` de `traktiFinon` estas entute neuzata.
 - **Sugesto**: la gardilo devas ŝlosiĝi sur la *finanta* fonto, kiun la voko portas (`LudantoInformo.nunaFonto` ĉe `Finita`), ne sur la nunan — la servo povas malkomodi ĝin el `player.currentMediaItem.mediaMetadata.extras` (`SonfontoKodilo`, sama procezo). Poste dedupigu sur (finanta fonto) kaj faru la kontrolon atoma (`AtomicReference.compareAndSet` aŭ `synchronized`). Simpla "ĉu la nuna stato ankoraŭ estas Finita/Eraro" **ne sufiĉas** — la servo-voko ofte alvenas antaŭ ol la app-flanka stato flipiĝas.
@@ -120,19 +120,19 @@
 - **Takso**: 2 linioj + testo (fluo en inversa ordo → ordigita en la deponejo).
 
 #### G10 — Elŝutoj: triligita elŝuto estas markata "Preta"
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/KtorElshutDeponejo.kt:118-141`
 - **Priskribo**: `channel.readAvailable(buffer)` redonas `<= 0` ĉe frua EOF; la ciklo rompiĝas kaj linio 131 metas `ElshutStato.Preta` — sen kontroli `elshutitaj == totalajBitokoj`. Se la servilo fermas la konekton frue (aŭ `contentLength` malpravas), la dosiero estas nemankebla kaj ankoraŭ persistita kiel kompleta (JSON-metadatenoj) — do ĝi neniam estos re-elŝutata.
 - **Sugesto**: post la ciklo, se `totalajBitokoj > 0 && elshutitaj != totalajBitokoj` → `Eraro("Triligita: X/Y bajtoj")` kaj forigo de la parta dosiero.
 
 #### G11 — Elŝutoj: partaj dosieroj neniam purigitaj; nesekuraj mapoj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `KtorElshutDeponejo.kt:44-45,86,98,137-141,157-165`; `rekargxiElshutojn`:60-80 (forigas nur orfajn JSON-ojn, neniam orfajn MP3-ojn)
 - **Priskribo**: (a) Ĉe eraro (linio 137) aŭ `haltigi` (Paŭzita) la parta MP3 restas sur disko — partaj dosieroj akumuliĝas por eterne. (b) `_statoj` kaj `joboj` estas simplaj `mutableMapOf` (LinkedHashMap), aliritaj samtempe el `Dispatchers.IO`-korutinoj (plurfadena!) kaj el la UI-fadeno — rasa kondiĉo (HashMap-korupto eblas).
 - **Sugesto**: forigi la partan dosieron en `catch`/`haltigi`; purigi orfajn MP3-ojn ĉe reŝargo; uzi `ConcurrentHashMap` (aŭ `synchronized`).
 
 #### G12 — Elŝutoj: `getExternalFilesDir()` povas redoni `null`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/KreuElshutDeponejo.kt:5`
 - **Priskribo**: Se ekstera stokado ne estas muntita, `getExternalFilesDir` redonas `null` kaj `File(null, ...)` fariĝas **relativa vojo** ("EsperantoRadio" en la laboratoria dosierujo de la procezo) — elŝutoj iras al neatendita loko aŭ malsukcesas neklarmaniere.
 - **Sugesto**: `getExternalFilesDir(...) ?: appContext.filesDir` (kun subdosierujo).
@@ -144,7 +144,7 @@
 - **Sugesto**: aldonu `LudvicoRegilo.haltuLudadon()` kaj uzu `ludiElsendon` ĉie; por rekta kanalo akceptendas rekta `fiksiFonton`, sed nuligu reprovon.
 
 #### G14 — La testo `servoVoko_duoblaTraktadoDeSamaFonto_estasIgnorata` ne testas la gardilon
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonTest/kotlin/dk/nordfalk/esperanto/domain/player/LudvicoRegiloTest.kt:393-416`
 - **Priskribo**: Post la unua voko la aŭtoludo (Unconfined-scope, `kreuRegilon`:59) jam startigis e2; la dua voko vidas **alian** fonton (e2), la gardilo ne blokas, e2 estas markita kiel finita kaj la ludado haltas — kaj la aserto (`stato == Ludas || stato == Haltita`) pasas en ambaŭ okazoj. La testo nenion distingas, kaj ĝia nomo estas falsa: la reala dup-trakta vojo (ambaŭ vokoj vidas la saman finantan fonton) estas netestata; la testo eĉ sankcias la malbonan rezulton (e2 markita finita). La testo pasus eĉ sen la gardilo.
 - **Sugesto**: restructuru la teston kun la "finanta fonto" (vidu G8) aŭ per ludilo kiu ne ŝanĝas la staton ĉe `ludi()`; asertu `!ludatoj.estasFinita(e2.id)` kaj ke la ludado daŭras post la dua voko.
@@ -581,6 +581,12 @@
 
 ## Jam farita (ne en la listo supre)
 
+- [x] **Ripara batch-o 2** (branĉo `riparoj/kodrevizio`, 241/241 testoj, APK + wasmJs konstruitaj):
+  - G8 — `traktiFinon` ricevas la **finantan fonton** de la vokanto (stato-emiso kaj `EsperantoLudadoServo` ambaŭ); nova atoma dedup-fenestro (Mutex + `ArrayDeque`, maks 4) anstataŭ la ne-atomCheck-then-set sur unu kampo
+  - G10 — triligita elŝuto (frua EOF kontraŭ `contentLength`) ĵetas → `Eraro`, ne `Preta`
+  - G11 — partaj MP3-oj forigitaj ĉe eraro/paŭzo + orfaj partaj dosieroj purigitaj ĉe reŝargo; `_statoj`/`joboj` → `ConcurrentHashMap`
+  - G12 — `getExternalFilesDir()`-nulaĵo → retrofalo al `filesDir`
+  - G14 — la testo `servoVoko_duoblaTraktadoDeSamaFonto_estasIgnorata` nun testas la veran dedup-vojon (malfrua duobla voko → e2 NE estas markita finita, neniu dua aŭtoludo); nova testo `servoVoko_senFontoNeFarasNenion`
 - [x] **Ripara batch-o 2026-10-09** (branĉo `riparoj/kodrevizio`, 240/240 testoj pasas, APK
   konstruita, wasmJs+Desktop kompilas, fum-testo sur emulator-5554 sukcesa):
   - K1 — HTTP-status-kontrolo (`expectSuccess` + `kontroluFluecon`) en `ElsendoDeponejoImpl` + Worker; testoj (404 kaj 200-fiaskpaĝo ne anstataŭigas la kaŝon)

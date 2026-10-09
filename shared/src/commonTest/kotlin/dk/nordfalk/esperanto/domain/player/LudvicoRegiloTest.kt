@@ -380,8 +380,8 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(e1)
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
 
-        // Simulas la servon: STATE_ENDED okazis
-        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+        // Simulas la servon: STATE_ENDED okazis — la servo transdonas la finantan fonton
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = Sonfonto.ElsendoFonto(e1))
 
         // La aŭtoludo devas komenci e2
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
@@ -395,26 +395,46 @@ class LudvicoRegiloTest {
         val e2 = elsendo("e2")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
         val ludilo = NoOpLudiloRegilo()
-        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, scope = this)
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this)
 
         regilo.ludiElsendon(e1)
 
         // Unua voko — traktas kaj lanĉas aŭtoludon (Unconfined: tuj komencas e2)
-        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = Sonfonto.ElsendoFonto(e1))
         assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id)
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 devas esti markita finita")
 
-        // Nun la nuna fonto estas e2. Se la servo vokus denove (ekz. pro prokrasto),
-        // la protekto devas vidi malsaman fonton kaj permesi trakti — sed tio estas
-        // nova elsendo, do ĝi estu traktata. Tamen, ni testas ke re-voki kun la
-        // sama stato ne kaŭzas problemon: la stato restas stabila.
-        val statoAntaux = ludilo.stato.value.stato
-        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false)
-        // Post la dua voko, la aŭtoludo de e2 (se okazis) aŭ io alia — sed ne eraru
-        assertTrue(
-            ludilo.stato.value.stato == LudantoStato.Ludas ||
-            ludilo.stato.value.stato == LudantoStato.Haltita,
-            "Stato devas esti valida post duobla voko"
-        )
+        // MALFRUA duobla voko por la sama finanta fonto (e1) — post kiam la aŭtoludo
+        // jam avancis al e2. La dedup-fenestro devas ignori ĝin: e2 (neniam finita!)
+        // ne estas markita finita kaj neniu dua aŭtoludo ekflugas (FAROTA G8 + G14).
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = Sonfonto.ElsendoFonto(e1))
+
+        assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id,
+            "La ludado devas daŭri kun e2 — neniu dua aŭtoludo")
+        assertFalse(ludatoj.estasFinita(e2.id), "e2 ne estis ludita ĝis fino — ne estu markita finita")
+        assertTrue(ludatoj.estasFinita(e1.id), "e1 restas finita")
+    }
+
+    @Test
+    fun servoVoko_senFontoNeFarasNenion() = runTest {
+        // La servo ne povas legi la fonton (ekz. malnova MediaItem sen extras) —
+        // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn (FAROTA K3/G8)
+        val e1 = elsendo("e1")
+        val e2 = elsendo("e2")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e1)
+
+        regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = null)
+
+        assertEquals("e1", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id,
+            "Neniu aŭtoludo sen konata finanta fonto")
+        assertFalse(ludatoj.estasFinita(e1.id), "Neniu elsendo estu markita finita")
+        assertFalse(ludatoj.estasFinita(e2.id), "Neniu elsendo estu markita finita")
     }
 
     // =========================================================================

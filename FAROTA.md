@@ -200,13 +200,13 @@
 - **Sugesto**: konservu la referencon kaj vokinu `controller.release()` post la komandoj (ili estas en la sama fadeno, do liveriĝas antaŭ la liberigo).
 
 #### G23 — F-Droid-metadato malaktuala
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml:44-51` (`CurrentVersion: 3.0.0`, `CurrentVersionCode: 244`, `Builds … versionCode: 244`)
 - **Priskribo**: La kodo estas `apoversio = 3.0.2` / `versionCode = 246` (`gradle/libs.versions.toml:6`, `androidApp/build.gradle.kts:59`). Ĉe la venonta F-Droid-konstruo la metadato kontraŭdiros la kodon.
 - **Sugesto**: ĝisdatigu al 3.0.2/246 (aŭ la konvena) kaj aldonu la kontrolon al la eldon-procezo (AGENTS.md "Eldono de nova versio").
 
 #### G24 — CI: neniu laborfluo rulas testojn aŭ konstruon por PR-oj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `.github/workflows/` (nur `changelog-kontrolo.yaml` kaj `eldonado.yml`)
 - **Priskribo**: 229 testoj kaj 4 platformoj ekzistas, sed PR povas enkonduki rompitajn testojn aŭ nekompileblan kodon sen ia rimarko — la eldonado (etikedo `v*`) konstruas, sed tio estas tro malfrue.
 - **Sugesto**: aldonu `testoj.yml` (`on: pull_request`) kiu rulas `./gradlew :shared:desktopTest` kaj kompil-kontrolojn (`:desktopApp:compileKotlinDesktop`, `:androidApp:assembleDebug`, eventuale wasmJs-kompilo); pli longe: androidTest per emulilo.
@@ -288,13 +288,13 @@
 ### Pliaj GRAVA trovoj (testoj, UI)
 
 #### G37 — `DiskKashoTest` poluas la veran uzantan kaŝujon
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonTest/.../data/repository/DiskKashoTest.kt`; `desktopMain/.../DosierKasho.kt:11` (`dosierKashoBazo` "interne ŝanĝebla por testoj" — neniu testo ŝanĝas ĝin)
 - **Priskribo**: La testoj vokas `skribuKashon(slug, …)` rekte kaj la `finally`-purigo estas `skribuKashon(nomo, "")` — tio **malplenigas la dosieron, ne forigas ĝin**. Pruvita: en `~/.esperantoradio/cache/` troviĝas 5 malplenaj dosieroj (`test_diskkasho_*.rss`).
 - **Sugesto**: en `DiskKashoTest`, starigi `dosierKashoBazo` al provizora dosierujo (JUnit `@TempDir`) kaj efektive forigi la dosierojn en `@AfterTest`.
 
 #### G38 — La vera kanalkonfiguro (27 kanaloj) nenie estas testata
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `KanalAgordoLegantoTest` (5 testoj, nur sinteza JSONC); `KanalDeponejoImpl` (legas la veran dosieron) — neniu testo
 - **Priskribo**: Se oni redaktas la JSONC kaj enmetas eraron — ekz. blok-komenton `/* */` (la striptigilo subtenas nur `//`, vidu C8) — la apo kraŝus ĉe ekfunkciigo kaj neniu testo kaptus. La konfiguro estas la kerno de la apo (AGENTS.md regulo 5).
 - **Sugesto**: "smoke test" en `commonTest`: legi la veran dosieron el la resurcoj, aserti ke ĝi parsiĝas, havas 27 kanalojn, ĉiuj havas kodon kaj nomon, almenaŭ unu havas RSS-URL, ktp.
@@ -306,7 +306,7 @@
 - **Sugesto**: `assertEquals(31, elsendoj.size)` + konkretaj asertoj por "La 185a elsendo": tri id-oj `varsoviavento:2025-04-24:1/2/3`, titoloj "La 185a elsendo 1a parto" ktp., fluoj finiĝantaj per `250424VVE185P1/P2/P3.mp3`.
 
 #### G40 — `PersistaLudatojDeponejo` kaj `PersistantaPlejŝatatajDeponejo` estas netestitaj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonMain/.../data/repository/PersistaLudatojDeponejo.kt` (111 linioj), `PersistantaPlejŝatatajDeponejo.kt`
 - **Priskribo**: `PersistaLudatojDeponejo` konservas la ludpoziciojn ("Daŭrigi de X:XX" trans restartoj) — kerna funkcio — sed neniu testo kontrolas: pozicio konservita kaj re-legita (kiel post restarto), korupta JSON → malplena (la `runCatching` en `legu()`), `malmarkiFinita`, `registriPozicion` konservas `finita`/`erara`. (Modelon donas `PersistantaAlarmoDeponejoTest` en `desktopTest` — 3 testoj kun vera persisto.)
 - **Sugesto**: aldoni `desktopTest` laŭ la modelo de `PersistantaAlarmoDeponejoTest` (ambaŭ deponejojn).
@@ -581,6 +581,12 @@
 
 ## Jam farita (ne en la listo supre)
 
+- [x] **Ripara batch-o 3** (branĉo `riparoj/kodrevizio`, 250/250 testoj, neniuj novaj dosieroj en `~/.esperantoradio/cache/`):
+  - G24 — nova CI-laborfluo `.github/workflows/testoj-kaj-konstruo.yaml`: `:shared:desktopTest` + Desktop/Android/wasmJs-kompilado por ĉiu PR kaj push al master (ankaŭ la wasmJs-kompiladon, kiu mankis kiam PR #79 enmetis `Dispatchers.IO`)
+  - G37 — `DiskKashoTest` movita al `desktopTest` kaj direktas `dosierKashoBazo` al provizora dosierujo (antaŭe: verkis en la veran `~/.esperantoradio/cache/` kaj "purigis" per malplenigo)
+  - G38 — nova `KanalAgordoFumTesto`: la VERA `esperantoradio_kanaloj_v9.json` parsiĝas, ≥20 kanaloj, unikaj kodoj, kodo+nomo, ≥15 kun RSS
+  - G40 — novaj `PersistaLudatojDeponejoTest` (pozicio/finita/erara/malmarko trans restarto, korupta JSON → freŝa komenco) kaj `PersistantaPlejŝatatajDeponejoTest` (baskulo trans restarto) — laŭ la modelo de `PersistantaAlarmoDeponejoTest`
+  - G23 — F-Droid-metadato ĝisdatigita al 3.0.2/246 (konforma al la kodo kaj la etikedo `v3.0.2`)
 - [x] **Ripara batch-o 2** (branĉo `riparoj/kodrevizio`, 241/241 testoj, APK + wasmJs konstruitaj):
   - G8 — `traktiFinon` ricevas la **finantan fonton** de la vokanto (stato-emiso kaj `EsperantoLudadoServo` ambaŭ); nova atoma dedup-fenestro (Mutex + `ArrayDeque`, maks 4) anstataŭ la ne-atomCheck-then-set sur unu kampo
   - G10 — triligita elŝuto (frua EOF kontraŭ `contentLength`) ĵetas → `Eraro`, ne `Preta`

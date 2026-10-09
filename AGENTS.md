@@ -164,6 +164,9 @@ EsperantoRadio/
 
 1. Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
    plia kommito en ekzistanta PR).
+   **Branĉnomo**: `MMdd-nomo` — ekz. `1009-hejmo-luditaj-kio-novas`.
+   La `MMdd`-prefikso estas la nuna dato (ekz. 1009 = 9-a de oktobro).
+   Uzu la saman nomon loke kaj sur GitHub.
 2. Faru ŝanĝojn, skribu testojn, kompilu kaj rulu testojn.
 3. Commit, push, kreu PR kun `gh pr create`.
 4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
@@ -350,6 +353,42 @@ adb logcat -d | grep -E "dk.nordfalk.esperanto.android"  # nur apo
 La debug-APK instaliĝas kiel `dk.nordfalk.esperanto.radio.alfa` (applicationId + `.alfa`) — ne konfuzu
 kun malnovaj pakoj (`dk.nordfalk.esperanto.android`, `.radio.beta`) kiuj eble ankaŭ estas en la emulilo:
 `adb shell monkey -p dk.nordfalk.esperanto.radio.alfa -c android.intent.category.LAUNCHER 1`
+
+## Sentry (erarmonitorado kaj protokoloj)
+
+La apo sendas ĉiujn protokolojn kaj erarojn al **Sentry.io** (organizo
+`esperantoradio`, regiono `de.sentry.io`, projekto `KMP`). Agordo:
+`SentryAgordo.kt` — DSN (nur *sendi* rajtigas), `environment = "evoluo"`,
+`release = "esperantoradio@<apoversio>"` (el `gradle/libs.versions.toml`).
+
+**Legi Sentry-on per MCP**: la oficiala Sentry-MCP-servilo estas konektita kiel
+`mcp_sentry` (`https://mcp.sentry.dev/mcp`, OAuth-agordo en `~/.vibe/config.toml`
+de la uzanto — se ĝi malaperas, rekonektu per `vibe mcp add sentry --url
+https://mcp.sentry.dev/mcp`). La plej uzataj iloj:
+
+- `find_organizations` / `find_projects` — trovu la slug-ojn (`esperantoradio`).
+- `search_issues` — grupigitaj problemoj (query: `is:unresolved`, `level:error`,
+  `lastSeen:-7d` kaj similaj; sort: `date`/`freq`/`user`/`recommended`).
+- `get_sentry_resource` — detaloj pri unu problemo (stacktrace, eventoj).
+- `search_logs` — protokol-agregaĵoj. Ekzemploj:
+  - Plej oftaj mesaĝoj: `fields: ['count()', 'message']`, `sort: '-count()'`.
+  - Uzantoj po eldono: `fields: ['release', 'count_unique(user)']` — proksimumo
+    de aktivaj uzantoj (nur uzantoj, kiuj generis almenaŭ unu protokolan eventon;
+    protokoloj povas esti forĵetitaj pro kvoto).
+- `search_errors` — erar-eventoj, nombroj, tendencoj.
+- `update_issue` — solvigi/atribui problemon.
+
+**Protokol-konvencio (grava por la Sentry-kvoto)**:
+
+- `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
+- `logi`/`logw`/`loge` → ankaŭ `Sentry.logger.*` — ĉiu voko estas eningendigita
+  kaj kalkuliĝas kontraŭ la kvoto.
+- Regulo: **altfrekvencaj datum-tavolaj detaloj uzu `logd`** (parsado, diskkaŝmemoro,
+  serĉo — io, kio okazas po kanalo po ŝargo); `logi` nur por uzantvidaj eventoj
+  (navigado, klakoj, ludado, starto). `logw`/`loge` ĉiam indas protokoligi.
+  (2026-10-09: la `logi`-vokoj de RssParsilo/ElsendoDeponejo estis ~85–90 % de
+  ĉiuj protokoloj — po ~700 mesaĝoj/kanalo/semajno nur por «parsado kompleta»;
+  ili fariĝis `logd`.)
 
 ## UI-dizajno (celo)
 

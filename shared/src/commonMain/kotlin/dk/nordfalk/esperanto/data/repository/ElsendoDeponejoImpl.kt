@@ -4,7 +4,6 @@ import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
-import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -62,15 +61,15 @@ open class ElsendoDeponejoImpl(
         }
 
         return try {
-            logi("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
+            logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
             Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
             val respondo = httpKliento.get(url).bodyAsText()
-            logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+            logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
             skribuKashon(kanalo.slug, respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
                 httpKliento.get(urlD).bodyAsText()
             }
-            logi("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
+            logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
             elsendoj
@@ -102,12 +101,12 @@ open class ElsendoDeponejoImpl(
      */
     suspend fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
         val respondo = leguKashon(kanalo.slug) ?: return null
-        logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
+        logd("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
             val elsendoj = parsilo.parsuRss(respondo, kanalo)
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
-            logi("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
+            logd("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj
         } catch (e: Exception) {
             loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron", e)
@@ -126,7 +125,7 @@ open class ElsendoDeponejoImpl(
             if (!kanalo.havasPodkastojn) continue
             leguKashitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
         }
-        logi("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+        logd("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
         return ĉiuj
     }
 
@@ -144,7 +143,7 @@ open class ElsendoDeponejoImpl(
             it.titolo.contains(teksto, ignoreCase = true) ||
             (it.priskribo?.contains(teksto, ignoreCase = true) ?: false)
         }.take(limo)
-        logi("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
+        logd("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
         return rezulto
     }
 }

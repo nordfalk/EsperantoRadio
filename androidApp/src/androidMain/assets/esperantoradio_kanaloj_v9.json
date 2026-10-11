@@ -174,7 +174,7 @@
 			"hejmpaĝoButono": "https://www.vinilkosmo-mp3.com/index.php?language=eo",
 			// Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (el la malnova apo)
 			"puriguModeloj": [
-				"<p class="who">.+?</p>"
+				"<p class=\"who\">(?:(?!</p>).)*?</p>"
 			]
 		}
 	,{

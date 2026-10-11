@@ -151,7 +151,7 @@ class RssParsiloTest {
             slug = "vinilkosmo",
             nomo = "Vinilkosmo",
             podkastaRssUrl = "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
-            puriguModeloj = listOf("""<p class="who">.+?</p>"""),
+            puriguModeloj = listOf("""<p class="who">(?:(?!</p>).)*?</p>"""),
         )
 
         val elsendoj = parsilo.parsuRss(fluo, kanalo)

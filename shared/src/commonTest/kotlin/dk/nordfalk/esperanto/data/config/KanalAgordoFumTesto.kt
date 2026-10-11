@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Fum-testo de la VERA kanalkonfiguro (FAROTA G38).
+ * Fum-testo de la VERA kanalkonfiguro (G38).
  *
  * `KanalAgordoLegantoTest` testas nur sintezitan JSONC. Sed la vera
  * `esperantoradio_kanaloj_v9.json` estas la kerno de la apo (AGENTS.md regulo 5):
@@ -40,7 +40,7 @@ class KanalAgordoFumTesto {
         val kunRss = agordo.kanaloj.count { !it.elsendojRssUrl.isNullOrBlank() }
         assertTrue(kunRss >= 15, "Atendis almenaŭ 15 kanalojn kun RSS-fluo, havas $kunRss")
 
-        // Regulo 6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (FAROTA G15)
+        // Regulo 6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (G15)
         val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }
         assertTrue(varsoviavento.puriguModeloj.isNotEmpty(), "varsoviavento havas puriguModelojn")
         assertTrue(varsoviavento.puriguModeloj.any { it.contains("audio") }, "varsoviavento purigas <audio>-ludilojn")

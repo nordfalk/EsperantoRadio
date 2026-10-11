@@ -163,7 +163,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         // Escepto: post halti() (stop + clearMediaItems) la playerError RESTAS — Media3 1.5.1
         // ne nuligas ĝin (nur prepare() faras) — kaj onMediaItemTransition(null) vokus updateState().
         // Sen la mediaItemCount-gardilo la stato iĝus Eraro anstataŭ Haltita, kaj LudvicoRegilo
-        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (FAROTA K3).
+        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (K3).
         val error = c.playerError
         val ludantoStato = if (c.mediaItemCount == 0) {
             LudantoStato.Haltita

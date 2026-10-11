@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 /**
  * Testoj por [PersistantaPlejŝatatajDeponejo] — persisto de ŝatataj kanaloj
- * (FAROTA G40). Uzas veran persiston (java.util.prefs en provizora nodo) por
+ * (G40). Uzas veran persiston (java.util.prefs en provizora nodo) por
  * kontroli ke la stato estas videbla ankaŭ por nova deponejo (kiel post restarto).
  */
 class PersistantaPlejŝatatajDeponejoTest {

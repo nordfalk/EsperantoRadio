@@ -57,7 +57,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
             val kodo = audio?.error?.code?.toInt()
             _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro ($kodo)", reprovebla = kodo == 2))
         })
-        // FAROTA G20: sen timeupdate la pozicio frostas ĉe la valoro de "playing" —
+        // (G20) sen timeupdate la pozicio frostas ĉe la valoro de "playing" —
         // la serĉbreto ne moviĝas kaj la pozicia savilo de LudvicoRegilo konservas malnovan valoron
         audio!!.addEventListener("timeupdate", { _ ->
             val a = audio ?: return@addEventListener
@@ -76,7 +76,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     }
 
     override fun ludi() {
-        // FAROTA G21: play() redonas Promise kaj ĝia malakcepto (aŭtopl.-politiko, CORS)
+        // (G21) play() redonas Promise kaj ĝia malakcepto (aŭtopl.-politiko, CORS)
         // NE ekigas la "error"-eventon — sen kapto la stato restus "Konektas" eterne
         audio?.play()?.catch { rezulto: JsAny? ->
             _stato.value = _stato.value.copy(

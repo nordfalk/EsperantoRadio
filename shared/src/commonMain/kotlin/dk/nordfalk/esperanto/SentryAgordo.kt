@@ -9,7 +9,7 @@ import io.sentry.kotlin.multiplatform.SentryOptions
  * Sur wasmJs la SDK estas no-op (kompilas sed faras nenion).
  * Sur Android gxi uzas Sentry Android SDK, sur JVM Sentry Java SDK.
  *
- * @param medio "produktado" aux "evoluo" (FAROTA G5) — antauxe "evoluo" estis
+ * @param medio "produktado" aux "evoluo" (G5) — antauxe "evoluo" estis
  *   hardkodita por CIUJ konstruoj, do produktadaj eraroj estis nefilteblaj.
  * @param specimenado spuro-specimenada kvociento — 1.0 (100 %) en evoluo,
  *   0.1 (10 %) en produktado (baterio/reto).

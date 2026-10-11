@@ -407,7 +407,7 @@ class LudvicoRegiloTest {
 
         // MALFRUA duobla voko por la sama finanta fonto (e1) — post kiam la aŭtoludo
         // jam avancis al e2. La dedup-fenestro devas ignori ĝin: e2 (neniam finita!)
-        // ne estas markita finita kaj neniu dua aŭtoludo ekflugas (FAROTA G8 + G14).
+        // ne estas markita finita kaj neniu dua aŭtoludo ekflugas ((G8) + G14).
         regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = Sonfonto.ElsendoFonto(e1))
 
         assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id,
@@ -419,7 +419,7 @@ class LudvicoRegiloTest {
     @Test
     fun servoVoko_senFontoNeFarasNenion() = runTest {
         // La servo ne povas legi la fonton (ekz. malnova MediaItem sen extras) —
-        // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn (FAROTA K3/G8)
+        // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn ((K3)/G8)
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
@@ -944,11 +944,11 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
-    // FAROTA K3 — rosta Eraro post halti() ne rekomencigu la ludadon
+    // (K3) — rosta Eraro post halti() ne rekomencigu la ludadon
     // =========================================================================
 
     /**
-     * Simulas la ExoPlayer-konduton post `halti()` (FAROTA K3): Media3 1.5.1 ne
+     * Simulas la ExoPlayer-konduton post `halti()` (K3): Media3 1.5.1 ne
      * nuligas `playerError` per stop()/clearMediaItems(), kaj `onMediaItemTransition(null)`
      * eligas Eraron **sen** nunaFonto.
      */
@@ -1009,7 +1009,7 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
-    // FAROTA G13 — paŭzigi/daŭrigi/rekta kanalo tra LudvicoRegilo
+    // (G13) — paŭzigi/daŭrigi/rekta kanalo tra LudvicoRegilo
     // =========================================================================
 
     @Test

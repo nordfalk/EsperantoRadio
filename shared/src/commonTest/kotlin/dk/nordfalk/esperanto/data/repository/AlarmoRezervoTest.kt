@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Testoj por la korupta-JSON-rezervo de PersistantaAlarmoDeponejo (FAROTA C4).
+ * Testoj por la korupta-JSON-rezervo de PersistantaAlarmoDeponejo (C4).
  */
 class AlarmoRezervoTest {
 
@@ -62,7 +62,7 @@ class AlarmoRezervoTest {
         )
     }
 
-    @Test // FAROTA C4: korupta JSON devas esti REZERVATA antaŭ ol ĝi estos anstataŭigita
+    @Test // (C4) korupta JSON devas esti REZERVATA antaŭ ol ĝi estos anstataŭigita
     fun koruptaJsonKreigasRezervon() = runTest {
         val settings = MapSettings()
         settings.putString(SettingsKeys.ALARMOJ, "{\"NE VALIDAS")

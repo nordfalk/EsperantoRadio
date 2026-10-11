@@ -26,7 +26,7 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
 
     companion object {
         /**
-         * Reuzata MediaController (FAROTA G22): antaŭe ĉiu "Ludi"-klako en sciigo kreis
+         * Reuzata MediaController (G22): antaŭe ĉiu "Ludi"-klako en sciigo kreis
          * NOVAN regilon kaj NENIAM liberigis ĝin — ĉiu klako likis unu MediaController
          * kaj Binder-konekton al la servo por la tuta procez-vivdaŭro.
          */

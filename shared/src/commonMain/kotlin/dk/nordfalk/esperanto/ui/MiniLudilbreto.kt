@@ -66,12 +66,12 @@ fun MiniLudilbreto(
     onLudiSekvantan: () -> Unit = {},
     /**
      * Haltigas la ludadon — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.haltuLudadon].
-     * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (FAROTA K3).
+     * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (K3).
      */
     onHaltigi: suspend () -> Unit = { ludilo.halti() },
-    /** Paŭzigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.pauxziguLudadon] (FAROTA G13). */
+    /** Paŭzigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.pauxziguLudadon] (G13). */
     onPauxzigi: suspend () -> Unit = { ludilo.pauxzigi() },
-    /** Daŭrigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.dauriguLudadon] (FAROTA G13). */
+    /** Daŭrigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.dauriguLudadon] (G13). */
     onDaurigi: suspend () -> Unit = { ludilo.ludi() },
 ) {
     val stato by ludilo.stato.collectAsState()

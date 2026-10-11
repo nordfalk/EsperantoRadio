@@ -5,7 +5,7 @@ import dk.nordfalk.esperanto.data.repository.SettingsKeys
 import java.util.UUID
 
 /**
- * Protektas la intencojn al la eksportita [android.app.Activity] kontraŭ falsado (FAROTA G3).
+ * Protektas la intencojn al la eksportita [android.app.Activity] kontraŭ falsado (G3).
  *
  * `MainActivity` estas `exported="true"` (necesa por la lanĉilo) kaj traktas la agojn
  * `ALARMO_EKIGAS` kaj `MALFERMI_ELSENDON` kun ekstraĵoj — kiujn alie IA AJN apliko

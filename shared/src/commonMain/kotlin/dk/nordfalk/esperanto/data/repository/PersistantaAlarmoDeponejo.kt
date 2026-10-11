@@ -62,7 +62,7 @@ class PersistantaAlarmoDeponejo(
             alarmoj
         } catch (e: Exception) {
             logw("AlarmoDeponejo", "Ne eblis legi persistitajn alarmojn", e)
-            // FAROTA C4: konservu la krudan valoron kiel rezervon — sen tio la sekvaj
+            // (C4) konservu la krudan valoron kiel rezervon — sen tio la sekvaj
             // persistu()-vokoj (ekigis/krei/sxalti) anstataŭigas ĝin kaj la uzantaj
             // alarmoj estas definitive perditaj. Kun la rezervo ili estas reakireblaj.
             try {

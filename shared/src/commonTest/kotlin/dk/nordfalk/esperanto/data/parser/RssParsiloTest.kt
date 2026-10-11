@@ -84,7 +84,7 @@ class RssParsiloTest {
     @Test
     fun parsasVarsoviaVenton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("varsoviavento_feed.xml")
-        // La purigaj modeloj kiel en la vera kanalkonfiguro (regulo 6.6, FAROTA G15/G39).
+        // La purigaj modeloj kiel en la vera kanalkonfiguro (regulo 6.6, (G15)/G39).
         // Temperitaj modeloj (?:(?!</p>).) — ili ne povas transiri alineon.
         val kanalo = Kanalo(
             slug = "varsoviavento",
@@ -99,7 +99,7 @@ class RssParsiloTest {
 
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
-        // Preciza kalkulo (FAROTA G39): 10 eroj → 31 elsendoj (9 × 3 partoj + 182a × 4)
+        // Preciza kalkulo (G39): 10 eroj → 31 elsendoj (9 × 3 partoj + 182a × 4)
         assertEquals(31, elsendoj.size, "Varsovia Vento devas havi 31 elsendojn")
 
         // "La 185a elsendo" (2025-04-24) havas 3 partojn kun konataj fluoj
@@ -123,7 +123,7 @@ class RssParsiloTest {
             "La enkonduko devas pluvivi: ${vv185.first().priskribo?.take(80)}",
         )
 
-        // Regulo 6.6 (FAROTA G15): la priskribo estas purigata — neniu parto-listilo,
+        // Regulo 6.6 (G15): la priskribo estas purigata — neniu parto-listilo,
         // neniu reklamo, neniu enkonstruita <audio>-ludilo
         for (e in elsendoj) {
             val priskribo = e.priskribo ?: ""
@@ -146,7 +146,7 @@ class RssParsiloTest {
     @Test
     fun parsasVinilkosmon() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
-        // La puriga modelo kiel en la vera kanalkonfiguro (regulo 6.6, FAROTA G15)
+        // La puriga modelo kiel en la vera kanalkonfiguro (regulo 6.6, (G15))
         val kanalo = Kanalo(
             slug = "vinilkosmo",
             nomo = "Vinilkosmo",
@@ -733,7 +733,7 @@ class RssParsiloTest {
         assertTrue(rezulto.contains("<p>"), "Rezulto devas konservi <p>: $rezulto")
     }
 
-    // === FAROTA G2 — nur http(s)-fluoj el nefidinda RSS ===
+    // === (G2) — nur http(s)-fluoj el nefidinda RSS ===
 
     @Test
     fun forjxasElsendojnKunNeRetajSkemoj() = kotlinx.coroutines.test.runTest {
@@ -771,7 +771,7 @@ class RssParsiloTest {
         assertNull(parsilo.saniguRetUrlon(null))
     }
 
-    // === FAROTA G4 — ligilo-sanigado en priskriboj ===
+    // === (G4) — ligilo-sanigado en priskriboj ===
 
     @Test
     fun puriguHtmlForigasDanxerajnLigilojn() {
@@ -787,7 +787,7 @@ class RssParsiloTest {
         assertTrue(purigita.contains("https://bone.example/pagho"), "http(s)-ligilo devas resti: $purigita")
     }
 
-    // === FAROTA G30 — <audio>-fallback ene de la priskribo-HTML ===
+    // === (G30) — <audio>-fallback ene de la priskribo-HTML ===
 
     @Test
     fun auxdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
@@ -809,7 +809,7 @@ class RssParsiloTest {
         assertEquals("https://x.example/sono.mp3", elsendoj[0].fluo)
     }
 
-    // === FAROTA G32 — ĝenerala skip-listo de nesubtenataj gastigantoj ===
+    // === (G32) — ĝenerala skip-listo de nesubtenataj gastigantoj ===
 
     @Test
     fun forjxasElsendojnKunNesubtenatajGastigantoj() = kotlinx.coroutines.test.runTest {
@@ -833,7 +833,7 @@ class RssParsiloTest {
             "Nur la ludebla fluo devas resti (video-gastigantoj estas saltataj)")
     }
 
-    // === FAROTA C10/C12/C13 — dato-, daŭro- kaj enclosure-randaĵoj ===
+    // === (C10)/C12/C13 — dato-, daŭro- kaj enclosure-randaĵoj ===
 
     @Test
     fun normigasDatojnSenTempoKajKunKvarliteraMonato() {
@@ -856,7 +856,7 @@ class RssParsiloTest {
 
     @Test
     fun preferasAŭdianEnclosure() = kotlinx.coroutines.test.runTest {
-        // Iuj fluoj metas bild-enclosure unue — la audio devas veni unue (FAROTA C12)
+        // Iuj fluoj metas bild-enclosure unue — la audio devas veni unue (C12)
         val rss = """
             <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
             <item><title>Bilda unue</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>

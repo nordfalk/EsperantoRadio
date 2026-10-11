@@ -11,7 +11,7 @@ import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import kotlin.test.Test
 
 /**
- * Testoj por la serĉ-ekrano (FAROTA G42/G43): debounce kaj rezulto-ĝisdatiĝo.
+ * Testoj por la serĉ-ekrano ((G42)/G43): debounce kaj rezulto-ĝisdatiĝo.
  *
  * La falsa deponejo respondas ATENDANTE — la debounce (300 ms) devas kolekti
  * klavpremojn kaj montri nur la rezulton de la LASTA teksto.

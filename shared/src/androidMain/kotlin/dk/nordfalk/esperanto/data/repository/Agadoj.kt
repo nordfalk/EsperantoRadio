@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.data.repository
 
 /**
- * Nomoj de komponantoj en la `androidApp`-modulo (FAROTA C19).
+ * Nomoj de komponantoj en la `androidApp`-modulo (C19).
  *
  * `shared` ne povas referenci la klasojn rekte (la modulo dependas en la inversan
  * direkton), do la nomoj estas ĉi tie en UNU sola loko — renomado de la klasoj

@@ -106,7 +106,7 @@ class NovajElsendojKontroloWorker(
             // CIO paneigas por ĉiuj https-petoj (vidu HttpMotoro.android.kt).
             val httpKliento = HttpClient(httpMotoro) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
-                // FAROTA K1: fiaskpaĝo (4xx/5xx) ne estu parsata kiel fluo —
+                // (K1) fiaskpaĝo (4xx/5xx) ne estu parsata kiel fluo —
                 // la per-kanala catch sube protokolas kaj daŭrigas kun la aliaj kanaloj
                 expectSuccess = true
             }
@@ -154,7 +154,7 @@ class NovajElsendojKontroloWorker(
         }
     }
 
-    /** Kreskanta, persistita sciig-ID (FAROTA C19) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
+    /** Kreskanta, persistita sciig-ID (C19) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
     private fun novaSciigId(): Int {
         val settings = kreuSettings()
         val id = (settings.getInt(SettingsKeys.SCIIG_ID, 1000) + 1).coerceAtMost(Int.MAX_VALUE - 2)
@@ -184,7 +184,7 @@ class NovajElsendojKontroloWorker(
             putExtra(EXTRA_BILDO_URL, elsendo.bildoUrl)
         }
 
-        // FAROTA C19: kreskanta persistita ID anstataŭ elsendo.id.hashCode() —
+        // (C19) kreskanta persistita ID anstataŭ elsendo.id.hashCode() —
         // kolizio inter du ID-oj anstataŭigus la sciigon kaj la "Ludi"-PendingIntent
         // eksterminatinge celus la alian elsendon. Ĉiu sciigo estas unika okazo.
         val sciigId = novaSciigId()
@@ -195,7 +195,7 @@ class NovajElsendojKontroloWorker(
                 Intent(ctx, Class.forName(Agadoj.CHEFA_AGADO)).apply {
                     action = ACTION_MALFERMI_ELSENDON
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    // FAROTA G3: la eksportita Activity kontrolas la nonce-on — sen ĝi
+                    // (G3) la eksportita Activity kontrolas la nonce-on — sen ĝi
                     // iu ajn apliko povus forĝi la ekstraĵojn (phishing, ludi ajnan URI-on)
                     IntentSxlosilo.aldonuNomon(this)
                 }

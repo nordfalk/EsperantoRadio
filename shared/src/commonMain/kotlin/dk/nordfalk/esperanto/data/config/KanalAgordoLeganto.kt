@@ -153,7 +153,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
         try {
             val id = partoj[i].toInt()
             val aktiva = partoj[i + 1] == "1"
-            // FAROTA C4: koercu — ekstervalora horo/minuto/ripeto el la agordo devas
+            // (C4) koercu — ekstervalora horo/minuto/ripeto el la agordo devas
             // ne kraŝi la skedadon (LocalTime/sekvaEkigo); ni ne ĵetas la tutan sugeston
             // pro unu malbona kampo (regulo 4 — toleremo al putrantaj fontoj)
             val horo = partoj[i + 2].toInt().coerceIn(0, 23)
@@ -186,7 +186,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
  *
  * Anstataŭas la antaŭan permanan supersignan tabelon, kiu estis erara:
  * `%C4%A5` estas **ĥ** (ne ĵ), `%C5%9C` estas **Ŝ** (ne ŝ), `%C5%AC` estas **Ŭ**
- * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (FAROTA K5).
+ * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (K5).
  * Jam-malkoditaj signoj (kodo > 127) estas trairataj senŝanĝe.
  */
 internal fun malkoduUrlKoditajxon(teksto: String): String {

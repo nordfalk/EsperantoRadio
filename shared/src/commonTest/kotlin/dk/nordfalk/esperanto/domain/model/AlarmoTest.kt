@@ -64,7 +64,7 @@ class AlarmoTest {
         assertEquals(LocalDateTime(2027, 1, 1, 7, 0), alarmo(7, 0, 0).sekvaEkigo(silvestro))
     }
 
-    @Test // FAROTA C4: korupta persistinta valoro ne devas kraŝi la skedadon
+    @Test // (C4) korupta persistinta valoro ne devas kraŝi la skedadon
     fun koercasEkstervalorajnHorojnKajMinutojn() {
         // horo=99 → 23, minuto=-5 → 0: la alarmo skediĝas, ne ĵetas
         assertEquals(LocalDateTime(2026, 9, 23, 23, 0), alarmo(99, -5, 0).sekvaEkigo(merkredo10))

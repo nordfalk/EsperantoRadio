@@ -112,6 +112,8 @@ EsperantoRadio/
 ├── .github/workflows/       # CI (changelog-kontrolo)
 ├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
 ├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
+├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
+├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
 └── AGENTS.md               # Tiu ĉi dosiero
 ```
 

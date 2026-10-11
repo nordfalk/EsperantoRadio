@@ -42,7 +42,7 @@ class KtorElshutDeponejo(
     override fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>> = _elshutoj.asStateFlow()
 
     // ConcurrentHashMap, ne LinkedHashMap: la mapoj estas alirataj samtempe el la
-    // IO-korutinoj de elŝutoj kaj el la UI-fadeno (FAROTA G11)
+    // IO-korutinoj de elŝutoj kaj el la UI-fadeno (G11)
     private val _statoj = java.util.concurrent.ConcurrentHashMap<String, MutableStateFlow<ElshutStato>>()
     private val joboj = java.util.concurrent.ConcurrentHashMap<String, Job>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -167,7 +167,7 @@ class KtorElshutDeponejo(
                 }
                 throw e
             } catch (e: Throwable) {
-                // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (FAROTA G26)
+                // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (G26)
                 loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))

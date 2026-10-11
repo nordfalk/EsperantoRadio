@@ -618,6 +618,59 @@ retumilo blokas ilin. Bezonas servilon aŭ prokurilon — tio kongruas kun la pl
 
 ---
 
+## 13. Kodrevizio 2026-10: stako de 6 PR-oj (#89–#95)
+
+Plena kodrevizio (subagentoj) → `FAROTA.md` (92 trovindikoj: K=kriza, G=grava, C=konsilo)
+→ 6 stakaj PR-oj, ĉiuj kunfanditaj per squash (1 commit po PR). Jen la incidentoj
+kies historio gravas; la DAŬRE VALIDA scio staras en `NOTOJ.md`.
+
+### Incidentoj kaj iliaj kaŭzoj
+
+- **K2 — sciigoj ne funkciis kun fermita apo**: `appContext`/Sentry estis agordataj
+  nur en `MainActivity`. En procezo lanĉita de WorkManager (la normala kazo por la
+  perioda kontrolo je 7:00/16:00) `sciigPermesoDonita()` trafis neprapezalan
+  `lateinit`-kampon → `UninitializedPropertyAccessException` → senfina
+  `Result.retry()`-ciklo (baterio-dreno, API 33+), aŭ `kreuSettings()` reenis al
+  `NoOpSettings` → silenta nenio-faro (API 26-32). **Riparo**: `EsperantoRadioAplikajho`
+  (Application.onCreate — ĉiu procezo).
+- **G28 + realaparata regreso — alarmo 16:10 ludis nur je 16:14** (2026-10-11,
+  Pixel 10 / Android 16): la alarmo ekigis ĝustatempe, sed `AlarmoReceivilo` nur
+  lanĉis `MainActivity` kaj atendis. `startActivity` el fona ricevilo estas SILENTE
+  blokata de la BAL-limigoj (neniu esceptoĵeto — la unua G28-riparo kun catch-fallback
+  tial neniam rulis); la Activity startis en fono kaj rulis sian kodon nur kiam la
+  uzanto vekis la telefonon. **Riparo** (PR #94): la ricevilo ludas mem
+  (goAsync-korutino + `AppStato.inicialigu` kun la movita `ExoPlayerLudiloRegilo`),
+  FSI-sciigo ĉiam, `USE_EXACT_ALARM`. **Pruvo**: emulilo API 35, ekrano malŝaltita,
+  alarmo 17:09:00.022 → "Komencas ludi" 17:09:00.180 → MediaSession PLAYING;
+  instrumentita testo pasis ankaŭ sur la reala Pixel 10.
+- **CIO-CertificateException** (2026-10-11): kiam `network_security_config` havis
+  cleartext-DOMAJNO-esceptojn, CIO paneigis por ĉIUJ https-petoj ("Domain specific
+  configurations require that hostname aware checkServerTrusted is used") — la apo
+  tiam provizore uzis la OkHttp-motoron. Post kiam ĉiuj URL-oj fariĝis HTTPS
+  (Peranto-emblemo kopiita al javabog.dk, ĉar wp11081574.server-he.de ne havas TLS),
+  la esceptoj malaperis, CIO ree funkcias kaj `ktor-client-okhttp` estis forigita.
+- **Vinilkosmo-regex rompis la tutan JSONC** (2026-10-10): `"<p class="who">.+?</p>"`
+  kun NEREFUTITAJ citiloj en `puriguModeloj` — la tuta kanalkonfiguro ne plu parsis;
+  `KanalAgordoFumTesto` kaptis ĝin sur ĉiuj branĉoj de la stako. Korekto:
+  `"<p class=\"who\">(?:(?!</p>).)*?</p>"` (temperita formo).
+- **Staka-PR-kunfluo-proceduro** (tiu ĉi stako): squash-kunfando de la BAZA PR kreas
+  history-diverĝon — la supraj branĉoj tiam montras realajn konfliktojn (ambaŭ
+  flankoj ŝanĝis la samajn dosierojn de la komuna prapatro). Solvo: `git rebase
+  --onto origin/master <malnova-supra-limo> <branĉo>` (arboido restas identa —
+  kontrolita per `git rev-parse <tip>^{tree}`), forta puŝo, poste merge. Krome:
+  forigo de la baz-branĉo povas FERMI la stakan infan-PR-on — retargetu ĉiujn
+  infanojn al master ANTAAŬ ol kunfandi, per `gh api -X PATCH pulls/N -f base=master`.
+
+### Kontrolrezulto
+
+- `:shared:desktopTest` — 273 testoj, 0 malsukcesoj (264 antaŭ la stako).
+- `:androidApp:assembleDebug` — konstruiĝas post ĉiu kunfando.
+- CI (`testoj` + `changelog`) verda sur ĉiu PR de la stako.
+- Emulilaj pruvoj: 27 kanaloj/722 elsendoj ŝargiĝas; alarmo kun malŝaltita ekrano
+  ludas tuj; instrumentitaj testoj pasis sur API 26, API 35 kaj la reala Pixel 10.
+
+---
+
 ## Dokumentado
 
 - `README.md` — faritaj taskoj forigitaj; aldonita la listo de mankantaj uzkazoj el `eo_strings.xml` kaj

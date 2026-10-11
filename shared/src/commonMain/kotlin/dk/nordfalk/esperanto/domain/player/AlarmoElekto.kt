@@ -9,7 +9,7 @@ import dk.nordfalk.esperanto.domain.model.LudataElsendo
  * Reguloj:
  * 1. Nur elsendoj kun sono-URL.
  * 2. La plej nova (laŭ dato) kiu ne estas finaŭskultita nek erara.
- * 3. Se ĉiuj estas aŭskultitaj: la plej nova NE-erara (FAROTA C14) — reludado
+ * 3. Se ĉiuj estas aŭskultitaj: la plej nova NE-erara (C14) — reludado
  *    pli bonas ol silento, sed erara fluo tuj paneus kaj lasus nur la
  *    ringtonon post 10 s.
  * 4. Se ĉiuj ceteraj estas eraraj: null (la ricevilo ludas la ringtonon).

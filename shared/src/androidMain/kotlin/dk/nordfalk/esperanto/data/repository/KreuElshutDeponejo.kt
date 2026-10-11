@@ -7,7 +7,7 @@ import java.io.File
 
 actual fun kreuElshutDeponejo(httpKliento: HttpClient): ElshutDeponejo {
     // getExternalFilesDir povas redoni null (ekstera stokado ne muntita) — File(null, …)
-    // fariĝus RELATIVA vojo en la proceza laboratorio (FAROTA G12). Retrofalas al la
+    // fariĝus RELATIVA vojo en la proceza laboratorio (G12). Retrofalas al la
     // interna dosierujo (same app-privata, neniu permeso bezonata).
     val ekstera = appContext.getExternalFilesDir(android.os.Environment.DIRECTORY_PODCASTS)
     val hejjo = if (ekstera != null) {

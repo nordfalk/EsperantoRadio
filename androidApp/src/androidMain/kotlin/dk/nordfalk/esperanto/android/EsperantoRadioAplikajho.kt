@@ -5,25 +5,19 @@ import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.initialiguSentry
 
 /**
- * Procez-nivela inicialigo (FAROTA K2 + C7).
+ * Procez-nivela inicialigo ((K2) + C7).
  *
- * Antaŭe `appContext` kaj Sentry estis agordataj nur en `MainActivity` — sed en
- * procezo lanĉita de WorkManager (sciigoj pri novaj elsendoj, la normala kazo por
- * la perioda laboro je 7:00/16:00) la apo tiam ne havis kuntekston:
- * `sciigPermesoDonita()` trafis neprapezalan `lateinit`-kampon → `UninitializedPropertyAccessException`
- * → senfina `Result.retry()`-ciklo (baterio-dreno, API 33+), aŭ `kreuSettings()` reeniris
- * al `NoOpSettings` → silenta nenio-faro (API 26-32).
- *
- * `Application.onCreate` ruliĝas en ĈIU procezo de la apo antaŭ ĉiu komponanto
- * (Activity, Service, Receiver, Worker).
+ * `appContext` kaj Sentry estas agordataj ĉi tie — ĈIU procezo de la apo
+ * (Activity, Service, Receiver, Worker) rulas `Application.onCreate` antaŭ
+ * iu ajn komponanto. Sen tio fonprocezoj (WorkManager, riceviloj) ne havas
+ * kuntekston. La inicialigo estas unufoje por la tuta procezo — ne en ĉiu
+ * `MainActivity.onCreate` (Sentry avertas pri duobla inicialigo ĉe Activity-rekreo).
  */
 class EsperantoRadioAplikajho : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = applicationContext
-        // Unufoje por la tuta procezo — ne en ĉiu MainActivity.onCreate
-        // (Sentry avertas pri duobla inicialigo ĉe Activity-rekreo).
-        // Medio laŭ la APLIKAĵO-flago (FAROTA G5): debug-versio → "evoluo",
+        // Medio laŭ la APLIKAĵO-flago (G5): debug-versio → "evoluo",
         // kunfandita release → "produktado" (kun 10 % specimenado kaj malpli da protokoloj).
         val estasEvolua = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
         initialiguSentry(if (estasEvolua) "evoluo" else "produktado")

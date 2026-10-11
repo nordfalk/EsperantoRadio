@@ -101,7 +101,7 @@ class LudvicoRegilo(
     /**
      * Dedup-fenestro de la lastaj traktitaj fontoj — protektas kontraŭ malfruaj
      * duoblaj vokoj de la sama fino (servo + stato-observanto, eĉ post kiam la
-     * aŭtoludo jam avancis al la sekva elsendo). Atoma per Mutex (FAROTA G8).
+     * aŭtoludo jam avancis al la sekva elsendo). Atoma per Mutex (G8).
      */
     private val traktitajFontoj = ArrayDeque<String>()
     private val traktitajMutex = Mutex()
@@ -167,7 +167,7 @@ class LudvicoRegilo(
         val info = ludilo.stato.value
         // NunaFonto == null en Eraro-stato signifas ke la fonto estis forigita
         // (ekz. ĵus post halti()) — ne reprovu, alikaze la muziko rekomenciĝus
-        // post ol la uzanto premis "Halti" (FAROTA K3).
+        // post ol la uzanto premis "Halti" (K3).
         val fonto = info.nunaFonto ?: return false
         if (fonto is Sonfonto.LokaElsendo) return false
         val provo = _reprovo.value + 1
@@ -202,7 +202,7 @@ class LudvicoRegilo(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                // Throwable, ne Exception: la retumila ludilo ĵetas kotlin.Error (FAROTA G26)
+                // Throwable, ne Exception: la retumila ludilo ĵetas kotlin.Error (G26)
                 loge("Ludvico", "Reprovo $provo ĵetis escepton", e)
             }
             // Sinkrona malsukceso (ekz. Desktop): la stato restas Eraro kaj la observanto ne vidas
@@ -229,20 +229,20 @@ class LudvicoRegilo(
      * @param finantaFonto la fonto kiu EFIKTIVE finiĝis — portata de la vokanto (la
      *   stato-emiso aŭ la servo), NE relegata el `ludilo.stato`: inter la fino kaj
      *   la traktado la aŭtoludo eble jam avancis al la sekva elsendo, kaj tiam ni
-     *   markus la MALĜUSTAN elsendon (FAROTA G8).
+     *   markus la MALĜUSTAN elsendon (G8).
      */
     private suspend fun traktiFinon(stato: LudantoStato, erara: Boolean, finantaFonto: Sonfonto?) {
         if (finantaFonto == null) {
             // Fonto nekonata (ekz. rosta playerError post halti() sur Android, aŭ eraro en
             // fiksiFonton sur Desktop) — neniu elsendo finiĝis, do nenion marku kaj ne aŭtoludu
-            // (alie "plej freŝa neludata" ekflus tuj post ol la uzanto premis "Halti") — FAROTA K3.
+            // (alie "plej freŝa neludata" ekflus tuj post ol la uzanto premis "Halti") — (K3).
             logw("Ludvico", "Fino/eraro sen konata fonto — ignoras (neniu aŭtoludo)")
             return
         }
         // Protekto kontraŭ duobla traktado — la servo (EsperantoLudadoServo) kaj la
         // stato-observanto ambaŭ povas vidi la saman finon, ankaŭ MALFRUE (post kiam
         // la aŭtoludo jam avancis al la sekva elsendo). Atoma, ŝlosita sur la FINANTA
-        // fonto (FAROTA G8).
+        // fonto (G8).
         val fontoId = fontoId(finantaFonto) ?: return
         if (markuTraktita(fontoId)) {
             logd("Ludvico", "Fonto jam traktita: $fontoId — ignoras duoblan vokon")
@@ -274,7 +274,7 @@ class LudvicoRegilo(
             }
         } else {
             logi("Ludvico", "Ludado finiĝis (naturfino)")
-            // Vera sukceso — la eraroj ne plu estas sinsekvaj (FAROTA G27: sen tio
+            // Vera sukceso — la eraroj ne plu estas sinsekvaj ((G27) sen tio
             // 10 akumulitaj eraroj dum longa seanco haltegus la aŭtoludon)
             erarojSinsekvaj = 0
             if (nunaElsendo != null) {
@@ -392,7 +392,7 @@ class LudvicoRegilo(
      * Eksplicite haltigas la ludadon — la ĝusta vojo por la "Halti"-butono.
      *
      * Kontraŭe al rekta `ludilo.halti()` tio ankaŭ nuligas planitan reprovon
-     * (aliaflanke la reprovo rekomencigus la ludadon post la atendo — FAROTA K3)
+     * (aliaflanke la reprovo rekomencigus la ludadon post la atendo — (K3))
      * kaj savas la pozicion antaŭ ol halti() forigas la fonton.
      */
     suspend fun haltuLudadon() {
@@ -404,7 +404,7 @@ class LudvicoRegilo(
     }
 
     /**
-     * Paŭzigas la nunan ludadon — tra la regilo, ne rekte al la ludilo (FAROTA G13):
+     * Paŭzigas la nunan ludadon — tra la regilo, ne rekte al la ludilo (G13):
      * nuligas planitan reprovon, alikaze ĝi rekomencigus la ludadon dum la paŭzo.
      */
     suspend fun pauxziguLudadon() {
@@ -415,7 +415,7 @@ class LudvicoRegilo(
     }
 
     /**
-     * Daŭrigas la ludadon post paŭzo — tra la regilo (FAROTA G13):
+     * Daŭrigas la ludadon post paŭzo — tra la regilo (G13):
      * nuligas planitan reprovon kaj rekomencas la kalkulon de sinsekvaj eraroj.
      */
     suspend fun dauriguLudadon() {
@@ -427,7 +427,7 @@ class LudvicoRegilo(
     }
 
     /**
-     * Ludas rektan kanalon (livestream) — tra la regilo, ne rekte al la ludilo (FAROTA G13):
+     * Ludas rektan kanalon (livestream) — tra la regilo, ne rekte al la ludilo (G13):
      * la reprovo-, eraro-kalkulo- kaj dedup-statoj restas koheraj.
      */
     suspend fun ludiRektan(kanalo: Kanalo) {
@@ -607,7 +607,7 @@ class LudvicoRegilo(
         const val POZICIO_SAV_INTERVALO_MS = 5000L
         /** Maksimumo de sinsekvaj eraroj antaŭ ol halti por eviti eternan buklon. */
         const val MAKS_ERAROJ = 10
-        /** Grandeco de la dedup-fenestro por finoj (FAROTA G8). */
+        /** Grandeco de la dedup-fenestro por finoj (G8). */
         const val TRAKTITAJ_FONTOJ_MAKS = 4
     }
 }

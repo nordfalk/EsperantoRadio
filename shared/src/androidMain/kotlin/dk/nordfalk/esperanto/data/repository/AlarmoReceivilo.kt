@@ -31,10 +31,9 @@ import kotlinx.coroutines.launch
  * ludadon, sendepende de iu ajn Activity.
  *
  * KIAL NE "lanĉu MainActivity kaj lasu ĝin ludi": startActivity el fona ricevilo
- * estas blokata de la Background-Activity-Launch-limigoj (Android 10+, "Background
- * activity launch blocked") kiam la apo ne estas videbla — ekzakte ĉe alarmo kun
- * malŝaltita ekrano. La Activity startas en la fono, ĝia kodo ne plenumiĝas ĝis la
- * uzanto vekas la telefonon (vidu 2026-10-11: alarmo 16:10 ludis nur je 16:14).
+ * estas blokata de la Background-Activity-Launch-limigoj (Android 10+) kiam la apo
+ * ne estas videbla — ekzakte ĉe alarmo kun malŝaltita ekrano. La Activity startas
+ * en la fono kaj ĝia kodo ne plenumiĝas ĝis la uzanto vekas la telefonon.
  * La ricevilo ne havas tian limigon: ĝi povas ludi tuj (goAsync + WakeLock).
  *
  * Videbleco por la uzanto certigas la full-screen-intent-sciigo (ĉiam montrata):
@@ -106,7 +105,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 action = AGO_ALARMO_EKIGAS
                 putExtra("alarmo_kanal_slug", kanaloSlug)
                 putExtra("alarmo_etikedo", etikedo)
-                // La eksportita Activity kontrolas la nonce-on (FAROTA G3)
+                // La eksportita Activity kontrolas la nonce-on (G3)
                 IntentSxlosilo.aldonuNomon(this)
             }
             context.startActivity(launchIntent)
@@ -216,7 +215,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
     }
 
     /**
-     * Altprioritata sciigo kun full-screen-intento — permesata el fono (FAROTA G28).
+     * Altprioritata sciigo kun full-screen-intento — permesata el fono (G28).
      * Vekas la ekranon kiam ĝi estas malŝaltita; alikaze heads-up-sciigo.
      */
     private fun montruFullEkranaSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
@@ -255,7 +254,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
     }
 
     /**
-     * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (FAROTA G28) —
+     * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (G28) —
      * alarmo devas SONI eĉ kiam la fluo/reto tute ne disponeblas.
      */
     private fun luduFallbackRingtonon(context: Context) {

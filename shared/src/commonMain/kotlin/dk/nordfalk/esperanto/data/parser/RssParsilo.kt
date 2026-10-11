@@ -8,7 +8,6 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
-import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import io.ktor.http.encodeURLPathPart
 import kotlinx.coroutines.CancellationException
@@ -69,7 +68,7 @@ class RssParsilo(
             }
         }
 
-        logi("RssParsilo", "${kanalo.slug}: parsado kompleta — ${rezulto.size} elsendoj")
+        logd("RssParsilo", "${kanalo.slug}: parsado kompleta — ${rezulto.size} elsendoj")
         return rezulto
     }
 
@@ -317,7 +316,7 @@ class RssParsilo(
                 logw("RssParsilo", "archive.org/$identigilo: neniu MP3 en metadatenoj — uzas divenitan nomon $divenita")
                 return divenita
             }
-            logi("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
+            logd("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
             archiveOrgKasho?.konservuDosiernomon(identigilo, dosiernomo)
             dosiernomo
         } catch (e: CancellationException) {

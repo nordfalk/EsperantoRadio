@@ -22,7 +22,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Agordu JDK 17
         uses: actions/setup-java@v4

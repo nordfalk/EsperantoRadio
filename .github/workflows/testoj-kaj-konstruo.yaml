@@ -22,7 +22,7 @@ jobs:
   testoj:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Agordu JDK 17 (JDK 17 estas necesa por la Android-konstruo)
         uses: actions/setup-java@v4

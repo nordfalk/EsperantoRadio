@@ -366,6 +366,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   liveras JSON kun `feedUrl`, `artworkUrl600`, `releaseDate` kaj `trackCount`; `https://itunes.apple.com/search?term=Esperanto&entity=podcast&limit=25`
   listigas ĉiujn ĉe Apple indeksitajn Esperanto-podkastojn. Uzebla por trovi fluojn kaj kontroli aktivecon sen
   skrapado de Apple-retejoj. (2026-10-08: tiel kolektiĝis la fluoj de la 7 novaj kanaloj.)
+- **Regex-`"`-signoj en JSONC devas esti refutitaj** (`\"`): la koment-striptigilo forigas
+  nur `//`-liniojn, sed la valoroj mem devas esti valida JSON post striptigo. Regex kiel
+  `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
+  (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
+  (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
+  riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
+  `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
 
 ## Logcat (Android)
 

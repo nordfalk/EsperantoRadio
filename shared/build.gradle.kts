@@ -119,11 +119,6 @@ kotlin {
             implementation(libs.androidx.work.runtime)
             implementation(libs.androidx.media3.exoplayer)
             implementation(libs.androidx.media3.session)
-            // FAROTA G1-flanko: la CIO-motoro uzas la malnovan 2-argan checkServerTrusted()
-            // sen gastiganto — tuj kiam network_security_config ekzistas, Android rifuzas
-            // Gxin por chiuj https-petoj ("Domain specific configurations require that
-            // hostname aware checkServerTrusted is used"). OkHttp estas gastiganto-konscia.
-            implementation(libs.ktor.client.okhttp)
         }
 
         val desktopMain by getting {

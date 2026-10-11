@@ -22,7 +22,6 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -102,9 +101,10 @@ class NovajElsendojKontroloWorker(
             val unuaRulo = viditaj.isEmpty()
             logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj (unuaRulo=$unuaRulo)")
 
-            // OkHttp (ne CIO): vidu la komenton en HttpMotoro.android.kt —
-            // CIO malsukcesas che chiuj https-petoj kiam network_security_config ekzistas
-            val httpKliento = HttpClient(OkHttp) {
+            // CIO tra httpMotoro — sama motoro kiel la cetero de la apo.
+            // AVERTO: se network_security_config iam re-havos domajno-esceptojn,
+            // CIO paneigas por ĉiuj https-petoj (vidu HttpMotoro.android.kt).
+            val httpKliento = HttpClient(httpMotoro) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
                 // FAROTA K1: fiaskpaĝo (4xx/5xx) ne estu parsata kiel fluo —
                 // la per-kanala catch sube protokolas kaj daŭrigas kun la aliaj kanaloj

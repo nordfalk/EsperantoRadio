@@ -245,6 +245,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `net`-modulon de Node.js ("Node.js net module is not available"). Uzu `httpMotoro` (expect/actual:
   CIO, aŭ `Js` = fetch sur wasmJs), ne `HttpClient(CIO)` rekte. La Js-motoro ĵetas `kotlin.Error`
   (ne Exception) ĉe reteraroj/CORS — kaptu `Throwable` (kaj reĵetu `CancellationException`).
+- **CIO + domajno-esceptoj en network_security_config = paneo** (2026-10-11, emulila testo):
+  kiam la config havis cleartext-domajno-esceptojn, CIO paneigis por ĈIUJ https-petoj
+  ("CertificateException: Domain specific configurations require that hostname aware
+  checkServerTrusted is used") — tiam OkHttp-motoro devis anstataŭigi CIO sur Android.
+  Kun nur `base-config` (neniuj domajno-esceptoj — la nuna stato) CIO funkcias normale,
+  kaj `ktor-client-okhttp` estis forigita. Se iam re-aldoniĝas domajno-escepto al la
+  security-config, remetu `libs.ktor.client.okhttp` kaj `HttpMotoro.android` al OkHttp.
 - **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
 - **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
 - **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per

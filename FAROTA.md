@@ -150,7 +150,7 @@
 - **Sugesto**: restructuru la teston kun la "finanta fonto" (vidu G8) aŭ per ludilo kiu ne ŝanĝas la staton ĉe `ludi()`; asertu `!ludatoj.estasFinita(e2.id)` kaj ke la ludado daŭras post la dua voko.
 
 #### G15 — Regulo 6.6 (`puriguModeloj`) dokumentita sed ne implementita
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `RssParsilo.kt:142-176` (`parsuVarsoviaVento`), `:356-380` (`parsuVinilkosmo`); dokumento: `docs/nova/04_parsado_kaj_arkivo.md:89-93`
 - **Priskribo**: `puriguModeloj` nenie ekzistas (nek en la `Kanalo`-modelo, nek en la JSONC, nek aplikata en la parsilo). La malnova kodo aplikis 9 regexojn al Varsovia Vento (Facebook-reklamo, "Elŝutu podkaston", "Subtenu nin", `<audio …></audio>`) kaj forigis `<p class="who">` ĉe Vinilkosmo. Sekvoj en la nova apo: Varsovia Vento (`uziWebViewPorElsendo=true`) montras **enkonstruitajn son-ludilojn** en la priskribo; Vinilkosmo-priskriboj komenciĝas per `<p class="who">VINILKOSMO … has posted:</p>`; la plata `priskribo` enhavas la tutan reklam-tekstegaĵon.
 - **Sugesto**: efektivigu regulo 6.6 kiel dokumentite — aldonu `puriguModeloj: List<String>` (regex) al `KanaloDto`/`Kanalo` kun la malnovaj modeloj por `varsoviavento` kaj `vinilkosmo` en la JSONC (ambaŭ kopioj), kaj apliku ilin en la parsilo; aŭ almenaŭ forigu `audio`-elementojn el `priskriboHtml` por Varsovia Vento kaj la `who`-alineon por Vinilkosmo; aŭ korektu la dokumenton.
@@ -238,13 +238,13 @@
 ### Pliaj GRAVA trovoj (parsado, kerno)
 
 #### G29 — Vinilkosmo: titolo derivata el la enhavo anstataŭ `<title>`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `RssParsilo.kt:372` (`titolo = puriguHtml(priskriboKruda).take(200)`)
 - **Priskribo**: La fiksaĵo kaj ambaŭ malnovaj vojoj uzis la `<title>` de la ero. La derivita titolo komenciĝas per `VINILKOSMO "Esperanto-Muzik-Prod." has posted: Esperanto: …` — klare malbona; la agordo ne havas `elsendojRssIgnoruTitolon` por `vinilkosmo`; la titolo ankaŭ ne estas `trim`-ita (male al `derivuTitolon`, `RssParsilo.kt:395-398`).
 - **Sugesto**: `titolo = ero.selectFirst("title")?.text()?.trim() ?: ""`, kaj derivu nur se `kanalo.ignoruTitolon`.
 
 #### G30 — Ĝenerala `<audio>`-fallback (regulo 6.1.4) ne funkcias por CDATA/eskaptita enhavo
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `RssParsilo.kt:105` (`ero.selectFirst("audio source")` sur la XML-dokumento); atendata: `Ksoup.parse(htmlEnhavo)` (kiel en `parsuVarsoviaVento`, linioj 153-157); ankaŭ: `<enclosure>` prenata sen kontrolo de `type="audio/*"` (linio 100)
 - **Priskribo**: Enhavo de `content:encoded`/`description` estas teksta nodo, ne elementoj — do la fallback trovas `<audio>` nur ĉe `type="xhtml"`-inline-enhavo. Por iu ajn ĝenerala fluo kiu metas la sonon nur en `<audio>` ene de la priskribo, la ero estas **forĵetita** (linio 106 `return null`). Neniu aktiva kanalo dependas de tio nun, sed la regulo estas dokumentita kaj la estonta servilo/normigitaj fluoj baziĝos sur la ĝenerala parsilo.
 - **Sugesto**: `Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src")`; akceptu nur `enclosure[type^=audio]` (`?: enclosure` defaŭlte); aldonu teston (neniu nuna testo kovras la fallback).
@@ -256,31 +256,31 @@
 - **Sugesto**: korektu ĉiam (krom se iu kanalo eksplicite bezonas http — tiam per konfiguro), kaj aldonu ĝeneralan teston; aŭ korektu la dokumenton.
 
 #### G32 — Ĝenerala skip-listo mankas en la nova parsilo (regulo 2)
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `RssParsilo.kt:82-129` (`parsuEroGxenerala`); malnova: `malnova/parse/.../RomePodcastParser.kt:140-164`; dokumento: `docs/nova/04:152`
 - **Priskribo**: La malnova kodo saltis erojn kies sola son-gastiganto estas youtube/soundcloud/vimeo/audioboom/yourlisten/vocaroo. La nova ĝenerala parsilo **akceptas** ekzemple `<enclosure url="https://www.youtube.com/watch?v=…">` kiel validan fluon — tia elsendo aperus en la listo kaj fiaskus ĉe ludado. La skip-regulo ekzistas nur en la Peranto-regulo (`RssParsilo.kt:240-248`), malmulte kodita. AGENTS.md regulo 2: "la skip-listo devas esti konservita".
 - **Sugesto**: komuna funkcio `estasSaltitaGastiganto(url: String)` en `RssParsilo` (aŭ agorde, se oni volas regulo 5), aplikata en `parsuEroGxenerala`, plus testoj (youtube/soundcloud/vimeo-enclosure → forĵetita).
 
 #### G33 — archive.org-metadaten-petoj: senlima paraleleco (regulo 6.3, paŝo 2)
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `RssParsilo.kt:270` (`identigiloj.map { id -> async { … } }.awaitAll()`)
 - **Priskribo**: La unua parsado de la Peranto-fluo (centoj da arkivaĵoj) povas lanĉi centojn da paralelaj petoj al archive.org → risko de 429/timumejo. La degrado estas bone traktata (5-s limtempo, fallback al la divenita nomo, neniam kaŝita fallback), sed multaj elsendoj provizore havos malĝustan (404-an) URL.
 - **Sugesto**: limigu la paralelecon (ekz. `Semaphore(8)` aŭ `chunked`).
 
 #### G34 — Diskkaŝa re-parsado sen `httpKliento` → Peranto ricevas divenitajn URL-ojn
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `ElsendoDeponejoImpl.kt:107` (`parsilo.parsuRss(respondo, kanalo)` sen la kliento; kontraste kun linio 71)
 - **Priskribo**: Ĉe malvarma startigo el disko, `trovuArchiveOrgMp3Dosiernomon` (`RssParsilo.kt:236-272`) nur konsulas la persistentan `ArchiveOrgDosiernomoKasho`; se tiu estas malplena (nova instalo kun konservita kaŝo, aŭ viŝita Settings), la fluoj estas la **divenitaj** — malĝustaj ĝuste por la kazoj kiel `malapero-benda-3` (la celo de commit 8c5ed4c) — ĝis la unua sukcesa refreŝo.
 - **Sugesto**: transdoni la klienton (kun la sama 5s-limigo) kaj la kaŝon ankaŭ en `leguKashitajnElsendojn`.
 
 #### G35 — `kaŝmemoro`/`fluoj` en `ElsendoDeponejoImpl` estas simplaj `mutableMapOf` sen Mutex
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `ElsendoDeponejoImpl.kt:31-32`
 - **Priskribo**: Ĉiuj metodoj estas `suspend` kaj nenio devigas unu-fadenan aliron; `getElsendo`/`sercxiElsendojn` iteracias la mapon dum alia korutino povas skribi (`put` en `sxargxiElsendojn`/`leguKashitajnElsendojn`). Nuntempe ĉio ŝajnas esti vokata el la ĉefa fadeno (ViewModel-oj), do la risko estas latenta — sed la klaso estas `open` kaj estonta vokanto el alia fadeno (ekz. WorkManager, vidu K2) povus kaŭzi `ConcurrentModificationException` aŭ perdon de skriboj.
 - **Sugesto**: Mutex (kiel en `ArchiveOrgDosiernomoKasho`) aŭ dokumentita unu-fadena devigo.
 
 #### G36 — `PersistaLudatojDeponejo`: read-modify-write sen Mutex + sinkrona diska skribo ĉiujn 5 s
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonMain/.../data/repository/PersistaLudatojDeponejo.kt:38,45-60`
 - **Priskribo**: `registriPozicion` estas vokata ĉiujn 5 s dum ludado (el `LudvicoRegilo`) kaj povas interplektiĝi kun `markiFinita`/`malmarkiFinita` el alia korutino: ambaŭ legas `_ludatoj.value`, ambaŭ skribas — la lasta skribanto venkas kaj la `finita`-flago povas perdiĝi. Krome `skribu()` serializas la tutan mapon kaj skribas al Settings ĉe ĉiu pozici-ĝisdatigo — sur Desktop tio estas sinkrona diska I/O ĉiujn 5 s.
 - **Sugesto**: Mutex ĉirkaŭ la read-modify-write; prokrasto de la persisto (ekz. maks. unufoje per 15-30 s kaj ĉe halto/paŭzo); limigo de la map-grandeco (LRU).
@@ -300,7 +300,7 @@
 - **Sugesto**: "smoke test" en `commonTest`: legi la veran dosieron el la resurcoj, aserti ke ĝi parsiĝas, havas 27 kanalojn, ĉiuj havas kodon kaj nomon, almenaŭ unu havas RSS-URL, ktp.
 
 #### G39 — `RssParsiloTest` regulo 6.2 (Varsovia Vento) testita nur supraĵe
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonTest/.../data/parser/RssParsiloTest.kt:76-99` (`parsasVarsoviaVenton`)
 - **Priskribo**: La kerna aserto estas `if (plurpartaj.isNotEmpty()) { … }` — se la fiksaĵo iam perdus plurpartajn erojn, la testo pasus sen kontroli ion ajn pri ili. Pruvita: la fiksaĵo havas 10 erojn → **31 elsendojn** (9 eroj × 3 partoj + "La 182a elsendo" × 4 partoj), kun konataj fluoj (`250424VVE185P1/P2/P3.mp3`). La dokumento (`docs/nova/04:150`) atendas precize tion.
 - **Sugesto**: `assertEquals(31, elsendoj.size)` + konkretaj asertoj por "La 185a elsendo": tri id-oj `varsoviavento:2025-04-24:1/2/3`, titoloj "La 185a elsendo 1a parto" ktp., fluoj finiĝantaj per `250424VVE185P1/P2/P3.mp3`.
@@ -385,7 +385,7 @@
 ### Ludilo
 
 #### C10 — `ExoPlayerLudiloRegilo`: MediaController neniam liberigita, neniu `onDisconnected`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `androidApp/.../ExoPlayerLudiloRegilo.kt:78-121`
 - **Priskribo**: Se la sistemo mortigas la servon aŭ la konekto falas, `controller` restas stale kaj `ludi()/pauxzigi()/saltiAl()` (poŝtataj al `controller?.`) silente nenion faras ĝis procezo-restarto. Se `buildAsync()` malsukcesas, `konektita.completeExceptionally` faras, ke ĉiu posta `fiksiFonton` ĵetas — `ludiElsendonInterna` nur logas, la stato restas `Haltita`: silenta morto.
 - **Sugesto**: traktu `onDisconnected` (emitu `Eraro(reprovebla = true)` kaj rekonstruu la regilon); ĉirkaŭu `konektita.await()` per `withTimeout` kaj emitu `Eraro` ĉe malsukceso.
@@ -397,13 +397,13 @@
 - **Sugesto**: serializu nur `id, kanaloSlug, titolo, fluo, dato, bildoUrl` kaj rekonstruu la `Elsendo`-on per `ElsendoDeponejo.getElsendo(id)`.
 
 #### C12 — `halti()` dum `fiksiFonton` atendas → ludado komenciĝas post halto
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `ExoPlayerLudiloRegilo.kt:182-201` kontraŭ `:204-213`
 - **Priskribo**: `fiksiFonton` atendas `konektita.await()`/`withContext(Main)`; se la uzanto premas "Halti" dum tio, `setMediaItem`+`prepare` ruliĝas *post* `clearMediaItems` → muziko komenciĝas. Fenestro estas mallarĝa (unua konektado).
 - **Sugesto**: generacia token / `Mutex` komuna inter `fiksiFonton` kaj `halti`.
 
 #### C13 — Aŭtoludo povas superpaŝi uzantan agon
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `LudvicoRegilo.kt:260,372` (`traktiFinon` lanĉas `ludiSekvan` en aparta korutino; antaŭ ol ludi, nenio rekontrolas, ke la ludilo ankoraŭ ludas la ĵus finitan elsendon)
 - **Sugesto**: komence de `ludiSekvanInterna`, komparu `ludilo.stato.value.nunaFonto` kun `nunaElsendo`; se ili malsamas, rezignu.
 
@@ -581,6 +581,17 @@
 
 ## Jam farita (ne en la listo supre)
 
+- [x] **Ripara batch-o 4 — parsado + kerno** (branĉo `riparoj/parsado-kerno`, stakita sur `riparoj/kodrevizio`, 260/260 testoj):
+  - G15 — `puriguModeloj: List<String>` en la kanalkonfiguro (regulo 6.6, datum-movita) + aplikado en ĉiuj parser-vojoj + modeloj por varsoviavento kaj vinilkosmo en la JSONC (ambaŭ kopioj). **Grava lernitaĵo**: la malnovaj modeloj el EoRssParsado (`<p>.+?FRazo.+?</p>` + DOTALL) estas DANGERAJ — ili manĝas ekde la unua alineo ĝis la reklamo (regres-testo certigas ke la enkonduko pluvivas). La novaj modeloj estas temperitaj: `(?:(?!</p>).)` ne transiras alineon.
+  - G29 — Vinilkosmo-titolo el `<title>` de la ero (ne derivita el la enhavo — "VINILKOSMO … has posted: …")
+  - G30 — ĝenerala `<audio>`-fallback serĉas en la priskribo-HTML (Ksoup.parse), ne en la XML-dokumento
+  - G32 — ĝenerala skip-listo (youtube/soundcloud/vimeo/audioboom/yourlisten/vocaroo) en `SALTAJ_GASTIGANTOJ`, ankaŭ uzata de la Peranto-parsilo (regulo 2 konservita)
+  - G33 — `Semaphore(8)` limigas la paralelecon de archive.org-metadaten-petoj
+  - G34 — la diskkaŝa re-parsado transdonas la HTTP-klienton → Peranto ne ricevas divenitajn dosiernomojn
+  - G35 — `ElsendoDeponejoImpl`: nemutablaj `@Volatile` momentfotoj + `konservu()` sub Mutex (nenia `ConcurrentModificationException`-risko)
+  - G36 — `PersistaLudatojDeponejo`: Mutex ĉirkaŭ la legu-modifu-skribu-ciklo
+  - G39 — la Varsovia Vento-testo estas nun preciza: 31 elsendoj, la 185a kun 3 partoj (id, titolo, fluo)
+  - C10/C12/C13 — `normigiDaton` akceptas "yyyy-MM-dd" sen T kaj "Sept"; audio-enclosure preferata super bildo; frakciaj sekundoj en `leguDauron`
 - [x] **Ripara batch-o 3** (branĉo `riparoj/kodrevizio`, 250/250 testoj, neniuj novaj dosieroj en `~/.esperantoradio/cache/`):
   - G24 — nova CI-laborfluo `.github/workflows/testoj-kaj-konstruo.yaml`: `:shared:desktopTest` + Desktop/Android/wasmJs-kompilado por ĉiu PR kaj push al master (ankaŭ la wasmJs-kompiladon, kiu mankis kiam PR #79 enmetis `Dispatchers.IO`)
   - G37 — `DiskKashoTest` movita al `desktopTest` kaj direktas `dosierKashoBazo` al provizora dosierujo (antaŭe: verkis en la veran `~/.esperantoradio/cache/` kaj "purigis" per malplenigo)

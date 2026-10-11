@@ -39,5 +39,12 @@ class KanalAgordoFumTesto {
         // Almenaŭ kelkaj kanaloj havas RSS-fluon — alie la apo estas senenhava
         val kunRss = agordo.kanaloj.count { !it.elsendojRssUrl.isNullOrBlank() }
         assertTrue(kunRss >= 15, "Atendis almenaŭ 15 kanalojn kun RSS-fluo, havas $kunRss")
+
+        // Regulo 6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (FAROTA G15)
+        val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }
+        assertTrue(varsoviavento.puriguModeloj.isNotEmpty(), "varsoviavento havas puriguModelojn")
+        assertTrue(varsoviavento.puriguModeloj.any { it.contains("audio") }, "varsoviavento purigas <audio>-ludilojn")
+        val vinilkosmo = agordo.kanaloj.first { it.kodo == "vinilkosmo" }
+        assertTrue(vinilkosmo.puriguModeloj.isNotEmpty(), "vinilkosmo havas puriguModelojn")
     }
 }

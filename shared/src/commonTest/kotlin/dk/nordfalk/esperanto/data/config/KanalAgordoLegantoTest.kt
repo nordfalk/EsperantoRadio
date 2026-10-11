@@ -177,4 +177,35 @@ class KanalAgordoLegantoTest {
         assertEquals("Matena ĥoro de Ŭato", alarmoj[0].etikedo)
         assertEquals("muzaiko", alarmoj[0].kanaloSlug)
     }
+
+    @Test
+    fun legasPuriguModelojn() {
+        // Regulo 6.6 (FAROTA G15): kanal-specifaj purigaj regex-modeloj el la konfiguro
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "varsoviavento",
+                        "nomo": "Varsovia Vento",
+                        "puriguModeloj": [
+                            "<p>.+?Elŝutu podkaston.+?</p>",
+                            "<audio .+?</audio>"
+                        ]
+                    },
+                    {
+                        "kodo": "senmodeloj",
+                        "nomo": "Sen Modeloj"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        val vv = agordo.kanaloj[0].alKanalo()
+        assertEquals(2, vv.puriguModeloj.size)
+        assertTrue(vv.puriguModeloj[0].contains("Elŝutu podkaston"))
+        // Kanalo sen la kampo ricevas malplenan liston (defaŭlto)
+        assertTrue(agordo.kanaloj[1].alKanalo().puriguModeloj.isEmpty())
+    }
 }

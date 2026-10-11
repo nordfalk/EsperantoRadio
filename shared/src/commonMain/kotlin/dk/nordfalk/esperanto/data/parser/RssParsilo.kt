@@ -464,7 +464,7 @@ class RssParsilo(
 
     fun normigiDaton(datStr: String?): String? {
         if (datStr.isNullOrBlank()) return null
-        // Simpla dato sen tempo: "2024-01-05" (FAROTA C10 — antaŭe la tuta ero estis forĵetita)
+        // Simpla dato sen tempo: "2024-01-05" (FAROTA C35 — antaŭe la tuta ero estis forĵetita)
         if (datStr.trim().matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return datStr.trim()
         if (datStr.contains("T")) {
             val dato = datStr.substringBefore("T")
@@ -476,7 +476,7 @@ class RssParsilo(
             "May" to "05", "Jun" to "06", "Jul" to "07", "Aug" to "08",
             "Sep" to "09", "Oct" to "10", "Nov" to "11", "Dec" to "12"
         )
-        // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (FAROTA C10)
+        // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (FAROTA C35)
         val m = Regex("(\\d{1,2})\\s+(\\w{3,4})\\s+(\\d{4})").find(korektita) ?: return null
         val tago = m.groupValues[1].padStart(2, '0')
         val monato = monatoj[m.groupValues[2].take(3)] ?: return null
@@ -485,7 +485,7 @@ class RssParsilo(
 
     fun leguDauron(teksto: String?): Long? {
         if (teksto.isNullOrBlank()) return null
-        // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (FAROTA C13)
+        // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (FAROTA C37)
         val partoj = teksto.trim().split(":").map { it.substringBefore('.') }
         return when (partoj.size) {
             1 -> partoj[0].toLongOrNull()

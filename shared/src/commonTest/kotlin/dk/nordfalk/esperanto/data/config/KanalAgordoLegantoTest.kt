@@ -178,6 +178,19 @@ class KanalAgordoLegantoTest {
         assertEquals("muzaiko", alarmoj[0].kanaloSlug)
     }
 
+    @Test // FAROTA C4: ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon
+    fun koercasEkstervalorajnSugestojn() {
+        // horo=99, minuto=-5, ripeto=0x123 (ekster la 7 tago-bitoj)
+        val sugestoj = "10001/1/99/-5/291/0/=muzaiko/=Testa/"
+
+        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
+
+        assertEquals(1, alarmoj.size, "Unu malbona kampo ne devas forĵeti la sugeston (regulo 4)")
+        assertEquals(23, alarmoj[0].horo)
+        assertEquals(0, alarmoj[0].minuto)
+        assertEquals(0x23, alarmoj[0].ripeto, "ripeto devas esti maskita al la 7 tago-bitoj (0x123 & 0x7f = 0x23 = Lu+Ma+Sa)")
+    }
+
     @Test
     fun legasPuriguModelojn() {
         // Regulo 6.6 (FAROTA G15): kanal-specifaj purigaj regex-modeloj el la konfiguro

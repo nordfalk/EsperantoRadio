@@ -153,9 +153,14 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
         try {
             val id = partoj[i].toInt()
             val aktiva = partoj[i + 1] == "1"
-            val horo = partoj[i + 2].toInt()
-            val minuto = partoj[i + 3].toInt()
-            val ripeto = partoj[i + 4].toInt()
+            // FAROTA C4: koercu — ekstervalora horo/minuto/ripeto el la agordo devas
+            // ne kraŝi la skedadon (LocalTime/sekvaEkigo); ni ne ĵetas la tutan sugeston
+            // pro unu malbona kampo (regulo 4 — toleremo al putrantaj fontoj)
+            val horo = partoj[i + 2].toInt().coerceIn(0, 23)
+            val minuto = partoj[i + 3].toInt().coerceIn(0, 59)
+            // ripeto: MASKU al la 7 tago-bitoj (ne limigu al 0x7f = ĉiutage) —
+            // tiel la semantiko kongruas kun sekvaEkigo kaj konservas la intencitajn tagojn
+            val ripeto = partoj[i + 4].toInt() and 0x7f
             // partoj[i + 5] = time (malnova, ne uzata)
             val kanaloSlug = partoj[i + 6].removePrefix("=")
             val etikedo = malkoduUrlKoditajxon(partoj[i + 7].removePrefix("="))

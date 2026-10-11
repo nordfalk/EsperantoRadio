@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Klara teksto (HTTP) estas malpermesata tutmonde — nur por gastigantoj kiuj
-    vere ankoraŭ ne subtenas HTTPS (FAROTA G1, reviziita laŭ la PR-komento).
+    Klara teksto (HTTP) estas MALPERMESATA por la tuta trafiko — neniuj esceptoj (FAROTA G1).
 
-    Antaŭe la listo havis 18 gastigantojn el ĉiuj http://-URL-oj de la konfiguro.
-    Kontrolante ĉiun per HTTPS-rekta provo (2026-10-11): 9 el 10 aktiva http-URL-oj
-    funkcias ankaŭ per HTTPS kaj estis ŝanĝitaj al https:// en la konfiguro.
-    Nur la emblemo de Peranto restas sur HTTP — ĝi estas olda GIF kaj la
-    servilo ne havas TLS.
-
-    La FORPRENITAJ_KANALOJ (ne legitaj de la kodo) povas enteni http-URL-ojn
-    — ili ne bezonas escepton ĉar la apo neniam petas ilin.
+    Ĉiuj URL-oj en la kanalkonfiguro uzas HTTPS (kontrolitaj per rekta provo, 2026-10-11).
+    La sola http-restinta (Peranto-emblemo) estis movigita al
+    https://javabog.dk/privat/esperantoradio/retradiologo.gif — la originalo
+    (wp11081574.server-he.de) ne subtenas TLS, do la emblemo estas gastigita sur javabog.dk.
+    Novaj kanaloj devas uzi HTTPS.
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">wp11081574.server-he.de</domain>
-    </domain-config>
 </network-security-config>

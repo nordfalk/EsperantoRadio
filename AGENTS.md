@@ -373,6 +373,17 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
   riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
   `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
+- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
+  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
+  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
+  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
+  (goAsync-korutino); la videblecon certigu full-screen-intent-sciigo (`CATEGORY_ALARM`,
+  `USE_FULL_SCREEN_INTENT`). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
+  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
+- **`USE_EXACT_ALARM` (API 33+) estas aŭtomate donata** por vekhorloĝo-apoj kaj igas
+  `canScheduleExactAlarms()` vera sen mana permeso — sen ĝi la skedilo devas fali al
+  `setWindow` kun 10-minuta fenestro (Doze-prokrastoj). `SCHEDULE_EXACT_ALARM` restas
+  bezonata por Android 12 (31-32), kie ĝi estas defaŭlte donata sed revokebla.
 
 ## Logcat (Android)
 

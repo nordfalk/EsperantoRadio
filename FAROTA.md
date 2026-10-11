@@ -230,10 +230,11 @@
 - **Sugesto**: nuligu `erarojSinsekvaj` ankaŭ en la branĉo `Ludas` (sukcesa (re)komenco = ne plu sinsekvaj eraroj).
 
 #### G28 — Alarmo sen ekzakta-alarma permeso povas esti tute silenta
-- **Statuso**: [x]
+- **Statuso**: [x] (dua riparo 2026-10-11, PR #94)
 - **Loko**: `shared/src/androidMain/.../data/repository/AlarmoReceivilo.kt:34-69` (`startActivity`:62, WakeLock liberigita:67-68); `AlarmoSkedilo.kt:38-48` (`setWindow` sen `SCHEDULE_EXACT_ALARM`)
 - **Priskribo**: `context.startActivity(launchIntent)` el fona `BroadcastReceiver` povas esti blokita de la limigoj pri lanĉo de agado el fono (Android 10+, precipe ĉe vekiĝo kun elŝaltita ekrano). La `catch` nur protokolas — kaj la fallback-ringtono ekzistas **nur** en `MainActivity`, kiu tiam neniam lanĉiĝas. Do: alarmo ekigas, sed nenio sonas. Krome la WakeLock (10-minuta tempolimo) estas liberigita en `finally` tuj post `startActivity` — ĝi ne kovras la nesinkronan "trovi elsendon kaj ludi"-fazon.
 - **Sugesto**: (a) en la `catch` de la lanĉo, ludu la fallback-ringtonon rekte en la ricevilo; (b) pli bone, uzu full-screen-intent-sciigon kun `setAlarmClock`-info (aŭ `setTurnScreenOn(true)` / `setShowWhenLocked`), kiel rekomendas la dokumentaro pri alarm-apoj; transdonu la WakeLock al `MainActivity` kaj liberigu ĝin kiam la ludado komenciĝas (aŭ post timeout). Testu sur reala aparato kun elŝaltita ekrano.
+- **Dua riparo (2026-10-11, PR #94)**: la unua riparo pritraktis nur la escepto-kazon — sed la BAL-bloko estas **silenta** (neniu esceptoĵeto; la Activity startas en fono kaj ĝia kodo ruliĝas nur kiam la uzanto vekas la telefonon — real-aparata pruvo: alarmo 16:10 ludis je 16:14). Nun la ricevilo ludas MEM (goAsync-korutino + `AppStato.inicialigu` kun la movita `ExoPlayerLudiloRegilo`), la FSI-sciigo estas montrata ĉiam, kaj `USE_EXACT_ALARM` donas ekzaktajn alarmojn sen mana permeso. Emulila pruvo: alarmo 17:09:00.022 → "Komencas ludi" 17:09:00.180 kun malŝaltita ekrano; instrumentita testo `AlarmoReceiviloTest` pasis ankaŭ sur la reala Pixel 10.
 
 ### Pliaj GRAVA trovoj (parsado, kerno)
 

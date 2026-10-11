@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
  * re-parsas per RssParsilo, kaj komparas la elsendojn.
  *
  * Rulas en desktopTest ĉar ĝi testas la Desktop-actualigon de la kaŝo
- * kaj direktas [dosierKashoBazo] al provizora dosierujo (G37):
+ * kaj direktas [dosierKashoBazo] al provizora dosierujo (PR #89):
  * antaŭe la testoj skribis en la VERAN uzantan kaŝujon `~/.esperantoradio/cache/`
  * kaj "purigis" nur per malplenigo — 5 malplenaj dosieroj restis tie.
  */

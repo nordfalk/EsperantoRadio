@@ -205,7 +205,7 @@ fun EsperantoRadioApp(
                                         when (fonto) {
                                             is Sonfonto.ElsendoFonto -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
                                             is Sonfonto.LokaElsendo -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
-                                            // (G13) tra la regilo — reprovo/kalkuloj/dedup restas koheraj
+                                            // (PR #92) tra la regilo — reprovo/kalkuloj/dedup restas koheraj
                                             is Sonfonto.RektaKanalo -> ludvicoRegilo.ludiRektan(fonto.kanalo)
                                         }
                                     }
@@ -335,7 +335,7 @@ fun EsperantoRadioApp(
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
                                 agordojDeponejo = agordojDeponejo,
-                                // (G13) paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
+                                // (PR #92) paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
                                 // ne nuligas planitan reprovon
                                 onPauxzigi = { scope.launch { ludvicoRegilo.pauxziguLudadon() } },
                                 onDaurigi = { scope.launch { ludvicoRegilo.dauriguLudadon() } },

@@ -72,7 +72,7 @@ class EsperantoLudadoServo : MediaSessionService() {
                         try {
                             val regilo = AppStato.ludvicoRegilo
                             if (regilo != null) {
-                                // Transdonu la FINANTAN fonton (G8) — ne relegu ĝin en
+                                // Transdonu la FINANTAN fonton (PR #89) — ne relegu ĝin en
                                 // LudvicoRegilo, kie la aŭtoludo eble jam avancis al la sekva
                                 val finantaFonto = SonfontoKodilo.malkodigu(
                                     player.currentMediaItem?.mediaMetadata?.extras

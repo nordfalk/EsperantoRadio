@@ -156,7 +156,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
         } catch (e: Exception) {
             log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace(System.err)
-            // Portu la FONTON en la Eraro-staton (G19): halti() supre forigis nunaFonton,
+            // Portu la FONTON en la Eraro-staton (PR #92): halti() supre forigis nunaFonton,
             // kaj sen ĝi LudvicoRegilo reprovus/aŭtoludus la MALĜUSTAN (antaŭan) elsendon.
             _stato.value = LudantoInformo(
                 // Retaj eraroj estas pasemaj; FileNotFoundException (HTTP 404) kaj nesubtenata formato ne
@@ -232,7 +232,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             log("ludi: ERARO — sourceDataLine aü audioInputStream estas null")
             return
         }
-        // Daŭrigo post paŭzo (G18): NE rekomencu la korutinon — `komenciLudadon`
+        // Daŭrigo post paŭzo (PR #92): NE rekomencu la korutinon — `komenciLudadon`
         // nuligus `totalBytesLuditaj`, do la pozicio rekomencus je 0 dum la fluo
         // daŭras meze (kaj la 5s-pozicia savilo de LudvicoRegilo superskribus la ĝustan valoron).
         if (ludaJob?.isActive == true && pauxzita) {

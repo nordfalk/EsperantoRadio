@@ -105,7 +105,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 action = AGO_ALARMO_EKIGAS
                 putExtra("alarmo_kanal_slug", kanaloSlug)
                 putExtra("alarmo_etikedo", etikedo)
-                // La eksportita Activity kontrolas la nonce-on (G3)
+                // La eksportita Activity kontrolas la nonce-on (PR #89)
                 IntentSxlosilo.aldonuNomon(this)
             }
             context.startActivity(launchIntent)
@@ -215,7 +215,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
     }
 
     /**
-     * Altprioritata sciigo kun full-screen-intento — permesata el fono (G28).
+     * Altprioritata sciigo kun full-screen-intento — permesata el fono (PR #94).
      * Vekas la ekranon kiam ĝi estas malŝaltita; alikaze heads-up-sciigo.
      */
     private fun montruFullEkranaSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
@@ -254,7 +254,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
     }
 
     /**
-     * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (G28) —
+     * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (PR #94) —
      * alarmo devas SONI eĉ kiam la fluo/reto tute ne disponeblas.
      */
     private fun luduFallbackRingtonon(context: Context) {

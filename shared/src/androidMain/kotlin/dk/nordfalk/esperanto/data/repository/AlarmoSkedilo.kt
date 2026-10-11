@@ -36,7 +36,7 @@ actual class AlarmoSkedilo actual constructor() {
         // uzanto povas revoki. Sen ĝi ni uzas setWindow() kun 10-minuta fenestro — ne postulas permeson,
         // kaj la alarmo tamen ekigas ene de 10 minutoj. La UI (AlarmoEkrano) montras averton.
         if (ekzaktajAlarmojPermesataj()) {
-            // (C18) la permeso estas FORPRENDEBLA iam ajn — inter la kontrolo kaj la
+            // (PR #93) la permeso estas FORPRENDEBLA iam ajn — inter la kontrolo kaj la
             // voko la uzanto povas revoki ĝin (Android 14+), tiam setAlarmClock ĵetas
             // SecurityException. FALDU al setWindow (la UI-averto en AlarmoEkrano kovras tion).
             try {

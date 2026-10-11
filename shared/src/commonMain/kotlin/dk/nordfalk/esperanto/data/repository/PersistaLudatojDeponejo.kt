@@ -46,7 +46,7 @@ class PersistaLudatojDeponejo(
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
     /**
-     * Mutex ĉirkaŭ la legu-modifu-skribu-ciklo (G36): registriPozicio (vokata
+     * Mutex ĉirkaŭ la legu-modifu-skribu-ciklo (PR #91): registriPozicio (vokata
      * ĉiujn 5 s dum ludado) kaj markiFinita/markiErara povas interplektiĝi — sen ŝlosilo
      * la lasta skribanto venkus kaj la finita-/erara-flago povus perdiĝi.
      */

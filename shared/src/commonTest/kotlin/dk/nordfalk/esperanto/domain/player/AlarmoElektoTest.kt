@@ -52,7 +52,7 @@ class AlarmoElektoTest {
         assertNull(elektuAlarmElsendon(emptyList(), emptyMap()))
     }
 
-    @Test // (C14) la falilo devas ignori ERARAJN elsendojn — reludado de ne-erara pli bonas
+    @Test // (PR #95) la falilo devas ignori ERARAJN elsendojn — reludado de ne-erara pli bonas
     fun faliloPreterpasasErarajn() {
         // nova estas finita KAJ erara; meza finita sed sana; malnova erara
         val ludatoj = mapOf(
@@ -63,7 +63,7 @@ class AlarmoElektoTest {
         assertEquals(meza, elektuAlarmElsendon(listOf(nova, meza, malnova), ludatoj))
     }
 
-    @Test // (C14) se ĈIUJ estas erara → null (ringtono) — erara fluo tuj paneus
+    @Test // (PR #95) se ĈIUJ estas erara → null (ringtono) — erara fluo tuj paneus
     fun cxiujErarajDonasNull() {
         val ludatoj = listOf("a", "b", "c").associateWith { LudataElsendo(it, "peranto", erara = true) }
         assertNull(elektuAlarmElsendon(listOf(malnova, meza, nova), ludatoj))

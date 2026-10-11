@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Klara teksto (HTTP) estas MALPERMESATA por la tuta trafiko — neniuj esceptoj (G1).
+    Klara teksto (HTTP) estas MALPERMESATA por la tuta trafiko — neniuj esceptoj (PR #89).
 
     Ĉiuj URL-oj en la kanalkonfiguro uzas HTTPS. La sola iam http-restinta
     (Peranto-emblemo, wp11081574.server-he.de sen TLS) estas gastigita sur

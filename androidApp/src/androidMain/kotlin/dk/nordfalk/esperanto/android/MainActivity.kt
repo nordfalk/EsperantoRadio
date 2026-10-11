@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikajho (Application) —
-        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (K2)
+        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (PR #89)
         petiSciigPermeson()
         // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity
         ludilo = ExoPlayerLudiloRegilo.akiru(this)
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
     /**
      * Traktas alvenantajn intentojn de sciigoj aŭ alarmoj.
      *
-     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (G3)
+     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (PR #89)
      * rifuzas falsitajn intencojn de aliaj aplikoj: `MainActivity` estas
      * `exported="true"` kaj la agoj estas publike konataj.
      */

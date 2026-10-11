@@ -25,7 +25,7 @@ actual fun malfermuSciigAgordojn() {
         putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
-    // (C20) kiel malfermuEkzaktajnAlarmAgordojn — ActivityNotFoundException ne paneigu
+    // (PR #93) kiel malfermuEkzaktajnAlarmAgordojn — ActivityNotFoundException ne paneigu
     try {
         appContext.startActivity(intent)
     } catch (e: Exception) {

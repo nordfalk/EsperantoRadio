@@ -65,7 +65,7 @@ class BootReceivilo : BroadcastReceiver() {
 internal fun leguPersistitajnAlarmojn(): List<Alarmo> {
     val str = kreuSettings().getString(SettingsKeys.ALARMOJ, "")
     if (str.isBlank()) return emptyList()
-    // (C17) korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
+    // (PR #93) korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
     // boot-re-skedadon — reeniru al malplena listo kaj protokolu
     return try {
         Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)

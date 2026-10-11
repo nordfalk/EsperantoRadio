@@ -31,7 +31,7 @@ open class ElsendoDeponejoImpl(
 ) : ElsendoDeponejo {
 
     /**
-     * Nemutablaj momentfotoj anstataŭ mutableMapOf (G35): la mapoj estas
+     * Nemutablaj momentfotoj anstataŭ mutableMapOf (PR #91): la mapoj estas
      * legitaj (getElsendo/sercxi) dum alia korutino skribas — kun mutable mapo
      * tio estis ConcurrentModificationException-risko. Skriboj nur per [konservu]
      * (Mutex); legoj estas sekuraj ĉar la momentfoto neniam ŝanĝiĝas surloke.
@@ -57,7 +57,7 @@ open class ElsendoDeponejoImpl(
     /**
      * Peto al archive.org-metadatenoj (regulo 6.3) — ankaŭ uzata ĉe la re-parsado
      * de la diskkaŝo: sen ĝi la Peranto-elsendoj ricevus DIVENITAJN (ofte 404-ajn)
-     * dosiernomojn ĝis la unua sukcesa reta refreŝo (G34).
+     * dosiernomojn ĝis la unua sukcesa reta refreŝo (PR #91).
      */
     private val arhivaPeto: suspend (String) -> String = { urlD ->
         httpKliento.get(urlD) { expectSuccess = true }.bodyAsText()
@@ -121,7 +121,7 @@ open class ElsendoDeponejoImpl(
             // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
             // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo 4).
             // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
-            // ili devas NE iĝi erar-nivelaj Sentry-eventoj ((C1) antaŭe la sama fiasko
+            // ili devas NE iĝi erar-nivelaj Sentry-eventoj ((PR #93) antaŭe la sama fiasko
             // estis kaptita dufoje — loge→captureException + captureMessage).
             logw(
                 "ElsendoDeponejo",

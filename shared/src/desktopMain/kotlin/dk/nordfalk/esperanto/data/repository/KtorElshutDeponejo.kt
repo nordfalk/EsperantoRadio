@@ -42,7 +42,7 @@ class KtorElshutDeponejo(
     override fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>> = _elshutoj.asStateFlow()
 
     // ConcurrentHashMap, ne LinkedHashMap: la mapoj estas alirataj samtempe el la
-    // IO-korutinoj de elŝutoj kaj el la UI-fadeno (G11)
+    // IO-korutinoj de elŝutoj kaj el la UI-fadeno (PR #89)
     private val _statoj = java.util.concurrent.ConcurrentHashMap<String, MutableStateFlow<ElshutStato>>()
     private val joboj = java.util.concurrent.ConcurrentHashMap<String, Job>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -158,7 +158,7 @@ class KtorElshutDeponejo(
                 logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
             } catch (e: kotlinx.coroutines.CancellationException) {
                 // haltigi() — la stato (Pauxzita) estas agordata de haltigi mem;
-                // forigu la partan dosieron (G11: partaj dosieroj ne akumuliĝu) —
+                // forigu la partan dosieron (PR #89: partaj dosieroj ne akumuliĝu) —
                 // sed nur se neniu pli nova elŝuto transprenis la saman dosieron
                 if (!transprenitaDePliNova()) {
                     try { celdosiero.delete() } catch (e2: Exception) {
@@ -167,7 +167,7 @@ class KtorElshutDeponejo(
                 }
                 throw e
             } catch (e: Throwable) {
-                // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (G26)
+                // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (PR #89)
                 loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))

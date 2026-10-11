@@ -11,7 +11,7 @@ import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import kotlin.test.Test
 
 /**
- * Testoj por la serĉ-ekrano ((G42)/G43): debounce kaj rezulto-ĝisdatiĝo.
+ * Testoj por la serĉ-ekrano (PR #93): debounce kaj rezulto-ĝisdatiĝo.
  *
  * La falsa deponejo respondas ATENDANTE — la debounce (300 ms) devas kolekti
  * klavpremojn kaj montri nur la rezulton de la LASTA teksto.
@@ -53,7 +53,7 @@ class SercxoEkranoTest {
         mainClock.advanceTimeBy(1000)  // preter la debounce-Atendo
         waitForIdle()
 
-        // Unu serĉo por la fina teksto "esper" — ne por "es" (G42: antaŭe ĉiu klavpremo serĉis)
+        // Unu serĉo por la fina teksto "esper" — ne por "es" (PR #93: antaŭe ĉiu klavpremo serĉis)
         assertEqualsKieta(1, deponejo.petoj.size, "Debounce kolektas klavpremojn")
         kotlin.test.assertEquals("esper", deponejo.petoj.last(), "Nur la fina teksto serĉiĝu")
         // La rezulto montriĝas

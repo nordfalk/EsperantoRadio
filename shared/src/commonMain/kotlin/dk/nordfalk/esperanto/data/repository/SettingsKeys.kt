@@ -14,4 +14,6 @@ object SettingsKeys {
     const val EVOLO = "evoluo"
     /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (FAROTA G3). */
     const val INTENT_NONCE = "intent_nonce"
+    /** Kreskanta kontraŭo por unikaj sciig-ID-oj (FAROTA C19 — hashCode-kolizioj anstataŭigis sciigojn). */
+    const val SCIIG_ID = "sciig_id"
 }

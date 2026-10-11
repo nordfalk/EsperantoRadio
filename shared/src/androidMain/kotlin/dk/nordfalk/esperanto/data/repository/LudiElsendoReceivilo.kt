@@ -72,7 +72,7 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
         // bindService() ĵetas ReceiverCallNotAllowedException ("BroadcastReceiver components are not
         // allowed to bind to services") — la "Ludi"-butono en la sciigo kraŝigis la apon.
         val appKunteksto = context.applicationContext
-        val sessionToken = SessionToken(appKunteksto, ComponentName(appKunteksto, "dk.nordfalk.esperanto.android.EsperantoLudadoServo"))
+        val sessionToken = SessionToken(appKunteksto, ComponentName(appKunteksto, Agadoj.LUDADO_SERVO))
 
         val ekzista = kontrolilo
         if (ekzista?.isConnected == true) {

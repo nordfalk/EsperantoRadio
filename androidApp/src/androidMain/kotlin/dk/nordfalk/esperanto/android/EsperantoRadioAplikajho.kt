@@ -22,7 +22,10 @@ class EsperantoRadioAplikajho : Application() {
         super.onCreate()
         appContext = applicationContext
         // Unufoje por la tuta procezo — ne en ĉiu MainActivity.onCreate
-        // (Sentry avertas pri duobla inicialigo ĉe Activity-rekreo)
-        initialiguSentry()
+        // (Sentry avertas pri duobla inicialigo ĉe Activity-rekreo).
+        // Medio laŭ la APLIKAĵO-flago (FAROTA G5): debug-versio → "evoluo",
+        // kunfandita release → "produktado" (kun 10 % specimenado kaj malpli da protokoloj).
+        val estasEvolua = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        initialiguSentry(if (estasEvolua) "evoluo" else "produktado")
     }
 }

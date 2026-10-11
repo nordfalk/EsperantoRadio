@@ -65,5 +65,12 @@ class BootReceivilo : BroadcastReceiver() {
 internal fun leguPersistitajnAlarmojn(): List<Alarmo> {
     val str = kreuSettings().getString(SettingsKeys.ALARMOJ, "")
     if (str.isBlank()) return emptyList()
-    return Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)
+    // FAROTA C17: korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
+    // boot-re-skedadon — reeniru al malplena listo kaj protokolu
+    return try {
+        Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)
+    } catch (e: Exception) {
+        logw("BootReceivilo", "Korupta alarmo-JSON — komencas sen persistitaj alarmoj", e)
+        emptyList()
+    }
 }

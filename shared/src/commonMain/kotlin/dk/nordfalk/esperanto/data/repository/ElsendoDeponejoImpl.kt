@@ -13,7 +13,6 @@ import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.sentry.kotlin.multiplatform.Sentry
-import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -121,14 +120,14 @@ open class ElsendoDeponejoImpl(
         } catch (e: Throwable) {
             // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
             // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo 4).
-            loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
-            // Raportu kiel averto (ne eraro) — la apo daŭrigas kun kaŝenita datumo
-            Sentry.captureMessage(
-                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn"
-            ) { scope ->
-                scope.level = SentryLevel.WARNING
-                scope.setTag("kanalo", kanalo.slug)
-            }
+            // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
+            // ili devas NE iĝi erar-nivelaj Sentry-eventoj (FAROTA C1: antaŭe la sama fiasko
+            // estis kaptita dufoje — loge→captureException + captureMessage).
+            logw(
+                "ElsendoDeponejo",
+                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
+                e
+            )
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }

@@ -30,6 +30,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Sur la reto (web) la progreso-linio moviĝas dum ludado kaj la pozicio ĝuste konserviĝas (https://github.com/nordfalk/EsperantoRadio/pull/92)
 - Sur la komputilo (desktop) daŭrigi post paŭzo ne rekomencigas la pozicion de nul (https://github.com/nordfalk/EsperantoRadio/pull/92)
 - Vekhorloĝo sonas ankaŭ kiam la sistemo blokas la lanĉon de la aplikaĵo (plenekrana sciigo + sistema son-retrofalo) (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- La serĉo ne plu retropasas malnovajn rezultojn kaj toleras erarojn; la serĉteksto kaj la alarmo-redaktilo plu restas post ekranturno
+- Alarmo-minuto kaj -horo malfermas ciferecan klavaron
 
 ### Sekureco
 

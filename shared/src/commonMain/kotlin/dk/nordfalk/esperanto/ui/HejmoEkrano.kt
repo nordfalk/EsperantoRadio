@@ -412,11 +412,11 @@ fun HejmoEkrano(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(aktivajKanaloj) { karto -> kanaloKarto(kanto = karto) }
+                            items(aktivajKanaloj, key = { it.kanalo.slug }) { karto -> kanaloKarto(kanto = karto) }
                             if (arkivajKanaloj.isNotEmpty()) {
                                 item { ArkivoDividilo() }
                             }
-                            items(arkivajKanaloj) { karto -> kanaloKarto(kanto = karto) }
+                            items(arkivajKanaloj, key = { it.kanalo.slug }) { karto -> kanaloKarto(kanto = karto) }
                         }
                     }
                 }
@@ -429,7 +429,7 @@ fun HejmoEkrano(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(novajElsendoj) { elsendo ->
+                            items(novajElsendoj, key = { it.id }) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                                 ElsendoKarto(
                                     elsendo = elsendo,
@@ -454,7 +454,7 @@ fun HejmoEkrano(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(lastatempeLudataj) { elsendo ->
+                            items(lastatempeLudataj, key = { it.id }) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                                 ElsendoKarto(
                                     elsendo = elsendo,
@@ -479,7 +479,7 @@ fun HejmoEkrano(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(popularajElsendoj) { elsendo ->
+                            items(popularajElsendoj, key = { it.id }) { elsendo ->
                                 val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                                 ElsendoKarto(
                                     elsendo = elsendo,

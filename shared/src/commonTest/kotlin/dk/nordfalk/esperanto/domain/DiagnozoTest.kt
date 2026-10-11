@@ -16,7 +16,8 @@ import kotlin.test.assertTrue
  *
  * La Desktop-implemento de DiagnozoRegilo redonas malplenan liston (nenio specifa),
  * do sur Desktop ni nur testas la modelojn kaj la malplenan rezulton.
- * La Android-implemento estas testata per instrumentoj sur la aparato.
+ * (FAROTA C42: la Android-implemento ankoraŭ ne havas instrumentitan teston — nur
+ * la modelo kaj la no-op-implementoj estas testataj ĉi tie.)
  */
 class DiagnozoTest {
 

@@ -106,7 +106,7 @@ EsperantoRadio/
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
 ├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
 ├── RssArkivServer/        # Kaŝenitaj RSS-fluoj (XML-fiksaĵoj)
-├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
+├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj — for de la repo per .gitignore; kiu bezonas pliajn fiksaĵojn kopiu ilin al shared/src/commonTest/resources/feeds/)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
 ├── .github/workflows/       # CI (changelog-kontrolo)
@@ -123,8 +123,9 @@ EsperantoRadio/
    `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
    La sep parsreguloj kaj la skip-listo devas esti konservitaj.
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
-   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
-   determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
+   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
+   `shared/src/commonTest/resources/feeds/` (4 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
    La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
    devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
@@ -365,6 +366,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   liveras JSON kun `feedUrl`, `artworkUrl600`, `releaseDate` kaj `trackCount`; `https://itunes.apple.com/search?term=Esperanto&entity=podcast&limit=25`
   listigas ĉiujn ĉe Apple indeksitajn Esperanto-podkastojn. Uzebla por trovi fluojn kaj kontroli aktivecon sen
   skrapado de Apple-retejoj. (2026-10-08: tiel kolektiĝis la fluoj de la 7 novaj kanaloj.)
+- **Regex-`"`-signoj en JSONC devas esti refutitaj** (`\"`): la koment-striptigilo forigas
+  nur `//`-liniojn, sed la valoroj mem devas esti valida JSON post striptigo. Regex kiel
+  `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
+  (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
+  (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
+  riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
+  `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
 
 ## Logcat (Android)
 

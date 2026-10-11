@@ -1,0 +1,13 @@
+# Dependabot (FAROTA G7): avertas pri malnovaj dependencoj kaj konataj CVE-oj.
+# La kodrevizio trovis, ke neniu kontrolas la dependec-versiojn (media3 1.5.1,
+# ktor 3.1.3, coil 3.0.4 ktp. estas 1-2 jarojn malnovaj).
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

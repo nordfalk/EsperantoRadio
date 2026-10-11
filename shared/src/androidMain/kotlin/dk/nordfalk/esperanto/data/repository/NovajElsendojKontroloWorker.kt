@@ -154,6 +154,14 @@ class NovajElsendojKontroloWorker(
         }
     }
 
+    /** Kreskanta, persistita sciig-ID (FAROTA C19) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
+    private fun novaSciigId(): Int {
+        val settings = kreuSettings()
+        val id = (settings.getInt(SettingsKeys.SCIIG_ID, 1000) + 1).coerceAtMost(Int.MAX_VALUE - 2)
+        settings.putInt(SettingsKeys.SCIIG_ID, id)
+        return id
+    }
+
     private suspend fun senduSciigon(elsendo: Elsendo, kanalo: Kanalo) {
         val ctx = appContext
         val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -176,10 +184,15 @@ class NovajElsendojKontroloWorker(
             putExtra(EXTRA_BILDO_URL, elsendo.bildoUrl)
         }
 
+        // FAROTA C19: kreskanta persistita ID anstataŭ elsendo.id.hashCode() —
+        // kolizio inter du ID-oj anstataŭigus la sciigon kaj la "Ludi"-PendingIntent
+        // eksterminatinge celus la alian elsendon. Ĉiu sciigo estas unika okazo.
+        val sciigId = novaSciigId()
+
         val malfermiPI = PendingIntent.getActivity(
-            ctx, elsendo.id.hashCode(),
+            ctx, sciigId,
             pleniguEkstraĵojn(
-                Intent(ctx, Class.forName("dk.nordfalk.esperanto.android.MainActivity")).apply {
+                Intent(ctx, Class.forName(Agadoj.CHEFA_AGADO)).apply {
                     action = ACTION_MALFERMI_ELSENDON
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     // FAROTA G3: la eksportita Activity kontrolas la nonce-on — sen ĝi
@@ -190,7 +203,7 @@ class NovajElsendojKontroloWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val ludiPI = PendingIntent.getBroadcast(
-            ctx, elsendo.id.hashCode() + 1,
+            ctx, sciigId + 1,
             pleniguEkstraĵojn(
                 Intent(ctx, LudiElsendoReceivilo::class.java).apply { action = ACTION_LUDI_ELSENDON }
             ),
@@ -198,7 +211,7 @@ class NovajElsendojKontroloWorker(
         )
 
         nm.notify(
-            elsendo.id.hashCode(),
+            sciigId,
             NotificationCompat.Builder(ctx, SCIIGO_KANALO_ID)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentTitle(kanalo.nomo)
@@ -209,6 +222,6 @@ class NovajElsendojKontroloWorker(
                 .addAction(android.R.drawable.ic_media_play, "Ludi", ludiPI)
                 .build()
         )
-        logi("NovajElsendoj", "Sciigo sendita: ${kanalo.nomo} — ${elsendo.titolo}")
+        logi("NovajElsendoj", "Sciigo sendita (${sciigId}): ${kanalo.nomo} — ${elsendo.titolo}")
     }
 }

@@ -94,6 +94,9 @@ object AppStato {
             install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
                 connectTimeoutMillis = 10_000
+                // FAROTA C2: sen tio servilo kiu akceptas kaj poste silentegas povas
+                // teni la peton viva pli longe ol la dezirata limo
+                socketTimeoutMillis = 30_000
             }
         }
 

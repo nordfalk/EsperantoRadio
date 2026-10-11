@@ -86,7 +86,7 @@
 - **Sugesto**: aldonu `WebViewClient` — en `shouldOverrideUrlLoading` malfermu http/https ekstere (per validita intenco) kaj redonu `true` por ĉio alia; plifortigu la sanitizilon (skemo-blanka listo `href`/`src`, usklec-insistema `javascript:`-kontrolo, forigo de stir-signoj); eksplicite `setAllowFileAccess(false)`.
 
 #### G5 — Sentry misagordita por produktado; aŭskult-datumoj sen filtrado
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/SentryAgordo.kt:16-25`; `MainActivity.kt:48`; `ProtokoloUtil.kt:21-33`
 - **Priskribo**: `options.environment = "evoluo"` kaj `tracesSampleRate = 1.0` (100 %) estas koditaj por ĉiuj build-oj inkluzive de release; `initialiguSentry()` estas vokata en **ĉiu** `MainActivity.onCreate` (re-kreoj → averto pri duobla init); Sentry ne estas inicializita en procezoj lanĉitaj de WorkManager/riceviloj. Ĉiuj logoj (kun plenaj URL-oj kaj titoloj — aŭskult-historio, kelkaj gastigantoj uzas subskribitajn URL-ojn kun token-oj) iras al Sentry; neniu filtrado (`beforeSend`/`beforeSendLog`).
 - **Sugesto**: `environment` laŭ build-tipo (aŭ lasu la Sentry-Gradle-pluginon); `tracesSampleRate` malpliigu en release; inicialigu unufoje (Application — ligita kun K2); `beforeSend`/`beforeSendLog` por forigi query-ĉenojn/URL-ojn; mencii Sentry en la privateca politiko.
@@ -318,13 +318,13 @@
 - **Sugesto**: solvi la kontraŭdiron: aŭ versiigu la fiksaĵojn (sen sekretoj), aŭ korektu AGENTS.md/dokumenton ("ne reproduktebla el la repo") kaj kopii la mankantajn fiksaĵojn (precipe anchor.fm) al `resources/feeds/`.
 
 #### G42 — Serĉo: sen debounce, sen escept-traktado, konkurantaj korutinoj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/ui/SercxoEkrano.kt:29-40`
 - **Priskribo**: Ĉiu klavpremo lanĉas novan `scope.launch { rezultoj.value = sercxoDeponejo.sercxi(it) }`. La korutinoj konkuras — la rezulto povas veni en malĝusta ordo (malrapida serĉo por "abc" povas fini post rapida por "abcd"). Se `sercxi` ĵetas escepton, la korutino kraŝos kaj la aplikaĵo povas kraŝi (`rememberCoroutineScope` sen `CoroutineExceptionHandler`).
 - **Sugesto**: uzu `LaunchedEffect(teksto)` kun `delay(300)` (debounce) kaj `try/catch` kun `loge` kaj malplena rezulto ĉe eraro.
 
 #### G43 — `AlarmoRedaktilo` kaj serĉo: stato perdiĝas ĉe ekranturno
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `AlarmoEkrano.kt:235-238` (`remember` sen `rememberSaveable`); `SercxoEkrano.kt:23-25` (`teksto`, `rezultoj`, `sxargxas`)
 - **Priskribo**: Se la uzanto turnas la ekranon dum redactado/kreado de alarmo, la tajpita horo, minuto, elektita kanalo kaj ripeto perdiĝas; same la serĉteksto kaj rezultoj.
 - **Sugesto**: `rememberSaveable` (kun `Saver` se necese) aŭ almenaŭ `remember(ekzistanta?.id)`.
@@ -336,12 +336,12 @@
 ### Sekureco / Sentry / build
 
 #### C1 — Sentry: duobla kapturo de la sama fiasko; atendataj eraroj iĝas erarnivelaj eventoj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `ProtokoloUtil.kt:41-46`; `ElsendoDeponejoImpl.kt:83-89`; kap-komento `ProtokoloUtil.kt:7` diras "ĉiu log*-voko aldonas Sentry-breadcrumb", sed `logd` kaj la 3-argumentaj `logw`/`loge` ne faras tion
 - **Sugesto**: por atendataj eraroj uzu `logw(tag, msg, e)` (loka protokolo sen Sentry-kapturo) kaj evitu la duoblan kaptilon; vicigu la komenton.
 
 #### C2 — `socketTimeoutMillis` mankas en la Ktor-kliento
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `AppStato.kt:94-95` (`requestTimeoutMillis = 30_000`, `connectTimeoutMillis = 10_000`)
 - **Sugesto**: aldonu `socketTimeoutMillis = 30_000` (blokita/malrapida korpo povas teni la peton viva pli longe ol la dezirata limo).
 
@@ -424,25 +424,25 @@
 - **Sugesto**: fermu `rawStream` en `catch`; klarigu en la KDoc de `saltiAl`, ke ĝi estas ŝajnigo.
 
 #### C17 — Regulo 8: silentaj `runCatching` / netraktita korupta JSON en riceviloj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `LudiElsendoReceivilo.kt:54` (`runCatching { setArtworkUri(...) }` sen `onFailure`/logado); `BootReceivilo.kt:55-60` (`leguPersistitajnAlarmojn()` ne envolvas la JSON-malkodon — korupta valoreto ĵetas, kaj neniuj alarmoj re-skediĝas post reŝargo)
 - **Sugesto**: aldonu `onFailure { logw(...) }` / `try-catch` kun protokolo.
 
 ### Android
 
 #### C18 — `AlarmoSkedilo`: rasa fenestro inter `canScheduleExactAlarms()` kaj `setAlarmClock()`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/AlarmoSkedilo.kt:38-48`; UI-voko sen try/catch: `AlarmoEkrano.kt:78,90,141`
 - **Priskribo**: Sur Android 14 la permeso `SCHEDULE_EXACT_ALARM` estas forprenebla iam ajn; se tio okazas inter la kontrolo kaj la voketo, `setAlarmClock` ĵetas `SecurityException`; en la UI-vojo (`scope.launch { … }` sen try/catch) la nekaptita escepto en korutino kraŝigas la aplikon.
 - **Sugesto**: `runCatching { setAlarmClock(...) }.onFailure { setWindow(...) }` — tio ankaŭ estas la intencita fallback.
 
 #### C19 — Sciigo: fragilaj detaloj en `NovajElsendojKontroloWorker`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `NovajElsendojKontroloWorker.kt:152-176` (`Class.forName("dk.nordfalk.esperanto.android.MainActivity")` — hardkodita ĉeno en shared; `nm.notify(elsendo.id.hashCode(), …)` — kolizioj anstataŭigas sciigojn / "Ludi" povus ludi la alian elsendon; `android.R.drawable.ic_media_play` kiel malgranda ikono aspektas nebone)
 - **Sugesto**: platform-indirekto por la klaso, stabila unika sciig-ID (kreskanta kontraŭo en Settings, aŭ UUID), propra vektora ikono.
 
 #### C20 — `SciigPermeso.malfermuSciigAgordojn()` sen try/catch
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/SciigPermeso.kt:21-28`
 - **Sugesto**: `runCatching { … }.onFailure { logw(...) }` (male al `malfermuEkzaktajnAlarmAgordojn()`, kiu havas).
 
@@ -501,7 +501,7 @@
 ### UI / alirebleco
 
 #### C31 — `LazyRow`/`items` sen ŝlosiloj; bildoj sen placeholder/error
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `HejmoEkrano.kt:400-477` (`items(aktivajKanaloj)` ktp. sen `key`); `AsyncImage` sen `placeholder`/`error` en HejmoEkrano, KanalEkrano, MiniLudilbreto, KanalaroEkrano
 - **Sugesto**: aldonu `key = { it.id }` (elsendoj) / `key = { it.kanalo.slug }` (kanaloj); aldonu placeholder/eraro-bildojn (Coil).
 
@@ -511,7 +511,7 @@
 - **Sugesto**: `Modifier.minimumTouchTargetSize()` aŭ pligrandigo; aldonu `contentDescription` al la ikonoj.
 
 #### C33 — `AlarmoEkrano`: `LazyColumn` ene de `Column` kun `verticalScroll`; horo/minuto tajpataj sen cifereca klavaro
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `AlarmoEkrano.kt:250-270` (nesting de ruliĝeblaj ujoj), `:247-258` (`OutlinedTextField` sen `keyboardOptions`)
 - **Sugesto**: uzu `Column` kun `kanaloj.forEach { … }` (la kanallisto estas malgranda, 27 kanaloj) anstataŭ `LazyColumn`; `keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)` aŭ Material-3 `TimePicker`.
 
@@ -561,7 +561,7 @@
 - **Sugesto**: 2-3 linioj en "Kio funkcias nun" + 3 linioj en la arbo; mallonga alineo en `docs/nova/03` pri `DiagnozoRegilo` (expect/actual); vicigu `docs/nova/04` kaj la kodon (G15/G16).
 
 #### C42 — `DiagnozoTest` komenta troigo
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/commonTest/.../domain/DiagnozoTest.kt:19` (diras "La Android-implemento estas testata per instrumentoj sur la aparato" — sed neniun instrumentitan teston aldoniĝis)
 - **Sugesto**: aŭ aldonu instrumentitan teston aŭ korektu la komenton.
 
@@ -581,6 +581,21 @@
 
 ## Jam farita (ne en la listo supre)
 
+- [x] **Ripara batch-o 6 — UI-kvalito + Sentry + malgrandaj Android-riparoj** (branĉo `riparoj/ui-kvalito`, stakita sur `riparoj/ludiloj`, 264/264 testoj):
+  - G5 — Sentry: medio laŭ la aplikaĵo-flago (debug→"evoluo", release→"produktado"), 10 % specimenado + malpli da protokoloj en produktado
+  - C1 — atendataj retaj malsukcesoj ne plu estas erar-nivelaj Sentry-eventoj (logw anstataŭ loge+captureMessage — duobla kaptulo forigita)
+  - C2 — `socketTimeoutMillis` en la Ktor-kliento
+  - G42 — serĉo: debounce (300 ms) + nuligebla tasko + escept-traktado; nova `SercxoEkranoTest` (2 testoj)
+  - G43 — serĉo-teksto kaj alarmo-redaktilo plu Survivalas ekranturnon (`rememberSaveable`)
+  - C17 — korupta alarmo-JSON ĉe boot ne plu blokas la re-skedadon
+  - C18 — `setAlarmClock` SecurityException (permeso revokita inter kontrolo kaj voko) → falo al `setWindow`
+  - C19 — kreskanta persistita sciig-ID (neniuj hashCode-kolizioj) + `Agadoj`-objekto: la klas-nomoj de la androidApp-komponantoj en 1 loko (estis 5 disaj)
+  - C20 — `malfermuSciigAgordojn` kun try/catch
+  - C31 — `key`-oj por ĉiuj LazyRow/LazyColumn-eroj en HejmoEkrano
+  - C33 — cifereca klavaro por horo/minuto en la alarmo-redaktilo
+  - C42 — DiagnozoTest-komento kongruas la realon
+  - G41 — AGENTS.md: la filcache-kontraŭdiro korektita (klarigas ke la fiksaĵoj NE estas en la repo)
+  - G7 (parto) — `.github/dependabot.yml` (semajna gradle + github-actions)
 - [x] **Ripara batch-o 5 — platformaj ludiloj** (branĉo `riparoj/ludiloj`, stakita sur `riparoj/parsado-kerno`, 262/262 testoj):
   - G13 (kompleta) — ĉiuj UI-vojigoj tra `LudvicoRegilo`: novaj `pauxziguLudadon()`/`dauriguLudadon()`/`ludiRektan()`;
     MiniLudilbreto (ludi/paŭzi/halti), ElsendoEkrano (paŭzigi/daŭrigi), App.kt kaj MainActivity (rekta kanalo)

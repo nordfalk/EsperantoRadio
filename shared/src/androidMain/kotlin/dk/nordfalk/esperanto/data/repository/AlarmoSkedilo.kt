@@ -36,13 +36,21 @@ actual class AlarmoSkedilo actual constructor() {
         // uzanto povas revoki. Sen ĝi ni uzas setWindow() kun 10-minuta fenestro — ne postulas permeson,
         // kaj la alarmo tamen ekigas ene de 10 minutoj. La UI (AlarmoEkrano) montras averton.
         if (ekzaktajAlarmojPermesataj()) {
-            // setAlarmClock: escepto de Doze, kaj la sistemo montras alarm-ikonon en la statusbreto
-            val montroIntent = PendingIntent.getActivity(
-                appContext, alarmo.id,
-                Intent().setClassName(appContext, "dk.nordfalk.esperanto.android.MainActivity"),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAtMillis, montroIntent), pendingIntent)
+            // FAROTA C18: la permeso estas FORPRENDEBLA iam ajn — inter la kontrolo kaj la
+            // voko la uzanto povas revoki ĝin (Android 14+), tiam setAlarmClock ĵetas
+            // SecurityException. FALDU al setWindow (la UI-averto en AlarmoEkrano kovras tion).
+            try {
+                // setAlarmClock: escepto de Doze, kaj la sistemo montras alarm-ikonon en la statusbreto
+                val montroIntent = PendingIntent.getActivity(
+                    appContext, alarmo.id,
+                    Intent().setClassName(appContext, Agadoj.CHEFA_AGADO),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAtMillis, montroIntent), pendingIntent)
+            } catch (e: SecurityException) {
+                logw("AlarmoSkedilo", "Permeso revokita dum skedado — uzas 10-minutan fenestron", e)
+                alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
+            }
         } else {
             logw("AlarmoSkedilo", "Ne rajtas skedi ekzaktajn alarmojn — uzas 10-minutan fenestron")
             alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)

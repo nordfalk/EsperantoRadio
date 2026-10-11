@@ -77,7 +77,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
         try {
             // Lanĉu la ĉefaktivon por ke la uzanto vidu la apot
             val launchIntent = Intent().apply {
-                setClassName(context, "dk.nordfalk.esperanto.android.MainActivity")
+                setClassName(context, Agadoj.CHEFA_AGADO)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 action = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
                 putExtra("alarmo_kanal_slug", kanaloSlug)
@@ -118,7 +118,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             )
         }
         val launchIntent = Intent().apply {
-            setClassName(context, "dk.nordfalk.esperanto.android.MainActivity")
+            setClassName(context, Agadoj.CHEFA_AGADO)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             action = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
             putExtra("alarmo_kanal_slug", kanaloSlug)

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -232,10 +233,10 @@ private fun AlarmoRedaktilo(
     onKonfirmi: (Alarmo) -> Unit,
     onNuligi: () -> Unit,
 ) {
-    var horo by remember { mutableStateOf(ekzistanta?.horo ?: 6) }
-    var minuto by remember { mutableStateOf(ekzistanta?.minuto ?: 0) }
-    var elektitaKanaloSlug by remember { mutableStateOf(ekzistanta?.kanaloSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
-    var ripeto by remember { mutableStateOf(ekzistanta?.ripeto ?: 0x7f) }
+    var horo by rememberSaveable { mutableStateOf(ekzistanta?.horo ?: 6) }
+    var minuto by rememberSaveable { mutableStateOf(ekzistanta?.minuto ?: 0) }
+    var elektitaKanaloSlug by rememberSaveable { mutableStateOf(ekzistanta?.kanaloSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
+    var ripeto by rememberSaveable { mutableStateOf(ekzistanta?.ripeto ?: 0x7f) }
 
     Column(
         modifier = Modifier
@@ -254,6 +255,9 @@ private fun AlarmoRedaktilo(
             OutlinedTextField(
                 value = horo.toString(),
                 onValueChange = { it.toIntOrNull()?.let { v -> horo = v.coerceIn(0, 23) } },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                ),
                 modifier = Modifier.width(80.dp),
                 singleLine = true
             )
@@ -262,7 +266,10 @@ private fun AlarmoRedaktilo(
                 value = minuto.toString(),
                 onValueChange = { it.toIntOrNull()?.let { v -> minuto = v.coerceIn(0, 59) } },
                 modifier = Modifier.width(80.dp),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                )
             )
         }
         Spacer(Modifier.height(16.dp))

@@ -27,9 +27,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Priskriboj de Varsovia Vento estas sen reklamaj alineoj kaj enkonstruitaj son-ludiloj (kun la vera enhavo nedifektita) (https://github.com/nordfalk/EsperantoRadio/pull/91)
 - Vinilkosmon montras la verajn titolojn de la elsendoj kaj priskribojn sen la "has posted"-alineo (https://github.com/nordfalk/EsperantoRadio/pull/91)
 - Elsendoj kun sono nur en la priskribo (aŭ ĉe video-gastigantoj kiel YouTube) ne plu rompas la kanalan liston (https://github.com/nordfalk/EsperantoRadio/pull/91)
-- Sur la reto (web) la progreso-linio moviĝas dum ludado kaj la pozicio ĝuste konserviĝas
-- Sur la komputilo (desktop) daŭrigi post paŭzo ne rekomencigas la pozicion de nul
-- Vekhorloĝo sonas ankaŭ kiam la sistemo blokas la lanĉon de la aplikaĵo (plenekrana sciigo + sistema son-retrofalo)
+- Sur la reto (web) la progreso-linio moviĝas dum ludado kaj la pozicio ĝuste konserviĝas (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- Sur la komputilo (desktop) daŭrigi post paŭzo ne rekomencigas la pozicion de nul (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- Vekhorloĝo sonas ankaŭ kiam la sistemo blokas la lanĉon de la aplikaĵo (plenekrana sciigo + sistema son-retrofalo) (https://github.com/nordfalk/EsperantoRadio/pull/92)
 
 ### Sekureco
 

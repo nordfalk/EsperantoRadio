@@ -92,7 +92,7 @@
 - **Sugesto**: `environment` laŭ build-tipo (aŭ lasu la Sentry-Gradle-pluginon); `tracesSampleRate` malpliigu en release; inicialigu unufoje (Application — ligita kun K2); `beforeSend`/`beforeSendLog` por forigi query-ĉenojn/URL-ojn; mencii Sentry en la privateca politiko.
 
 #### G6 — `allowBackup` ne agordita (defaŭlte true)
-- **Statuso**: [x]
+- **Statuso**: [x] (decido de la posedanto: restu `true` — vidu la komenton en PR #89)
 - **Loko**: `androidApp/src/androidMain/AndroidManifest.xml`
 - **Priskribo**: Aŭskult-historio, alarmoj (kun uzant-ŝatimitaj etikedoj) kaj ŝatataj estas sekurkopiataj al la nubo (Auto Backup).
 - **Sugesto**: `allowBackup="false"` aŭ `dataExtractionRules` kun ekskludo; mencii en la privateca politiko.

@@ -31,7 +31,6 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Fluo- kaj bildligiloj el la radi-fluoj estas kontrolataj: nur http/https estas ludebla (ne ekz. file://) (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - Falsitaj sciigo-intencoj de aliaj aplikoj estas rifuzataj (privata po-instala kodo) (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - Ligiloj en la elsendo-priskriboj malfermiĝas ekstere, ne ene de la priskribo-vido; danĝeraj skemoj (intent://, data:, javascript:) estas forigitaj (https://github.com/nordfalk/EsperantoRadio/pull/89)
-- Aŭskult-historio kaj alarmoj ne plu estas aŭtomate sekurkopiataj al la nubo (https://github.com/nordfalk/EsperantoRadio/pull/89)
 
 ### Aldonita
 

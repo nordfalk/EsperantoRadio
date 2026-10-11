@@ -404,6 +404,49 @@ class LudvicoRegilo(
     }
 
     /**
+     * Paŭzigas la nunan ludadon — tra la regilo, ne rekte al la ludilo (FAROTA G13):
+     * nuligas planitan reprovon, alikaze ĝi rekomencigus la ludadon dum la paŭzo.
+     */
+    suspend fun pauxziguLudadon() {
+        ludMutex.withLock {
+            nuliguReprovon()
+            ludilo.pauxzigi()
+        }
+    }
+
+    /**
+     * Daŭrigas la ludadon post paŭzo — tra la regilo (FAROTA G13):
+     * nuligas planitan reprovon kaj rekomencas la kalkulon de sinsekvaj eraroj.
+     */
+    suspend fun dauriguLudadon() {
+        ludMutex.withLock {
+            nuliguReprovon()
+            erarojSinsekvaj = 0
+            ludilo.ludi()
+        }
+    }
+
+    /**
+     * Ludas rektan kanalon (livestream) — tra la regilo, ne rekte al la ludilo (FAROTA G13):
+     * la reprovo-, eraro-kalkulo- kaj dedup-statoj restas koheraj.
+     */
+    suspend fun ludiRektan(kanalo: Kanalo) {
+        ludMutex.withLock {
+            erarojSinsekvaj = 0
+            nuliguReprovon()
+            malpleniguTraktitajnFontojn()
+            try {
+                ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
+                ludilo.ludi()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                loge("Ludvico", "Malsukcesis ludi rektan kanalon ${kanalo.slug}", e)
+            }
+        }
+    }
+
+    /**
      * Aldonas elsendon al la fino de la ludvico.
      * Se nenio ludas, tuj komencas ludi ĝin.
      */

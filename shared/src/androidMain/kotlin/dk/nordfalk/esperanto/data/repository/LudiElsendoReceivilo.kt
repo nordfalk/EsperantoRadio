@@ -24,6 +24,15 @@ import androidx.core.content.ContextCompat
  */
 class LudiElsendoReceivilo : BroadcastReceiver() {
 
+    companion object {
+        /**
+         * Reuzata MediaController (FAROTA G22): antaŭe ĉiu "Ludi"-klako en sciigo kreis
+         * NOVAN regilon kaj NENIAM liberigis ĝin — ĉiu klako likis unu MediaController
+         * kaj Binder-konekton al la servo por la tuta procez-vivdaŭro.
+         */
+        @Volatile private var kontrolilo: MediaController? = null
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != NovajElsendojKontroloWorker.ACTION_LUDI_ELSENDON) return
 
@@ -65,10 +74,21 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
         val appKunteksto = context.applicationContext
         val sessionToken = SessionToken(appKunteksto, ComponentName(appKunteksto, "dk.nordfalk.esperanto.android.EsperantoLudadoServo"))
 
+        val ekzista = kontrolilo
+        if (ekzista?.isConnected == true) {
+            ekzista.setMediaItem(mediaItem)
+            ekzista.prepare()
+            ekzista.play()
+            logi("LudiElsendo", "Komencis ludi (reuzata regilo): $titolo")
+            pendingResult.finish()
+            return
+        }
+
         val future = MediaController.Builder(appKunteksto, sessionToken).buildAsync()
         future.addListener({
             runCatching {
                 future.get()?.apply {
+                    kontrolilo = this
                     setMediaItem(mediaItem); prepare(); play()
                     logi("LudiElsendo", "Komencis ludi: $titolo")
                 } ?: logw("LudiElsendo", "MediaController estas null")

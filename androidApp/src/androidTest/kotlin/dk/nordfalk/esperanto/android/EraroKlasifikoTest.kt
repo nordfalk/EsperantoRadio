@@ -5,6 +5,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import dk.nordfalk.esperanto.domain.player.estasReproveblaEraro
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

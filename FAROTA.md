@@ -347,13 +347,13 @@
 - **Sugesto**: aldonu `socketTimeoutMillis = 30_000` (blokita/malrapida korpo povas teni la peton viva pli longe ol la dezirata limo).
 
 #### C3 — `DosierNomoj.sanigiDosiernomon`: neniu long-limigo, nul-bajtoj, Windows-rezervitaj nomoj
-- **Statuso**: [ ]
+- **Statuso**: [ x] (PR #95)
 - **Loko**: `shared/src/commonMain/.../data/repository/DosierNomoj.kt:8`
 - **Priskribo**: Path-traversal estas bone malebligita (`:/\|?*"<>|` → `-`, do `../` iĝas `..-`), sed: neniu long-limigo (RSS-id-oj ofte estas plenaj URL-oj → >255 bajtoj → elŝuto malsukcesas), neniu traktado de nul-bajtoj, Windows-rezervitaj nomoj (`CON`, `PRN`) kaj finaj punktoj (Desktop sur Windows).
 - **Sugesto**: limigu la longon (hash + mallonga prezervaĵo), kaj defendpe: `File(hejjo, nomo).canonicalFile.parentFile == hejjo.canonicalFile`.
 
 #### C4 — `Alarmo` sen validigo de horo/minuto/ripeto; korupta JSON anstataŭigata
-- **Statuso**: [ ]
+- **Statuso**: [ x] (PR #95)
 - **Loko**: `PersistantaAlarmoDeponejo.kt:63`; `domain/model/Alarmo.kt:54` (`Alarmo.sekvaEkigo` konstruas `LocalTime(horo, minuto)`)
 - **Priskribo**: Ĉe ekstervalora horo (ekz. 99 el malbona konfiguro) `LocalTime` ĵetas `IllegalArgumentException` kaj povas kraŝi la planadon. Se la persistita JSON estas korupta, `legu()` revenas al la sugestoj kaj la sekva `persistu()` anstataŭigas la koruptan valoron — la uzantaj alarmoj estas definitive perditaj.
 - **Sugesto**: validigu/koercu en `Alarmo.init` aŭ en `parsuSugestojnPorAlarmoj`; konservu la krudan valoron kiel rezervon anstataŭ anstataŭigi ĝin.
@@ -409,7 +409,7 @@
 - **Sugesto**: komence de `ludiSekvanInterna`, komparu `ludilo.stato.value.nunaFonto` kun `nunaElsendo`; se ili malsamas, rezignu.
 
 #### C14 — `AlarmoElekto`: la rezerva elekto ignoras `erara`
-- **Statuso**: [ ]
+- **Statuso**: [ x] (PR #95)
 - **Loko**: `shared/src/commonMain/.../domain/player/AlarmoElekto.kt:17-18` (`?: ordigitaj.firstOrNull()` povas elekti la plej novan *eraran* elsendon; `MainActivity` tiam mem korektas al la ringtono post 10 s)
 - **Sugesto**: dua falilo "plej nova ne-erara", kaj nur tiam la ringtono.
 
@@ -524,18 +524,18 @@
 ### Kerno / parsado (malgrandaj)
 
 #### C35 — `normigiDaton` forĵetas iujn validokusitajn datojn
-- **Statuso**: [ ]
+- **Statuso**: [ x] (jam farita en PR #91 — la statuso estis kaduka; testoj en RssParsiloTest)
 - **Loko**: `RssParsilo.kt:384-400`
 - **Priskribo**: Simpla `yyyy-MM-dd` (sen "T") ne estas rekonita (la regex malsukcesas → `return null` → **la tuta ero estas forĵetita**, linio 92); same por 4-letera "Sept". La malnova `Date.parse` akceptis ambaŭ.
 - **Sugesto**: aldonu `if (datStr.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return datStr` kaj `(\\w{3,4})` + `take(3)` + testoj.
 
 #### C36 — `retpaghoUrl` por Atom-eroj trafas malplenan ĉenon
-- **Statuso**: [ ]
+- **Statuso**: [ x] (jam farita en PR #91 — `.ifEmpty { null }`; statuso estis kaduka)
 - **Loko**: `RssParsilo.kt:116-117` (`selectFirst("link")?.text() ?: …attr("href")` — por Atom `<link href=…/>` havas malplenan tekston, kaj `""` ne estas `null` → `retpaghoUrl = ""`)
 - **Sugesto**: `.text().ifEmpty { null } ?: …`
 
 #### C37 — `leguDauron` ne pritraktas frakciajn sekundojn
-- **Statuso**: [ ]
+- **Statuso**: [ x] (jam farita en PR #91 — `substringBefore('.')`; testoj en RssParsiloTest)
 - **Loko**: `RssParsilo.kt:402-412` (`00:51:17.47` → `toLongOrNull("17.47")` malsukcesas → `null`)
 - **Sugesto**: `substringBefore('.')` por la lasta komponento.
 

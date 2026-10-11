@@ -64,7 +64,7 @@ fun ElsendoEkrano(
     ludilo: LudiloRegilo? = null,
     agordojDeponejo: AgordojDeponejo? = null,
     /**
-     * Paŭzigi/daŭrigi tra [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] (FAROTA G13):
+     * Paŭzigi/daŭrigi tra [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] (PR #92):
      * rekta `ludilo.pauxzigi()` ne nuligas planitan reprovon, kiu rekomencigus la ludadon.
      */
     onPauxzigi: () -> Unit = { ludilo?.pauxzigi() },

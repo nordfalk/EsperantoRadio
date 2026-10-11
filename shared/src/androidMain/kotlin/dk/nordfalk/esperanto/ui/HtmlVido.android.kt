@@ -19,7 +19,7 @@ import dk.nordfalk.esperanto.logw
  * Sekureco: la enhavo venas el nefidindaj RSS-priskriboj. JavaScript estas
  * malŝaltita kaj [WebViewClient] blokas ĉian navigadon ene de la WebView —
  * http(s)-ligiloj malfermiĝas ekstere, ĉio alia (ekz. `intent://`) estas
- * blokata (FAROTA G4). Ankaŭ `file://`/`content://`-aliro estas malŝaltita.
+ * blokata (PR #89). Ankaŭ `file://`/`content://`-aliro estas malŝaltita.
  */
 @Composable
 actual fun HtmlVido(html: String, modifier: Modifier, uzuWebView: Boolean) {

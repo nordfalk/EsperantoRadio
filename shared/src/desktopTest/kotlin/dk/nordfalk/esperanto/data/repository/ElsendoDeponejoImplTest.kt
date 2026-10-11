@@ -13,12 +13,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Testoj por ElsendoDeponejoImpl — FAROTA K1 (fiaskpaĝo ne anstataŭigu la kaŝon)
+ * Testoj por ElsendoDeponejoImpl — (PR #89) (fiaskpaĝo ne anstataŭigu la kaŝon)
  * kaj G9 (ordigo plej-freŝe-unue, anstataŭ la fluo-ordo de ekz. IRo).
  *
  * Rulas en desktopTest ĉar ĝi bezonas veran diskkaŝon — [dosierKashoBazo] estas
  * direktata al provizora dosierujo (nenia poluado de ~/.esperantoradio/cache/,
- * kontraste al DiskKashoTest — FAROTA G37 restas malfermita por tiu).
+ * kontraste al DiskKashoTest — (PR #89) restas malfermita por tiu).
  */
 class ElsendoDeponejoImplTest {
 

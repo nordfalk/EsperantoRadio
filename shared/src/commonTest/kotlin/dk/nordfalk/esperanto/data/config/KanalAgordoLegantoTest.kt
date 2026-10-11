@@ -138,7 +138,7 @@ class KanalAgordoLegantoTest {
         assertTrue(agordo.kanaloj.isEmpty())
     }
 
-    // === FAROTA K5 — ĝusta percent-malkodado de supersignoj ===
+    // === (PR #89) — ĝusta percent-malkodado de supersignoj ===
 
     @Test
     fun malkoduUrlKoditajxonCxiujSupersignoj() {
@@ -178,7 +178,7 @@ class KanalAgordoLegantoTest {
         assertEquals("muzaiko", alarmoj[0].kanaloSlug)
     }
 
-    @Test // FAROTA C4: ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon
+    @Test // (PR #95) ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon
     fun koercasEkstervalorajnSugestojn() {
         // horo=99, minuto=-5, ripeto=0x123 (ekster la 7 tago-bitoj)
         val sugestoj = "10001/1/99/-5/291/0/=muzaiko/=Testa/"
@@ -193,7 +193,7 @@ class KanalAgordoLegantoTest {
 
     @Test
     fun legasPuriguModelojn() {
-        // Regulo 6.6 (FAROTA G15): kanal-specifaj purigaj regex-modeloj el la konfiguro
+        // Regulo 6.6 (PR #91): kanal-specifaj purigaj regex-modeloj el la konfiguro
         val jsonc = """
             {
                 "kanaloj": [

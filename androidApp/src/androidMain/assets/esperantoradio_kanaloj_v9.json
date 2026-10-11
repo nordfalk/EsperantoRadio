@@ -62,7 +62,16 @@
 			"emblemoUrl": "https://www.podkasto.net/wp-content/uploads/2010/07/podkasto5.jpg",
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
-			"hejmpaĝoButono": "https://podkasto.net/"
+			"hejmpaĝoButono": "https://podkasto.net/",
+			// Regulo 6.6: purigaj modeloj por la priskribo (reklamoj kaj enkonstruitaj <audio>-ludiloj).
+			// La modeloj uzas (?:(?!</p>).) anstataŭ .+? — ili ne povas transiri alineon, do
+			// ili neniam "manĝas" la veran enhavon (la malnovaj modeloj el EoRssParsado
+			// havis <p>.+?FRazo.+?</p>-formon kiu forviŝis ekde la unua alineo ĝis la reklamo).
+			"puriguModeloj": [
+				"<audio .+?</audio>",
+				"<p>(?:(?!</p>).)*?tempo-daŭro(?:(?!</p>).)*?</p>",
+				"<p>(?:(?!</p>).)*?Subtenu nin(?:(?!</p>).)*?</p>"
+			]
 		}
 	,{
 			"kodo": "lamalfamuloj",
@@ -162,7 +171,11 @@
 			"elsendojRssUrl": "https://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": true,
-			"hejmpaĝoButono": "https://www.vinilkosmo-mp3.com/index.php?language=eo"
+			"hejmpaĝoButono": "https://www.vinilkosmo-mp3.com/index.php?language=eo",
+			// Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (el la malnova apo)
+			"puriguModeloj": [
+				"<p class="who">.+?</p>"
+			]
 		}
 	,{
 			"kodo": "bitmono",

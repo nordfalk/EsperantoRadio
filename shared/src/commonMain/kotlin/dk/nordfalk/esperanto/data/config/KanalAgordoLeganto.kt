@@ -115,6 +115,8 @@ data class KanaloDto(
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
+    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6). */
+    val puriguModeloj: List<String> = emptyList(),
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -130,6 +132,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     ignoruTitolon = elsendojRssIgnoruTitolon,
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
+    puriguModeloj = puriguModeloj,
 )
 
 /**

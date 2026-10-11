@@ -340,6 +340,11 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   (2026-10-11: tio rompis ĉiujn https-fluojn post la G1-ŝanĝo — la diskkaŝo KAŜIS la simptomon
   ("Ŝargis N elsendojn" montris nur malnovajn datumojn el la kaŝo). Fum-testu ĉiam per
   `adb shell pm clear` + freŝa reto, ne kun diskkaŝo.)
+- **Purigaj regex-modeloj kun `<p>.+?FRazo.+?</p>` + DOTALL estas danĝeraj**: la `.+?` komenciĝas ĉe
+  la UNUA `<p>` en la tuta teksto kaj manĝas ĉiun alineon ĝis la celita frazo — kun la nuna
+  Varsovia Vento-fluo tio forviŝis la enkondukon kaj la parto-listilon. Uzu temperitan formon
+  `(?:(?!</p>).)` anstataŭ `.+?` por ke la modelo ne povu transiri alineon (ekzemploj:
+  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, FAROTA G15.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash

@@ -24,6 +24,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kanaloj kun plej-malnovaj-unue fluoj (ekz. Internacia Retradio) montras la plej novajn elsendojn supre kaj aŭtoludas en la ĝusta direkto (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - Triligitaj elŝutoj ne plu estas konservataj kiel "pretaj"; partaj dosieroj estas forigataj post eraro, paŭzo kaj restarto (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - La fona aŭtoludo ne plu povas erare marki la sekvan elsendon "fininta" kiam la servo kaj la ludilo ambaŭ raportas la saman finon (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Priskriboj de Varsovia Vento estas sen reklamaj alineoj kaj enkonstruitaj son-ludiloj (kun la vera enhavo nedifektita) (https://github.com/nordfalk/EsperantoRadio/pull/91)
+- Vinilkosmon montras la verajn titolojn de la elsendoj kaj priskribojn sen la "has posted"-alineo (https://github.com/nordfalk/EsperantoRadio/pull/91)
+- Elsendoj kun sono nur en la priskribo (aŭ ĉe video-gastigantoj kiel YouTube) ne plu rompas la kanalan liston (https://github.com/nordfalk/EsperantoRadio/pull/91)
 
 ### Sekureco
 

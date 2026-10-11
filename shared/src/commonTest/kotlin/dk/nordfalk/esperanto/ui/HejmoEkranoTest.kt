@@ -300,4 +300,49 @@ class HejmoEkranoTest {
         onAllNodesWithText("Kernpunkto epizodo 6").assertCountEquals(1) // nur Kio popularas
         onAllNodesWithText("Kernpunkto epizodo 7").assertCountEquals(1) // nur Kio popularas
     }
+
+    // =========================================================================
+    // ViewModel — nuna ludata restas en "Kio novas", aliaj elsendoj stabilas
+    // =========================================================================
+
+    @Test
+    fun nunaLudataRestasEnKioNovasKajAperasEnLastatempeLudata() = runBlocking {
+        val kanaloj = listOf(Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"))
+        val elsendoj = listOf(
+            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Epizodo 1", fluo = "", dato = datoAntaux(1)),
+            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Epizodo 2", fluo = "", dato = datoAntaux(2)),
+        )
+        val ludatoj = LudatojDeponejoMaketo()
+        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), ludatoj)
+        vm.plenigu(kanaloj, elsendoj)
+
+        // Ludado vere ekis por kp:1
+        ludatoj.markiLudita("kp:1", "kernpunkto")
+
+        // Dum kp:1 ludas ĝi restas en "Kio novas" kaj aperas unue en "Lastatempe ludata"
+        vm.aktualigiuLudatajn("kp:1")
+        assertTrue(vm.novajElsendoj.value.any { it.id == "kp:1" }, "La nune ludata elsendo devas resti en Kio novas")
+        assertEquals("kp:1", vm.lastatempeLudataj.value.firstOrNull()?.id, "La nune ludata elsendo devas esti unue en Lastatempe ludata")
+
+        // Kiam alia elsendo ludas, kp:1 jam estas "ludita" kaj forlasas "Kio novas"
+        vm.aktualigiuLudatajn("kp:2")
+        assertTrue(!vm.novajElsendoj.value.any { it.id == "kp:1" }, "Ne-nuna luditaj elsendoj devas malaperi de Kio novas")
+    }
+
+    @Test
+    fun aliajElsendojNeRemiksasJeRekomputado() = runBlocking {
+        val kanaloj = listOf(Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"))
+        // Suĉe multaj elsendoj por ke "Kio popularas" havu kandidatojn
+        val elsendoj = (1..12).map { i ->
+            Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Epizodo $i", fluo = "", dato = datoAntaux(i))
+        }
+        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), null)
+        vm.plenigu(kanaloj, elsendoj)
+        val unua = vm.popularajElsendoj.value
+        assertTrue(unua.isNotEmpty(), "Kio popularas devas havi kandidatojn")
+
+        // Rekomputado (ekz. pozicio-savo dum ludado) ne devas re-miksi la ordon
+        vm.aktualigiuLudatajn(null)
+        assertEquals(unua, vm.popularajElsendoj.value, "Aliaj elsendoj devas havi stabilan ordon inter rekomputadoj")
+    }
 }

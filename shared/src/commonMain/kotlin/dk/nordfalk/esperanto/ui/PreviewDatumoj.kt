@@ -94,6 +94,7 @@ internal fun pLudatojDeponejo(
     private val f = MutableStateFlow(ludatoj)
     override fun observiLudatojn() = f.asStateFlow()
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {}
+    override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {}
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {}
     override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {}
     override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {}

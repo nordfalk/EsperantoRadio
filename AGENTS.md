@@ -378,6 +378,36 @@ https://mcp.sentry.dev/mcp`). La plej uzataj iloj:
 - `search_errors` — erar-eventoj, nombroj, tendencoj.
 - `update_issue` — solvigi/atribui problemon.
 
+**Kapabloj de la datumaroj** (2026-10-10, gravas por demandoj):
+
+- **logs** (protokoloj): havas `user.id`, `device.model`, `release`, `message` —
+  sed **neniun geo-kampon** (`geo.country_code` k.a. ne ekzistas).
+- **errors** (erar-eventoj): havas `geo.country_code` — sed `device.model` estas
+  **malplena** (la KMP-SendSDK ne sendas aparat-kuntekston ĉe eraroj).
+  Sekve aparato × lando NE estas rekombebla per la API.
+- Negacia filtro (`!device.model:...`) ne funkcias en logs — prenu ĉiujn
+  grupojn (`limit: 100`) kaj filtru loke.
+- `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
+- Tempserio: petu naturlingve «... as a time series» kun `fields: ['timestamp',
+  'count_unique(user)']` → tagaj siteloj; la hodiaŭa sitelo estas nekompleta.
+
+**Interpretaĵ-avertoj pri uzant-nombroj**:
+
+- `user.id` estas **anonima po instalaĵo** — reinstalo = nova uzanto-id.
+  Emulilajn testreinstalojn eblas rekoni: `device.model:sdk_gphone*`
+  (Google-emulilaj bildoj; ĉiuj `sdk_gphone*` estas emuliloj).
+- `count_unique(device.model)` nombras unikajn **modelajn ĉenojn**, ne
+  aparatojn (2 uzantoj kun sama modelo kalkuliĝas unufoje).
+- Landoj haveblas nur el erar-eventoj (do nur por uzantoj, kiuj havis almenaŭ
+  unu eraron) — la nombro subtaksas.
+
+**Konekta leciono** (2026-10-10): la `mcp_sentry`-konekto povas fali meze en
+seanco (iloj malaperas el la agenta nomspaco) kaj ne reaperas per `/reload`.
+Remedio: restartigu Vibe (`vibe -c` daŭrigas la konversacion). Se post
+restarto la servilo listiĝas kiel bezonanta aŭtentikigon, rulu `/mcp login
+sentry` (OAuth-aliro-ĵetonoj eksvalidiĝas post kelkaj horoj; la renovigo
+foje malsukcesas).
+
 **Protokol-konvencio (grava por la Sentry-kvoto)**:
 
 - `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.

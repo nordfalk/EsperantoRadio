@@ -16,22 +16,22 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
-- Ne plu perdiĝas jam elŝutita kanal-enhavo kiam la servilo respondas per eraro-paĝo aŭ kaptiva portalo
-- La sciigoj pri novaj elsendoj nun funkcias ankaŭ kiam la apo estas fermita (la fonprocezo antaŭe havis neniun kuntekston)
-- Sur Android la ludado ne plu povas rekomenciĝi per si mem post kiam oni premis "Halti"
-- Klako sur ero en la ludvico nun malfermas la elsendon (antaŭe la klako faris nenion)
-- Alarmo-sugestoj montras ĝustajn supersignojn (ĥ, Ŝ, Ŭ ktp.)
-- Kanaloj kun plej-malnovaj-unue fluoj (ekz. Internacia Retradio) montras la plej novajn elsendojn supre kaj aŭtoludas en la ĝusta direkto
-- Triligitaj elŝutoj ne plu estas konservataj kiel "pretaj"; partaj dosieroj estas forigataj post eraro, paŭzo kaj restarto
-- La fona aŭtoludo ne plu povas erare marki la sekvan elsendon "fininta" kiam la servo kaj la ludilo ambaŭ raportas la saman finon
+- Ne plu perdiĝas jam elŝutita kanal-enhavo kiam la servilo respondas per eraro-paĝo aŭ kaptiva portalo (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- La sciigoj pri novaj elsendoj nun funkcias ankaŭ kiam la apo estas fermita (la fonprocezo antaŭe havis neniun kuntekston) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Sur Android la ludado ne plu povas rekomenciĝi per si mem post kiam oni premis "Halti" (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Klako sur ero en la ludvico nun malfermas la elsendon (antaŭe la klako faris nenion) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Alarmo-sugestoj montras ĝustajn supersignojn (ĥ, Ŝ, Ŭ ktp.) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Kanaloj kun plej-malnovaj-unue fluoj (ekz. Internacia Retradio) montras la plej novajn elsendojn supre kaj aŭtoludas en la ĝusta direkto (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Triligitaj elŝutoj ne plu estas konservataj kiel "pretaj"; partaj dosieroj estas forigataj post eraro, paŭzo kaj restarto (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- La fona aŭtoludo ne plu povas erare marki la sekvan elsendon "fininta" kiam la servo kaj la ludilo ambaŭ raportas la saman finon (https://github.com/nordfalk/EsperantoRadio/pull/89)
 
 ### Sekureco
 
-- HTTP (klara teksto) estas nun permesata nur por la heredaĵaj gastigantoj kiuj bezonas ĝin — ne por la tuta trafiko
-- Fluo- kaj bildligiloj el la radi-fluoj estas kontrolataj: nur http/https estas ludebla (ne ekz. file://)
-- Falsitaj sciigo-intencoj de aliaj aplikoj estas rifuzataj (privata po-instala kodo)
-- Ligiloj en la elsendo-priskriboj malfermiĝas ekstere, ne ene de la priskribo-vido; danĝeraj skemoj (intent://, data:, javascript:) estas forigitaj
-- Aŭskult-historio kaj alarmoj ne plu estas aŭtomate sekurkopiataj al la nubo
+- HTTP (klara teksto) estas nun permesata nur por la heredaĵaj gastigantoj kiuj bezonas ĝin — ne por la tuta trafiko (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Fluo- kaj bildligiloj el la radi-fluoj estas kontrolataj: nur http/https estas ludebla (ne ekz. file://) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Falsitaj sciigo-intencoj de aliaj aplikoj estas rifuzataj (privata po-instala kodo) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Ligiloj en la elsendo-priskriboj malfermiĝas ekstere, ne ene de la priskribo-vido; danĝeraj skemoj (intent://, data:, javascript:) estas forigitaj (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Aŭskult-historio kaj alarmoj ne plu estas aŭtomate sekurkopiataj al la nubo (https://github.com/nordfalk/EsperantoRadio/pull/89)
 
 ### Aldonita
 

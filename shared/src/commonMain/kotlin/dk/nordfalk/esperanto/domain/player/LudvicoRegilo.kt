@@ -419,6 +419,9 @@ class LudvicoRegilo(
             // Se nenio ludas, tuj komencu
             val stato = ludilo.stato.value.stato
             if (stato == LudantoStato.Haltita || stato == LudantoStato.Finita) {
+                // Eksplicita nova ekuzo — malplenigu la dedup-fenestron (aliokaze la fino de
+                // re-vicigita, jam-iam-fininta elsendo estus traktata kiel duobla voko)
+                malpleniguTraktitajnFontojn()
                 ludiSekvanInterna(null)
             }
         }

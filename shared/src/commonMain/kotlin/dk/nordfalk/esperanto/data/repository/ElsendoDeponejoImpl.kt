@@ -109,6 +109,9 @@ open class ElsendoDeponejoImpl(
         val respondo = leguKashon(kanalo.slug) ?: return null
         logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
+            // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
+            // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
+            kontroluFluecon(respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo).ordigitajPlejFreshajUnue()
             kaŝmemoro[kanalo.slug] = elsendoj
             fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj

@@ -115,6 +115,11 @@ class KtorElshutDeponejo(
         _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
 
         val job = scope.launch {
+            val mi = coroutineContext[Job]
+            // Se pli NOVA elŝuto transprenis la identigilon, NE tuŝu ĝian dosieron
+            // (revizio de PR #89: la nuligita malnova tasko forviŝus la partan dosieron
+            // de la nova elŝuto kun la sama vojo)
+            fun transprenitaDePliNova() = joboj[id] != null && joboj[id] !== mi
             try {
                 val respondo = httpKliento.get(elsendo.fluo)
                 if (!respondo.status.isSuccess()) {
@@ -153,9 +158,12 @@ class KtorElshutDeponejo(
                 logi("ElshutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")
             } catch (e: kotlinx.coroutines.CancellationException) {
                 // haltigi() — la stato (Pauxzita) estas agordata de haltigi mem;
-                // forigu la partan dosieron (G11: partaj dosieroj ne akumuliĝu)
-                try { celdosiero.delete() } catch (e2: Exception) {
-                    loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                // forigu la partan dosieron (G11: partaj dosieroj ne akumuliĝu) —
+                // sed nur se neniu pli nova elŝuto transprenis la saman dosieron
+                if (!transprenitaDePliNova()) {
+                    try { celdosiero.delete() } catch (e2: Exception) {
+                        loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                    }
                 }
                 throw e
             } catch (e: Throwable) {
@@ -164,8 +172,10 @@ class KtorElshutDeponejo(
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
                 // G11: forigu la partan dosieron — ĝi estas nemankebla kaj okupus spacon por eterne
-                try { celdosiero.delete() } catch (e2: Exception) {
-                    loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                if (!transprenitaDePliNova()) {
+                    try { celdosiero.delete() } catch (e2: Exception) {
+                        loge("ElshutDeponejo", "Ne eblis forigi partan dosieron: ${celdosiero.name}", e2)
+                    }
                 }
             }
         }

@@ -82,6 +82,9 @@ class EsperantoLudadoServo : MediaSessionService() {
                             } else {
                                 logw("LudadoServo", "AppStato.ludvicoRegilo estas null — ne povas aŭtoludi")
                             }
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            // serviceScope estas nuligata je detruo — la nuligo ne estas eraro
+                            throw e
                         } catch (e: Exception) {
                             logw("LudadoServo", "Malsukcesis voki traktiFinonPublika", e)
                         }

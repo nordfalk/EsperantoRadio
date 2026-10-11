@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.logi
@@ -58,6 +59,9 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 action = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
                 putExtra("alarmo_kanal_slug", kanaloSlug)
                 putExtra("alarmo_etikedo", etikedo)
+                // FAROTA G3: la eksportita Activity kontrolas la nonce-on — sen ĝi
+                // iu ajn apliko povus forĝi tiun ĉi intencon (ludi ajnan fluon, laŭteco-boost)
+                IntentSxlosilo.aldonuNomon(this)
             }
             context.startActivity(launchIntent)
             logi("AlarmoReceivilo", "Lanĉis MainActivity kun kanalo=$kanaloSlug")

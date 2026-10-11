@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class RssParsiloTest {
@@ -683,5 +684,59 @@ class RssParsiloTest {
         assertFalse(rezulto.contains("<iframe"), "Rezulto ne enhavas <iframe>: $rezulto")
         assertTrue(rezulto.contains("Hi"), "Rezulto devas enhavi 'Hi': $rezulto")
         assertTrue(rezulto.contains("<p>"), "Rezulto devas konservi <p>: $rezulto")
+    }
+
+    // === FAROTA G2 — nur http(s)-fluoj el nefidinda RSS ===
+
+    @Test
+    fun forjxasElsendojnKunNeRetajSkemoj() = kotlinx.coroutines.test.runTest {
+        // file://, content:// kaj javascript:// el difektita/malica fluo ne estu ludeblaj:
+        // ExoPlayer/Coil scipovas malfermi file:// kaj content://
+        val rss = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Bona</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/bona.mp3" type="audio/mpeg"/></item>
+            <item><title>Dosiero</title><pubDate>Thu, 2 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="file:///data/data/sekreto.mp3" type="audio/mpeg"/></item>
+            <item><title>Content</title><pubDate>Fri, 3 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="content://media/external/audio/1" type="audio/mpeg"/></item>
+            <item><title>Skripto</title><pubDate>Sat, 4 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="javascript:alert(1)" type="audio/mpeg"/></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val elsendoj = parsilo.parsuRss(rss, kanalo)
+
+        assertEquals(1, elsendoj.size, "Nur la https-fluo devas resti: ${elsendoj.map { it.titolo }}")
+        assertEquals("Bona", elsendoj[0].titolo)
+    }
+
+    @Test
+    fun saniguRetUrlonNuligasNepermesatajnSkemojn() {
+        assertEquals("https://x.example/a.mp3", parsilo.saniguRetUrlon("https://x.example/a.mp3"))
+        assertEquals("http://x.example/a.mp3", parsilo.saniguRetUrlon(" http://x.example/a.mp3 "))
+        assertNull(parsilo.saniguRetUrlon("file:///sekreto"))
+        assertNull(parsilo.saniguRetUrlon("content://media/1"))
+        assertNull(parsilo.saniguRetUrlon("intent://malico/#Intent;end"))
+        assertNull(parsilo.saniguRetUrlon("javascript:alert(1)"))
+        assertNull(parsilo.saniguRetUrlon(""))
+        assertNull(parsilo.saniguRetUrlon(null))
+    }
+
+    // === FAROTA G4 — ligilo-sanigado en priskriboj ===
+
+    @Test
+    fun puriguHtmlForigasDanxerajnLigilojn() {
+        val html = "<p>Saluton " +
+            "<a href=\"intent://malico/#Intent;action=android.intent.action.CALL;end\">voku</a>" +
+            "<a href=\"JaVaScRiPt:alert(1)\">kliku</a>" +
+            "<a href=\"data:text/html;base64,PHNjcmlwdD4=\">datumo</a>" +
+            "<a href=\"https://bone.example/pagho\">ĝusta ligilo</a></p>"
+        val purigita = parsilo.puriguHtmlKunEtikedojn(html)
+        assertFalse(purigita.contains("intent://"), "intent:// devas esti forigita: $purigita")
+        assertFalse(purigita.lowercase().contains("javascript:"), "javascript: devas esti forigita: $purigita")
+        assertFalse(purigita.contains("data:text/html"), "data:-URL devas esti forigita: $purigita")
+        assertTrue(purigita.contains("https://bone.example/pagho"), "http(s)-ligilo devas resti: $purigita")
     }
 }

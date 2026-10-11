@@ -245,6 +245,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `net`-modulon de Node.js ("Node.js net module is not available"). Uzu `httpMotoro` (expect/actual:
   CIO, aŭ `Js` = fetch sur wasmJs), ne `HttpClient(CIO)` rekte. La Js-motoro ĵetas `kotlin.Error`
   (ne Exception) ĉe reteraroj/CORS — kaptu `Throwable` (kaj reĵetu `CancellationException`).
+- **CIO + domajno-esceptoj en network_security_config = paneo** (2026-10-11, emulila testo):
+  kiam la config havis cleartext-domajno-esceptojn, CIO paneigis por ĈIUJ https-petoj
+  ("CertificateException: Domain specific configurations require that hostname aware
+  checkServerTrusted is used") — tiam OkHttp-motoro devis anstataŭigi CIO sur Android.
+  Kun nur `base-config` (neniuj domajno-esceptoj — la nuna stato) CIO funkcias normale,
+  kaj `ktor-client-okhttp` estis forigita. Se iam re-aldoniĝas domajno-escepto al la
+  security-config, remetu `libs.ktor.client.okhttp` kaj `HttpMotoro.android` al OkHttp.
 - **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
 - **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
 - **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per
@@ -318,6 +325,21 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
   `--body-file <dosiero>` aŭ
   `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — `CoroutineScope(Dispatchers.IO …)`
+  en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
+  expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
+  ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
+  estu parto de estonta testa CI, vidu FAROTA.md G24.)
+- **Ktor CIO + network_security_config = paneo de ĈIUJ https-petoj sur Android**: la CIO-motoro
+  vokas la malnovan 2-argan `checkServerTrusted(ĉeno, tipo)` sen gastiganto; tuj kiam la apo
+  difinas `android:networkSecurityConfig` (nia G1-ŝanĝo), Android postulas la gastiganto-konscian
+  3-argan variaĵon kaj ĵetas `CertificateException: Domain specific configurations require that
+  hostname aware checkServerTrusted(...) is used` por ĈIUJ https-konektoj (ne nur la esceptitaj
+  domajnoj). Solvo: `ktor-client-okhttp` kiel la Android-motoro (`HttpMotoro.kt` androidMain) —
+  OkHttp estas gastiganto-konscia. CIO restas sur Desktop/iOS; Js sur wasmJs.
+  (2026-10-11: tio rompis ĉiujn https-fluojn post la G1-ŝanĝo — la diskkaŝo KAŜIS la simptomon
+  ("Ŝargis N elsendojn" montris nur malnovajn datumojn el la kaŝo). Fum-testu ĉiam per
+  `adb shell pm clear` + freŝa reto, ne kun diskkaŝo.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash

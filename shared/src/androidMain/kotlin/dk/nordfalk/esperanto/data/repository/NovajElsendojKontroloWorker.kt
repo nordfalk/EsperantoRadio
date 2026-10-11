@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
@@ -21,7 +22,6 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -101,8 +101,14 @@ class NovajElsendojKontroloWorker(
             val unuaRulo = viditaj.isEmpty()
             logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj (unuaRulo=$unuaRulo)")
 
-            val httpKliento = HttpClient(CIO) {
+            // CIO tra httpMotoro — sama motoro kiel la cetero de la apo.
+            // AVERTO: se network_security_config iam re-havos domajno-esceptojn,
+            // CIO paneigas por ĉiuj https-petoj (vidu HttpMotoro.android.kt).
+            val httpKliento = HttpClient(httpMotoro) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
+                // FAROTA K1: fiaskpaĝo (4xx/5xx) ne estu parsata kiel fluo —
+                // la per-kanala catch sube protokolas kaj daŭrigas kun la aliaj kanaloj
+                expectSuccess = true
             }
             val parsilo = RssParsilo(ArchiveOrgDosiernomoKasho(settings))
             var totalNovaj = 0
@@ -176,6 +182,9 @@ class NovajElsendojKontroloWorker(
                 Intent(ctx, Class.forName("dk.nordfalk.esperanto.android.MainActivity")).apply {
                     action = ACTION_MALFERMI_ELSENDON
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    // FAROTA G3: la eksportita Activity kontrolas la nonce-on — sen ĝi
+                    // iu ajn apliko povus forĝi la ekstraĵojn (phishing, ludi ajnan URI-on)
+                    IntentSxlosilo.aldonuNomon(this)
                 }
             ),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,

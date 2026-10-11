@@ -15,8 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
-import dk.nordfalk.esperanto.initialiguSentry
-import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
@@ -45,8 +44,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        initialiguSentry()
-        appContext = applicationContext
+        // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikajho (Application) —
+        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (FAROTA K2)
         petiSciigPermeson()
         // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity
         ludilo = ExoPlayerLudiloRegilo.akiru(this)
@@ -65,12 +64,28 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Traktas alvenantajn intentojn de sciigoj aŭ alarmoj.
+     *
+     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (FAROTA G3)
+     * rifuzas falsitajn intencojn de aliaj aplikoj: `MainActivity` estas
+     * `exported="true"` kaj la agoj estas publike konataj.
      */
     private fun traktuIntenton(intent: Intent?) {
         if (intent == null) return
         when (intent.action) {
-            "dk.nordfalk.esperanto.ALARMO_EKIGAS" -> traktuAlarmIntent(intent)
-            NovajElsendojKontroloWorker.ACTION_MALFERMI_ELSENDON -> traktuMalfermiElsendon(intent)
+            "dk.nordfalk.esperanto.ALARMO_EKIGAS" -> {
+                if (!IntentSxlosilo.estasFidinda(intent)) {
+                    logw("MainActivity", "Rifuzas falsitan ALARMO_EKIGAS-intenton (nonce mankas aŭ malĝustas)")
+                    return
+                }
+                traktuAlarmIntent(intent)
+            }
+            NovajElsendojKontroloWorker.ACTION_MALFERMI_ELSENDON -> {
+                if (!IntentSxlosilo.estasFidinda(intent)) {
+                    logw("MainActivity", "Rifuzas falsitan MALFERMI_ELSENDON-intenton (nonce mankas aŭ malĝustas)")
+                    return
+                }
+                traktuMalfermiElsendon(intent)
+            }
         }
     }
 

@@ -1,0 +1,44 @@
+# Testoj kaj konstruo por ĉiu PR kaj push al master (FAROTA G24).
+#
+# Antaŭe neniu CI rulis testojn aŭ konstruon por PR-oj — nur changelog-kontrolo kaj
+# la eldona laborfluo (kiu konstruas nur ĉe etikedo, do tro malfrue). Tiel:
+# - PR #79 enmetis `Dispatchers.IO` en commonMain kaj ROMPIS la wasmJs-kompiladon
+#   (IO ne ekzistas sur wasmJs) — nekaptita, ĉar neniu laborfluo kompilis wasmJs.
+# - PR #81 pasis CI sed rompis `androidApp/build.gradle.kts`.
+#
+# La instrumentitaj testoj (connectedDebugAndroidTest) restas neaŭtomataj —
+# ili bezonas emulilon kaj estas rulataj mane (vidu AGENTS.md).
+name: testoj-kaj-konstruo
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  testoj:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Agordu JDK 17 (JDK 17 estas necesa por la Android-konstruo)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Unuopecaj testoj (Desktop)
+        run: ./gradlew :shared:desktopTest
+
+      - name: Kompil-kontrolo Desktop
+        run: ./gradlew :desktopApp:compileKotlinDesktop
+
+      - name: Android-APK (debug)
+        run: ./gradlew :androidApp:assembleDebug
+
+      - name: Kompil-kontrolo wasmJs
+        run: ./gradlew :shared:compileKotlinWasmJs

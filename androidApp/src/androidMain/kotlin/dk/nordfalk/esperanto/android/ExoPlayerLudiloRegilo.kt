@@ -160,8 +160,14 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         // Se eraro ekzistas, konservu Eraro-staton — onPlaybackStateChanged(STATE_IDLE)
         // vokas updateState() tuj post onPlayerErrorChanged kaj povus superskribi Eraro per Haltita.
         // StateFlow estas conflated, do la kolektanto povus maltrafi Eraro se ni ne gardas ĝin ĉi tie.
+        // Escepto: post halti() (stop + clearMediaItems) la playerError RESTAS — Media3 1.5.1
+        // ne nuligas ĝin (nur prepare() faras) — kaj onMediaItemTransition(null) vokus updateState().
+        // Sen la mediaItemCount-gardilo la stato iĝus Eraro anstataŭ Haltita, kaj LudvicoRegilo
+        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (FAROTA K3).
         val error = c.playerError
-        val ludantoStato = if (error != null) {
+        val ludantoStato = if (c.mediaItemCount == 0) {
+            LudantoStato.Haltita
+        } else if (error != null) {
             LudantoStato.Eraro(error.message ?: "Nekonata eraro", reprovebla = estasReproveblaEraro(error))
         } else when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita

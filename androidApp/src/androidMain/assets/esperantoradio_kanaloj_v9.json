@@ -78,8 +78,8 @@
 			"kodo": "3zzzenesperanto",
 			"nomo": "3ZZZ en Esperanto",
 			"priskribo": "Semajnja unuhora programo de la Melburna Esperanto-komunumo ĉe la komunuma radio 3ZZZ.",
-			"emblemoUrl": "http://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
-			"elsendojRssUrl": "http://melburno.org.au/3ZZZradio/feed/",
+			"emblemoUrl": "https://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
+			"elsendojRssUrl": "https://melburno.org.au/3ZZZradio/feed/",
 			"elsendojRssIgnoruTitolon": true,
 			//			"hejmpaĝoEkrane": "http://melburno.org.au/3ZZZradio/",
 			"retpoŝto": "leslie@heldzingen.com",
@@ -130,11 +130,11 @@
 			"kodo": "radioscienca",
 			"nomo": "Radio Scienca",
 			"priskribo": "Sciencaj temoj - de kosmo ĝis korpo - klarigitaj en Esperanto.",
-			"emblemoUrl": "http://www.radioscienca.com/wp/wp-content/uploads/2017/01/bg-1.jpg",
-			"elsendojRssUrl": "http://www.radioscienca.com/feed/",
+			"emblemoUrl": "https://www.radioscienca.com/wp/wp-content/uploads/2017/01/bg-1.jpg",
+			"elsendojRssUrl": "https://www.radioscienca.com/feed/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝoButono": "http://www.radioscienca.com/"
+			"hejmpaĝoButono": "https://www.radioscienca.com/"
 		}
 	,{
 			"kodo": "radiovatikana",
@@ -158,11 +158,11 @@
 			"kodo": "vinilkosmo",
 			"nomo": "Vinilkosmo",
 			"priskribo": "Podkasto de la samnoma Esperanto-muzikeldonejo: novaĵoj kaj novaĵaroj pri Esperanto-muziko.",
-			"emblemoUrl": "http://www.vinilkosmo-mp3.com/images/banniere_300.jpg",
-			"elsendojRssUrl": "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
+			"emblemoUrl": "https://www.vinilkosmo-mp3.com/images/banniere_300.jpg",
+			"elsendojRssUrl": "https://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": true,
-			"hejmpaĝoButono": "http://www.vinilkosmo-mp3.com/index.php?language=eo"
+			"hejmpaĝoButono": "https://www.vinilkosmo-mp3.com/index.php?language=eo"
 		}
 	,{
 			"kodo": "bitmono",
@@ -199,11 +199,11 @@
 			"kodo": "peranto",
 			"nomo": "Esperanta Retradio",
 			"priskribo": "Ĉiutagaj «sonartikoloj»: voĉlegitaj tekstoj de la blogo Esperanta Retradio. Bona por lernantoj.",
-			"emblemoUrl": "http://wp11081574.server-he.de/peranto/retradiologo.gif",
+			"emblemoUrl": "https://javabog.dk/privat/esperantoradio/retradiologo.gif",
 			"elsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default",
 			"xxelsendojRssUrl": "https://esperantaretradio.blogspot.com/feeds/posts/default?start-index=149&max-results=25000",
 			"retpoŝto": "retradio@aldone.de",
-			"hejmpaĝoButono": "http://aldone.de/retradio"
+			"hejmpaĝoButono": "https://aldone.de/retradio"
 		}
 	,{
 			"kodo": "kaliningrada",
@@ -355,7 +355,7 @@
 			"montruTitolojn": "true",
 			"retpoŝto": "arono@radioverda.com",
 			"hejmpaĝoButono": "http://radioverda.com/"
-		}
+		},
 	{
 			"kodo": "vej",
 			"nomo": "Voĉoj el Japanio",

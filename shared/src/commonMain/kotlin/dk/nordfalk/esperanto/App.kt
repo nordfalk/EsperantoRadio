@@ -411,6 +411,7 @@ fun EsperantoRadioApp(
                     sekvantaSubtitolo = sekvantaSubtitolo,
                     sekvantaBildoUrl = sekvantaBildoUrl,
                     onLudiSekvantan = onLudiSekvantan,
+                    onHaltigi = { ludvicoRegilo.haltuLudadon() },
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {

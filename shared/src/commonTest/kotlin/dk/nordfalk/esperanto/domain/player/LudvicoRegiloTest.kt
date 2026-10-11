@@ -1007,4 +1007,46 @@ class LudvicoRegiloTest {
         assertNull(ludatoj.getLudato(e2.id), "e2 ne estu ludita/finiĝinta")
         assertFalse(ludatoj.getLudato(e1.id)?.erara == true, "e1 ne estu markita erara")
     }
+
+    // =========================================================================
+    // FAROTA G13 — paŭzigi/daŭrigi/rekta kanalo tra LudvicoRegilo
+    // =========================================================================
+
+    @Test
+    fun pauxzigiNuligasPlanitanReprovon() = runTest {
+        val e1 = elsendo("e1")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = mapOf("k1" to listOf(e1)), scope = this,
+            reprovoAtendo = { 100L },
+        )
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        ludilo.simuluEraron("Reto perdiĝis", reprovebla = true)
+        assertEquals(1, regilo.reprovo.value, "Reprovo 1 planita")
+
+        // Paŭzigi — la planita reprovo devas esti nuligita
+        regilo.pauxziguLudadon()
+
+        assertEquals(0, regilo.reprovo.value, "Paŭzigi nuligas la planitan reprovon")
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato)
+
+        // Atendu preter la reprovo-atendo — la reprovo ne rekomencigu la ludadon
+        kotlinx.coroutines.withContext(Dispatchers.Default) { kotlinx.coroutines.delay(200) }
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Reprovo ne rekomencu post paŭzigo")
+    }
+
+    @Test
+    fun ludiRektanLudasRektanKanalon() = runTest {
+        val kanalo = Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://fluo.example/live.m3u8")
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, scope = this)
+
+        regilo.ludiRektan(kanalo)
+
+        val fonto = ludilo.stato.value.nunaFonto
+        assertTrue(fonto is Sonfonto.RektaKanalo, "Rekta kanalo devas ludi: $fonto")
+        assertEquals("muzaiko", (fonto as Sonfonto.RektaKanalo).kanalo.slug)
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
+    }
 }

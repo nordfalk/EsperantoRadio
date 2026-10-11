@@ -205,7 +205,8 @@ fun EsperantoRadioApp(
                                         when (fonto) {
                                             is Sonfonto.ElsendoFonto -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
                                             is Sonfonto.LokaElsendo -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
-                                            is Sonfonto.RektaKanalo -> { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                            // FAROTA G13: tra la regilo — reprovo/kalkuloj/dedup restas koheraj
+                                            is Sonfonto.RektaKanalo -> ludvicoRegilo.ludiRektan(fonto.kanalo)
                                         }
                                     }
                                 },
@@ -334,6 +335,10 @@ fun EsperantoRadioApp(
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
                                 agordojDeponejo = agordojDeponejo,
+                                // FAROTA G13: paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
+                                // ne nuligas planitan reprovon
+                                onPauxzigi = { scope.launch { ludvicoRegilo.pauxziguLudadon() } },
+                                onDaurigi = { scope.launch { ludvicoRegilo.dauriguLudadon() } },
                             )
                         }
                     },
@@ -412,6 +417,8 @@ fun EsperantoRadioApp(
                     sekvantaBildoUrl = sekvantaBildoUrl,
                     onLudiSekvantan = onLudiSekvantan,
                     onHaltigi = { ludvicoRegilo.haltuLudadon() },
+                    onPauxzigi = { ludvicoRegilo.pauxziguLudadon() },
+                    onDaurigi = { ludvicoRegilo.dauriguLudadon() },
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {

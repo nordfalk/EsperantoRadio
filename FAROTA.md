@@ -138,7 +138,7 @@
 - **Sugesto**: `getExternalFilesDir(...) ?: appContext.filesDir` (kun subdosierujo).
 
 #### G13 — UI vokas `ludilo.halti()`/`ludi()` rekte, preterpasante `LudvicoRegilo`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `MiniLudilbreto.kt:191` (halti); `ElsendoEkrano.kt:171,330` (paŭzi/daŭrigi); `MainActivity.kt:82-99` (sciigo "Malfermi" → rekta `fiksiFonton`+`ludi`); `App.kt:170,180` (rekta kanalo)
 - **Priskribo**: Sekvoj: neni `nuliguReprovon`, neni `malmarkiFinita` (finita elsendo restas finita en la deponejo), neni rekomencigo de `erarojSinsekvaj`. La fonto-kontrolo en la reprovo-tasko parte ŝirmas, sed K3 montras, ke tio ne sufiĉas.
 - **Sugesto**: aldonu `LudvicoRegilo.haltuLudadon()` kaj uzu `ludiElsendon` ĉie; por rekta kanalo akceptendas rekta `fiksiFonton`, sed nuligu reprovon.
@@ -170,31 +170,31 @@
 ### Pliaj GRAVA trovoj (ludilo, platformoj)
 
 #### G18 — Desktop: daŭrigo post paŭzo nuligas la pozicion
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/desktopMain/.../domain/player/DesktopLudiloRegilo.kt:169-186` (`komenciLudadon`, `totalBytesLuditaj = 0L`:180), `:222` (`ludi`)
 - **Priskribo**: `komenciLudadon()` faras `ludaJob?.cancel()` kaj novan korutinon kun `totalBytesLuditaj = 0L`; `ludi()` vokas ĝin ankaŭ post paŭzo → post paŭzo+daŭrigo la pozicio rekomencas je 0 dum la fluo daŭras meze. Sekvoj: la UI montras 0:00, kaj la 5-sekunda savanto de `LudvicoRegilo` **superskribas la ĝustan konservitan pozicion per la malĝusta malgranda valoro** — "Daŭrigi de X:XX" koruptiĝas.
 - **Sugesto**: ne nuligu `totalBytesLuditaj` ĉe daŭrigo (konservu `bytesBeforePause`); aŭ ne kanselu la paŭzitan taskon, nur malmarku `pauxzita`.
 
 #### G19 — Desktop: eraro ĉe `fiksiFonton` portas `nunaFonto = null`
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `DesktopLudiloRegilo.kt:159-165` (catch), `:76` (`halti()` ene de `fiksiFonton`)
 - **Priskribo**: La `catch` faras `_stato.value.copy(stato = Eraro(...))`, sed antaŭe `halti()` jam metis `nunaFonto = null`. La stato `Eraro` do ne portas la fonton → `LudvicoRegilo.provuReprovi`/`traktiFinon` legas `lastaFonto` (la *antaŭa* elsendo!) → sur Desktop: 404 ne markas la elsendon erara, aŭto-ludo saltas al "plej freŝa neludata" (prioritato 2/3) anstataŭ la sekva samkanala, kaj povas eĉ reprovu la *malĝustan* (antaŭan) elsendon.
 - **Sugesto**: en la `catch` elsendu `LudantoInformo(stato = Eraro(...), nunaFonto = fonto, pozicioMs = komencoPozicioMs, ...)` anstataŭ `.copy` de la haltita stato.
 
 #### G20 — wasmJs: pozicio neniam ĝisdatatas dum ludado
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/wasmJsMain/.../domain/player/WasmJsLudiloRegilo.kt:40-67`
 - **Priskribo**: Nur la eventoj `playing`, `pause`, `ended`, `error`; **mankas `timeupdate`**. `pozicioMs` restas je la valoro de la `playing`-evento → la progreso-linio/serĉbreto frostiĝas, kaj la 5-sekunda savanto de `LudvicoRegilo` konservas malnovan pozicion → rekomenco ("Daŭrigi de X:XX") estas malĝusta sur la reto.
 - **Sugesto**: aldonu `timeupdate`-aŭskultanton (aŭ 1s `setInterval`), kiu metas `_stato.value.copy(pozicioMs = …)`.
 
 #### G21 — wasmJs: `audio.play()`-promeso ne estas traktata
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `WasmJsLudiloRegilo.kt:69`
 - **Priskribo**: `audio?.play()` redonas `Promise`; malakcepto (aŭtomata ekigo blokita de la retumilo, CORS) **ne** ekigas la `error`-eventon → la stato restas `Konektas` eterne, sen reprovu nek aŭtoludo.
 - **Sugesto**: traktu la promeson (`.then {}.catch { … }` per `asDynamic()`), kaj en `catch` emitu `Eraro(reprovebla = true)`.
 
 #### G22 — `LudiElsendoReceivilo` likas `MediaController`-on
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/LudiElsendoReceivilo.kt:70-77`
 - **Priskribo**: `future.get()?.apply { setMediaItem; prepare; play }` — la regilo **neniam estas `release()`-ata**. Ĉiu "Ludi"-klako en sciigo likas unu `MediaController` + Binder-konekton al la servo (procesa vivdaŭro).
 - **Sugesto**: konservu la referencon kaj vokinu `controller.release()` post la komandoj (ili estas en la sama fadeno, do liveriĝas antaŭ la liberigo).
@@ -230,7 +230,7 @@
 - **Sugesto**: nuligu `erarojSinsekvaj` ankaŭ en la branĉo `Ludas` (sukcesa (re)komenco = ne plu sinsekvaj eraroj).
 
 #### G28 — Alarmo sen ekzakta-alarma permeso povas esti tute silenta
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Loko**: `shared/src/androidMain/.../data/repository/AlarmoReceivilo.kt:34-69` (`startActivity`:62, WakeLock liberigita:67-68); `AlarmoSkedilo.kt:38-48` (`setWindow` sen `SCHEDULE_EXACT_ALARM`)
 - **Priskribo**: `context.startActivity(launchIntent)` el fona `BroadcastReceiver` povas esti blokita de la limigoj pri lanĉo de agado el fono (Android 10+, precipe ĉe vekiĝo kun elŝaltita ekrano). La `catch` nur protokolas — kaj la fallback-ringtono ekzistas **nur** en `MainActivity`, kiu tiam neniam lanĉiĝas. Do: alarmo ekigas, sed nenio sonas. Krome la WakeLock (10-minuta tempolimo) estas liberigita en `finally` tuj post `startActivity` — ĝi ne kovras la nesinkronan "trovi elsendon kaj ludi"-fazon.
 - **Sugesto**: (a) en la `catch` de la lanĉo, ludu la fallback-ringtonon rekte en la ricevilo; (b) pli bone, uzu full-screen-intent-sciigon kun `setAlarmClock`-info (aŭ `setTurnScreenOn(true)` / `setShowWhenLocked`), kiel rekomendas la dokumentaro pri alarm-apoj; transdonu la WakeLock al `MainActivity` kaj liberigu ĝin kiam la ludado komenciĝas (aŭ post timeout). Testu sur reala aparato kun elŝaltita ekrano.
@@ -581,6 +581,16 @@
 
 ## Jam farita (ne en la listo supre)
 
+- [x] **Ripara batch-o 5 — platformaj ludiloj** (branĉo `riparoj/ludiloj`, stakita sur `riparoj/parsado-kerno`, 262/262 testoj):
+  - G13 (kompleta) — ĉiuj UI-vojigoj tra `LudvicoRegilo`: novaj `pauxziguLudadon()`/`dauriguLudadon()`/`ludiRektan()`;
+    MiniLudilbreto (ludi/paŭzi/halti), ElsendoEkrano (paŭzigi/daŭrigi), App.kt kaj MainActivity (rekta kanalo)
+  - G18 — Desktop: daŭrigo post paŭzo ne rekomencigas la korutinon (pozicio ne nuliĝas)
+  - G19 — Desktop: eraro en `fiksiFonton` portas la fonton (reprovo/aŭtoludo celas la ĝustan elsendon)
+  - G20 — wasmJs: `timeupdate`-aŭskultanto (la pozicio ne plu frostas)
+  - G21 — wasmJs: `play()`-promesa malakcepto kaptata (ne plu eterne "Konektas")
+  - G22 — `LudiElsendoReceivilo` reuzas unu `MediaController` (antaŭe: ĉiu "Ludi"-klako likis unu)
+  - G28 — `AlarmoReceivilo`: full-screen-intent-sciigo + rekte ludata ringtono kiel retrofalo kiam
+    `startActivity` estas blokata de BAL-limigoj; WakeLock-transdono al MainActivity (liberigata en `finally`)
 - [x] **Ripara batch-o 4 — parsado + kerno** (branĉo `riparoj/parsado-kerno`, stakita sur `riparoj/kodrevizio`, 260/260 testoj):
   - G15 — `puriguModeloj: List<String>` en la kanalkonfiguro (regulo 6.6, datum-movita) + aplikado en ĉiuj parser-vojoj + modeloj por varsoviavento kaj vinilkosmo en la JSONC (ambaŭ kopioj). **Grava lernitaĵo**: la malnovaj modeloj el EoRssParsado (`<p>.+?FRazo.+?</p>` + DOTALL) estas DANGERAJ — ili manĝas ekde la unua alineo ĝis la reklamo (regres-testo certigas ke la enkonduko pluvivas). La novaj modeloj estas temperitaj: `(?:(?!</p>).)` ne transiras alineon.
   - G29 — Vinilkosmo-titolo el `<title>` de la ero (ne derivita el la enhavo — "VINILKOSMO … has posted: …")

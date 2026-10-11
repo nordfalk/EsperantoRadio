@@ -63,6 +63,12 @@ fun ElsendoEkrano(
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
     agordojDeponejo: AgordojDeponejo? = null,
+    /**
+     * Paŭzigi/daŭrigi tra [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] (FAROTA G13):
+     * rekta `ludilo.pauxzigi()` ne nuligas planitan reprovon, kiu rekomencigus la ludadon.
+     */
+    onPauxzigi: () -> Unit = { ludilo?.pauxzigi() },
+    onDaurigi: () -> Unit = { ludilo?.ludi() },
 ) {
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
@@ -168,8 +174,8 @@ fun ElsendoEkrano(
                         label = if (tiuElsendoLudas) "Paŭzigi" else "Ludi",
                         onClick = {
                             when {
-                                tiuElsendoLudas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi(); montruMesaĝon("Paŭzigita") }
-                                tiuElsendoPauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi(); montruMesaĝon("Daŭriganta") }
+                                tiuElsendoLudas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); onPauxzigi(); montruMesaĝon("Paŭzigita") }
+                                tiuElsendoPauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaurigi(); montruMesaĝon("Daŭriganta") }
                                 else -> { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi(); montruMesaĝon("Ludanta: ${elsendo.titolo}") }
                             }
                         },
@@ -327,12 +333,12 @@ fun ElsendoEkrano(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     tiuElsendoLudas -> Button(
-                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi(); montruMesaĝon("Paŭzigita") },
+                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); onPauxzigi(); montruMesaĝon("Paŭzigita") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzigi") }
 
                     tiuElsendoPauxzita -> Button(
-                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi(); montruMesaĝon("Daŭriganta") },
+                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaurigi(); montruMesaĝon("Daŭriganta") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.PlayArrow, contentDescription = null); Text(" Daŭrigi") }
 
@@ -439,6 +445,8 @@ fun ElsendoEkranoKunSvipo(
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
     agordojDeponejo: AgordojDeponejo? = null,
+    onPauxzigi: () -> Unit = { ludilo?.pauxzigi() },
+    onDaurigi: () -> Unit = { ludilo?.ludi() },
 ) {
     if (elsendoj.size <= 1) {
         // Ne eblas svipi — montru nur la unuan elsendon
@@ -458,6 +466,8 @@ fun ElsendoEkranoKunSvipo(
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
             agordojDeponejo = agordojDeponejo,
+            onPauxzigi = onPauxzigi,
+            onDaurigi = onDaurigi,
         )
         return
     }
@@ -482,6 +492,8 @@ fun ElsendoEkranoKunSvipo(
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
             agordojDeponejo = agordojDeponejo,
+            onPauxzigi = onPauxzigi,
+            onDaurigi = onDaurigi,
         )
     }
 }

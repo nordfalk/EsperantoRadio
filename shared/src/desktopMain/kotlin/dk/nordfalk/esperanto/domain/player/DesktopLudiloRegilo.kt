@@ -156,12 +156,17 @@ class DesktopLudiloRegilo : LudiloRegilo {
         } catch (e: Exception) {
             log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace(System.err)
-            _stato.value = _stato.value.copy(
+            // Portu la FONTON en la Eraro-staton (FAROTA G19): halti() supre forigis nunaFonton,
+            // kaj sen ĝi LudvicoRegilo reprovus/aŭtoludus la MALĜUSTAN (antaŭan) elsendon.
+            _stato.value = LudantoInformo(
                 // Retaj eraroj estas pasemaj; FileNotFoundException (HTTP 404) kaj nesubtenata formato ne
                 stato = LudantoStato.Eraro(
                     "Ne eblis sxargxi: ${e.message}",
                     reprovebla = e is java.io.IOException && e !is java.io.FileNotFoundException,
-                )
+                ),
+                nunaFonto = fonto,
+                pozicioMs = komencoPozicioMs,
+                estasRekta = fonto is Sonfonto.RektaKanalo
             )
         }
     }
@@ -225,6 +230,15 @@ class DesktopLudiloRegilo : LudiloRegilo {
         val fluo = audioInputStream
         if (line == null || fluo == null) {
             log("ludi: ERARO — sourceDataLine aü audioInputStream estas null")
+            return
+        }
+        // Daŭrigo post paŭzo (FAROTA G18): NE rekomencu la korutinon — `komenciLudadon`
+        // nuligus `totalBytesLuditaj`, do la pozicio rekomencus je 0 dum la fluo
+        // daŭras meze (kaj la 5s-pozicia savilo de LudvicoRegilo superskribus la ĝustan valoron).
+        if (ludaJob?.isActive == true && pauxzita) {
+            pauxzita = false
+            line.start()
+            _stato.value = _stato.value.copy(stato = LudantoStato.Ludas)
             return
         }
         ludas = true

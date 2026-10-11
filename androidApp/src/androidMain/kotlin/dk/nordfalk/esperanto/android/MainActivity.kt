@@ -19,6 +19,7 @@ import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.alKanalo
+import dk.nordfalk.esperanto.data.repository.AlarmoReceivilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -167,13 +168,18 @@ class MainActivity : ComponentActivity() {
 
                 logi("MainActivity", "Komencas ludi: ${kanalo.nomo}")
 
+                val ludvicoRegilo = AppStato.ludvicoRegilo
                 if (kanalo.rektaElsendaSonoUrl != null) {
-                    ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
-                    ludilo.ludi()
+                    // FAROTA G13: tra la regilo — rekta ludilo-voko ne nuligas reprovon
+                    if (ludvicoRegilo != null) {
+                        ludvicoRegilo.ludiRektan(kanalo)
+                    } else {
+                        ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
+                        ludilo.ludi()
+                    }
                 } else {
                     // Podkasto: ludu la plej freŝan neaŭskultitan elsendon
                     val elsendo = trovuAlarmElsendon(kanalo)
-                    val ludvicoRegilo = AppStato.ludvicoRegilo
                     if (elsendo == null || ludvicoRegilo == null) {
                         logw("MainActivity", "Neniu ludebla elsendo por $kanaloSlug — ludas fallback ringtonon")
                         luduFallbackRingtonon()
@@ -194,6 +200,10 @@ class MainActivity : ComponentActivity() {
             } catch (e: Exception) {
                 logw("MainActivity", "Eraro dum alarmo-ludado", e)
                 luduFallbackRingtonon()
+            } finally {
+                // FAROTA G28: transdonu la WakeLock-propriecon de AlarmoReceivilo —
+                // liberigu ĝin kiam la alarmo estas plene traktita
+                AlarmoReceivilo.liberiguAlarmoWakeLock()
             }
         }
     }

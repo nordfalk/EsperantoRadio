@@ -69,6 +69,10 @@ fun MiniLudilbreto(
      * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (FAROTA K3).
      */
     onHaltigi: suspend () -> Unit = { ludilo.halti() },
+    /** Paŭzigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.pauxziguLudadon] (FAROTA G13). */
+    onPauxzigi: suspend () -> Unit = { ludilo.pauxzigi() },
+    /** Daŭrigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.dauriguLudadon] (FAROTA G13). */
+    onDaurigi: suspend () -> Unit = { ludilo.ludi() },
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -192,7 +196,7 @@ fun MiniLudilbreto(
                 IconButton(onClick = {
                     logi("Klako", if (ludas) "paŭzigi" else "ludi")
                     scope.launch {
-                        if (ludas) ludilo.pauxzigi() else ludilo.ludi()
+                        if (ludas) onPauxzigi() else onDaurigi()
                     }
                 }) {
                     val konektas = info.stato is LudantoStato.Konektas ||

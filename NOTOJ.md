@@ -2,7 +2,7 @@
 
 > Ĉi tie staras la daŭre validaj decidoj, kondiĉoj kaj ĝangaloj de la nova KMP-apo,
 > kiuj estis lernitaj dum la kodrevizio (2026-10) kaj kiujn estonta programado devas
-> koni. La PR-referencoj montras al la PR kies priskribo kaj komsmitaj mesaĝoj
+> koni. La PR-referencoj montras al la PR kies priskribo kaj kommitaj mesaĝoj
 > entenas la plenan klarigon (pruvojn, kialojn, kaj la difinojn de la etikedoj
 > K…/G…/C… el la kodrevizio).
 >
@@ -11,7 +11,7 @@
 | [NOTOJ.md](NOTOJ.md) | ĉi tiu dosiero — permanenta scio, laŭ temo |
 | [FAROTA.md](FAROTA.md) | la RESTANTAJ (malfermaj) taskoj de la revizio |
 | [SXANGXOJ.md](SXANGXOJ.md) | detala historia taglibro — problemo→kaŭzo→riparo→testo |
-| [AGENTS.md](AGENTS.md) | laborfluo kaj il-mordecioj (build, CI, git) |
+| [AGENTS.md](AGENTS.md) | laborfluo kaj il-kutimoj (build, CI, git) |
 
 ## Ludado-arkitekturo
 
@@ -27,7 +27,7 @@
 - **Dedup de finoj estas deviga** ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)): la sama elsendo-fino povas esti raportita
   kaj de `EsperantoLudadoServo` (STATE_ENDED-aŭskultanto) kaj de la stato-observanto
   de `LudvicoRegilo`. `traktiFinon` markas la FINANTAN fonton kiel traktita en
-  atomara `ArrayDeque` (Mutex + fenestro) — duoblaj vokoj estas ignorataj.
+  atoma `ArrayDeque` (Mutex + fenestro) — duoblaj vokoj estas ignorataj.
   Transdonu ĉiam la finantan fonton (`traktiFinonPublika(..., finantaFonto = …)`),
   ne relegu `nunaFonto` (la aŭtoludo eble jam avancis).
 - **`erarojSinsekvaj` rekomenciĝas ĉe ĉiu vera sukceso** ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)) — sen tio 10 akumulitaj
@@ -75,7 +75,7 @@
   savas la krudan valoron en `ALARMOJ_REZERVO` antaŭ ol fali al la sugestoj — sen
   tio la sekvaj `persistu()`-vokoj anstataŭigus ĝin kaj la uzantaj alarmoj
   estus definitive perditaj.
-- **Alarmo-elekto** ([PR #95](https://github.com/nordfalk/EsperantoRadio/pull/95)): 1) plej nova nefinita/neerara, 2) falile plej nova
+- **Alarmo-elekto** ([PR #95](https://github.com/nordfalk/EsperantoRadio/pull/95)): 1) plej nova nefinita/neerara, 2) fale la plej nova
   NE-erara (reludado > erara fluo kiu tuj paneus), 3) null → fallback-ringtono
   (TYPE_ALARM + USAGE_ALARM-atributo) + vibrado.
 - **Skribu al Settings ANTAŬ ol lanĉi ion** el la ricevilo: se la alarmo lanĉas
@@ -85,7 +85,7 @@
 ## Reto kaj sekureco
 
 - **`network_security_config.xml` restas kun nur `base-config`** (klara teksto
-  malpermesata, neniuj esceptoj) — ĝi estas NEPRATA ĉar `minSdk = 26` (< API 28,
+  malpermesata, neniuj esceptoj) — ĝi estas NEPRIGATA ĉar `minSdk = 26` (< API 28,
   kie klara teksto estas defaŭlte permesata). Novaj kanaloj devas uzi HTTPS; la
   Peranto-emblemo estas gastigita sur `javabog.dk` (la originalo ne havas TLS) ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)).
 - **CIO + domajno-esceptoj = paneo** (2026-10-11, emulila testo): se la security-config
@@ -170,7 +170,7 @@
   mortigas la nuligo-semantikon (korutino ne finiĝas, sed ankaŭ ne plu funkcias).
 - **`Dispatchers.IO` ne ekzistas sur wasmJs** — komuna kodo uzas `Dispatchers.Default`
   (la Ktor-motoro mem taskas al siaj fadenoj).
-- **WakeLock-dungado el ricevilo** estas transdonata al la korutino kaj liberigata
+- **WakeLock-akiro el la ricevilo** estas transdonata al la korutino kaj liberigata
   en `finally` (kun tempolimo kiel sekureca reto).
 
 ## Protokolado kaj Sentry
@@ -179,6 +179,6 @@
   estas normala okazaĵo (regulo 4) kaj devas NE iĝi erar-nivela Sentry-evento —
   alikaze oni ne trovas la verajn paneojn. `loge` = paneo.
 - **`logd` por la datum-tavolo** (RssParsilo, ElsendoDeponejo): alie Sentry-`beforeSendLog`
-  inundeble raportas ĉiun kanal-ŝargadon.
+  inundiĝus per raportoj pri ĉiu kanal-ŝargado.
 - ** Medio laŭ la DEBUGGING-flago** ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)), ne la build-tipo: debug-versio → "evoluo",
   release → "produktado" (10 % specimenado).

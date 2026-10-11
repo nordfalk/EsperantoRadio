@@ -628,9 +628,9 @@ kies historio gravas; la DAŬRE VALIDA scio staras en `NOTOJ.md`.
 
 - **K2 — sciigoj ne funkciis kun fermita apo**: `appContext`/Sentry estis agordataj
   nur en `MainActivity`. En procezo lanĉita de WorkManager (la normala kazo por la
-  perioda kontrolo je 7:00/16:00) `sciigPermesoDonita()` trafis neprapezalan
+  perioda kontrolo je 7:00/16:00) `sciigPermesoDonita()` trafis neiniciigitan
   `lateinit`-kampon → `UninitializedPropertyAccessException` → senfina
-  `Result.retry()`-ciklo (baterio-dreno, API 33+), aŭ `kreuSettings()` reenis al
+  `Result.retry()`-ciklo (baterio-dreno, API 33+), aŭ `kreuSettings()` reenfalis al
   `NoOpSettings` → silenta nenio-faro (API 26-32). **Riparo**: `EsperantoRadioAplikajho`
   (Application.onCreate — ĉiu procezo).
 - **G28 + realaparata regreso — alarmo 16:10 ludis nur je 16:14** (2026-10-11,

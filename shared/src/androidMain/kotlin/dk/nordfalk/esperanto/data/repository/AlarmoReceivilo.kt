@@ -17,6 +17,7 @@ import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
+import dk.nordfalk.esperanto.logGrava
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -70,7 +71,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
         val kanaloSlug = intent.getStringExtra("kanal_slug")
         val etikedo = intent.getStringExtra("etikedo")
 
-        logi("AlarmoReceivilo", "Alarmo ekigis! id=$alarmoId kanalo=$kanaloSlug etikedo=$etikedo")
+        logGrava("AlarmoReceivilo", "Vekiĝo: alarmo ekigis! id=$alarmoId kanalo=$kanaloSlug etikedo=$etikedo")
 
         alarmoWakeLock = (context.getSystemService(Context.POWER_SERVICE) as PowerManager)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG)

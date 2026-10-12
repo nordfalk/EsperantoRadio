@@ -14,6 +14,8 @@ object SettingsKeys {
     const val ALARMOJ_REZERVO = "alarmoj_rezervo"
     const val AUXTOMATA_DAURIGO = "auxtomata_daurigo"
     const val EVOLO = "evoluo"
+    /** Ĉu la uzanto ŝaltis "detalan protokoladon" (pliaj logi-vokoj al Sentry). */
+    const val DETALA_PROTOKOLADO = "detala_protokolado"
     const val KASXITAJ_AVERTOJ = "kasxitaj_avertoj"
     /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (PR #89). */
     const val INTENT_NONCE = "intent_nonce"

@@ -52,6 +52,7 @@ interface AgordojDeponejo {
     val sciigoj: StateFlow<Boolean>
     val auxtomataDaurigo: StateFlow<Boolean>
     val evoluo: StateFlow<Boolean>
+    val detalaProtokolado: StateFlow<Boolean>
 
     /**
      * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
@@ -63,6 +64,7 @@ interface AgordojDeponejo {
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
     fun fiksiEvoluon(sxaltita: Boolean)
+    fun fiksiDetalanProtokoladon(sxaltita: Boolean)
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
     fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>)

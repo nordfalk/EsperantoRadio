@@ -36,6 +36,7 @@ fun AgordojEkrano(
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
+    val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
 
     Scaffold(
@@ -129,6 +130,21 @@ fun AgordojEkrano(
                     Switch(
                         checked = evoluo,
                         onCheckedChange = { logi("Klako", "evoluo → $it"); agordojDeponejo.fiksiEvoluon(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(Modifier.height(24.dp))
+            Text("Privateco", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Ŝaltu detalan protokoladon") },
+                supportingContent = { Text("Sendas pliajn informojn pri via uzado al la erar-monitorado (Sentry). Defaŭlte nur eraroj kaj gravaj eventoj (malfermo, ekludo, vekiĝo) estas sendataj") },
+                trailingContent = {
+                    Switch(
+                        checked = detalaProtokolado,
+                        onCheckedChange = { logi("Klako", "detalaProtokolado → $it"); agordojDeponejo.fiksiDetalanProtokoladon(it) }
                     )
                 }
             )

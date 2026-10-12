@@ -18,6 +18,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 - Vekhorloĝo: se ĉiuj elsendoj de la kanalo estas jam aŭskultitaj, la alarmo nun reludas la plej novan sane ludeblan anstataŭ eble eraran elsendon (https://github.com/nordfalk/EsperantoRadio/pull/95)
 - La averto pri detektitaj problemoj sur la ĉefekrano havas "x"-butonon por kaŝi ĝin; ĝi kondukas al la agordoj, kie la averto ĉiam restas videbla ĉe "Diagnozo". Kiam nova problemo aperas, la averto reaperas sur la ĉefekrano (https://github.com/nordfalk/EsperantoRadio/pull/105)
+- Nova agordo "Ŝaltu detalan protokoladon" (Agordoj → Privateco): defaŭlte nur eraroj kaj gravaj eventoj (malfermo de la apo, ekludo de elsendo, vekiĝo) sendiĝas al la erar-monitorado; ŝaltu por sendi ankaŭ la ceterajn protokolajn informojn (https://github.com/nordfalk/EsperantoRadio/pull/106)
 
 ### Riparita
 

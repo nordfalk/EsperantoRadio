@@ -411,6 +411,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
   sen kaŝita differenco = la ĉeno mem estas alia.
 
+- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
+  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
+  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
+  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
+  `options.logs.enabled` estas nun ĉiam `true` — sen tio la gravaj eventoj kaj la
+  ŝaltita detala protokolado estus forĵetitaj en produktado. Ne reenmetu
+  `Sentry.captureMessage` por aŭtoludo (ĉiu aŭtomata sekva = 1 evento).
+
 ## Logcat (Android)
 
 `adb` jam haveblas en la medio (`/home/j/Android/Sdk/platform-tools/adb`) kaj la
@@ -483,14 +491,25 @@ foje malsukcesas).
 **Protokol-konvencio (grava por la Sentry-kvoto)**:
 
 - `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
-- `logi`/`logw`/`loge` → ankaŭ `Sentry.logger.*` — ĉiu voko estas eningendigita
-  kaj kalkuliĝas kontraŭ la kvoto.
+- `logi` → loka + `Sentry.logger.info` **nur se "detala protokolado" estas ŝaltita**
+  (agordo Agordoj → Privateco; tutmonda flag `protokoloDetala` en `ProtokoloUtil.kt`,
+  sinkronigita de `AgordojDeponejoImpl`). Defaŭlte `logi` restas nur loka.
+- `logGrava` → loka + `Sentry.logger.info` **ĉiam** — nur por la gravaj eventoj:
+  malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
+  Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la kvoto.
+- `logw`/`loge` → ankaŭ `Sentry.logger.warn`/`error` — ĉiam sendataj (avertoj kaj
+  eraroj estas maloftaj, do ili ne minacas la kvoton).
+- `loge(tag, msg, e)` → krome `Sentry.captureException(e)` (eraro-evento).
+- `Sentry.captureMessage` rekte en la kodo — NE uzu por po-ŝanĝaj aferoj
+  (ĉiu aŭtoludo k.a. kreus eventon kaj plenigus la kvoton).
 - Regulo: **altfrekvencaj datum-tavolaj detaloj uzu `logd`** (parsado, diskkaŝmemoro,
   serĉo — io, kio okazas po kanalo po ŝargo); `logi` nur por uzantvidaj eventoj
   (navigado, klakoj, ludado, starto). `logw`/`loge` ĉiam indas protokoligi.
   (2026-10-09: la `logi`-vokoj de RssParsilo/ElsendoDeponejo estis ~85–90 % de
   ĉiuj protokoloj — po ~700 mesaĝoj/kanalo/semajno nur por «parsado kompleta»;
   ili fariĝis `logd`.)
+- `options.logs.enabled` estas ĉiam `true` (ankaŭ en produktado) — la kvanto estas
+  limigita per la kodo supre (2026-10-12).
 
 ## UI-dizajno (celo)
 

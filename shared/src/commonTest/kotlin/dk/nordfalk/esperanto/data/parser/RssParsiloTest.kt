@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class RssParsiloTest {
@@ -83,27 +84,57 @@ class RssParsiloTest {
     @Test
     fun parsasVarsoviaVenton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("varsoviavento_feed.xml")
+        // La purigaj modeloj kiel en la vera kanalkonfiguro (regulo 6.6, FAROTA G15/G39).
+        // Temperitaj modeloj (?:(?!</p>).) — ili ne povas transiri alineon.
         val kanalo = Kanalo(
             slug = "varsoviavento",
             nomo = "Varsovia Vento",
-            podkastaRssUrl = "https://www.podkasto.net/feed/"
+            podkastaRssUrl = "https://www.podkasto.net/feed/",
+            puriguModeloj = listOf(
+                "<audio .+?</audio>",
+                "<p>(?:(?!</p>).)*?tempo-daŭro(?:(?!</p>).)*?</p>",
+                "<p>(?:(?!</p>).)*?Subtenu nin(?:(?!</p>).)*?</p>",
+            ),
         )
 
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
-        assertTrue(elsendoj.isNotEmpty(), "Varsovia Vento devas havi elsendojn")
-        println("Varsovia Vento: ${elsendoj.size} elsendoj")
+        // Preciza kalkulo (FAROTA G39): 10 eroj → 31 elsendoj (9 × 3 partoj + 182a × 4)
+        assertEquals(31, elsendoj.size, "Varsovia Vento devas havi 31 elsendojn")
 
-        // Trovu eron kun pluraj partoj (id finiĝas per :1, :2, :3)
-        val plurpartaj = elsendoj.filter { it.id.matches(Regex(".*:\\d+$")) }
-        if (plurpartaj.isNotEmpty()) {
-            val unuaParto = plurpartaj.first()
-            println("Plurparta: ${unuaParto.titolo} — ${unuaParto.id}")
-            assertTrue(unuaParto.titolo.contains("parto"), "Titolo devas enhavi 'parto': ${unuaParto.titolo}")
-            assertTrue(unuaParto.fluo.contains(".mp3"), "Stream devas enhavi .mp3: ${unuaParto.fluo}")
+        // "La 185a elsendo" (2025-04-24) havas 3 partojn kun konataj fluoj
+        val vv185 = elsendoj.filter { it.titolo.startsWith("La 185a elsendo") }
+        assertEquals(3, vv185.size, "La 185a elsendo havas 3 partojn")
+        assertEquals(
+            listOf("varsoviavento:2025-04-24:1", "varsoviavento:2025-04-24:2", "varsoviavento:2025-04-24:3"),
+            vv185.map { it.id },
+        )
+        assertEquals(
+            listOf("1a parto", "2a parto", "3a parto"),
+            vv185.map { it.titolo.removePrefix("La 185a elsendo ") },
+        )
+        assertTrue(vv185.all { it.fluo.contains("250424VVE185P1") || it.fluo.contains("250424VVE185P2") || it.fluo.contains("250424VVE185P3") },
+            "La fluoj de la 185a devas esti VVE185P1/P2/P3: ${vv185.map { it.fluo }}")
+
+        // Regres-kontrolo kontraŭ la malnova "<p>.+?FRazo.+?</p>"-formo: la enkonduka
+        // alineo de la 185a-ero devas PLUVIVI la purigadon
+        assertTrue(
+            (vv185.first().priskribo ?: "").startsWith("Mikrofona renkontiĝo kun Matt"),
+            "La enkonduko devas pluvivi: ${vv185.first().priskribo?.take(80)}",
+        )
+
+        // Regulo 6.6 (FAROTA G15): la priskribo estas purigata — neniu parto-listilo,
+        // neniu reklamo, neniu enkonstruita <audio>-ludilo
+        for (e in elsendoj) {
+            val priskribo = e.priskribo ?: ""
+            assertTrue(priskribo.isNotBlank(), "La priskribo devas havi veran enhavon post la purigado")
+            assertFalse(priskribo.contains("tempo-daŭro"), "Parto-listilo devas esti purigita: ${priskribo.take(80)}")
+            assertFalse(priskribo.contains("Subtenu nin"), "Reklamo devas esti purigita")
+            assertFalse(priskribo.contains("elŝutu"), "Elŝut-ligiloj devas esti purigita")
+            assertFalse((e.priskriboHtml ?: "").contains("<audio"), "Enkonstruita ludilo devas esti purigita")
         }
 
-        // Ĉiuj ID-oj devas havi formaton varsoviavento:yyyy-MM-dd:n
+        // Ĉiuj ID-oj devas havi la formaton varsoviavento:yyyy-MM-dd:n
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("varsoviavento:"), "ID: ${e.id}")
             assertTrue(e.kanaloSlug == "varsoviavento")
@@ -115,16 +146,33 @@ class RssParsiloTest {
     @Test
     fun parsasVinilkosmon() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
+        // La puriga modelo kiel en la vera kanalkonfiguro (regulo 6.6, FAROTA G15)
         val kanalo = Kanalo(
             slug = "vinilkosmo",
             nomo = "Vinilkosmo",
-            podkastaRssUrl = "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio"
+            podkastaRssUrl = "http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio",
+            puriguModeloj = listOf("""<p class="who">(?:(?!</p>).)*?</p>"""),
         )
 
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertTrue(elsendoj.isNotEmpty(), "Vinilkosmo devas havi elsendojn")
-        println("Vinilkosmo: ${elsendoj.size} elsendoj")
+
+        // G29: la titolo venas el <title> de la ero — NE derivata el la enhavo
+        // (antaŭe: "VINILKOSMO … has posted: …")
+        val amsterdamo = elsendoj.first { it.titolo.contains("Amsterdam") }
+        assertTrue(
+            amsterdamo.titolo.contains("La Kompanoj kantas Brel"),
+            "La titolo de la Amsterdam-ero venas el <title>: ${amsterdamo.titolo}",
+        )
+        for (e in elsendoj) {
+            assertFalse(e.titolo.contains("has posted"), "Titolo ne devenu de la enhavo: ${e.titolo}")
+        }
+
+        // G15: la "<p class='who'>…has posted…</p>"-alineo estas purigata el la priskribo
+        for (e in elsendoj) {
+            assertFalse((e.priskribo ?: "").contains("has posted"), "Priskribo devas esti purigita")
+        }
 
         // ID-formato: vk:<publikig-sen-tempzonon>
         for (e in elsendoj) {
@@ -683,5 +731,146 @@ class RssParsiloTest {
         assertFalse(rezulto.contains("<iframe"), "Rezulto ne enhavas <iframe>: $rezulto")
         assertTrue(rezulto.contains("Hi"), "Rezulto devas enhavi 'Hi': $rezulto")
         assertTrue(rezulto.contains("<p>"), "Rezulto devas konservi <p>: $rezulto")
+    }
+
+    // === FAROTA G2 — nur http(s)-fluoj el nefidinda RSS ===
+
+    @Test
+    fun forjxasElsendojnKunNeRetajSkemoj() = kotlinx.coroutines.test.runTest {
+        // file://, content:// kaj javascript:// el difektita/malica fluo ne estu ludeblaj:
+        // ExoPlayer/Coil scipovas malfermi file:// kaj content://
+        val rss = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Bona</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/bona.mp3" type="audio/mpeg"/></item>
+            <item><title>Dosiero</title><pubDate>Thu, 2 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="file:///data/data/sekreto.mp3" type="audio/mpeg"/></item>
+            <item><title>Content</title><pubDate>Fri, 3 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="content://media/external/audio/1" type="audio/mpeg"/></item>
+            <item><title>Skripto</title><pubDate>Sat, 4 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="javascript:alert(1)" type="audio/mpeg"/></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val elsendoj = parsilo.parsuRss(rss, kanalo)
+
+        assertEquals(1, elsendoj.size, "Nur la https-fluo devas resti: ${elsendoj.map { it.titolo }}")
+        assertEquals("Bona", elsendoj[0].titolo)
+    }
+
+    @Test
+    fun saniguRetUrlonNuligasNepermesatajnSkemojn() {
+        assertEquals("https://x.example/a.mp3", parsilo.saniguRetUrlon("https://x.example/a.mp3"))
+        assertEquals("http://x.example/a.mp3", parsilo.saniguRetUrlon(" http://x.example/a.mp3 "))
+        assertNull(parsilo.saniguRetUrlon("file:///sekreto"))
+        assertNull(parsilo.saniguRetUrlon("content://media/1"))
+        assertNull(parsilo.saniguRetUrlon("intent://malico/#Intent;end"))
+        assertNull(parsilo.saniguRetUrlon("javascript:alert(1)"))
+        assertNull(parsilo.saniguRetUrlon(""))
+        assertNull(parsilo.saniguRetUrlon(null))
+    }
+
+    // === FAROTA G4 — ligilo-sanigado en priskriboj ===
+
+    @Test
+    fun puriguHtmlForigasDanxerajnLigilojn() {
+        val html = "<p>Saluton " +
+            "<a href=\"intent://malico/#Intent;action=android.intent.action.CALL;end\">voku</a>" +
+            "<a href=\"JaVaScRiPt:alert(1)\">kliku</a>" +
+            "<a href=\"data:text/html;base64,PHNjcmlwdD4=\">datumo</a>" +
+            "<a href=\"https://bone.example/pagho\">ĝusta ligilo</a></p>"
+        val purigita = parsilo.puriguHtmlKunEtikedojn(html)
+        assertFalse(purigita.contains("intent://"), "intent:// devas esti forigita: $purigita")
+        assertFalse(purigita.lowercase().contains("javascript:"), "javascript: devas esti forigita: $purigita")
+        assertFalse(purigita.contains("data:text/html"), "data:-URL devas esti forigita: $purigita")
+        assertTrue(purigita.contains("https://bone.example/pagho"), "http(s)-ligilo devas resti: $purigita")
+    }
+
+    // === FAROTA G30 — <audio>-fallback ene de la priskribo-HTML ===
+
+    @Test
+    fun auxdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
+        // Regulo 6.1.4: fluo kies sola sono estas en <audio><source> ene de la priskribo
+        // (CDATA/eskapita) — antaŭe la serĉo okazis en la XML-dokumento kaj trovis nenion
+        val rss = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Kun sono en priskribo</title>
+              <pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <description><![CDATA[<p>Aŭdu: <audio><source src="https://x.example/sono.mp3" type="audio/mpeg"></audio></p>]]></description>
+            </item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val elsendoj = parsilo.parsuRss(rss, kanalo)
+
+        assertEquals(1, elsendoj.size, "La ero devas esti trovita per la priskribo-<audio>")
+        assertEquals("https://x.example/sono.mp3", elsendoj[0].fluo)
+    }
+
+    // === FAROTA G32 — ĝenerala skip-listo de nesubtenataj gastigantoj ===
+
+    @Test
+    fun forjxasElsendojnKunNesubtenatajGastigantoj() = kotlinx.coroutines.test.runTest {
+        val rss = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Bona</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/bona.mp3" type="audio/mpeg"/></item>
+            <item><title>YouTube</title><pubDate>Thu, 2 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://www.youtube.com/watch?v=abc" type="video/mpeg"/></item>
+            <item><title>SoundCloud</title><pubDate>Fri, 3 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://soundcloud.com/uzanto/kanto" type="audio/mpeg"/></item>
+            <item><title>Vimeo</title><pubDate>Sat, 4 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://vimeo.com/12345" type="video/mp4"/></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val elsendoj = parsilo.parsuRss(rss, kanalo)
+
+        assertEquals(listOf("Bona"), elsendoj.map { it.titolo },
+            "Nur la ludebla fluo devas resti (video-gastigantoj estas saltataj)")
+    }
+
+    // === FAROTA C10/C12/C13 — dato-, daŭro- kaj enclosure-randaĵoj ===
+
+    @Test
+    fun normigasDatojnSenTempoKajKunKvarliteraMonato() {
+        // "2024-01-05" sen T — antaŭe la tuta ero estis forĵetita (return null)
+        assertEquals("2024-01-05", parsilo.normigiDaton("2024-01-05"))
+        // "Sept" (4 literoj) — antaŭe ne rekonita
+        assertEquals("2024-09-05", parsilo.normigiDaton("5 Sept 2024"))
+        // ...kaj la 3-literaj formoj daŭre funkcias
+        assertEquals("2025-04-24", parsilo.normigiDaton("Thu, 24 Apr 2025 12:00:00 +0000"))
+        assertNull(parsilo.normigiDaton("ne estas dato"))
+    }
+
+    @Test
+    fun leguDaŭronKunFrakciajSekundoj() {
+        assertEquals(3_077L, parsilo.leguDauron("00:51:17.47"))
+        assertEquals(3_077L, parsilo.leguDauron("00:51:17"))
+        assertEquals(90L, parsilo.leguDauron("1:30"))
+        assertNull(parsilo.leguDauron("abc"))
+    }
+
+    @Test
+    fun preferasAŭdianEnclosure() = kotlinx.coroutines.test.runTest {
+        // Iuj fluoj metas bild-enclosure unue — la audio devas veni unue (FAROTA C12)
+        val rss = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Bilda unue</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/bildo.jpg" type="image/jpeg" length="1000"/>
+              <enclosure url="https://x.example/sono.mp3" type="audio/mpeg" length="999999"/>
+            </item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val elsendoj = parsilo.parsuRss(rss, kanalo)
+
+        assertEquals(1, elsendoj.size)
+        assertEquals("https://x.example/sono.mp3", elsendoj[0].fluo,
+            "La audio-enclosure devas esti preferata super la bildo")
     }
 }

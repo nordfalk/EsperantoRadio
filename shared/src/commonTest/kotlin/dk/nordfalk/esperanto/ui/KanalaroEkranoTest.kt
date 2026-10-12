@@ -31,7 +31,10 @@ class KanalaroEkranoTest {
     fun kanalaroMontrasKanalojn() = runComposeUiTest {
         val deponejo = FalsaKanaloDeponejo(
             listOf(
-                Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x"),
+                Kanalo(
+                    slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "x",
+                    priskribo = "24-hora Esperanto-retradio: muziko kaj parolataj programeroj."
+                ),
                 Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "y"),
             )
         )
@@ -46,5 +49,7 @@ class KanalaroEkranoTest {
         onNodeWithText("Kernpunkto").assertIsDisplayed()
         onNodeWithText("Rekta elsendo").assertIsDisplayed()
         onNodeWithText("Podkasto").assertIsDisplayed()
+        // Priskribo el la kanalkonfiguro vidigatas en la listero
+        onNodeWithText("24-hora Esperanto-retradio: muziko kaj parolataj programeroj.").assertIsDisplayed()
     }
 }

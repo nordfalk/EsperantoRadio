@@ -57,6 +57,15 @@ class WasmJsLudiloRegilo : LudiloRegilo {
             val kodo = audio?.error?.code?.toInt()
             _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro ($kodo)", reprovebla = kodo == 2))
         })
+        // FAROTA G20: sen timeupdate la pozicio frostas ĉe la valoro de "playing" —
+        // la serĉbreto ne moviĝas kaj la pozicia savilo de LudvicoRegilo konservas malnovan valoron
+        audio!!.addEventListener("timeupdate", { _ ->
+            val a = audio ?: return@addEventListener
+            _stato.value = _stato.value.copy(
+                pozicioMs = (a.currentTime * 1000).toLong(),
+                dauroMs = if (a.duration.isNaN()) 0 else (a.duration * 1000).toLong(),
+            )
+        })
         _stato.value = LudantoInformo(
             stato = LudantoStato.Konektas,
             nunaFonto = fonto,
@@ -66,7 +75,19 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         )
     }
 
-    override fun ludi() { audio?.play() }
+    override fun ludi() {
+        // FAROTA G21: play() redonas Promise kaj ĝia malakcepto (aŭtopl.-politiko, CORS)
+        // NE ekigas la "error"-eventon — sen kapto la stato restus "Konektas" eterne
+        audio?.play()?.catch { rezulto: JsAny? ->
+            _stato.value = _stato.value.copy(
+                stato = LudantoStato.Eraro(
+                    "Ne eblis komenci la ludadon: ${rezulto?.toString() ?: "nekonata kaŭzo"}",
+                    reprovebla = true,
+                )
+            )
+            null
+        }
+    }
     override fun pauxzigi() { audio?.pause() }
     override fun halti() { audio?.pause(); audio = null; nunaFonto = null; _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { audio?.currentTime = pozicioMs / 1000.0 }

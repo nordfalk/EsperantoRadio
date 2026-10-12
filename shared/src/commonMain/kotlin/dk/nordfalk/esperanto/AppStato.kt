@@ -16,8 +16,12 @@ import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
 import dk.nordfalk.esperanto.domain.DiagnozoRegilo
 import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
+import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
+import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.ui.HejmoViewModel
 import dk.nordfalk.esperanto.ui.KanalaroViewModel
@@ -73,6 +77,28 @@ object AppStato {
     fun inicialigita(): Boolean = httpKliento != null
 
     /**
+     * Trovas la elsendon kiun alarmo ludu por podkasta kanalo (komuna por la
+     * alarmo-ricevilo kaj la ĉefaktivon). Provas laŭvice:
+     * reton (freŝa RSS), diskkaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
+     * la reto ofte ankoraŭ ne pretas. Poste elektas per [elektuAlarmElsendon].
+     *
+     * Revenas null se AppStato ne estas inicialigita aŭ neniu elsendo troveblas.
+     */
+    suspend fun trovuAlarmElsendon(kanalo: Kanalo): Elsendo? {
+        val elsendoDeponejo = elsendoDeponejo
+            ?: return null.also { logw("AppStato", "Ne inicialigita — ne povas trovi elsendon por alarmo") }
+        val elsendoj = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi = true)
+            .ifEmpty { elsendoDeponejo.leguKashitajnElsendojn(kanalo) ?: emptyList() }
+            .ifEmpty {
+                elshutDeponejo?.observiElshutojn()?.value?.values
+                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElshutStato.Preta }
+                    ?.map { it.elsendo } ?: emptyList()
+            }
+        val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        return elektuAlarmElsendon(elsendoj, ludatoj)
+    }
+
+    /**
      * Kreas ĉiujn deponejojn kaj ViewModel-ojn. Idempotent — se jam inicialigita, faras nenion.
      *
      * @param ludilo la ludilo-regilo (platform-specifa, transdonita de la enirpunkto)
@@ -94,6 +120,9 @@ object AppStato {
             install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
                 connectTimeoutMillis = 10_000
+                // FAROTA C2: sen tio servilo kiu akceptas kaj poste silentegas povas
+                // teni la peton viva pli longe ol la dezirata limo
+                socketTimeoutMillis = 30_000
             }
         }
 
@@ -137,8 +166,10 @@ object AppStato {
 
         diagnozoRegilo = kreuDiagnozoRegilon()
 
-        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano
-        CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
+        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano.
+        // Dispatchers.Default, ne IO: IO ne ekzistas sur wasmJs (la DNS-testo de la
+        // Android-implemento rulas en propra fadeno interne).
+        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
             try {
                 diagnozoRegilo?.kontroliRapide()
             } catch (e: Exception) {

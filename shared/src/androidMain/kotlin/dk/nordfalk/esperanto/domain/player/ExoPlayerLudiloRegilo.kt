@@ -1,4 +1,4 @@
-package dk.nordfalk.esperanto.android
+package dk.nordfalk.esperanto.domain.player
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,9 +18,8 @@ import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.repository.Agadoj
 import dk.nordfalk.esperanto.data.repository.LudiElsendoReceivilo
-import dk.nordfalk.esperanto.domain.player.LudiloRegilo
-import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -41,9 +40,10 @@ import kotlin.math.roundToInt
 /**
  * Android-implemento de LudiloRegilo per Media3 MediaController.
  *
- * La vera ExoPlayer vivas en [EsperantoLudadoServo] (MediaSessionService).
- * Tiu ĉi klaso estas maldika prokso: ĝi konektiĝas al la servo per
- * MediaController kaj plusendas komandojn. Tiel la ludado daŭras en la fono
+ * La vera ExoPlayer vivas en la MediaSessionService (`EsperantoLudadoServo` en la
+ * `androidApp`-modulo — atingebla per [Agadoj.LUDADO_SERVO], ĉar `shared` ne povas
+ * referenci la klason rekte). Tiu ĉi klaso estas maldika prokso: ĝi konektiĝas al la
+ * servo per MediaController kaj plusendas komandojn. Tiel la ludado daŭras en la fono
  * eĉ kiam la Activity detruiĝas.
  *
  * Estas **unu instanco por la tuta procezo** ([akiru]) — ne po Activity. [AppStato] kaj
@@ -74,7 +74,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
     private val cxefaFadeno = Handler(Looper.getMainLooper())
 
     private val appContext = context.applicationContext
-    private val sessionToken = SessionToken(appContext, ComponentName(appContext, EsperantoLudadoServo::class.java))
+    private val sessionToken = SessionToken(appContext, ComponentName(appContext, Agadoj.LUDADO_SERVO))
     private val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
     private var controller: MediaController? = null
 
@@ -160,8 +160,14 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         // Se eraro ekzistas, konservu Eraro-staton — onPlaybackStateChanged(STATE_IDLE)
         // vokas updateState() tuj post onPlayerErrorChanged kaj povus superskribi Eraro per Haltita.
         // StateFlow estas conflated, do la kolektanto povus maltrafi Eraro se ni ne gardas ĝin ĉi tie.
+        // Escepto: post halti() (stop + clearMediaItems) la playerError RESTAS — Media3 1.5.1
+        // ne nuligas ĝin (nur prepare() faras) — kaj onMediaItemTransition(null) vokus updateState().
+        // Sen la mediaItemCount-gardilo la stato iĝus Eraro anstataŭ Haltita, kaj LudvicoRegilo
+        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (FAROTA K3).
         val error = c.playerError
-        val ludantoStato = if (error != null) {
+        val ludantoStato = if (c.mediaItemCount == 0) {
+            LudantoStato.Haltita
+        } else if (error != null) {
             LudantoStato.Eraro(error.message ?: "Nekonata eraro", reprovebla = estasReproveblaEraro(error))
         } else when (c.playbackState) {
             Player.STATE_READY -> if (c.isPlaying) LudantoStato.Ludas else LudantoStato.Haltita

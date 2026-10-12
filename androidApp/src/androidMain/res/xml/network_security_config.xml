@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Klara teksto (HTTP) estas MALPERMESATA por la tuta trafiko — neniuj esceptoj (FAROTA G1).
+
+    Ĉiuj URL-oj en la kanalkonfiguro uzas HTTPS (kontrolitaj per rekta provo, 2026-10-11).
+    La sola http-restinta (Peranto-emblemo) estis movigita al
+    https://javabog.dk/privat/esperantoradio/retradiologo.gif — la originalo
+    (wp11081574.server-he.de) ne subtenas TLS, do la emblemo estas gastigita sur javabog.dk.
+    Novaj kanaloj devas uzi HTTPS.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

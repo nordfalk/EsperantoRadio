@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 data class Kanalo(
     val slug: String,                         // kodo — unika ŝlosilo
     val nomo: String,                          // vidiga nomo
+    val priskribo: String? = null,              // mallonga priskribo (1-2 linioj) el la kanalkonfiguro
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,   // livestream (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
@@ -20,6 +21,8 @@ data class Kanalo(
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
+    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6) — datum-movita, el la JSONC. */
+    val puriguModeloj: List<String> = emptyList(),
     val defaltSxatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null

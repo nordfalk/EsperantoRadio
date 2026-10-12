@@ -128,8 +128,7 @@ internal class PreviewElsendoDeponejo(
     private val elsendoj: List<Elsendo>,
 ) : ElsendoDeponejoImpl(HttpClient(httpMotoro)) {
     override suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
-        kaŝmemoro[kanalo.slug] = elsendoj
-        fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
+        konservu(kanalo.slug, elsendoj)
         return elsendoj
     }
 }

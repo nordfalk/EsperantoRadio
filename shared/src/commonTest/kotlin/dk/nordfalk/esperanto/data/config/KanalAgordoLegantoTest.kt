@@ -40,6 +40,33 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
+    fun legasPriskribonKajPlueAlKanalo() {
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "muzaiko",
+                        "nomo": "Muzaiko",
+                        "priskribo": "24-hora Esperanto-retradio: muziko kaj parolataj programeroj.",
+                        "elsendojRssUrl": "https://ekzemplo.com/feed/"
+                    },
+                    {
+                        "kodo": "senpriskribo",
+                        "nomo": "Sen priskribo",
+                        "elsendojRssUrl": "https://ekzemplo.com/alia/"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertEquals("24-hora Esperanto-retradio: muziko kaj parolataj programeroj.", agordo.kanaloj[0].priskribo)
+        assertEquals("24-hora Esperanto-retradio: muziko kaj parolataj programeroj.", agordo.kanaloj[0].alKanalo().priskribo)
+        assertNull(agordo.kanaloj[1].priskribo)
+    }
+
+    @Test
     fun legasRektaElsendaSonoUrl() {
         val jsonc = """
             {
@@ -109,5 +136,89 @@ class KanalAgordoLegantoTest {
         val agordo = leganto.legu(jsonc)
 
         assertTrue(agordo.kanaloj.isEmpty())
+    }
+
+    // === FAROTA K5 — ĝusta percent-malkodado de supersignoj ===
+
+    @Test
+    fun malkoduUrlKoditajxonCxiujSupersignoj() {
+        // %C4%A5 = ĥ (la malnova tabelo erare mapis ĝin al ĵ),
+        // %C5%9C = Ŝ (ne ŝ), %C5%AC = Ŭ (ne Ŝ — kaj la linio aperis dufoje)
+        assertEquals(
+            "ĈĉĜĝĤĥĴĵŜŝŬŭ",
+            malkoduUrlKoditajxon("%C4%88%C4%89%C4%9C%C4%9D%C4%A4%C4%A5%C4%B4%C4%B5%C5%9C%C5%9D%C5%AC%C5%AD")
+        )
+    }
+
+    @Test
+    fun malkoduUrlKoditajxonPlusKajLinisalto() {
+        assertEquals("Muzaiko matene\nlabortago", malkoduUrlKoditajxon("Muzaiko+matene%0Alabortago"))
+        // Jam-malkoditaj signoj estas trairataj senŝanĝe
+        assertEquals("Ĥoro Ŭato", malkoduUrlKoditajxon("Ĥoro Ŭato"))
+        // Ne-heksa %-sekvenco restas senŝanĝe
+        assertEquals("100% certa", malkoduUrlKoditajxon("100%+certa"))
+        // %25 = %
+        assertEquals("100%", malkoduUrlKoditajxon("100%25"))
+    }
+
+    @Test
+    fun malkoduUrlKoditajxonKun4BajtaSigno() {
+        // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bajtajn UTF-8-signojn
+        assertEquals("😀", malkoduUrlKoditajxon("%F0%9F%98%80"))
+    }
+
+    @Test
+    fun parsuSugestojnPorAlarmojKunSupersignoj() {
+        val sugestoj = "10000/0/6/45/31/0/=muzaiko/=Matena+%C4%A5oro+de+%C5%ACato/"
+
+        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
+
+        assertEquals(1, alarmoj.size)
+        assertEquals("Matena ĥoro de Ŭato", alarmoj[0].etikedo)
+        assertEquals("muzaiko", alarmoj[0].kanaloSlug)
+    }
+
+    @Test // FAROTA C4: ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon
+    fun koercasEkstervalorajnSugestojn() {
+        // horo=99, minuto=-5, ripeto=0x123 (ekster la 7 tago-bitoj)
+        val sugestoj = "10001/1/99/-5/291/0/=muzaiko/=Testa/"
+
+        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
+
+        assertEquals(1, alarmoj.size, "Unu malbona kampo ne devas forĵeti la sugeston (regulo 4)")
+        assertEquals(23, alarmoj[0].horo)
+        assertEquals(0, alarmoj[0].minuto)
+        assertEquals(0x23, alarmoj[0].ripeto, "ripeto devas esti maskita al la 7 tago-bitoj (0x123 & 0x7f = 0x23 = Lu+Ma+Sa)")
+    }
+
+    @Test
+    fun legasPuriguModelojn() {
+        // Regulo 6.6 (FAROTA G15): kanal-specifaj purigaj regex-modeloj el la konfiguro
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "varsoviavento",
+                        "nomo": "Varsovia Vento",
+                        "puriguModeloj": [
+                            "<p>.+?Elŝutu podkaston.+?</p>",
+                            "<audio .+?</audio>"
+                        ]
+                    },
+                    {
+                        "kodo": "senmodeloj",
+                        "nomo": "Sen Modeloj"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        val vv = agordo.kanaloj[0].alKanalo()
+        assertEquals(2, vv.puriguModeloj.size)
+        assertTrue(vv.puriguModeloj[0].contains("Elŝutu podkaston"))
+        // Kanalo sen la kampo ricevas malplenan liston (defaŭlto)
+        assertTrue(agordo.kanaloj[1].alKanalo().puriguModeloj.isEmpty())
     }
 }

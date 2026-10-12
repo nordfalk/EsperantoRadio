@@ -16,11 +16,44 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Vekhorloĝo: se ĉiuj elsendoj de la kanalo estas jam aŭskultitaj, la alarmo nun reludas la plej novan sane ludeblan anstataŭ eble eraran elsendon (https://github.com/nordfalk/EsperantoRadio/pull/95)
+
+### Riparita
+
+- La vekhorloĝo nun ludas tuj je la ĝusta tempo ankaŭ kiam la telefono dormas kun malŝaltita ekrano — antaŭe ĝi atentis ĝis vi mem vekis la telefonon (https://github.com/nordfalk/EsperantoRadio/pull/94)
+- Ne plu perdiĝas jam elŝutita kanal-enhavo kiam la servilo respondas per eraro-paĝo aŭ kaptiva portalo (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- La sciigoj pri novaj elsendoj nun funkcias ankaŭ kiam la apo estas fermita (la fonprocezo antaŭe havis neniun kuntekston) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Sur Android la ludado ne plu povas rekomenciĝi per si mem post kiam oni premis "Halti" (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Klako sur ero en la ludvico nun malfermas la elsendon (antaŭe la klako faris nenion) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Alarmo-sugestoj montras ĝustajn supersignojn (ĥ, Ŝ, Ŭ ktp.) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Kanaloj kun plej-malnovaj-unue fluoj (ekz. Internacia Retradio) montras la plej novajn elsendojn supre kaj aŭtoludas en la ĝusta direkto (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Triligitaj elŝutoj ne plu estas konservataj kiel "pretaj"; partaj dosieroj estas forigataj post eraro, paŭzo kaj restarto (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- La fona aŭtoludo ne plu povas erare marki la sekvan elsendon "fininta" kiam la servo kaj la ludilo ambaŭ raportas la saman finon (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Priskriboj de Varsovia Vento estas sen reklamaj alineoj kaj enkonstruitaj son-ludiloj (kun la vera enhavo nedifektita) (https://github.com/nordfalk/EsperantoRadio/pull/91)
+- Vinilkosmon montras la verajn titolojn de la elsendoj kaj priskribojn sen la "has posted"-alineo (https://github.com/nordfalk/EsperantoRadio/pull/91)
+- Elsendoj kun sono nur en la priskribo (aŭ ĉe video-gastigantoj kiel YouTube) ne plu rompas la kanalan liston (https://github.com/nordfalk/EsperantoRadio/pull/91)
+- Sur la reto (web) la progreso-linio moviĝas dum ludado kaj la pozicio ĝuste konserviĝas (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- Sur la komputilo (desktop) daŭrigi post paŭzo ne rekomencigas la pozicion de nul (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- Vekhorloĝo sonas ankaŭ kiam la sistemo blokas la lanĉon de la aplikaĵo (plenekrana sciigo + sistema son-retrofalo) (https://github.com/nordfalk/EsperantoRadio/pull/92)
+- La serĉo ne plu retropasas malnovajn rezultojn kaj toleras erarojn; la serĉteksto kaj la alarmo-redaktilo plu restas post ekranturno
+- Alarmo-minuto kaj -horo malfermas ciferecan klavaron
+
+### Sekureco
+
+- HTTP (klara teksto) estas nun permesata nur por la heredaĵaj gastigantoj kiuj bezonas ĝin — ne por la tuta trafiko (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Fluo- kaj bildligiloj el la radi-fluoj estas kontrolataj: nur http/https estas ludebla (ne ekz. file://) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Falsitaj sciigo-intencoj de aliaj aplikoj estas rifuzataj (privata po-instala kodo) (https://github.com/nordfalk/EsperantoRadio/pull/89)
+- Ligiloj en la elsendo-priskriboj malfermiĝas ekstere, ne ene de la priskribo-vido; danĝeraj skemoj (intent://, data:, javascript:) estas forigitaj (https://github.com/nordfalk/EsperantoRadio/pull/89)
+
+### Aldonita
+
 - 7 novaj podkastaj kanaloj: Fremdulo 3, Usone Persone, Ne Parolu pri Esperanto, Radikala tenero, Esperanto Stories, Le Monde diplomatique en Esperanto kaj Rakonta Tempo (https://github.com/nordfalk/EsperantoRadio/pull/83)
-- Luditaj elsendoj malaperas de "Kio novas" kaj tuj aperas en "Lastatempe ludata" (https://github.com/nordfalk/EsperantoRadio/pull/85)
+- 2 pliaj kanaloj: Internacia Retradio (IRo) kaj Esp. Magazino Tuluzo (https://github.com/nordfalk/EsperantoRadio/pull/86)
+- La ludilbreto kolapsas per reen-butono aŭ klako ekstere, kaj sekvas la navigadon kiam nenio ludas — montras la nunan kanalon/elsendon kun ludi-butono (https://github.com/nordfalk/EsperantoRadio/pull/87)
+- Mallongaj priskriboj de ĉiuj kanaloj videblaj en la kanalaro kaj en la kanala paĝo (https://github.com/nordfalk/EsperantoRadio/pull/88)
+- Luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata" nur kiam la ludado vere ekis; la nune ludata karto restas en "Kio novas" (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - "Kio novas" montras maksimume 5 elsendojn po kanalo por lasi spacon al aliaj (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - Varsovia Vento kaj Kernpunkto estas defaŭlte ŝatataj (sciigoj pri novaj elsendoj) (https://github.com/nordfalk/EsperantoRadio/pull/85)
-
 ## [3.0.2] - 2026-10-08
 
 ### Aldonita

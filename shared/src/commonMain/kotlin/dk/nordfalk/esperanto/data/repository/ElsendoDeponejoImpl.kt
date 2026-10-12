@@ -4,20 +4,22 @@ import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
-import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.sentry.kotlin.multiplatform.Sentry
-import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlin.concurrent.Volatile
 
 /**
  * ElsendoDeponejo-implentaĵo. Elŝutas RSS-fluojn per Ktor, parsas per RssParsilo,
@@ -28,11 +30,48 @@ open class ElsendoDeponejoImpl(
     private val parsilo: RssParsilo = RssParsilo(),
 ) : ElsendoDeponejo {
 
-    protected val kaŝmemoro = mutableMapOf<String, List<Elsendo>>()
-    protected val fluoj = mutableMapOf<String, MutableStateFlow<List<Elsendo>>>()
+    /**
+     * Nemutablaj momentfotoj anstataŭ mutableMapOf (FAROTA G35): la mapoj estas
+     * legitaj (getElsendo/sercxi) dum alia korutino skribas — kun mutable mapo
+     * tio estis ConcurrentModificationException-risko. Skriboj nur per [konservu]
+     * (Mutex); legoj estas sekuraj ĉar la momentfoto neniam ŝanĝiĝas surloke.
+     */
+    @Volatile protected var kaŝmemoro: Map<String, List<Elsendo>> = emptyMap()
+    @Volatile protected var fluoj: Map<String, MutableStateFlow<List<Elsendo>>> = emptyMap()
+    private val mapMutex = Mutex()
+
+    /**
+     * Skribas la kanal-rezulton atome en la memoran kaŝon kaj la fluon.
+     * La nura vojo por mutacii la mapojn (ankaŭ por subklasoj).
+     */
+    protected suspend fun konservu(kanaloSlug: String, elsendoj: List<Elsendo>) {
+        mapMutex.withLock {
+            kaŝmemoro = kaŝmemoro + (kanaloSlug to elsendoj)
+            val fluo = fluoj[kanaloSlug] ?: MutableStateFlow<List<Elsendo>>(emptyList()).also {
+                fluoj = fluoj + (kanaloSlug to it)
+            }
+            fluo.value = elsendoj
+        }
+    }
+
+    /**
+     * Peto al archive.org-metadatenoj (regulo 6.3) — ankaŭ uzata ĉe la re-parsado
+     * de la diskkaŝo: sen ĝi la Peranto-elsendoj ricevus DIVENITAJN (ofte 404-ajn)
+     * dosiernomojn ĝis la unua sukcesa reta refreŝo (FAROTA G34).
+     */
+    private val arhivaPeto: suspend (String) -> String = { urlD ->
+        httpKliento.get(urlD) { expectSuccess = true }.bodyAsText()
+    }
 
     override fun observiElsendojn(kanaloSlug: String): StateFlow<List<Elsendo>> {
-        return fluoj.getOrPut(kanaloSlug) { MutableStateFlow(kaŝmemoro[kanaloSlug] ?: emptyList()) }.asStateFlow()
+        fluoj[kanaloSlug]?.let { return it.asStateFlow() }
+        // Unua observo antaŭ ol ion ŝargis: kreu la fluon senŝlosile (ne-suspenda
+        // funkcio). La sekvanta konservu() trovas kaj uzas ĝin. Du samtempaj unuaj
+        // observoj de la sama kanalo estas sensignifa raso (nenia korupto — @Volatile
+        // momentfoto), sed ne povas okazi ĉi tie.
+        val nova = MutableStateFlow(kaŝmemoro[kanaloSlug] ?: emptyList())
+        fluoj = fluoj + (kanaloSlug to nova)
+        return nova.asStateFlow()
     }
 
     override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> {
@@ -62,31 +101,33 @@ open class ElsendoDeponejoImpl(
         }
 
         return try {
-            logi("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
+            logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
             Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
-            val respondo = httpKliento.get(url).bodyAsText()
-            logi("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+            // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch sube redonas la kaŝitan
+            // datumon. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
+            // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
+            val respondo = httpKliento.get(url) { expectSuccess = true }.bodyAsText()
+            kontroluFluecon(respondo)
+            logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
             skribuKashon(kanalo.slug, respondo)
-            val elsendoj = parsilo.parsuRss(respondo, kanalo) { urlD ->
-                httpKliento.get(urlD).bodyAsText()
-            }
-            logi("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
-            kaŝmemoro[kanalo.slug] = elsendoj
-            fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
+            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto)
+                .ordigitajPlejFreshajUnue()
+            logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
+            konservu(kanalo.slug, elsendoj)
             elsendoj
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
             // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
             // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo 4).
-            loge("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto malsukcesa", e)
-            // Raportu kiel averto (ne eraro) — la apo daŭrigas kun kaŝenita datumo
-            Sentry.captureMessage(
-                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn"
-            ) { scope ->
-                scope.level = SentryLevel.WARNING
-                scope.setTag("kanalo", kanalo.slug)
-            }
+            // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
+            // ili devas NE iĝi erar-nivelaj Sentry-eventoj (FAROTA C1: antaŭe la sama fiasko
+            // estis kaptita dufoje — loge→captureException + captureMessage).
+            logw(
+                "ElsendoDeponejo",
+                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
+                e
+            )
             // Toleremeco: liveri kaŝenitan datumon se haveblan
             kaŝenitaj ?: emptyList()
         }
@@ -102,14 +143,18 @@ open class ElsendoDeponejoImpl(
      */
     suspend fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
         val respondo = leguKashon(kanalo.slug) ?: return null
-        logi("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
+        logd("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
-            val elsendoj = parsilo.parsuRss(respondo, kanalo)
-            kaŝmemoro[kanalo.slug] = elsendoj
-            fluoj.getOrPut(kanalo.slug) { MutableStateFlow(emptyList()) }.value = elsendoj
-            logi("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
+            // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
+            // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
+            kontroluFluecon(respondo)
+            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto).ordigitajPlejFreshajUnue()
+            konservu(kanalo.slug, elsendoj)
+            logd("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
             loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron", e)
             null
         }
@@ -126,7 +171,7 @@ open class ElsendoDeponejoImpl(
             if (!kanalo.havasPodkastojn) continue
             leguKashitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
         }
-        logi("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+        logd("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
         return ĉiuj
     }
 
@@ -144,7 +189,29 @@ open class ElsendoDeponejoImpl(
             it.titolo.contains(teksto, ignoreCase = true) ||
             (it.priskribo?.contains(teksto, ignoreCase = true) ?: false)
         }.take(limo)
-        logi("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
+        logd("ElsendoDeponejo", "Serĉas '$teksto' en ${ĉiuj.size} elsendoj — ${rezulto.size} trovoj")
         return rezulto
     }
+
+    /**
+     * Kontrolas ke la respondo aspektas kiel RSS/Atom-fluo. Fiaskpaĝo kun HTTP 200
+     * (prokura servilo, kaptiva portalo) ne devas anstataŭigi la kaŝon.
+     * Ĵetas [IllegalArgumentException] se ne — la vokanto kaptas kaj konservas la kaŝon.
+     */
+    private fun kontroluFluecon(respondo: String) {
+        val malalta = respondo.lowercase()
+        require("<rss" in malalta || "<feed" in malalta || "<rdf" in malalta) {
+            "La respondo ne estas RSS/Atom-fluo"
+        }
+    }
 }
+
+/**
+ * Ordigas elsendojn plej-freŝe-unue.
+ *
+ * La dato estas "yyyy-MM-dd"-ĉeno, do leksikografia ordo estas kronologia ordo.
+ * Ne ĉiuj fluoj estas plej-freŝe-unue (ekz. IRo listigas plej-malnovajn unue;
+ * `LudvicoLogiko` kaj la kanal-vido supozas plej-freŝe-unue) — tial la deponejo
+ * devigas la ordon ĉe unu loko.
+ */
+internal fun List<Elsendo>.ordigitajPlejFreshajUnue(): List<Elsendo> = sortedByDescending { it.dato }

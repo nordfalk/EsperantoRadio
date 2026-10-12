@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
@@ -21,7 +22,6 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -101,8 +101,14 @@ class NovajElsendojKontroloWorker(
             val unuaRulo = viditaj.isEmpty()
             logi("NovajElsendoj", "${viditaj.size} jam viditaj elsendoj (unuaRulo=$unuaRulo)")
 
-            val httpKliento = HttpClient(CIO) {
+            // CIO tra httpMotoro — sama motoro kiel la cetero de la apo.
+            // AVERTO: se network_security_config iam re-havos domajno-esceptojn,
+            // CIO paneigas por ĉiuj https-petoj (vidu HttpMotoro.android.kt).
+            val httpKliento = HttpClient(httpMotoro) {
                 install(HttpTimeout) { requestTimeoutMillis = 30_000; connectTimeoutMillis = 10_000 }
+                // FAROTA K1: fiaskpaĝo (4xx/5xx) ne estu parsata kiel fluo —
+                // la per-kanala catch sube protokolas kaj daŭrigas kun la aliaj kanaloj
+                expectSuccess = true
             }
             val parsilo = RssParsilo(ArchiveOrgDosiernomoKasho(settings))
             var totalNovaj = 0
@@ -148,6 +154,14 @@ class NovajElsendojKontroloWorker(
         }
     }
 
+    /** Kreskanta, persistita sciig-ID (FAROTA C19) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
+    private fun novaSciigId(): Int {
+        val settings = kreuSettings()
+        val id = (settings.getInt(SettingsKeys.SCIIG_ID, 1000) + 1).coerceAtMost(Int.MAX_VALUE - 2)
+        settings.putInt(SettingsKeys.SCIIG_ID, id)
+        return id
+    }
+
     private suspend fun senduSciigon(elsendo: Elsendo, kanalo: Kanalo) {
         val ctx = appContext
         val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -170,18 +184,26 @@ class NovajElsendojKontroloWorker(
             putExtra(EXTRA_BILDO_URL, elsendo.bildoUrl)
         }
 
+        // FAROTA C19: kreskanta persistita ID anstataŭ elsendo.id.hashCode() —
+        // kolizio inter du ID-oj anstataŭigus la sciigon kaj la "Ludi"-PendingIntent
+        // eksterminatinge celus la alian elsendon. Ĉiu sciigo estas unika okazo.
+        val sciigId = novaSciigId()
+
         val malfermiPI = PendingIntent.getActivity(
-            ctx, elsendo.id.hashCode(),
+            ctx, sciigId,
             pleniguEkstraĵojn(
-                Intent(ctx, Class.forName("dk.nordfalk.esperanto.android.MainActivity")).apply {
+                Intent(ctx, Class.forName(Agadoj.CHEFA_AGADO)).apply {
                     action = ACTION_MALFERMI_ELSENDON
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    // FAROTA G3: la eksportita Activity kontrolas la nonce-on — sen ĝi
+                    // iu ajn apliko povus forĝi la ekstraĵojn (phishing, ludi ajnan URI-on)
+                    IntentSxlosilo.aldonuNomon(this)
                 }
             ),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val ludiPI = PendingIntent.getBroadcast(
-            ctx, elsendo.id.hashCode() + 1,
+            ctx, sciigId + 1,
             pleniguEkstraĵojn(
                 Intent(ctx, LudiElsendoReceivilo::class.java).apply { action = ACTION_LUDI_ELSENDON }
             ),
@@ -189,7 +211,7 @@ class NovajElsendojKontroloWorker(
         )
 
         nm.notify(
-            elsendo.id.hashCode(),
+            sciigId,
             NotificationCompat.Builder(ctx, SCIIGO_KANALO_ID)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentTitle(kanalo.nomo)
@@ -200,6 +222,6 @@ class NovajElsendojKontroloWorker(
                 .addAction(android.R.drawable.ic_media_play, "Ludi", ludiPI)
                 .build()
         )
-        logi("NovajElsendoj", "Sciigo sendita: ${kanalo.nomo} — ${elsendo.titolo}")
+        logi("NovajElsendoj", "Sciigo sendita (${sciigId}): ${kanalo.nomo} — ${elsendo.titolo}")
     }
 }

@@ -1,4 +1,4 @@
-package dk.nordfalk.esperanto.android
+package dk.nordfalk.esperanto.domain.player
 
 import androidx.media3.common.PlaybackException
 import androidx.media3.datasource.HttpDataSource
@@ -11,7 +11,7 @@ import androidx.media3.datasource.HttpDataSource
  * sukcesas (la redirekto tiam elektas alian nodon). HTTP 4xx (ekz. 404) restas
  * daŭra: la dosiero vere mankas kaj la ludvico tuj saltas al la sekva elsendo.
  */
-internal fun estasReproveblaEraro(error: PlaybackException): Boolean =
+fun estasReproveblaEraro(error: PlaybackException): Boolean =
     estasPasemaErarKodo(error.errorCode) || estasServileraro(error)
 
 /** Pasemaj erar-kodoj (reto, tempolimo ktp.); daŭraj (HTTP 4xx, formato, malkodilo) ne. */

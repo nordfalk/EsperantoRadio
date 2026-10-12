@@ -106,7 +106,7 @@ EsperantoRadio/
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
 ├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
 ├── RssArkivServer/        # Kaŝenitaj RSS-fluoj (XML-fiksaĵoj)
-├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj)
+├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj — for de la repo per .gitignore; kiu bezonas pliajn fiksaĵojn kopiu ilin al shared/src/commonTest/resources/feeds/)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
 ├── .github/workflows/       # CI (changelog-kontrolo)
@@ -123,8 +123,9 @@ EsperantoRadio/
    `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
    La sep parsreguloj kaj la skip-listo devas esti konservitaj.
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
-   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn — uzu ilin kiel
-   determinismajn test-enirojn. Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
+   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
+   `shared/src/commonTest/resources/feeds/` (4 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
    La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
    devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
@@ -164,6 +165,9 @@ EsperantoRadio/
 
 1. Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
    plia kommito en ekzistanta PR).
+   **Branĉnomo**: `MMdd-nomo` — ekz. `1009-hejmo-luditaj-kio-novas`.
+   La `MMdd`-prefikso estas la nuna dato (ekz. 1009 = 9-a de oktobro).
+   Uzu la saman nomon loke kaj sur GitHub.
 2. Faru ŝanĝojn, skribu testojn, kompilu kaj rulu testojn.
 3. Commit, push, kreu PR kun `gh pr create`.
 4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
@@ -242,6 +246,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `net`-modulon de Node.js ("Node.js net module is not available"). Uzu `httpMotoro` (expect/actual:
   CIO, aŭ `Js` = fetch sur wasmJs), ne `HttpClient(CIO)` rekte. La Js-motoro ĵetas `kotlin.Error`
   (ne Exception) ĉe reteraroj/CORS — kaptu `Throwable` (kaj reĵetu `CancellationException`).
+- **CIO + domajno-esceptoj en network_security_config = paneo** (2026-10-11, emulila testo):
+  kiam la config havis cleartext-domajno-esceptojn, CIO paneigis por ĈIUJ https-petoj
+  ("CertificateException: Domain specific configurations require that hostname aware
+  checkServerTrusted is used") — tiam OkHttp-motoro devis anstataŭigi CIO sur Android.
+  Kun nur `base-config` (neniuj domajno-esceptoj — la nuna stato) CIO funkcias normale,
+  kaj `ktor-client-okhttp` estis forigita. Se iam re-aldoniĝas domajno-escepto al la
+  security-config, remetu `libs.ktor.client.okhttp` kaj `HttpMotoro.android` al OkHttp.
 - **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
 - **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
 - **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per
@@ -315,6 +326,26 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
   `--body-file <dosiero>` aŭ
   `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — `CoroutineScope(Dispatchers.IO …)`
+  en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
+  expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
+  ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
+  estu parto de estonta testa CI, vidu FAROTA.md G24.)
+- **Ktor CIO + network_security_config = paneo de ĈIUJ https-petoj sur Android**: la CIO-motoro
+  vokas la malnovan 2-argan `checkServerTrusted(ĉeno, tipo)` sen gastiganto; tuj kiam la apo
+  difinas `android:networkSecurityConfig` (nia G1-ŝanĝo), Android postulas la gastiganto-konscian
+  3-argan variaĵon kaj ĵetas `CertificateException: Domain specific configurations require that
+  hostname aware checkServerTrusted(...) is used` por ĈIUJ https-konektoj (ne nur la esceptitaj
+  domajnoj). Solvo: `ktor-client-okhttp` kiel la Android-motoro (`HttpMotoro.kt` androidMain) —
+  OkHttp estas gastiganto-konscia. CIO restas sur Desktop/iOS; Js sur wasmJs.
+  (2026-10-11: tio rompis ĉiujn https-fluojn post la G1-ŝanĝo — la diskkaŝo KAŜIS la simptomon
+  ("Ŝargis N elsendojn" montris nur malnovajn datumojn el la kaŝo). Fum-testu ĉiam per
+  `adb shell pm clear` + freŝa reto, ne kun diskkaŝo.)
+- **Purigaj regex-modeloj kun `<p>.+?FRazo.+?</p>` + DOTALL estas danĝeraj**: la `.+?` komenciĝas ĉe
+  la UNUA `<p>` en la tuta teksto kaj manĝas ĉiun alineon ĝis la celita frazo — kun la nuna
+  Varsovia Vento-fluo tio forviŝis la enkondukon kaj la parto-listilon. Uzu temperitan formon
+  `(?:(?!</p>).)` anstataŭ `.+?` por ke la modelo ne povu transiri alineon (ekzemploj:
+  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, FAROTA G15.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
@@ -335,6 +366,24 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   liveras JSON kun `feedUrl`, `artworkUrl600`, `releaseDate` kaj `trackCount`; `https://itunes.apple.com/search?term=Esperanto&entity=podcast&limit=25`
   listigas ĉiujn ĉe Apple indeksitajn Esperanto-podkastojn. Uzebla por trovi fluojn kaj kontroli aktivecon sen
   skrapado de Apple-retejoj. (2026-10-08: tiel kolektiĝis la fluoj de la 7 novaj kanaloj.)
+- **Regex-`"`-signoj en JSONC devas esti refutitaj** (`\"`): la koment-striptigilo forigas
+  nur `//`-liniojn, sed la valoroj mem devas esti valida JSON post striptigo. Regex kiel
+  `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
+  (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
+  (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
+  riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
+  `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
+- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
+  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
+  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
+  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
+  (goAsync-korutino); la videblecon certigu full-screen-intent-sciigo (`CATEGORY_ALARM`,
+  `USE_FULL_SCREEN_INTENT`). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
+  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
+- **`USE_EXACT_ALARM` (API 33+) estas aŭtomate donata** por vekhorloĝo-apoj kaj igas
+  `canScheduleExactAlarms()` vera sen mana permeso — sen ĝi la skedilo devas fali al
+  `setWindow` kun 10-minuta fenestro (Doze-prokrastoj). `SCHEDULE_EXACT_ALARM` restas
+  bezonata por Android 12 (31-32), kie ĝi estas defaŭlte donata sed revokebla.
 
 ## Logcat (Android)
 
@@ -350,6 +399,72 @@ adb logcat -d | grep -E "dk.nordfalk.esperanto.android"  # nur apo
 La debug-APK instaliĝas kiel `dk.nordfalk.esperanto.radio.alfa` (applicationId + `.alfa`) — ne konfuzu
 kun malnovaj pakoj (`dk.nordfalk.esperanto.android`, `.radio.beta`) kiuj eble ankaŭ estas en la emulilo:
 `adb shell monkey -p dk.nordfalk.esperanto.radio.alfa -c android.intent.category.LAUNCHER 1`
+
+## Sentry (erarmonitorado kaj protokoloj)
+
+La apo sendas ĉiujn protokolojn kaj erarojn al **Sentry.io** (organizo
+`esperantoradio`, regiono `de.sentry.io`, projekto `KMP`). Agordo:
+`SentryAgordo.kt` — DSN (nur *sendi* rajtigas), `environment = "evoluo"`,
+`release = "esperantoradio@<apoversio>"` (el `gradle/libs.versions.toml`).
+
+**Legi Sentry-on per MCP**: la oficiala Sentry-MCP-servilo estas konektita kiel
+`mcp_sentry` (`https://mcp.sentry.dev/mcp`, OAuth-agordo en `~/.vibe/config.toml`
+de la uzanto — se ĝi malaperas, rekonektu per `vibe mcp add sentry --url
+https://mcp.sentry.dev/mcp`). La plej uzataj iloj:
+
+- `find_organizations` / `find_projects` — trovu la slug-ojn (`esperantoradio`).
+- `search_issues` — grupigitaj problemoj (query: `is:unresolved`, `level:error`,
+  `lastSeen:-7d` kaj similaj; sort: `date`/`freq`/`user`/`recommended`).
+- `get_sentry_resource` — detaloj pri unu problemo (stacktrace, eventoj).
+- `search_logs` — protokol-agregaĵoj. Ekzemploj:
+  - Plej oftaj mesaĝoj: `fields: ['count()', 'message']`, `sort: '-count()'`.
+  - Uzantoj po eldono: `fields: ['release', 'count_unique(user)']` — proksimumo
+    de aktivaj uzantoj (nur uzantoj, kiuj generis almenaŭ unu protokolan eventon;
+    protokoloj povas esti forĵetitaj pro kvoto).
+- `search_errors` — erar-eventoj, nombroj, tendencoj.
+- `update_issue` — solvigi/atribui problemon.
+
+**Kapabloj de la datumaroj** (2026-10-10, gravas por demandoj):
+
+- **logs** (protokoloj): havas `user.id`, `device.model`, `release`, `message` —
+  sed **neniun geo-kampon** (`geo.country_code` k.a. ne ekzistas).
+- **errors** (erar-eventoj): havas `geo.country_code` — sed `device.model` estas
+  **malplena** (la KMP-SendSDK ne sendas aparat-kuntekston ĉe eraroj).
+  Sekve aparato × lando NE estas rekombebla per la API.
+- Negacia filtro (`!device.model:...`) ne funkcias en logs — prenu ĉiujn
+  grupojn (`limit: 100`) kaj filtru loke.
+- `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
+- Tempserio: petu naturlingve «... as a time series» kun `fields: ['timestamp',
+  'count_unique(user)']` → tagaj siteloj; la hodiaŭa sitelo estas nekompleta.
+
+**Interpretaĵ-avertoj pri uzant-nombroj**:
+
+- `user.id` estas **anonima po instalaĵo** — reinstalo = nova uzanto-id.
+  Emulilajn testreinstalojn eblas rekoni: `device.model:sdk_gphone*`
+  (Google-emulilaj bildoj; ĉiuj `sdk_gphone*` estas emuliloj).
+- `count_unique(device.model)` nombras unikajn **modelajn ĉenojn**, ne
+  aparatojn (2 uzantoj kun sama modelo kalkuliĝas unufoje).
+- Landoj haveblas nur el erar-eventoj (do nur por uzantoj, kiuj havis almenaŭ
+  unu eraron) — la nombro subtaksas.
+
+**Konekta leciono** (2026-10-10): la `mcp_sentry`-konekto povas fali meze en
+seanco (iloj malaperas el la agenta nomspaco) kaj ne reaperas per `/reload`.
+Remedio: restartigu Vibe (`vibe -c` daŭrigas la konversacion). Se post
+restarto la servilo listiĝas kiel bezonanta aŭtentikigon, rulu `/mcp login
+sentry` (OAuth-aliro-ĵetonoj eksvalidiĝas post kelkaj horoj; la renovigo
+foje malsukcesas).
+
+**Protokol-konvencio (grava por la Sentry-kvoto)**:
+
+- `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
+- `logi`/`logw`/`loge` → ankaŭ `Sentry.logger.*` — ĉiu voko estas eningendigita
+  kaj kalkuliĝas kontraŭ la kvoto.
+- Regulo: **altfrekvencaj datum-tavolaj detaloj uzu `logd`** (parsado, diskkaŝmemoro,
+  serĉo — io, kio okazas po kanalo po ŝargo); `logi` nur por uzantvidaj eventoj
+  (navigado, klakoj, ludado, starto). `logw`/`loge` ĉiam indas protokoligi.
+  (2026-10-09: la `logi`-vokoj de RssParsilo/ElsendoDeponejo estis ~85–90 % de
+  ĉiuj protokoloj — po ~700 mesaĝoj/kanalo/semajno nur por «parsado kompleta»;
+  ili fariĝis `logd`.)
 
 ## UI-dizajno (celo)
 

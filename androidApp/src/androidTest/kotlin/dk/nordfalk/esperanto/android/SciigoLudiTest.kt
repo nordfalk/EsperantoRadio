@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dk.nordfalk.esperanto.data.repository.LudiElsendoReceivilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule

@@ -133,6 +133,7 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 implementation(libs.compose.ui.test)
+                implementation(libs.ktor.client.mock)
             }
         }
     }

@@ -63,4 +63,13 @@ class AlarmoTest {
         val silvestro = LocalDateTime(2026, 12, 31, 23, 0)
         assertEquals(LocalDateTime(2027, 1, 1, 7, 0), alarmo(7, 0, 0).sekvaEkigo(silvestro))
     }
+
+    @Test // FAROTA C4: korupta persistinta valoro ne devas kraŝi la skedadon
+    fun koercasEkstervalorajnHorojnKajMinutojn() {
+        // horo=99 → 23, minuto=-5 → 0: la alarmo skediĝas, ne ĵetas
+        assertEquals(LocalDateTime(2026, 9, 23, 23, 0), alarmo(99, -5, 0).sekvaEkigo(merkredo10))
+        // ripeto ekster la 7 tago-bitoj → maskita (0x123 & 0x7f = 0x23 = Lu+Ma+Sa);
+        // merkredo-11:00 jam pasis (10:00) kaj merkredo ne estas en la masko → sabato
+        assertEquals(LocalDateTime(2026, 9, 26, 11, 0), alarmo(11, 0, 0x123).sekvaEkigo(merkredo10))
+    }
 }

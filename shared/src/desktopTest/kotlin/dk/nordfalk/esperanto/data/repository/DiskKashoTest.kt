@@ -1,10 +1,10 @@
 package dk.nordfalk.esperanto.data.repository
 
-import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,10 +17,31 @@ import kotlin.test.assertTrue
  *
  * Skribas krudan RSS-tekston al diskkaŝmemoro, legas ĝin reen,
  * re-parsas per RssParsilo, kaj komparas la elsendojn.
+ *
+ * Rulas en desktopTest ĉar ĝi testas la Desktop-actualigon de la kaŝo
+ * kaj direktas [dosierKashoBazo] al provizora dosierujo (FAROTA G37):
+ * antaŭe la testoj skribis en la VERAN uzantan kaŝujon `~/.esperantoradio/cache/`
+ * kaj "purigis" nur per malplenigo — 5 malplenaj dosieroj restis tie.
  */
 class DiskKashoTest {
 
     private val parsilo = RssParsilo()
+
+    private val malnovaBazo = dosierKashoBazo
+    private val provizora: File = File.createTempFile("esperantoradio-diskkasho", "").let { f ->
+        f.delete()
+        File(f.absolutePath + ".dir").apply { mkdirs() }
+    }
+
+    init {
+        dosierKashoBazo = provizora.absolutePath
+    }
+
+    @AfterTest
+    fun purigu() {
+        dosierKashoBazo = malnovaBazo
+        provizora.deleteRecursively()
+    }
 
     private fun leguFiksaĵon(nomo: String): String {
         val fluo = Thread.currentThread().contextClassLoader
@@ -29,23 +50,14 @@ class DiskKashoTest {
         return fluo.bufferedReader().use { it.readText() }
     }
 
-    @AfterTest
-    fun purigu() = kotlinx.coroutines.test.runTest {
-        AppStato.reset()
-    }
-
     @Test
     fun skribuKajLeguKashon() = kotlinx.coroutines.test.runTest {
         val nomo = "test_diskkasho_roundtrip"
         val enhavo = "<rss><channel><title>Testo</title></channel></rss>"
-        try {
-            skribuKashon(nomo, enhavo)
-            val legita = leguKashon(nomo)
-            assertNotNull(legita, "Legu kaŝon devas redoni la skribitan enhavon")
-            assertEquals(enhavo, legita)
-        } finally {
-            skribuKashon(nomo, "") // purigo
-        }
+        skribuKashon(nomo, enhavo)
+        val legita = leguKashon(nomo)
+        assertNotNull(legita, "Legu kaŝon devas redoni la skribitan enhavon")
+        assertEquals(enhavo, legita)
     }
 
     @Test
@@ -63,25 +75,21 @@ class DiskKashoTest {
             nomo = "Testo Kernpunkto",
             podkastaRssUrl = "https://kern.punkto.info/feed/mp3/",
         )
-        try {
-            // Skribu la krudan RSS-tekston al diskkaŝmemoro
-            skribuKashon(slug, rssTeksto)
+        // Skribu la krudan RSS-tekston al diskkaŝmemoro
+        skribuKashon(slug, rssTeksto)
 
-            // Parsu rekte por havi la atendojn
-            val atendataj = parsilo.parsuRss(rssTeksto, kanalo)
-            assertTrue(atendataj.isNotEmpty(), "La fixture devas enhavi elsendojn")
+        // Parsu rekte por havi la atendojn
+        val atendataj = parsilo.parsuRss(rssTeksto, kanalo)
+        assertTrue(atendataj.isNotEmpty(), "La fixture devas enhavi elsendojn")
 
-            // Legu per ElsendoDeponejoImpl
-            val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
-            val kashitaj = deponejo.leguKashitajnElsendojn(kanalo)
+        // Legu per ElsendoDeponejoImpl
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val kashitaj = deponejo.leguKashitajnElsendojn(kanalo)
 
-            assertNotNull(kashitaj, "leguKashitajnElsendojn devas redoni elsendojn")
-            assertEquals(atendataj.size, kashitaj.size, "La nombro da elsendoj devas kongrui")
-            assertEquals(atendataj.first().titolo, kashitaj.first().titolo, "La unua titolo devas kongrui")
-            assertEquals(atendataj.first().id, kashitaj.first().id, "La unua ID devas kongrui")
-        } finally {
-            skribuKashon(slug, "") // purigo
-        }
+        assertNotNull(kashitaj, "leguKashitajnElsendojn devas redoni elsendojn")
+        assertEquals(atendataj.size, kashitaj.size, "La nombro da elsendoj devas kongrui")
+        assertEquals(atendataj.first().titolo, kashitaj.first().titolo, "La unua titolo devas kongrui")
+        assertEquals(atendataj.first().id, kashitaj.first().id, "La unua ID devas kongrui")
     }
 
     @Test
@@ -106,20 +114,15 @@ class DiskKashoTest {
         val kanalo1 = Kanalo(slug = slug1, nomo = "Testo KP1", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
         val kanalo2 = Kanalo(slug = slug2, nomo = "Testo KP2", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
 
-        try {
-            skribuKashon(slug1, rss1)
-            skribuKashon(slug2, rss2)
+        skribuKashon(slug1, rss1)
+        skribuKashon(slug2, rss2)
 
-            val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
-            val ĉiuj = deponejo.leguĈiujnKashitajnElsendojn(listOf(kanalo1, kanalo2))
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val ĉiuj = deponejo.leguĈiujnKashitajnElsendojn(listOf(kanalo1, kanalo2))
 
-            assertTrue(ĉiuj.isNotEmpty(), "Devas havi elsendojn de ambaŭ kanaloj")
-            assertTrue(ĉiuj.any { it.kanaloSlug == slug1 }, "Devas enhavi elsendojn de kanalo 1")
-            assertTrue(ĉiuj.any { it.kanaloSlug == slug2 }, "Devas enhavi elsendojn de kanalo 2")
-        } finally {
-            skribuKashon(slug1, "")
-            skribuKashon(slug2, "")
-        }
+        assertTrue(ĉiuj.isNotEmpty(), "Devas havi elsendojn de ambaŭ kanaloj")
+        assertTrue(ĉiuj.any { it.kanaloSlug == slug1 }, "Devas enhavi elsendojn de kanalo 1")
+        assertTrue(ĉiuj.any { it.kanaloSlug == slug2 }, "Devas enhavi elsendojn de kanalo 2")
     }
 
     @Test
@@ -128,25 +131,21 @@ class DiskKashoTest {
         val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(slug = slug, nomo = "Testo KP", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
 
-        try {
-            skribuKashon(slug, rssTeksto)
+        skribuKashon(slug, rssTeksto)
 
-            val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
-            // Antaŭe: kaŝmemoro estas malplena
-            assertNull(deponejo.getElsendo("neniu"))
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        // Antaŭe: kaŝmemoro estas malplena
+        assertNull(deponejo.getElsendo("neniu"))
 
-            // Legu diskkaŝmemoron — plenigas kaŝmemoron
-            val kashitaj = deponejo.leguKashitajnElsendojn(kanalo)
-            assertNotNull(kashitaj)
-            assertTrue(kashitaj.isNotEmpty())
+        // Legu diskkaŝmemoron — plenigas kaŝmemoron
+        val kashitaj = deponejo.leguKashitajnElsendojn(kanalo)
+        assertNotNull(kashitaj)
+        assertTrue(kashitaj.isNotEmpty())
 
-            // Poste: kaŝmemoro estas plena — serĉado funkcias
-            val unuaElsendo = kashitaj.first()
-            val trovita = deponejo.getElsendo(unuaElsendo.id)
-            assertNotNull(trovita, "getElsendo devas trovi elsendon el kaŝmemoro post leguKashitajnElsendojn")
-            assertEquals(unuaElsendo.titolo, trovita.titolo)
-        } finally {
-            skribuKashon(slug, "")
-        }
+        // Poste: kaŝmemoro estas plena — serĉado funkcias
+        val unuaElsendo = kashitaj.first()
+        val trovita = deponejo.getElsendo(unuaElsendo.id)
+        assertNotNull(trovita, "getElsendo devas trovi elsendon el kaŝmemoro post leguKashitajnElsendojn")
+        assertEquals(unuaElsendo.titolo, trovita.titolo)
     }
 }

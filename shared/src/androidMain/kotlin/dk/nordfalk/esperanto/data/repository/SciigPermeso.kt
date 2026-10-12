@@ -25,5 +25,10 @@ actual fun malfermuSciigAgordojn() {
         putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
-    appContext.startActivity(intent)
+    // FAROTA C20: kiel malfermuEkzaktajnAlarmAgordojn — ActivityNotFoundException ne paneigu
+    try {
+        appContext.startActivity(intent)
+    } catch (e: Exception) {
+        dk.nordfalk.esperanto.logw("SciigPermeso", "Ne povis malfermi la sciig-agordojn", e)
+    }
 }

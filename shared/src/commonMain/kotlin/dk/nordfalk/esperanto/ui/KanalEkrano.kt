@@ -304,6 +304,18 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
         Spacer(Modifier.height(8.dp))
         Text(kanalo.nomo, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
+        // Mallonga priskribo el la kanalkonfiguro (nedeviga)
+        if (!kanalo.priskribo.isNullOrBlank()) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                kanalo.priskribo,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+
         // Retejo kaj retpoŝto butonoj
         if (kanalo.retejoUrl != null || kanalo.retposhto != null) {
             Spacer(Modifier.height(8.dp))

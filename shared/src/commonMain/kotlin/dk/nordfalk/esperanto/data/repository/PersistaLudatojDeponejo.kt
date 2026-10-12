@@ -8,6 +8,8 @@ import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.serialization.json.Json
@@ -43,20 +45,29 @@ class PersistaLudatojDeponejo(
     private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(legu())
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
+    /**
+     * Mutex ĉirkaŭ la legu-modifu-skribu-ciklo (FAROTA G36): registriPozicio (vokata
+     * ĉiujn 5 s dum ludado) kaj markiFinita/markiErara povas interplektiĝi — sen ŝlosilo
+     * la lasta skribanto venkus kaj la finita-/erara-flago povus perdiĝi.
+     */
+    private val mutex = Mutex()
+
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {
-        val nuna = _ludatoj.value.toMutableMap()
-        val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudataElsendo(
-            elsendoId = elsendoId,
-            kanaloSlug = kanaloSlug,
-            pozicioMs = pozicioMs,
-            dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
-            finita = ekzista?.finita ?: false,
-            erara = ekzista?.erara ?: false,
-            lasteLudita = Clock.System.now().toEpochMilliseconds(),
-        )
-        skribu(nuna)
-        _ludatoj.value = nuna
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId]
+            nuna[elsendoId] = LudataElsendo(
+                elsendoId = elsendoId,
+                kanaloSlug = kanaloSlug,
+                pozicioMs = pozicioMs,
+                dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
+                finita = ekzista?.finita ?: false,
+                erara = ekzista?.erara ?: false,
+                lasteLudita = Clock.System.now().toEpochMilliseconds(),
+            )
+            skribu(nuna)
+            _ludatoj.value = nuna
+        }
     }
 
     override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {
@@ -69,45 +80,51 @@ class PersistaLudatojDeponejo(
     }
 
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludatoj.value.toMutableMap()
-        val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudataElsendo(
-            elsendoId = elsendoId,
-            kanaloSlug = kanaloSlug,
-            pozicioMs = ekzista?.pozicioMs ?: 0,
-            dauroMs = ekzista?.dauroMs ?: 0,
-            finita = true,
-            lasteLudita = Clock.System.now().toEpochMilliseconds(),
-        )
-        skribu(nuna)
-        _ludatoj.value = nuna
-        logi("Ludatoj", "Markita finita: $elsendoId")
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId]
+            nuna[elsendoId] = LudataElsendo(
+                elsendoId = elsendoId,
+                kanaloSlug = kanaloSlug,
+                pozicioMs = ekzista?.pozicioMs ?: 0,
+                dauroMs = ekzista?.dauroMs ?: 0,
+                finita = true,
+                lasteLudita = Clock.System.now().toEpochMilliseconds(),
+            )
+            skribu(nuna)
+            _ludatoj.value = nuna
+            logi("Ludatoj", "Markita finita: $elsendoId")
+        }
     }
 
     override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludatoj.value.toMutableMap()
-        val ekzista = nuna[elsendoId]
-        nuna[elsendoId] = LudataElsendo(
-            elsendoId = elsendoId,
-            kanaloSlug = kanaloSlug,
-            pozicioMs = ekzista?.pozicioMs ?: 0,
-            dauroMs = ekzista?.dauroMs ?: 0,
-            finita = true,
-            erara = true,
-            lasteLudita = Clock.System.now().toEpochMilliseconds(),
-        )
-        skribu(nuna)
-        _ludatoj.value = nuna
-        logi("Ludatoj", "Markita erara: $elsendoId")
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId]
+            nuna[elsendoId] = LudataElsendo(
+                elsendoId = elsendoId,
+                kanaloSlug = kanaloSlug,
+                pozicioMs = ekzista?.pozicioMs ?: 0,
+                dauroMs = ekzista?.dauroMs ?: 0,
+                finita = true,
+                erara = true,
+                lasteLudita = Clock.System.now().toEpochMilliseconds(),
+            )
+            skribu(nuna)
+            _ludatoj.value = nuna
+            logi("Ludatoj", "Markita erara: $elsendoId")
+        }
     }
 
     override suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludatoj.value.toMutableMap()
-        val ekzista = nuna[elsendoId] ?: return
-        nuna[elsendoId] = ekzista.copy(finita = false, erara = false, pozicioMs = 0)
-        skribu(nuna)
-        _ludatoj.value = nuna
-        logi("Ludatoj", "Malmarkita finita: $elsendoId")
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId] ?: return
+            nuna[elsendoId] = ekzista.copy(finita = false, erara = false, pozicioMs = 0)
+            skribu(nuna)
+            _ludatoj.value = nuna
+            logi("Ludatoj", "Malmarkita finita: $elsendoId")
+        }
     }
 
     override suspend fun getLudato(elsendoId: String): LudataElsendo? = _ludatoj.value[elsendoId]

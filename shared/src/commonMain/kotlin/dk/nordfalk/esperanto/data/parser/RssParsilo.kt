@@ -8,13 +8,14 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
-import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import io.ktor.http.encodeURLPathPart
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
@@ -36,6 +37,43 @@ class RssParsilo(
     companion object {
         /** Maksimuma tempo por unu archive.org-metadaten-peto (la respondo estas ~1-2 KB). */
         const val METADATEN_LIMTEMPO_MS = 5_000L
+
+        /** Maksimumo da samtempaj archive.org-metadaten-petoj (FAROTA G33). */
+        const val PARALELA_PETO_LIMIGO = 8
+
+        /**
+         * Regulo 6.1.4: eroj kies sola son-gastiganto estas nesubtenata (video-platformoj)
+         * estas saltataj — tia "fluo" ne estis ludebla (FAROTA G32). Devas esti konservita
+         * el la malnova apo (AGENTS.md regulo 2).
+         */
+        internal val SALTAJ_GASTIGANTOJ = listOf(
+            "youtube.com", "youtu.be", "soundcloud.com", "vimeo.com",
+            "audioboom.com", "yourlisten.com", "vocaroo.com",
+        )
+    }
+
+    /** Ĉu la URL pointas al nesubtenata (saltata) gastiganto? */
+    internal fun estasSaltitaGastiganto(url: String): Boolean {
+        val malalta = url.lowercase()
+        return SALTAJ_GASTIGANTOJ.any { malalta.contains(it) }
+    }
+
+    /**
+     * Aplikas la kanal-specifajn purigajn regex-modelojn al kruda HTML (regulo 6.6, FAROTA G15).
+     * La modeloj vivas en la kanalkonfiguro (`puriguModeloj`) — datum-movita, ne kodigita.
+     * Nevalida regex estas protokolata kaj preterpasata (regulo 4: unu eraro ne paneigu la kanalon).
+     */
+    internal fun puriguPerModeloj(html: String, kanalo: Kanalo): String {
+        if (kanalo.puriguModeloj.isEmpty()) return html
+        var rezulto = html
+        for (modelo in kanalo.puriguModeloj) {
+            try {
+                rezulto = Regex(modelo, RegexOption.DOT_MATCHES_ALL).replace(rezulto, "")
+            } catch (e: Exception) {
+                logw("RssParsilo", "Nevalida purig-modelo por ${kanalo.slug}: $modelo", e)
+            }
+        }
+        return rezulto
     }
 
     suspend fun parsuRss(
@@ -69,7 +107,7 @@ class RssParsilo(
             }
         }
 
-        logi("RssParsilo", "${kanalo.slug}: parsado kompleta — ${rezulto.size} elsendoj")
+        logd("RssParsilo", "${kanalo.slug}: parsado kompleta — ${rezulto.size} elsendoj")
         return rezulto
     }
 
@@ -97,26 +135,41 @@ class RssParsilo(
         val dato = normigiDaton(pubDate) ?: return null
 
         // Stream: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
-        var fluo = ero.selectFirst("enclosure")?.attr("url") ?: ""
+        // Preferu enclosure kun type="audio/…" (regulo 6.1.4); iuj fluoj metas bildon unue (FAROTA C12)
+        var fluo = ero.selectFirst("enclosure[type^=audio]")?.attr("url")
+            ?: ero.selectFirst("enclosure")?.attr("url")
+            ?: ""
         if (fluo.isEmpty()) {
             fluo = ero.selectFirst("link[rel=enclosure]")?.attr("href") ?: ""
         }
         if (fluo.isEmpty()) {
-            fluo = ero.selectFirst("audio source")?.attr("src") ?: ""
+            // Regulo 6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
+            // serchu en la HTML-enhavo, ne en la XML-dokumento (FAROTA G30)
+            fluo = Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src") ?: ""
         }
         if (fluo.isEmpty()) return null
+        // Nur http(s) permesataj — file://, content://, javascript:// ktp. el nefidinda RSS ne (FAROTA G2)
+        fluo = saniguRetUrlon(fluo) ?: return null
+        // Saltu video-gastigantojn, kiujn ni ne povas ludi (FAROTA G32)
+        if (estasSaltitaGastiganto(fluo)) return null
 
         if (kanalo.slug == "kernpunkto" && fluo.startsWith("http://")) {
             fluo = "https://" + fluo.removePrefix("http://")
         }
 
         val dauro = leguDauron(ero.selectFirst("itunes|duration")?.text())
-        val bildoUrl = ero.selectFirst("itunes|image")?.attr("href")
-            ?: ero.selectFirst("image url")?.text()
-        val retpaghoUrl = ero.selectFirst("link")?.text()
-            ?: ero.selectFirst("link")?.attr("href")
+        // Regulo 6.6: kanal-specifaj purigaj modeloj (reklamoj, enkonstruitaj ludiloj)
+        val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
+        val bildoUrl = saniguRetUrlon(
+            ero.selectFirst("itunes|image")?.attr("href")
+                ?: ero.selectFirst("image url")?.text()
+        )
+        val retpaghoUrl = saniguRetUrlon(
+            ero.selectFirst("link")?.text()?.ifEmpty { null }
+                ?: ero.selectFirst("link")?.attr("href")
+        )
 
-        val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboKruda) else titolo
+        val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboPurigita) else titolo
 
         // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
         val guid = ero.selectFirst("guid")?.text()
@@ -127,8 +180,8 @@ class RssParsilo(
             kanaloSlug = kanalo.slug,
             kanaloNomo = kanalo.nomo,
             titolo = finaTitolo,
-            priskribo = puriguHtml(priskriboKruda),
-            priskriboHtml = puriguHtmlKunEtikedojn(priskriboKruda),
+            priskribo = puriguHtml(priskriboPurigita),
+            priskriboHtml = puriguHtmlKunEtikedojn(priskriboPurigita),
             bildoUrl = bildoUrl,
             dato = dato,
             dauro = dauro,
@@ -157,16 +210,19 @@ class RssParsilo(
             val audioj = htmlDoc.select("audio source")
             if (audioj.isEmpty()) continue
 
+            // Regulo 6.6: la <audio>-ludiloj kaj reklamaj alineoj estas purigataj el la
+            // PRISKRIBO — sed la fluo-ekstraktado supre uzas la KRUDAN enhavon (FAROTA G15)
+            val purigitaEnhavo = puriguPerModeloj(htmlEnhavo, kanalo)
+
             for ((i, source) in audioj.withIndex()) {
-                val fluo = source.attr("src")
-                if (fluo.isEmpty()) continue
+                val fluo = saniguRetUrlon(source.attr("src")) ?: continue
                 rezulto.add(Elsendo(
                     id = "${kanalo.slug}:$dato:${i + 1}",
                     kanaloSlug = kanalo.slug,
                     kanaloNomo = kanalo.nomo,
                     titolo = "$titolo ${i + 1}a parto",
-                    priskribo = puriguHtml(htmlEnhavo),
-                    priskriboHtml = puriguHtmlKunEtikedojn(htmlEnhavo),
+                    priskribo = puriguHtml(purigitaEnhavo),
+                    priskriboHtml = puriguHtmlKunEtikedojn(purigitaEnhavo),
                     dato = dato,
                     fluo = fluo,
                 ))
@@ -211,7 +267,7 @@ class RssParsilo(
             val htmlDoc = Ksoup.parse(htmlEsprimite)
 
             // Eltiru bildon el la unua <img>
-            val bildoUrl = htmlDoc.selectFirst("img")?.attr("src")
+            val bildoUrl = saniguRetUrlon(htmlDoc.selectFirst("img")?.attr("src"))
 
             // Forigu <img>, <iframe>, <div class="separator"> el priskribo
             htmlDoc.select("img").remove()
@@ -237,14 +293,10 @@ class RssParsilo(
                     val id = iframeSrc.substringAfter("/file/d/").substringBefore("/")
                     "https://drive.google.com/u/1/uc?id=$id&export=download"
                 }
-                // Neniu iframe aŭ nesubtenata gastiganto → saltu
+                // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo 6.3: la komuna
+                // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, FAROTA G32)
                 iframeSrc.isEmpty() -> return@mapIndexedNotNull null
-                iframeSrc.contains("youtube.com") || iframeSrc.contains("youtu.be") -> return@mapIndexedNotNull null
-                iframeSrc.contains("soundcloud.com") -> return@mapIndexedNotNull null
-                iframeSrc.contains("vimeo.com") -> return@mapIndexedNotNull null
-                iframeSrc.contains("audioboom.com") -> return@mapIndexedNotNull null
-                iframeSrc.contains("yourlisten.com") -> return@mapIndexedNotNull null
-                iframeSrc.contains("vocaroo.com") -> return@mapIndexedNotNull null
+                estasSaltitaGastiganto(iframeSrc) -> return@mapIndexedNotNull null
                 else -> return@mapIndexedNotNull null
             }
 
@@ -256,7 +308,7 @@ class RssParsilo(
                 priskribo = priskribo,
                 priskriboHtml = puriguHtmlKunEtikedojn(htmlEsprimite),
                 bildoUrl = bildoUrl,
-                retpaghoUrl = ero.selectFirst("link[rel=alternate]")?.attr("href"),
+                retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[rel=alternate]")?.attr("href")),
                 arkivaIdentigilo = arkivaIdentigilo,
                 fluo = fluo,
             )
@@ -265,9 +317,14 @@ class RssParsilo(
         // Paŝo 2: demandu archive.org pri la veraj MP3-dosiernomoj (paralele, unufoje po
         // identigilo). La dosiernomo ne ĉiam egalas al la identigilo: ekz. `malapero-benda-3`
         // enhavas `Malapero_Benda3.mp3` — la divenita URL tiam redonus HTTP 404.
+        // Limigu la paralelecon (Semaphore 8): centoj da samtempaj petoj al archive.org
+        // ricevus 429/timumejon (FAROTA G33).
         val identigiloj = eroj.mapNotNull { it.arkivaIdentigilo }.distinct()
+        val semaforo = Semaphore(PARALELA_PETO_LIMIGO)
         val dosiernomoj: Map<String, String> = if (identigiloj.isEmpty()) emptyMap() else coroutineScope {
-            identigiloj.map { id -> async { id to trovuArchiveOrgMp3Dosiernomon(id, httpKliento) } }.awaitAll().toMap()
+            identigiloj.map { id ->
+                async { semaforo.withPermit { id to trovuArchiveOrgMp3Dosiernomon(id, httpKliento) } }
+            }.awaitAll().toMap()
         }
 
         // Paŝo 3: konstruu la elsendojn kun la korektitaj fluo-URL-oj
@@ -317,7 +374,7 @@ class RssParsilo(
                 logw("RssParsilo", "archive.org/$identigilo: neniu MP3 en metadatenoj — uzas divenitan nomon $divenita")
                 return divenita
             }
-            logi("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
+            logd("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
             archiveOrgKasho?.konservuDosiernomon(identigilo, dosiernomo)
             dosiernomo
         } catch (e: CancellationException) {
@@ -358,20 +415,28 @@ class RssParsilo(
             val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
             val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
 
-            val fluo = ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href")
+            val fluo = saniguRetUrlon(ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href"))
                 ?: return@mapNotNull null
-            val bildoUrl = ero.selectFirst("link[type=image/jpeg]")?.attr("href")
-            val retpaghoUrl = ero.selectFirst("link[type=text/html]")?.attr("href")
+            val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
+            val retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
+            // Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (FAROTA G15)
+            val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
             Elsendo(
                 id = id,
                 kanaloSlug = kanalo.slug,
                 kanaloNomo = kanalo.nomo,
-                titolo = puriguHtml(priskriboKruda).take(200),
-                priskribo = puriguHtml(priskriboKruda),
-                priskriboHtml = puriguHtmlKunEtikedojn(priskriboKruda),
+                // La titolo venas el <title> de la ero — derivado el la enhavo produktis
+                // "VINILKOSMO … has posted: …" (regreso kontraŭ la malnova apo, FAROTA G29)
+                titolo = if (kanalo.ignoruTitolon) {
+                    puriguHtml(priskriboPurigita).take(200).trim()
+                } else {
+                    ero.selectFirst("title")?.text()?.trim() ?: ""
+                },
+                priskribo = puriguHtml(priskriboPurigita),
+                priskriboHtml = puriguHtmlKunEtikedojn(priskriboPurigita),
                 bildoUrl = bildoUrl,
                 dato = dato,
                 fluo = fluo,
@@ -381,8 +446,26 @@ class RssParsilo(
 
     // === Helpiloj ===
 
+    /**
+     * Validigas URL-on el nefidinda RSS-enhavo: nur `http://`/`https://` permesataj.
+     *
+     * Defendo kontraŭ skemoj kiel `file://`, `content://`, `javascript:`, `intent://`:
+     * ExoPlayer/Coil denaske scipovas malfermi `file://` kaj `content://` — malica aŭ
+     * difektita fluo devas ne igi nin ludi/montri lokan enhavon (FAROTA G2).
+     *
+     * @return la trimmed URL, aŭ null se la skemo ne estas permesata
+     */
+    fun saniguRetUrlon(url: String?): String? {
+        if (url.isNullOrBlank()) return null
+        val pura = url.trim()
+        val malalta = pura.lowercase()
+        return if (malalta.startsWith("http://") || malalta.startsWith("https://")) pura else null
+    }
+
     fun normigiDaton(datStr: String?): String? {
         if (datStr.isNullOrBlank()) return null
+        // Simpla dato sen tempo: "2024-01-05" (FAROTA C35 — antaŭe la tuta ero estis forĵetita)
+        if (datStr.trim().matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return datStr.trim()
         if (datStr.contains("T")) {
             val dato = datStr.substringBefore("T")
             if (dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return dato
@@ -393,15 +476,17 @@ class RssParsilo(
             "May" to "05", "Jun" to "06", "Jul" to "07", "Aug" to "08",
             "Sep" to "09", "Oct" to "10", "Nov" to "11", "Dec" to "12"
         )
-        val m = Regex("(\\d{1,2})\\s+(\\w{3})\\s+(\\d{4})").find(korektita) ?: return null
+        // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (FAROTA C35)
+        val m = Regex("(\\d{1,2})\\s+(\\w{3,4})\\s+(\\d{4})").find(korektita) ?: return null
         val tago = m.groupValues[1].padStart(2, '0')
-        val monato = monatoj[m.groupValues[2]] ?: return null
+        val monato = monatoj[m.groupValues[2].take(3)] ?: return null
         return "${m.groupValues[3]}-$monato-$tago"
     }
 
     fun leguDauron(teksto: String?): Long? {
         if (teksto.isNullOrBlank()) return null
-        val partoj = teksto.trim().split(":")
+        // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (FAROTA C37)
+        val partoj = teksto.trim().split(":").map { it.substringBefore('.') }
         return when (partoj.size) {
             1 -> partoj[0].toLongOrNull()
             2 -> (partoj[0].toLongOrNull() ?: return null) * 60 + (partoj[1].toLongOrNull() ?: return null)
@@ -428,10 +513,23 @@ class RssParsilo(
         val doc = Ksoup.parse(html)
         // Forigu danĝerajn etikedojn
         doc.select("script, style, iframe, object, embed, form, input, button, meta, link").remove()
-        // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj)
+        // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj).
+        // BLANKA LISTO por href/src: nur http(s), mailto, #-ankroj kaj /-relativaj vojoj
+        // permesataj — `intent://`, `data:`, `file://` kaj obfuskigita `java\tscript:`
+        // (usklec-miksita) tiel ne trafluas (FAROTA G4).
         for (el in doc.select("*")) {
             for (attr in el.attributes().asList()) {
-                if (attr.key.startsWith("on") || attr.value.trim().startsWith("javascript:")) {
+                val sxlosilo = attr.key.lowercase()
+                val valoro = attr.value.trim()
+                val malalta = valoro.lowercase()
+                val danxeraAtributo = sxlosilo.startsWith("on") ||
+                    malalta.startsWith("javascript:") ||
+                    malalta.startsWith("data:") ||
+                    ((sxlosilo == "href" || sxlosilo == "src") && !(
+                        malalta.startsWith("http://") || malalta.startsWith("https://") ||
+                        malalta.startsWith("mailto:") || valoro.startsWith("#") || valoro.startsWith("/")
+                    ))
+                if (danxeraAtributo) {
                     el.removeAttr(attr.key)
                 }
             }

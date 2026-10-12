@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -103,7 +104,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -127,7 +128,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -152,7 +153,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -189,7 +190,7 @@ class MiniLudilbretoTesto {
         )
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -206,7 +207,8 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo)
+                var elfaldita by remember { mutableStateOf(false) }
+                MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
             }
         }
         waitForIdle()
@@ -227,7 +229,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo(pozicioMs = 600_000, dauroMs = dauroMs) // 50%
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -247,9 +249,10 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
+                var elfaldita by remember { mutableStateOf(false) }
                 // Malsupra alcentrigo: la pozicio de la breto moviĝas kiam ĝia alteco ŝanĝiĝas
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                    MiniLudilbreto(ludilo = ludilo)
+                    MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
                 }
             }
         }
@@ -275,7 +278,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -296,7 +299,7 @@ class MiniLudilbretoTesto {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, komenceElfaldita = true)
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
             }
         }
         waitForIdle()
@@ -314,5 +317,67 @@ class MiniLudilbretoTesto {
             0.3f,
             onNodeWithTag("lauxteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
+    }
+
+    @Test
+    fun sekvanta_montras_titolon_kaj_ludi_butonon() = runComposeUiTest {
+        val ludilo = TestaLudiloRegilo(
+            LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = null)
+        )
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(
+                    ludilo = ludilo,
+                    sekvantaTitolo = "Varsovia Vento",
+                    sekvantaSubtitolo = "Kanalo",
+                    onLudiSekvantan = {},
+                )
+            }
+        }
+        waitForIdle()
+
+        onNodeWithTag("ludilbreto").assertExists()
+        onNodeWithContentDescription("Ludi").assertExists()
+        // Ne montru halti- aŭ ludvico-butonojn en sekvanta reĝimo
+        onNodeWithContentDescription("Halti").assertDoesNotExist()
+        onNodeWithContentDescription("Ludvico").assertDoesNotExist()
+    }
+
+    @Test
+    fun sekvanta_mankas_kiam_neniu_sekvanta() = runComposeUiTest {
+        val ludilo = TestaLudiloRegilo(
+            LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = null)
+        )
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo)
+            }
+        }
+        waitForIdle()
+
+        onNodeWithTag("ludilbreto").assertDoesNotExist()
+    }
+
+    @Test
+    fun sekvanta_ludi_butono_vokas_onLudiSekvantan() = runComposeUiTest {
+        val ludilo = TestaLudiloRegilo(
+            LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = null)
+        )
+        var ludiVokita = false
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(
+                    ludilo = ludilo,
+                    sekvantaTitolo = "Kern.punkto",
+                    sekvantaSubtitolo = "Kanalo",
+                    onLudiSekvantan = { ludiVokita = true },
+                )
+            }
+        }
+        waitForIdle()
+
+        onNodeWithContentDescription("Ludi").performClick()
+        waitForIdle()
+        assertTrue(ludiVokita, "onLudiSekvantan devas esti vokita klakante la ludi-butonon")
     }
 }

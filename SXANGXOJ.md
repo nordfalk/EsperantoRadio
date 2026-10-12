@@ -685,3 +685,44 @@ kies historio gravas; la DAŬRE VALIDA scio staras en `NOTOJ.md`.
 - Eksponenta reprovo ne atendas je reta reveno (la malnova `venterPåAtKommeOnline`) — rezignas post ~3 minutoj.
 - Web: CORS blokas plej multajn RSS-fluojn; bildoj ne aperas. Bezonas servilon/prokurilon.
 - HLS sur Desktop/Web.
+
+---
+
+## Kio novas / Lastatempe ludata — konduto kaj lud-ekigo (PR: #85)
+
+### Dizajno (post provo kaj rezigno de la "flugo")
+
+Uzanto petis ke luditaj elsendoj malaperas de "Kio novas". Unue ni provis animacian
+"flugon" de la karto inter la sekcioj per `SharedTransitionScope` +
+`sharedElementWithCallerManagedVisibility` (stubo kun `visible=false` difinas la
+komenc-pozicion, la cel-karto flugas). Sur la emulilo ĝi funkciis, sed la uzanto
+trovis tion tro komplika kaj ni rezignis ĝin. La fina konduto estas pli simpla:
+
+- **La nune ludata karto restas en "Kio novas"** (ĝis alia elsendo iĝas la nuna) —
+  la klakita karto ne saltas for sub la fingro; ĝi ankaŭ aperas en "Lastatempe ludata".
+- **"Lastatempe ludata" nur post vera lud-ekigo**: `lasteLudita` ne plu skribiĝas tuj
+  ĉe klako sur "Ludi" (tiu skribo en `ludiElsendonInterna` estas forigita), sed nur
+  kiam la ludilo atingas `Ludas` — nova `markiLudita(elsendoId, kanaloSlug)` metas
+  nur la tempmarkon kaj ne tuŝas pozicion/daŭron (ne kiel `registriPozicion`, kiu
+  anstataŭigus ilin). Sekve elsendo kiu nur "konektas" aŭ eraras ne aperas tro frue.
+- **"Lastatempe ludata" rulas aŭtomate** al la nova karto (`animateScrollToItem(0)`
+  kiam la unua ero ŝanĝiĝas).
+- **"Aliaj elsendoj" ne re-miksas**: antaŭe `.shuffled()` rulis ĉe ĉiu
+  `aktualigiuLudatajn` (t.e. ĉiujn 5 s dum pozicio-savado) kaj la sekcio konstante
+  ŝanĝiĝis. Nun `plenigu` antaŭmiksas la kandidatojn unufoje (`shuffled(Random(enhavo-hash))`)
+  kaj `aktualigiuLudatajnInterna` nur filtras — la ordo de restantaj kartoj stabilas.
+
+### Sekureca kunfando post master
+
+Dum revizio post la mergo de master oni trovis, ke la novaj skriboj de
+`PersistaLudatojDeponejo` estas protektataj per `mutex.withLock` (veninta el master),
+sed la nova `markiLudita` komence ne uzis ĝin — kur-kondiĉo kun la pozicio-savanto.
+Riparite; la Leciono estas en AGENTS.md.
+
+### Kontrolrezulto
+
+- Emulilo (uiautomator + logcat): klako → "Konektas…" (karto ankoraŭ nur en "Kio
+  novas") → `Markita ludita` je la vera `Ludas`-momento → karto samtempe en "Kio
+  novas" kaj unue en "Lastatempe ludata", la vico rulas al ĝi; paŭz-butono aperas.
+- `:shared:desktopTest` kaj `:androidApp:assembleDebug` pasas post ĉiu mergo de master;
+  CI (`testoj` + `changelog`) verda sur la PR.

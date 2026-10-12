@@ -332,7 +332,7 @@ class HejmoEkranoTest {
     @Test
     fun aliajElsendojNeRemiksasJeRekomputado() = runBlocking {
         val kanaloj = listOf(Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"))
-        // Suĉe multaj elsendoj por ke "Kio popularas" havu kandidatojn
+        // Sufiĉe multaj elsendoj por ke "Kio popularas" havu kandidatojn
         val elsendoj = (1..12).map { i ->
             Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Epizodo $i", fluo = "", dato = datoAntaux(i))
         }

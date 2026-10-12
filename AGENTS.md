@@ -179,6 +179,14 @@ EsperantoRadio/
 6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
+7. **La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
+   `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
+   (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.
+   (2026-10-11: PR #85 naskas el `hejmo-luditaj-kio-novas`, ne `pr-85`.)
+8. **Por ĝisdatigi malfermitan PR-on de master, uzu merge, ne rebazo** — rebazo
+   reskribas la historion kaj postulas force-push; `git merge origin/master` en la
+   PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
+   ricevis master-ĝisdatigojn.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -386,6 +394,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `canScheduleExactAlarms()` vera sen mana permeso — sen ĝi la skedilo devas fali al
   `setWindow` kun 10-minuta fenestro (Doze-prokrastoj). `SCHEDULE_EXACT_ALARM` restas
   bezonata por Android 12 (31-32), kie ĝi estas defaŭlte donata sed revokebla.
+- **Post mergo de master, reviziu la novajn invariantojn en la kunfanditaj dosieroj**:
+  novo aldonita metodo povas malobservi novaĵon de master. (2026-10-11: `markiLudita`
+  komence skribis sen `mutex.withLock`, kiun master intertempe postulis por ĉiuj
+  skriboj de `PersistaLudatojDeponejo` — kur-kondiĉo kun la pozicio-savanto.)
+- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo, kontrolu la ĝustan
+  literigon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
+  "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
+  sen kaŝita differenco = la ĉeno mem estas alia.
 
 ## Logcat (Android)
 

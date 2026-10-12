@@ -117,6 +117,7 @@ data class KanaloDto(
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6). */
     val puriguModeloj: List<String> = emptyList(),
+    @SerialName("defaŭltŜatata") val defaltSxatata: Boolean = false,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -133,6 +134,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
+    defaltSxatata = defaltSxatata,
 )
 
 /**

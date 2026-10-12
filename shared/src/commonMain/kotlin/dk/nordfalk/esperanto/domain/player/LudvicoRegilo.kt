@@ -143,6 +143,7 @@ class LudvicoRegilo(
             stato == LudantoStato.Ludas -> {
                 if (_reprovo.value > 0) logi("Ludvico", "Reprovo ${_reprovo.value} sukcesis")
                 _reprovo.value = 0
+                markiLudataElsendon()
                 ghisdatiguLastaPozicion()
                 komenciPozicianSpuradon()
             }
@@ -316,6 +317,21 @@ class LudvicoRegilo(
         is Sonfonto.LokaElsendo -> fonto.elsendo.id
         is Sonfonto.RektaKanalo -> "rekta:${fonto.kanalo.slug}"
         null -> null
+    }
+
+    /**
+     * Ludado vere ekis por la nuna elsendo — registrigu lasteLudita.
+     * Tio igas la elsendon aperi en "Lastatempe ludata" kaj konservi ĝin videbla
+     * en "Kio novas" dum ĝi ludas. Ne tuŝas pozicion aŭ daŭron.
+     */
+    private suspend fun markiLudataElsendon() {
+        val info = ludilo.stato.value
+        val elsendo = when (val fonto = info.nunaFonto) {
+            is Sonfonto.ElsendoFonto -> fonto.elsendo
+            is Sonfonto.LokaElsendo -> fonto.elsendo
+            else -> return
+        }
+        ludatojDeponejo.markiLudita(elsendo.id, elsendo.kanaloSlug)
     }
 
     private fun komenciPozicianSpuradon() {
@@ -542,8 +558,12 @@ class LudvicoRegilo(
     }
 
     /**
-     * Interna helpilo: ludas elsendon kun resumigo kaj registri lasteLudita.
+     * Interna helpilo: ludas elsendon kun resumigo.
      * Ne uzas mutex — vokenda el mutex-kunteksto.
+     *
+     * Neniu lasteLudita estas skribata ĉi tie — tio okazas nur kiam la ludado
+     * vere ekis (stato Ludas, vidu [traktiStatoSxangxon]), por ke la elsendo
+     * ne tro frue moviĝu al "Lastatempe ludata".
      */
     private suspend fun ludiElsendonInterna(elsendo: Elsendo) {
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
@@ -568,7 +588,6 @@ class LudvicoRegilo(
         } catch (e: Throwable) {
             loge("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
         }
-        ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, komencoPozicio, 0)
     }
 
     /**

@@ -515,16 +515,18 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun pozicio_registritaKiamLudiElsendon() = runTest {
+    fun pozicio_registritaKiamLudadoEkas() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
-        val (regilo, _, _) = kreuRegilon(ludatojDeponejo = ludatoj, scope = this)
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
 
+        regilo.komenci()
         regilo.ludiElsendon(e)
 
-        // registriPozicio estas vokita en ludiElsendon
+        // La elsendo estas registrita (markiLudita) kiam la ludado vere ekas
         val ludato = ludatoj.getLudato(e.id)
-        assertTrue(ludato != null, "Ludanto devus esti registrita")
+        assertTrue(ludato != null, "Ludanto devus esti registrita kiam la ludado ekas")
         assertEquals("e1", ludato!!.elsendoId)
     }
 
@@ -646,6 +648,46 @@ class LudvicoRegiloTest {
 
         val savita = ludatoj.getPozicio(e.id)
         assertEquals(90_000, savita, "Pozicio devus esti savita kiam haltigxas (per retroiro)")
+    }
+
+    // =========================================================================
+    // lasteLudita — skribata nur kiam la ludado vere ekis
+    // =========================================================================
+
+    @Test
+    fun lasteLudita_mankasGxisLudadoEkis() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        // Fonto ŝargita sed la ludado ankoraŭ ne vere ekis (ekz. konektas/bufras)
+        ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e), 0)
+        assertNull(ludatoj.getLudato(e.id), "lasteLudita ne devas esti skribita antaŭ ol la ludado vere ekis")
+
+        // Ludado ekis — nun lasteLudita devas esti skribita
+        ludilo.ludi()
+        assertTrue(
+            (ludatoj.getLudato(e.id)?.lasteLudita ?: 0) > 0,
+            "lasteLudita devas esti skribita kiam la ludado vere ekis",
+        )
+    }
+
+    @Test
+    fun lasteLudita_neSxangxasPozicion() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 30_000, 300_000)
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e), 30_000)
+        ludilo.ludi()
+
+        // markiLudita nur metas la tempmarkon — la pozicio devas resti sendifekta
+        assertEquals(30_000, ludatoj.getPozicio(e.id), "markiLudita ne devas ŝanĝi la pozicion")
     }
 
     // =========================================================================

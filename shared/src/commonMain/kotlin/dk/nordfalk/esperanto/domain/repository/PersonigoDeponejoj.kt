@@ -27,6 +27,13 @@ interface LastAuxskultitajDeponejo {
 interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
     suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+
+    /**
+     * Metas la tempmarkon lasteLudita al nun — sen tuŝi pozicion aŭ daŭron.
+     * Vokata kiam la ludado vere ekis (ne jam ĉe klako sur "Ludi"),
+     * por ke la elsendo aperu en "Lastatempe ludata" nur tiam.
+     */
+    suspend fun markiLudita(elsendoId: String, kanaloSlug: String)
     suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
     suspend fun markiErara(elsendoId: String, kanaloSlug: String)
     suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)

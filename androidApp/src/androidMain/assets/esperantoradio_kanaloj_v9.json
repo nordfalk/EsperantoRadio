@@ -71,7 +71,8 @@
 				"<audio .+?</audio>",
 				"<p>(?:(?!</p>).)*?tempo-daŭro(?:(?!</p>).)*?</p>",
 				"<p>(?:(?!</p>).)*?Subtenu nin(?:(?!</p>).)*?</p>"
-			]
+			],
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "lamalfamuloj",
@@ -123,7 +124,8 @@
 			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝoButono": "https://kern.punkto.info/"
+			"hejmpaĝoButono": "https://kern.punkto.info/",
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "movada-vidpunkto",

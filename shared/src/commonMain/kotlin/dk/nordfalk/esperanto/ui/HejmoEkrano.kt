@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,6 +54,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.DatePeriod
@@ -189,6 +191,21 @@ class HejmoViewModel(
     private val _lastatempeLudataj = MutableStateFlow<List<Elsendo>>(emptyList())
     val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
+    /** Kruda listo de ĉiuj elsendoj — uzata por reaktualigi kiam ludatoj ŝanĝiĝas. */
+    private var cxiujElsendoj: List<Elsendo> = emptyList()
+
+    /**
+     * ID de la elsendo kiu nun estas ŝargita en la ludilo (ludas aŭ paŭzita).
+     * Ĝi restas en "Kio novas" dum ĝi estas la nuna ludata elsendo.
+     */
+    private var nunaLudataId: String? = null
+
+    /**
+     * Antaŭmiksita ordo por "Aliaj elsendoj" (Kio popularas) — unufoje po ŝarĝado.
+     * Evitas ke la sekcio re-miksigas ĉe ĉiu rekomputado (ekz. pozicio-savoj).
+     */
+    private var aliajKandidatoj: List<Elsendo> = emptyList()
+
     /** Aktivaj kanaloj — kun elsendo dum la pasinta jaro (montrataj unue). */
     private val _aktivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
     val aktivajKanaloj = _aktivajKanaloj.asStateFlow()
@@ -236,14 +253,11 @@ class HejmoViewModel(
      */
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
+        cxiujElsendoj = elsendoj
+        // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
+        // kun semo derivata de la enhavo — la ordo restas stabila inter rekomputadoj.
+        aliajKandidatoj = elsendoj.shuffled(Random(elsendoj.hashCode().toLong()))
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
-        val novaj = elsendoj
-            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) }
-            .groupBy { it.kanaloSlug }
-            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
-            .sortedByDescending { it.dato }
-            .take(50)
-        _novajElsendoj.value = novaj
 
         val cxiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
@@ -255,23 +269,62 @@ class HejmoViewModel(
         _aktivajKanaloj.value = aktivaj
         _arkivajKanaloj.value = arkivaj
 
-        val ekskluditaj = (novaj.take(20).map { it.id } +
-            cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
-        _popularajElsendoj.value = elsendoj
-            .filter { it.id !in ekskluditaj }
-            .shuffled()
-            .take(20)
+        aktualigiuLudatajnInterna()
+    }
+
+    /**
+     * Reaktualigas "Kio novas", "Lastatempe ludata" kaj "Kio popularas" surbaze
+     * de la nunaj ludatoj kaj de la nune ludata elsendo.
+     *
+     * - Jam luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata";
+     *   la nune ludata elsendo tamen RESTAS en "Kio novas" (kaj ankaŭ aperas en "Lastatempe ludata")
+     * - Maksimume 5 plej novaj elsendoj po kanalo en "Kio novas"
+     */
+    @OptIn(ExperimentalTime::class)
+    fun aktualigiuLudatajn(nunaElsendoId: String?) {
+        nunaLudataId = nunaElsendoId
+        aktualigiuLudatajnInterna()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun aktualigiuLudatajnInterna() {
+        val elsendoj = cxiujElsendoj
+        if (elsendoj.isEmpty()) return
+        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+
+        val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        val luditajIdj = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .map { it.elsendoId }
+            .toSet()
+
+        // "Kio novas" — ekskludu luditajn (krom la nune ludata), maks 5 po kanalo
+        val novaj = elsendoj
+            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) && (it.id !in luditajIdj || it.id == nunaLudataId) }
+            .groupBy { it.kanaloSlug }
+            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(5) }
+            .sortedByDescending { it.dato }
+            .take(50)
+        _novajElsendoj.value = novaj
 
         // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
-        if (ludatojDeponejo != null) {
-            val ludatoj = ludatojDeponejo.observiLudatojn().value
-            val lastatempe = ludatoj.values
-                .filter { it.lasteLudita > 0 }
-                .sortedByDescending { it.lasteLudita }
-                .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
-                .take(20)
-            _lastatempeLudataj.value = lastatempe
-        }
+        val lastatempe = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .sortedByDescending { it.lasteLudita }
+            .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
+            .take(20)
+        _lastatempeLudataj.value = lastatempe
+
+        // "Kio popularas" — ekskludu novajn, kanalajn kaj luditajn.
+        // Uzas la antaŭmiksitan kandidatliston (vidu plenigu) — la ordo de la
+        // restantaj kartoj ne ŝanĝiĝas kiam la ekskludoj ŝanĝiĝas.
+        val kanalajIdj = (aktivajKanaloj.value + arkivajKanaloj.value)
+            .mapNotNull { it.plejNovaElsendo?.id }
+            .toSet()
+        val ekskluditaj = (novaj.take(20).map { it.id } + kanalajIdj + luditajIdj).toSet()
+        _popularajElsendoj.value = aliajKandidatoj
+            .filter { it.id !in ekskluditaj }
+            .take(20)
     }
 }
 
@@ -334,6 +387,30 @@ fun HejmoEkrano(
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
+
+    // La nune ludata elsendo (el la ludilo) — ĝi restas videbla en "Kio novas"
+    val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
+    val nunaElsendoId = when (val fonto = ludantoStato.nunaFonto) {
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.id
+        is Sonfonto.LokaElsendo -> fonto.elsendo.id
+        else -> null
+    }
+
+    // Reaktualigu "Kio novas" kaj "Lastatempe ludata" kiam ludatoj aŭ la nuna ludata elsendo ŝanĝiĝas
+    LaunchedEffect(ludatojMapo, nunaElsendoId) {
+        vm.aktualigiuLudatajn(nunaElsendoId)
+    }
+
+    // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
+    val luditajVicoStato = rememberLazyListState()
+    var antauxaUnuaLudataId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(lastatempeLudataj) {
+        val unuaId = lastatempeLudataj.firstOrNull()?.id
+        if (unuaId != null && unuaId != antauxaUnuaLudataId) {
+            antauxaUnuaLudataId = unuaId
+            luditajVicoStato.animateScrollToItem(0)
+        }
+    }
 
     if (viewModel == null) {
         LaunchedEffect(Unit) {
@@ -446,11 +523,13 @@ fun HejmoEkrano(
                     }
                 }
 
-                // "Lastatempe ludata" — elsendoj kiuj estis luditaj
+                // "Lastatempe ludata" — elsendoj kiuj estis luditaj; la vico
+                // aŭtomate rulas al la plej nova karto (maldekstre)
                 if (lastatempeLudataj.isNotEmpty()) {
                     item { SekcioTitolo("Lastatempe ludata") }
                     item {
                         LazyRow(
+                            state = luditajVicoStato,
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {

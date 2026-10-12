@@ -44,10 +44,19 @@ interface AgordojDeponejo {
     val sciigoj: StateFlow<Boolean>
     val auxtomataDaurigo: StateFlow<Boolean>
     val evoluo: StateFlow<Boolean>
+
+    /**
+     * Ĉu la avertokarto pri diagnozaj problemoj aperu sur la ĉefekrano.
+     * La uzanto povas kaŝi ĝin per la 'x'-butono de la karto; la avertoj
+     * restas videblaj en Agordoj → Diagnozo.
+     */
+    val montruHejmajnAvertojn: StateFlow<Boolean>
+
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
     fun fiksiEvoluon(sxaltita: Boolean)
+    fun fiksiMontronDeHejmajAvertoj(sxaltita: Boolean)
 }
 
 /**

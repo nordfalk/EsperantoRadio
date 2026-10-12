@@ -17,6 +17,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - Vekhorloĝo: se ĉiuj elsendoj de la kanalo estas jam aŭskultitaj, la alarmo nun reludas la plej novan sane ludeblan anstataŭ eble eraran elsendon (https://github.com/nordfalk/EsperantoRadio/pull/95)
+- La averto pri detektitaj problemoj sur la ĉefekrano havas "x"-butonon por kaŝi ĝin; ĝi kondukas al la agordoj, kie la averto ĉiam restas videbla ĉe "Diagnozo" kaj ŝaltilo ebligas remontri ĝin (PR-ligilo venos)
 
 ### Riparita
 

@@ -181,8 +181,9 @@ fun EsperantoRadioApp(
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
-                                onDiagnozo = { push(Vojo.Diagnozo) },
+                                onKasxuHejmajnAvertojn = { agordojDeponejo.fiksiMontronDeHejmajAvertoj(false) },
                                 diagnozoProblemoj = diagnozoRegilo.problemoj,
+                                montruHejmajnAvertojn = agordojDeponejo.montruHejmajnAvertojn,
                                 onElshuti = { elsendo ->
                                     logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
                                     scope.launch { elshutDeponejo.elshuti(elsendo) }
@@ -268,6 +269,7 @@ fun EsperantoRadioApp(
                                 agordojDeponejo = agordojDeponejo,
                                 onReen = { reen() },
                                 onDiagnozo = { push(Vojo.Diagnozo) },
+                                diagnozoProblemoj = diagnozoRegilo.problemoj,
                             )
                         }
                         entry<Vojo.Diagnozo> {

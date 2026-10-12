@@ -138,6 +138,9 @@ class AgordojDeponejoImpl(
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
+    private val _montruHejmajnAvertojn = MutableStateFlow(settings?.getBoolean(SettingsKeys.MONTRU_HEJMAJN_AVERTOJN, true) ?: true)
+    override val montruHejmajnAvertojn: StateFlow<Boolean> = _montruHejmajnAvertojn.asStateFlow()
+
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
@@ -156,5 +159,10 @@ class AgordojDeponejoImpl(
         _evoluo.value = sxaltita
         settings?.putBoolean(SettingsKeys.EVOLO, sxaltita)
         logi("Agordoj", "Evoluo → $sxaltita")
+    }
+    override fun fiksiMontronDeHejmajAvertoj(sxaltita: Boolean) {
+        _montruHejmajnAvertojn.value = sxaltita
+        settings?.putBoolean(SettingsKeys.MONTRU_HEJMAJN_AVERTOJN, sxaltita)
+        logi("Agordoj", "MontruHejmajnAvertojn → $sxaltita")
     }
 }

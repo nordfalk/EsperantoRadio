@@ -10,14 +10,18 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.test.ComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
+import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.NoOpLudiloRegilo
@@ -233,6 +237,56 @@ class EkranfotoTesto {
         }
         waitForIdle()
         kaptuKajSavu(this, "09_mini_ludilbreto_elfaldita")
+    }
+
+    /** Falsa ElsendoDeponejo kiu ĉiam liveras unu testelsendon. */
+    private fun falsaElsendoDeponejo() = object : ElsendoDeponejo {
+        private val fluo = MutableStateFlow(listOf(testElsendo)).asStateFlow()
+        override fun observiElsendojn(kanaloSlug: String): StateFlow<List<Elsendo>> = fluo
+        override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> = listOf(testElsendo)
+        override suspend fun getElsendo(id: String): Elsendo? = testElsendo
+        override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> = listOf(testElsendo)
+        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> = listOf(testElsendo)
+    }
+
+    /** Unu diagnoza problemo por la avertokartaj ekranfotoj. */
+    private fun avertaProblemo() = listOf(
+        DiagnozoRezulto(
+            tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
+            titolo = "Bateri-optimumado estas ŝaltita",
+            priskribo = "La sistemo povas limigi la aplikon en la fono.",
+            severeco = Severeco.ERARO,
+        )
+    )
+
+    @Test
+    fun ekranfoto_hejmo_avertokarto() = runComposeUiTest {
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                HejmoEkrano(
+                    kanaloDeponejo = falsaKanaloDeponejo(),
+                    elsendoDeponejo = falsaElsendoDeponejo(),
+                    diagnozoProblemoj = MutableStateFlow(avertaProblemo()),
+                )
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "10_hejmo_avertokarto")
+    }
+
+    @Test
+    fun ekranfoto_agordoj_avertosigno() = runComposeUiTest {
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                AgordojEkrano(
+                    agordojDeponejo = AgordojDeponejoImpl(),
+                    onReen = {},
+                    diagnozoProblemoj = MutableStateFlow(avertaProblemo()),
+                )
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "11_agordoj_avertosigno")
     }
 }
 

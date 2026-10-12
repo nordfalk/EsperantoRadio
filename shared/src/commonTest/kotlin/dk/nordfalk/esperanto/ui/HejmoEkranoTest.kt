@@ -4,14 +4,19 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.test.swipeDown
 import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.Flow
@@ -243,5 +248,69 @@ class HejmoEkranoTest {
         // neniam la ludprogreson — "aŭdis 42%" aperas nur sur la elsendo-kartoj
         onAllNodesWithText("5 tagoj").assertCountEquals(1)
         onAllNodesWithText("aŭdis 42%").assertCountEquals(2) // "Kio novas" + "Lastatempe ludata"
+    }
+
+    /** Averto-rezulto uzata de la diagnozaj testoj. */
+    private fun avertaProblemo() = DiagnozoRezulto(
+        tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
+        titolo = "Bateri-optimumado estas ŝaltita",
+        priskribo = "La sistemo povas limigi la aplikon en la fono.",
+        severeco = Severeco.ERARO,
+    )
+
+    @Test
+    fun avertokartoGvidasAlAgordojKajKasxeblasPerX() = runComposeUiTest {
+        val problemoj = MutableStateFlow(listOf(avertaProblemo()))
+        val montru = MutableStateFlow(true)
+        var agordojKlakoj = 0
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                onAgordoj = { agordojKlakoj++ },
+                onKasxuHejmajnAvertojn = { montru.value = false },
+                diagnozoProblemoj = problemoj,
+                montruHejmajnAvertojn = montru,
+            )
+        }
+        waitForIdle()
+        // La karto videblas kaj klako kondukas al la agordoj (ne rekte al Diagnozo)
+        onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
+        onNodeWithText("1 problemo(j) detektitaj").performClick()
+        assertEquals(1, agordojKlakoj, "Klako sur la avertokarto devas malfermi la agordojn")
+        // La 'x'-butono kaŝas la avertojn de la ĉefekrano — sen navigi
+        onNodeWithContentDescription("Kaŝu avertojn").performClick()
+        waitForIdle()
+        assertEquals(1, agordojKlakoj, "La 'x'-butono devas nur kaŝi, ne navigi al agordoj")
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun avertokartoNeAperasSeKasxita() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                diagnozoProblemoj = MutableStateFlow(listOf(avertaProblemo())),
+                montruHejmajnAvertojn = MutableStateFlow(false),
+            )
+        }
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun avertokartoIgnorasInformativajnProblemojn() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                diagnozoProblemoj = MutableStateFlow(
+                    listOf(avertaProblemo().copy(severeco = Severeco.INFO))
+                ),
+            )
+        }
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
     }
 }

@@ -3,21 +3,28 @@ package dk.nordfalk.esperanto.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.ApoVersio
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
 import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
 import dk.nordfalk.esperanto.logi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,11 +32,15 @@ fun AgordojEkrano(
     agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
     onDiagnozo: () -> Unit = {},
+    diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
 ) {
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
+    val montruHejmajnAvertojn by agordojDeponejo.montruHejmajnAvertojn.collectAsState()
+    val problemoj by diagnozoProblemoj.collectAsState()
+    val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
 
     Scaffold(
         topBar = {
@@ -57,9 +68,44 @@ fun AgordojEkrano(
             Spacer(Modifier.height(8.dp))
             ListItem(
                 headlineContent = { Text("Diagnozo") },
-                supportingContent = { Text("Kontroli ĉu la aparato estas bone agordita por fona ludado kaj aŭtomata daŭrigo") },
+                supportingContent = {
+                    Text(
+                        if (problemojGravaj.isEmpty()) "Kontroli ĉu la aparato estas bone agordita por fona ludado kaj aŭtomata daŭrigo"
+                        else "${problemojGravaj.size} problemo(j) detektitaj — tuŝu por vidi la detalojn"
+                    )
+                },
+                leadingContent = if (problemojGravaj.isNotEmpty()) {
+                    {
+                        Icon(
+                            Icons.Filled.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                } else null,
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
                 modifier = Modifier.clickable { logi("Klako", "Diagnozo"); onDiagnozo() }
+            )
+
+            // Ĉu la avertokarto aperu sur la ĉefekrano — la 'x'-butono de la
+            // karto malŝaltas tion; ĉi tie la uzanto povas reebligi ĝin.
+            ListItem(
+                headlineContent = { Text("Montri avertojn sur la ĉefekrano") },
+                supportingContent = { Text("Kiam problemoj estas detektitaj, aperas averto-karto super la enhavo. La avertoj ĉiam restas videblaj ĉe \"Diagnozo\".") },
+                trailingContent = {
+                    Switch(
+                        checked = montruHejmajnAvertojn,
+                        onCheckedChange = null,
+                    )
+                },
+                modifier = Modifier.toggleable(
+                    value = montruHejmajnAvertojn,
+                    role = Role.Switch,
+                    onValueChange = {
+                        logi("Klako", "montruHejmajnAvertojn → $it")
+                        agordojDeponejo.fiksiMontronDeHejmajAvertoj(it)
+                    }
+                )
             )
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)

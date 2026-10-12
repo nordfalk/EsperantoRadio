@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -313,8 +313,9 @@ fun HejmoEkrano(
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
-    onDiagnozo: () -> Unit = {},
+    onKasxuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
+    montruHejmajnAvertojn: StateFlow<Boolean> = MutableStateFlow(true),
     onElshuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -330,6 +331,7 @@ fun HejmoEkrano(
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
+    val montruAvertojn by montruHejmajnAvertojn.collectAsState()
     val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
     val scope = rememberCoroutineScope()
 
@@ -397,9 +399,15 @@ fun HejmoEkrano(
             ) {
 
                 // Avertosigno pri detektitaj problemoj — supre, nur se estas
-                if (problemojGravaj.isNotEmpty()) {
+                // kaj la uzanto ne kaŝis ĝin (la 'x'-butono kaŝas; ĝi restas
+                // videbla en Agordoj → Diagnozo)
+                if (problemojGravaj.isNotEmpty() && montruAvertojn) {
                     item {
-                        DiagnozoAvertoKarto(problemoj = problemojGravaj, onDiagnozo = onDiagnozo)
+                        DiagnozoAvertoKarto(
+                            problemoj = problemojGravaj,
+                            onAgordoj = onAgordoj,
+                            onKasxu = onKasxuHejmajnAvertojn,
+                        )
                     }
                 }
 
@@ -750,24 +758,26 @@ private fun ElsendoKartoPreviewPauxzita() {
 
 /**
  * Averto-karto pri detektitaj problemoj — montrata supre de la ĉefekrano.
- * Klako kondukas rekte al la diagnoza ekrano.
+ * Klako kondukas al Agordoj (kie la sama avertosigno restas videbla ĉe
+ * "Diagnozo"); la 'x'-butono kaŝas la avertojn de la ĉefekrano.
  */
 @Composable
 private fun DiagnozoAvertoKarto(
     problemoj: List<DiagnozoRezulto>,
-    onDiagnozo: () -> Unit,
+    onAgordoj: () -> Unit,
+    onKasxu: () -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { logi("Klako", "diagnozo-karto (Hejmo)"); onDiagnozo() },
+            .clickable { logi("Klako", "diagnozo-karto (Hejmo) → agordoj"); onAgordoj() },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
         ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 4.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -790,11 +800,13 @@ private fun DiagnozoAvertoKarto(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            IconButton(onClick = { logi("Klako", "kaŝu hejmajn avertojn"); onKasxu() }) {
+                Icon(
+                    Icons.Filled.Close,
+                    contentDescription = "Kaŝu avertojn",
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
         }
     }
 }

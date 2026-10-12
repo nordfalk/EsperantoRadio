@@ -7,6 +7,7 @@ import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.ApajNovajxojDeponejo
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
@@ -70,6 +71,8 @@ object AppStato {
     var ludvicoRegilo: LudvicoRegilo? = null
         private set
     var diagnozoRegilo: DiagnozoRegilo? = null
+        private set
+    var apajNovajxojDeponejo: ApajNovajxojDeponejo? = null
         private set
 
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
@@ -152,6 +155,9 @@ object AppStato {
         val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
         alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
+        // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
+        apajNovajxojDeponejo = ApajNovajxojDeponejo(settings, agordo.android?.apajNovajxoj)
+
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 
         hejmoViewModel = HejmoViewModel(kanaloDeponejo!!, elsendoDeponejo!!, ludatojDeponejo!!)
@@ -211,6 +217,7 @@ object AppStato {
         ludatojDeponejo = null
         ludvicoRegilo = null
         diagnozoRegilo = null
+        apajNovajxojDeponejo = null
         kanaloViewModelj.clear()
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -88,6 +89,7 @@ fun EsperantoRadioApp(
         val ludatojDeponejo = AppStato.ludatojDeponejo!!
         val ludvicoRegilo = AppStato.ludvicoRegilo!!
         val diagnozoRegilo = AppStato.diagnozoRegilo!!
+        val apajNovajxojDeponejo = AppStato.apajNovajxojDeponejo!!
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
@@ -449,6 +451,28 @@ fun EsperantoRadioApp(
                     onSercxo = { switchTab(Vojo.Sercxo) },
                 )
             }
+        }
+
+        // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo unufoje
+        // por ĉiu nova mesaĝo; "Bone" persistas la haŝaĵon en la agordoj
+        val apajNovajxoj by apajNovajxojDeponejo.observuMontratan().collectAsState()
+        apajNovajxoj?.let { mesagxo ->
+            LaunchedEffect(mesagxo) {
+                logi("ApajNovajxoj", "Montras novajn apajn novaĵojn (hesho=${mesagxo.hashCode()})")
+            }
+            AlertDialog(
+                // Kiel en la malnova apo: nur la "Bone"-butono fermas la dialogon
+                onDismissRequest = { },
+                title = { Text("Novaĵoj") },
+                // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
+                text = { HtmlVido(html = mesagxo, uzuWebView = false, modifier = Modifier.fillMaxWidth()) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        logi("ApajNovajxoj", "Uzanto konfirmis la apajn novaĵojn")
+                        apajNovajxojDeponejo.konfirmu()
+                    }) { Text("Bone") }
+                },
+            )
         }
     }
 }

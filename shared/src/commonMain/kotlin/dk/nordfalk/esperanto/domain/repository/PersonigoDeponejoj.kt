@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.domain.repository
 
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
@@ -46,17 +47,21 @@ interface AgordojDeponejo {
     val evoluo: StateFlow<Boolean>
 
     /**
-     * Ĉu la avertokarto pri diagnozaj problemoj aperu sur la ĉefekrano.
-     * La uzanto povas kaŝi ĝin per la 'x'-butono de la karto; la avertoj
-     * restas videblaj en Agordoj → Diagnozo.
+     * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
+     * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
      */
-    val montruHejmajnAvertojn: StateFlow<Boolean>
+    val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>>
 
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
     fun fiksiEvoluon(sxaltita: Boolean)
-    fun fiksiMontronDeHejmajAvertoj(sxaltita: Boolean)
+
+    /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
+    fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>)
+
+    /** Forgesas la kaŝojn de problemo-tipoj kiuj ne plu ekzistas */
+    fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>)
 }
 
 /**

@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
@@ -138,8 +139,18 @@ class AgordojDeponejoImpl(
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
-    private val _montruHejmajnAvertojn = MutableStateFlow(settings?.getBoolean(SettingsKeys.MONTRU_HEJMAJN_AVERTOJN, true) ?: true)
-    override val montruHejmajnAvertojn: StateFlow<Boolean> = _montruHejmajnAvertojn.asStateFlow()
+    private val _kasxitajAvertoj = MutableStateFlow(
+        settings?.getString(SettingsKeys.KASXITAJ_AVERTOJ, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
+    )
+    override val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kasxitajAvertoj.asStateFlow()
+
+    /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
+    private fun persistu(tipoj: Set<DiagnozoTipo>) {
+        settings?.putString(SettingsKeys.KASXITAJ_AVERTOJ, tipoj.joinToString(",") { it.name })
+    }
+
+    private fun tipoDeNomo(nomo: String): DiagnozoTipo? =
+        nomo.takeIf { it.isNotBlank() }?.let { n -> DiagnozoTipo.entries.firstOrNull { it.name == n } }
 
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
@@ -160,9 +171,17 @@ class AgordojDeponejoImpl(
         settings?.putBoolean(SettingsKeys.EVOLO, sxaltita)
         logi("Agordoj", "Evoluo → $sxaltita")
     }
-    override fun fiksiMontronDeHejmajAvertoj(sxaltita: Boolean) {
-        _montruHejmajnAvertojn.value = sxaltita
-        settings?.putBoolean(SettingsKeys.MONTRU_HEJMAJN_AVERTOJN, sxaltita)
-        logi("Agordoj", "MontruHejmajnAvertojn → $sxaltita")
+    override fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>) {
+        _kasxitajAvertoj.value = tipoj
+        persistu(tipoj)
+        logi("Agordoj", "KasxitajAvertoj → $tipoj")
+    }
+    override fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>) {
+        val purigita = _kasxitajAvertoj.value intersect ekzistantaj
+        if (purigita != _kasxitajAvertoj.value) {
+            _kasxitajAvertoj.value = purigita
+            persistu(purigita)
+            logi("Agordoj", "Purigis kasxitajn avertojn → $purigita")
+        }
     }
 }

@@ -27,16 +27,12 @@ enum class DiagnozoTipo {
 
     /** DNS-solvado malsukcesis — ofte pro privata DNS (DNS-over-TLS) aŭ VPN. */
     DNS,
-
-    /** Ĝenerala reta problemo (ne povas konekti al la servilo). */
-    RETO,
 }
 
-/** Graveco de la problemo — regas la koloron kaj ikonon en la UI. */
+/**
+ * Graveco de la problemo — regas la koloron kaj ikonon en la UI de Diagnozo.
+ */
 enum class Severeco {
-    /** Nur informa — ne blokas la ĉefan funkcion. */
-    INFO,
-
     /** Averto — povas kaŭzi problemojn en iuj kazoj. */
     AVERTO,
 

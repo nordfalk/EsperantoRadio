@@ -31,6 +31,7 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
@@ -169,6 +170,19 @@ object AppStato {
                 diagnozoRegilo?.kontroliRapide()
             } catch (e: Exception) {
                 logw("AppStato", "Malsukcesis kontroli diagnozon", e)
+            }
+        }
+
+        // Kaŝitaj avertoj: kiam problemo malaperas (ekz. la uzanto riparis ĝin),
+        // ĝia kaŝo forgesiĝas — se ĝi poste revenas, la avertokarto reaperas
+        // sur la ĉefekrano.
+        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
+            diagnozoRegilo?.problemoj?.collect { problemoj ->
+                try {
+                    agordojDeponejo.puriguKasxitajnAvertojn(problemoj.map { it.tipo }.toSet())
+                } catch (e: Exception) {
+                    logw("AppStato", "Malsukcesis purigi kasxitajn avertojn", e)
+                }
             }
         }
 

@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -315,7 +315,7 @@ fun HejmoEkrano(
     onAlarmoj: () -> Unit = {},
     onKasxuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
-    montruHejmajnAvertojn: StateFlow<Boolean> = MutableStateFlow(true),
+    kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
     onElshuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -331,8 +331,8 @@ fun HejmoEkrano(
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
-    val montruAvertojn by montruHejmajnAvertojn.collectAsState()
-    val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
+    val kasxitaj by kasxitajAvertoj.collectAsState()
+    val neKasxitajProblemoj = problemoj.filter { it.tipo !in kasxitaj }
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
@@ -398,13 +398,11 @@ fun HejmoEkrano(
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 
-                // Avertosigno pri detektitaj problemoj — supre, nur se estas
-                // kaj la uzanto ne kaŝis ĝin (la 'x'-butono kaŝas; ĝi restas
-                // videbla en Agordoj → Diagnozo)
-                if (problemojGravaj.isNotEmpty() && montruAvertojn) {
+                // Avertosigno pri detektitaj problemoj
+                if (neKasxitajProblemoj.isNotEmpty()) {
                     item {
                         DiagnozoAvertoKarto(
-                            problemoj = problemojGravaj,
+                            problemoj = neKasxitajProblemoj,
                             onAgordoj = onAgordoj,
                             onKasxu = onKasxuHejmajnAvertojn,
                         )
@@ -758,8 +756,6 @@ private fun ElsendoKartoPreviewPauxzita() {
 
 /**
  * Averto-karto pri detektitaj problemoj — montrata supre de la ĉefekrano.
- * Klako kondukas al Agordoj (kie la sama avertosigno restas videbla ĉe
- * "Diagnozo"); la 'x'-butono kaŝas la avertojn de la ĉefekrano.
  */
 @Composable
 private fun DiagnozoAvertoKarto(

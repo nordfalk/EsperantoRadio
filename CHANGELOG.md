@@ -12,7 +12,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 2.0.12f) estas en la git-historio; ĝian finan eldonaĵon markas la etikedo
 [`fresxa_versio`](https://github.com/nordfalk/EsperantoRadio/releases/tag/fresxa_versio).
 
-## [Neeldonita]
+## [3.0.3] - 2026-10-12
 
 ### Aldonita
 
@@ -61,6 +61,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata" nur kiam la ludado vere ekis; la nune ludata karto restas en "Kio novas" (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - "Kio novas" montras maksimume 5 elsendojn po kanalo por lasi spacon al aliaj (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - Varsovia Vento kaj Kernpunkto estas defaŭlte ŝatataj (sciigoj pri novaj elsendoj) (https://github.com/nordfalk/EsperantoRadio/pull/85)
+
+## [Neeldonita]
 
 ## [3.0.2] - 2026-10-08
 
@@ -126,6 +128,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master
 [3.0.0]: https://github.com/nordfalk/EsperantoRadio/compare/fresxa_versio...294834b

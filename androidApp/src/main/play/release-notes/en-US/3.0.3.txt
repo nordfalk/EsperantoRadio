@@ -1,0 +1,10 @@
+Nova en 3.0.3:
+
+📻 9 novaj kanaloj — nun 27 entute!
+🎧 Faldebla mini-ludilbreto
+⏰ Vekhorloĝo plibonigita: ludas tuj, ankaŭ kun malŝaltita ekrano
+🩺 Avertokarto pri problemoj kun gvido al agordoj
+📢 Novaĵ-dialogo pri gravaj sciigoj
+🔒 Pli bona privateco: malpli da protokolado sendiĝas defaŭlte
+
+Kaj multaj riparoj: elŝutoj, sciigoj, serĉo, ludvico kaj pli.

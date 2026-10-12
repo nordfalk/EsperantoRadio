@@ -52,7 +52,7 @@ data class Alarmo(
  *   (0x01=lundo ... 0x40=dimanĉo) kaj kies tempo estas post [nun].
  */
 fun Alarmo.sekvaEkigo(nun: LocalDateTime): LocalDateTime {
-    // FAROTA C4: koercu — korupta agordo (ekz. horo=99 el mana JSON-redakto) devas
+    // (PR #95) koercu — korupta agordo (ekz. horo=99 el mana JSON-redakto) devas
     // ne kraŝi la skedadon (LocalTime ĵetas IllegalArgumentException). La validigo
     // de NOVAJ alarmoj okazas en parsuSugestojnPorAlarmoj kaj AlarmoEkrano; tio ĉi
     // estas la krash-defendo por jam persistintaj valoroj.

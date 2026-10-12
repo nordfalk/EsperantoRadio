@@ -26,14 +26,14 @@ fun SercxoEkrano(
     sercxoDeponejo: SercxoDeponejo,
     onElsendo: (Elsendo) -> Unit,
 ) {
-    // FAROTA G43: la serĉteksto pluvivas ekranturnon (rememberSaveable — la rezultoj
+    // (PR #93) la serĉteksto pluvivas ekranturnon (rememberSaveable — la rezultoj
     // estas DERIVITAJ statoj: post restarigo la serĉo aŭtomate re-ruliĝas malsupre)
     var teksto by rememberSaveable { mutableStateOf("") }
     var rezultoj by remember { mutableStateOf(emptyList<Elsendo>()) }
     var sxargxas by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // FAROTA G42: debounce + nuligebla tasko — antaŭe ĉiu klavpremo lanĉis novan
+    // (PR #93) debounce + nuligebla tasko — antaŭe ĉiu klavpremo lanĉis novan
     // korutinon; ili konkuris kaj malrapida rezulto povis veni post pli rapida
     // (malĝusta ordo), kaj escepto en sercxi paneigus la korutinon.
     var sercxaJob by remember { mutableStateOf<Job?>(null) }

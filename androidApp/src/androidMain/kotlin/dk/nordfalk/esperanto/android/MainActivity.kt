@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikajho (Application) —
-        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (FAROTA K2)
+        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (PR #89)
         petiSciigPermeson()
         // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity
         ludilo = ExoPlayerLudiloRegilo.akiru(this)
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
     /**
      * Traktas alvenantajn intentojn de sciigoj aŭ alarmoj.
      *
-     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (FAROTA G3)
+     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (PR #89)
      * rifuzas falsitajn intencojn de aliaj aplikoj: `MainActivity` estas
      * `exported="true"` kaj la agoj estas publike konataj.
      */
@@ -122,9 +122,9 @@ class MainActivity : ComponentActivity() {
      * Alarmo-intento (de la full-screen-sciigo aŭ de la best-effort startActivity
      * de la ricevilo).
      *
-     * La LUDADON faras AlarmoReceivilo mem — aktivon lanĉita el fona ricevilo estas
-     * blokata de la Background-Activity-Launch-limigoj kaj povas komenciĝi nur kiam
-     * la uzanto vekas la telefonon (2026-10-11: alarmo 16:10 ludis nur je 16:14).
+     * La LUDADON faras AlarmoReceivilo mem — Activity lanĉita el fona ricevilo estas
+     * blokata de la Background-Activity-Launch-limigoj kaj komenciĝas nur kiam
+     * la uzanto vekas la telefonon.
      * Ĉi tie restas nur la UI: la mini-ludilbreto montras la jam ludantan elsendon.
      */
     private fun traktuAlarmIntent(intent: Intent?) {

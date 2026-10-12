@@ -1,3 +1,44 @@
+# Ŝanĝoj — 2026-10-12
+
+## Apaj novaĵoj en la nova apo
+
+La malnova apo montris mesaĝon el la `android`-sekcio de la kanalkonfiguro
+kie la redaktisto de la apo povas alini sciigojn (ekz. versio-anoncojn aŭ
+ke Muzaiko ne funkcias) kaj ĝi montriĝis kiel dialogo — unufoje por ĉiu
+nova enhavo (haŝaĵo de la konfirmita mesaĝo persistiĝis en
+SharedPreferences). La nova apo parsis la kampon sed neniam uzis ĝin.
+La funkcio nun portiĝas kiel **apaj novaĵoj** (dialogo-titolo: "Novaĵoj");
+la malnova dana ŝlosilo tute malaperis (ankaŭ el la JSONC-konfiguro).
+
+Noma historio de tiu ĉi labortago: la malnova dana ŝlosilo →
+`servoStatusMesagxo` → "Kio novas" (kunfrotis kun la samnoma
+hejmo-sekcio pri novaj elsendoj) → fina nomo laŭ deziro de la uzanto:
+JSON-ŝlosilo `apaj_novaĵoj`, Kotlin-identigilo `apajNovajxoj`.
+
+- JSONC (ambaŭ kopioj, denove identaj): la uzanto redaktis la
+  android-sekcion — arĥivaj malaktivaj ŝlosiloj forigitaj, nova aktiva
+  mesaĝo sub `apaj_novaĵoj`: versio-3.0.3-anonco (3.0.2 jam eldoniĝis
+  la 8-an de oktobro) en la stilo de la Play-release-notes, komence
+  "27 radiokanaloj kaj podkastoj" kaj poste la plej gravaj
+  Neeldonita-eroj (vekhoro ĝustatempe, kolapsebla ludilbreto, puraj
+  priskriboj, la novaĵo-dialogo mem).
+- `KanalAgordo.AndroidSekcio`: nova kampo `apajNovajxoj`
+  (`@SerialName("apaj_novaĵoj")` — ŝlosilo kun supersignoj kiel la
+  ekzistantaj `retpoŝto`/`hejmpaĝoButono`).
+- Nova `ApajNovajxojDeponejo` (Settings, ŝlosilo `apaj_novajxoj_hesh`):
+  pura decidlogiko (`deciduMontratan`) — malplena mesaĝo neniam
+  montriĝas; ne-malplena montriĝas nur se ĝia `hashCode` diferencas de
+  la konservita (same kiel la malnova apo; `"".hashCode() == 0`
+  koincidas kun la komenca valoro por novaj instalaĵoj). `konfirmu()`
+  persistas la haŝaĵon kaj fermas.
+- `App.kt`: `AlertDialog` titolita "Novaĵoj" kun `HtmlVido` (la uzanto
+  elektis `uzuWebView = false` → AnnotatedString-vidigo); nur "Bone"
+  fermas (kiel en la malnova apo, ne nuligebla per reen/ekstera klako).
+- Fum-testo sur emulilo: dialogo aperas → "Bone" fermas → restarto ne
+  reaperigas. Unuaj testoj: `ApajNovajxojTest` (decidlogiko + persisto +
+  restarto-kongruo) + agordo-mapado en `KanalAgordoLegantoTest` kaj
+  `KanalAgordoFumTesto`.
+
 # Ŝanĝoj — 2026-10-08
 
 ## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)

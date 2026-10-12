@@ -116,6 +116,7 @@ object AppStato {
     ) {
         if (httpKliento != null) return
 
+        logGrava("AppStato", "Apo malfermita (versio ${ApoVersio.VERSION})")
         logi("AppStato", "Inicialigas deponejojn kaj ViewModel-ojn")
 
         httpKliento = HttpClient(httpMotoro) {

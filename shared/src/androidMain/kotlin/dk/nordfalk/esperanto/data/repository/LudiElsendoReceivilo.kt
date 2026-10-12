@@ -12,6 +12,7 @@ import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import dk.nordfalk.esperanto.logGrava
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import androidx.core.content.ContextCompat
@@ -57,6 +58,8 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
             dato = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_DATO) ?: "",
             fluo = fluo,
         )
+        logGrava("LudiElsendo", "Ekludo el sciigo: ${elsendo.titolo} (kanalo: ${elsendo.kanaloNomo ?: elsendo.kanaloSlug})")
+
         val metadata = MediaMetadata.Builder().setTitle(elsendo.titolo).apply {
             elsendo.kanaloNomo?.let { setArtist(it) }
             elsendo.bildoUrl?.let {

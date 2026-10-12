@@ -10,13 +10,11 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
-import dk.nordfalk.esperanto.agorduSentryEtikedon
+import dk.nordfalk.esperanto.logGrava
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
-import io.sentry.kotlin.multiplatform.Sentry
-import io.sentry.kotlin.multiplatform.SentryLevel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -452,6 +450,8 @@ class LudvicoRegilo(
             nuliguReprovon()
             malpleniguTraktitajnFontojn()
             try {
+                // Grava evento — ĉiam al Sentry: ekludo de rekta kanalo
+                logGrava("Ludvico", "Ekludo de rekta kanalo: ${kanalo.nomo}")
                 ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
                 ludilo.ludi()
             } catch (e: CancellationException) {
@@ -545,11 +545,9 @@ class LudvicoRegilo(
             )
 
             if (sekva != null) {
+                // La ekludo mem estas protokolita per logGrava en ludiElsendonInterna —
+                // Sentry.captureMessage ĉi tie kreus po-ŝanĝan eventon kaj plenigus la kvoton
                 logi("Ludvico", "Aŭtomata sekva: ${sekva.id} — ${sekva.titolo}")
-                Sentry.captureMessage("Aŭtoludo: ${sekva.titolo}") { scope ->
-                    scope.level = SentryLevel.INFO
-                    scope.setTag("kanalo", sekva.kanaloSlug)
-                }
                 ludiElsendonInterna(sekva)
             } else {
                 logi("Ludvico", "Nenio por ludi sekve — haltas")
@@ -566,6 +564,8 @@ class LudvicoRegilo(
      * ne tro frue moviĝu al "Lastatempe ludata".
      */
     private suspend fun ludiElsendonInterna(elsendo: Elsendo) {
+        // Grava evento — ĉiam al Sentry: ekludo de elsendo kun la kanalo
+        logGrava("Ludvico", "Ekludo: '${elsendo.titolo}' (kanalo: ${elsendo.kanaloNomo ?: elsendo.kanaloSlug})")
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
         val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
             logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")

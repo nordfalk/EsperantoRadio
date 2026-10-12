@@ -39,6 +39,30 @@ JSON-ŝlosilo `apaj_novaĵoj`, Kotlin-identigilo `apajNovajxoj`.
   restarto-kongruo) + agordo-mapado en `KanalAgordoLegantoTest` kaj
   `KanalAgordoFumTesto`.
 
+## Sentry-kvoto: protokolado severe limigita (PR #107)
+
+La Sentry-kvoto estis minacata de la multaj `logi`-vokoj (antaŭe ĉiu `logi`
+iris al `Sentry.logger`). Nun:
+
+- `logi` sendas al Sentry nur se la agordo **"Ŝaltu detalan protokoladon"**
+  (Agordoj → Privateco) estas ŝaltita — la flago `protokoloDetala` en
+  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl` (persisto en
+  `SettingsKeys.DETALA_PROTOKOLADO`).
+- Nova `logGrava` (loka + `Sentry.logger.info` ĉiam) por la gravaj eventoj:
+  - malfermo de la apo (`AppStato.inicialigu`),
+  - ekludo de elsendo/rekta kanalo kun la kanalo (`LudvicoRegilo.ludiElsendonInterna`/`ludiRektan`),
+  - ekludo el sciigo (`LudiElsendoReceivilo`),
+  - vekiĝo de alarmo (`AlarmoReceivilo`).
+- `logw`/`loge` restas ĉiam sendataj (avertoj/eraroj estas maloftaj).
+- `Sentry.captureMessage("Aŭtoludo: …")` en `LudvicoRegilo` FORIGITA — ĉiu
+  aŭtomata sekva kreis eventon; la ekludo estas protokolita per `logGrava`.
+- `options.logs.enabled` nun ĉiam `true` (antaŭe nur en evoluo) — tiel la
+  gravaj eventoj kaj la ŝaltita detala protokolado funkcias ankaŭ en produktado;
+  la kvanto estas limigita per la kodo.
+
+Testoj: `AgordojDetalaProtokoladoTest` (defaŭlto, persisto, sinkronigo de la
+flago) + `AgordojEkranoTest.montrasSxaltilonPorDetalaProtokolado`.
+
 # Ŝanĝoj — 2026-10-08
 
 ## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)

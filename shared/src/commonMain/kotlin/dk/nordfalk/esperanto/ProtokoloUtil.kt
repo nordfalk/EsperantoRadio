@@ -3,22 +3,34 @@ package dk.nordfalk.esperanto
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
+import kotlin.concurrent.Volatile
 
 /**
  * Protokolaj funkcioj por la tuta apo.
  *
- * Cxiu logi/logd/logw/loge voko aldonas Sentry-breadcrumb-on, tiel ke
- * cxiuj protokolaj mesagxoj estas videblaj en Sentry antaux eraroj.
  * Platform-specifa eligxo estas farata per platformLog* (expect/actual).
  *
  * Konvencio: [Komponanto] mesagxo
- * Niveloj: d = debug, i = info, w = warning, e = error
+ * Niveloj: d = debug, i = info, g = grava info, w = warning, e = eraro
  */
+@Volatile
+var protokoloDetala: Boolean = false
+
 fun logd(tag: String, msg: String) {
     platformLogd(tag, msg)
 }
 
 fun logi(tag: String, msg: String) {
+    platformLogi(tag, msg)
+    if (protokoloDetala) Sentry.logger.info("[$tag] $msg")
+}
+
+/**
+ * Grava evento — ĈIAM sendata al Sentry, sendepende de [protokoloDetala]:
+ * malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
+ * Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la Sentry-kvoto.
+ */
+fun logGrava(tag: String, msg: String) {
     platformLogi(tag, msg)
     Sentry.logger.info("[$tag] $msg")
 }

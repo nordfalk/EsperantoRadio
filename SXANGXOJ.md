@@ -711,18 +711,3 @@ trovis tion tro komplika kaj ni rezignis ĝin. La fina konduto estas pli simpla:
   `aktualigiuLudatajn` (t.e. ĉiujn 5 s dum pozicio-savado) kaj la sekcio konstante
   ŝanĝiĝis. Nun `plenigu` antaŭmiksas la kandidatojn unufoje (`shuffled(Random(enhavo-hash))`)
   kaj `aktualigiuLudatajnInterna` nur filtras — la ordo de restantaj kartoj stabilas.
-
-### Sekureca kunfando post master
-
-Dum revizio post la mergo de master oni trovis, ke la novaj skriboj de
-`PersistaLudatojDeponejo` estas protektataj per `mutex.withLock` (veninta el master),
-sed la nova `markiLudita` komence ne uzis ĝin — kur-kondiĉo kun la pozicio-savanto.
-Riparite; la Leciono estas en AGENTS.md.
-
-### Kontrolrezulto
-
-- Emulilo (uiautomator + logcat): klako → "Konektas…" (karto ankoraŭ nur en "Kio
-  novas") → `Markita ludita` je la vera `Ludas`-momento → karto samtempe en "Kio
-  novas" kaj unue en "Lastatempe ludata", la vico rulas al ĝi; paŭz-butono aperas.
-- `:shared:desktopTest` kaj `:androidApp:assembleDebug` pasas post ĉiu mergo de master;
-  CI (`testoj` + `changelog`) verda sur la PR.

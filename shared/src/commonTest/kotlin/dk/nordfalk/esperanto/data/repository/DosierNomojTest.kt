@@ -34,7 +34,7 @@ class DosierNomojTest {
         assertEquals("", sanigiDosiernomon(""))
     }
 
-    @Test // FAROTA C3: RSS-id-oj povas esti plenaj URL-oj — >255 bajtoj malsukcesigas elŝuton
+    @Test // (PR #95) RSS-id-oj povas esti plenaj URL-oj — >255 bajtoj malsukcesigas elŝuton
     fun limigasLongonKajKonservasUnikecon() {
         val longa = "x".repeat(500)
         val rezulto = sanigiDosiernomon(longa)
@@ -45,7 +45,7 @@ class DosierNomojTest {
         assertNotEquals(sanigiDosiernomon(longa), sanigiDosiernomon(alia), "Haketaĵoj devas esti malsamaj")
     }
 
-    @Test // FAROTA C3: Windows-rezervitaj nomoj kaj finaj punktoj
+    @Test // (PR #95) Windows-rezervitaj nomoj kaj finaj punktoj
     fun sanigasWindowsRezervitajnNomojn() {
         assertEquals("_CON", sanigiDosiernomon("CON"))
         assertEquals("_prn", sanigiDosiernomon("prn"))
@@ -53,7 +53,7 @@ class DosierNomojTest {
         assertEquals("abc", sanigiDosiernomon("abc "), "Fina spaco devas esti forigita")
     }
 
-    @Test // FAROTA C3: nul-bajtoj
+    @Test // (PR #95) nul-bajtoj
     fun forigasNulbajtojn() {
         assertEquals("ab", sanigiDosiernomon("a\u0000b"))
     }

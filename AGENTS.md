@@ -112,6 +112,8 @@ EsperantoRadio/
 ├── .github/workflows/       # CI (changelog-kontrolo)
 ├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
 ├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
+├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
+├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
 └── AGENTS.md               # Tiu ĉi dosiero
 ```
 
@@ -330,7 +332,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
   expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
   ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
-  estu parto de estonta testa CI, vidu FAROTA.md G24.)
+  konstatis tion; la CI-laborfluo ekzistas depost PR #89.)
 - **Ktor CIO + network_security_config = paneo de ĈIUJ https-petoj sur Android**: la CIO-motoro
   vokas la malnovan 2-argan `checkServerTrusted(ĉeno, tipo)` sen gastiganto; tuj kiam la apo
   difinas `android:networkSecurityConfig` (nia G1-ŝanĝo), Android postulas la gastiganto-konscian
@@ -345,7 +347,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   la UNUA `<p>` en la tuta teksto kaj manĝas ĉiun alineon ĝis la celita frazo — kun la nuna
   Varsovia Vento-fluo tio forviŝis la enkondukon kaj la parto-listilon. Uzu temperitan formon
   `(?:(?!</p>).)` anstataŭ `.+?` por ke la modelo ne povu transiri alineon (ekzemploj:
-  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, FAROTA G15.)
+  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, PR #91.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
@@ -371,7 +373,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
   (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
   (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
-  riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
+  riparo-stako; kaptita de la fum-testo kaj la CI-laborfluo (PR #89). Uzu la temperitan formon
   `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
 - **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
   ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)

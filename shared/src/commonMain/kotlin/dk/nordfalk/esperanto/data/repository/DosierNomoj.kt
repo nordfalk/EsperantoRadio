@@ -8,7 +8,7 @@ package dk.nordfalk.esperanto.data.repository
  *   (`../` iĝas `..-`).
  * - Forigas nul-bajtojn kaj finajn punktojn/spacojn (Windows).
  * - Evitas Windows-rezervitajn nomojn (CON, PRN, AUX, NUL, COM1-9, LPT1-9).
- * - Limigas la longon (FAROTA C3): RSS-id-oj ofte estas plenaj URL-oj —
+ * - Limigas la longon (PR #95): RSS-id-oj ofte estas plenaj URL-oj —
  *   >255 bajtoj malsukcesigas la dosier-kreadon. Longaj nomoj ricevas
  *   8-signan haketaĵon de la plena ID por resti unikaj kaj koliziecaj
  *   nomoj restas distingeblaj.

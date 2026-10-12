@@ -19,6 +19,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Vekhorloĝo: se ĉiuj elsendoj de la kanalo estas jam aŭskultitaj, la alarmo nun reludas la plej novan sane ludeblan anstataŭ eble eraran elsendon (https://github.com/nordfalk/EsperantoRadio/pull/95)
 - La averto pri detektitaj problemoj sur la ĉefekrano havas "x"-butonon por kaŝi ĝin; ĝi kondukas al la agordoj, kie la averto ĉiam restas videbla ĉe "Diagnozo". Kiam nova problemo aperas, la averto reaperas sur la ĉefekrano (https://github.com/nordfalk/EsperantoRadio/pull/105)
 
+### Ŝanĝita
+
+- Novaj ekranfotoj kaj priskribo por Google Play: 8 ekranfotoj el la nova apo (anstataŭ 3 malnovaj) kaj tute nova priskribo kun listo de ĉiuj 27 kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/108)
+
 ### Riparita
 
 - La vekhorloĝo nun ludas tuj je la ĝusta tempo ankaŭ kiam la telefono dormas kun malŝaltita ekrano — antaŭe ĝi atentis ĝis vi mem vekis la telefonon (https://github.com/nordfalk/EsperantoRadio/pull/94)

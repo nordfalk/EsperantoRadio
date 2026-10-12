@@ -71,20 +71,18 @@ class DiagnozoTest {
     }
 
     @Test
-    fun severeco_havasTriNivelojn() {
-        assertEquals(3, Severeco.entries.size)
-        assertTrue(Severeco.entries.contains(Severeco.INFO))
+    fun severeco_havasDuNivelojn() {
+        assertEquals(2, Severeco.entries.size)
         assertTrue(Severeco.entries.contains(Severeco.AVERTO))
         assertTrue(Severeco.entries.contains(Severeco.ERARO))
     }
 
     @Test
-    fun diagnozoTipo_havasKvinTipojn() {
-        assertEquals(5, DiagnozoTipo.entries.size)
+    fun diagnozoTipo_havasKvarTipojn() {
+        assertEquals(4, DiagnozoTipo.entries.size)
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.BATERIO_OPTIMIZATION))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.NOTIFICATIONS))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.EXACT_ALARMS))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.DNS))
-        assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.RETO))
     }
 }

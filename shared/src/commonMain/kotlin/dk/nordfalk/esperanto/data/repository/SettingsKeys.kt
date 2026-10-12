@@ -14,6 +14,7 @@ object SettingsKeys {
     const val ALARMOJ_REZERVO = "alarmoj_rezervo"
     const val AUXTOMATA_DAURIGO = "auxtomata_daurigo"
     const val EVOLO = "evoluo"
+    const val KASXITAJ_AVERTOJ = "kasxitaj_avertoj"
     /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (PR #89). */
     const val INTENT_NONCE = "intent_nonce"
     /** Kreskanta kontraŭo por unikaj sciig-ID-oj ((PR #93) — hashCode-kolizioj anstataŭigis sciigojn). */

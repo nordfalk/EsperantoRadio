@@ -367,6 +367,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
   uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
   CHANGELOG.md — konservita en la stash, ne enmetita.)
+- **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
+  se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
+  (ekz. CHANGELOG.md), la kunfando konservas ambaŭ sen konfliktmarkoj — la
+  dosiero ricevas du `### Aldonita`/`### Riparita`-sekciojn. Post ĉiu stash pop
+  kontrolu `grep -n "^## \|^### " CHANGELOG.md` kaj kunigu mane. Ankaŭ kontrolu
+  importojn: viaj forigitaj/aldonitaj importoj povas resti/rediĉiĝi en dosieroj
+  kiujn vi ne plu celas ŝanĝi. (2026-10-11: duoblaj sekcioj + restinta
+  `fonaDispatcher`-importo en AppStato.kt.)
 - **Nova kanalo = ŝanĝu ambaŭ kopiojn de la konfiguro**: `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json`
   KAJ `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` (identikaj). Kaj atentu: la JSONC havas
   DU arojn — `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ` (referencataj, de la kodo NE legataj). Novaj kanaloj

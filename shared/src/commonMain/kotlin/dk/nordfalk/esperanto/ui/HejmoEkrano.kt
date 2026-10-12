@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
@@ -18,7 +19,6 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -366,8 +366,9 @@ fun HejmoEkrano(
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
-    onDiagnozo: () -> Unit = {},
+    onKasxuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
+    kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
     onElshuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -383,7 +384,8 @@ fun HejmoEkrano(
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
-    val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
+    val kasxitaj by kasxitajAvertoj.collectAsState()
+    val neKasxitajProblemoj = problemoj.filter { it.tipo !in kasxitaj }
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
@@ -473,10 +475,14 @@ fun HejmoEkrano(
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 
-                // Avertosigno pri detektitaj problemoj — supre, nur se estas
-                if (problemojGravaj.isNotEmpty()) {
+                // Avertosigno pri detektitaj problemoj
+                if (neKasxitajProblemoj.isNotEmpty()) {
                     item {
-                        DiagnozoAvertoKarto(problemoj = problemojGravaj, onDiagnozo = onDiagnozo)
+                        DiagnozoAvertoKarto(
+                            problemoj = neKasxitajProblemoj,
+                            onAgordoj = onAgordoj,
+                            onKasxu = onKasxuHejmajnAvertojn,
+                        )
                     }
                 }
 
@@ -829,24 +835,24 @@ private fun ElsendoKartoPreviewPauxzita() {
 
 /**
  * Averto-karto pri detektitaj problemoj — montrata supre de la ĉefekrano.
- * Klako kondukas rekte al la diagnoza ekrano.
  */
 @Composable
 private fun DiagnozoAvertoKarto(
     problemoj: List<DiagnozoRezulto>,
-    onDiagnozo: () -> Unit,
+    onAgordoj: () -> Unit,
+    onKasxu: () -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { logi("Klako", "diagnozo-karto (Hejmo)"); onDiagnozo() },
+            .clickable { logi("Klako", "diagnozo-karto (Hejmo) → agordoj"); onAgordoj() },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
         ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 4.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -869,11 +875,13 @@ private fun DiagnozoAvertoKarto(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            IconButton(onClick = { logi("Klako", "kaŝu hejmajn avertojn"); onKasxu() }) {
+                Icon(
+                    Icons.Filled.Close,
+                    contentDescription = "Kaŝu avertojn",
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
         }
     }
 }

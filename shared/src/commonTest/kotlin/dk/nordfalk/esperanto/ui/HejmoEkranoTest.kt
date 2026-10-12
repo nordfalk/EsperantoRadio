@@ -4,14 +4,19 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.test.swipeDown
 import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import kotlinx.coroutines.flow.Flow
@@ -344,5 +349,90 @@ class HejmoEkranoTest {
         // Rekomputado (ekz. pozicio-savo dum ludado) ne devas re-miksi la ordon
         vm.aktualigiuLudatajn(null)
         assertEquals(unua, vm.popularajElsendoj.value, "Aliaj elsendoj devas havi stabilan ordon inter rekomputadoj")
+    }
+
+    /** Averto-rezulto uzata de la diagnozaj testoj. */
+    private fun avertaProblemo() = DiagnozoRezulto(
+        tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
+        titolo = "Bateri-optimumado estas ŝaltita",
+        priskribo = "La sistemo povas limigi la aplikon en la fono.",
+        severeco = Severeco.ERARO,
+    )
+
+    @Test
+    fun avertokartoGvidasAlAgordojKajKasxeblasPerX() = runComposeUiTest {
+        val problemoj = MutableStateFlow(listOf(avertaProblemo()))
+        val kasxitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
+        var agordojKlakoj = 0
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                onAgordoj = { agordojKlakoj++ },
+                onKasxuHejmajnAvertojn = {
+                    // simulas la App.kt-dratadon: kaŝi la nunajn problemo-tipojn
+                    kasxitaj.value = problemoj.value.map { it.tipo }.toSet()
+                },
+                diagnozoProblemoj = problemoj,
+                kasxitajAvertoj = kasxitaj,
+            )
+        }
+        waitForIdle()
+        // La karto videblas kaj klako kondukas al la agordoj (ne rekte al Diagnozo)
+        onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
+        onNodeWithText("1 problemo(j) detektitaj").performClick()
+        assertEquals(1, agordojKlakoj, "Klako sur la avertokarto devas malfermi la agordojn")
+        // La 'x'-butono kaŝas la avertojn de la ĉefekrano — sen navigi
+        onNodeWithContentDescription("Kaŝu avertojn").performClick()
+        waitForIdle()
+        assertEquals(1, agordojKlakoj, "La 'x'-butono devas nur kaŝi, ne navigi al agordoj")
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun avertokartoReaperasKiamNovaProblemoAperas() = runComposeUiTest {
+        val problemoj = MutableStateFlow(listOf(avertaProblemo()))
+        val kasxitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                onKasxuHejmajnAvertojn = {
+                    kasxitaj.value = problemoj.value.map { it.tipo }.toSet()
+                },
+                diagnozoProblemoj = problemoj,
+                kasxitajAvertoj = kasxitaj,
+            )
+        }
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
+        // Kaŝu la nunan problemon
+        onNodeWithContentDescription("Kaŝu avertojn").performClick()
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+        // Nova problemo aperas (alia tipo) — la karto reaperas, kun la nova problema titolo
+        val nova = avertaProblemo().copy(tipo = DiagnozoTipo.DNS, titolo = "DNS-solvado malsukcesis")
+        problemoj.value = problemoj.value + nova
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
+        onNodeWithText("DNS-solvado malsukcesis").assertIsDisplayed()
+        // Kaŝu denove — nun la nova tipo estas en la kaŝita aro kaj la karto malaperas
+        onNodeWithContentDescription("Kaŝu avertojn").performClick()
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun avertokartoNeAperasSeKasxita() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                diagnozoProblemoj = MutableStateFlow(listOf(avertaProblemo())),
+                kasxitajAvertoj = MutableStateFlow(setOf(DiagnozoTipo.BATERIO_OPTIMIZATION)),
+            )
+        }
+        waitForIdle()
+        onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
     }
 }

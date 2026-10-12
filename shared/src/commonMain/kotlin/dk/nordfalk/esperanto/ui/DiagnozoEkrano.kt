@@ -139,7 +139,6 @@ private fun DiagnozoEro(rezulto: DiagnozoRezulto) {
     val (ikono, koloro) = when (rezulto.severeco) {
         Severeco.ERARO -> Icons.Filled.Error to MaterialTheme.colorScheme.error
         Severeco.AVERTO -> Icons.Filled.Warning to MaterialTheme.colorScheme.tertiary
-        Severeco.INFO -> Icons.Filled.CheckCircle to MaterialTheme.colorScheme.primary
     }
 
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {

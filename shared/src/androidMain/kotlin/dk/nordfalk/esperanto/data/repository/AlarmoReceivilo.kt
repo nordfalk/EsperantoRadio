@@ -37,8 +37,9 @@ import kotlinx.coroutines.launch
  * en la fono kaj ĝia kodo ne plenumiĝas ĝis la uzanto vekas la telefonon.
  * La ricevilo ne havas tian limigon: ĝi povas ludi tuj (goAsync + WakeLock).
  *
- * Videbleco por la uzanto certigas la full-screen-intent-sciigo (ĉiam montrata):
- * ĝi rajtas veki la ekranon el fono (CATEGORY_ALARM + USE_FULL_SCREEN_INTENT).
+ * Videbleco por la uzanto certigas alt-prioritate sciigon (CATEGORY_ALARM + PRIORITY_MAX).
+ * Sen USE_FULL_SCREEN_INTENT la ekrano ne vekiĝas aŭtomate — la uzanto aŭdas la
+ * alarmon kaj vidas la sciigon kiam li vekas la telefonon.
  */
 class AlarmoReceivilo : BroadcastReceiver() {
 
@@ -89,12 +90,13 @@ class AlarmoReceivilo : BroadcastReceiver() {
             logw("AlarmoReceivilo", "Eraro ĝisdatigante alarmon $alarmoId post ekigo", e)
         }
 
-        // Full-screen-intent-sciigo ĈIAM (ne nur kiel eraro-fallback): ĝi estas la
-        // sola vojo vidi la apot el fono kiam la ekrano estas ŝaltita/malŝaltita.
+        // Alt-prioritate sciigo ĈIAM: ĝi certigas ke la uzanto vidas la vekiĝon
+        // (sen USE_FULL_SCREEN_INTENT la ekrano ne vekiĝas, sed la sciigo aperas
+        // kiel heads-up kiam la uzanto ŝaltas la ekranon).
         try {
-            montruFullEkranaSciigon(context, kanaloSlug, etikedo)
+            montruAltPrioritateSciigon(context, kanaloSlug, etikedo)
         } catch (e: Exception) {
-            logw("AlarmoReceivilo", "Full-screen-intent malsukcesis", e)
+            logw("AlarmoReceivilo", "Alt-prioritata sciigo malsukcesis", e)
         }
 
         // Best-effort: malfermu la UI rekte — funkcias nur se la apo estas videbla
@@ -216,10 +218,11 @@ class AlarmoReceivilo : BroadcastReceiver() {
     }
 
     /**
-     * Altprioritata sciigo kun full-screen-intento — permesata el fono (PR #94).
-     * Vekas la ekranon kiam ĝi estas malŝaltita; alikaze heads-up-sciigo.
+     * Altprioritata sciigo (CATEGORY_ALARM + PRIORITY_MAX) — permesata el fono.
+     * Sen USE_FULL_SCREEN_INTENT ĝi montriĝas kiel heads-up kiam la ekrano estas
+     * ŝaltita; la alarmsono tamen ĉiam ludas (vidu luduAlarmon).
      */
-    private fun montruFullEkranaSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
+    private fun montruAltPrioritateSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nm.createNotificationChannel(
@@ -243,15 +246,15 @@ class AlarmoReceivilo : BroadcastReceiver() {
         val sciigo = androidx.core.app.NotificationCompat.Builder(context, SCIIGO_KANALO)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(etikedo ?: "Alarmo")
-            .setContentText("Vekhorloĝo de EsperantoRadio")
+            .setContentText("Vekhorloĝo de EsperantoRadio — tuŝu por malŝalti")
             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_MAX)
             .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
-            .setFullScreenIntent(pi, true)
             .setContentIntent(pi)
             .setAutoCancel(true)
+            .setOngoing(true)
             .build()
         nm.notify(kanaloSlug.hashCode(), sciigo)
-        logi("AlarmoReceivilo", "Montris full-screen-intent-sciigon por kanalo=$kanaloSlug")
+        logi("AlarmoReceivilo", "Montris alt-prioritate sciigon por kanalo=$kanaloSlug")
     }
 
     /**

@@ -64,6 +64,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Ŝanĝita
+
+- Vekhorloĝo: la permesoj `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj (por eviti la Google Play-deklaron). Sur Android 12+ alarmoj povas malfrui ĝis 10 minutoj kaj la ekrano ne vekiĝas aŭtomate — la sono ĉiam ludas. Sur Android 11 kaj sube ĉio funkcias same kiel antaŭe.
+
 ## [3.0.2] - 2026-10-08
 
 ### Aldonita

@@ -4,9 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.logi
@@ -32,13 +30,11 @@ actual class AlarmoSkedilo actual constructor() {
         val triggerAtMillis = kalkuluNexxtemTempon(alarmo)
         val pendingIntent = kreuPendingIntent(alarmo)
 
-        // Ekde Android 12 (API 31) ekzaktaj alarmoj postulas permeson SCHEDULE_EXACT_ALARM, kiun la
-        // uzanto povas revoki. Sen ĝi ni uzas setWindow() kun 10-minuta fenestro — ne postulas permeson,
-        // kaj la alarmo tamen ekigas ene de 10 minutoj. La UI (AlarmoEkrano) montras averton.
+        // Ekde Android 12 (API 31) ekzaktaj alarmoj postulas permeson, kiun ni intence
+        // NE deklaras (por eviti la Google Play-deklaron). Sen ĝi ni uzas setWindow()
+        // kun 10-minuta fenestro — ne postulas permeson, kaj la alarmo tamen ekigas
+        // ene de 10 minutoj. Sur Android 11 kaj sube setAlarmClock() funkcias sen permeso.
         if (ekzaktajAlarmojPermesataj()) {
-            // (PR #93) la permeso estas FORPRENDEBLA iam ajn — inter la kontrolo kaj la
-            // voko la uzanto povas revoki ĝin (Android 14+), tiam setAlarmClock ĵetas
-            // SecurityException. FALDU al setWindow (la UI-averto en AlarmoEkrano kovras tion).
             try {
                 // setAlarmClock: escepto de Doze, kaj la sistemo montras alarm-ikonon en la statusbreto
                 val montroIntent = PendingIntent.getActivity(
@@ -48,11 +44,11 @@ actual class AlarmoSkedilo actual constructor() {
                 )
                 alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAtMillis, montroIntent), pendingIntent)
             } catch (e: SecurityException) {
-                logw("AlarmoSkedilo", "Permeso revokita dum skedado — uzas 10-minutan fenestron", e)
+                logw("AlarmoSkedilo", "setAlarmClock malsukcesis — uzas 10-minutan fenestron", e)
                 alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
             }
         } else {
-            logw("AlarmoSkedilo", "Ne rajtas skedi ekzaktajn alarmojn — uzas 10-minutan fenestron")
+            logw("AlarmoSkedilo", "Ekzaktaj alarmoj ne subtenataj (Android 12+) — uzas 10-minutan fenestron")
             alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
         }
 
@@ -109,20 +105,8 @@ actual class AlarmoSkedilo actual constructor() {
 actual val subtenasVekhorlogxn: Boolean = true
 
 actual fun ekzaktajAlarmojPermesataj(): Boolean {
+    // Sen SCHEDULE_EXACT_ALARM/USE_EXACT_ALARM en la manifest, canScheduleExactAlarms()
+    // ĉiam redonas false sur Android 12+. Sur Android 11 kaj sube neniu permeso bezonatas.
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
-    val alarmManager = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    return alarmManager.canScheduleExactAlarms()
-}
-
-actual fun malfermuEkzaktajnAlarmAgordojn() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
-    try {
-        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-            data = Uri.parse("package:${appContext.packageName}")
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        appContext.startActivity(intent)
-    } catch (e: Exception) {
-        logw("AlarmoSkedilo", "Ne povis malfermi agordojn por ekzaktaj alarmoj", e)
-    }
+    return false
 }

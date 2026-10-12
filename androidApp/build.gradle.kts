@@ -56,7 +56,7 @@ android {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
         targetSdk = 36
-        versionCode = 247
+        versionCode = 248
         versionName = libs.versions.apoversio.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

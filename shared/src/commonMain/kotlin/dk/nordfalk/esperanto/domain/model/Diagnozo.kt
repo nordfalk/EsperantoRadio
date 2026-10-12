@@ -22,7 +22,8 @@ enum class DiagnozoTipo {
     /** Sciig-permeso mankas — la media sciigo kaj sciigoj pri novaj elsendoj ne aperas. */
     NOTIFICATIONS,
 
-    /** Ekzaktaj alarmoj ne permesitaj (Android 12+) — alarmoj povas esti prokrastitaj. */
+    /** Ekzaktaj alarmoj ne permesitaj (Android 12+) — alarmoj povas esti prokrastitaj.
+     *  Ne plu generata ekde 2026-10: la permeso estas intence ne deklarita. */
     EXACT_ALARMS,
 
     /** DNS-solvado malsukcesis — ofte pro privata DNS (DNS-over-TLS) aŭ VPN. */
@@ -44,7 +45,7 @@ enum class Severeco {
  * Proponita ago por ripari la problemon — ekz. "Malfermi bateriajn agordojn".
  *
  * La kampo [intenco] estas platform-specifa identigilo:
- * - Android: `"battery"`, `"notifications"`, `"exact_alarms"`, `"wireless"`
+ * - Android: `"battery"`, `"notifications"`, `"wireless"`
  * - Aliaj platformoj: ne uzata (ago == null)
  */
 data class DiagnozoAgo(

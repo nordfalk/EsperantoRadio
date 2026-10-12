@@ -1,6 +1,6 @@
 # Ŝanĝoj — 2026-10-12
 
-## Sentry-kvoto: protokolado severe limigita (PR #106)
+## Sentry-kvoto: protokolado severe limigita (PR #107)
 
 La Sentry-kvoto estis minacata de la multaj `logi`-vokoj (antaŭe ĉiu `logi`
 iris al `Sentry.logger`). Nun:

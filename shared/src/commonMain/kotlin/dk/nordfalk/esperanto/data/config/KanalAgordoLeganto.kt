@@ -91,7 +91,7 @@ data class KanalAgordo(
         val kontakt_url: String? = null,
         val kontakt_modtagere: List<String>? = null,
         val kontakt_titel: String? = null,
-        val drift_statusmeddelelse: String? = null,
+        @SerialName("apaj_novaĵoj") val apajNovajxoj: String? = null,
     )
 
     @Serializable

@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.config
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -39,6 +40,11 @@ class KanalAgordoFumTesto {
         // Almenaŭ kelkaj kanaloj havas RSS-fluon — alie la apo estas senenhava
         val kunRss = agordo.kanaloj.count { !it.elsendojRssUrl.isNullOrBlank() }
         assertTrue(kunRss >= 15, "Atendis almenaŭ 15 kanalojn kun RSS-fluo, havas $kunRss")
+
+        // La ŝlosilo de apaj novaĵoj devas ekzisti en la konfiguro
+        // (la enhavo povas esti malplena — tiam neniu dialogo montriĝas)
+        assertNotNull(agordo.android, "La android-sekcio devas ekzisti en la konfiguro")
+        assertNotNull(agordo.android!!.apajNovajxoj, "apaj_novaĵoj devas ekzisti en la konfiguro")
 
         // Regulo 6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (PR #91)
         val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }

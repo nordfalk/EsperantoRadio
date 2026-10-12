@@ -113,6 +113,23 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
+    fun legasApajnNovajxojn() {
+        val jsonc = """
+            {
+                "android": {
+                    "apaj_novaĵoj": "Majo 2022: Muzaiko ne plu funkcias"
+                },
+                "kanaloj": []
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertNotNull(agordo.android)
+        assertEquals("Majo 2022: Muzaiko ne plu funkcias", agordo.android!!.apajNovajxoj)
+    }
+
+    @Test
     fun legasIntervalsKajKomencaKanalo() {
         val jsonc = """
             {

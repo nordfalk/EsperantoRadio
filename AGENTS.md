@@ -410,6 +410,12 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   literigon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
   "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
   sen kaŝita differenco = la ĉeno mem estas alia.
+- **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
+  la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
+  `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la
+  konfiguro rulu `./gradlew :shared:desktopTest` antaŭ ol fidi la rezulton.
+  (2026-10-12: forigo de la eksa statusmesaĝo-ŝlosilo postlasis `,` post
+  `apaj_novaĵoj`.)
 
 ## Logcat (Android)
 

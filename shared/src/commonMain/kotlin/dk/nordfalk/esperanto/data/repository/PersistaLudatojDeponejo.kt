@@ -71,11 +71,13 @@ class PersistaLudatojDeponejo(
     }
 
     override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {
-        val nuna = _ludatoj.value.toMutableMap()
-        val ekzista = nuna[elsendoId] ?: LudataElsendo(elsendoId = elsendoId, kanaloSlug = kanaloSlug)
-        nuna[elsendoId] = ekzista.copy(lasteLudita = Clock.System.now().toEpochMilliseconds())
-        skribu(nuna)
-        _ludatoj.value = nuna
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId] ?: LudataElsendo(elsendoId = elsendoId, kanaloSlug = kanaloSlug)
+            nuna[elsendoId] = ekzista.copy(lasteLudita = Clock.System.now().toEpochMilliseconds())
+            skribu(nuna)
+            _ludatoj.value = nuna
+        }
         logi("Ludatoj", "Markita ludita: $elsendoId")
     }
 

@@ -1,3 +1,72 @@
+# Ŝanĝoj — 2026-10-13
+
+## GPP-eldona noto: trako-bazita, ne versio-bazita (malkovrita dum la 249-eldono)
+
+La 249-a eldono aperis en Play kun la malnovaj 3.0.1-notoj. Kaŭzo (konfirmita
+el la bajtkodo de GPP 3.12.2, `PublishArtifactWorkerBase.findReleaseNotes`):
+GPP serĉas la noto-dosieron en `release-notes/en-US/` laŭ la **trako-nomo** —
+`internal.txt` (aŭ `default.txt` kiel retroio) — NENIAM laŭ versionName. La
+versio-dosieroj `3.0.1.txt`/`3.0.2.txt`/`3.0.3.txt` do estis ignoritaj kaj ĉiuj
+eldonoj de 3.0.2 ĝis 249 eldoniĝis sen novaj notoj (la trako plu montris la
+notojn iam fiksigitajn en la 3.0.1-epoko). Riparo: `internal.txt` kreita kun la
+3.0.3-teksto; la jam eldonitan 249-on ne eblas re-alŝuti (API rifuzas
+versionCode-reuzon), do ĝiajn notojn oni korektas permane en Play Console aŭ
+per la venonta 250-a eldono. AGENTS.md-instruo ĝisdatigita. **La notoj de 249
+estis korektitaj permane en Play Console la saman tagon.**
+
+## Sentry-kvoto: eraroj protektataj (PR #109)
+
+La averto de Sentry (80 % de la monata eraroj-kvoto — 4 004/5 000) devigis
+agadon. La erar-eventoj (`loge(tag,msg,e)` → captureException; NE la protokoloj)
+venis precipe de: malnovaj versioj (loge-RSS-fiaskoj, „Aŭtoludo“-
+captureMessage), ExoPlayer-ludad-fiaskoj (KMP-H), la Compose-skopa escepto
+(KMP-X/W) kaj la malpura-kaŝa eraro (KMP-1S). Nun:
+
+- `options.sampleRate = 0.5` en produktado — duona specimenado de erar-eventoj
+  (Sentry grupigas ilin al problemoj, do la problemoj plu formiĝas).
+- Forĵeto de eraroj de malnovaj versioj (beforeSend kun `MALNOVAJ_VERSIOJ`)
+  estis provizita kaj tuj retirita: malmoligita versio-listo en la apo ne
+  povas scii kiu versio iĝos "malnova" post venontaj eldonoj — tio bezonas
+  ĝisdateblan centran liston (FAROTA C45). La eraroj de ≤ 3.0.2 ĉesos
+  nature per la ĝisdatigo de tiuj uzantoj.
+- KMP-1S: `leguKashitajnElsendojn` forigas malpuran kaŝon (fiaskpaĝo) kaj
+  raportas per logw — antaŭe la eraro ripetiĝis je ĉiu apomfermo.
+- KMP-X/W (rememberCoroutineScope): la ŝargadoj de HejmoViewModel,
+  KanaloViewModel kaj KanalaroViewModel rulas en propraj ViewModel-skopoj
+  (`SupervisorJob() + Dispatchers.Main`, kiel la oficiala viewModelScope) —
+  ili transvivas navigadon anstataŭ esti nuligitaj kaj ĵeti.
+- loge→logw por atendeblaj fiaskoj (ne erar-eventoj): ExoPlayer „Ludanta
+  eraro“ (KMP-H), LudvicoRegilo (ludi/reprovi/rekta), DesktopLudilo,
+  Sercxo, NovajElsendojKontroloWorker, elŝuto-malsukcesoj.
+- La agordo „detala protokolado“ estas nun defaŭlte ŜALTITA — la protokola
+  kvoto montriĝis ne-problema (635 protokoloj/24h de 23 uzantoj en 3.0.3);
+  malŝaltebla en Agordoj → Privateco.
+- Nova `foriguKashon` (expect/actual ×4) en DosierKasho.
+
+Testoj: `malpuraKashoEstasForigata` (ElsendoDeponejoImplTest) +
+`defauxlteSxaltitaKajFlagoSinkronigita` (AgordojDetalaProtokoladoTest).
+
+## Debug-konstruoj kaj emuliloj ne raportas al Sentry (PR #109)
+
+La fatalaj OOM-kraŝoj en la produktadaj Sentry-datumoj (KMP-1R, KMP-1H) venis
+de la propra emulila testado de la programisto (release-konstruo flanke
+instalita sur `sdk_gphone*`, `isSideLoaded: true`). Kaj la debug-konstruoj
+poluis la mediojn "evoluo"/"produktado". Nun:
+
+- `EsperantoRadioAplikajho` inicialigas Sentry-n NUR por ne-debug konstruoj
+  sur realaj aparatoj: `FLAG_DEBUGGABLE` aŭ emulila modelo (`sdk_gphone*`,
+  `goldfish`, `ranchu`, `generic`, `Emulator`, Genymotion) → tute neniu
+  inicialigo; ĉiuj Sentry-vokoj restas no-op (la KMP-SDK estas sendanĝera
+  vokata sen init — la desktop-testoj delonge tion pruvas).
+- Desktop-rulado same ne inicialigas (`desktopApp/Main.kt` — ne ekzistas
+  release-konstruo, do ĉiu rulado estas evolu-rulado).
+- Web (wasmJs) restas senŝanĝa: la SDK tie estas no-op laŭ `SentryAgordo.kt`.
+- Por testi Sentry-n: release-konstruo sur reala aparato.
+
+Kontrolitaj: AndroidManifest havas neniun Sentry-aŭtoinit-meta-datumon
+(ni regas la tutan init-on per `initialiguSentry()`), kaj neniuj
+instrumentitaj testoj dependas de Sentry.
+
 # Ŝanĝoj — 2026-10-12
 
 ## Apaj novaĵoj en la nova apo

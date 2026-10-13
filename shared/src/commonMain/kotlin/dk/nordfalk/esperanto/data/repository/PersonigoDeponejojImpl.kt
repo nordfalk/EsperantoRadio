@@ -147,7 +147,7 @@ class AgordojDeponejoImpl(
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
-    private val _detalaProtokolado = MutableStateFlow(settings?.getBoolean(SettingsKeys.DETALA_PROTOKOLADO, false) ?: false)
+    private val _detalaProtokolado = MutableStateFlow(settings?.getBoolean(SettingsKeys.DETALA_PROTOKOLADO, true) ?: true)
     override val detalaProtokolado: StateFlow<Boolean> = _detalaProtokolado.asStateFlow()
 
     private val _kasxitajAvertoj = MutableStateFlow(

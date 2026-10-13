@@ -137,7 +137,7 @@ class NovajElsendojKontroloWorker(
                     }
                     if (novaj.isEmpty()) plejNovaj.forEach { viditaj.add(it.id) }
                 } catch (e: Exception) {
-                    loge("NovajElsendoj", "${kanalo.slug}: eraro dum kontrolado", e)
+                    logw("NovajElsendoj", "${kanalo.slug}: eraro dum kontrolado", e)
                 }
             }
 

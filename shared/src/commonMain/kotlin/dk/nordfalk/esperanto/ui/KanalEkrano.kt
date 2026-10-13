@@ -39,6 +39,9 @@ import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -53,8 +56,18 @@ class KanaloViewModel(
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
+    /**
+     * Fona skopo en la ViewModel — transvivas navigadon (KMP-X/KMP-W:
+     * rememberCoroutineScope nuligus la ŝargadon ĉe ekranforiro).
+     */
+    private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu la fluon denove (malsupren-tiro). */
-    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
+    fun sxargxi(fortoRefresigi: Boolean = false) {
+        skopo.launch { sxargxiInterna(fortoRefresigi) }
+    }
+
+    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         val kashitaj = elsendoDeponejo.leguKashitajnElsendojn(kanalo)
         if (kashitaj != null && kashitaj.isNotEmpty()) {
@@ -99,7 +112,7 @@ fun KanaloEkrano(
     val snackbarStato = remember { SnackbarHostState() }
 
     LaunchedEffect(kanalo.slug) {
-        scope.launch { viewModel.sxargxi() }
+        viewModel.sxargxi()
     }
 
     Scaffold(
@@ -143,7 +156,7 @@ fun KanaloEkrano(
     ) { padding -> PullToRefreshBox(
         // La granda spinilo en la listo montras la unuan ŝarĝon; ĉi tiu nur kiam jam estas elsendoj
         isRefreshing = sxargxas && elsendoj.isNotEmpty(),
-        onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); scope.launch { viewModel.sxargxi(fortoRefresigi = true) } },
+        onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); viewModel.sxargxi(fortoRefresigi = true) },
         modifier = Modifier.fillMaxSize().padding(padding),
     ) {
         LazyColumn(

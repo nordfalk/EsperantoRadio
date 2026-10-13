@@ -47,6 +47,9 @@ import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -217,8 +220,21 @@ class HejmoViewModel(
     private val _sxargxas = MutableStateFlow(false)
     val sxargxas = _sxargxas.asStateFlow()
 
+    /**
+     * Fona skopo en la ViewModel — transvivas navigadon. rememberCoroutineScope
+     * (Compose) nuligus la ŝargadon kiam la uzanto forlasas la ekranon kaj la
+     * Ktor-motoro poste ĵetus ForgottenCoroutineScopeException (KMP-X/KMP-W).
+     * Main-dispatcher kiel la oficiala viewModelScope; la suspendaj ret-vokoj
+     * mem liberigas la fadenon.
+     */
+    private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
-    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
+    fun sxargxi(fortoRefresigi: Boolean = false) {
+        skopo.launch { sxargxiInterna(fortoRefresigi) }
+    }
+
+    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
         val kanaloj = kanaloDeponejo.getKanalojn()
         logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
@@ -386,7 +402,6 @@ fun HejmoEkrano(
     val problemoj by diagnozoProblemoj.collectAsState()
     val kasxitaj by kasxitajAvertoj.collectAsState()
     val neKasxitajProblemoj = problemoj.filter { it.tipo !in kasxitaj }
-    val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
 
@@ -416,7 +431,7 @@ fun HejmoEkrano(
 
     if (viewModel == null) {
         LaunchedEffect(Unit) {
-            scope.launch { vm.sxargxi() }
+            vm.sxargxi()
         }
     }
 
@@ -467,7 +482,7 @@ fun HejmoEkrano(
             }
         } else PullToRefreshBox(
             isRefreshing = sxargxas,
-            onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); scope.launch { vm.sxargxi(fortoRefresigi = true) } },
+            onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); vm.sxargxi(fortoRefresigi = true) },
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             LazyColumn(

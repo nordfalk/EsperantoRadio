@@ -10,6 +10,7 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -110,5 +111,18 @@ class ElsendoDeponejoImplTest {
             leguKashon("test_200fiasko")!!.contains("<rss"),
             "La diskkaŝo devas enhavi la fluon, ne la fiaskpaĝon"
         )
+    }
+
+    @Test
+    fun malpuraKashoEstasForigata() = runTest {
+        // KMP-1S (2026-10-13): kaŝo verkita de antaŭ-#89 versio povas enhavi
+        // fiaskpaĝon (kaptiva portalo). Legado devas revenigi null KAJ forigi
+        // la malpuran kaŝon — alikaze la sama fiasko ripetiĝus je ĉiu apomfermo.
+        skribuKashon("test_malpura", fiaskpagho)
+        val deponejo = ElsendoDeponejoImpl(HttpClient(MockEngine { respond(fluoPlejMalnovajUnue, HttpStatusCode.OK) }))
+
+        val k = kanalo("test_malpura")
+        assertNull(deponejo.leguKashitajnElsendojn(k), "Malpura kaŝo ne estas legebla kiel flue")
+        assertNull(leguKashon(k.slug), "La malpura kaŝo devas esti forigita por ke la venonta ŝargado skribu puran")
     }
 }

@@ -140,7 +140,7 @@ fun AgordojEkrano(
             Spacer(Modifier.height(8.dp))
             ListItem(
                 headlineContent = { Text("Ŝaltu detalan protokoladon") },
-                supportingContent = { Text("Sendas pliajn informojn pri via uzado al la erar-monitorado (Sentry). Defaŭlte nur eraroj kaj gravaj eventoj (malfermo, ekludo, vekiĝo) estas sendataj") },
+                supportingContent = { Text("Protokolas anonimajn detalojn pri via uzado (navigado, klakoj, ŝargado) al la erar-monitorado (Sentry). Malŝaltu por sendi nur erarojn kaj gravajn eventojn (malfermo, ekludo, vekiĝo)") },
                 trailingContent = {
                     Switch(
                         checked = detalaProtokolado,

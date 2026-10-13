@@ -190,7 +190,7 @@ EsperantoRadio/
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
-[`CHANGELOG.md`](CHANGELOG.md) estas la konkiza, uzantvida resumo de ĉiuj
+[`CHANGELOG.md`](CHANGELOG.md) estas konciza, uzantvida resumo de ĉiuj
 rimarkindaj ŝanĝoj. La formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/)
 kun esperantaj kategorioj (**Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**,
 **Sekureco**). Ĉiu eniro estas **unu linio**: konciza priskribo sen teknikaj
@@ -210,6 +210,11 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
    1. `apoversio` en `gradle/libs.versions.toml` ricevas la novan nombron
       (ĝi estas la unu fonto de vero por `versionName`/Sentry — `ApoVersio.kt`
       estas generata el ĝi).
+   1b. **Baskulu `versionCode`** en `androidApp/build.gradle.kts`
+      (`defaultConfig.versionCode`) — GPP ne pliigas ĝin aŭtomate, kaj la
+      Play-API rifuzas re-uzi jam eldonitan versionCode
+      ("Version code is too low or has already been used").
+      247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto (2026-10-13).
    2. Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT` kaj malfermu novan
       malplenan `## [Neeldonita]`-sekcion.
    3. Kreu git-tagon `vX.Y.Z` sur la eldona komito kaj puŝu ĝin
@@ -220,10 +225,30 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
       (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
       Noto: `3.0.0` ne havas etikedon — la ligo en CHANGELOG.md uzas la eldonan
       komiton (`294834b`).
-   5. **Release-notes por Google Play** estas intence en Esperanto — kreu
-      `androidApp/src/main/play/release-notes/en-US/X.Y.Z.txt` (malgraŭ la
+   5. **Release-notes por Google Play** estas intence en Esperanto — ili vivas en
+      `androidApp/src/main/play/release-notes/en-US/internal.txt` (malgraŭ la
       `en-US`-dosierujo, la enhavo estas en Esperanto; Play Store montras ĝin
       kiel "Kio novas" por ĉiuj uzantoj). Maksimumo 500 signoj.
+      **ATENTU (2026-10-13): GPP elektas la dosieron laŭ la TRAKO-nomo** —
+      `${track}.txt`, do `internal.txt` (aŭ `default.txt` kiel retroiro) —
+      NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.) estas
+      ignoritaj de GPP; tial ĉiuj eldonoj de 3.0.2 ĝis 3.0.3/249 eldoniĝis kun
+      la malnovaj notoj de la 3.0.1-epoko. Ĝisdatigu `internal.txt` ĉe ĉiu
+      eldono. (La historiaj `X.Y.Z.txt`-dosieroj restas kiel arkivo.)
+   6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka
+      maŝino rajtas eldoni — la CI-`eldonado.yml` per GitHub-sekretoj NE
+      uzeblas nuntempe):
+      ```bash
+      export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      ./gradlew :androidApp:publishReleaseApk   # APK (ne AAB — la apo ne
+                                                # estas en Play App Signing)
+      ```
+      Tio eldonas al la trako `internal` (agordita en la `play`-bloko).
+      Poste la uzanto promocias la eldonon al produktado permane en Play
+      Console. La signado legas `secrets.properties` en la radiko (ne tuŝu/
+      legu ĝin). La notoj de jam eldonita versionCode NE plu korekteblas per
+      GPP (API-rifuzas versionCode-reuzon) — korektu ilin permane en Play
+      Console, kiel farite por 249 (2026-10-13).
 
 ## Teknikaj scioj lernitaj dum la laboro
 
@@ -407,7 +432,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   komence skribis sen `mutex.withLock`, kiun master intertempe postulis por ĉiuj
   skriboj de `PersistaLudatojDeponejo` — kur-kondiĉo kun la pozicio-savanto.)
 - **Kiam `edit` fiaskas per "string not found" sen evidenta kialo, kontrolu la ĝustan
-  literigon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
+  literumon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
   "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
   sen kaŝita differenco = la ĉeno mem estas alia.
 - **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
@@ -421,9 +446,39 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
   `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
   `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
-  `options.logs.enabled` estas nun ĉiam `true` — sen tio la gravaj eventoj kaj la
-  ŝaltita detala protokolado estus forĵetitaj en produktado. Ne reenmetu
-  `Sentry.captureMessage` por aŭtoludo (ĉiu aŭtomata sekva = 1 evento).
+  Debug-konstruoj kaj emuliloj ne raportas al Sentry.
+- **Eraroj-kvoto: `loge(tag,msg,e)` = erar-evento** (2026-10-13): `loge(tag, msg, e)`
+  vokas `Sentry.captureException` kaj konsumas la MONATAN ERAROJ-KVOTON (5 000);
+  `loge(tag, msg)` sen escepto kaj `Sentry.logger.*` estas nur protokol-eventoj
+  (aparta kvoto). Atendataj fiaskoj (reto, ludad-, elŝut-, serĉ-fiaskoj) uzu
+  `logw(tag, msg, e)` (nur loka) — neniam loge. En produktado eraroj estas
+  50 %-specimenataj (`options.sampleRate` — rekte duonigas la kvot-konsumon;
+  `options.tracesSampleRate` specimenas nur SPUROJN, apartan kvoton, ne erarojn).
+  Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
+  (FAROTA C45) — ne malmolu versio-listojn en la apo.
+- **Eldonado al Play funkcias nur LOKE** (2026-10-13): `./gradlew :androidApp:publishReleaseApk`
+  el ĉi tiu maŝino (track `internal`; APK, ne AAB — la apo ne estas en Play App Signing;
+  poste permana promocio al produktado en Play Console) — la CI-`eldonado.yml` per
+  GitHub-sekretoj ne uzeblas nuntempe. versionCode baskuliĝas permane en
+  `androidApp/build.gradle.kts` (GPP ne pliigas ĝin; la API rifuzas versionCode-reuzon).
+  Release-notoj: `release-notes/en-US/internal.txt` — trako-bazita, ne versio-bazita
+  (detaloj en la eldona sekcio; la 249-notoj korektiĝis permane post la eldono).
+  **GPP-taskoj** (2026-10-13, el `./gradlew :androidApp:tasks`):
+  - `publishReleaseApk` — APK + release-notoj (kion ni uzas; `internal.txt`).
+  - `publishReleaseListing` — **aparte** alŝutas la metadatumojn (priskribo,
+    ekranfotoj el `play/listings/`). `publishReleaseApk` NE inkluzivas ilin!
+    Ŝanĝoj al `full-description.txt` kc. bezonas tiun taskon aŭ permanan
+    konzol-agon.
+  - `publishReleaseApps` — APK + metadatumoj kune (kombino de ambaŭ).
+  - `promoteReleaseArtifact` — promocias eldonon inter trako (ekz. interna →
+    produktado; `play { fromTrack/promoteTrack }`) — povas anstataŭigi la
+    permanan promocion en Play Console.
+  - `bootstrapReleaseListing` — elŝutas la NUNAN konzolan staton loken —
+    diagnozilo (per ĝi oni estus malkovrinta la trako-bazitan noto-nomadon).
+  - **FOOTGUN**: `defaultToAppBundles.set(true)` en nia `play`-bloko + la
+    agrega tasko `publish`/`publishApps` → GPP provus AAB → 403 (la apo NE
+    estas enskribita en Play App Signing). Ĉiam uzu la eksplicitan
+    `publishReleaseApk`, aŭ ŝanĝu `defaultToAppBundles` al `false`.
 
 ## Logcat (Android)
 
@@ -442,10 +497,11 @@ kun malnovaj pakoj (`dk.nordfalk.esperanto.android`, `.radio.beta`) kiuj eble an
 
 ## Sentry (erarmonitorado kaj protokoloj)
 
-La apo sendas ĉiujn protokolojn kaj erarojn al **Sentry.io** (organizo
+La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo
 `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`). Agordo:
-`SentryAgordo.kt` — DSN (nur *sendi* rajtigas), `environment = "evoluo"`,
-`release = "esperantoradio@<apoversio>"` (el `gradle/libs.versions.toml`).
+`SentryAgordo.kt` — DSN (nur *sendi* rajtigas), medio "produktado" por
+release-konstruoj, `release = "esperantoradio@<apoversio>"` (el
+`gradle/libs.versions.toml`). 
 
 **Legi Sentry-on per MCP**: la oficiala Sentry-MCP-servilo estas konektita kiel
 `mcp_sentry` (`https://mcp.sentry.dev/mcp`, OAuth-agordo en `~/.vibe/config.toml`
@@ -493,13 +549,19 @@ Remedio: restartigu Vibe (`vibe -c` daŭrigas la konversacion). Se post
 restarto la servilo listiĝas kiel bezonanta aŭtentikigon, rulu `/mcp login
 sentry` (OAuth-aliro-ĵetonoj eksvalidiĝas post kelkaj horoj; la renovigo
 foje malsukcesas).
+Dua varianto (2026-10-13): la iloj RESTAS videblaj kaj la nomspaco ŝargas,
+sed ĉiu voko fiaskas per `effect_recovery_failed:
+RustInvalidStateRejection(command_type='reconfigure', state='running')`
+(harness-replay-tavolo, ankaŭ en try/catch nekaptrebla) — same helpas nur
+restarto de Vibe.
 
 **Protokol-konvencio (grava por la Sentry-kvoto)**:
 
 - `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
-- `logi` → loka + `Sentry.logger.info` **nur se "detala protokolado" estas ŝaltita**
-  (agordo Agordoj → Privateco; tutmonda flag `protokoloDetala` en `ProtokoloUtil.kt`,
-  sinkronigita de `AgordojDeponejoImpl`). Defaŭlte `logi` restas nur loka.
+- `logi` → loka + `Sentry.logger.info` se "detala protokolado" estas ŝaltita
+  (agordo Agordoj → Privateco; flag `protokoloDetala` en `ProtokoloUtil.kt`,
+  sinkronigita de `AgordojDeponejoImpl`). Defaŭlte ŜALTITA (2026-10-13 — la
+  protokola kvoto montriĝis ne-problema).
 - `logGrava` → loka + `Sentry.logger.info` **ĉiam** — nur por la gravaj eventoj:
   malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
   Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la kvoto.

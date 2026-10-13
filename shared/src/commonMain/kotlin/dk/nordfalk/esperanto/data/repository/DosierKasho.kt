@@ -10,3 +10,10 @@ package dk.nordfalk.esperanto.data.repository
  */
 expect fun leguKashon(nomo: String): String?
 expect fun skribuKashon(nomo: String, enhavo: String)
+
+/**
+ * Forigas kaŝdosieron — ekz. fiaskpaĝon de kaptiva portalo kaptitan de antaŭa
+ * versio (KMP-1S, 2026-10-13), alikaze la malpura kaŝo ĵetus eraron je ĉiu
+ * apomfermo. Sendanĝera se la dosiero ne ekzistas.
+ */
+expect fun foriguKashon(nomo: String)

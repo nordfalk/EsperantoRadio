@@ -9,9 +9,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Testoj por la agordo "detala protokolado" (Sentry-kvoto, 2026-10-12):
- * defaŭlte false; fiksi ŝaltas la StateFlow, persistas kaj sinkronigas la
- * tutmondan protokol-flagon (legata de logi en ProtokoloUtil).
+ * Testoj por la agordo "detala protokolado" (Sentry-kvoto):
+ * defaŭlte ŜALTITA (2026-10-13 — la protokola kvoto montriĝis ne-problema);
+ * fiksi ŝanĝas la StateFlow, persistas kaj sinkronigas la tutmondan
+ * protokol-flagon (legata de logi en ProtokoloUtil).
  */
 class AgordojDetalaProtokoladoTest {
 
@@ -25,11 +26,11 @@ class AgordojDetalaProtokoladoTest {
     }
 
     @Test
-    fun defauxlteMalsxaltitaKajFlagoSinkronigita() {
+    fun defauxlteSxaltitaKajFlagoSinkronigita() {
         protokoloDetala = false
         val deponejo = AgordojDeponejoImpl(settings)
-        assertFalse(deponejo.detalaProtokolado.value)
-        assertFalse(protokoloDetala)
+        assertTrue(deponejo.detalaProtokolado.value)
+        assertTrue(protokoloDetala)
     }
 
     @Test

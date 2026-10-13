@@ -127,6 +127,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.multiplatform.settings.jvm)
                 implementation(libs.mp3spi)
+                // Dispatchers.Main (ViewModel-skopoj) bezonas la Swing-implementation sur JVM
+                implementation(libs.kotlinx.coroutines.swing)
             }
         }
 

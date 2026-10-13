@@ -38,6 +38,8 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 # KMP-kerno
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+# Dispatchers.Main sur Desktop/JVM — versio kongrua kun la coroutines de Compose (1.11.0)
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "1.11.0" }
 
 # Reto
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

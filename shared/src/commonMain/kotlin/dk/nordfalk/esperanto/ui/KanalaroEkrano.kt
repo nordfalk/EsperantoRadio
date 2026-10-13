@@ -29,6 +29,9 @@ import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -56,8 +59,18 @@ class KanalaroViewModel(
     private val _lastajElsendoj = MutableStateFlow<Map<String, Elsendo>>(emptyMap())
     val lastajElsendoj = _lastajElsendoj.asStateFlow()
 
+    /**
+     * Fona skopo en la ViewModel — transvivas navigadon (KMP-X/KMP-W:
+     * rememberCoroutineScope nuligus la ŝargadon ĉe ekranforiro).
+     */
+    private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
-    suspend fun sxargxi(fortoRefresigi: Boolean = false) {
+    fun sxargxi(fortoRefresigi: Boolean = false) {
+        skopo.launch { sxargxiInterna(fortoRefresigi) }
+    }
+
+    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
         val kanaloj = deponejo.getKanalojn()
 
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
@@ -119,10 +132,9 @@ fun KanalaroEkrano(
     val sxargxas by viewModel.sxargxas.collectAsState()
     val elsendoKontoj by viewModel.elsendoKontoj.collectAsState()
     val lastajElsendoj by viewModel.lastajElsendoj.collectAsState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        scope.launch { viewModel.sxargxi() }
+        viewModel.sxargxi()
     }
 
     Scaffold(
@@ -146,7 +158,7 @@ fun KanalaroEkrano(
             }
         } else PullToRefreshBox(
             isRefreshing = sxargxas,
-            onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); scope.launch { viewModel.sxargxi(fortoRefresigi = true) } },
+            onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); viewModel.sxargxi(fortoRefresigi = true) },
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             LazyColumn(

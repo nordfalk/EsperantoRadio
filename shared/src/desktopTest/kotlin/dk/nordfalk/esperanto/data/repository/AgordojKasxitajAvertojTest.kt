@@ -32,10 +32,10 @@ class AgordojKasxitajAvertojTest {
         val deponejo = AgordojDeponejoImpl(settings)
         deponejo.kasxuAvertojn(setOf(DiagnozoTipo.BATERIO_OPTIMIZATION, DiagnozoTipo.DNS))
         assertEquals(setOf(DiagnozoTipo.BATERIO_OPTIMIZATION, DiagnozoTipo.DNS), deponejo.kasxitajAvertoj.value)
-        deponejo.kasxuAvertojn(setOf(DiagnozoTipo.EXACT_ALARMS))
-        assertEquals(setOf(DiagnozoTipo.EXACT_ALARMS), deponejo.kasxitajAvertoj.value)
+        deponejo.kasxuAvertojn(setOf(DiagnozoTipo.NOTIFICATIONS))
+        assertEquals(setOf(DiagnozoTipo.NOTIFICATIONS), deponejo.kasxitajAvertoj.value)
         // Persistas trans restarto — nova deponejo legas la saman agordon
-        assertEquals(setOf(DiagnozoTipo.EXACT_ALARMS), AgordojDeponejoImpl(settings).kasxitajAvertoj.value)
+        assertEquals(setOf(DiagnozoTipo.NOTIFICATIONS), AgordojDeponejoImpl(settings).kasxitajAvertoj.value)
     }
 
     @Test

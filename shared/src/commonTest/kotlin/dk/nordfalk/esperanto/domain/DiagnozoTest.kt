@@ -78,11 +78,10 @@ class DiagnozoTest {
     }
 
     @Test
-    fun diagnozoTipo_havasKvarTipojn() {
-        assertEquals(4, DiagnozoTipo.entries.size)
+    fun diagnozoTipo_havasTriTipojn() {
+        assertEquals(3, DiagnozoTipo.entries.size)
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.BATERIO_OPTIMIZATION))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.NOTIFICATIONS))
-        assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.EXACT_ALARMS))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.DNS))
     }
 }

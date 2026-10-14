@@ -152,6 +152,64 @@ iris al `Sentry.logger`). Nun:
 Testoj: `AgordojDetalaProtokoladoTest` (defaŭlto, persisto, sinkronigo de la
 flago) + `AgordojEkranoTest.montrasSxaltilonPorDetalaProtokolado`.
 
+## Eldono 3.0.3: vekhorloĝaj permesoj forigitaj + revizio de la rapida korekto
+
+### La problemo
+Google Play rifuzis la alŝuton de la APK (eraro 403): "You must let us know
+whether your app uses any full-screen intent permissions" — la deklaro de
+`USE_FULL_SCREEN_INTENT` en la manifest postulas la respondon en la Play-Konsolo.
+Post esploro de alternativoj (deklari en la konsolo, aŭtomata vekiĝo sen FSI ktp.)
+la uzanto akceptis la kompromison: **forigi la tri permesojn** `SCHEDULE_EXACT_ALARM`,
+`USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` (komito `b834483`, versionCode
+247 → 248). Sekvoj sur Android 12+: alarmoj povas ekigi ĝis 10 minutojn malfrue
+kaj la ekrano ne vekiĝas aŭtomate; la sono ĉiam ludas. Sur Android ≤11 ĉio
+funkcias same kiel antaŭe. Poste la uzanto promociis la eldonon al Production
+(status: completed, 100 %).
+
+### La Play-listigo
+La nova priskribo + 8 ekranfotoj estis publikigitaj, sed la enhavo ĉe Play restis
+la malnova — `publishReleaseListing` konsideris sin `UP-TO-DATE` kaj efektive ne
+alŝutis. Devige re-rulita per `--rerun-tasks`; poste kontrolita per la Play
+Developer API (listigo: nova priskribo 3913 signoj; bild-kolektoj: 8
+`phoneScreenshots` + `featureGraphic` + `icon`). **Leciono**: sukceso/UP-TO-DATE de
+GPP ne pruvas, ke la enhavo estas ĉe Play — kontrolu per la API (atento: la
+listing-GET ne montras bildojn; ili estas en apartaj kolektoj
+`listings/<lng>/phoneScreenshots` ktp.).
+
+### Revizio de la rapida korekto (sekvaĵoj)
+La uzanto petis revizion de `b834483` ("ĉu estas io farinda post tiu tre rapida
+korekto?"). Trovitaj kaj riparitaj:
+
+- **Daŭra sciigo restus por ĉiam**: la rapida korekto aldonis `setOngoing(true)`
+  al la alarm-sciigo, sed nenio nuligis ĝin kaj daŭraj sciigoj ne estas forviŝeblaj
+  per svingo — post halto de la alarmo la sciigo restus en la ombrumo por ĉiam.
+  Riparita: fiksa sciigo-ID (`SCIIGO_ID`), `AlarmoReceivilo.nuliguSciigon()`, kaj
+  gardo en `onReceive` kiu nuligas la sciigon kiam la ludado (iam ludinta/konektinta)
+  iĝas `Haltita` aŭ `Finita`. (Eraro ne nuligas — tiam la fallback-ringtono daŭre
+  sonas.) Testo: `AlarmoReceiviloTest.alarmoSciigoNuligxigxasKiamLudadoHaltigxas`.
+- **Sentry-spamo**: `logw` sur la atendata Android-12+ `setWindow`-vojo (ĉiufoje
+  kiam alarmo skediĝas) → `logd` (loka nur).
+- **Malnovaj komentoj**: `SciigPermeso` (referenco al la forigita
+  `malfermuEkzaktajnAlarmAgordojn`), `MainActivity` ("full-screen-sciigo").
+- **Morta enumero**: `DiagnozoTipo.EXACT_ALARMS` (neniu plu generas ĝin ekde la
+  permeso-forigo) forigita kune kun la du testoj, kiuj ankoraŭ referencis ĝin.
+- **CHANGELOG**: la permeso-entry estis sub `[Neeldonita]`, sed ĝi estas en la
+  eldonita 3.0.3 (versionCode 248) → movita al `## [3.0.3]` (`### Ŝanĝita`).
+- **AGENTS.md / NOTOJ.md**: tri respektive du malnovaj lokoj pri FSI kaj ekzaktaj
+  alarmoj ĝisdatigitaj; nova datita leciono en AGENTS.md (regulo 11).
+
+### Poste farita (ankora 2026-10-12)
+- Etikedo `v3.0.3` movita al `b834483` — la fonto de la eldonita APK (versionCode 248).
+- Ĉiuj sekvaĵoj de la revizio komititaj kaj puŝitaj al `master`.
+- La CI-eldonado (`eldonado.yml`) ankoraŭ malsukcesas: la GitHub-sekretoj
+  (KEYSTORE_BASE64, KEYSTORE_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON) ne estas
+  konfiguritaj — eldonoj devas esti farataj loke (kiel ĉi-foje).
+
+### Rimarko (antaŭekzista, ne de ĉi tiu korekto)
+- La fallback-ringtono (`luduFallbackRingtonon`) konservas neniun tenilon kaj
+  havas neniun haltigan vojon — se ĝi eksonas, ĝi ripetiĝas ĝis la procezo mortas.
+  Antaŭa problemo de PR #94, ne kaŭzita de la permeso-forigo.
+
 # Ŝanĝoj — 2026-10-08
 
 ## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)

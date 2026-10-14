@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.sekvaEkigo
@@ -48,7 +49,7 @@ actual class AlarmoSkedilo actual constructor() {
                 alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
             }
         } else {
-            logw("AlarmoSkedilo", "Ekzaktaj alarmoj ne subtenataj (Android 12+) — uzas 10-minutan fenestron")
+            logi("AlarmoSkedilo", "Ekzaktaj alarmoj ne deklaritaj (Android 12+) — uzas 10-minutan fenestron")
             alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, FENESTRO_MS, pendingIntent)
         }
 

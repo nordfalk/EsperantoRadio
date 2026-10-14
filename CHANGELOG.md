@@ -32,6 +32,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Ŝanĝita
 
 - Novaj ekranfotoj kaj priskribo por Google Play: 8 ekranfotoj el la nova apo (anstataŭ 3 malnovaj) kaj tute nova priskribo kun listo de ĉiuj 27 kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/108)
+- Vekhorloĝo: la permesoj `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj (laŭ postulo de Google Play). Sur Android 12+ alarmoj povas malfrui ĝis 10 minutoj kaj la ekrano ne vekiĝas aŭtomate — la sono ĉiam ludas. Sur Android 11 kaj sube ĉio funkcias same kiel antaŭe.
 
 ### Riparita
 
@@ -72,9 +73,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
-### Ŝanĝita
+### Riparita
 
-- Vekhorloĝo: la permesoj `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj (por eviti la Google Play-deklaron). Sur Android 12+ alarmoj povas malfrui ĝis 10 minutoj kaj la ekrano ne vekiĝas aŭtomate — la sono ĉiam ludas. Sur Android 11 kaj sube ĉio funkcias same kiel antaŭe.
+- La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
 
 ## [3.0.2] - 2026-10-08
 

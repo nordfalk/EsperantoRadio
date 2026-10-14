@@ -57,16 +57,24 @@
   la telefonon. La ricevilo ludas mem per `LudvicoRegilo` (kun elŝuto-prefero,
   pozicio-resumigo, reprovo) kaj inicialigas `AppStato` kun la procez-nivela
   `ExoPlayerLudiloRegilo.akiru()` ankaŭ en freŝa procezo ([PR #94](https://github.com/nordfalk/EsperantoRadio/pull/94)).
-- **Full-screen-intent-sciigo estas la videbleca vojo** ([PR #94](https://github.com/nordfalk/EsperantoRadio/pull/94)): `CATEGORY_ALARM` +
-  `USE_FULL_SCREEN_INTENT` — la sistemo mem vekas la ekranon kaj lanĉas la
-  Activity-on plenekrane (normala permeso, sen dialogo; de Android 14 donata de la
-  uzanto en "Plenekranaj sciigoj" — degradado al heads-up estas graca). La sono ne
+- **Alt-prioritate sciigo estas la videbleca vojo** (ĝis 3.0.2: full-screen-intent,
+  [PR #94](https://github.com/nordfalk/EsperantoRadio/pull/94)): `CATEGORY_ALARM` +
+  `PRIORITY_MAX` + kanalo `IMPORTANCE_HIGH` — aperas kiel heads-up kiam la ekrano
+  estas ŝaltita. `USE_FULL_SCREEN_INTENT` estas **forigita en 3.0.3** (Google Play
+  postulas deklaron pri full-screen-intent; la kompromiso estis akceptita): la
+  ekrano ne vekiĝas aŭtomate, sed la sono ĉiam ludas. La sciigo estas daŭra
+  (ongoing) dum la alarmo sonas kaj estas nuligata kiam la ludado haltiĝas aŭ
+  finiĝas (gardo en `AlarmoReceivilo.onReceive`) — alie ĝi restus en la ombrumo
+  por ĉiam, ĉar daŭraj sciigoj ne estas forviŝeblaj per svingo. La sono ne
   dependas de ĝi.
-- **Ekzakteco**: `USE_EXACT_ALARM` (API 33+, aŭtomate donata al vekhorloĝo-apoj) +
-  `SCHEDULE_EXACT_ALARM` (Android 12) → `setAlarmClock` (ekzakta, Doze-escepta,
-  alarm-ikono en la statusbreto). Sen permeso: `setWindow` 10 min + averto en la
-  UI. La permeso estas revokebla iam ajn — `skedi` devas fali al `setWindow` per
-  try/catch de `SecurityException` ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)).
+- **Ekzakteco**: `SCHEDULE_EXACT_ALARM`/`USE_EXACT_ALARM` estas **intence ne
+  deklaritaj ekde 3.0.3** (same kiel supre — la Play-deklaro). Tial sur Android 12+
+  la skedilo uzas `setWindow` kun 10-minuta fenestro (la alarmo tamen ekigas, eble
+  ĝis 10 min malfrue); sur Android ≤11 `setAlarmClock` (ekzakta, Doze-escepta,
+  alarm-ikono en la statusbreto). Informa karto en `AlarmoEkrano` klarigas tion
+  al la uzanto. (Antaŭ 3.0.3: sen permeso `setWindow` 10 min + averto kun
+  "Permesi"-butono; la permeso estis revokebla iam ajn — `skedi` falu al `setWindow`
+  per try/catch de `SecurityException`, [PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93).)
 - **Validigo/koercado** ([PR #95](https://github.com/nordfalk/EsperantoRadio/pull/95)): `sekvaEkigo` koercas horon/minuton kaj maskas
   `ripeto` al la 7 tago-bitoj (maskado, ne limigo — la intencitaj tagoj restas);
   `parsuSugestojnPorAlarmoj` same. Korupta persistinta valoro devas neniam kraŝi

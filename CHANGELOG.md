@@ -14,6 +14,12 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Ŝanĝita
+
+- Debug-konstruoj, komputilaj ruladoj (desktop) kaj emuliloj ne plu sendas ion ajn al la erar-monitorado — nur veraj uzantoj de la eldonitaj versioj (https://github.com/nordfalk/EsperantoRadio/pull/109)
+- La protokola kvoto montriĝis ne-problema: "detala protokolado" estas nun defaŭlte ŝaltita, do ankaŭ la ordinaraj protokoloj (navigado, klakoj) denove sendiĝas; malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/109)
+- Erar-monitorado: eraroj estas duone specimenataj kaj atendantaj fiaskoj (reto, ludado, elŝuto) ne plu kalkuliĝas kiel eraroj — la preskaŭ elĉerpita monata eraroj-kvoto estas tiele protektata (https://github.com/nordfalk/EsperantoRadio/pull/109)
+
 ### Riparita
 
 - La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam

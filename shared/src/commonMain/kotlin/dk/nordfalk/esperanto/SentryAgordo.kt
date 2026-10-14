@@ -9,11 +9,12 @@ import io.sentry.kotlin.multiplatform.SentryOptions
  * Sur wasmJs la SDK estas no-op (kompilas sed faras nenion).
  * Sur Android gxi uzas Sentry Android SDK, sur JVM Sentry Java SDK.
  *
- * @param medio "produktado" aux "evoluo" (PR #93) — regas la medion kaj la
- *   spuro-specimenan kvocion (1.0 = 100 % en evoluo, 0.1 = 10 % en produktado).
- *   La PROTOKOLA kvanto ne plu dependas de la medio: logs estas ĉiam ŝaltitaj,
- *   sed limigitaj per la kodo (defaŭlte nur eraroj + gravaj eventoj — vidu
- *   [protokoloDetala] en ProtokoloUtil; agordo "Ŝaltu detalan protokoladon").
+ * @param medio "produktado" aux "evoluo" — regas la medion kaj la specimenajn
+ *   kvocientojn (traces: 1.0/0.1 de PR #93; eraroj: 1.0/0.5 de PR #109 — la
+ *   eraroj-specimenado rekte protektas la monatan eraroj-kvoton).
+ *   La PROTOKOLA kvanto ne dependas de la medio: logs estas ĉiam ŝaltitaj,
+ *   limigitaj per la agordo "Ŝaltu detalan protokoladon" ([protokoloDetala]
+ *   en ProtokoloUtil; 2026-10-13 defaŭlte ŝaltita).
  */
 fun initialiguSentry(medio: String = "evoluo") {
     Sentry.init { options: SentryOptions ->
@@ -26,6 +27,11 @@ fun initialiguSentry(medio: String = "evoluo") {
         options.logs.enabled = true
         // Kaptu 100 % da traktadoj nur en evoluo; 10 % en produktado (PR #93)
         options.tracesSampleRate = if (medio == "produktado") 0.1 else 1.0
+        // Erar-specimenado: en produktado nur 50 % — la monata eraroj-kvoto
+        // estis preskaŭ elĉerpita (4 004/5 000, 2026-10-13). Sentry grupigas la
+        // eventojn al problemoj, do la grupoj plu formiĝas; nur la nombroj
+        // malpreciziĝas.
+        options.sampleRate = if (medio == "produktado") 0.5 else 1.0
         // Montru kion la SDK faras dum provado
         // options.debug = true
         options.attachThreads = false

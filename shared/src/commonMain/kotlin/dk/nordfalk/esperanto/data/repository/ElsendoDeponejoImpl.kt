@@ -3,7 +3,6 @@ package dk.nordfalk.esperanto.data.repository
 import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
-import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -155,7 +154,11 @@ open class ElsendoDeponejoImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
-            loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron", e)
+            // Fiaskpaĝo (kaptiva portalo) aŭ rompita parsado: forigu la malpuran
+            // kaŝon, alikaze tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S).
+            // logw (ne loge): tolerita, atendebla situacio — ne erar-evento.
+            logw("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron — forigas la kaŝon", e)
+            foriguKashon(kanalo.slug)
             null
         }
     }

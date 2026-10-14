@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
 import dk.nordfalk.esperanto.logi
-import dk.nordfalk.esperanto.loge
+import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -58,7 +58,7 @@ fun SercxoEkrano(
                 throw e
             } catch (e: Throwable) {
                 // Throwable, ne Exception: regulo 8 + la Js-motoro ĵetas kotlin.Error
-                loge("Sercxo", "Serĉado malsukcesis por '$teksto'", e)
+                logw("Sercxo", "Serĉado malsukcesis por '$teksto'", e)
                 rezultoj = emptyList()
                 sxargxas = false
             }

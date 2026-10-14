@@ -6,6 +6,7 @@ import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
@@ -168,7 +169,7 @@ class KtorElshutDeponejo(
                 throw e
             } catch (e: Throwable) {
                 // Throwable, ne Exception: la Js-motoro (wasmJs) ĵetas kotlin.Error (PR #89)
-                loge("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
+                logw("ElshutDeponejo", "Elŝuto malsukcesa: ${elsendo.id}", e)
                 stato.value = ElshutStato.Eraro(e.message ?: "Nekonata eraro")
                 _elshutoj.value = _elshutoj.value + (id to ElshutitaElsendo(elsendo, celdosiero.absolutePath, stato.value))
                 // G11: forigu la partan dosieron — ĝi estas nemankebla kaj okupus spacon por eterne

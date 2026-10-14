@@ -103,12 +103,15 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Unua ŝargo: 2 podkastaj kanaloj, sen forto
         assertEquals(listOf(false, false), refresxigoVokoj)
 
         // Tiru de la supro de la listo ĝis la fundo (la sojlo estas ~80dp post rezisto)
         onRoot().performTouchInput { swipeDown(startY = top + height * 0.2f, endY = bottom) }
         waitForIdle()
+        waitUntil(timeoutMillis = 5_000) { refresxigoVokoj.size >= 3 }
         assertTrue(refresxigoVokoj.drop(2).isNotEmpty(), "Malsupren-tiro ne ekigis refreŝigon: $refresxigoVokoj")
         assertTrue(refresxigoVokoj.drop(2).all { it }, "Refreŝigo devas uzi fortoRefresigi=true: $refresxigoVokoj")
     }
@@ -122,6 +125,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText("Kio novas").assertIsDisplayed()
         onNodeWithText("Aliaj elsendoj").assertIsDisplayed()
         onNodeWithText("Kanaloj").assertIsDisplayed()
@@ -136,6 +141,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // "Kernpunkto": kp:1 (Kio novas + Ĉiuj kanaloj), kp:2 (Kio novas), kp:malnova (Kio popularas) = 4x
         // "Varsovia Vento": same 4x
         onAllNodesWithText("Kernpunkto").assertCountEquals(4)
@@ -151,6 +158,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Novaj elsendoj (kp:1, kp:2, vv:1, vv:2) aperas en "Kio novas".
         // La plej novaj (kp:1, vv:1) ankaŭ en "Ĉiuj kanaloj".
         // Malnovaj (kp:malnova, vv:malnova) nur en "Kio popularas".
@@ -172,6 +181,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Flavaj emblemetoj montras la aĝon de la elsendo — en "Kio novas", "Ĉiuj kanaloj" kaj "Kio popularas"
         // kp:1 (5 tagoj, plej nova): Kio novas + Ĉiuj kanaloj = 2
         // vv:1 (3 tagoj, plej nova): 2
@@ -207,6 +218,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Ĉiuj tri kanaloj aperas en la "Kanaloj"-vico: "Nova Kanalo" ankaŭ en "Kio novas",
         // "Meznova Kanalo" kaj "Antikva Kanalo" nur en la kanala vico
         onAllNodesWithText("Nova Kanalo").assertCountEquals(2)
@@ -244,6 +257,10 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo).
+        // ATENTU: ĉiuj elsendoj estas luditaj → "Kio novas" restas malplena; atendu la
+        // "Lastatempe ludata"-karton mem.
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("aŭdis 42%").fetchSemanticsNodes().isNotEmpty() }
         // La flava markilo sur la kanalo montras la aĝon de la plej nova elsendo ("5 tagoj"),
         // neniam la ludprogreson — "aŭdis 42%" aperas nur sur la elsendo-kartoj
         onAllNodesWithText("5 tagoj").assertCountEquals(1)
@@ -272,6 +289,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // kp:1 malaperas de "Kio novas" — nur aperas en "Lastatempe ludata" + "Kanaloj" (plej nova)
         onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(2) // Lastatempe ludata + Kanaloj
         // kp:2 ankoraŭ en "Kio novas"
@@ -298,6 +317,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Epizodoj 1-5 (plej novaj) aperas en "Kio novas" + epizodo 1 ankaŭ en "Kanaloj"
         onAllNodesWithText("Kernpunkto epizodo 1").assertCountEquals(2) // Kio novas + Kanaloj
         onAllNodesWithText("Kernpunkto epizodo 5").assertCountEquals(1) // Kio novas
@@ -378,6 +399,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // La karto videblas kaj klako kondukas al la agordoj (ne rekte al Diagnozo)
         onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
         onNodeWithText("1 problemo(j) detektitaj").performClick()
@@ -405,6 +428,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText("1 problemo(j) detektitaj").assertIsDisplayed()
         // Kaŝu la nunan problemon
         onNodeWithContentDescription("Kaŝu avertojn").performClick()
@@ -433,6 +458,8 @@ class HejmoEkranoTest {
             )
         }
         waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
     }
 }

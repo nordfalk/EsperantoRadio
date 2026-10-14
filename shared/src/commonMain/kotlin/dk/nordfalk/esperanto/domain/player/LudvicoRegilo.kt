@@ -202,7 +202,7 @@ class LudvicoRegilo(
                 throw e
             } catch (e: Throwable) {
                 // Throwable, ne Exception: la retumila ludilo ĵetas kotlin.Error (PR #89)
-                loge("Ludvico", "Reprovo $provo ĵetis escepton", e)
+                logw("Ludvico", "Reprovo $provo ĵetis escepton", e)
             }
             // Sinkrona malsukceso (ekz. Desktop): la stato restas Eraro kaj la observanto ne vidas
             // novan ŝanĝon (distinctUntilChanged) — do planu la sekvan reprovon mem
@@ -457,7 +457,7 @@ class LudvicoRegilo(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                loge("Ludvico", "Malsukcesis ludi rektan kanalon ${kanalo.slug}", e)
+                logw("Ludvico", "Malsukcesis ludi rektan kanalon ${kanalo.slug}", e)
             }
         }
     }
@@ -586,7 +586,7 @@ class LudvicoRegilo(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
-            loge("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
+            logw("Ludvico", "Malsukcesis ludi: ${elsendo.id}", e)
         }
     }
 

@@ -1,6 +1,6 @@
 package dk.nordfalk.esperanto.domain.player
 
-import dk.nordfalk.esperanto.loge
+import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
@@ -193,7 +193,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
                 val read = try {
                     fluo.read(buffer)
                 } catch (e: Exception) {
-                    loge("DesktopLudilo", "ludi: eraro legante fluon", e)
+                    logw("DesktopLudilo", "ludi: eraro legante fluon", e)
                     legoEraro = e
                     -1
                 }

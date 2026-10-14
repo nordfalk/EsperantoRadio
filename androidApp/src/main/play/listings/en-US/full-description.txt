@@ -36,6 +36,7 @@ Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en unu a
 Listen to Esperanto — 27 radio stations and podcasts from around the world in one app.
 
 📻 ALL CHANNELS
+- Esperanto Stories — short stories for learners, both in Esperanto and in English
 - Esperanta Retradio — daily "sound articles" for learners
 - Varsovia Vento — classic Esperanto podcast since 2006: music, news and interviews from Warsaw
 - Pola Retradio — continuation of the historic Polish radio broadcast (1959–2011)
@@ -52,7 +53,6 @@ Listen to Esperanto — 27 radio stations and podcasts from around the world in 
 - Usone Persone — literature, politics and the movement from the USA
 - Ne Parolu pri Esperanto — entertaining explanations about everything
 - Radikala tenero — feminist chats
-- Esperanto Stories — short stories for learners, both in Esperanto and in English
 - Le Monde diplomatique en Esperanto — voiced articles
 - Rakonta Tempo — novels and fairy tales read aloud
 - Esp. Magazino Tuluzo — magazine from Toulouse, partly in Esperanto

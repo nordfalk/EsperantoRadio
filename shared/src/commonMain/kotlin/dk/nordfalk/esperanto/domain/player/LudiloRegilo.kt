@@ -51,20 +51,6 @@ interface LudiloRegilo {
 expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 
 /**
- * Haltigas la rezervan (fallback) alarm-sonon, se ĝi aktivas.
- *
- * La vekhorloĝo ludas la sisteman alarm-sonon rekte en la ricevilo kiel
- * rezervon kiam la fluo ne disponeblas (AlarmoReceivilo.luduFallbackRingtonon).
- * Tiu sono ripetiĝas ĝis oni haltigas ĝin — sed en la pura-fallback-kazo la
- * ludilo neniam startas, do observi la ludanto-staton NE sufiĉas (halti()
- * metus Haltita egalan al la nuna valoro kaj StateFlow nenion elsendus).
- * Tial la halto estas hokita rekte en la ludilo-regilojn: halti() kaj ĉiu
- * stato-ŝanĝo al Haltita vokas ĉi tiun funkcion. Sur platformoj sen fallback-
- * sono (Desktop/Web/iOS) ĝi estas senefika no-op.
- */
-expect fun haltuAlarmRingon()
-
-/**
  * No-op ludilo — UI funkcias, stato-ŝanĝoj funkcias, sed neniu sono.
  * Subtenas simuli naturfinon per [simuluFinon] por testoj.
  */

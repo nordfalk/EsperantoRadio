@@ -84,43 +84,6 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 logw("AlarmoReceivilo", "Ne eblis nuligi la alarm-sciigon", e)
             }
         }
-
-        /**
-         * Tenilo de la fallback-ringtono: Ringtone.play() ripetiĝas ĝis stop() —
-         * sen tenilo nenio povus haltigi ĝin (la sciigo diras "tuŝu por malŝalti",
-         * sed antaŭe neniu vojo haltigis la sonon).
-         */
-        @Volatile private var fallbackRingtono: android.media.Ringtone? = null
-
-        /**
-         * Maksimuma daŭro de la fallback-ringtono — poste ĝi mem haltas kaj la
-         * daŭra alarm-sciigo estas nuligata (sen tio la alarmo sonus por ĉiam).
-         * Test-ŝanĝebla.
-         */
-        @Volatile var ringtonoMaksDauroMs: Long = 5 * 60 * 1000L
-
-        /** Ĉu la fallback-ringtono nun sonas (por testoj). */
-        val fallbackRingtonoAktiva: Boolean get() = fallbackRingtono?.isPlaying == true
-
-        /**
-         * Haltigas la fallback-ringtonon (idempotenta — sekura eĉ se neniu sonas).
-         * Vokata per haltuAlarmRingon() (vd. LudiloRegilo.kt) kiam la uzanto
-         * haltigas la ludadon, kaj de la mem-halto-tempujo en luduFallbackRingtonon.
-         */
-        fun haltuFallbackRingon() {
-            val ringtono = fallbackRingtono
-            if (ringtono != null) {
-                fallbackRingtono = null
-                try {
-                    if (ringtono.isPlaying) {
-                        ringtono.stop()
-                        logi("AlarmoReceivilo", "Haltigis fallback-ringtonon")
-                    }
-                } catch (e: Exception) {
-                    logw("AlarmoReceivilo", "Ne eblis haltigi fallback-ringtonon", e)
-                }
-            }
-        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -316,9 +279,6 @@ class AlarmoReceivilo : BroadcastReceiver() {
             action = AGO_ALARMO_EKIGAS
             putExtra("alarmo_kanal_slug", kanaloSlug)
             putExtra("alarmo_etikedo", etikedo)
-            // De la sciigo: MainActivity haltigu la fallback-ringtonon — sed NE la
-            // best-effort startActivity de la ricevilo mem (vd. MainActivity).
-            putExtra("de_sciigo", true)
             IntentSxlosilo.aldonuNomon(this)
         }
         val pi = android.app.PendingIntent.getActivity(
@@ -342,10 +302,6 @@ class AlarmoReceivilo : BroadcastReceiver() {
     /**
      * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (PR #94) —
      * alarmo devas SONI eĉ kiam la fluo/reto tute ne disponeblas.
-     *
-     * La sono estas haltigebla per haltuFallbackRingon() (vokata de haltuAlarmRingon
-     * kiam la uzanto haltigas la ludadon) kaj mem haltas post [ringtonoMaksDauroMs]
-     * (Ringtone.play() alie ripetiĝus senfine — kaj la daŭra sciigo restus).
      */
     private fun luduFallbackRingtonon(context: Context) {
         try {
@@ -353,26 +309,11 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
                 ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
             if (uri != null) {
-                // Unue haltigu eventualan antaŭan sonon — neniam duobla alarmo
-                haltuFallbackRingon()
                 android.media.RingtoneManager.getRingtone(context, uri)?.let {
                     it.audioAttributes = android.media.AudioAttributes.Builder()
                         .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                         .build()
                     it.play()
-                    // Konservu la tenilon por haltuFallbackRingon() kaj mem-haltu
-                    // post ringtonoMaksDauroMs. La referenca komparo (===) certigas
-                    // ke malnova tempumilo ne haltigu novan sonon.
-                    fallbackRingtono = it
-                    val mia = it
-                    CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
-                        delay(ringtonoMaksDauroMs)
-                        if (fallbackRingtono === mia) {
-                            logi("AlarmoReceivilo", "Fallback-ringtono mem haltigita post ${ringtonoMaksDauroMs} ms")
-                            haltuFallbackRingon()
-                            nuliguSciigon(context.applicationContext)
-                        }
-                    }
                 }
                 logi("AlarmoReceivilo", "Ludas fallback-ringtonon: $uri")
             }

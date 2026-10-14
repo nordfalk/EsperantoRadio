@@ -14,6 +14,7 @@ import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.IntentSxlosilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
+import dk.nordfalk.esperanto.domain.player.haltuAlarmRingon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
@@ -132,6 +133,12 @@ class MainActivity : ComponentActivity() {
 
         val kanaloSlug = intent.getStringExtra("alarmo_kanal_slug")
         val etikedo = intent.getStringExtra("alarmo_etikedo")
+        // "Tuŝu por malŝalti": nur la TUŜO de la sciigo (de_sciigo=true) haltigu la
+        // rezervan alarm-sonon — ne la best-effort startActivity de la ricevilo mem,
+        // kiu alvenas sen ia ago de la uzanto. En la pura-fallback-kazo (neniu
+        // mini-ludilbreto, neniu media sciigo) la tuŝo de la sciigo estas la sola
+        // halta afordanco. (setAutoCancel forigas la sciigon mem.)
+        if (intent.getBooleanExtra("de_sciigo", false)) haltuAlarmRingon()
         logi("MainActivity", "Alarmo-UI malfermita: kanalo=$kanaloSlug etikedo=$etikedo — ludado estas lanĉita de AlarmoReceivilo")
     }
 

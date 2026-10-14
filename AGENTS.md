@@ -53,7 +53,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono (haltigebla per Halti kaj per tuŝo de la sciigo, mem-haltiĝas post 5 min), volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
 - **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
@@ -187,6 +187,12 @@ EsperantoRadio/
    reskribas la historion kaj postulas force-push; `git merge origin/master` en la
    PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
    ricevis master-ĝisdatigojn.)
+9. **Kiam la uzanto petas revizion de PR: unue ŝanĝu la lokan laborarbon al la
+   koncerna branĉo** (`git switch <branĉo>` — la IDE de la uzanto, Android Studio,
+   montras tiun branĉon), kaj laboru, testu kaj puŝu sur ĝi. Ne kreu apartajn
+   laborarbojn (worktree) por revizioj — la uzanto volas sekvi la laboron sur la
+   ĝusta branĉo en la IDE. (2026-10-14: dum la revizio de PR #111 la laboro okazis
+   en aparta worktree; la uzanto volas la branĉo-ŝanĝon en Android Studio.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -420,6 +426,27 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   literigon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
   "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
   sen kaŝita differenco = la ĉeno mem estas alia.
+- **Fallback-sono ne haltigeblas per stato-observado** (2026-10-12): se nenio iam
+  komencas la ludilon (pura-fallback-kazo de la vekhorloĝo), `halti()` metas
+  `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas — la halto
+  devas esti hokita rekte en la agojn (`halti()`, stato-ŝanĝo al `Haltita`, tuŝo de
+  la sciigo), ne per kolektanto.
+- **`## [Neeldonita]` en CHANGELOG.md ĉiam estas la UNUA versio-sekcio** (rekte
+  antaŭ la plej nova eldonita versio) — enmeto antaŭ pli malnova versio lasas ĝin
+  meze de la antaŭa sekcio. (2026-10-12: tia enmeto en 2491035 devis esti movita.)
+- **Instrumentitaj testoj: la testata procezo estas "foreground"** (2026-10-12): la
+  best-effort `startActivity` el fona ricevilo SUKCESAS dum la testoj (male ol vera
+  fona alarmo, kie BAL blokas ĝin; eĉ `moveToState(CREATED)` ne helpas). Kondiĉoj,
+  kiuj distingas "uzanto tuŝis" de "sistemo lanĉis", devas esti en la intenco mem
+  (ekz. `de_sciigo=true` de la sciigo), ne en la ĉirkaŭaĵo.
+- **`haltuAlarmRingon()` en `updateState()` nur ĉe transicio al `Haltita`**
+  (2026-10-14, PR #111): la unua `updateState()` post la MediaController-konekto
+  kalkulas `Haltita` kun malplena media listo — sen transicia gardilo ĝi vokus
+  `haltuAlarmRingon()` kaj mortigus ĵus startintan fallback-ringtonon en freŝa
+  procezo (la alarmo restus silenta). Gardilo: `ludantoStato is Haltita &&
+  _stato.value.stato !is Haltita`. Instrumentitaj testoj kun `ActivityScenarioRule`
+  ne kaptas tion (tie la ludilo jam ekzistas kaj estas konektita) — bezonas teston
+  sen la regulo (`FresxProcezaFallbackTest`).
 - **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
   la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
   `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la

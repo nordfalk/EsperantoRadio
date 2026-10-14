@@ -240,11 +240,13 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   antaŭ ol publikigi aŭ daŭrigi.
 - **JDK 17** estas necesa por konstrui la Android-apk (la defaŭlta JDK 21 mankas `jlink`).
   Uzu: `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`
-- **Versioj**: Kotlin 2.2.20, Compose Multiplatform 1.10.0, Material3 1.10.0-alpha05,
+- **Versioj**: Kotlin 2.4.21, Compose Multiplatform 1.10.0, Material3 1.10.0-alpha05,
   Ktor 3.1.3, Media3 1.5.1, Coil 3.0.4, kotlinx-datetime 0.7.0. Vidu `gradle/libs.versions.toml`
   kaj `docs/nova/02_teknika_stako.md`.
-  Ĝisdatigo de Kotlin 2.1.0/Compose 1.7.3 al 2.2.20/1.10.0 okazis en #32/#35.
-- **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
+  Ĝisdatigo de Kotlin 2.1.0/Compose 1.7.3 al 2.2.20/1.10.0 okazis en #32/#35;
+  Kotlin 2.2.20 → 2.4.21 okazis en #99/#101 (CI kaj loka kunmetita konstruo pasis).
+- **ksoup 0.2.2** estis versionita pro Kotlin 2.2.20 (0.2.6+ postulis Kotlin 2.3+).
+  Depost Kotlin 2.4.21 (#99/#101) la pino ne plu devas — ĝisdatigo al 0.2.6+ nun eblas.
   La API: `Ksoup.parseXml(teksto, "")` por XML, `Ksoup.parse(teksto)` por HTML.
   `selectFirst(...)` ekzistas (ne nur `select(...).firstOrNull()`).
 - **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
@@ -276,9 +278,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   1,5 GB la Wasm-ligilo ĵetas OutOfMemoryError). Enirpunkto: `ComposeViewport` (CanvasBasedWindow
   estas malrekomendita-kiel-eraro en Compose 1.10).
 - **Klib-ABI kaj Kotlin-versio**: Wasm/Native-bibliotekoj (`.klib`) kompilitaj per pli nova Kotlin ne
-  legeblas de Kotlin 2.2.20 → "Unresolved reference" nur sur wasmJs (JVM/Android uzas jar kaj funkcias).
+  legeblas de malnova kompililo → "Unresolved reference" nur sur wasmJs (JVM/Android uzas jar kaj funkcias).
   Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`. Tial navigation3 estas
-  `1.1.0-alpha02` (1.1.1 = Kotlin 2.3.10). Ĝisdatigu nur kune kun Kotlin 2.3.
+  `1.1.0-alpha02` (1.1.1 = Kotlin 2.3.10); depost Kotlin 2.4.21 (#99/#101) ĝisdatigo al 1.1.1+
+  eblas, sed ankoraŭ ne farita.
 - **Kanalkonfiguro sur wasmJs/iOS** estas enigita kiel Kotlin-ĉeno dum la konstruo
   (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`) — la fonto restas la JSONC-dosiero.
 - **JSONC-parsado**: la kanalkonfiguro havas `//`-komentojn kaj plurliniajn ĉenojn kun
@@ -461,6 +464,16 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `options.logs.enabled` estas nun ĉiam `true` — sen tio la gravaj eventoj kaj la
   ŝaltita detala protokolado estus forĵetitaj en produktado. Ne reenmetu
   `Sentry.captureMessage` por aŭtoludo (ĉiu aŭtomata sekva = 1 evento).
+
+- **Dependabot-versi-PR-oj povas esti interdependaj kaj konfliktaj** (2026-10-13, #99/#101/#102):
+  la du Kotlin-bumpoj (#99: multiplatform/compose/serialization, #101: jvm) tuŝas apudajn
+  liniojn de `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la
+  PR-branĉon kaj ĉiuj kvar kromprogramoj je la sama versio. Coil 3.6.3 (#102) estas blokita
+  DUFOJE: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatenon 2.4.0, nelegeblan de
+  kompililo 2.2.20 (maks 2.3.0) — fiasko jam en `:shared:compileKotlinDesktop`; (2) eĉ sub
+  Kotlin 2.4.21 ĝi postulas `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`;
+  nuna AGP 8.9.1 maks rekomendatas 36). Dependaĵ-bumpoj do ne estas ĉiam memstaraj: kontrolu
+  kaj la Kotlin-metadatenan kaj la compileSdk/AGP-postulojn antaŭ ol kunfandi.
 
 ## Logcat (Android)
 

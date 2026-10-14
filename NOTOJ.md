@@ -86,6 +86,18 @@
 - **Alarmo-elekto** ([PR #95](https://github.com/nordfalk/EsperantoRadio/pull/95)): 1) plej nova nefinita/neerara, 2) fale la plej nova
   NE-erara (reludado > erara fluo kiu tuj paneus), 3) null → fallback-ringtono
   (TYPE_ALARM + USAGE_ALARM-atributo) + vibrado.
+- **Fallback-ringtono haltigebla** (2026-10-12, sekvaĵo de la revizio de
+  b834483): `Ringtone.play()` ripetiĝas ĝis `stop()`, sed antaŭe nenie estis
+  tenilo nek haltiga vojo — la sono ludis senfine. Nun: tenilo
+  `AlarmoReceivilo.fallbackRingtono`, `haltuFallbackRingon()` vokata per
+  `haltuAlarmRingon()` el `ExoPlayerLudiloRegilo.halti()`/`updateState()` kaj
+  `MainActivity.traktuAlarmIntent` — tiu lasta nur por la sciigo-tuŝo (la intento
+  portas `de_sciigo=true`; la best-effort `startActivity` de la ricevilo ne haltigas,
+  ĉar ĝi ne estas uzanta ago — kaj dum instrumentitaj testoj la procezo estas
+  "foreground", do tiu lanĉo ĉiam sukcesas, kio alie flakigus la testojn).
+  Observi la staton ne sufiĉas: en la pura-fallback-kazo `halti()` metas
+  `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas. Mem-halto
+  post `ringtonoMaksDauroMs` (defaŭlte 5 min) kiu ankaŭ nuligas la daŭran sciigon.
 - **Skribu al Settings ANTAŬ ol lanĉi ion** el la ricevilo: se la alarmo lanĉas
   freŝan procezon, `ekigis(alarmoId)` (unufoja → malaktiva; ripetanta → re-skedo)
   devas okazi antaŭ ol la startanta `AppStato` legas la liston.

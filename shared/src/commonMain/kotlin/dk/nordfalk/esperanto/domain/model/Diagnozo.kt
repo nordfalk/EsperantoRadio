@@ -22,10 +22,6 @@ enum class DiagnozoTipo {
     /** Sciig-permeso mankas — la media sciigo kaj sciigoj pri novaj elsendoj ne aperas. */
     NOTIFICATIONS,
 
-    /** Ekzaktaj alarmoj ne permesitaj (Android 12+) — alarmoj povas esti prokrastitaj.
-     *  Ne plu generata ekde 2026-10: la permeso estas intence ne deklarita. */
-    EXACT_ALARMS,
-
     /** DNS-solvado malsukcesis — ofte pro privata DNS (DNS-over-TLS) aŭ VPN. */
     DNS,
 }

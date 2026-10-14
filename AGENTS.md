@@ -53,7 +53,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` kiam ekzaktaj alarmoj permesataj, alie `setWindow` kun 10-minuta fenestro + averto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
 - **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
@@ -395,13 +395,23 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
   plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
   tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
-  (goAsync-korutino); la videblecon certigu full-screen-intent-sciigo (`CATEGORY_ALARM`,
-  `USE_FULL_SCREEN_INTENT`). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
+  (goAsync-korutino); la videblecon certigu alt-prioritate DAŬRA sciigo (`CATEGORY_ALARM` +
+  `PRIORITY_MAX`; sen `USE_FULL_SCREEN_INTENT` la ekrano ne vekiĝas aŭtomate, sed la
+  sciigo aperas kiel heads-up kaj restas dum la alarmo sonas — nuligata kiam la
+  ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
   vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
-- **`USE_EXACT_ALARM` (API 33+) estas aŭtomate donata** por vekhorloĝo-apoj kaj igas
-  `canScheduleExactAlarms()` vera sen mana permeso — sen ĝi la skedilo devas fali al
-  `setWindow` kun 10-minuta fenestro (Doze-prokrastoj). `SCHEDULE_EXACT_ALARM` restas
-  bezonata por Android 12 (31-32), kie ĝi estas defaŭlte donata sed revokebla.
+- **Vekhorloĝaj permesoj intence NE deklaritaj (ekde 3.0.3, 2026-10-12)**: Google Play
+  rifuzas la alŝuton se la apo deklaras `USE_FULL_SCREEN_INTENT` sen la respondo al la
+  demando "full-screen intent" ("You must let us know whether your app uses any
+  full-screen intent permissions", eraro 403). Tial `SCHEDULE_EXACT_ALARM`,
+  `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj el la manifest
+  (kompromiso akceptita de la uzanto). Sekvoj sur Android 12+: alarmoj povas ekigi
+  ĝis 10 minutojn malfrue (`setWindow` anstataŭ `setAlarmClock`) kaj la ekrano ne
+  vekiĝas aŭtomate — la sono ĉiam ludas kaj la sciigo aperas kiel heads-up
+  (`CATEGORY_ALARM` + `PRIORITY_MAX`). Sur Android ≤11 nenio ŝanĝiĝas. (La malnova
+  lernita fakto — `USE_EXACT_ALARM` aŭtomate donata al vekhorloĝo-apoj, `SCHEDULE_EXACT_ALARM`
+  defaŭlte donata sed revokebla sur Android 12 — plu validas, sed ne plu aplikiĝas,
+  ĉar ni simple ne deklaras la permesojn.)
 - **Post mergo de master, reviziu la novajn invariantojn en la kunfanditaj dosieroj**:
   novo aldonita metodo povas malobservi novaĵon de master. (2026-10-11: `markiLudita`
   komence skribis sen `mutex.withLock`, kiun master intertempe postulis por ĉiuj

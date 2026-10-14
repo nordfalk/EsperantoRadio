@@ -24,7 +24,9 @@ import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
@@ -47,6 +49,8 @@ class AlarmoReceivilo : BroadcastReceiver() {
         private const val WAKELOCK_TAG = "EsperantoRadio::Alarmo"
         private const val WAKELOCK_TIMEOUT = 10 * 60 * 1000L // 10 minutoj
         private const val SCIIGO_KANALO = "alarmoj"
+        /** Fiksa ID de la alarm-sciigo — tiel oni povas nuligi ĝin (la sciigo estas daŭra). */
+        const val SCIIGO_ID = 4711
         const val AGO_ALARMO_EKIGAS = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
 
         /**
@@ -64,6 +68,21 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 logw("AlarmoReceivilo", "Ne eblis liberigi la alarmo-WakeLock", e)
             }
             alarmoWakeLock = null
+        }
+
+        /**
+         * Nuligas la alarm-sciigon. La sciigo estas daŭra (ongoing) dum la alarmo
+         * sonas — daŭraj sciigoj ne estas forviŝeblaj per svingo, do io devas esti
+         * vokata kiam la ludado haltiĝas aŭ finiĝas (vidu la gardon en onReceive).
+         * Krome la sciigo mem estas nuligata per setAutoCancel kiam la uzanto tuŝas ĝin.
+         */
+        fun nuliguSciigon(context: Context) {
+            try {
+                (context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                    .cancel(SCIIGO_ID)
+            } catch (e: Exception) {
+                logw("AlarmoReceivilo", "Ne eblis nuligi la alarm-sciigon", e)
+            }
         }
     }
 
@@ -131,6 +150,26 @@ class AlarmoReceivilo : BroadcastReceiver() {
             } finally {
                 liberiguAlarmoWakeLock()
                 pendingResult.finish()
+            }
+        }
+
+        // Gardo de la daŭra alarm-sciigo: nuligu ĝin kiam la alarm-ludado haltiĝas
+        // aŭ finiĝas (post kiam ĝi iam komenciĝis — Konektas/Ludas/Eraro). Sen tio
+        // la ongoing-sciigo restus en la ombrumo por ĉiam, ĉar daŭraj sciigoj ne
+        // estas forviŝeblaj per svingo.
+        CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
+            val ludilo = ExoPlayerLudiloRegilo.akiru(context.applicationContext)
+            var iamKomencis = false
+            ludilo.stato.collect { info ->
+                when (info.stato) {
+                    is LudantoStato.Haltita, is LudantoStato.Finita -> {
+                        if (iamKomencis) {
+                            nuliguSciigon(context.applicationContext)
+                            cancel()
+                        }
+                    }
+                    else -> iamKomencis = true // Konektas, Ludas, Eraro — la alarm-ludado estis iniciatita
+                }
             }
         }
     }
@@ -221,6 +260,9 @@ class AlarmoReceivilo : BroadcastReceiver() {
      * Altprioritata sciigo (CATEGORY_ALARM + PRIORITY_MAX) — permesata el fono.
      * Sen USE_FULL_SCREEN_INTENT ĝi montriĝas kiel heads-up kiam la ekrano estas
      * ŝaltita; la alarmsono tamen ĉiam ludas (vidu luduAlarmon).
+     * La sciigo estas daŭra (ongoing) dum la alarmo sonas — tial ĝi ne estu
+     * forviŝebla per svingo; ĝi estas nuligata kiam la ludado haltiĝas aŭ finiĝas
+     * (vidu la gardon en onReceive) aŭ kiam la uzanto tuŝas ĝin (setAutoCancel).
      */
     private fun montruAltPrioritateSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -253,7 +295,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             .setAutoCancel(true)
             .setOngoing(true)
             .build()
-        nm.notify(kanaloSlug.hashCode(), sciigo)
+        nm.notify(SCIIGO_ID, sciigo)
         logi("AlarmoReceivilo", "Montris alt-prioritate sciigon por kanalo=$kanaloSlug")
     }
 

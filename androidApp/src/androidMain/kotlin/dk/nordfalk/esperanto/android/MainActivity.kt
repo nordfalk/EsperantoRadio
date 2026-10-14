@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Alarmo-intento (de la full-screen-sciigo aŭ de la best-effort startActivity
+     * Alarmo-intento (de la alt-prioritata sciigo aŭ de la best-effort startActivity
      * de la ricevilo).
      *
      * La LUDADON faras AlarmoReceivilo mem — Activity lanĉita el fona ricevilo estas

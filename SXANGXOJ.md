@@ -57,6 +57,35 @@ estas hokita rekte en la agojn, ne per observado.
   Changelog ĝi devas esti la unua versio-sekcio; nun ĝi estas supre antaŭ
   `## [3.0.3]`, kun la nova eniro.
 
+### Revizio de PR #111: la konekt-time `updateState()` mortigis la fallback-ringtonon (2026-10-14)
+
+Revizio de la PR trovis regreson, kiun la novaj testoj ne kaptis: en **freŝa
+procezo** (la vera alarm-scenaro — la apliko ne estas malfermita) la sinsekvo estas
+`akiru()` (ludilo kreita, konekto komenciĝas) → `luduFallbackRingtonon()` (sono
+startas) → MediaController konektiĝas → `updateState()` kalkulas `Haltita` (malplena
+media listo) → `haltuAlarmRingon()` → la ĵus startinta sono estas **mortigita**.
+Nenio suspendas inter `akiru()` kaj `luduFallbackRingtonon` (`inicialigu` kaj
+`leguBundledKanalkonfiguron` estas nesuspendaj), do la sono ĉiam startas antaŭ la
+konekto — la alarmo restus silenta. Konfirmita sur emulator-5554 (API 26):
+`Haltigis fallback-ringtonon` en la sama millisecondo kiel `MediaController konektita
+al servo`, 4,5 s post ekigo.
+
+La testoj en `AlarmoReceiviloTest` ne vidas tion, ĉar en la testa procezo la ludilo
+jam ekzistas kaj estas konektita (`ActivityScenarioRule` lanĉas `MainActivity`).
+
+**Korekto**: `haltuAlarmRingon()` en `updateState()` nur ĉe **transicio** al
+`Haltita` (`_stato.value.stato !is Haltita`) — la unua `updateState()` post konekto
+lasas la sonon viva; halto el la media sciigo (`Ludas → Haltita`) ankoraŭ haltigas
+ĝin; `halti()`, la sciigo-tuŝo kaj la mem-halto estas senŝanĝaj.
+
+**Verifikita sur emulator-5554**: nova regres-testo `FresxProcezaFallbackTest` (sen
+`ActivityScenarioRule` — la ludilo ankoraŭ ne ekzistas, kiel en freŝa procezo): sen la
+gardilo ĝi fiaskas determinisme, kun la gardilo ĝi pasas. `fallbackRingtonoHaltigxigxasPerHalti`,
+`fallbackRingtonoMemHaltigxigxasKajNuligxasSciigon` kaj
+`alarmoSciigoNuligxigxasKiamLudadoHaltigxas` pasas same. (`alarmoReceiviloMemKomencasLudadon`
+malsukcesis en la revizia medio pro manko de reto — la RSS-fetch falis post 10 s
+konekt-timeout; la testo estas ret-dependa.)
+
 ## Apaj novaĵoj en la nova apo
 
 La malnova apo montris mesaĝon el la `android`-sekcio de la kanalkonfiguro

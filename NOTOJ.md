@@ -98,6 +98,9 @@
   Observi la staton ne sufiĉas: en la pura-fallback-kazo `halti()` metas
   `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas. Mem-halto
   post `ringtonoMaksDauroMs` (defaŭlte 5 min) kiu ankaŭ nuligas la daŭran sciigon.
+  (2026-10-14, PR #111: la `updateState()`-hoko estas vokata nur ĉe *transicio* al
+  `Haltita` — alie la konekt-time `updateState()` en freŝa procezo mortigus la ĵus
+  startintan sonon; regres-testo `FresxProcezaFallbackTest`.)
 - **Skribu al Settings ANTAŬ ol lanĉi ion** el la ricevilo: se la alarmo lanĉas
   freŝan procezon, `ekigis(alarmoId)` (unufoja → malaktiva; ripetanta → re-skedo)
   devas okazi antaŭ ol la startanta `AppStato` legas la liston.

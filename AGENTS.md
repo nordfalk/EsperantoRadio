@@ -433,6 +433,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   fona alarmo, kie BAL blokas ĝin; eĉ `moveToState(CREATED)` ne helpas). Kondiĉoj,
   kiuj distingas "uzanto tuŝis" de "sistemo lanĉis", devas esti en la intenco mem
   (ekz. `de_sciigo=true` de la sciigo), ne en la ĉirkaŭaĵo.
+- **`haltuAlarmRingon()` en `updateState()` nur ĉe transicio al `Haltita`**
+  (2026-10-14, PR #111): la unua `updateState()` post la MediaController-konekto
+  kalkulas `Haltita` kun malplena media listo — sen transicia gardilo ĝi vokus
+  `haltuAlarmRingon()` kaj mortigus ĵus startintan fallback-ringtonon en freŝa
+  procezo (la alarmo restus silenta). Gardilo: `ludantoStato is Haltita &&
+  _stato.value.stato !is Haltita`. Instrumentitaj testoj kun `ActivityScenarioRule`
+  ne kaptas tion (tie la ludilo jam ekzistas kaj estas konektita) — bezonas teston
+  sen la regulo (`FresxProcezaFallbackTest`).
 - **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
   la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
   `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la

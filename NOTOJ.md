@@ -359,9 +359,6 @@ dk/nordfalk/esperanto/
 
 ## Sonludado kaj ludado — arkitekturaj resumoj (translokigitaj el AGENTS.md)
 
-- **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
-  La API: `Ksoup.parseXml(teksto, "")` por XML, `Ksoup.parse(teksto)` por HTML.
-  `selectFirst(...)` ekzistas (ne nur `select(...).firstOrNull()`).
 - **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
   NE estas liberigita en `onDestroy`. `AppStato.ludvicoRegilo` tenas ĝin dum la tuta procezo. La nuna `Sonfonto`
   estas JSON en `MediaMetadata.extras` (`SonfontoKodilo`), do ludado komencita de alia MediaController
@@ -388,26 +385,6 @@ dk/nordfalk/esperanto/
   - Mutex protektas `ludiElsendon`/`aldoniAlVico`/`ludiSekvan` kontraŭ konkurantaj vokoj.
   - `LudatojDeponejoMaketo` estas la memora implemento por Preview kaj testoj (ne por produktado).
 
-- **Ludvico kaj daŭra ludado** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
-  - `LudvicoLogiko` estas pura decidlogiko (sen flankaj efikoj) — tute testebla.
-  - `LudvicoRegilo` observas `LudantoStato.Finita` per `StateFlow.distinctUntilChanged()`
-    kaj lanĉas aŭtoludon en aparta korutino (`scope.launch`) por eviti rekurson.
-  - Pozicio estas savata ĉiu 5s per `delay()`-bazita korutino. Ĉe `halti()` la
-    `nunaFonto` estas forigita de la ludilo, do `LudvicoRegilo` konservas
-    `lastaFonto`/`lastaPozicioMs` (kun `@Volatile`) kiel retroiron.
-  - `malmarkiFinita()` estas vokata kiam la uzanto eksplicite reludas finitan elsendon.
-  - Mutex protektas `ludiElsendon`/`aldoniAlVico`/`ludiSekvan` kontraŭ konkurantaj vokoj.
-  - `LudatojDeponejoMaketo` estas la memora implemento por Preview kaj testoj (ne por produktado).
-
-- **Sciigoj pri novaj elsendoj** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
-  - `NovajElsendojKontroloWorker` (Android, WorkManager) periode kontrolas ŝatatajn kanalojn
-    (skedita je 7:00 kaj 16:00, ±1h), elŝutas RSS-fluojn, kaj kreas sciigojn por neviditaj elsendoj.
-  - La sciigo havas "Ludi"-agon: `LudiElsendoReceivilo` ricevas la intenon kaj lanĉas ludadon
-    rekte per `MediaController` (konektita al la MediaSession). Uzas `goAsync()` por teni la
-    Receivilon vivanta dum la nesinkrona konekto.
-  - `GhisdatiguSciigSkedon` ĝisdatigas la WorkManager-skedon kiam la uzanto ŝaltas/malŝaltas sciigojn.
-  - `BootReceivilo` re-skedas alarmojn post restarto de la aparato.
-
 - **Sciigoj pri novaj elsendoj** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
   - `NovajElsendojKontroloWorker` (Android, WorkManager) periode kontrolas ŝatatajn kanalojn
     (skedita je 7:00 kaj 16:00, ±1h), elŝutas RSS-fluojn, kaj kreas sciigojn por neviditaj elsendoj.
@@ -421,10 +398,6 @@ dk/nordfalk/esperanto/
   `rememberNavBackStack`, `entryProvider`, `NavDisplay`. Stato persistebla per `SavedStateConfiguration`
   kun `polymorphic` serializers por ĉiu `Vojo`-subklaso. Detaloj: `docs/nova/05_dizajno_kaj_ui.md`.
 
-- **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en `<content:encoded>`.
-  Uzu `getElementsByTag("content:encoded").firstOrNull()?.text()` (ne `html()`) por
-  akiri la malkoditan HTML-enhavon, poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
-  Detaloj pri ĉiuj parsreguloj: `docs/nova/04_parsado_kaj_arkivo.md`.
 - **Sonludado — bibliotek-elekto** (detaloj: `docs/nova/02_teknika_stako.md`):
   - **basic-sound** (LexiLabs-App/basic-sound, MIT) estis provita unue. La JVM-implemento
     uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
@@ -440,41 +413,9 @@ dk/nordfalk/esperanto/
     Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
     `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
     pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
-
-- **Sonludado — bibliotek-elekto** (detaloj: `docs/nova/02_teknika_stako.md`):
-  - **basic-sound** (LexiLabs-App/basic-sound, MIT) estis provita unue. La JVM-implemento
-    uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
-    por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
-  - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
-    Compose 1.10.0 — tiam tro nova por nia Kotlin (nun 2.2.20 / Compose 1.10.0, sed la biblioteko bezonas VLC sur Desktop).
-  - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
-    kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
-    `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
-    estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
-  - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
-    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
-    Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
-    `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
-    pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
-- **Platforma subteno — sonludado**:
-
-  | Funkcio | Android | Desktop (JVM) | Web (wasmJs) | iOS |
-  |---|:--:|:--:|:--:|:--:|
-  | MP3-fluado | ExoPlayer | mp3spi + SourceDataLine | HTMLAudioElement | no-op |
-  | HLS | ExoPlayer | ne | retumilo | no-op |
-  | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
-  | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
-  | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
 
 ## Vekhorloĝo kaj Android-limoj (translokigitaj el AGENTS.md)
 
-- **Regex-`"`-signoj en JSONC devas esti refutitaj** (`\"`): la koment-striptigilo forigas
-  nur `//`-liniojn, sed la valoroj mem devas esti valida JSON post striptigo. Regex kiel
-  `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
-  (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
-  (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
-  riparo-stako; kaptita de la fum-testo kaj la CI-laborfluo (PR #89). Uzu la temperitan formon
-  `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
 - **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
   ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
   plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
@@ -485,15 +426,6 @@ dk/nordfalk/esperanto/
   ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
   vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
 
-- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
-  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
-  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
-  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
-  (goAsync-korutino); la videblecon certigu alt-prioritate DAŬRA sciigo (`CATEGORY_ALARM` +
-  `PRIORITY_MAX`; sen `USE_FULL_SCREEN_INTENT` la ekrano ne vekiĝas aŭtomate, sed la
-  sciigo aperas kiel heads-up kaj restas dum la alarmo sonas — nuligata kiam la
-  ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
-  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
 - **Vekhorloĝaj permesoj intence NE deklaritaj (ekde 3.0.3, 2026-10-12)**: Google Play
   rifuzas la alŝuton se la apo deklaras `USE_FULL_SCREEN_INTENT` sen la respondo al la
   demando "full-screen intent" ("You must let us know whether your app uses any
@@ -510,7 +442,9 @@ dk/nordfalk/esperanto/
 ## Git- kaj agent-lecionoj — historiaj (translokigitaj el AGENTS.md)
 
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
-  projectCards-malrekomendo) — uzu la REST API (vidu supre).
+  projectCards-malrekomendo) — uzu la REST API:
+  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
   atendatas, serĉu nereatingeblajn komitojn per
   `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
@@ -521,6 +455,7 @@ dk/nordfalk/esperanto/
   `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
   uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
   CHANGELOG.md — konservita en la stash, ne enmetita.)
+
 - **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
   se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
   (ekz. CHANGELOG.md), la kunfando konservas ambaŭ sen konfliktmarkoj — la
@@ -532,24 +467,12 @@ dk/nordfalk/esperanto/
 
 ## Sentry-kvoto — historia evoluo (translokigita el AGENTS.md)
 
-- **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
-  la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
-  `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la
-  konfiguro rulu `./gradlew :shared:desktopTest` antaŭ ol fidi la rezulton.
-  (2026-10-12: forigo de la eksa statusmesaĝo-ŝlosilo postlasis `,` post
-  `apaj_novaĵoj`.)
-
 - **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
   Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
   `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
   `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
   Debug-konstruoj kaj emuliloj ne raportas al Sentry.
 
-- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
-  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
-  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
-  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
-  Debug-konstruoj kaj emuliloj ne raportas al Sentry.
 - **Eraroj-kvoto: `loge(tag,msg,e)` = erar-evento** (2026-10-13): `loge(tag, msg, e)`
   vokas `Sentry.captureException` kaj konsumas la MONATAN ERAROJ-KVOTON (5 000);
   `loge(tag, msg)` sen escepto kaj `Sentry.logger.*` estas nur protokol-eventoj

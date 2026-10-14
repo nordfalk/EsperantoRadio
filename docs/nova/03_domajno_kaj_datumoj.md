@@ -1,7 +1,8 @@
 # 3. Domajno kaj datumoj
 
 > Tiu dokumento priskribas la efektivajn modelojn kaj interfacojn en la kodo.
-> Por la plej ĝisdatigitan liston de dosieroj, vidu la struktursekcion en `AGENTS.md`.
+> Por la plej ĝisdatigitan liston de dosieroj, vidu la struktursekcion en `NOTOJ.md`
+> (sekcio "Deponeja koda mapo").
 
 ## Domajnmodeloj (`shared/domain/model/Modeloj.kt`)
 
@@ -257,9 +258,8 @@ expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
 - **iOS:** `NoOpLudiloRegilo` (estonte: AVPlayer).
 - **Testoj/Preview:** `NoOpLudiloRegilo` — kun `simuluFinon()`/`simuluPozicion()` por testoj.
 
-> **Neniu eksponenta repro-logiko** estis implementita. La malnova `Afspiller` havis
-> eksponentan backoff (gxis 10 provoj). Se reto perdigxas dum ludado, la uzanto devas
-> mane reprovi. Tio estas malfermita punkto.
+> **Eksponenta repro-logiko** estas implementita: `LudvicoRegilo` reprovas pasemajn
+> erarojn ĝis 10 fojoj (1s → 2s → 4s … maks. 30s, de la sama pozicio; `ReprovoLogiko`).
 
-> Detalojn pri ludvica logiko, pozicio-spurado kaj aŭtoludo vidu en
-> `AGENTS.md` (sekcio "Ludvico kaj daŭra ludado").
+> Detalojn pri ludvico, pozicio-spurado kaj aŭtoludo vidu en
+> `NOTOJ.md` (sekcio "Sonludado kaj ludado — arkitekturaj resumoj").

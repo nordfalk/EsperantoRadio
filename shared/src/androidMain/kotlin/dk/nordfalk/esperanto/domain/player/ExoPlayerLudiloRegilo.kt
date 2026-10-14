@@ -176,6 +176,10 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             Player.STATE_IDLE -> LudantoStato.Haltita
             else -> LudantoStato.Haltita
         }
+        // Stato iĝis Haltita (ekz. halto el la media sciigo — Media3 direktas
+        // CMD_STOP al la player, preter nia halti()) → ankaŭ haltigu rezervan alarm-sonon.
+        // Idempotenta kaj malmultekosta, do sekura ĉe ĉiu updateState-voko.
+        if (ludantoStato is LudantoStato.Haltita) haltuAlarmRingon()
         _stato.value = LudantoInformo(
             stato = ludantoStato,
             nunaFonto = nunaFonto,
@@ -213,6 +217,9 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             controller?.clearMediaItems()
         }
         nunaFonto = null
+        // Ankaŭ haltigu rezervan alarm-sonon — en la pura-fallback-kazo la
+        // ExoPlayer neniam startis, do nur ĉi tiu hoko povas haltigi la sonon.
+        haltuAlarmRingon()
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }

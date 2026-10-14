@@ -46,6 +46,26 @@ captureMessage), ExoPlayer-ludad-fiaskoj (KMP-H), la Compose-skopa escepto
 Testoj: `malpuraKashoEstasForigata` (ElsendoDeponejoImplTest) +
 `defauxlteSxaltitaKajFlagoSinkronigita` (AgordojDetalaProtokoladoTest).
 
+## Kvoto-protekto 249: unua taksado (2026-10-14, 26h post eldono)
+
+- **Eraroj laŭ build-numero (`dist`)**: dist 248 = 47 eventoj (4 uzantoj),
+  dist 246/3.0.2 = 20 (2 uzantoj), **dist 249 = NUL** en 24h — dum almenaŭ
+  5 aktivaj 249-uzantoj (ilin malkaŝas la "detala protokolado"-defaŭlto:
+  "parsado kompleta"-mesaĝoj povas veni nur de 249). Kun sampleRate 0.5 eĉ
+  eventualaj 249-eraroj duoniĝus — sed la logw-ŝanĝoj (ludad-/ret-fiaskoj)
+  kaj la KMP-1S/KMP-X-riparoj forigis la fontojn tute.
+- **Taga eraro-kvanto**: ~138/tage (10-07…10-12) → 80 (eldonotago 10-13) →
+  29 en 16h (10-14) — ~75 % malkresko; la restaĵo venas de malnovaj versioj
+  (ĉinaj uzantoj kun reto-blokado) kaj formortos per ĝisdatigoj.
+- **Kvoto**: ~110 erar-eventoj konsumitaj ekde la averto (4 004/5 000) —
+  je tiu ritmo la monata kvoto komforte sufiĉos.
+- **Ne-atendita sondaĵo**: "[LudadoServo] startForeground() malsukcesis
+  (fono)" estas la plej laŭta restanta protokolo (119/24h, 4 uzantoj, logw →
+  protokolo-kvoto) — kandidato por dedupigo en estonta versio.
+- **Datumaro-limo**: `dist` ekzistas nur en errors; la logs-datumaro ne
+  subtenas ĝin (API-eraro ĉe grupigo) — protokoloj ne distingeblas per
+  build-numero, nur per release.
+
 ## Debug-konstruoj kaj emuliloj ne raportas al Sentry (PR #109)
 
 La fatalaj OOM-kraŝoj en la produktadaj Sentry-datumoj (KMP-1R, KMP-1H) venis

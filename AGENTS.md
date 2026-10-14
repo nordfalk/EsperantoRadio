@@ -234,7 +234,9 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
       NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.) estas
       ignoritaj de GPP; tial ĉiuj eldonoj de 3.0.2 ĝis 3.0.3/249 eldoniĝis kun
       la malnovaj notoj de la 3.0.1-epoko. Ĝisdatigu `internal.txt` ĉe ĉiu
-      eldono. (La historiaj `X.Y.Z.txt`-dosieroj restas kiel arkivo.)
+      eldono. (La historiaj `X.Y.Z.txt`-dosieroj estas arkivigitaj en
+      `androidApp/src/main/play/release-notes-arkivo/` — ekster la de GPP
+      skanata dosierujo.)
    6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka
       maŝino rajtas eldoni — la CI-`eldonado.yml` per GitHub-sekretoj NE
       uzeblas nuntempe):
@@ -523,7 +525,9 @@ https://mcp.sentry.dev/mcp`). La plej uzataj iloj:
 **Kapabloj de la datumaroj** (2026-10-10, gravas por demandoj):
 
 - **logs** (protokoloj): havas `user.id`, `device.model`, `release`, `message` —
-  sed **neniun geo-kampon** (`geo.country_code` k.a. ne ekzistas).
+  sed **neniun geo-kampon** (`geo.country_code` k.a. ne ekzistas) kaj **nenian
+  `dist`-kampon** (build-numero — grupigo per `dist` ĵetas API-eraron;
+  nur la errors-datumaro havas ĝin, agorditan de la Android-SDK = versionCode).
 - **errors** (erar-eventoj): havas `geo.country_code` — sed `device.model` estas
   **malplena** (la KMP-SendSDK ne sendas aparat-kuntekston ĉe eraroj).
   Sekve aparato × lando NE estas rekombebla per la API.

@@ -7,6 +7,7 @@ import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.ApajNovajxojDeponejo
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
@@ -16,8 +17,12 @@ import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
 import dk.nordfalk.esperanto.domain.DiagnozoRegilo
 import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
+import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
+import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
 import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
 import dk.nordfalk.esperanto.ui.HejmoViewModel
 import dk.nordfalk.esperanto.ui.KanalaroViewModel
@@ -27,6 +32,7 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
@@ -66,11 +72,35 @@ object AppStato {
         private set
     var diagnozoRegilo: DiagnozoRegilo? = null
         private set
+    var apajNovajxojDeponejo: ApajNovajxojDeponejo? = null
+        private set
 
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
     val kanaloViewModelj = mutableMapOf<String, KanaloViewModel>()
 
     fun inicialigita(): Boolean = httpKliento != null
+
+    /**
+     * Trovas la elsendon kiun alarmo ludu por podkasta kanalo (komuna por la
+     * alarmo-ricevilo kaj la ĉefaktivon). Provas laŭvice:
+     * reton (freŝa RSS), diskkaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
+     * la reto ofte ankoraŭ ne pretas. Poste elektas per [elektuAlarmElsendon].
+     *
+     * Revenas null se AppStato ne estas inicialigita aŭ neniu elsendo troveblas.
+     */
+    suspend fun trovuAlarmElsendon(kanalo: Kanalo): Elsendo? {
+        val elsendoDeponejo = elsendoDeponejo
+            ?: return null.also { logw("AppStato", "Ne inicialigita — ne povas trovi elsendon por alarmo") }
+        val elsendoj = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi = true)
+            .ifEmpty { elsendoDeponejo.leguKashitajnElsendojn(kanalo) ?: emptyList() }
+            .ifEmpty {
+                elshutDeponejo?.observiElshutojn()?.value?.values
+                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElshutStato.Preta }
+                    ?.map { it.elsendo } ?: emptyList()
+            }
+        val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        return elektuAlarmElsendon(elsendoj, ludatoj)
+    }
 
     /**
      * Kreas ĉiujn deponejojn kaj ViewModel-ojn. Idempotent — se jam inicialigita, faras nenion.
@@ -86,6 +116,7 @@ object AppStato {
     ) {
         if (httpKliento != null) return
 
+        logGrava("AppStato", "Apo malfermita (versio ${ApoVersio.VERSION})")
         logi("AppStato", "Inicialigas deponejojn kaj ViewModel-ojn")
 
         httpKliento = HttpClient(httpMotoro) {
@@ -94,7 +125,7 @@ object AppStato {
             install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
                 connectTimeoutMillis = 10_000
-                // FAROTA C2: sen tio servilo kiu akceptas kaj poste silentegas povas
+                // (PR #93) sen tio servilo kiu akceptas kaj poste silentegas povas
                 // teni la peton viva pli longe ol la dezirata limo
                 socketTimeoutMillis = 30_000
             }
@@ -109,15 +140,23 @@ object AppStato {
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
-        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings)
+        // Legu kanalkonfiguron unufoje — por defaŭltaj ŝatataj kaj alarm-sugestoj
+        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
+        val defaltajSxatataj = agordo.kanaloj
+            .filter { it.defaltSxatata }
+            .map { it.kodo }
+            .toSet()
+        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings, defaltajSxatataj)
 
         sercxoDeponejo = SercxoDeponejoImpl(elsendoDeponejo!!)
 
         elshutDeponejo = kreuElshutDeponejo(httpKliento!!)
 
-        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
         val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
         alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
+
+        // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
+        apajNovajxojDeponejo = ApajNovajxojDeponejo(settings, agordo.android?.apajNovajxoj)
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 
@@ -146,6 +185,19 @@ object AppStato {
             }
         }
 
+        // Kaŝitaj avertoj: kiam problemo malaperas (ekz. la uzanto riparis ĝin),
+        // ĝia kaŝo forgesiĝas — se ĝi poste revenas, la avertokarto reaperas
+        // sur la ĉefekrano.
+        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
+            diagnozoRegilo?.problemoj?.collect { problemoj ->
+                try {
+                    agordojDeponejo.puriguKasxitajnAvertojn(problemoj.map { it.tipo }.toSet())
+                } catch (e: Exception) {
+                    logw("AppStato", "Malsukcesis purigi kasxitajn avertojn", e)
+                }
+            }
+        }
+
         logi("AppStato", "Inicialigito completa")
     }
 
@@ -165,6 +217,7 @@ object AppStato {
         ludatojDeponejo = null
         ludvicoRegilo = null
         diagnozoRegilo = null
+        apajNovajxojDeponejo = null
         kanaloViewModelj.clear()
     }
 }

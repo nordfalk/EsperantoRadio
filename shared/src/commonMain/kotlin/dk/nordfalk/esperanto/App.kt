@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -88,6 +89,7 @@ fun EsperantoRadioApp(
         val ludatojDeponejo = AppStato.ludatojDeponejo!!
         val ludvicoRegilo = AppStato.ludvicoRegilo!!
         val diagnozoRegilo = AppStato.diagnozoRegilo!!
+        val apajNovajxojDeponejo = AppStato.apajNovajxojDeponejo!!
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
@@ -181,8 +183,12 @@ fun EsperantoRadioApp(
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onElshutoj = { push(Vojo.Elshutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
-                                onDiagnozo = { push(Vojo.Diagnozo) },
+                                onKasxuHejmajnAvertojn = {
+                                    // Kaŝu la NUNAJN problemo-tipojn; nova problemo poste reaperigos la karton
+                                    agordojDeponejo.kasxuAvertojn(diagnozoRegilo.problemoj.value.map { it.tipo }.toSet())
+                                },
                                 diagnozoProblemoj = diagnozoRegilo.problemoj,
+                                kasxitajAvertoj = agordojDeponejo.kasxitajAvertoj,
                                 onElshuti = { elsendo ->
                                     logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
                                     scope.launch { elshutDeponejo.elshuti(elsendo) }
@@ -205,7 +211,7 @@ fun EsperantoRadioApp(
                                         when (fonto) {
                                             is Sonfonto.ElsendoFonto -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
                                             is Sonfonto.LokaElsendo -> ludvicoRegilo.ludiElsendon(fonto.elsendo)
-                                            // FAROTA G13: tra la regilo — reprovo/kalkuloj/dedup restas koheraj
+                                            // (PR #92) tra la regilo — reprovo/kalkuloj/dedup restas koheraj
                                             is Sonfonto.RektaKanalo -> ludvicoRegilo.ludiRektan(fonto.kanalo)
                                         }
                                     }
@@ -268,6 +274,7 @@ fun EsperantoRadioApp(
                                 agordojDeponejo = agordojDeponejo,
                                 onReen = { reen() },
                                 onDiagnozo = { push(Vojo.Diagnozo) },
+                                diagnozoProblemoj = diagnozoRegilo.problemoj,
                             )
                         }
                         entry<Vojo.Diagnozo> {
@@ -335,7 +342,7 @@ fun EsperantoRadioApp(
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
                                 agordojDeponejo = agordojDeponejo,
-                                // FAROTA G13: paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
+                                // (PR #92) paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
                                 // ne nuligas planitan reprovon
                                 onPauxzigi = { scope.launch { ludvicoRegilo.pauxziguLudadon() } },
                                 onDaurigi = { scope.launch { ludvicoRegilo.dauriguLudadon() } },
@@ -444,6 +451,28 @@ fun EsperantoRadioApp(
                     onSercxo = { switchTab(Vojo.Sercxo) },
                 )
             }
+        }
+
+        // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo unufoje
+        // por ĉiu nova mesaĝo; "Bone" persistas la haŝaĵon en la agordoj
+        val apajNovajxoj by apajNovajxojDeponejo.observuMontratan().collectAsState()
+        apajNovajxoj?.let { mesagxo ->
+            LaunchedEffect(mesagxo) {
+                logi("ApajNovajxoj", "Montras novajn apajn novaĵojn (hesho=${mesagxo.hashCode()})")
+            }
+            AlertDialog(
+                // Kiel en la malnova apo: nur la "Bone"-butono fermas la dialogon
+                onDismissRequest = { },
+                title = { Text("Novaĵoj") },
+                // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
+                text = { HtmlVido(html = mesagxo, uzuWebView = false, modifier = Modifier.fillMaxWidth()) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        logi("ApajNovajxoj", "Uzanto konfirmis la apajn novaĵojn")
+                        apajNovajxojDeponejo.konfirmu()
+                    }) { Text("Bone") }
+                },
+            )
         }
     }
 }

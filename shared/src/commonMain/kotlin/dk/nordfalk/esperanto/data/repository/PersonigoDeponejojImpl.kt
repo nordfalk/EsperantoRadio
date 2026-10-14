@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
@@ -10,6 +11,7 @@ import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.protokoloDetala
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -69,6 +71,13 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
             erara = ekzista?.erara ?: false,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
+        _ludatoj.value = nuna
+    }
+
+    override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {
+        val nuna = _ludatoj.value.toMutableMap()
+        val ekzista = nuna[elsendoId] ?: LudataElsendo(elsendoId = elsendoId, kanaloSlug = kanaloSlug)
+        nuna[elsendoId] = ekzista.copy(lasteLudita = Clock.System.now().toEpochMilliseconds())
         _ludatoj.value = nuna
     }
 
@@ -138,6 +147,27 @@ class AgordojDeponejoImpl(
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
+    private val _detalaProtokolado = MutableStateFlow(settings?.getBoolean(SettingsKeys.DETALA_PROTOKOLADO, false) ?: false)
+    override val detalaProtokolado: StateFlow<Boolean> = _detalaProtokolado.asStateFlow()
+
+    private val _kasxitajAvertoj = MutableStateFlow(
+        settings?.getString(SettingsKeys.KASXITAJ_AVERTOJ, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
+    )
+    override val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kasxitajAvertoj.asStateFlow()
+
+    init {
+        // Sinkronigu la tutmondan protokol-flagon (legata de logi en ProtokoloUtil)
+        protokoloDetala = _detalaProtokolado.value
+    }
+
+    /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
+    private fun persistu(tipoj: Set<DiagnozoTipo>) {
+        settings?.putString(SettingsKeys.KASXITAJ_AVERTOJ, tipoj.joinToString(",") { it.name })
+    }
+
+    private fun tipoDeNomo(nomo: String): DiagnozoTipo? =
+        nomo.takeIf { it.isNotBlank() }?.let { n -> DiagnozoTipo.entries.firstOrNull { it.name == n } }
+
     override fun fiksiTemon(temo: String) {
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
@@ -156,5 +186,24 @@ class AgordojDeponejoImpl(
         _evoluo.value = sxaltita
         settings?.putBoolean(SettingsKeys.EVOLO, sxaltita)
         logi("Agordoj", "Evoluo → $sxaltita")
+    }
+    override fun fiksiDetalanProtokoladon(sxaltita: Boolean) {
+        _detalaProtokolado.value = sxaltita
+        protokoloDetala = sxaltita
+        settings?.putBoolean(SettingsKeys.DETALA_PROTOKOLADO, sxaltita)
+        logi("Agordoj", "DetalaProtokolado → $sxaltita")
+    }
+    override fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>) {
+        _kasxitajAvertoj.value = tipoj
+        persistu(tipoj)
+        logi("Agordoj", "KasxitajAvertoj → $tipoj")
+    }
+    override fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>) {
+        val purigita = _kasxitajAvertoj.value intersect ekzistantaj
+        if (purigita != _kasxitajAvertoj.value) {
+            _kasxitajAvertoj.value = purigita
+            persistu(purigita)
+            logi("Agordoj", "Purigis kasxitajn avertojn → $purigita")
+        }
     }
 }

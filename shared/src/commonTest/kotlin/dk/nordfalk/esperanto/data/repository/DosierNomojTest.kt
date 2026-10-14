@@ -33,4 +33,28 @@ class DosierNomojTest {
     fun malplenaIdRestasMalplena() {
         assertEquals("", sanigiDosiernomon(""))
     }
+
+    @Test // (PR #95) RSS-id-oj povas esti plenaj URL-oj — >255 bajtoj malsukcesigas elŝuton
+    fun limigasLongonKajKonservasUnikecon() {
+        val longa = "x".repeat(500)
+        val rezulto = sanigiDosiernomon(longa)
+        assertEquals(true, rezulto.length <= 120, "Nomo devas esti maks 120 signoj: ${rezulto.length}")
+
+        // Malsamaj longaj ID-oj devas resti DISTINGEBLAJ (malsamaj haketaĵoj)
+        val alia = "y".repeat(500)
+        assertNotEquals(sanigiDosiernomon(longa), sanigiDosiernomon(alia), "Haketaĵoj devas esti malsamaj")
+    }
+
+    @Test // (PR #95) Windows-rezervitaj nomoj kaj finaj punktoj
+    fun sanigasWindowsRezervitajnNomojn() {
+        assertEquals("_CON", sanigiDosiernomon("CON"))
+        assertEquals("_prn", sanigiDosiernomon("prn"))
+        assertEquals("abc", sanigiDosiernomon("abc."), "Fina punkto devas esti forigita (Windows)")
+        assertEquals("abc", sanigiDosiernomon("abc "), "Fina spaco devas esti forigita")
+    }
+
+    @Test // (PR #95) nul-bajtoj
+    fun forigasNulbajtojn() {
+        assertEquals("ab", sanigiDosiernomon("a\u0000b"))
+    }
 }

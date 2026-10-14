@@ -24,10 +24,8 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.data.repository.ekzaktajAlarmojPermesataj
-import dk.nordfalk.esperanto.data.repository.malfermuEkzaktajnAlarmAgordojn
 import dk.nordfalk.esperanto.data.repository.subtenasVekhorlogxn
 import dk.nordfalk.esperanto.logi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,34 +157,24 @@ fun AlarmoEkrano(
 }
 
 /**
- * Averto kiam la apo ne rajtas skedi ekzaktajn alarmojn (Android 12+). La alarmoj tamen
- * ekigas, sed eble ĝis 10 minutoj malfrue. Rekontrolas periode, ĉar la uzanto donas la
- * permeson en la sistemaj agordoj kaj poste revenas.
+ * Informa karto kiam la apo ne rajtas skedi ekzaktajn alarmojn (Android 12+).
+ * La permeso SCHEDULE_EXACT_ALARM/USE_EXACT_ALARM estas intence ne deklarita
+ * (por eviti la Google Play-deklaron). La alarmoj tamen ekigas, sed eble
+ * ĝis 10 minutoj malfrue. Sur Android 11 kaj sube tio ne validas.
  */
 @Composable
 private fun EkzaktajAlarmojAverto() {
-    var permesata by remember { mutableStateOf(ekzaktajAlarmojPermesataj()) }
-    LaunchedEffect(permesata) {
-        while (!permesata) {
-            delay(2000)
-            permesata = ekzaktajAlarmojPermesataj()
-        }
-    }
-    if (permesata) return
+    if (ekzaktajAlarmojPermesataj()) return
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         modifier = Modifier.fillMaxWidth().padding(8.dp)
     ) {
         Column(Modifier.padding(12.dp)) {
             Text(
-                "La apo ne rajtas skedi ekzaktajn alarmojn. Alarmoj povas malfrui ĝis 10 minutoj.",
+                "Alarmoj povas malfrui ĝis 10 minutoj (Android 12+). La sono ĉiam ludas — por ekzakta vekiĝo, uzu la sisteman vekhorloĝon.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            TextButton(onClick = {
-                logi("Klako", "permesi ekzaktajn alarmojn")
-                malfermuEkzaktajnAlarmAgordojn()
-            }) { Text("Permesi") }
         }
     }
 }

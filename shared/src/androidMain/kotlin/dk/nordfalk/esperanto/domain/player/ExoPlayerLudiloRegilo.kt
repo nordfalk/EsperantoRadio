@@ -1,4 +1,4 @@
-package dk.nordfalk.esperanto.android
+package dk.nordfalk.esperanto.domain.player
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,9 +18,8 @@ import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.data.repository.Agadoj
 import dk.nordfalk.esperanto.data.repository.LudiElsendoReceivilo
-import dk.nordfalk.esperanto.domain.player.LudiloRegilo
-import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -41,9 +40,10 @@ import kotlin.math.roundToInt
 /**
  * Android-implemento de LudiloRegilo per Media3 MediaController.
  *
- * La vera ExoPlayer vivas en [EsperantoLudadoServo] (MediaSessionService).
- * Tiu ĉi klaso estas maldika prokso: ĝi konektiĝas al la servo per
- * MediaController kaj plusendas komandojn. Tiel la ludado daŭras en la fono
+ * La vera ExoPlayer vivas en la MediaSessionService (`EsperantoLudadoServo` en la
+ * `androidApp`-modulo — atingebla per [Agadoj.LUDADO_SERVO], ĉar `shared` ne povas
+ * referenci la klason rekte). Tiu ĉi klaso estas maldika prokso: ĝi konektiĝas al la
+ * servo per MediaController kaj plusendas komandojn. Tiel la ludado daŭras en la fono
  * eĉ kiam la Activity detruiĝas.
  *
  * Estas **unu instanco por la tuta procezo** ([akiru]) — ne po Activity. [AppStato] kaj
@@ -74,7 +74,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
     private val cxefaFadeno = Handler(Looper.getMainLooper())
 
     private val appContext = context.applicationContext
-    private val sessionToken = SessionToken(appContext, ComponentName(appContext, EsperantoLudadoServo::class.java))
+    private val sessionToken = SessionToken(appContext, ComponentName(appContext, Agadoj.LUDADO_SERVO))
     private val controllerFuture = MediaController.Builder(appContext, sessionToken).buildAsync()
     private var controller: MediaController? = null
 
@@ -163,7 +163,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         // Escepto: post halti() (stop + clearMediaItems) la playerError RESTAS — Media3 1.5.1
         // ne nuligas ĝin (nur prepare() faras) — kaj onMediaItemTransition(null) vokus updateState().
         // Sen la mediaItemCount-gardilo la stato iĝus Eraro anstataŭ Haltita, kaj LudvicoRegilo
-        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (FAROTA K3).
+        // reprovo-lanĉus: la muziko rekomenciĝus post ol la uzanto premis "Halti" (PR #89).
         val error = c.playerError
         val ludantoStato = if (c.mediaItemCount == 0) {
             LudantoStato.Haltita
@@ -176,6 +176,13 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             Player.STATE_IDLE -> LudantoStato.Haltita
             else -> LudantoStato.Haltita
         }
+        // Stato IĜIS Haltita (ekz. halto el la media sciigo — Media3 direktas
+        // CMD_STOP al la player, preter nia halti()) → ankaŭ haltigu rezervan alarm-sonon.
+        // Nur ĉe TRANSICIO al Haltita: ĉe la unua updateState() post la konekto
+        // la stato estas Haltita kun malplena media listo — se fallback-ringtono
+        // ĵus startis (freŝa procezo, pura-fallback-kazo de la vekhorloĝo), ĝi
+        // tiam estus mortigita kaj la alarmo restus silenta.
+        if (ludantoStato is LudantoStato.Haltita && _stato.value.stato !is LudantoStato.Haltita) haltuAlarmRingon()
         _stato.value = LudantoInformo(
             stato = ludantoStato,
             nunaFonto = nunaFonto,
@@ -213,6 +220,9 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             controller?.clearMediaItems()
         }
         nunaFonto = null
+        // Ankaŭ haltigu rezervan alarm-sonon — en la pura-fallback-kazo la
+        // ExoPlayer neniam startis, do nur ĉi tiu hoko povas haltigi la sonon.
+        haltuAlarmRingon()
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
     override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }

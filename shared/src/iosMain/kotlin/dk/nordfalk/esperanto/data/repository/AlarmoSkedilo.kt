@@ -18,4 +18,3 @@ actual class AlarmoSkedilo actual constructor() {
 }
 actual val subtenasVekhorlogxn: Boolean = false
 actual fun ekzaktajAlarmojPermesataj(): Boolean = true
-actual fun malfermuEkzaktajnAlarmAgordojn() {}

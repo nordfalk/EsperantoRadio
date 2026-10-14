@@ -52,13 +52,18 @@ data class Alarmo(
  *   (0x01=lundo ... 0x40=dimanĉo) kaj kies tempo estas post [nun].
  */
 fun Alarmo.sekvaEkigo(nun: LocalDateTime): LocalDateTime {
-    val tempo = LocalTime(horo, minuto)
+    // (PR #95) koercu — korupta agordo (ekz. horo=99 el mana JSON-redakto) devas
+    // ne kraŝi la skedadon (LocalTime ĵetas IllegalArgumentException). La validigo
+    // de NOVAJ alarmoj okazas en parsuSugestojnPorAlarmoj kaj AlarmoEkrano; tio ĉi
+    // estas la krash-defendo por jam persistintaj valoroj.
+    val tempo = LocalTime(horo.coerceIn(0, 23), minuto.coerceIn(0, 59))
+    val sekuraRipeto = ripeto and 0x7f
     for (i in 0..7) {
         val tago = nun.date.plus(i, DateTimeUnit.DAY)
         val kandidato = LocalDateTime(tago, tempo)
         if (kandidato <= nun) continue
         val bito = 1 shl (tago.dayOfWeek.isoDayNumber - 1)
-        if (ripeto == 0 || ripeto and bito != 0) return kandidato
+        if (sekuraRipeto == 0 || sekuraRipeto and bito != 0) return kandidato
     }
     // Ne atingebla por valida bitmasko (0x01..0x7f); sekurece: morgaŭ
     return LocalDateTime(nun.date.plus(1, DateTimeUnit.DAY), tempo)

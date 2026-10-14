@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.domain.repository
 
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElshutStato
 import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
@@ -27,6 +28,13 @@ interface LastAuxskultitajDeponejo {
 interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
     suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+
+    /**
+     * Metas la tempmarkon lasteLudita al nun — sen tuŝi pozicion aŭ daŭron.
+     * Vokata kiam la ludado vere ekis (ne jam ĉe klako sur "Ludi"),
+     * por ke la elsendo aperu en "Lastatempe ludata" nur tiam.
+     */
+    suspend fun markiLudita(elsendoId: String, kanaloSlug: String)
     suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
     suspend fun markiErara(elsendoId: String, kanaloSlug: String)
     suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)
@@ -44,10 +52,25 @@ interface AgordojDeponejo {
     val sciigoj: StateFlow<Boolean>
     val auxtomataDaurigo: StateFlow<Boolean>
     val evoluo: StateFlow<Boolean>
+    val detalaProtokolado: StateFlow<Boolean>
+
+    /**
+     * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
+     * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
+     */
+    val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>>
+
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(sxaltita: Boolean)
     fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
     fun fiksiEvoluon(sxaltita: Boolean)
+    fun fiksiDetalanProtokoladon(sxaltita: Boolean)
+
+    /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
+    fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>)
+
+    /** Forgesas la kaŝojn de problemo-tipoj kiuj ne plu ekzistas */
+    fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>)
 }
 
 /**

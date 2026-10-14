@@ -1,10 +1,7 @@
 package dk.nordfalk.esperanto.domain
 
-import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
@@ -26,11 +23,10 @@ import java.net.InetAddress
 /**
  * Android-implemento de DiagnozoRegilo.
  *
- * Kontrolas la kvar ĉefajn kialojn kial fona ludado / aŭtoludo ĉesas:
+ * Kontrolas la ĉefajn kialojn kial fona ludado / aŭtoludo ĉesas:
  * 1. **Bateri-optimumado** (Samsung MARs, Android Doze) — `PowerManager.isIgnoringBatteryOptimizations`
  * 2. **Sciig-permeso** — `NotificationManagerCompat.areNotificationsEnabled`
- * 3. **Ekzaktaj alarmoj** (Android 12+) — `AlarmManager.canScheduleExactAlarms`
- * 4. **DNS-solvado** — provas solvi `archive.org` (ofte blokita de privata DNS / VPN)
+ * 3. **DNS-solvado** — provas solvi `archive.org` (ofte blokita de privata DNS / VPN)
  *
  * La rezulto estas konservita en [problemoj] (StateFlow) por ke la ĉefekrano
  * povu montri avertosignon.
@@ -98,30 +94,7 @@ actual class DiagnozoRegilo(private val context: Context) {
             loge("Diagnozo", "Malsukcesis kontroli sciig-permeson", e)
         }
 
-        // 3. Ekzaktaj alarmoj (Android 12+)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                if (!am.canScheduleExactAlarms()) {
-                    rezultoj.add(
-                        DiagnozoRezulto(
-                            tipo = DiagnozoTipo.EXACT_ALARMS,
-                            titolo = "Ekzaktaj alarmoj ne estas permesitaj",
-                            priskribo = "Vekhorloĝaj alarmoj povas esti prokrastitaj je ĝis 10 minutoj. Donu la permeson por ekzaktaj alarmoj.",
-                            severeco = Severeco.AVERTO,
-                            ago = DiagnozoAgo("Donu permeson por ekzaktaj alarmoj", "exact_alarms"),
-                        )
-                    )
-                    logw("Diagnozo", "Ekzaktaj alarmoj ne permesitaj")
-                } else {
-                    logi("Diagnozo", "Ekzaktaj alarmoj: en ordo")
-                }
-            }
-        } catch (e: Exception) {
-            loge("Diagnozo", "Malsukcesis kontroli ekzaktajn alarmojn", e)
-        }
-
-        // 4. DNS-testo — nur en la kompleta kontrolo (povas esti malrapida)
+        // 3. DNS-testo — nur en la kompleta kontrolo (povas esti malrapida)
         if (inkluziveDns) {
             try {
                 InetAddress.getByName("archive.org")
@@ -155,14 +128,6 @@ actual fun malfermiSistemAgordon(intenco: String) {
 
             "notifications" -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-            }
-
-            "exact_alarms" -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                        data = Uri.parse("package:${context.packageName}")
-                    }
-                } else null
             }
 
             "wireless" -> Intent(Settings.ACTION_WIRELESS_SETTINGS)

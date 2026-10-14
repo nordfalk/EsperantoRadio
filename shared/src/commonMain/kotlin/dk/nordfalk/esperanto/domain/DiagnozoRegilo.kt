@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * Platform-specifa:
  * - **Android**: kontrolas PowerManager (bateri-optimumado), NotificationManager
- *   (sciig-permeso), AlarmManager (ekzaktaj alarmoj), kaj provas DNS-solvadon.
+ *   (sciig-permeso), kaj provas DNS-solvadon.
  * - **Desktop / Web / iOS**: redonas malplenan liston (nenio specifa).
  *
  * La rezultoj estas uzataj en [dk.nordfalk.esperanto.ui.DiagnozoEkrano] por
@@ -44,7 +44,6 @@ expect fun kreuDiagnozoRegilon(): DiagnozoRegilo
  * Subtenataj intencoj (sur Android):
  * - `"battery"` — bateriaj optimumigoj (Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
  * - `"notifications"` — sciig-agordoj de la apo
- * - `"exact_alarms"` — permeso por ekzaktaj alarmoj (Android 12+)
  * - `"wireless"` — sendrataj agordoj (por privata DNS)
  *
  * Sur aliaj platformoj: faras nenion.

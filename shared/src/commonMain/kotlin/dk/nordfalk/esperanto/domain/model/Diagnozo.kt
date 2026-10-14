@@ -22,21 +22,14 @@ enum class DiagnozoTipo {
     /** Sciig-permeso mankas — la media sciigo kaj sciigoj pri novaj elsendoj ne aperas. */
     NOTIFICATIONS,
 
-    /** Ekzaktaj alarmoj ne permesitaj (Android 12+) — alarmoj povas esti prokrastitaj. */
-    EXACT_ALARMS,
-
     /** DNS-solvado malsukcesis — ofte pro privata DNS (DNS-over-TLS) aŭ VPN. */
     DNS,
-
-    /** Ĝenerala reta problemo (ne povas konekti al la servilo). */
-    RETO,
 }
 
-/** Graveco de la problemo — regas la koloron kaj ikonon en la UI. */
+/**
+ * Graveco de la problemo — regas la koloron kaj ikonon en la UI de Diagnozo.
+ */
 enum class Severeco {
-    /** Nur informa — ne blokas la ĉefan funkcion. */
-    INFO,
-
     /** Averto — povas kaŭzi problemojn en iuj kazoj. */
     AVERTO,
 
@@ -48,7 +41,7 @@ enum class Severeco {
  * Proponita ago por ripari la problemon — ekz. "Malfermi bateriajn agordojn".
  *
  * La kampo [intenco] estas platform-specifa identigilo:
- * - Android: `"battery"`, `"notifications"`, `"exact_alarms"`, `"wireless"`
+ * - Android: `"battery"`, `"notifications"`, `"wireless"`
  * - Aliaj platformoj: ne uzata (ago == null)
  */
 data class DiagnozoAgo(

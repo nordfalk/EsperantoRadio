@@ -62,6 +62,14 @@ class PersistantaAlarmoDeponejo(
             alarmoj
         } catch (e: Exception) {
             logw("AlarmoDeponejo", "Ne eblis legi persistitajn alarmojn", e)
+            // (PR #95) konservu la krudan valoron kiel rezervon — sen tio la sekvaj
+            // persistu()-vokoj (ekigis/krei/sxalti) anstataŭigas ĝin kaj la uzantaj
+            // alarmoj estas definitive perditaj. Kun la rezervo ili estas reakireblaj.
+            try {
+                settings.putString(SettingsKeys.ALARMOJ_REZERVO, str)
+            } catch (e2: Exception) {
+                logw("AlarmoDeponejo", "Ne eblis skribi la alarmo-rezervon", e2)
+            }
             sugestoj
         }
     }

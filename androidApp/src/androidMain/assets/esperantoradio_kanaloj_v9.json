@@ -9,12 +9,7 @@
 		"kontakt_modtagere": ["jacob.nordfalk@gmail.com" ],
 		"kontakt_titel": "Pri la Esperanto-radio",
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
-		"malfamdrift_statusmeddelelse": "Ĵus aldoniĝis 'La malfamuloj'<br> Bonan aŭskultadon :-)",
-		"qqdrift_statusmeddelelse": "testo testo",
-		"sdsddrift_statusmeddelelse": "Aŭgusto 2020:<br><br>Nova versio kiu korektis kelkajn eraretojn<br><br>Vi devas ĝisdatigi la apon en Google Play por denove povi aŭskulti kelkajn kanalojn.<br>Tuj iru al <a href=\"https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio\">Guglo Play</a> kaj ĝisdatigu :-)<br><br>Kore, Jacob Nordfalk.",
-		"x0drift_statusmeddelelse": "Majo 2022:<br><br>Bedaŭrinde la <b>rektaj elsendoj de Muzaiko</b> ne plu funkcias.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
-		"x1drift_statusmeddelelse": "Junio 2022:<br><br>La <b>rektaj elsendoj de Muzaiko</b> estas restarigataj.<br><br>Se vi volas labori por re-ebligi rektajn elsendojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
-		"x2drift_statusmeddelelse": "Majo 2025:<br><br>La kanalo de <b>Muzaiko</b> estu restarigata - havu paciencon<br><br>Se vi povus partopreni, bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>. Intertempe, pro teknikaj kialoj, estas brazilaj podkastoj de BaBibejo montrataj ĉe Muzaiko",
+		"apaj_novaĵoj": "<b>Version 3.0.3</b> eldoniĝis 12a de oktobro 2026: <br><br>📻 27 radiokanaloj kaj podkastoj<br>⏰ La vekhorloĝo sonas ĝustatempe ankaŭ kiam la telefono dormas<br>🎛️ La ludilbreto kolapsas per la reen-butono kaj sekvas la navigadon<br>🧹 Pli puraj priskriboj ĉe Varsovia Vento kaj Vinilkosmo<br>✉️ Gravaj sciigoj denove aperas kiel dialogo — vi vidas ĝin nun :-)<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"drift_statusmeddelelse": ""
 	},
 
@@ -71,7 +66,8 @@
 				"<audio .+?</audio>",
 				"<p>(?:(?!</p>).)*?tempo-daŭro(?:(?!</p>).)*?</p>",
 				"<p>(?:(?!</p>).)*?Subtenu nin(?:(?!</p>).)*?</p>"
-			]
+			],
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "lamalfamuloj",
@@ -123,7 +119,8 @@
 			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": false,
-			"hejmpaĝoButono": "https://kern.punkto.info/"
+			"hejmpaĝoButono": "https://kern.punkto.info/",
+			"defaŭltŜatata": true
 		}
 	,{
 			"kodo": "movada-vidpunkto",

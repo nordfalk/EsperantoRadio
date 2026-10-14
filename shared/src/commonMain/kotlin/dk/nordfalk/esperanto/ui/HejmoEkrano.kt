@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
@@ -17,7 +19,6 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -31,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
+import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -53,6 +54,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.DatePeriod
@@ -189,6 +191,21 @@ class HejmoViewModel(
     private val _lastatempeLudataj = MutableStateFlow<List<Elsendo>>(emptyList())
     val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
+    /** Kruda listo de ĉiuj elsendoj — uzata por reaktualigi kiam ludatoj ŝanĝiĝas. */
+    private var cxiujElsendoj: List<Elsendo> = emptyList()
+
+    /**
+     * ID de la elsendo kiu nun estas ŝargita en la ludilo (ludas aŭ paŭzita).
+     * Ĝi restas en "Kio novas" dum ĝi estas la nuna ludata elsendo.
+     */
+    private var nunaLudataId: String? = null
+
+    /**
+     * Antaŭmiksita ordo por "Aliaj elsendoj" (Kio popularas) — unufoje po ŝarĝado.
+     * Evitas ke la sekcio re-miksigas ĉe ĉiu rekomputado (ekz. pozicio-savoj).
+     */
+    private var aliajKandidatoj: List<Elsendo> = emptyList()
+
     /** Aktivaj kanaloj — kun elsendo dum la pasinta jaro (montrataj unue). */
     private val _aktivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
     val aktivajKanaloj = _aktivajKanaloj.asStateFlow()
@@ -236,14 +253,11 @@ class HejmoViewModel(
      */
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
+        cxiujElsendoj = elsendoj
+        // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
+        // kun semo derivata de la enhavo — la ordo restas stabila inter rekomputadoj.
+        aliajKandidatoj = elsendoj.shuffled(Random(elsendoj.hashCode().toLong()))
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
-        val novaj = elsendoj
-            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) }
-            .groupBy { it.kanaloSlug }
-            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(7) }
-            .sortedByDescending { it.dato }
-            .take(50)
-        _novajElsendoj.value = novaj
 
         val cxiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
@@ -255,23 +269,62 @@ class HejmoViewModel(
         _aktivajKanaloj.value = aktivaj
         _arkivajKanaloj.value = arkivaj
 
-        val ekskluditaj = (novaj.take(20).map { it.id } +
-            cxiujKanalojKartog.mapNotNull { it.plejNovaElsendo?.id }).toSet()
-        _popularajElsendoj.value = elsendoj
-            .filter { it.id !in ekskluditaj }
-            .shuffled()
-            .take(20)
+        aktualigiuLudatajnInterna()
+    }
+
+    /**
+     * Reaktualigas "Kio novas", "Lastatempe ludata" kaj "Kio popularas" surbaze
+     * de la nunaj ludatoj kaj de la nune ludata elsendo.
+     *
+     * - Jam luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata";
+     *   la nune ludata elsendo tamen RESTAS en "Kio novas" (kaj ankaŭ aperas en "Lastatempe ludata")
+     * - Maksimume 5 plej novaj elsendoj po kanalo en "Kio novas"
+     */
+    @OptIn(ExperimentalTime::class)
+    fun aktualigiuLudatajn(nunaElsendoId: String?) {
+        nunaLudataId = nunaElsendoId
+        aktualigiuLudatajnInterna()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun aktualigiuLudatajnInterna() {
+        val elsendoj = cxiujElsendoj
+        if (elsendoj.isEmpty()) return
+        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+
+        val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
+        val luditajIdj = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .map { it.elsendoId }
+            .toSet()
+
+        // "Kio novas" — ekskludu luditajn (krom la nune ludata), maks 5 po kanalo
+        val novaj = elsendoj
+            .filter { estasEneDeSesMonatoj(it.dato, nunaDatumo) && (it.id !in luditajIdj || it.id == nunaLudataId) }
+            .groupBy { it.kanaloSlug }
+            .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(5) }
+            .sortedByDescending { it.dato }
+            .take(50)
+        _novajElsendoj.value = novaj
 
         // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
-        if (ludatojDeponejo != null) {
-            val ludatoj = ludatojDeponejo.observiLudatojn().value
-            val lastatempe = ludatoj.values
-                .filter { it.lasteLudita > 0 }
-                .sortedByDescending { it.lasteLudita }
-                .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
-                .take(20)
-            _lastatempeLudataj.value = lastatempe
-        }
+        val lastatempe = ludatoj.values
+            .filter { it.lasteLudita > 0 }
+            .sortedByDescending { it.lasteLudita }
+            .mapNotNull { ludato -> elsendoj.find { it.id == ludato.elsendoId } }
+            .take(20)
+        _lastatempeLudataj.value = lastatempe
+
+        // "Kio popularas" — ekskludu novajn, kanalajn kaj luditajn.
+        // Uzas la antaŭmiksitan kandidatliston (vidu plenigu) — la ordo de la
+        // restantaj kartoj ne ŝanĝiĝas kiam la ekskludoj ŝanĝiĝas.
+        val kanalajIdj = (aktivajKanaloj.value + arkivajKanaloj.value)
+            .mapNotNull { it.plejNovaElsendo?.id }
+            .toSet()
+        val ekskluditaj = (novaj.take(20).map { it.id } + kanalajIdj + luditajIdj).toSet()
+        _popularajElsendoj.value = aliajKandidatoj
+            .filter { it.id !in ekskluditaj }
+            .take(20)
     }
 }
 
@@ -313,8 +366,9 @@ fun HejmoEkrano(
     onAgordoj: () -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
-    onDiagnozo: () -> Unit = {},
+    onKasxuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
+    kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
     onElshuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -330,10 +384,35 @@ fun HejmoEkrano(
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
     val sxargxas by vm.sxargxas.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
-    val problemojGravaj = problemoj.filter { it.severeco != Severeco.INFO }
+    val kasxitaj by kasxitajAvertoj.collectAsState()
+    val neKasxitajProblemoj = problemoj.filter { it.tipo !in kasxitaj }
     val scope = rememberCoroutineScope()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
+
+    // La nune ludata elsendo (el la ludilo) — ĝi restas videbla en "Kio novas"
+    val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
+    val nunaElsendoId = when (val fonto = ludantoStato.nunaFonto) {
+        is Sonfonto.ElsendoFonto -> fonto.elsendo.id
+        is Sonfonto.LokaElsendo -> fonto.elsendo.id
+        else -> null
+    }
+
+    // Reaktualigu "Kio novas" kaj "Lastatempe ludata" kiam ludatoj aŭ la nuna ludata elsendo ŝanĝiĝas
+    LaunchedEffect(ludatojMapo, nunaElsendoId) {
+        vm.aktualigiuLudatajn(nunaElsendoId)
+    }
+
+    // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
+    val luditajVicoStato = rememberLazyListState()
+    var antauxaUnuaLudataId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(lastatempeLudataj) {
+        val unuaId = lastatempeLudataj.firstOrNull()?.id
+        if (unuaId != null && unuaId != antauxaUnuaLudataId) {
+            antauxaUnuaLudataId = unuaId
+            luditajVicoStato.animateScrollToItem(0)
+        }
+    }
 
     if (viewModel == null) {
         LaunchedEffect(Unit) {
@@ -396,10 +475,14 @@ fun HejmoEkrano(
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 
-                // Avertosigno pri detektitaj problemoj — supre, nur se estas
-                if (problemojGravaj.isNotEmpty()) {
+                // Avertosigno pri detektitaj problemoj
+                if (neKasxitajProblemoj.isNotEmpty()) {
                     item {
-                        DiagnozoAvertoKarto(problemoj = problemojGravaj, onDiagnozo = onDiagnozo)
+                        DiagnozoAvertoKarto(
+                            problemoj = neKasxitajProblemoj,
+                            onAgordoj = onAgordoj,
+                            onKasxu = onKasxuHejmajnAvertojn,
+                        )
                     }
                 }
 
@@ -446,11 +529,13 @@ fun HejmoEkrano(
                     }
                 }
 
-                // "Lastatempe ludata" — elsendoj kiuj estis luditaj
+                // "Lastatempe ludata" — elsendoj kiuj estis luditaj; la vico
+                // aŭtomate rulas al la plej nova karto (maldekstre)
                 if (lastatempeLudataj.isNotEmpty()) {
                     item { SekcioTitolo("Lastatempe ludata") }
                     item {
                         LazyRow(
+                            state = luditajVicoStato,
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -750,24 +835,24 @@ private fun ElsendoKartoPreviewPauxzita() {
 
 /**
  * Averto-karto pri detektitaj problemoj — montrata supre de la ĉefekrano.
- * Klako kondukas rekte al la diagnoza ekrano.
  */
 @Composable
 private fun DiagnozoAvertoKarto(
     problemoj: List<DiagnozoRezulto>,
-    onDiagnozo: () -> Unit,
+    onAgordoj: () -> Unit,
+    onKasxu: () -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { logi("Klako", "diagnozo-karto (Hejmo)"); onDiagnozo() },
+            .clickable { logi("Klako", "diagnozo-karto (Hejmo) → agordoj"); onAgordoj() },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
         ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 4.dp, bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -790,11 +875,13 @@ private fun DiagnozoAvertoKarto(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            IconButton(onClick = { logi("Klako", "kaŝu hejmajn avertojn"); onKasxu() }) {
+                Icon(
+                    Icons.Filled.Close,
+                    contentDescription = "Kaŝu avertojn",
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
         }
     }
 }

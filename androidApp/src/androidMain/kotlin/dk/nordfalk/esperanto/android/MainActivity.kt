@@ -3,12 +3,8 @@ package dk.nordfalk.esperanto.android
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.AudioManager
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,16 +12,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.IntentSxlosilo
-import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
-import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
-import dk.nordfalk.esperanto.data.config.alKanalo
-import dk.nordfalk.esperanto.data.repository.AlarmoReceivilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
-import dk.nordfalk.esperanto.AppStato
+import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
+import dk.nordfalk.esperanto.domain.player.haltuAlarmRingon
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.Kanalo
-import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
@@ -33,10 +23,7 @@ import dk.nordfalk.esperanto.testuSentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 
 class MainActivity : ComponentActivity() {
     private lateinit var ludilo: ExoPlayerLudiloRegilo
@@ -46,7 +33,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikajho (Application) —
-        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (FAROTA K2)
+        // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (PR #89)
         petiSciigPermeson()
         // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity
         ludilo = ExoPlayerLudiloRegilo.akiru(this)
@@ -66,7 +53,7 @@ class MainActivity : ComponentActivity() {
     /**
      * Traktas alvenantajn intentojn de sciigoj aŭ alarmoj.
      *
-     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (FAROTA G3)
+     * La agoj venas de niaj propraj PendingIntents — la nonce-kontrolo (PR #89)
      * rifuzas falsitajn intencojn de aliaj aplikoj: `MainActivity` estas
      * `exported="true"` kaj la agoj estas publike konataj.
      */
@@ -132,129 +119,27 @@ class MainActivity : ComponentActivity() {
         dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.setu(elsendo)
     }
 
+    /**
+     * Alarmo-intento (de la alt-prioritata sciigo aŭ de la best-effort startActivity
+     * de la ricevilo).
+     *
+     * La LUDADON faras AlarmoReceivilo mem — Activity lanĉita el fona ricevilo estas
+     * blokata de la Background-Activity-Launch-limigoj kaj komenciĝas nur kiam
+     * la uzanto vekas la telefonon.
+     * Ĉi tie restas nur la UI: la mini-ludilbreto montras la jam ludantan elsendon.
+     */
     private fun traktuAlarmIntent(intent: Intent?) {
         if (intent?.action != "dk.nordfalk.esperanto.ALARMO_EKIGAS") return
 
         val kanaloSlug = intent.getStringExtra("alarmo_kanal_slug")
         val etikedo = intent.getStringExtra("alarmo_etikedo")
-        logi("MainActivity", "Alarmo ricevita: kanalo=$kanaloSlug etikedo=$etikedo")
-
-        if (kanaloSlug.isNullOrBlank()) {
-            logw("MainActivity", "Neniu kanalo-slug en alarm-intento")
-            luduFallbackRingtonon()
-            return
-        }
-
-        // Volumo-boost: certigu minimuman volumenon (2/5 de maksimumo)
-        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        val maksVolumeno = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val minVolumeno = (maksVolumeno * 2 / 5).coerceAtLeast(1)
-        if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) < minVolumeno) {
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, minVolumeno, 0)
-            logi("MainActivity", "Volumo-boost: ${audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)}/$maksVolumeno")
-        }
-
-        scope.launch {
-            try {
-                // Shargu la kanalaron por trovi la gxustan kanalon
-                val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
-                val kanalo = agordo.kanaloj.find { it.kodo == kanaloSlug }?.alKanalo()
-
-                if (kanalo == null) {
-                    logw("MainActivity", "Kanalo ne trovita: $kanaloSlug")
-                    luduFallbackRingtonon()
-                    return@launch
-                }
-
-                logi("MainActivity", "Komencas ludi: ${kanalo.nomo}")
-
-                val ludvicoRegilo = AppStato.ludvicoRegilo
-                if (kanalo.rektaElsendaSonoUrl != null) {
-                    // FAROTA G13: tra la regilo — rekta ludilo-voko ne nuligas reprovon
-                    if (ludvicoRegilo != null) {
-                        ludvicoRegilo.ludiRektan(kanalo)
-                    } else {
-                        ludilo.fiksiFonton(Sonfonto.RektaKanalo(kanalo))
-                        ludilo.ludi()
-                    }
-                } else {
-                    // Podkasto: ludu la plej freŝan neaŭskultitan elsendon
-                    val elsendo = trovuAlarmElsendon(kanalo)
-                    if (elsendo == null || ludvicoRegilo == null) {
-                        logw("MainActivity", "Neniu ludebla elsendo por $kanaloSlug — ludas fallback ringtonon")
-                        luduFallbackRingtonon()
-                        return@launch
-                    }
-                    logi("MainActivity", "Alarmo ludas podkaston: ${elsendo.id} (${elsendo.dato})")
-                    // ludiElsendon preferas elŝutitan dosieron kaj resumas de savita pozicio
-                    ludvicoRegilo.ludiElsendon(elsendo)
-                }
-
-                // Post 10 sekundoj: se la stato estas Eraro, ludu fallback ringtonon
-                delay(10_000)
-                val stato = ludilo.stato.value
-                if (stato.stato is dk.nordfalk.esperanto.domain.model.LudantoStato.Eraro) {
-                    logw("MainActivity", "Ludado malsukcesis post 10s — ludas fallback ringtonon")
-                    luduFallbackRingtonon()
-                }
-            } catch (e: Exception) {
-                logw("MainActivity", "Eraro dum alarmo-ludado", e)
-                luduFallbackRingtonon()
-            } finally {
-                // FAROTA G28: transdonu la WakeLock-propriecon de AlarmoReceivilo —
-                // liberigu ĝin kiam la alarmo estas plene traktita
-                AlarmoReceivilo.liberiguAlarmoWakeLock()
-            }
-        }
-    }
-
-    /**
-     * Trovas la elsendon kiun alarmo ludu por podkasta kanalo. Provas laŭvice:
-     * reton (freŝa RSS), diskkaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
-     * la reto ofte ankoraŭ ne pretas.
-     */
-    private suspend fun trovuAlarmElsendon(kanalo: Kanalo): Elsendo? = withContext(Dispatchers.IO) {
-        // AppStato estas inicialigita de la Compose-tavolo; atendu ĝin se la alarmo lanĉis la apon
-        withTimeoutOrNull(5_000) { while (!AppStato.inicialigita()) delay(100) }
-        val elsendoDeponejo = AppStato.elsendoDeponejo ?: run {
-            logw("MainActivity", "AppStato ne inicialigita — ne eblas trovi elsendon por alarmo")
-            return@withContext null
-        }
-        val elsendoj = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi = true)
-            .ifEmpty { elsendoDeponejo.leguKashitajnElsendojn(kanalo) ?: emptyList() }
-            .ifEmpty {
-                AppStato.elshutDeponejo?.observiElshutojn()?.value?.values
-                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElshutStato.Preta }
-                    ?.map { it.elsendo } ?: emptyList()
-            }
-        val ludatoj = AppStato.ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
-        elektuAlarmElsendon(elsendoj, ludatoj)
-    }
-
-    /**
-     * Ludas la sisteman alarm-sonon kaj vibras kiel fallback kiam la reto malsukcesas.
-     */
-    private fun luduFallbackRingtonon() {
-        try {
-            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE
-            )
-            if (uri != null) {
-                val ringtone = RingtoneManager.getRingtone(applicationContext, uri)
-                ringtone?.play()
-                logi("MainActivity", "Ludas fallback ringtonon: $uri")
-            }
-
-            // Vibradu 4 sekundojn
-            val vibrator = getSystemService(VIBRATOR_SERVICE) as? Vibrator
-            if (vibrator?.hasVibrator() == true) {
-                vibrator.vibrate(VibrationEffect.createOneShot(4000, VibrationEffect.DEFAULT_AMPLITUDE))
-                logi("MainActivity", "Vibras 4s")
-            }
-        } catch (e: Exception) {
-            logw("MainActivity", "Eraro dum fallback ringtono", e)
-        }
+        // "Tuŝu por malŝalti": nur la TUŜO de la sciigo (de_sciigo=true) haltigu la
+        // rezervan alarm-sonon — ne la best-effort startActivity de la ricevilo mem,
+        // kiu alvenas sen ia ago de la uzanto. En la pura-fallback-kazo (neniu
+        // mini-ludilbreto, neniu media sciigo) la tuŝo de la sciigo estas la sola
+        // halta afordanco. (setAutoCancel forigas la sciigon mem.)
+        if (intent.getBooleanExtra("de_sciigo", false)) haltuAlarmRingon()
+        logi("MainActivity", "Alarmo-UI malfermita: kanalo=$kanaloSlug etikedo=$etikedo — ludado estas lanĉita de AlarmoReceivilo")
     }
 
     override fun onDestroy() {

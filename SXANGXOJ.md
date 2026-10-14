@@ -1,3 +1,212 @@
+# Ŝanĝoj — 2026-10-12
+
+## Rezerva alarm-sono nun haltigebla kaj mem-haltiĝanta (sekvaĵo de la revizio de b834483)
+
+Trovo en la revizio de la rapida permeso-korekto `b834483`: la rezerva
+(fallback) alarm-sono — ludata de `AlarmoReceivilo.luduFallbackRingtonon`
+kiam la kanalo/fluo ne disponeblas — havis **nenian haltigan vojon**.
+`Ringtone.play()` ripetiĝas ĝis `stop()`, sed nenie estis konservita tenilo
+kaj nenio iam vokis `stop()`. La sciigo diris "tuŝu por malŝalti", sed la
+tuŝo nur malfermis la UI (kaj `setAutoCancel` forigis la sciigon) — la sono
+daŭre sonis senfine.
+
+Kritika detalo: observi la ludanto-staton NE sufiĉas — en la pura-fallback-
+kazo la ExoPlayer neniam startas, do `halti()` metas `LudantoInformo(Haltita)`
+EGALAN al la nuna valoro kaj la StateFlow nenion elsendas. Krome en tiu
+kazo estas neniu mini-ludilbreto (nunaFonto==null) kaj neniu media sciigo —
+do la tuŝo de la alarm-sciigo estas la sola halta afordanco. Tial la halto
+estas hokita rekte en la agojn, ne per observado.
+
+- `AlarmoReceivilo` (companion): `@Volatile private var fallbackRingtono`
+  (tenilo), `@Volatile var ringtonoMaksDauroMs = 5 * 60 * 1000L` (test-ŝanĝebla),
+  `haltuFallbackRingon()` (idempotenta: stop + null + logi/logw) kaj
+  `fallbackRingtonoAktiva` (por testoj).
+- `luduFallbackRingtonon`: unue `haltuFallbackRingon()` (neniam duobla sono),
+  post `play()` konservas la tenilon kaj lanĉas fajron-kaj-forgesu tempon:
+  post `ringtonoMaksDauroMs` (referenca komparo `===`, ke malnova tempumilo
+  ne haltigu novan sonon) ĝi haltigas la sonon KAJ nuligas la daŭran sciigon
+  (sen tio ĝi restus — la problemo riparita en la sama revizio).
+- `expect fun haltuAlarmRingon()` en `LudiloRegilo.kt` (commonMain);
+  Android-`actual` vokas `AlarmoReceivilo.haltuFallbackRingon()`, la aliaj
+  platformoj (Desktop/Web/iOS) estas senefikaj no-op.
+- Hokoj: `ExoPlayerLudiloRegilo.halti()` (la rekta vojo de la uzanto),
+  `ExoPlayerLudiloRegilo.updateState()` kiam la kalkulita stato estas `Haltita`
+  (kaptas ankaŭ paŭzo/halto el la media sciigo — Media3 direktas CMD_STOP al
+  la player, preter `halti()`; sekura ĉar sen sono ĝi estas senefika), kaj
+  `MainActivity.traktuAlarmIntent` — sed nur kiam la intento portas
+  `de_sciigo=true`, kiun nur la sciigo mem metas (vidu sube; en la
+  pura-fallback-kazo la tuŝo de la sciigo estas la sola halta afordanco;
+  `setAutoCancel` forigas la sciigon).
+- Testoj (instrumentitaj, ret-ne-dependaj — uzas NEekzistantan kanalon, do la
+  ricevilo tuj ludas la fallback-ringtonon sen RSS-elŝuto): `fallbackRingtonoHaltigxigxasPerHalti`
+  (halti() haltigas la sonon) kaj `fallbackRingtonoMemHaltigxigxasKajNuligxasSciigon`
+  (`ringtonoMaksDauroMs = 2000` → sono haltas kaj sciigo nuligas).
+- **Flakemo kaptita dum la testado** (unua provo de `fallbackRingtonoMemHaltigxigxasKajNuligxasSciigon`
+  malsukcesis sur la Pixel 10): dum instrumentitaj testoj la testata procezo estas
+  konsiderata "foreground", do la best-effort `startActivity` de la ricevilo ĈIAM
+  sukcesas kaj MainActivity traktas la alarm-intenton — senkondiĉa hoko tie povus
+  haltigi la ringtonon tuj post ĝia ekigo (la sono vivis nur ~100 ms kaj la atendu
+  maltrafis ĝin). Ankaŭ `moveToState(CREATED)` ne helpis (la procezo restas
+  "foreground" pro la aktiva instrumentado). **Solvo**: la sciigo metas
+  `de_sciigo=true` en sian intenton kaj `traktuAlarmIntent` haltigas la ringtonon
+  nur tiam — la distingon portas la intenco mem, ne la ĉirkaŭaĵo. Tio estas ankaŭ
+  pli ĝusta produkta konduto: la best-effort lanĉo de la ricevilo ne estas uzanta
+  ago kaj ne haltigu la sonon.
+- Krome struktura riparo en CHANGELOG.md: la sekcio `## [Neeldonita]` (kreita
+  en 2491035) staris meze de la 3.0.3-sekcio (antaŭ `## [3.0.2]`) — laŭ Keep a
+  Changelog ĝi devas esti la unua versio-sekcio; nun ĝi estas supre antaŭ
+  `## [3.0.3]`, kun la nova eniro.
+
+### Revizio de PR #111: la konekt-time `updateState()` mortigis la fallback-ringtonon (2026-10-14)
+
+Revizio de la PR trovis regreson, kiun la novaj testoj ne kaptis: en **freŝa
+procezo** (la vera alarm-scenaro — la apliko ne estas malfermita) la sinsekvo estas
+`akiru()` (ludilo kreita, konekto komenciĝas) → `luduFallbackRingtonon()` (sono
+startas) → MediaController konektiĝas → `updateState()` kalkulas `Haltita` (malplena
+media listo) → `haltuAlarmRingon()` → la ĵus startinta sono estas **mortigita**.
+Nenio suspendas inter `akiru()` kaj `luduFallbackRingtonon` (`inicialigu` kaj
+`leguBundledKanalkonfiguron` estas nesuspendaj), do la sono ĉiam startas antaŭ la
+konekto — la alarmo restus silenta. Konfirmita sur emulator-5554 (API 26):
+`Haltigis fallback-ringtonon` en la sama millisecondo kiel `MediaController konektita
+al servo`, 4,5 s post ekigo.
+
+La testoj en `AlarmoReceiviloTest` ne vidas tion, ĉar en la testa procezo la ludilo
+jam ekzistas kaj estas konektita (`ActivityScenarioRule` lanĉas `MainActivity`).
+
+**Korekto**: `haltuAlarmRingon()` en `updateState()` nur ĉe **transicio** al
+`Haltita` (`_stato.value.stato !is Haltita`) — la unua `updateState()` post konekto
+lasas la sonon viva; halto el la media sciigo (`Ludas → Haltita`) ankoraŭ haltigas
+ĝin; `halti()`, la sciigo-tuŝo kaj la mem-halto estas senŝanĝaj.
+
+**Verifikita sur emulator-5554**: nova regres-testo `FresxProcezaFallbackTest` (sen
+`ActivityScenarioRule` — la ludilo ankoraŭ ne ekzistas, kiel en freŝa procezo): sen la
+gardilo ĝi fiaskas determinisme, kun la gardilo ĝi pasas. `fallbackRingtonoHaltigxigxasPerHalti`,
+`fallbackRingtonoMemHaltigxigxasKajNuligxasSciigon` kaj
+`alarmoSciigoNuligxigxasKiamLudadoHaltigxas` pasas same. (`alarmoReceiviloMemKomencasLudadon`
+malsukcesis en la revizia medio pro manko de reto — la RSS-fetch falis post 10 s
+konekt-timeout; la testo estas ret-dependa.)
+
+## Apaj novaĵoj en la nova apo
+
+La malnova apo montris mesaĝon el la `android`-sekcio de la kanalkonfiguro
+kie la redaktisto de la apo povas alini sciigojn (ekz. versio-anoncojn aŭ
+ke Muzaiko ne funkcias) kaj ĝi montriĝis kiel dialogo — unufoje por ĉiu
+nova enhavo (haŝaĵo de la konfirmita mesaĝo persistiĝis en
+SharedPreferences). La nova apo parsis la kampon sed neniam uzis ĝin.
+La funkcio nun portiĝas kiel **apaj novaĵoj** (dialogo-titolo: "Novaĵoj");
+la malnova dana ŝlosilo tute malaperis (ankaŭ el la JSONC-konfiguro).
+
+Noma historio de tiu ĉi labortago: la malnova dana ŝlosilo →
+`servoStatusMesagxo` → "Kio novas" (kunfrotis kun la samnoma
+hejmo-sekcio pri novaj elsendoj) → fina nomo laŭ deziro de la uzanto:
+JSON-ŝlosilo `apaj_novaĵoj`, Kotlin-identigilo `apajNovajxoj`.
+
+- JSONC (ambaŭ kopioj, denove identaj): la uzanto redaktis la
+  android-sekcion — arĥivaj malaktivaj ŝlosiloj forigitaj, nova aktiva
+  mesaĝo sub `apaj_novaĵoj`: versio-3.0.3-anonco (3.0.2 jam eldoniĝis
+  la 8-an de oktobro) en la stilo de la Play-release-notes, komence
+  "27 radiokanaloj kaj podkastoj" kaj poste la plej gravaj
+  Neeldonita-eroj (vekhoro ĝustatempe, kolapsebla ludilbreto, puraj
+  priskriboj, la novaĵo-dialogo mem).
+- `KanalAgordo.AndroidSekcio`: nova kampo `apajNovajxoj`
+  (`@SerialName("apaj_novaĵoj")` — ŝlosilo kun supersignoj kiel la
+  ekzistantaj `retpoŝto`/`hejmpaĝoButono`).
+- Nova `ApajNovajxojDeponejo` (Settings, ŝlosilo `apaj_novajxoj_hesh`):
+  pura decidlogiko (`deciduMontratan`) — malplena mesaĝo neniam
+  montriĝas; ne-malplena montriĝas nur se ĝia `hashCode` diferencas de
+  la konservita (same kiel la malnova apo; `"".hashCode() == 0`
+  koincidas kun la komenca valoro por novaj instalaĵoj). `konfirmu()`
+  persistas la haŝaĵon kaj fermas.
+- `App.kt`: `AlertDialog` titolita "Novaĵoj" kun `HtmlVido` (la uzanto
+  elektis `uzuWebView = false` → AnnotatedString-vidigo); nur "Bone"
+  fermas (kiel en la malnova apo, ne nuligebla per reen/ekstera klako).
+- Fum-testo sur emulilo: dialogo aperas → "Bone" fermas → restarto ne
+  reaperigas. Unuaj testoj: `ApajNovajxojTest` (decidlogiko + persisto +
+  restarto-kongruo) + agordo-mapado en `KanalAgordoLegantoTest` kaj
+  `KanalAgordoFumTesto`.
+
+## Sentry-kvoto: protokolado severe limigita (PR #107)
+
+La Sentry-kvoto estis minacata de la multaj `logi`-vokoj (antaŭe ĉiu `logi`
+iris al `Sentry.logger`). Nun:
+
+- `logi` sendas al Sentry nur se la agordo **"Ŝaltu detalan protokoladon"**
+  (Agordoj → Privateco) estas ŝaltita — la flago `protokoloDetala` en
+  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl` (persisto en
+  `SettingsKeys.DETALA_PROTOKOLADO`).
+- Nova `logGrava` (loka + `Sentry.logger.info` ĉiam) por la gravaj eventoj:
+  - malfermo de la apo (`AppStato.inicialigu`),
+  - ekludo de elsendo/rekta kanalo kun la kanalo (`LudvicoRegilo.ludiElsendonInterna`/`ludiRektan`),
+  - ekludo el sciigo (`LudiElsendoReceivilo`),
+  - vekiĝo de alarmo (`AlarmoReceivilo`).
+- `logw`/`loge` restas ĉiam sendataj (avertoj/eraroj estas maloftaj).
+- `Sentry.captureMessage("Aŭtoludo: …")` en `LudvicoRegilo` FORIGITA — ĉiu
+  aŭtomata sekva kreis eventon; la ekludo estas protokolita per `logGrava`.
+- `options.logs.enabled` nun ĉiam `true` (antaŭe nur en evoluo) — tiel la
+  gravaj eventoj kaj la ŝaltita detala protokolado funkcias ankaŭ en produktado;
+  la kvanto estas limigita per la kodo.
+
+Testoj: `AgordojDetalaProtokoladoTest` (defaŭlto, persisto, sinkronigo de la
+flago) + `AgordojEkranoTest.montrasSxaltilonPorDetalaProtokolado`.
+
+## Eldono 3.0.3: vekhorloĝaj permesoj forigitaj + revizio de la rapida korekto
+
+### La problemo
+Google Play rifuzis la alŝuton de la APK (eraro 403): "You must let us know
+whether your app uses any full-screen intent permissions" — la deklaro de
+`USE_FULL_SCREEN_INTENT` en la manifest postulas la respondon en la Play-Konsolo.
+Post esploro de alternativoj (deklari en la konsolo, aŭtomata vekiĝo sen FSI ktp.)
+la uzanto akceptis la kompromison: **forigi la tri permesojn** `SCHEDULE_EXACT_ALARM`,
+`USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` (komito `b834483`, versionCode
+247 → 248). Sekvoj sur Android 12+: alarmoj povas ekigi ĝis 10 minutojn malfrue
+kaj la ekrano ne vekiĝas aŭtomate; la sono ĉiam ludas. Sur Android ≤11 ĉio
+funkcias same kiel antaŭe. Poste la uzanto promociis la eldonon al Production
+(status: completed, 100 %).
+
+### La Play-listigo
+La nova priskribo + 8 ekranfotoj estis publikigitaj, sed la enhavo ĉe Play restis
+la malnova — `publishReleaseListing` konsideris sin `UP-TO-DATE` kaj efektive ne
+alŝutis. Devige re-rulita per `--rerun-tasks`; poste kontrolita per la Play
+Developer API (listigo: nova priskribo 3913 signoj; bild-kolektoj: 8
+`phoneScreenshots` + `featureGraphic` + `icon`). **Leciono**: sukceso/UP-TO-DATE de
+GPP ne pruvas, ke la enhavo estas ĉe Play — kontrolu per la API (atento: la
+listing-GET ne montras bildojn; ili estas en apartaj kolektoj
+`listings/<lng>/phoneScreenshots` ktp.).
+
+### Revizio de la rapida korekto (sekvaĵoj)
+La uzanto petis revizion de `b834483` ("ĉu estas io farinda post tiu tre rapida
+korekto?"). Trovitaj kaj riparitaj:
+
+- **Daŭra sciigo restus por ĉiam**: la rapida korekto aldonis `setOngoing(true)`
+  al la alarm-sciigo, sed nenio nuligis ĝin kaj daŭraj sciigoj ne estas forviŝeblaj
+  per svingo — post halto de la alarmo la sciigo restus en la ombrumo por ĉiam.
+  Riparita: fiksa sciigo-ID (`SCIIGO_ID`), `AlarmoReceivilo.nuliguSciigon()`, kaj
+  gardo en `onReceive` kiu nuligas la sciigon kiam la ludado (iam ludinta/konektinta)
+  iĝas `Haltita` aŭ `Finita`. (Eraro ne nuligas — tiam la fallback-ringtono daŭre
+  sonas.) Testo: `AlarmoReceiviloTest.alarmoSciigoNuligxigxasKiamLudadoHaltigxas`.
+- **Sentry-spamo**: `logw` sur la atendata Android-12+ `setWindow`-vojo (ĉiufoje
+  kiam alarmo skediĝas) → `logd` (loka nur).
+- **Malnovaj komentoj**: `SciigPermeso` (referenco al la forigita
+  `malfermuEkzaktajnAlarmAgordojn`), `MainActivity` ("full-screen-sciigo").
+- **Morta enumero**: `DiagnozoTipo.EXACT_ALARMS` (neniu plu generas ĝin ekde la
+  permeso-forigo) forigita kune kun la du testoj, kiuj ankoraŭ referencis ĝin.
+- **CHANGELOG**: la permeso-entry estis sub `[Neeldonita]`, sed ĝi estas en la
+  eldonita 3.0.3 (versionCode 248) → movita al `## [3.0.3]` (`### Ŝanĝita`).
+- **AGENTS.md / NOTOJ.md**: tri respektive du malnovaj lokoj pri FSI kaj ekzaktaj
+  alarmoj ĝisdatigitaj; nova datita leciono en AGENTS.md (regulo 11).
+
+### Poste farita (ankora 2026-10-12)
+- Etikedo `v3.0.3` movita al `b834483` — la fonto de la eldonita APK (versionCode 248).
+- Ĉiuj sekvaĵoj de la revizio komititaj kaj puŝitaj al `master`.
+- La CI-eldonado (`eldonado.yml`) ankoraŭ malsukcesas: la GitHub-sekretoj
+  (KEYSTORE_BASE64, KEYSTORE_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON) ne estas
+  konfiguritaj — eldonoj devas esti farataj loke (kiel ĉi-foje).
+
+### Rimarko (antaŭekzista, ne de ĉi tiu korekto)
+- La fallback-ringtono (`luduFallbackRingtonon`) konservas neniun tenilon kaj
+  havas neniun haltigan vojon — se ĝi eksonas, ĝi ripetiĝas ĝis la procezo mortas.
+  Antaŭa problemo de PR #94, ne kaŭzita de la permeso-forigo.
+
 # Ŝanĝoj — 2026-10-08
 
 ## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)
@@ -618,6 +827,59 @@ retumilo blokas ilin. Bezonas servilon aŭ prokurilon — tio kongruas kun la pl
 
 ---
 
+## 13. Kodrevizio 2026-10: stako de 6 PR-oj (#89–#95)
+
+Plena kodrevizio (subagentoj) → `FAROTA.md` (92 trovindikoj: K=kriza, G=grava, C=konsilo)
+→ 6 stakaj PR-oj, ĉiuj kunfanditaj per squash (1 commit po PR). Jen la incidentoj
+kies historio gravas; la DAŬRE VALIDA scio staras en `NOTOJ.md`.
+
+### Incidentoj kaj iliaj kaŭzoj
+
+- **K2 — sciigoj ne funkciis kun fermita apo**: `appContext`/Sentry estis agordataj
+  nur en `MainActivity`. En procezo lanĉita de WorkManager (la normala kazo por la
+  perioda kontrolo je 7:00/16:00) `sciigPermesoDonita()` trafis neiniciigitan
+  `lateinit`-kampon → `UninitializedPropertyAccessException` → senfina
+  `Result.retry()`-ciklo (baterio-dreno, API 33+), aŭ `kreuSettings()` reenfalis al
+  `NoOpSettings` → silenta nenio-faro (API 26-32). **Riparo**: `EsperantoRadioAplikajho`
+  (Application.onCreate — ĉiu procezo).
+- **G28 + realaparata regreso — alarmo 16:10 ludis nur je 16:14** (2026-10-11,
+  Pixel 10 / Android 16): la alarmo ekigis ĝustatempe, sed `AlarmoReceivilo` nur
+  lanĉis `MainActivity` kaj atendis. `startActivity` el fona ricevilo estas SILENTE
+  blokata de la BAL-limigoj (neniu esceptoĵeto — la unua G28-riparo kun catch-fallback
+  tial neniam rulis); la Activity startis en fono kaj rulis sian kodon nur kiam la
+  uzanto vekis la telefonon. **Riparo** (PR #94): la ricevilo ludas mem
+  (goAsync-korutino + `AppStato.inicialigu` kun la movita `ExoPlayerLudiloRegilo`),
+  FSI-sciigo ĉiam, `USE_EXACT_ALARM`. **Pruvo**: emulilo API 35, ekrano malŝaltita,
+  alarmo 17:09:00.022 → "Komencas ludi" 17:09:00.180 → MediaSession PLAYING;
+  instrumentita testo pasis ankaŭ sur la reala Pixel 10.
+- **CIO-CertificateException** (2026-10-11): kiam `network_security_config` havis
+  cleartext-DOMAJNO-esceptojn, CIO paneigis por ĉIUJ https-petoj ("Domain specific
+  configurations require that hostname aware checkServerTrusted is used") — la apo
+  tiam provizore uzis la OkHttp-motoron. Post kiam ĉiuj URL-oj fariĝis HTTPS
+  (Peranto-emblemo kopiita al javabog.dk, ĉar wp11081574.server-he.de ne havas TLS),
+  la esceptoj malaperis, CIO ree funkcias kaj `ktor-client-okhttp` estis forigita.
+- **Vinilkosmo-regex rompis la tutan JSONC** (2026-10-10): `"<p class="who">.+?</p>"`
+  kun NEREFUTITAJ citiloj en `puriguModeloj` — la tuta kanalkonfiguro ne plu parsis;
+  `KanalAgordoFumTesto` kaptis ĝin sur ĉiuj branĉoj de la stako. Korekto:
+  `"<p class=\"who\">(?:(?!</p>).)*?</p>"` (temperita formo).
+- **Staka-PR-kunfluo-proceduro** (tiu ĉi stako): squash-kunfando de la BAZA PR kreas
+  history-diverĝon — la supraj branĉoj tiam montras realajn konfliktojn (ambaŭ
+  flankoj ŝanĝis la samajn dosierojn de la komuna prapatro). Solvo: `git rebase
+  --onto origin/master <malnova-supra-limo> <branĉo>` (arboido restas identa —
+  kontrolita per `git rev-parse <tip>^{tree}`), forta puŝo, poste merge. Krome:
+  forigo de la baz-branĉo povas FERMI la stakan infan-PR-on — retargetu ĉiujn
+  infanojn al master ANTAAŬ ol kunfandi, per `gh api -X PATCH pulls/N -f base=master`.
+
+### Kontrolrezulto
+
+- `:shared:desktopTest` — 273 testoj, 0 malsukcesoj (264 antaŭ la stako).
+- `:androidApp:assembleDebug` — konstruiĝas post ĉiu kunfando.
+- CI (`testoj` + `changelog`) verda sur ĉiu PR de la stako.
+- Emulilaj pruvoj: 27 kanaloj/722 elsendoj ŝargiĝas; alarmo kun malŝaltita ekrano
+  ludas tuj; instrumentitaj testoj pasis sur API 26, API 35 kaj la reala Pixel 10.
+
+---
+
 ## Dokumentado
 
 - `README.md` — faritaj taskoj forigitaj; aldonita la listo de mankantaj uzkazoj el `eo_strings.xml` kaj
@@ -632,3 +894,29 @@ retumilo blokas ilin. Bezonas servilon aŭ prokurilon — tio kongruas kun la pl
 - Eksponenta reprovo ne atendas je reta reveno (la malnova `venterPåAtKommeOnline`) — rezignas post ~3 minutoj.
 - Web: CORS blokas plej multajn RSS-fluojn; bildoj ne aperas. Bezonas servilon/prokurilon.
 - HLS sur Desktop/Web.
+
+---
+
+## Kio novas / Lastatempe ludata — konduto kaj lud-ekigo (PR: #85)
+
+### Dizajno (post provo kaj rezigno de la "flugo")
+
+Uzanto petis ke luditaj elsendoj malaperas de "Kio novas". Unue ni provis animacian
+"flugon" de la karto inter la sekcioj per `SharedTransitionScope` +
+`sharedElementWithCallerManagedVisibility` (stubo kun `visible=false` difinas la
+komenc-pozicion, la cel-karto flugas). Sur la emulilo ĝi funkciis, sed la uzanto
+trovis tion tro komplika kaj ni rezignis ĝin. La fina konduto estas pli simpla:
+
+- **La nune ludata karto restas en "Kio novas"** (ĝis alia elsendo iĝas la nuna) —
+  la klakita karto ne saltas for sub la fingro; ĝi ankaŭ aperas en "Lastatempe ludata".
+- **"Lastatempe ludata" nur post vera lud-ekigo**: `lasteLudita` ne plu skribiĝas tuj
+  ĉe klako sur "Ludi" (tiu skribo en `ludiElsendonInterna` estas forigita), sed nur
+  kiam la ludilo atingas `Ludas` — nova `markiLudita(elsendoId, kanaloSlug)` metas
+  nur la tempmarkon kaj ne tuŝas pozicion/daŭron (ne kiel `registriPozicion`, kiu
+  anstataŭigus ilin). Sekve elsendo kiu nur "konektas" aŭ eraras ne aperas tro frue.
+- **"Lastatempe ludata" rulas aŭtomate** al la nova karto (`animateScrollToItem(0)`
+  kiam la unua ero ŝanĝiĝas).
+- **"Aliaj elsendoj" ne re-miksas**: antaŭe `.shuffled()` rulis ĉe ĉiu
+  `aktualigiuLudatajn` (t.e. ĉiujn 5 s dum pozicio-savado) kaj la sekcio konstante
+  ŝanĝiĝis. Nun `plenigu` antaŭmiksas la kandidatojn unufoje (`shuffled(Random(enhavo-hash))`)
+  kaj `aktualigiuLudatajnInterna` nur filtras — la ordo de restantaj kartoj stabilas.

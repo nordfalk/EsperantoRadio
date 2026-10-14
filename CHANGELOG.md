@@ -16,6 +16,26 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
+- La rezerva alarm-sono (kiam la kanalo ne disponeblas) estas nun haltigebla per "Halti" aŭ per tuŝo de la sciigo kaj mem ĉesas post 5 minutoj — antaŭe ĝi sonis senfine
+
+## [3.0.3] - 2026-10-12
+
+### Aldonita
+
+- Vekhorloĝo: se ĉiuj elsendoj de la kanalo estas jam aŭskultitaj, la alarmo nun reludas la plej novan sane ludeblan anstataŭ eble eraran elsendon (https://github.com/nordfalk/EsperantoRadio/pull/95)
+- La averto pri detektitaj problemoj sur la ĉefekrano havas "x"-butonon por kaŝi ĝin; ĝi kondukas al la agordoj, kie la averto ĉiam restas videbla ĉe "Diagnozo". Kiam nova problemo aperas, la averto reaperas sur la ĉefekrano (https://github.com/nordfalk/EsperantoRadio/pull/105)
+- Novaĵoj: kiel en la malnova apo, grava sciigo pri la apo (ekz. versio-anonco aŭ ke kanalo ne funkcias) montriĝas kiel dialogo unufoje kiam ĝi ŝanĝiĝas (https://github.com/nordfalk/EsperantoRadio/pull/106)
+- Nova agordo "Ŝaltu detalan protokoladon" (Agordoj → Privateco): defaŭlte nur eraroj kaj gravaj eventoj (malfermo de la apo, ekludo de elsendo, vekiĝo) sendiĝas al la erar-monitorado; ŝaltu por sendi ankaŭ la ceterajn protokolajn informojn (https://github.com/nordfalk/EsperantoRadio/pull/107)
+
+### Ŝanĝita
+
+- Novaj ekranfotoj kaj priskribo por Google Play: 8 ekranfotoj el la nova apo (anstataŭ 3 malnovaj) kaj tute nova priskribo kun listo de ĉiuj 27 kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/108)
+- Vekhorloĝo: la permesoj `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj (laŭ postulo de Google Play). Sur Android 12+ alarmoj povas malfrui ĝis 10 minutoj kaj la ekrano ne vekiĝas aŭtomate — la sono ĉiam ludas. Sur Android 11 kaj sube ĉio funkcias same kiel antaŭe.
+
+### Riparita
+
+- La vekhorloĝo nun ludas tuj je la ĝusta tempo ankaŭ kiam la telefono dormas kun malŝaltita ekrano — antaŭe ĝi atentis ĝis vi mem vekis la telefonon (https://github.com/nordfalk/EsperantoRadio/pull/94)
 - Ne plu perdiĝas jam elŝutita kanal-enhavo kiam la servilo respondas per eraro-paĝo aŭ kaptiva portalo (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - La sciigoj pri novaj elsendoj nun funkcias ankaŭ kiam la apo estas fermita (la fonprocezo antaŭe havis neniun kuntekston) (https://github.com/nordfalk/EsperantoRadio/pull/89)
 - Sur Android la ludado ne plu povas rekomenciĝi per si mem post kiam oni premis "Halti" (https://github.com/nordfalk/EsperantoRadio/pull/89)
@@ -46,6 +66,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - 2 pliaj kanaloj: Internacia Retradio (IRo) kaj Esp. Magazino Tuluzo (https://github.com/nordfalk/EsperantoRadio/pull/86)
 - La ludilbreto kolapsas per reen-butono aŭ klako ekstere, kaj sekvas la navigadon kiam nenio ludas — montras la nunan kanalon/elsendon kun ludi-butono (https://github.com/nordfalk/EsperantoRadio/pull/87)
 - Mallongaj priskriboj de ĉiuj kanaloj videblaj en la kanalaro kaj en la kanala paĝo (https://github.com/nordfalk/EsperantoRadio/pull/88)
+- Luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata" nur kiam la ludado vere ekis; la nune ludata karto restas en "Kio novas" (https://github.com/nordfalk/EsperantoRadio/pull/85)
+- "Kio novas" montras maksimume 5 elsendojn po kanalo por lasi spacon al aliaj (https://github.com/nordfalk/EsperantoRadio/pull/85)
+- Varsovia Vento kaj Kernpunkto estas defaŭlte ŝatataj (sciigoj pri novaj elsendoj) (https://github.com/nordfalk/EsperantoRadio/pull/85)
 
 ## [3.0.2] - 2026-10-08
 
@@ -111,6 +134,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master
 [3.0.0]: https://github.com/nordfalk/EsperantoRadio/compare/fresxa_versio...294834b

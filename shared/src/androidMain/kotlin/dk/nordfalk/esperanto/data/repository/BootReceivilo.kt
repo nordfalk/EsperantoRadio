@@ -1,6 +1,5 @@
 package dk.nordfalk.esperanto.data.repository
 
-import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,17 +18,6 @@ import kotlinx.serialization.json.Json
  */
 class BootReceivilo : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED) {
-            // La uzanto donis la permeson → re-skedu kun setAlarmClock anstataŭ la 10-minuta fenestro
-            logi("BootReceivilo", "Permeso por ekzaktaj alarmoj ŝanĝiĝis — re-planas alarmojn")
-            try {
-                appContext = context.applicationContext
-                AlarmoSkedilo().reskediCxiujn(leguPersistitajnAlarmojn())
-            } catch (e: Exception) {
-                logw("BootReceivilo", "Eraro re-planante alarmojn post permes-ŝanĝo", e)
-            }
-            return
-        }
         if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
             intent.action != "android.intent.action.QUICKBOOT_POWERON" &&
             intent.action != "android.intent.action.LOCKED_BOOT_COMPLETED"
@@ -65,7 +53,7 @@ class BootReceivilo : BroadcastReceiver() {
 internal fun leguPersistitajnAlarmojn(): List<Alarmo> {
     val str = kreuSettings().getString(SettingsKeys.ALARMOJ, "")
     if (str.isBlank()) return emptyList()
-    // FAROTA C17: korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
+    // (PR #93) korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
     // boot-re-skedadon — reeniru al malplena listo kaj protokolu
     return try {
         Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)

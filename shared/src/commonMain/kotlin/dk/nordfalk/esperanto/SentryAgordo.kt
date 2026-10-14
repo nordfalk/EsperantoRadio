@@ -9,17 +9,22 @@ import io.sentry.kotlin.multiplatform.SentryOptions
  * Sur wasmJs la SDK estas no-op (kompilas sed faras nenion).
  * Sur Android gxi uzas Sentry Android SDK, sur JVM Sentry Java SDK.
  *
- * @param medio "produktado" aux "evoluo" (FAROTA G5) — antauxe "evoluo" estis
- *   hardkodita por CIUJ konstruoj, do produktadaj eraroj estis nefilteblaj.
- * @param specimenado spuro-specimenada kvociento — 1.0 (100 %) en evoluo,
- *   0.1 (10 %) en produktado (baterio/reto).
+ * @param medio "produktado" aux "evoluo" (PR #93) — regas la medion kaj la
+ *   spuro-specimenan kvocion (1.0 = 100 % en evoluo, 0.1 = 10 % en produktado).
+ *   La PROTOKOLA kvanto ne plu dependas de la medio: logs estas ĉiam ŝaltitaj,
+ *   sed limigitaj per la kodo (defaŭlte nur eraroj + gravaj eventoj — vidu
+ *   [protokoloDetala] en ProtokoloUtil; agordo "Ŝaltu detalan protokoladon").
  */
 fun initialiguSentry(medio: String = "evoluo") {
     Sentry.init { options: SentryOptions ->
         options.dsn = "https://764998823a401d936a5e227d1453951e@o4512078664564736.ingest.de.sentry.io/4512078868185168"
 
-        options.logs.enabled = medio == "evoluo"
-        // Kaptu 100 % da traktadoj nur en evoluo; 10 % en produktado (G5)
+        // Logs (Sentry.logger.*) ĉiam ŝaltitaj — ankaŭ en produktado. La kvanto
+        // estas limigita per la kodo: defaŭlte nur eraroj kaj gravaj eventoj
+        // (logGrava); la ceteraj logi-vokoj nur se "detala protokolado" estas
+        // ŝaltita (protokoloDetala en ProtokoloUtil, 2026-10-12).
+        options.logs.enabled = true
+        // Kaptu 100 % da traktadoj nur en evoluo; 10 % en produktado (PR #93)
         options.tracesSampleRate = if (medio == "produktado") 0.1 else 1.0
         // Montru kion la SDK faras dum provado
         // options.debug = true

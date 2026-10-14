@@ -7,17 +7,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.ApoVersio
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
 import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
 import dk.nordfalk.esperanto.logi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,11 +30,14 @@ fun AgordojEkrano(
     agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
     onDiagnozo: () -> Unit = {},
+    diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
 ) {
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
+    val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
+    val problemoj by diagnozoProblemoj.collectAsState()
 
     Scaffold(
         topBar = {
@@ -57,10 +65,30 @@ fun AgordojEkrano(
             Spacer(Modifier.height(8.dp))
             ListItem(
                 headlineContent = { Text("Diagnozo") },
-                supportingContent = { Text("Kontroli ĉu la aparato estas bone agordita por fona ludado kaj aŭtomata daŭrigo") },
+                supportingContent = {
+                    Text(
+                        if (problemoj.isEmpty()) "Via aparato estas bone agordita por fona ludado kaj aŭtomata daŭrigo"
+                        else "${problemoj.size} problemo(j) detektitaj — tuŝu por vidi la detalojn"
+                    )
+                },
+                leadingContent = {
+                    if (problemoj.isNotEmpty())
+                        Icon(
+                            Icons.Filled.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    else
+                        Icon(
+                            Icons.Filled.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary, // verda — ĉio estas en ordo
+                        )
+                },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
                 modifier = Modifier.clickable { logi("Klako", "Diagnozo"); onDiagnozo() }
             )
+
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -102,6 +130,21 @@ fun AgordojEkrano(
                     Switch(
                         checked = evoluo,
                         onCheckedChange = { logi("Klako", "evoluo → $it"); agordojDeponejo.fiksiEvoluon(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(Modifier.height(24.dp))
+            Text("Privateco", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Ŝaltu detalan protokoladon") },
+                supportingContent = { Text("Sendas pliajn informojn pri via uzado al la erar-monitorado (Sentry). Defaŭlte nur eraroj kaj gravaj eventoj (malfermo, ekludo, vekiĝo) estas sendataj") },
+                trailingContent = {
+                    Switch(
+                        checked = detalaProtokolado,
+                        onCheckedChange = { logi("Klako", "detalaProtokolado → $it"); agordojDeponejo.fiksiDetalanProtokoladon(it) }
                     )
                 }
             )

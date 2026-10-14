@@ -38,12 +38,12 @@ class RssParsilo(
         /** Maksimuma tempo por unu archive.org-metadaten-peto (la respondo estas ~1-2 KB). */
         const val METADATEN_LIMTEMPO_MS = 5_000L
 
-        /** Maksimumo da samtempaj archive.org-metadaten-petoj (FAROTA G33). */
+        /** Maksimumo da samtempaj archive.org-metadaten-petoj (PR #91). */
         const val PARALELA_PETO_LIMIGO = 8
 
         /**
          * Regulo 6.1.4: eroj kies sola son-gastiganto estas nesubtenata (video-platformoj)
-         * estas saltataj — tia "fluo" ne estis ludebla (FAROTA G32). Devas esti konservita
+         * estas saltataj — tia "fluo" ne estis ludebla (PR #91). Devas esti konservita
          * el la malnova apo (AGENTS.md regulo 2).
          */
         internal val SALTAJ_GASTIGANTOJ = listOf(
@@ -59,7 +59,7 @@ class RssParsilo(
     }
 
     /**
-     * Aplikas la kanal-specifajn purigajn regex-modelojn al kruda HTML (regulo 6.6, FAROTA G15).
+     * Aplikas la kanal-specifajn purigajn regex-modelojn al kruda HTML (regulo 6.6, (PR #91)).
      * La modeloj vivas en la kanalkonfiguro (`puriguModeloj`) — datum-movita, ne kodigita.
      * Nevalida regex estas protokolata kaj preterpasata (regulo 4: unu eraro ne paneigu la kanalon).
      */
@@ -135,7 +135,7 @@ class RssParsilo(
         val dato = normigiDaton(pubDate) ?: return null
 
         // Stream: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
-        // Preferu enclosure kun type="audio/…" (regulo 6.1.4); iuj fluoj metas bildon unue (FAROTA C12)
+        // Preferu enclosure kun type="audio/…" (regulo 6.1.4); iuj fluoj metas bildon unue (PR #91)
         var fluo = ero.selectFirst("enclosure[type^=audio]")?.attr("url")
             ?: ero.selectFirst("enclosure")?.attr("url")
             ?: ""
@@ -144,13 +144,13 @@ class RssParsilo(
         }
         if (fluo.isEmpty()) {
             // Regulo 6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
-            // serchu en la HTML-enhavo, ne en la XML-dokumento (FAROTA G30)
+            // serchu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
             fluo = Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src") ?: ""
         }
         if (fluo.isEmpty()) return null
-        // Nur http(s) permesataj — file://, content://, javascript:// ktp. el nefidinda RSS ne (FAROTA G2)
+        // Nur http(s) permesataj — file://, content://, javascript:// ktp. el nefidinda RSS ne (PR #89)
         fluo = saniguRetUrlon(fluo) ?: return null
-        // Saltu video-gastigantojn, kiujn ni ne povas ludi (FAROTA G32)
+        // Saltu video-gastigantojn, kiujn ni ne povas ludi (PR #91)
         if (estasSaltitaGastiganto(fluo)) return null
 
         if (kanalo.slug == "kernpunkto" && fluo.startsWith("http://")) {
@@ -211,7 +211,7 @@ class RssParsilo(
             if (audioj.isEmpty()) continue
 
             // Regulo 6.6: la <audio>-ludiloj kaj reklamaj alineoj estas purigataj el la
-            // PRISKRIBO — sed la fluo-ekstraktado supre uzas la KRUDAN enhavon (FAROTA G15)
+            // PRISKRIBO — sed la fluo-ekstraktado supre uzas la KRUDAN enhavon (PR #91)
             val purigitaEnhavo = puriguPerModeloj(htmlEnhavo, kanalo)
 
             for ((i, source) in audioj.withIndex()) {
@@ -294,7 +294,7 @@ class RssParsilo(
                     "https://drive.google.com/u/1/uc?id=$id&export=download"
                 }
                 // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo 6.3: la komuna
-                // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, FAROTA G32)
+                // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, (PR #91))
                 iframeSrc.isEmpty() -> return@mapIndexedNotNull null
                 estasSaltitaGastiganto(iframeSrc) -> return@mapIndexedNotNull null
                 else -> return@mapIndexedNotNull null
@@ -318,7 +318,7 @@ class RssParsilo(
         // identigilo). La dosiernomo ne ĉiam egalas al la identigilo: ekz. `malapero-benda-3`
         // enhavas `Malapero_Benda3.mp3` — la divenita URL tiam redonus HTTP 404.
         // Limigu la paralelecon (Semaphore 8): centoj da samtempaj petoj al archive.org
-        // ricevus 429/timumejon (FAROTA G33).
+        // ricevus 429/timumejon (PR #91).
         val identigiloj = eroj.mapNotNull { it.arkivaIdentigilo }.distinct()
         val semaforo = Semaphore(PARALELA_PETO_LIMIGO)
         val dosiernomoj: Map<String, String> = if (identigiloj.isEmpty()) emptyMap() else coroutineScope {
@@ -420,7 +420,7 @@ class RssParsilo(
             val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
             val retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
-            // Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (FAROTA G15)
+            // Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (PR #91)
             val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
@@ -429,7 +429,7 @@ class RssParsilo(
                 kanaloSlug = kanalo.slug,
                 kanaloNomo = kanalo.nomo,
                 // La titolo venas el <title> de la ero — derivado el la enhavo produktis
-                // "VINILKOSMO … has posted: …" (regreso kontraŭ la malnova apo, FAROTA G29)
+                // "VINILKOSMO … has posted: …" (regreso kontraŭ la malnova apo, (PR #91))
                 titolo = if (kanalo.ignoruTitolon) {
                     puriguHtml(priskriboPurigita).take(200).trim()
                 } else {
@@ -451,7 +451,7 @@ class RssParsilo(
      *
      * Defendo kontraŭ skemoj kiel `file://`, `content://`, `javascript:`, `intent://`:
      * ExoPlayer/Coil denaske scipovas malfermi `file://` kaj `content://` — malica aŭ
-     * difektita fluo devas ne igi nin ludi/montri lokan enhavon (FAROTA G2).
+     * difektita fluo devas ne igi nin ludi/montri lokan enhavon (PR #89).
      *
      * @return la trimmed URL, aŭ null se la skemo ne estas permesata
      */
@@ -464,7 +464,7 @@ class RssParsilo(
 
     fun normigiDaton(datStr: String?): String? {
         if (datStr.isNullOrBlank()) return null
-        // Simpla dato sen tempo: "2024-01-05" (FAROTA C10 — antaŭe la tuta ero estis forĵetita)
+        // Simpla dato sen tempo: "2024-01-05" ((PR #95) — antaŭe la tuta ero estis forĵetita)
         if (datStr.trim().matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return datStr.trim()
         if (datStr.contains("T")) {
             val dato = datStr.substringBefore("T")
@@ -476,7 +476,7 @@ class RssParsilo(
             "May" to "05", "Jun" to "06", "Jul" to "07", "Aug" to "08",
             "Sep" to "09", "Oct" to "10", "Nov" to "11", "Dec" to "12"
         )
-        // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (FAROTA C10)
+        // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (PR #95)
         val m = Regex("(\\d{1,2})\\s+(\\w{3,4})\\s+(\\d{4})").find(korektita) ?: return null
         val tago = m.groupValues[1].padStart(2, '0')
         val monato = monatoj[m.groupValues[2].take(3)] ?: return null
@@ -485,7 +485,7 @@ class RssParsilo(
 
     fun leguDauron(teksto: String?): Long? {
         if (teksto.isNullOrBlank()) return null
-        // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (FAROTA C13)
+        // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (PR #95)
         val partoj = teksto.trim().split(":").map { it.substringBefore('.') }
         return when (partoj.size) {
             1 -> partoj[0].toLongOrNull()
@@ -516,7 +516,7 @@ class RssParsilo(
         // Forigu danĝerajn atributojn (event-handlers, javascript:-ligiloj).
         // BLANKA LISTO por href/src: nur http(s), mailto, #-ankroj kaj /-relativaj vojoj
         // permesataj — `intent://`, `data:`, `file://` kaj obfuskigita `java\tscript:`
-        // (usklec-miksita) tiel ne trafluas (FAROTA G4).
+        // (usklec-miksita) tiel ne trafluas (PR #89).
         for (el in doc.select("*")) {
             for (attr in el.attributes().asList()) {
                 val sxlosilo = attr.key.lowercase()

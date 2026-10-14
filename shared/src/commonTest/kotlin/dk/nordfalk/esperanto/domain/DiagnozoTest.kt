@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
  *
  * La Desktop-implemento de DiagnozoRegilo redonas malplenan liston (nenio specifa),
  * do sur Desktop ni nur testas la modelojn kaj la malplenan rezulton.
- * (FAROTA C42: la Android-implemento ankoraŭ ne havas instrumentitan teston — nur
+ * ((PR #93) la Android-implemento ankoraŭ ne havas instrumentitan teston — nur
  * la modelo kaj la no-op-implementoj estas testataj ĉi tie.)
  */
 class DiagnozoTest {
@@ -71,20 +71,17 @@ class DiagnozoTest {
     }
 
     @Test
-    fun severeco_havasTriNivelojn() {
-        assertEquals(3, Severeco.entries.size)
-        assertTrue(Severeco.entries.contains(Severeco.INFO))
+    fun severeco_havasDuNivelojn() {
+        assertEquals(2, Severeco.entries.size)
         assertTrue(Severeco.entries.contains(Severeco.AVERTO))
         assertTrue(Severeco.entries.contains(Severeco.ERARO))
     }
 
     @Test
-    fun diagnozoTipo_havasKvinTipojn() {
-        assertEquals(5, DiagnozoTipo.entries.size)
+    fun diagnozoTipo_havasTriTipojn() {
+        assertEquals(3, DiagnozoTipo.entries.size)
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.BATERIO_OPTIMIZATION))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.NOTIFICATIONS))
-        assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.EXACT_ALARMS))
         assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.DNS))
-        assertTrue(DiagnozoTipo.entries.contains(DiagnozoTipo.RETO))
     }
 }

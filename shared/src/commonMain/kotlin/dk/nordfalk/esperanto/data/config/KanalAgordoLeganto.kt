@@ -91,7 +91,7 @@ data class KanalAgordo(
         val kontakt_url: String? = null,
         val kontakt_modtagere: List<String>? = null,
         val kontakt_titel: String? = null,
-        val drift_statusmeddelelse: String? = null,
+        @SerialName("apaj_novaĵoj") val apajNovajxoj: String? = null,
     )
 
     @Serializable
@@ -117,6 +117,7 @@ data class KanaloDto(
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6). */
     val puriguModeloj: List<String> = emptyList(),
+    @SerialName("defaŭltŜatata") val defaltSxatata: Boolean = false,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -133,6 +134,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
+    defaltSxatata = defaltSxatata,
 )
 
 /**
@@ -153,9 +155,14 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
         try {
             val id = partoj[i].toInt()
             val aktiva = partoj[i + 1] == "1"
-            val horo = partoj[i + 2].toInt()
-            val minuto = partoj[i + 3].toInt()
-            val ripeto = partoj[i + 4].toInt()
+            // (PR #95) koercu — ekstervalora horo/minuto/ripeto el la agordo devas
+            // ne kraŝi la skedadon (LocalTime/sekvaEkigo); ni ne ĵetas la tutan sugeston
+            // pro unu malbona kampo (regulo 4 — toleremo al putrantaj fontoj)
+            val horo = partoj[i + 2].toInt().coerceIn(0, 23)
+            val minuto = partoj[i + 3].toInt().coerceIn(0, 59)
+            // ripeto: MASKU al la 7 tago-bitoj (ne limigu al 0x7f = ĉiutage) —
+            // tiel la semantiko kongruas kun sekvaEkigo kaj konservas la intencitajn tagojn
+            val ripeto = partoj[i + 4].toInt() and 0x7f
             // partoj[i + 5] = time (malnova, ne uzata)
             val kanaloSlug = partoj[i + 6].removePrefix("=")
             val etikedo = malkoduUrlKoditajxon(partoj[i + 7].removePrefix("="))
@@ -181,7 +188,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
  *
  * Anstataŭas la antaŭan permanan supersignan tabelon, kiu estis erara:
  * `%C4%A5` estas **ĥ** (ne ĵ), `%C5%9C` estas **Ŝ** (ne ŝ), `%C5%AC` estas **Ŭ**
- * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (FAROTA K5).
+ * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (PR #89).
  * Jam-malkoditaj signoj (kodo > 127) estas trairataj senŝanĝe.
  */
 internal fun malkoduUrlKoditajxon(teksto: String): String {

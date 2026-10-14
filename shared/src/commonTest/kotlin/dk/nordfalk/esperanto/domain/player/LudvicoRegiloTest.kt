@@ -407,7 +407,7 @@ class LudvicoRegiloTest {
 
         // MALFRUA duobla voko por la sama finanta fonto (e1) — post kiam la aŭtoludo
         // jam avancis al e2. La dedup-fenestro devas ignori ĝin: e2 (neniam finita!)
-        // ne estas markita finita kaj neniu dua aŭtoludo ekflugas (FAROTA G8 + G14).
+        // ne estas markita finita kaj neniu dua aŭtoludo ekflugas ((PR #89) + G14).
         regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = Sonfonto.ElsendoFonto(e1))
 
         assertEquals("e2", (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id,
@@ -419,7 +419,7 @@ class LudvicoRegiloTest {
     @Test
     fun servoVoko_senFontoNeFarasNenion() = runTest {
         // La servo ne povas legi la fonton (ekz. malnova MediaItem sen extras) —
-        // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn (FAROTA K3/G8)
+        // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn (PR #89)
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
@@ -515,16 +515,18 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun pozicio_registritaKiamLudiElsendon() = runTest {
+    fun pozicio_registritaKiamLudadoEkas() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
-        val (regilo, _, _) = kreuRegilon(ludatojDeponejo = ludatoj, scope = this)
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
 
+        regilo.komenci()
         regilo.ludiElsendon(e)
 
-        // registriPozicio estas vokita en ludiElsendon
+        // La elsendo estas registrita (markiLudita) kiam la ludado vere ekas
         val ludato = ludatoj.getLudato(e.id)
-        assertTrue(ludato != null, "Ludanto devus esti registrita")
+        assertTrue(ludato != null, "Ludanto devus esti registrita kiam la ludado ekas")
         assertEquals("e1", ludato!!.elsendoId)
     }
 
@@ -646,6 +648,46 @@ class LudvicoRegiloTest {
 
         val savita = ludatoj.getPozicio(e.id)
         assertEquals(90_000, savita, "Pozicio devus esti savita kiam haltigxas (per retroiro)")
+    }
+
+    // =========================================================================
+    // lasteLudita — skribata nur kiam la ludado vere ekis
+    // =========================================================================
+
+    @Test
+    fun lasteLudita_mankasGxisLudadoEkis() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        // Fonto ŝargita sed la ludado ankoraŭ ne vere ekis (ekz. konektas/bufras)
+        ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e), 0)
+        assertNull(ludatoj.getLudato(e.id), "lasteLudita ne devas esti skribita antaŭ ol la ludado vere ekis")
+
+        // Ludado ekis — nun lasteLudita devas esti skribita
+        ludilo.ludi()
+        assertTrue(
+            (ludatoj.getLudato(e.id)?.lasteLudita ?: 0) > 0,
+            "lasteLudita devas esti skribita kiam la ludado vere ekis",
+        )
+    }
+
+    @Test
+    fun lasteLudita_neSxangxasPozicion() = runTest {
+        val e = elsendo("e1")
+        val ludatoj = LudatojDeponejoMaketo()
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 30_000, 300_000)
+        val ludilo = NoOpLudiloRegilo()
+        val (regilo, _, _) = kreuRegilon(ludilo, ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.komenci()
+        ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e), 30_000)
+        ludilo.ludi()
+
+        // markiLudita nur metas la tempmarkon — la pozicio devas resti sendifekta
+        assertEquals(30_000, ludatoj.getPozicio(e.id), "markiLudita ne devas ŝanĝi la pozicion")
     }
 
     // =========================================================================
@@ -944,11 +986,11 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
-    // FAROTA K3 — rosta Eraro post halti() ne rekomencigu la ludadon
+    // (PR #89) — rosta Eraro post halti() ne rekomencigu la ludadon
     // =========================================================================
 
     /**
-     * Simulas la ExoPlayer-konduton post `halti()` (FAROTA K3): Media3 1.5.1 ne
+     * Simulas la ExoPlayer-konduton post `halti()` (PR #89): Media3 1.5.1 ne
      * nuligas `playerError` per stop()/clearMediaItems(), kaj `onMediaItemTransition(null)`
      * eligas Eraron **sen** nunaFonto.
      */
@@ -1009,7 +1051,7 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
-    // FAROTA G13 — paŭzigi/daŭrigi/rekta kanalo tra LudvicoRegilo
+    // (PR #92) — paŭzigi/daŭrigi/rekta kanalo tra LudvicoRegilo
     // =========================================================================
 
     @Test

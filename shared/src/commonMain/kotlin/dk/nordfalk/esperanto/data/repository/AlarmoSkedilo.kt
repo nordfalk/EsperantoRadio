@@ -27,15 +27,9 @@ expect val subtenasVekhorlogxn: Boolean
 
 /**
  * Ĉu la apo rajtas skedi ekzaktajn alarmojn.
- * - Android 12+: `AlarmManager.canScheduleExactAlarms()` (permeso SCHEDULE_EXACT_ALARM)
- * - aliaj: ĉiam true
- * Sen permeso la alarmo tamen ekigas, sed eble ĝis 10 minutoj malfrue.
+ * - Android 11 kaj sube: ĉiam true (neniu permeso bezonata)
+ * - Android 12+: false (la permeso SCHEDULE_EXACT_ALARM/USE_EXACT_ALARM estas
+ *   intence ne deklarita — la alarmo tamen ekigas, sed eble ĝis 10 minutoj malfrue)
+ * - aliaj platformoj: ĉiam true
  */
 expect fun ekzaktajAlarmojPermesataj(): Boolean
-
-/**
- * Malfermas la sistemajn agordojn por permesi ekzaktajn alarmojn.
- * - Android 12+: ACTION_REQUEST_SCHEDULE_EXACT_ALARM
- * - aliaj: NoOp
- */
-expect fun malfermuEkzaktajnAlarmAgordojn()

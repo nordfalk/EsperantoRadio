@@ -53,7 +53,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
 - **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
 - **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` kiam ekzaktaj alarmoj permesataj, alie `setWindow` kun 10-minuta fenestro + averto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono (haltigebla per Halti kaj per tuŝo de la sciigo, mem-haltiĝas post 5 min), volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
 - **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
 - **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
 - **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
@@ -112,6 +112,8 @@ EsperantoRadio/
 ├── .github/workflows/       # CI (changelog-kontrolo)
 ├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
 ├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
+├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
+├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
 └── AGENTS.md               # Tiu ĉi dosiero
 ```
 
@@ -177,6 +179,20 @@ EsperantoRadio/
 6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
+7. **La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
+   `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
+   (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.
+   (2026-10-11: PR #85 naskas el `hejmo-luditaj-kio-novas`, ne `pr-85`.)
+8. **Por ĝisdatigi malfermitan PR-on de master, uzu merge, ne rebazo** — rebazo
+   reskribas la historion kaj postulas force-push; `git merge origin/master` en la
+   PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
+   ricevis master-ĝisdatigojn.)
+9. **Kiam la uzanto petas revizion de PR: unue ŝanĝu la lokan laborarbon al la
+   koncerna branĉo** (`git switch <branĉo>` — la IDE de la uzanto, Android Studio,
+   montras tiun branĉon), kaj laboru, testu kaj puŝu sur ĝi. Ne kreu apartajn
+   laborarbojn (worktree) por revizioj — la uzanto volas sekvi la laboron sur la
+   ĝusta branĉo en la IDE. (2026-10-14: dum la revizio de PR #111 la laboro okazis
+   en aparta worktree; la uzanto volas la branĉo-ŝanĝon en Android Studio.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -330,7 +346,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
   expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
   ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
-  estu parto de estonta testa CI, vidu FAROTA.md G24.)
+  konstatis tion; la CI-laborfluo ekzistas depost PR #89.)
 - **Ktor CIO + network_security_config = paneo de ĈIUJ https-petoj sur Android**: la CIO-motoro
   vokas la malnovan 2-argan `checkServerTrusted(ĉeno, tipo)` sen gastiganto; tuj kiam la apo
   difinas `android:networkSecurityConfig` (nia G1-ŝanĝo), Android postulas la gastiganto-konscian
@@ -345,7 +361,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   la UNUA `<p>` en la tuta teksto kaj manĝas ĉiun alineon ĝis la celita frazo — kun la nuna
   Varsovia Vento-fluo tio forviŝis la enkondukon kaj la parto-listilon. Uzu temperitan formon
   `(?:(?!</p>).)` anstataŭ `.+?` por ke la modelo ne povu transiri alineon (ekzemploj:
-  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, FAROTA G15.)
+  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, PR #91.)
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
   projectCards-malrekomendo) — uzu la REST API (vidu supre).
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
@@ -357,6 +373,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
   uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
   CHANGELOG.md — konservita en la stash, ne enmetita.)
+- **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
+  se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
+  (ekz. CHANGELOG.md), la kunfando konservas ambaŭ sen konfliktmarkoj — la
+  dosiero ricevas du `### Aldonita`/`### Riparita`-sekciojn. Post ĉiu stash pop
+  kontrolu `grep -n "^## \|^### " CHANGELOG.md` kaj kunigu mane. Ankaŭ kontrolu
+  importojn: viaj forigitaj/aldonitaj importoj povas resti/rediĉiĝi en dosieroj
+  kiujn vi ne plu celas ŝanĝi. (2026-10-11: duoblaj sekcioj + restinta
+  `fonaDispatcher`-importo en AppStato.kt.)
 - **Nova kanalo = ŝanĝu ambaŭ kopiojn de la konfiguro**: `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json`
   KAJ `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` (identikaj). Kaj atentu: la JSONC havas
   DU arojn — `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ` (referencataj, de la kodo NE legataj). Novaj kanaloj
@@ -371,8 +395,72 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
   (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
   (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
-  riparo-stako; kaptita de la fum-testo G23/G24. Uzu la temperitan formon
+  riparo-stako; kaptita de la fum-testo kaj la CI-laborfluo (PR #89). Uzu la temperitan formon
   `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
+- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
+  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
+  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
+  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
+  (goAsync-korutino); la videblecon certigu alt-prioritate DAŬRA sciigo (`CATEGORY_ALARM` +
+  `PRIORITY_MAX`; sen `USE_FULL_SCREEN_INTENT` la ekrano ne vekiĝas aŭtomate, sed la
+  sciigo aperas kiel heads-up kaj restas dum la alarmo sonas — nuligata kiam la
+  ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
+  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
+- **Vekhorloĝaj permesoj intence NE deklaritaj (ekde 3.0.3, 2026-10-12)**: Google Play
+  rifuzas la alŝuton se la apo deklaras `USE_FULL_SCREEN_INTENT` sen la respondo al la
+  demando "full-screen intent" ("You must let us know whether your app uses any
+  full-screen intent permissions", eraro 403). Tial `SCHEDULE_EXACT_ALARM`,
+  `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj el la manifest
+  (kompromiso akceptita de la uzanto). Sekvoj sur Android 12+: alarmoj povas ekigi
+  ĝis 10 minutojn malfrue (`setWindow` anstataŭ `setAlarmClock`) kaj la ekrano ne
+  vekiĝas aŭtomate — la sono ĉiam ludas kaj la sciigo aperas kiel heads-up
+  (`CATEGORY_ALARM` + `PRIORITY_MAX`). Sur Android ≤11 nenio ŝanĝiĝas. (La malnova
+  lernita fakto — `USE_EXACT_ALARM` aŭtomate donata al vekhorloĝo-apoj, `SCHEDULE_EXACT_ALARM`
+  defaŭlte donata sed revokebla sur Android 12 — plu validas, sed ne plu aplikiĝas,
+  ĉar ni simple ne deklaras la permesojn.)
+- **Post mergo de master, reviziu la novajn invariantojn en la kunfanditaj dosieroj**:
+  novo aldonita metodo povas malobservi novaĵon de master. (2026-10-11: `markiLudita`
+  komence skribis sen `mutex.withLock`, kiun master intertempe postulis por ĉiuj
+  skriboj de `PersistaLudatojDeponejo` — kur-kondiĉo kun la pozicio-savanto.)
+- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo, kontrolu la ĝustan
+  literigon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
+  "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
+  sen kaŝita differenco = la ĉeno mem estas alia.
+- **Fallback-sono ne haltigeblas per stato-observado** (2026-10-12): se nenio iam
+  komencas la ludilon (pura-fallback-kazo de la vekhorloĝo), `halti()` metas
+  `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas — la halto
+  devas esti hokita rekte en la agojn (`halti()`, stato-ŝanĝo al `Haltita`, tuŝo de
+  la sciigo), ne per kolektanto.
+- **`## [Neeldonita]` en CHANGELOG.md ĉiam estas la UNUA versio-sekcio** (rekte
+  antaŭ la plej nova eldonita versio) — enmeto antaŭ pli malnova versio lasas ĝin
+  meze de la antaŭa sekcio. (2026-10-12: tia enmeto en 2491035 devis esti movita.)
+- **Instrumentitaj testoj: la testata procezo estas "foreground"** (2026-10-12): la
+  best-effort `startActivity` el fona ricevilo SUKCESAS dum la testoj (male ol vera
+  fona alarmo, kie BAL blokas ĝin; eĉ `moveToState(CREATED)` ne helpas). Kondiĉoj,
+  kiuj distingas "uzanto tuŝis" de "sistemo lanĉis", devas esti en la intenco mem
+  (ekz. `de_sciigo=true` de la sciigo), ne en la ĉirkaŭaĵo.
+- **`haltuAlarmRingon()` en `updateState()` nur ĉe transicio al `Haltita`**
+  (2026-10-14, PR #111): la unua `updateState()` post la MediaController-konekto
+  kalkulas `Haltita` kun malplena media listo — sen transicia gardilo ĝi vokus
+  `haltuAlarmRingon()` kaj mortigus ĵus startintan fallback-ringtonon en freŝa
+  procezo (la alarmo restus silenta). Gardilo: `ludantoStato is Haltita &&
+  _stato.value.stato !is Haltita`. Instrumentitaj testoj kun `ActivityScenarioRule`
+  ne kaptas tion (tie la ludilo jam ekzistas kaj estas konektita) — bezonas teston
+  sen la regulo (`FresxProcezaFallbackTest`).
+- **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
+  la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
+  `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la
+  konfiguro rulu `./gradlew :shared:desktopTest` antaŭ ol fidi la rezulton.
+  (2026-10-12: forigo de la eksa statusmesaĝo-ŝlosilo postlasis `,` post
+  `apaj_novaĵoj`.)
+
+- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
+  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
+  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
+  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
+  `options.logs.enabled` estas nun ĉiam `true` — sen tio la gravaj eventoj kaj la
+  ŝaltita detala protokolado estus forĵetitaj en produktado. Ne reenmetu
+  `Sentry.captureMessage` por aŭtoludo (ĉiu aŭtomata sekva = 1 evento).
 
 ## Logcat (Android)
 
@@ -446,14 +534,25 @@ foje malsukcesas).
 **Protokol-konvencio (grava por la Sentry-kvoto)**:
 
 - `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
-- `logi`/`logw`/`loge` → ankaŭ `Sentry.logger.*` — ĉiu voko estas eningendigita
-  kaj kalkuliĝas kontraŭ la kvoto.
+- `logi` → loka + `Sentry.logger.info` **nur se "detala protokolado" estas ŝaltita**
+  (agordo Agordoj → Privateco; tutmonda flag `protokoloDetala` en `ProtokoloUtil.kt`,
+  sinkronigita de `AgordojDeponejoImpl`). Defaŭlte `logi` restas nur loka.
+- `logGrava` → loka + `Sentry.logger.info` **ĉiam** — nur por la gravaj eventoj:
+  malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
+  Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la kvoto.
+- `logw`/`loge` → ankaŭ `Sentry.logger.warn`/`error` — ĉiam sendataj (avertoj kaj
+  eraroj estas maloftaj, do ili ne minacas la kvoton).
+- `loge(tag, msg, e)` → krome `Sentry.captureException(e)` (eraro-evento).
+- `Sentry.captureMessage` rekte en la kodo — NE uzu por po-ŝanĝaj aferoj
+  (ĉiu aŭtoludo k.a. kreus eventon kaj plenigus la kvoton).
 - Regulo: **altfrekvencaj datum-tavolaj detaloj uzu `logd`** (parsado, diskkaŝmemoro,
   serĉo — io, kio okazas po kanalo po ŝargo); `logi` nur por uzantvidaj eventoj
   (navigado, klakoj, ludado, starto). `logw`/`loge` ĉiam indas protokoligi.
   (2026-10-09: la `logi`-vokoj de RssParsilo/ElsendoDeponejo estis ~85–90 % de
   ĉiuj protokoloj — po ~700 mesaĝoj/kanalo/semajno nur por «parsado kompleta»;
   ili fariĝis `logd`.)
+- `options.logs.enabled` estas ĉiam `true` (ankaŭ en produktado) — la kvanto estas
+  limigita per la kodo supre (2026-10-12).
 
 ## UI-dizajno (celo)
 

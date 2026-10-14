@@ -46,7 +46,7 @@ class PersistaLudatojDeponejo(
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
     /**
-     * Mutex ĉirkaŭ la legu-modifu-skribu-ciklo (FAROTA G36): registriPozicio (vokata
+     * Mutex ĉirkaŭ la legu-modifu-skribu-ciklo (PR #91): registriPozicio (vokata
      * ĉiujn 5 s dum ludado) kaj markiFinita/markiErara povas interplektiĝi — sen ŝlosilo
      * la lasta skribanto venkus kaj la finita-/erara-flago povus perdiĝi.
      */
@@ -68,6 +68,17 @@ class PersistaLudatojDeponejo(
             skribu(nuna)
             _ludatoj.value = nuna
         }
+    }
+
+    override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {
+        mutex.withLock {
+            val nuna = _ludatoj.value.toMutableMap()
+            val ekzista = nuna[elsendoId] ?: LudataElsendo(elsendoId = elsendoId, kanaloSlug = kanaloSlug)
+            nuna[elsendoId] = ekzista.copy(lasteLudita = Clock.System.now().toEpochMilliseconds())
+            skribu(nuna)
+            _ludatoj.value = nuna
+        }
+        logi("Ludatoj", "Markita ludita: $elsendoId")
     }
 
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {

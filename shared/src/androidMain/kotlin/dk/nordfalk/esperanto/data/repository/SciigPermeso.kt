@@ -25,7 +25,7 @@ actual fun malfermuSciigAgordojn() {
         putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
-    // FAROTA C20: kiel malfermuEkzaktajnAlarmAgordojn — ActivityNotFoundException ne paneigu
+    // (PR #93) — ActivityNotFoundException ne paneigu la malfermon
     try {
         appContext.startActivity(intent)
     } catch (e: Exception) {

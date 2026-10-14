@@ -187,6 +187,12 @@ EsperantoRadio/
    reskribas la historion kaj postulas force-push; `git merge origin/master` en la
    PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
    ricevis master-ĝisdatigojn.)
+9. **Kiam la uzanto petas revizion de PR: unue ŝanĝu la lokan laborarbon al la
+   koncerna branĉo** (`git switch <branĉo>` — la IDE de la uzanto, Android Studio,
+   montras tiun branĉon), kaj laboru, testu kaj puŝu sur ĝi. Ne kreu apartajn
+   laborarbojn (worktree) por revizioj — la uzanto volas sekvi la laboron sur la
+   ĝusta branĉo en la IDE. (2026-10-14: dum la revizio de PR #111 la laboro okazis
+   en aparta worktree; la uzanto volas la branĉo-ŝanĝon en Android Studio.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 

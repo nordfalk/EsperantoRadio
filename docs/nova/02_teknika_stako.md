@@ -24,7 +24,7 @@
 
 | Teknologio | Kialo |
 |---|---|
-| **Media3 ExoPlayer 1.11.1** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
+| **Media3 ExoPlayer** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
 | **Media3 MediaSessionService** | Malfona ludado, mediasciigo, mediabutonoj, sonfokuso (ĉio "senpaga") |
 | **DownloadManager** / **WorkManager** | Elŝutoj / sciigoj pri novaj elsendoj |
 | **AlarmManager** | Vekhorloĝo |
@@ -111,28 +111,13 @@ JSONC-parsilon.
 
 ## Versikatalogo
 
-Versioj rapide malaktualiĝas. Vidu la nunajn stabilajn versiojn dum efektivigado.
-Nuna `gradle/libs.versions.toml` (oktobro 2026):
-```toml
-[versions]
-kotlin = "2.4.21"
-compose-multiplatform = "1.12.2"
-compose-material3 = "1.12.0-alpha03"
-ktor = "3.6.0"
-kotlinx-serialization = "1.11.0"
-kotlinx-datetime = "0.8.0"
-media3 = "1.11.1"
-ksoup = "0.2.6"
-coil = "3.6.3"
-multiplatform-settings = "1.3.0"
-turbine = "1.2.1"
-mp3spi = "1.9.5.4"
-sentry-kmp = "0.28.0"
-multiplatform-nav3-ui = "1.1.2"
-```
+Ĉiuj versioj vivas en **unu fonto de vero**: [`gradle/libs.versions.toml`](../../gradle/libs.versions.toml)
+(Gradle-versio: `gradle/wrapper/gradle-wrapper.properties`; compileSdk:
+`androidApp/build.gradle.kts`). Ili ne estas ripetataj ĉi tie — versioj rapide
+malaktualiĝas kaj duobla skribo kreus malakordon.
 
-> Plua ilo-ĝisdatigo de 2026-10-17: **Gradle 9.8.1, AGP 9.4.1, compileSdk 37**
-> (vidu la lecionon en AGENTS.md pri la necesaj pretervojoj `android.newDsl=false`
-> kaj `android.builtInKotlin=false`).
-> **Material3** havas apartan version (ekz. `1.12.0-alpha03` por CMP 1.12.2), ne
-> la saman kiel `compose-multiplatform` — prenu la parigon el la CMP-release-notoj.
+> **Material3** havas apartan version de `compose-multiplatform` — prenu la
+> parigon el la CMP-release-notoj (tabelo „Libraries"), ne el la CMP-versinombro.
+> **AGP 9 + KMP**: `gradle.properties` enhavas la necesajn pretervojojn
+> `android.newDsl=false` kaj `android.builtInKotlin=false` (vidu la lecionon en
+> AGENTS.md).

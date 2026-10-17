@@ -32,13 +32,12 @@ nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp
 tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
 (2026-10-17, regulo de la uzanto).
 
-Aktualaj versioj (unu fonto de vero: `gradle/libs.versions.toml`; staka priskribo:
-`docs/nova/02_teknika_stako.md`): Kotlin 2.4.21, Gradle 9.8.1, AGP 9.4.1,
-compileSdk 37, Compose Multiplatform 1.12.2, Material3 1.12.0-alpha03,
-Ktor 3.6.0, Media3 1.11.1, Coil 3.6.3, kotlinx-datetime 0.8.0,
-kotlinx-coroutines 1.11.0, ksoup 0.2.6, nav3 1.1.2 (ĝisdatigo 2026-10-17).
-KMP-post `androidTarget()` bezonas `android.newDsl=false` kaj
-`android.builtInKotlin=false` en `gradle.properties` (AGP 9 — foriĝos en AGP 10;
+Versioj ne estas listigitaj ĉi tie — unu fonto de vero:
+`gradle/libs.versions.toml` (Gradle: `gradle/wrapper/gradle-wrapper.properties`;
+compileSdk: `androidApp/build.gradle.kts`; staka priskribo:
+`docs/nova/02_teknika_stako.md`). KMP-post `androidTarget()` bezonas
+`android.newDsl=false` kaj `android.builtInKotlin=false` en `gradle.properties`
+(AGP 9 — foriĝos en AGP 10;
 laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 
 ## Kompilado-limigoj kaj iliaj erarmesaĝoj
@@ -56,11 +55,11 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 - **klib-ABI**: Wasm/Native-bibliotekoj (`.klib`) de pli nova Kotlin ne legeblas de
   la nuna → "Unresolved reference" NUR sur wasmJs (JVM/Android uzas jar).
   Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`.
-  (2026-10-17: nav3 1.1.2 + Kotlin 2.4.21 bone kompilas sur wasmJs — la malnova
-  timo ke ĉiu nav3-versio pli nova ol 1.1.0-alpha02 rompos wasmJs ne konfirmiĝis.
-  Tamen kontrolu wasmJs-kompilon (`:webApp:compileKotlinWasmJs`) post versi-bumo.)
-- **ksoup 0.2.6** funkcias kun Kotlin 2.4.21 kaj CMP 1.12.2 (CI-verda kombino,
-  2026-10-17).
+  (2026-10-17: la tiam nuna nav3-versio bone kompilas sur wasmJs — la malnova
+  timo ke ĉiu nav3-versio pli nova ol la eksperimenta 1.1.0-alfa rompos wasmJs
+  ne konfirmiĝis. Tamen kontrolu wasmJs-kompilon (`:webApp:compileKotlinWasmJs`)
+  post versi-bumo.)
+- **ksoup** funkcias kun la nuna Kotlin/CMP-kombino (CI-verda, 2026-10-17).
   `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`; `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —
   sen ĝi la MediaSession silente malsukcesas (`ClassNotFoundException:

@@ -205,3 +205,295 @@
   inundiĝus per raportoj pri ĉiu kanal-ŝargado.
 - ** Medio laŭ la DEBUGGING-flago** ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)), ne la build-tipo: debug-versio → "evoluo",
   release → "produktado" (10 % specimenado).
+
+---
+
+## Projekta stato kaj fazoj (ĝis 2026-10-13; translokigita el AGENTS.md)
+
+> Notu: la fazo-tabelo kaj la listo "kio funkcias/kio ne funkcias" estas
+> historia portreto de la 2026-10-13-epoko; la aktuala resumo staras en AGENTS.md.
+
+
+La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
+
+| Fazo | Priskribo | Stato | PR |
+|---|---|---|---|
+| 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
+| 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
+| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + golden-testoj | ✅ Farita | #7 |
+| 1c | Kanalvido (elsendlisto) + elsendodetalo + Ktor + Coil 3 | ✅ Farita | #9 |
+| 1d | Peranto-parsilo (archive.org + Google Drive, regulo 6.3) | ✅ Farita | #10 |
+| 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
+| 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
+| — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
+| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | ✅ Farita | #15,#16 |
+| 5 | Elŝutoj (Ktor→dosiero, persisto, eksterreta ludado) | ✅ Farita | #20,#21,#22,#23 |
+| — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
+| — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
+| — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
+| 6 | Pezaj platform-funkcioj (vekhoro, sciigoj, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro + sciigoj faritaj; widget/Chromecast/TTS venas) | #24-#30,#44 |
+| — | Ludvico kaj daŭra ludado | ✅ Farita | #46 |
+| — | Sciigoj pri novaj elsendoj (WorkManager, "Ludi"-butono en sciigo) | ✅ Farita | #44 |
+| — | Sentry.io erarmonitorado | ✅ Farita | #51 |
+| — | Riĉa HTML-vidigo, horizontala svipo, evolua reĝimo, konservi dum ekranturnoj | ✅ Farita | #53,#56-#63 |
+| — | radioTxtKomparilo + 2 novaj kanaloj (Kaliningrada E-radio, Universeala Lindo) | ✅ Farita | #62 |
+| — | Malsupren-tiro, ekzaktaj alarmoj, podkasto ĉe alarmo, eksponenta reprovo, HLS sur Android | ✅ Farita | — |
+
+### Kio funkcias nun
+
+- **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
+- **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
+- **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregulojn (inkl. Peranto/archive.org)
+- **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
+- **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
+- **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
+- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono, volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
+- **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
+- **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
+- **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
+- **Nova apo — HTML**: riĉa HTML-vidigo de priskriboj en ElsendoEkrano (`HtmlVido`/`HtmlTeksto`)
+- **Nova apo — gestoj**: horizontala svipo inter elsendoj de sama kanalo (ElsendoEkrano) kaj inter kanaloj (KanalEkrano)
+- **Nova apo — evolua reĝimo**: ŝaltilo en agordoj + elektiloj por priskribo-fonto kaj vidmaniero
+- **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
+- **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
+- **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
+- **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
+- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
+  Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
+- **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
+
+### Kio NE funkcias ankoraŭ
+
+- Aŭtomata resumigo: pozicio-restarigo okazas nur kiam oni reiras al la elsendo kaj klakas "Aŭskulti"; ne aŭtomate kiam oni malfermas la apoon kaj la ludilo daŭras en fono
+- iOS-ludado (no-op, bezonas AVPlayer)
+- Web: plej multaj RSS-fluoj estas blokitaj de CORS (neniu `Access-Control-Allow-Origin`) — bezonas
+  servilon/prokurilon (vidu `docs/nova/06_servilo_arkivo.md`); bildoj ankaŭ ne aperas
+- Hejmekrana widget, Chromecast, parolsintezo
+
+## Deponeja koda mapo (translokigita el AGENTS.md, 2026-10-14)
+
+
+```
+EsperantoRadio/
+├── malnova/                # Malnova Android-apo (funkcianta, ne tuŝebla)
+│   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
+│   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
+│   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
+├── androidApp/            # Nova Android-aplikaĵo (MainActivity → EsperantoRadioApp)
+├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (Window + Compose)
+├── webApp/                # Nova Web-aplikaĵo (wasmJs, CanvasBasedWindow)
+├── shared/                # Nova komuna KMP-modulo
+│   ├── src/commonMain/    #   Komuna kodo (modeloj, parsilo, UI, deponejoj)
+│   ├── src/androidMain/   #   Android-specifa
+│   ├── src/desktopMain/   #   Desktop-specifa (JVM)
+│   ├── src/iosMain/        #   iOS-specifa (kodo ekzistas; iosApp/ Xcode-projekto ankoraŭ ne kreita — malkomentu `include(":iosApp")` en settings.gradle.kts sur Mac)
+│   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
+│   └── src/commonTest/    #   Testoj + desktopTest (ĉiuj pasas)
+├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
+├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
+├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
+├── RssArkivServer/        # Kaŝenitaj RSS-fluoj (XML-fiksaĵoj)
+├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj — for de la repo per .gitignore; kiu bezonas pliajn fiksaĵojn kopiu ilin al shared/src/commonTest/resources/feeds/)
+├── docs/malnova/           # Esperanta superrigordo de la malnova apo
+├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
+├── .github/workflows/       # CI (changelog-kontrolo)
+├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
+├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
+├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
+├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
+└── AGENTS.md               # Tiu ĉi dosiero
+```
+
+### La nova kodo — dosiero-mapo
+
+
+La nova kodo vivas en `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/`.
+Por la arkitekturan kontekston, vidu `docs/nova/01_celoj_kaj_arkitekturo.md`.
+
+```
+dk/nordfalk/esperanto/
+├── App.kt                    # Radika Compose-funkcio (EsperantoRadioApp, navigation3)
+├── AppStato.kt               # Proceznivela unuopulo: deponejoj + ViewModel-oj (pluvivas Activity-rekreon)
+├── Protokolo.kt              # Protokol-funkcioj (logi/logd/logw/loge) — expect/actual
+├── ProtokoloUtil.kt          # Komuna protokol-helpiloj
+├── SentryAgordo.kt           # Sentry.io-init (erarmonitorado)
+├── navigation/Vojoj.kt       # NavKey-oj (Hejmo, Kanalaro, KanaloDetalo, ElsendoDetalo, …)
+├── domain/
+│   ├── model/Modeloj.kt      # Kanalo, Elsendo, Sonfonto, LudantoStato, LudataElsendo
+│   ├── model/Alarmo.kt       # Vekhorloĝo-modelo
+│   ├── model/ElshutStato.kt  # Elŝut-statoj + ElshutitaElsendo
+│   ├── repository/Deponejoj.kt          # KanaloDeponejo, ElsendoDeponejo (interfacoj)
+│   └── repository/PersonigoDeponejoj.kt # Plejŝatataj, LastAŭskultitaj, Ludatoj, Serĉo, Agordoj, Elŝut, Alarmo (interfacoj)
+├── data/
+│   ├── config/KanalAgordoLeganto.kt   # JSONC-leganto (striptigas komentojn) + sugestoj por alarmoj
+│   ├── config/PlatformResource.kt    # expect/actual por legi resurcojn
+│   ├── config/KreuSettings.kt        # expect/actual por Settings
+│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep reguloj)
+│   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo
+│   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
+│   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
+│   ├── repository/PersistantaPlejŝatatajDeponejo.kt
+│   ├── repository/PersistantaAlarmoDeponejo.kt # Alarmoj (Settings+JSON)
+│   ├── repository/PersonigoDeponejojImpl.kt  # AgordojDeponejoImpl, SerĉoDeponejoImpl
+│   ├── repository/DosierKasho.kt            # expect/actual dosier-kaŝmemoro
+│   ├── repository/DosierNomoj.kt            # Konvencioj por dosiernomoj
+│   ├── repository/AlarmoSkedilo.kt          # expect/actual por AlarmManager-skedado
+│   ├── repository/KreuAlarmoSkedilo.kt      # Fabriko
+│   ├── repository/ElshutDeponejo (Ktor→dosiero, expect/actual + NoOp)
+│   ├── repository/SciigPermeso.kt           # expect/actual por sciig-permeso
+│   ├── repository/GhisdatiguSciigSkedon.kt  # Ĝisdatigas WorkManager-skedon laŭ agordoj
+│   ├── repository/NovajElsendojSkedilo.kt   # (Android) WorkManager-skedado de novaj-elsendaj kontroloj
+│   └── repository/NoOpElshutDeponejo.kt      # NoOp por wasmJs/iOS
+├── domain/player/
+│   ├── LudiloRegilo.kt       # Ludilo-interfaco + NoOpLudiloRegilo (kun simuluFinon)
+│   ├── LudvicoLogiko.kt      # Pura decidlogiko por aŭtoludo (3 prioritatoj)
+│   ├── LudvicoRegilo.kt      # Kontrolilo: pozicio-spurado, resumigo, aŭtoludo, ludvico
+│   └── SciigoKontroloj.kt    # Sciigo-registroj (MediaSession-metadata)
+└── ui/
+    ├── KanalaroEkrano.kt     # Kanalaro-ekrano
+    ├── HejmoEkrano.kt       # Hejmo (Kio novas + Lastatempe ludata + Kio popularas + Ĉiuj kanaloj) + HejmoViewModel
+    ├── KanalEkrano.kt       # Kanalvido (elsendlisto, horizontala svipo) + KanaloViewModel
+    ├── ElsendoEkrano.kt     # Elsendodetalo (ludi, elŝuti, ludvico, "Daŭrigi de X:XX", riĉa HTML, horizontala svipo)
+    ├── LudvicoEkrano.kt     # Ludvico-ekrano (forigi/malplenigi)
+    ├── MiniLudilbreto.kt    # Malsupra ludilbreto (ludi/paŭzi/halti/ludvico)
+    ├── MalsupraNavigaBreto.kt # 4 langetoj (Hejmo, Kanaloj, Plej ŝatataj, Serĉi)
+    ├── PlejŝatatajEkrano.kt # Plej ŝatataj kanaloj
+    ├── SercxoEkrano.kt      # Serĉo
+    ├── ElshutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)
+    ├── AlarmoEkrano.kt      # Vekhorloĝo (kreilo/redaktilo)
+    ├── AgordojEkrano.kt     # Agordoj (daŭrigo, sciigoj, evoluo, temo)
+    ├── HtmlVido.kt / HtmlTeksto.kt # Riĉa HTML-vidigo (expect/actual)
+    ├── Temo.kt              # Muzaiko-temo (koloroj, tiparo, formoj)
+    └── Previews.kt / PreviewDatumoj.kt # Antaŭvidoj
+```
+
+> Platformo-specifaj `expect`/`actual` ekzistas en `androidMain/` (ExoPlayer, AlarmManager, WorkManager,
+> Receiviloj), `desktopMain/` (DesktopLudiloRegilo mp3spi), `wasmJsMain/` (WasmJsLudiloRegilo HTMLAudioElement),
+> `iosMain/` (NoOp). Android-specifaj: `AlarmoReceivilo`, `LudiElsendoReceivilo`, `BootReceivilo`,
+> `NovajElsendojKontroloWorker` (WorkManager).
+
+## Sonludado kaj ludado — arkitekturaj resumoj (translokigitaj el AGENTS.md)
+
+- **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
+  NE estas liberigita en `onDestroy`. `AppStato.ludvicoRegilo` tenas ĝin dum la tuta procezo. La nuna `Sonfonto`
+  estas JSON en `MediaMetadata.extras` (`SonfontoKodilo`), do ludado komencita de alia MediaController
+  (ekz. `LudiElsendoReceivilo`) estas rekonata. Vidu `SXANGXOJ.md`.
+
+- **Platforma subteno — sonludado**:
+
+  | Funkcio | Android | Desktop (JVM) | Web (wasmJs) | iOS |
+  |---|:--:|:--:|:--:|:--:|
+  | MP3-fluado | ExoPlayer | mp3spi + SourceDataLine | HTMLAudioElement | no-op |
+  | HLS | ExoPlayer | ne | retumilo | no-op |
+  | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
+  | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
+  | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
+
+- **Ludvico kaj daŭra ludado** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
+  - `LudvicoLogiko` estas pura decidlogiko (sen flankaj efikoj) — tute testebla.
+  - `LudvicoRegilo` observas `LudantoStato.Finita` per `StateFlow.distinctUntilChanged()`
+    kaj lanĉas aŭtoludon en aparta korutino (`scope.launch`) por eviti rekurson.
+  - Pozicio estas savata ĉiu 5s per `delay()`-bazita korutino. Ĉe `halti()` la
+    `nunaFonto` estas forigita de la ludilo, do `LudvicoRegilo` konservas
+    `lastaFonto`/`lastaPozicioMs` (kun `@Volatile`) kiel retroiron.
+  - `malmarkiFinita()` estas vokata kiam la uzanto eksplicite reludas finitan elsendon.
+  - Mutex protektas `ludiElsendon`/`aldoniAlVico`/`ludiSekvan` kontraŭ konkurantaj vokoj.
+  - `LudatojDeponejoMaketo` estas la memora implemento por Preview kaj testoj (ne por produktado).
+
+- **Sciigoj pri novaj elsendoj** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
+  - `NovajElsendojKontroloWorker` (Android, WorkManager) periode kontrolas ŝatatajn kanalojn
+    (skedita je 7:00 kaj 16:00, ±1h), elŝutas RSS-fluojn, kaj kreas sciigojn por neviditaj elsendoj.
+  - La sciigo havas "Ludi"-agon: `LudiElsendoReceivilo` ricevas la intenon kaj lanĉas ludadon
+    rekte per `MediaController` (konektita al la MediaSession). Uzas `goAsync()` por teni la
+    Receivilon vivanta dum la nesinkrona konekto.
+  - `GhisdatiguSciigSkedon` ĝisdatigas la WorkManager-skedon kiam la uzanto ŝaltas/malŝaltas sciigojn.
+  - `BootReceivilo` re-skedas alarmojn post restarto de la aparato.
+
+- **Navigado**: uzas `navigation3` (`androidx.navigation3`) — `NavKey` ( sealed `Vojo`),
+  `rememberNavBackStack`, `entryProvider`, `NavDisplay`. Stato persistebla per `SavedStateConfiguration`
+  kun `polymorphic` serializers por ĉiu `Vojo`-subklaso. Detaloj: `docs/nova/05_dizajno_kaj_ui.md`.
+
+- **Sonludado — bibliotek-elekto** (detaloj: `docs/nova/02_teknika_stako.md`):
+  - **basic-sound** (LexiLabs-App/basic-sound, MIT) estis provita unue. La JVM-implemento
+    uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
+    por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
+  - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
+    Compose 1.10.0 — tiam tro nova por nia Kotlin (tiam 2.2.20; nun 2.4.21, sed la biblioteko bezonas VLC sur Desktop).
+  - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
+    kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
+    `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
+    estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
+  - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
+    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
+    Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
+    `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
+    pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
+
+## Vekhorloĝo kaj Android-limoj (translokigitaj el AGENTS.md)
+
+- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
+  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
+  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
+  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
+  (goAsync-korutino); la videblecon certigu alt-prioritate DAŬRA sciigo (`CATEGORY_ALARM` +
+  `PRIORITY_MAX`; sen `USE_FULL_SCREEN_INTENT` la ekrano ne vekiĝas aŭtomate, sed la
+  sciigo aperas kiel heads-up kaj restas dum la alarmo sonas — nuligata kiam la
+  ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
+  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
+
+- **Vekhorloĝaj permesoj intence NE deklaritaj (ekde 3.0.3, 2026-10-12)**: Google Play
+  rifuzas la alŝuton se la apo deklaras `USE_FULL_SCREEN_INTENT` sen la respondo al la
+  demando "full-screen intent" ("You must let us know whether your app uses any
+  full-screen intent permissions", eraro 403). Tial `SCHEDULE_EXACT_ALARM`,
+  `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj el la manifest
+  (kompromiso akceptita de la uzanto). Sekvoj sur Android 12+: alarmoj povas ekigi
+  ĝis 10 minutojn malfrue (`setWindow` anstataŭ `setAlarmClock`) kaj la ekrano ne
+  vekiĝas aŭtomate — la sono ĉiam ludas kaj la sciigo aperas kiel heads-up
+  (`CATEGORY_ALARM` + `PRIORITY_MAX`). Sur Android ≤11 nenio ŝanĝiĝas. (La malnova
+  lernita fakto — `USE_EXACT_ALARM` aŭtomate donata al vekhorloĝo-apoj, `SCHEDULE_EXACT_ALARM`
+  defaŭlte donata sed revokebla sur Android 12 — plu validas, sed ne plu aplikiĝas,
+  ĉar ni simple ne deklaras la permesojn.)
+
+## Git- kaj agent-lecionoj — historiaj (translokigitaj el AGENTS.md)
+
+- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
+  projectCards-malrekomendo) — uzu la REST API:
+  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+
+- **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
+  atendatas, serĉu nereatingeblajn komitojn per
+  `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
+  2–3 gepatroj, mesaĝo "On <branĉo>: ...") kaj reakiru per
+  `git stash store -m "..." <hash>`. (2026-10-08: la stash "eldono 3.0.2" tiel reakiriĝis.)
+
+- **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
+  `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
+  uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
+  CHANGELOG.md — konservita en la stash, ne enmetita.)
+
+- **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
+  se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
+  (ekz. CHANGELOG.md), la kunfando konservas ambaŭ sen konfliktmarkoj — la
+  dosiero ricevas du `### Aldonita`/`### Riparita`-sekciojn. Post ĉiu stash pop
+  kontrolu `grep -n "^## \|^### " CHANGELOG.md` kaj kunigu mane. Ankaŭ kontrolu
+  importojn: viaj forigitaj/aldonitaj importoj povas resti/rediĉiĝi en dosieroj
+  kiujn vi ne plu celas ŝanĝi. (2026-10-11: duoblaj sekcioj + restinta
+  `fonaDispatcher`-importo en AppStato.kt.)
+
+## Sentry-kvoto — historia evoluo (translokigita el AGENTS.md)
+
+- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
+  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
+  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
+  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
+  Debug-konstruoj kaj emuliloj ne raportas al Sentry.
+
+- **Eraroj-kvoto: `loge(tag,msg,e)` = erar-evento** (2026-10-13): `loge(tag, msg, e)`
+  vokas `Sentry.captureException` kaj konsumas la MONATAN ERAROJ-KVOTON (5 000);
+  `loge(tag, msg)` sen escepto kaj `Sentry.logger.*` estas nur protokol-eventoj
+  (aparta kvoto). Atendataj fiaskoj (reto, ludad-, elŝut-, serĉ-fiaskoj) uzu
+  `logw(tag, msg, e)` (nur loka) — neniam loge. En produktado eraroj estas
+  50 %-specimenataj (`options.sampleRate` — rekte duonigas la kvot-konsumon;
+  `options.tracesSampleRate` specimenas nur SPUROJN, apartan kvoton, ne erarojn).
+  Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
+  (FAROTA C45) — ne malmolu versio-listojn en la apo.

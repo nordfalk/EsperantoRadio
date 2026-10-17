@@ -1,6 +1,6 @@
 # AGENTS.md — Gvidlinioj por agentoj en ĉi tiu deponejo
 
-> **Nuna jaro: 2026 (septembro).** Ĉiuj referencoj al "aktuala" datas
+> **Nuna jaro: 2026 (oktobro).** Ĉiuj referencoj al "aktuala" datas
 > rilatas al 2026 se ne alie specifite.
 
 > Lingvo: Preferu Esperanton por ĉiu dokumentado, komentoj, identigiloj kaj
@@ -18,63 +18,15 @@ kanal superrigardo, livestreno, podkastoj, elŝutoj, plej ŝatataj, serĉo, vekh
 La plej valora parto ne estas la ludilo aŭ UI, sed la **scio pri la fontoj** — kiuj
 kanaloj ekzistas, kiel iliaj fluoj aspektas, kaj kiel eltiri rektan MP3-URL el ĉiu.
 
-## Stato de la projekto (2026-09-22)
+## Stato de la projekto (ĝisdatigita 2026-10-14)
 
-La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
-
-| Fazo | Priskribo | Stato | PR |
-|---|---|---|---|
-| 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
-| 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
-| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + golden-testoj | ✅ Farita | #7 |
-| 1c | Kanalvido (elsendlisto) + elsendodetalo + Ktor + Coil 3 | ✅ Farita | #9 |
-| 1d | Peranto-parsilo (archive.org + Google Drive, regulo 6.3) | ✅ Farita | #10 |
-| 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
-| 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
-| — | UI-testoj + Android assets-fix | ✅ Farita | #14 |
-| 4 | Malfono & mediaintegriĝo (MediaSession, sciigoj) + persisto | ✅ Farita | #15,#16 |
-| 5 | Elŝutoj (Ktor→dosiero, persisto, eksterreta ludado) | ✅ Farita | #20,#21,#22,#23 |
-| — | Sonludado sur Web (wasmJs/HTMLAudioElement) | ✅ Farita | #17 |
-| — | Sonludado sur Desktop (mp3spi + SourceDataLine) | ✅ Farita | #18 |
-| — | Protokolo ĉie en la apo (RSS, navigado, klakoj, eraroj) | ✅ Farita | #19 |
-| 6 | Pezaj platform-funkcioj (vekhoro, sciigoj, widget, Chromecast, TTS) | 🔨 Nuna (vekhoro + sciigoj faritaj; widget/Chromecast/TTS venas) | #24-#30,#44 |
-| — | Ludvico kaj daŭra ludado | ✅ Farita | #46 |
-| — | Sciigoj pri novaj elsendoj (WorkManager, "Ludi"-butono en sciigo) | ✅ Farita | #44 |
-| — | Sentry.io erarmonitorado | ✅ Farita | #51 |
-| — | Riĉa HTML-vidigo, horizontala svipo, evolua reĝimo, konservi dum ekranturnoj | ✅ Farita | #53,#56-#63 |
-| — | radioTxtKomparilo + 2 novaj kanaloj (Kaliningrada E-radio, Universeala Lindo) | ✅ Farita | #62 |
-| — | Malsupren-tiro, ekzaktaj alarmoj, podkasto ĉe alarmo, eksponenta reprovo, HLS sur Android | ✅ Farita | — |
-
-### Kio funkcias nun
-
-- **Malnova apo** (`malnova/app/`): konstruiĝas kaj funkcias (APK, 18 MB)
-- **Nova apo — kanalaro**: montras la realajn kanalojn el la JSONC-konfiguro (Desktop + Android)
-- **Nova apo — RSS-parsilo**: parsas ĈIUJN 7 parsregulojn (inkl. Peranto/archive.org)
-- **Nova apo — ludado**: vera sonludado sur Android (Media3 ExoPlayer), Web (HTMLAudioElement), Desktop (mp3spi + SourceDataLine)
-- **Nova apo — navigado**: kanalaro → kanal → elsendo + serĉo + plejŝatataj + elŝutoj + alarmoj + agordoj (uzas `navigation3` — `NavKey`/`NavDisplay`/`entryProvider`)
-- **Nova apo — elŝutoj**: fluanta elŝuto (Ktor→FileOutputStream), persisto inter restartoj (JSON-metadateno), eksterreta ludado (prefero por loka dosiero)
-- **Nova apo — vekhorloĝo**: alarmoj kun sugestoj el JSONC, persisto inter restartoj (Settings+JSON), UI kun kreilo/redaktilo, AlarmManager-skedado (Android), aŭtomata ludado (livestream, aŭ la plej freŝa neaŭskultita podkasto — `elektuAlarmElsendon`), fallback ringtono (haltigebla per Halti kaj per tuŝo de la sciigo, mem-haltiĝas post 5 min), volumo-boost. `setAlarmClock` sur Android ≤11, `setWindow` kun 10-minuta fenestro sur Android 12+ (la ekzaktaj-alarm-permesoj estas intence ne deklaritaj — vidu la lecionon sube) + informa karto en AlarmoEkrano; ripetantaj alarmoj re-skediĝas en `AlarmoReceivilo`
-- **Nova apo — sciigoj**: WorkManager kontrolas ŝatatajn kanalojn por novaj elsendoj (skedita je 7:00 kaj 16:00), sciigo kun "Ludi"-butono kiu lanĉas la elsendon rekte per `MediaController` (`LudiElsendoReceivilo`)
-- **Nova apo — emblemoj**: Coil 3-bildoj en kanalaro kaj kanalvido
-- **Nova apo — ludvico**: aŭtomata sekva-ludado post naturfino (3 prioritatoj: samkanala → ŝatataj → plej freŝa), pozicio-spurado (ĉiu 5s) kun resumigo, eksplicita ludvico per ludvico-butono (Material 3 ikono), "Lastatempe ludata" sekcio sur HejmoEkrano, "Daŭrigi de X:XX" en ElsendoEkrano
-- **Nova apo — HTML**: riĉa HTML-vidigo de priskriboj en ElsendoEkrano (`HtmlVido`/`HtmlTeksto`)
-- **Nova apo — gestoj**: horizontala svipo inter elsendoj de sama kanalo (ElsendoEkrano) kaj inter kanaloj (KanalEkrano)
-- **Nova apo — evolua reĝimo**: ŝaltilo en agordoj + elektiloj por priskribo-fonto kaj vidmaniero
-- **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
-- **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
-- **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
-- **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
-- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
-  Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
-- **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
-
-### Kio NE funkcias ankoraŭ
-
-- Aŭtomata resumigo: pozicio-restarigo okazas nur kiam oni reiras al la elsendo kaj klakas "Aŭskulti"; ne aŭtomate kiam oni malfermas la apoon kaj la ludilo daŭras en fono
-- iOS-ludado (no-op, bezonas AVPlayer)
-- Web: plej multaj RSS-fluoj estas blokitaj de CORS (neniu `Access-Control-Allow-Origin`) — bezonas
-  servilon/prokurilon (vidu `docs/nova/06_servilo_arkivo.md`); bildoj ankaŭ ne aperas
-- Hejmekrana widget, Chromecast, parolsintezo
+La nova KMP-apo (Android + Desktop + Web/wasmJs) estas eldonita kaj aktiva en
+Google Play (3.0.3/249, 2026-10-13). Ĉiuj fazoj de la plano estas faritaj krom:
+iOS-ludado (bezonas AVPlayer + Xcode-projekton), eldono de Desktop + Web/wasmJs, hejmekrana widget, Chromecast,
+parolsintezo kaj la podkasta arkiv-servilo (`docs/nova/06_servilo_arkivo.md`).
+Web estas limigita de CORS (nur la anchor.fm-podkastoj ŝargeblas sen servilo).
+La historia fazo-tabelo kaj la detala listo "kio funkcias / kio ne funkcias"
+staras en [`NOTOJ.md`](NOTOJ.md) → "Projekta stato kaj fazoj".
 
 ## Granda plano
 
@@ -86,36 +38,12 @@ konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 ## Dosierujo-structuro
 
-```
-EsperantoRadio/
-├── malnova/                # Malnova Android-apo (funkcianta, ne tuŝebla)
-│   ├── app/                #   Android-apo (dk.dr.radio.* / dk.nordfalk.esperanto.radio)
-│   ├── parse/              #   RSS-parsado + RssArkivServer (memstara CLI-servilo)
-│   └── data/               #   Datummodeloj (Kanal, Udsendelse, Grunddata...)
-├── androidApp/            # Nova Android-aplikaĵo (MainActivity → EsperantoRadioApp)
-├── desktopApp/            # Nova Desktop-JVM-aplikaĵo (Window + Compose)
-├── webApp/                # Nova Web-aplikaĵo (wasmJs, CanvasBasedWindow)
-├── shared/                # Nova komuna KMP-modulo
-│   ├── src/commonMain/    #   Komuna kodo (modeloj, parsilo, UI, deponejoj)
-│   ├── src/androidMain/   #   Android-specifa
-│   ├── src/desktopMain/   #   Desktop-specifa (JVM)
-│   ├── src/iosMain/        #   iOS-specifa (kodo ekzistas; iosApp/ Xcode-projekto ankoraŭ ne kreita — malkomentu `include(":iosApp")` en settings.gradle.kts sur Mac)
-│   ├── src/wasmJsMain/    #   Web-specifa (wasmJs)
-│   └── src/commonTest/    #   Testoj + desktopTest (ĉiuj pasas)
-├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
-├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
-├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
-├── RssArkivServer/        # Kaŝenitaj RSS-fluoj (XML-fiksaĵoj)
-├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj — for de la repo per .gitignore; kiu bezonas pliajn fiksaĵojn kopiu ilin al shared/src/commonTest/resources/feeds/)
-├── docs/malnova/           # Esperanta superrigordo de la malnova apo
-├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
-├── .github/workflows/       # CI (changelog-kontrolo)
-├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
-├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
-├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
-├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
-└── AGENTS.md               # Tiu ĉi dosiero
-```
+La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esencoj:
+`malnova/` (la historia apo — ne tuŝebla), `androidApp/` + `desktopApp/` +
+`webApp/` + `shared/` (la nova KMP-apo), `docs/malnova/` + `docs/nova/`
+(dokumentaro), `CHANGELOG.md` + `SXANGXOJ.md` + `NOTOJ.md` + `FAROTA.md` +
+`AGENTS.md` (la protokolaro), `.vibe/skills/` (proceduraj skill-oj:
+`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`).
 
 ## Plej gravaj reguloj por agentoj
 
@@ -153,10 +81,11 @@ EsperantoRadio/
    Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; se la
    CI-kontrolo erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
    la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
-11. **Aŭtomate aldonu viajn lecionojn al ĉi tiu dosiero.** Post ĉiu laboro —
-    precipe post eraro, incidento aŭ neatendita rezulto — skribu koncizan
-    lecionon (kun dato kaj ekzemplo) en la sekcion "Teknikaj scioj lernitaj
-    dum la laboro". Celo: neniam ripeti la saman eraron.
+11. **Aŭtomate aldonu viajn lecionojn.** Post ĉiu laboro — precipe post
+    eraro, incidento aŭ neatendita rezulto — skribu koncizan lecionon (kun
+    dato): aktivaj reguloj en "Aktivaj reguloj kaj rimarkoj" (sube), procedura
+    scio en la koncernan skill-on (`.vibe/skills/`), historiaj detaloj en
+    NOTOJ.md aŭ SXANGXOJ.md. Celo: ne ripeti la saman eraron.
 12. **Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
     Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
     esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
@@ -187,12 +116,6 @@ EsperantoRadio/
    reskribas la historion kaj postulas force-push; `git merge origin/master` en la
    PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
    ricevis master-ĝisdatigojn.)
-9. **Kiam la uzanto petas revizion de PR: unue ŝanĝu la lokan laborarbon al la
-   koncerna branĉo** (`git switch <branĉo>` — la IDE de la uzanto, Android Studio,
-   montras tiun branĉon), kaj laboru, testu kaj puŝu sur ĝi. Ne kreu apartajn
-   laborarbojn (worktree) por revizioj — la uzanto volas sekvi la laboron sur la
-   ĝusta branĉo en la IDE. (2026-10-14: dum la revizio de PR #111 la laboro okazis
-   en aparta worktree; la uzanto volas la branĉo-ŝanĝon en Android Studio.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -212,312 +135,44 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 2. La CI (`.github/workflows/changelog-kontrolo.yaml`) rifuzas PR-ojn, kiuj
    ŝanĝas la ĉefan fontkodon (`*Main`-dosierujoj) sen ŝanĝo de `CHANGELOG.md`.
    Preterpaso: PR-etikedo `preterlasu-changelog` (puraj internaj ŝanĝoj).
-3. Eldono de nova versio:
-   1. `apoversio` en `gradle/libs.versions.toml` ricevas la novan nombron
-      (ĝi estas la unu fonto de vero por `versionName`/Sentry — `ApoVersio.kt`
-      estas generata el ĝi).
-   1b. **Baskulu `versionCode`** en `androidApp/build.gradle.kts`
-      (`defaultConfig.versionCode`) — GPP ne pliigas ĝin aŭtomate, kaj la
-      Play-API rifuzas re-uzi jam eldonitan versionCode
-      ("Version code is too low or has already been used").
-      247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto (2026-10-13).
-   2. Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT` kaj malfermu novan
-      malplenan `## [Neeldonita]`-sekcion.
-   3. Kreu git-tagon `vX.Y.Z` sur la eldona komito kaj puŝu ĝin
-      (`git tag vX.Y.Z && git push origin vX.Y.Z`). La malnova deponejo uzis la
-      etikedon `fresxa_versio` por la fina 2.x-eldono (2.0.12f, 2018) — se tiu
-      konvencio devas daŭri, movu ĝin al la sama komito; alikaze `vX.Y.Z` sufiĉas.
-   4. Aldonu kompar-ligojn malsupre en CHANGELOG.md
-      (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
-      Noto: `3.0.0` ne havas etikedon — la ligo en CHANGELOG.md uzas la eldonan
-      komiton (`294834b`).
-   5. **Release-notes por Google Play** estas intence en Esperanto — ili vivas en
-      `androidApp/src/main/play/release-notes/en-US/internal.txt` (malgraŭ la
-      `en-US`-dosierujo, la enhavo estas en Esperanto; Play Store montras ĝin
-      kiel "Kio novas" por ĉiuj uzantoj). Maksimumo 500 signoj.
-      **ATENTU (2026-10-13): GPP elektas la dosieron laŭ la TRAKO-nomo** —
-      `${track}.txt`, do `internal.txt` (aŭ `default.txt` kiel retroiro) —
-      NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.) estas
-      ignoritaj de GPP; tial ĉiuj eldonoj de 3.0.2 ĝis 3.0.3/249 eldoniĝis kun
-      la malnovaj notoj de la 3.0.1-epoko. Ĝisdatigu `internal.txt` ĉe ĉiu
-      eldono. (La historiaj `X.Y.Z.txt`-dosieroj estas arkivigitaj en
-      `androidApp/src/main/play/release-notes-arkivo/` — ekster la de GPP
-      skanata dosierujo.)
-   6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka
-      maŝino rajtas eldoni — la CI-`eldonado.yml` per GitHub-sekretoj NE
-      uzeblas nuntempe):
-      ```bash
-      export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-      ./gradlew :androidApp:publishReleaseApk   # APK (ne AAB — la apo ne
-                                                # estas en Play App Signing)
-      ```
-      Tio eldonas al la trako `internal` (agordita en la `play`-bloko).
-      Poste la uzanto promocias la eldonon al produktado permane en Play
-      Console. La signado legas `secrets.properties` en la radiko (ne tuŝu/
-      legu ĝin). La notoj de jam eldonita versionCode NE plu korekteblas per
-      GPP (API-rifuzas versionCode-reuzon) — korektu ilin permane en Play
-      Console, kiel farite por 249 (2026-10-13).
+3. Eldono de nova versio: sekvu la skill-on **`eldonado`** (`.vibe/skills/eldonado/`)
+   — `apoversio` + versionCode-baskulo + CHANGELOG-sekcio + git-etikedo +
+   `internal.txt`-notoj + `publishReleaseApk` de la LOKA maŝino (la CI-eldonado
+   per GitHub-sekretoj ne uzeblas) + permana promocio al produktado. Kritikaj
+   faktoj: versionCode ne re-uzeblas (Play-API-rifuzo); GPP legas la notojn laŭ
+   la TRAKO (`internal.txt`), neniam laŭ versionName; APK, ne AAB (la apo ne
+   estas en Play App Signing); la signado legas `secrets.properties` (ne tuŝu).
 
-## Teknikaj scioj lernitaj dum la laboro
+## Aktivaj reguloj kaj rimarkoj
 
-- **Ĉiam konstruu post kunfando.** La CI (`changelog-kontrolo`) nur kontrolas
-  CHANGELOG-ŝanĝojn — ĝi NE konstruas la apon. PR #81 pasis CI sed rompis
-  `androidApp/build.gradle.kts` (import mankis, `Properties` nevidebla en
-  `play {}`). Post ĉiu kunfando, rulu `./gradlew :androidApp:assembleDebug`
-  antaŭ ol publikigi aŭ daŭrigi.
-- **JDK 17** estas necesa por konstrui la Android-apk (la defaŭlta JDK 21 mankas `jlink`).
-  Uzu: `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`
-- **Versioj**: Kotlin 2.2.20, Compose Multiplatform 1.10.0, Material3 1.10.0-alpha05,
-  Ktor 3.1.3, Media3 1.5.1, Coil 3.0.4, kotlinx-datetime 0.7.0. Vidu `gradle/libs.versions.toml`
-  kaj `docs/nova/02_teknika_stako.md`.
-  Ĝisdatigo de Kotlin 2.1.0/Compose 1.7.3 al 2.2.20/1.10.0 okazis en #32/#35.
-- **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
-  La API: `Ksoup.parseXml(teksto, "")` por XML, `Ksoup.parse(teksto)` por HTML.
-  `selectFirst(...)` ekzistas (ne nur `select(...).firstOrNull()`).
-- **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
-  NE estas liberigita en `onDestroy`. `AppStato.ludvicoRegilo` tenas ĝin dum la tuta procezo. La nuna `Sonfonto`
-  estas JSON en `MediaMetadata.extras` (`SonfontoKodilo`), do ludado komencita de alia MediaController
-  (ekz. `LudiElsendoReceivilo`) estas rekonata. Vidu `SXANGXOJ.md`.
-- **Instrumentitaj Compose-testoj** bezonas `GrantPermissionRule` por `POST_NOTIFICATIONS` (vidu
-  `AndroidUiTest`): alie `MainActivity.petiSciigPermeson()` montras la permes-dialogon, MainActivity estas
-  paŭzita, kaj la Compose-testregistro (nur RESUMED-radikoj) raportas "No compose hierarchies found".
-  `connectedAndroidTest` malinstalas la apon post ĉiu rulo, do la permeso ĉiam mankas komence.
-  Rulu ĉiujn: `./gradlew :androidApp:connectedDebugAndroidTest`.
-- **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` — sen ĝi la MediaSession silente
-  malsukcesas (`ClassNotFoundException: HlsMediaSource$Factory` en logcat, `MediaSessionStub`).
-- **Ktor 3**: CIO sur Android/Desktop/iOS, sed **ne en la retumilo** — CIO en wasmJs bezonas la
-  `net`-modulon de Node.js ("Node.js net module is not available"). Uzu `httpMotoro` (expect/actual:
-  CIO, aŭ `Js` = fetch sur wasmJs), ne `HttpClient(CIO)` rekte. La Js-motoro ĵetas `kotlin.Error`
-  (ne Exception) ĉe reteraroj/CORS — kaptu `Throwable` (kaj reĵetu `CancellationException`).
-- **CIO + domajno-esceptoj en network_security_config = paneo** (2026-10-11, emulila testo):
-  kiam la config havis cleartext-domajno-esceptojn, CIO paneigis por ĈIUJ https-petoj
-  ("CertificateException: Domain specific configurations require that hostname aware
-  checkServerTrusted is used") — tiam OkHttp-motoro devis anstataŭigi CIO sur Android.
-  Kun nur `base-config` (neniuj domajno-esceptoj — la nuna stato) CIO funkcias normale,
-  kaj `ktor-client-okhttp` estis forigita. Se iam re-aldoniĝas domajno-escepto al la
-  security-config, remetu `libs.ktor.client.okhttp` kaj `HttpMotoro.android` al OkHttp.
-- **Neniu DI-framintervalo** — permana injektado en konstruktiloj, kiel la ekzistanta kodo.
-- **Neniu datumbazo** — la kliento simple kaŝenas servil-respondojn kiel dosierojn.
-- **Web**: nur `wasmJs` (ne `js` — la JS-celo havis Skia-bindings-eraron). Rulu per
-  `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (kun la defaŭlta
-  1,5 GB la Wasm-ligilo ĵetas OutOfMemoryError). Enirpunkto: `ComposeViewport` (CanvasBasedWindow
-  estas malrekomendita-kiel-eraro en Compose 1.10).
-- **Klib-ABI kaj Kotlin-versio**: Wasm/Native-bibliotekoj (`.klib`) kompilitaj per pli nova Kotlin ne
-  legeblas de Kotlin 2.2.20 → "Unresolved reference" nur sur wasmJs (JVM/Android uzas jar kaj funkcias).
-  Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`. Tial navigation3 estas
-  `1.1.0-alpha02` (1.1.1 = Kotlin 2.3.10). Ĝisdatigu nur kune kun Kotlin 2.3.
-- **Kanalkonfiguro sur wasmJs/iOS** estas enigita kiel Kotlin-ĉeno dum la konstruo
-  (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`) — la fonto restas la JSONC-dosiero.
-- **JSONC-parsado**: la kanalkonfiguro havas `//`-komentojn kaj plurliniajn ĉenojn kun
-  `\` ĉe lini-fino. La `KanalAgordoLeganto.striptiguKomentojn` traktas ambaŭ.
-- **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en `<content:encoded>`.
-  Uzu `getElementsByTag("content:encoded").firstOrNull()?.text()` (ne `html()`) por
-  akiri la malkoditan HTML-enhavon, poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
-  Detaloj pri ĉiuj parsreguloj: `docs/nova/04_parsado_kaj_arkivo.md`.
-- **Sonludado — bibliotek-elekto** (detaloj: `docs/nova/02_teknika_stako.md`):
-  - **basic-sound** (LexiLabs-App/basic-sound, MIT) estis provita unue. La JVM-implemento
-    uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
-    por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
-  - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
-    Compose 1.10.0 — tiam tro nova por nia Kotlin (nun 2.2.20 / Compose 1.10.0, sed la biblioteko bezonas VLC sur Desktop).
-  - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
-    kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
-    `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
-    estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
-  - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
-    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
-    Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
-    `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
-    pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).
-- **Platforma subteno — sonludado**:
+> La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan:
+> **`eldonado`** (versio-eldonado al Play), **`sentry-esplorado`** (legi/analizi
+> Sentry-n), **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, emulilo),
+> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj). Historiaj lecionoj kaj
+> arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
+> [`SXANGXOJ.md`](SXANGXOJ.md).
 
-  | Funkcio | Android | Desktop (JVM) | Web (wasmJs) | iOS |
-  |---|:--:|:--:|:--:|:--:|
-  | MP3-fluado | ExoPlayer | mp3spi + SourceDataLine | HTMLAudioElement | no-op |
-  | HLS | ExoPlayer | ne | retumilo | no-op |
-  | Seek | ExoPlayer | ne (streaming) | HTMLAudioElement | no-op |
-  | Volumo | ExoPlayer | FloatControl | HTMLAudioElement | no-op |
-  | Pozicio-sekvado | ExoPlayer | bajtoj/kadraj | eventlistener | no-op |
-
-- **Ludvico kaj daŭra ludado** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
-  - `LudvicoLogiko` estas pura decidlogiko (sen flankaj efikoj) — tute testebla.
-  - `LudvicoRegilo` observas `LudantoStato.Finita` per `StateFlow.distinctUntilChanged()`
-    kaj lanĉas aŭtoludon en aparta korutino (`scope.launch`) por eviti rekurson.
-  - Pozicio estas savata ĉiu 5s per `delay()`-bazita korutino. Ĉe `halti()` la
-    `nunaFonto` estas forigita de la ludilo, do `LudvicoRegilo` konservas
-    `lastaFonto`/`lastaPozicioMs` (kun `@Volatile`) kiel retroiron.
-  - `malmarkiFinita()` estas vokata kiam la uzanto eksplicite reludas finitan elsendon.
-  - Mutex protektas `ludiElsendon`/`aldoniAlVico`/`ludiSekvan` kontraŭ konkurantaj vokoj.
-  - `LudatojDeponejoMaketo` estas la memora implemento por Preview kaj testoj (ne por produktado).
-
-- **Sciigoj pri novaj elsendoj** (detaloj: `docs/nova/03_domajno_kaj_datumoj.md`):
-  - `NovajElsendojKontroloWorker` (Android, WorkManager) periode kontrolas ŝatatajn kanalojn
-    (skedita je 7:00 kaj 16:00, ±1h), elŝutas RSS-fluojn, kaj kreas sciigojn por neviditaj elsendoj.
-  - La sciigo havas "Ludi"-agon: `LudiElsendoReceivilo` ricevas la intenon kaj lanĉas ludadon
-    rekte per `MediaController` (konektita al la MediaSession). Uzas `goAsync()` por teni la
-    Receivilon vivanta dum la nesinkrona konekto.
-  - `GhisdatiguSciigSkedon` ĝisdatigas la WorkManager-skedon kiam la uzanto ŝaltas/malŝaltas sciigojn.
-  - `BootReceivilo` re-skedas alarmojn post restarto de la aparato.
-
-- **Navigado**: uzas `navigation3` (`androidx.navigation3`) — `NavKey` ( sealed `Vojo`),
-  `rememberNavBackStack`, `entryProvider`, `NavDisplay`. Stato persistebla per `SavedStateConfiguration`
-  kun `polymorphic` serializers por ĉiu `Vojo`-subklaso. Detaloj: `docs/nova/05_dizajno_kaj_ui.md`.
+- **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
+  post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
+  nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
+  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
+  (2026-10-17, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
-  precipe `gh pr create --body "..."`: bash plenumas la backtick-enhavon kiel
-  komand-anstataŭigon. (2026-10-08, PR #80: la kodo-pecoj de la PR-teksto plenumiĝis —
-  akcidentaj `git tag v3.0.1`/`v3.0.2` + `git push` + `./gradlew`; la etikedoj
-  kreiĝis sur la malĝusta komito kaj devis esti korektitaj.) Uzu
-  `--body-file <dosiero>` aŭ
-  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
-- **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — `CoroutineScope(Dispatchers.IO …)`
-  en commonMain rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default` en komuna kodo (aŭ
-  expect/actual se IO-gravegas sur JVM). (2026-10-09: PR #79 enmetis tion en `AppStato.inicialigu`;
-  ĝi pasis nekaptita ĉar neniu CI-laborfluo kompilas wasmJs — `./gradlew :shared:compileKotlinWasmJs`
-  konstatis tion; la CI-laborfluo ekzistas depost PR #89.)
-- **Ktor CIO + network_security_config = paneo de ĈIUJ https-petoj sur Android**: la CIO-motoro
-  vokas la malnovan 2-argan `checkServerTrusted(ĉeno, tipo)` sen gastiganto; tuj kiam la apo
-  difinas `android:networkSecurityConfig` (nia G1-ŝanĝo), Android postulas la gastiganto-konscian
-  3-argan variaĵon kaj ĵetas `CertificateException: Domain specific configurations require that
-  hostname aware checkServerTrusted(...) is used` por ĈIUJ https-konektoj (ne nur la esceptitaj
-  domajnoj). Solvo: `ktor-client-okhttp` kiel la Android-motoro (`HttpMotoro.kt` androidMain) —
-  OkHttp estas gastiganto-konscia. CIO restas sur Desktop/iOS; Js sur wasmJs.
-  (2026-10-11: tio rompis ĉiujn https-fluojn post la G1-ŝanĝo — la diskkaŝo KAŜIS la simptomon
-  ("Ŝargis N elsendojn" montris nur malnovajn datumojn el la kaŝo). Fum-testu ĉiam per
-  `adb shell pm clear` + freŝa reto, ne kun diskkaŝo.)
-- **Purigaj regex-modeloj kun `<p>.+?FRazo.+?</p>` + DOTALL estas danĝeraj**: la `.+?` komenciĝas ĉe
-  la UNUA `<p>` en la tuta teksto kaj manĝas ĉiun alineon ĝis la celita frazo — kun la nuna
-  Varsovia Vento-fluo tio forviŝis la enkondukon kaj la parto-listilon. Uzu temperitan formon
-  `(?:(?!</p>).)` anstataŭ `.+?` por ke la modelo ne povu transiri alineon (ekzemploj:
-  `esperantoradio_kanaloj_v9.json`, puriguModeloj de varsoviavento). (2026-10-09, PR #91.)
-- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
-  projectCards-malrekomendo) — uzu la REST API (vidu supre).
-- **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
-  atendatas, serĉu nereatingeblajn komitojn per
-  `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
-  2–3 gepatroj, mesaĝo "On <branĉo>: ...") kaj reakiru per
-  `git stash store -m "..." <hash>`. (2026-10-08: la stash "eldono 3.0.2" tiel reakiriĝis.)
+  precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
+  (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.
+- **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
+  dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
+  skribis sen la intertempe postulita `mutex.withLock`).
+- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
+  ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
+  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`).
+- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
+  uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
 - **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
-  `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
-  uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
-  CHANGELOG.md — konservita en la stash, ne enmetita.)
-- **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
-  se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
-  (ekz. CHANGELOG.md), la kunfando konservas ambaŭ sen konfliktmarkoj — la
-  dosiero ricevas du `### Aldonita`/`### Riparita`-sekciojn. Post ĉiu stash pop
-  kontrolu `grep -n "^## \|^### " CHANGELOG.md` kaj kunigu mane. Ankaŭ kontrolu
-  importojn: viaj forigitaj/aldonitaj importoj povas resti/rediĉiĝi en dosieroj
-  kiujn vi ne plu celas ŝanĝi. (2026-10-11: duoblaj sekcioj + restinta
-  `fonaDispatcher`-importo en AppStato.kt.)
-- **Nova kanalo = ŝanĝu ambaŭ kopiojn de la konfiguro**: `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json`
-  KAJ `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` (identikaj). Kaj atentu: la JSONC havas
-  DU arojn — `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ` (referencataj, de la kodo NE legataj). Novaj kanaloj
-  devas iri en `kanaloj`; la dosiero FINIĜAS per la forprenitaj, do "aldonu ĉe la fino" estas la malĝusta loko.
-  (2026-10-08: la 7 novaj podkastoj unue erare surteriĝis en FORPRENITAJ_KANALOJ.)
-- **iTunes Search-API eldonas la kanonikan RSS-URL-on de podkasto**: `https://itunes.apple.com/lookup?id=<appleId>`
-  liveras JSON kun `feedUrl`, `artworkUrl600`, `releaseDate` kaj `trackCount`; `https://itunes.apple.com/search?term=Esperanto&entity=podcast&limit=25`
-  listigas ĉiujn ĉe Apple indeksitajn Esperanto-podkastojn. Uzebla por trovi fluojn kaj kontroli aktivecon sen
-  skrapado de Apple-retejoj. (2026-10-08: tiel kolektiĝis la fluoj de la 7 novaj kanaloj.)
-- **Regex-`"`-signoj en JSONC devas esti refutitaj** (`\"`): la koment-striptigilo forigas
-  nur `//`-liniojn, sed la valoroj mem devas esti valida JSON post striptigo. Regex kiel
-  `<p class="who">.+?</p>` rekte enskribita en `puriguModeloj` rompas la tutan kanalkonfiguron
-  (KanalAgordoFumTesto malsukcesas per `JsonDecodingException` ĉe `puriguModeloj[0]`).
-  (2026-10-10: tia eraro enŝoviĝis en la vinilkosmo-regex kaj rompis ĉiujn branĉojn de la
-  riparo-stako; kaptita de la fum-testo kaj la CI-laborfluo (PR #89). Uzu la temperitan formon
-  `<p class=\"who\">(?:(?!</p>).)*?</p>` kiel ĉe varsoviavento.)
-- **`startActivity` el fona BroadcastReceiver estas SILENTE blokata** (BAL-limigoj, Android 10+):
-  ĝi ne ĵetas escepton — la Activity startas en la fono kaj ĝia kodo (onCreate, intent-traktado)
-  plenumiĝas nur kiam la uzanto vekas la telefonon. Do neniam metu alarm-ludon (aŭ alian
-  tempokritikan logikon) en Activity lanĉota el ricevilo — ludu rekte en la ricevilo
-  (goAsync-korutino); la videblecon certigu alt-prioritate DAŬRA sciigo (`CATEGORY_ALARM` +
-  `PRIORITY_MAX`; sen `USE_FULL_SCREEN_INTENT` la ekrano ne vekiĝas aŭtomate, sed la
-  sciigo aperas kiel heads-up kaj restas dum la alarmo sonas — nuligata kiam la
-  ludado haltiĝas aŭ finiĝas). (2026-10-11: alarmo 16:10 ludis nur je 16:14 kiam la uzanto
-  vekis la telefonon; la "catch"-fallback neniam rulis ĉar ne estis escepto. Riparita en PR #94.)
-- **Vekhorloĝaj permesoj intence NE deklaritaj (ekde 3.0.3, 2026-10-12)**: Google Play
-  rifuzas la alŝuton se la apo deklaras `USE_FULL_SCREEN_INTENT` sen la respondo al la
-  demando "full-screen intent" ("You must let us know whether your app uses any
-  full-screen intent permissions", eraro 403). Tial `SCHEDULE_EXACT_ALARM`,
-  `USE_EXACT_ALARM` kaj `USE_FULL_SCREEN_INTENT` estas forigitaj el la manifest
-  (kompromiso akceptita de la uzanto). Sekvoj sur Android 12+: alarmoj povas ekigi
-  ĝis 10 minutojn malfrue (`setWindow` anstataŭ `setAlarmClock`) kaj la ekrano ne
-  vekiĝas aŭtomate — la sono ĉiam ludas kaj la sciigo aperas kiel heads-up
-  (`CATEGORY_ALARM` + `PRIORITY_MAX`). Sur Android ≤11 nenio ŝanĝiĝas. (La malnova
-  lernita fakto — `USE_EXACT_ALARM` aŭtomate donata al vekhorloĝo-apoj, `SCHEDULE_EXACT_ALARM`
-  defaŭlte donata sed revokebla sur Android 12 — plu validas, sed ne plu aplikiĝas,
-  ĉar ni simple ne deklaras la permesojn.)
-- **Post mergo de master, reviziu la novajn invariantojn en la kunfanditaj dosieroj**:
-  novo aldonita metodo povas malobservi novaĵon de master. (2026-10-11: `markiLudita`
-  komence skribis sen `mutex.withLock`, kiun master intertempe postulis por ĉiuj
-  skriboj de `PersistaLudatojDeponejo` — kur-kondiĉo kun la pozicio-savanto.)
-- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo, kontrolu la ĝustan
-  literumon de identigiloj** per `grep`/`od` antaŭ ol reprovi — la okulo ofte
-  "korektas" similan nomon (ekz. `estasEneDe` ≠ `estaEneDe`). Ripetaj malsukcesoj
-  sen kaŝita differenco = la ĉeno mem estas alia.
-- **Fallback-sono ne haltigeblas per stato-observado** (2026-10-12): se nenio iam
-  komencas la ludilon (pura-fallback-kazo de la vekhorloĝo), `halti()` metas
-  `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas — la halto
-  devas esti hokita rekte en la agojn (`halti()`, stato-ŝanĝo al `Haltita`, tuŝo de
-  la sciigo), ne per kolektanto.
-- **`## [Neeldonita]` en CHANGELOG.md ĉiam estas la UNUA versio-sekcio** (rekte
-  antaŭ la plej nova eldonita versio) — enmeto antaŭ pli malnova versio lasas ĝin
-  meze de la antaŭa sekcio. (2026-10-12: tia enmeto en 2491035 devis esti movita.)
-- **Instrumentitaj testoj: la testata procezo estas "foreground"** (2026-10-12): la
-  best-effort `startActivity` el fona ricevilo SUKCESAS dum la testoj (male ol vera
-  fona alarmo, kie BAL blokas ĝin; eĉ `moveToState(CREATED)` ne helpas). Kondiĉoj,
-  kiuj distingas "uzanto tuŝis" de "sistemo lanĉis", devas esti en la intenco mem
-  (ekz. `de_sciigo=true` de la sciigo), ne en la ĉirkaŭaĵo.
-- **`haltuAlarmRingon()` en `updateState()` nur ĉe transicio al `Haltita`**
-  (2026-10-14, PR #111): la unua `updateState()` post la MediaController-konekto
-  kalkulas `Haltita` kun malplena media listo — sen transicia gardilo ĝi vokus
-  `haltuAlarmRingon()` kaj mortigus ĵus startintan fallback-ringtonon en freŝa
-  procezo (la alarmo restus silenta). Gardilo: `ludantoStato is Haltita &&
-  _stato.value.stato !is Haltita`. Instrumentitaj testoj kun `ActivityScenarioRule`
-  ne kaptas tion (tie la ludilo jam ekzistas kaj estas konektita) — bezonas teston
-  sen la regulo (`FresxProcezaFallbackTest`).
-- **Forigi ŝlosilo-linion el la JSONC per skripto lasas vostan komon**, se ĝi estis
-  la lasta ero de la objekto — `KanalAgordoFumTesto` kaptas tion per
-  `JsonDecodingException: Trailing comma`. Post ĉia programema redakto de la
-  konfiguro rulu `./gradlew :shared:desktopTest` antaŭ ol fidi la rezulton.
-  (2026-10-12: forigo de la eksa statusmesaĝo-ŝlosilo postlasis `,` post
-  `apaj_novaĵoj`.)
-
-- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
-  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
-  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
-  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
-  Debug-konstruoj kaj emuliloj ne raportas al Sentry.
-- **Eraroj-kvoto: `loge(tag,msg,e)` = erar-evento** (2026-10-13): `loge(tag, msg, e)`
-  vokas `Sentry.captureException` kaj konsumas la MONATAN ERAROJ-KVOTON (5 000);
-  `loge(tag, msg)` sen escepto kaj `Sentry.logger.*` estas nur protokol-eventoj
-  (aparta kvoto). Atendataj fiaskoj (reto, ludad-, elŝut-, serĉ-fiaskoj) uzu
-  `logw(tag, msg, e)` (nur loka) — neniam loge. En produktado eraroj estas
-  50 %-specimenataj (`options.sampleRate` — rekte duonigas la kvot-konsumon;
-  `options.tracesSampleRate` specimenas nur SPUROJN, apartan kvoton, ne erarojn).
-  Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
-  (FAROTA C45) — ne malmolu versio-listojn en la apo.
-- **Eldonado al Play funkcias nur LOKE** (2026-10-13): `./gradlew :androidApp:publishReleaseApk`
-  el ĉi tiu maŝino (track `internal`; APK, ne AAB — la apo ne estas en Play App Signing;
-  poste permana promocio al produktado en Play Console) — la CI-`eldonado.yml` per
-  GitHub-sekretoj ne uzeblas nuntempe. versionCode baskuliĝas permane en
-  `androidApp/build.gradle.kts` (GPP ne pliigas ĝin; la API rifuzas versionCode-reuzon).
-  Release-notoj: `release-notes/en-US/internal.txt` — trako-bazita, ne versio-bazita
-  (detaloj en la eldona sekcio; la 249-notoj korektiĝis permane post la eldono).
-  **GPP-taskoj** (2026-10-13, el `./gradlew :androidApp:tasks`):
-  - `publishReleaseApk` — APK + release-notoj (kion ni uzas; `internal.txt`).
-  - `publishReleaseListing` — **aparte** alŝutas la metadatumojn (priskribo,
-    ekranfotoj el `play/listings/`). `publishReleaseApk` NE inkluzivas ilin!
-    Ŝanĝoj al `full-description.txt` kc. bezonas tiun taskon aŭ permanan
-    konzol-agon.
-  - `publishReleaseApps` — APK + metadatumoj kune (kombino de ambaŭ).
-  - `promoteReleaseArtifact` — promocias eldonon inter trako (ekz. interna →
-    produktado; `play { fromTrack/promoteTrack }`) — povas anstataŭigi la
-    permanan promocion en Play Console.
-  - `bootstrapReleaseListing` — elŝutas la NUNAN konzolan staton loken —
-    diagnozilo (per ĝi oni estus malkovrinta la trako-bazitan noto-nomadon).
-  - **FOOTGUN**: `defaultToAppBundles.set(true)` en nia `play`-bloko + la
-    agrega tasko `publish`/`publishApps` → GPP provus AAB → 403 (la apo NE
-    estas enskribita en Play App Signing). Ĉiam uzu la eksplicitan
-    `publishReleaseApk`, aŭ ŝanĝu `defaultToAppBundles` al `false`.
+  `git add -A`) kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la uzanto.
+- **Arkitekturaj bazlinioj**: neniu DI-framintervalo (permana injektado en
+  konstruktiloj); neniu datumbazo (la kliento kaŝenas servil-respondojn kiel
+  dosierojn).
 - **Loka `remote.origin.fetch` estas limigita al master** (2026-10-14, revizio de
   PR #109): `git fetch origin` (ankaŭ kun `--prune`) NE alportas PR-branĉojn —
   la refspec estas `+refs/heads/master:refs/remotes/origin/master`. Por revizii
@@ -533,106 +188,35 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
   kontroloj (aŭ atendu `CLEAN` antaŭ ol merĝi).
 
-## Logcat (Android)
+## Protokolado kaj Sentry — konvencio
 
-`adb` jam haveblas en la medio (`/home/j/Android/Sdk/platform-tools/adb`) kaj la
-emulilo kuras kiel `emulator-5554`. Oni povas legi logcat-on rekte:
+La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
+projekto `KMP`). **Nur release-konstruoj sur realaj aparatoj raportas** —
+debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109).
+Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
+skill-on **`sentry-esplorado`**.
 
-```bash
-adb logcat -d -t 100                      # lastaj 100 linioj
-adb logcat -d | grep FATAL                 # nur kraŝoj
-adb logcat -d | grep -E "dk.nordfalk.esperanto.android"  # nur apo
-```
+Niveloj (`ProtokoloUtil.kt`):
 
-La debug-APK instaliĝas kiel `dk.nordfalk.esperanto.radio.alfa` (applicationId + `.alfa`) — ne konfuzu
-kun malnovaj pakoj (`dk.nordfalk.esperanto.android`, `.radio.beta`) kiuj eble ankaŭ estas en la emulilo:
-`adb shell monkey -p dk.nordfalk.esperanto.radio.alfa -c android.intent.category.LAUNCHER 1`
-
-## Sentry (erarmonitorado kaj protokoloj)
-
-La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo
-`esperantoradio`, regiono `de.sentry.io`, projekto `KMP`). Agordo:
-`SentryAgordo.kt` — DSN (nur *sendi* rajtigas), medio "produktado" por
-release-konstruoj, `release = "esperantoradio@<apoversio>"` (el
-`gradle/libs.versions.toml`). 
-
-**Legi Sentry-on per MCP**: la oficiala Sentry-MCP-servilo estas konektita kiel
-`mcp_sentry` (`https://mcp.sentry.dev/mcp`, OAuth-agordo en `~/.vibe/config.toml`
-de la uzanto — se ĝi malaperas, rekonektu per `vibe mcp add sentry --url
-https://mcp.sentry.dev/mcp`). La plej uzataj iloj:
-
-- `find_organizations` / `find_projects` — trovu la slug-ojn (`esperantoradio`).
-- `search_issues` — grupigitaj problemoj (query: `is:unresolved`, `level:error`,
-  `lastSeen:-7d` kaj similaj; sort: `date`/`freq`/`user`/`recommended`).
-- `get_sentry_resource` — detaloj pri unu problemo (stacktrace, eventoj).
-- `search_logs` — protokol-agregaĵoj. Ekzemploj:
-  - Plej oftaj mesaĝoj: `fields: ['count()', 'message']`, `sort: '-count()'`.
-  - Uzantoj po eldono: `fields: ['release', 'count_unique(user)']` — proksimumo
-    de aktivaj uzantoj (nur uzantoj, kiuj generis almenaŭ unu protokolan eventon;
-    protokoloj povas esti forĵetitaj pro kvoto).
-- `search_errors` — erar-eventoj, nombroj, tendencoj.
-- `update_issue` — solvigi/atribui problemon.
-
-**Kapabloj de la datumaroj** (2026-10-10, gravas por demandoj):
-
-- **logs** (protokoloj): havas `user.id`, `device.model`, `release`, `message` —
-  sed **neniun geo-kampon** (`geo.country_code` k.a. ne ekzistas) kaj **nenian
-  `dist`-kampon** (build-numero — grupigo per `dist` ĵetas API-eraron;
-  nur la errors-datumaro havas ĝin, agorditan de la Android-SDK = versionCode).
-- **errors** (erar-eventoj): havas `geo.country_code` — sed `device.model` estas
-  **malplena** (la KMP-SendSDK ne sendas aparat-kuntekston ĉe eraroj).
-  Sekve aparato × lando NE estas rekombebla per la API.
-- Negacia filtro (`!device.model:...`) ne funkcias en logs — prenu ĉiujn
-  grupojn (`limit: 100`) kaj filtru loke.
-- `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
-- Tempserio: petu naturlingve «... as a time series» kun `fields: ['timestamp',
-  'count_unique(user)']` → tagaj siteloj; la hodiaŭa sitelo estas nekompleta.
-
-**Interpretaĵ-avertoj pri uzant-nombroj**:
-
-- `user.id` estas **anonima po instalaĵo** — reinstalo = nova uzanto-id.
-  Emulilajn testreinstalojn eblas rekoni: `device.model:sdk_gphone*`
-  (Google-emulilaj bildoj; ĉiuj `sdk_gphone*` estas emuliloj).
-- `count_unique(device.model)` nombras unikajn **modelajn ĉenojn**, ne
-  aparatojn (2 uzantoj kun sama modelo kalkuliĝas unufoje).
-- Landoj haveblas nur el erar-eventoj (do nur por uzantoj, kiuj havis almenaŭ
-  unu eraron) — la nombro subtaksas.
-
-**Konekta leciono** (2026-10-10): la `mcp_sentry`-konekto povas fali meze en
-seanco (iloj malaperas el la agenta nomspaco) kaj ne reaperas per `/reload`.
-Remedio: restartigu Vibe (`vibe -c` daŭrigas la konversacion). Se post
-restarto la servilo listiĝas kiel bezonanta aŭtentikigon, rulu `/mcp login
-sentry` (OAuth-aliro-ĵetonoj eksvalidiĝas post kelkaj horoj; la renovigo
-foje malsukcesas).
-Dua varianto (2026-10-13): la iloj RESTAS videblaj kaj la nomspaco ŝargas,
-sed ĉiu voko fiaskas per `effect_recovery_failed:
-RustInvalidStateRejection(command_type='reconfigure', state='running')`
-(harness-replay-tavolo, ankaŭ en try/catch nekaptrebla) — same helpas nur
-restarto de Vibe.
-
-**Protokol-konvencio (grava por la Sentry-kvoto)**:
-
-- `logd` → NUR lokala logcat (platformLogd) — **ne** iras al Sentry.
-- `logi` → loka + `Sentry.logger.info` se "detala protokolado" estas ŝaltita
-  (agordo Agordoj → Privateco; flag `protokoloDetala` en `ProtokoloUtil.kt`,
-  sinkronigita de `AgordojDeponejoImpl`). Defaŭlte ŜALTITA (2026-10-13 — la
-  protokola kvoto montriĝis ne-problema).
-- `logGrava` → loka + `Sentry.logger.info` **ĉiam** — nur por la gravaj eventoj:
-  malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
-  Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la kvoto.
-- `logw`/`loge` → ankaŭ `Sentry.logger.warn`/`error` — ĉiam sendataj (avertoj kaj
-  eraroj estas maloftaj, do ili ne minacas la kvoton).
-- `loge(tag, msg, e)` → krome `Sentry.captureException(e)` (eraro-evento).
-- `Sentry.captureMessage` rekte en la kodo — NE uzu por po-ŝanĝaj aferoj
-  (ĉiu aŭtoludo k.a. kreus eventon kaj plenigus la kvoton).
-- Regulo: **altfrekvencaj datum-tavolaj detaloj uzu `logd`** (parsado, diskkaŝmemoro,
-  serĉo — io, kio okazas po kanalo po ŝargo); `logi` nur por uzantvidaj eventoj
-  (navigado, klakoj, ludado, starto). `logw`/`loge` ĉiam indas protokoligi.
-  (2026-10-09: la `logi`-vokoj de RssParsilo/ElsendoDeponejo estis ~85–90 % de
-  ĉiuj protokoloj — po ~700 mesaĝoj/kanalo/semajno nur por «parsado kompleta»;
-  ili fariĝis `logd`.)
-- `options.logs.enabled` estas ĉiam `true` (ankaŭ en produktado) — la kvanto estas
-  limigita per la kodo supre (2026-10-12).
+- `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
+  diskkaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
+- `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
+  protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
+  Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
+- `logGrava` — ĉiam al Sentry. NUR la gravaj eventoj: malfermo de la apo,
+  ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
+- `logw` — avertoj. Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu
+  `logw(tag, msg, e)` — ĝi restas LOKA kaj ne konsumas la Sentry-kvoton.
+- `loge` — veraj eraroj. **`loge(tag, msg, e)` vokas `captureException` kaj
+  konsumas la MONATAN ERAROJ-KVOTON** — neniam uzu por atendataj fiaskoj;
+  `loge(tag, msg)` sen escepto estas nur protokol-evento (aparta kvoto).
+- `Sentry.captureMessage` rekte en la kodo — NE uzu (po-ŝanĝaj eventoj
+  plenigas la kvoton; la „Aŭtoludo“-mesaĝoj estis tial forigitaj).
+- Ĉiu `catch` devas protokoli (regulo 8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
+  kun stacktrace — neniam engluti escepton silente.
+- En produktado eraroj estas 50 %-specimenataj (`options.sampleRate`, PR #109).
+  Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
+  (FAROTA C45) — ne malmolu versio-listojn en la apo.
 
 ## UI-dizajno (celo)
 
@@ -648,20 +232,11 @@ ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
 
 ## Konstru-komandoj
 
-```bash
-# Malnova apo
-./gradlew :app:assembleDebug         # konstruas la malnovan Android-apk (bezonas JDK 17)
-./gradlew :parse:rssarkivserverJar   # konstruas RssArkivServer-jaron
-java -jar malnova/parse/build/libs/rssarkivserver.jar   # rulas la arkivan servilon
-
-# Nova apo
-./gradlew :shared:desktopTest        # rulas la testojn
-./gradlew :desktopApp:run            # rulas la desktop-apo
-./gradlew :androidApp:assembleDebug  # konstruas la novan Android-apk
-./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g  # rulas la web-apo en retumilo
-./gradlew :androidApp:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dk.nordfalk.esperanto.android.SciigoLudiTest
-./gradlew :desktopApp:radioTxtKomparilo  # komparas kanalkonfiguron kun esperanto-radio.com/radio.txt
-```
+Ĉiuj konstruaj/testaj komandoj, JDK-postuloj kaj platform-limigoj staras en la
+skill-o **`konstruado-kaj-testado`** (`.vibe/skills/`). Bazaj:
+`export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64` (JDK 17 devas — JDK 21
+mankas `jlink`); `./gradlew :shared:desktopTest` (ĉiuj testoj);
+`./gradlew :androidApp:assembleDebug` (APK).
 
 ## Datumfluo (nova apo)
 
@@ -695,73 +270,18 @@ esperantoradio_kanaloj_v9.json (bundled resource)
 | Vidi la parsad-specifaĵon | `docs/nova/04_parsado_kaj_arkivo.md` |
 | Vidi la dizajnon (Muzaiko-temo) | `docs/nova/05_dizajno_kaj_ui.md` |
 | Vidi la servilan planon | `docs/nova/06_servilo_arkivo.md` |
+| Konstrui/testi/debugi la apon | la skill-o `konstruado-kaj-testado` (`.vibe/skills/`) |
+| Eldoni version al Google Play | la skill-o `eldonado` (`.vibe/skills/`) |
+| Legi/esplori Sentry-n | la skill-o `sentry-esplorado` (`.vibe/skills/`) |
+| Redakti la kanalkonfiguron / JSONC | la skill-o `kanalkonfiguro` (`.vibe/skills/`) |
+| Arkitekturaj notoj kaj historiaj lecionoj | `NOTOJ.md` |
 
 ## La nova kodo — strukturo
 
 La nova kodo vivas en `shared/src/commonMain/kotlin/dk/nordfalk/esperanto/`.
-Por la arkitekturan kontekston, vidu `docs/nova/01_celoj_kaj_arkitekturo.md`.
-
-```
-dk/nordfalk/esperanto/
-├── App.kt                    # Radika Compose-funkcio (EsperantoRadioApp, navigation3)
-├── AppStato.kt               # Proceznivela unuopulo: deponejoj + ViewModel-oj (pluvivas Activity-rekreon)
-├── Protokolo.kt              # Protokol-funkcioj (logi/logd/logw/loge) — expect/actual
-├── ProtokoloUtil.kt          # Komuna protokol-helpiloj
-├── SentryAgordo.kt           # Sentry.io-init (erarmonitorado)
-├── navigation/Vojoj.kt       # NavKey-oj (Hejmo, Kanalaro, KanaloDetalo, ElsendoDetalo, …)
-├── domain/
-│   ├── model/Modeloj.kt      # Kanalo, Elsendo, Sonfonto, LudantoStato, LudataElsendo
-│   ├── model/Alarmo.kt       # Vekhorloĝo-modelo
-│   ├── model/ElshutStato.kt  # Elŝut-statoj + ElshutitaElsendo
-│   ├── repository/Deponejoj.kt          # KanaloDeponejo, ElsendoDeponejo (interfacoj)
-│   └── repository/PersonigoDeponejoj.kt # Plejŝatataj, LastAŭskultitaj, Ludatoj, Serĉo, Agordoj, Elŝut, Alarmo (interfacoj)
-├── data/
-│   ├── config/KanalAgordoLeganto.kt   # JSONC-leganto (striptigas komentojn) + sugestoj por alarmoj
-│   ├── config/PlatformResource.kt    # expect/actual por legi resurcojn
-│   ├── config/KreuSettings.kt        # expect/actual por Settings
-│   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep reguloj)
-│   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo
-│   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
-│   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
-│   ├── repository/PersistantaPlejŝatatajDeponejo.kt
-│   ├── repository/PersistantaAlarmoDeponejo.kt # Alarmoj (Settings+JSON)
-│   ├── repository/PersonigoDeponejojImpl.kt  # AgordojDeponejoImpl, SerĉoDeponejoImpl
-│   ├── repository/DosierKasho.kt            # expect/actual dosier-kaŝmemoro
-│   ├── repository/DosierNomoj.kt            # Konvencioj por dosiernomoj
-│   ├── repository/AlarmoSkedilo.kt          # expect/actual por AlarmManager-skedado
-│   ├── repository/KreuAlarmoSkedilo.kt      # Fabriko
-│   ├── repository/ElshutDeponejo (Ktor→dosiero, expect/actual + NoOp)
-│   ├── repository/SciigPermeso.kt           # expect/actual por sciig-permeso
-│   ├── repository/GhisdatiguSciigSkedon.kt  # Ĝisdatigas WorkManager-skedon laŭ agordoj
-│   ├── repository/NovajElsendojSkedilo.kt   # (Android) WorkManager-skedado de novaj-elsendaj kontroloj
-│   └── repository/NoOpElshutDeponejo.kt      # NoOp por wasmJs/iOS
-├── domain/player/
-│   ├── LudiloRegilo.kt       # Ludilo-interfaco + NoOpLudiloRegilo (kun simuluFinon)
-│   ├── LudvicoLogiko.kt      # Pura decidlogiko por aŭtoludo (3 prioritatoj)
-│   ├── LudvicoRegilo.kt      # Kontrolilo: pozicio-spurado, resumigo, aŭtoludo, ludvico
-│   └── SciigoKontroloj.kt    # Sciigo-registroj (MediaSession-metadata)
-└── ui/
-    ├── KanalaroEkrano.kt     # Kanalaro-ekrano
-    ├── HejmoEkrano.kt       # Hejmo (Kio novas + Lastatempe ludata + Kio popularas + Ĉiuj kanaloj) + HejmoViewModel
-    ├── KanalEkrano.kt       # Kanalvido (elsendlisto, horizontala svipo) + KanaloViewModel
-    ├── ElsendoEkrano.kt     # Elsendodetalo (ludi, elŝuti, ludvico, "Daŭrigi de X:XX", riĉa HTML, horizontala svipo)
-    ├── LudvicoEkrano.kt     # Ludvico-ekrano (forigi/malplenigi)
-    ├── MiniLudilbreto.kt    # Malsupra ludilbreto (ludi/paŭzi/halti/ludvico)
-    ├── MalsupraNavigaBreto.kt # 4 langetoj (Hejmo, Kanaloj, Plej ŝatataj, Serĉi)
-    ├── PlejŝatatajEkrano.kt # Plej ŝatataj kanaloj
-    ├── SercxoEkrano.kt      # Serĉo
-    ├── ElshutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)
-    ├── AlarmoEkrano.kt      # Vekhorloĝo (kreilo/redaktilo)
-    ├── AgordojEkrano.kt     # Agordoj (daŭrigo, sciigoj, evoluo, temo)
-    ├── HtmlVido.kt / HtmlTeksto.kt # Riĉa HTML-vidigo (expect/actual)
-    ├── Temo.kt              # Muzaiko-temo (koloroj, tiparo, formoj)
-    └── Previews.kt / PreviewDatumoj.kt # Antaŭvidoj
-```
-
-> Platformo-specifaj `expect`/`actual` ekzistas en `androidMain/` (ExoPlayer, AlarmManager, WorkManager,
-> Receiviloj), `desktopMain/` (DesktopLudiloRegilo mp3spi), `wasmJsMain/` (WasmJsLudiloRegilo HTMLAudioElement),
-> `iosMain/` (NoOp). Android-specifaj: `AlarmoReceivilo`, `LudiElsendoReceivilo`, `BootReceivilo`,
-> `NovajElsendojKontroloWorker` (WorkManager).
+La kompleta dosierujo-arbo kaj dosiero-mapo staras en [`NOTOJ.md`](NOTOJ.md) →
+"Deponeja koda mapo". Arkitektura konteksto:
+[`docs/nova/01_celoj_kaj_arkitekturo.md`](docs/nova/01_celoj_kaj_arkitekturo.md).
 
 ## Stilo
 

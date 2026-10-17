@@ -112,10 +112,10 @@ JSONC-parsilon.
 ## Versikatalogo
 
 Versioj rapide malaktualiĝas. Vidu la nunajn stabilajn versiojn dum efektivigado.
-Nuna `gradle/libs.versions.toml` (septembro 2026):
+Nuna `gradle/libs.versions.toml` (oktobro 2026):
 ```toml
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.4.21"
 compose-multiplatform = "1.10.0"
 compose-material3 = "1.10.0-alpha05"
 ktor = "3.1.3"
@@ -124,12 +124,13 @@ kotlinx-datetime = "0.7.0"
 media3 = "1.5.1"
 ksoup = "0.2.2"
 coil = "3.0.4"
-multiplatform-settings = "1.2.0"
+multiplatform-settings = "1.3.0"
 turbine = "1.2.0"
 mp3spi = "1.9.5.4"
 sentry-kmp = "0.27.0"
-multiplatform-nav3 = "1.1.1"
+multiplatform-nav3-ui = "1.1.0-alpha02"
 ```
 
-> **ksoup 0.2.2** estas la versio kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
+> **ksoup 0.2.2** funkcias kun Kotlin 2.4.21 (CI-verda kombino; la altgradigo al
+> 0.2.6+ estas nun ebla, sed netestita).
 > **Material3** havas apartan version (`1.10.0-alpha05`), ne la saman kiel `compose-multiplatform`.

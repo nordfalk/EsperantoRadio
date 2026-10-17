@@ -139,6 +139,7 @@ EsperantoRadio/
 
 ## Faza stato
 
-La plej ĝisdatigitan fazo-tabelon vidu en `AGENTS.md` (sekcio "Stato de la projekto").
+La plej ĝisdatigitan fazo-tabelon vidu en `NOTOJ.md` (sekcio "Projekta stato kaj fazoj");
+la aktualan staton en `AGENTS.md` (sekcio "Stato de la projekto").
 Resumo: fazoj 0–5 estas kompletaj; fazo 6 (pezaj platform-funkcioj) estas parte farita
 (vekhoro + sciigoj; widget/Chromecast/TTS ankoraŭ venas).

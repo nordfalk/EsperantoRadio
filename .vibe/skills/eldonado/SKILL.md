@@ -1,0 +1,75 @@
+---
+name: eldonado
+description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version al Google Play, promocii eldonon, ĝisdatigi release-notojn, baskuli versionCode, aŭ kiam ajn temas pri la eldona procezo (signado, GPP-taskoj, Play Console, F-Droid, Aptoide).
+---
+
+# Eldonado de EsperantoRadio
+
+> La plena gvidilo ankaŭ vivas en `docs/nova/07_eldonado.md`; la oficiala GPP-dokumentaro:
+> https://github.com/Triple-T/gradle-play-publisher
+
+## Resuma laborfluo (nova versio X.Y.Z)
+
+1. **`apoversio`** en `gradle/libs.versions.toml` ricevas la novan nombron (unu fonto de
+   vero por `versionName`/Sentry — `ApoVersio.kt` generiĝas el ĝi).
+2. **Baskulu `versionCode`** en `androidApp/build.gradle.kts` (`defaultConfig.versionCode`).
+   GPP ne pliigas ĝin aŭtomate kaj la Play-API rifuzas re-uzi jam eldonitan
+   versionCode ("Version code is too low or has already been used").
+   Historio: 246=3.0.2, 247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto (2026-10-13).
+3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
+   novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
+   (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
+4. **Kreu git-etikedon** `vX.Y.Z` sur la eldona komito kaj puŝu ĝin
+   (`git tag vX.Y.Z && git push origin vX.Y.Z`). F-Droid konstruas el la etikedo —
+   do la eldonita APK devus kongrui kun etikedita komito (ne eldonu el nekompromita
+   laborarbo kiam eviteble; se tamen necesis, komitu la ĝustan fonton tuj poste —
+   kiel farite por 249 per PR #109).
+5. **Release-notoj** (intence en Esperanto, maks. 500 signoj):
+   `androidApp/src/main/play/release-notes/en-US/internal.txt`.
+   **GPP elektas la dosieron laŭ la TRAKO-nomo** — `internal.txt` (aŭ `default.txt`
+   kiel retroiro) — NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.)
+   estas ignoritaj de GPP (tiel ĉiuj eldonoj 3.0.2…249 eldoniĝis kun la malnovaj
+   3.0.1-notoj; la 249-notoj korektiĝis permane). La historiaj `X.Y.Z.txt`-dosieroj
+   estas arkivigitaj en `release-notes-arkivo/` — ekster la de GPP skanata dosierujo.
+6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
+   la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
+   ```bash
+   export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+   ./gradlew :androidApp:publishReleaseApk   # APK, ne AAB — la apo NE estas en Play App Signing
+   ```
+   Tio eldonas al la trako `internal` (la `play`-bloko en `androidApp/build.gradle.kts`).
+   La signado legas `secrets.properties` en la radiko — NENIAM tuŝu/legu/komitu ĝin.
+7. **Promocio al produktado**: permane en Play Console (aŭ per `promoteReleaseArtifact`,
+   vidu suben). Play disvastigas la ĝisdatigon laŭgrade dum horoj–tagoj.
+
+## GPP-taskoj (el `./gradlew :androidApp:tasks`)
+
+| Tasko | Kion ĝi faras |
+|---|---|
+| `publishReleaseApk` | APK + release-notoj (`internal.txt`) — **kion ni uzas** |
+| `publishReleaseListing` | **aparte** alŝutas metadatumojn (priskribo, ekranfotoj el `play/listings/`) — `publishReleaseApk` NE inkluzivas ilin! |
+| `publishReleaseApps` | APK + metadatumoj kune |
+| `promoteReleaseArtifact` | promocias eldonon inter trakoj (`play { fromTrack/promoteTrack }`) |
+| `bootstrapReleaseListing` | elŝutas la NUNAN konzolan staton loken — diagnozilo |
+
+- **FOOTGUN**: `defaultToAppBundles.set(true)` en la `play`-bloko + la agrega tasko
+  `publish`/`publishApps` → GPP provus AAB → 403 (ne enskribita en Play App Signing).
+  Ĉiam uzu la eksplicitan `publishReleaseApk` aŭ ŝanĝu `defaultToAppBundles` al `false`.
+
+## Jam konataj limoj kaj problemoj
+
+- **Notoj de jam eldonita versionCode NE korekteblas per GPP** (la API rifuzas
+  versionCode-reuzon) — korektu ilin permane en Play Console (kiel farite por 249).
+- **AAB ne eblas** ĝis la apo enskribiĝos en Play App Signing (403 "must be enrolled").
+- **Reproduktebleco**: versio-identaj rekonstruoj (247/248/249 ĉiuj = 3.0.3) malfaciligas
+  la diagnozon — `dist` (= versionCode) en Sentry estas la nura distingilo por eraroj.
+- **Keystore**: `jacobnordfalk.keystore` (2010) estas la kronjuvelo — sen Play App
+  Signing, ĝia perdo signifas ke la apo neniam plu ĝisdateblas. Kontrolu rezervkopiojn.
+- **F-Droid** konstruas mem el la git-etikedo (duon-aŭtomata; vidu `docs/nova/07`).
+- **Aptoide** bezonas konton + API-ŝlosilon (vidu `docs/nova/07`).
+
+## Kontrolu post la eldono
+
+- La tasko-eligilo devas montri `Updating [completed] release (...:[N]) in track 'internal'`.
+- Post la promocio: observu Sentry (per la `sentry-esplorado`-skill) — uzantoj laŭ
+  `dist`, eraro-kvanto malkreskos pro la specimenado/agordo de la nova versio.

@@ -266,6 +266,12 @@ JSON-ŝlosilo `apaj_novaĵoj`, Kotlin-identigilo `apajNovajxoj`.
   reaperigas. Unuaj testoj: `ApajNovajxojTest` (decidlogiko + persisto +
   restarto-kongruo) + agordo-mapado en `KanalAgordoLegantoTest` kaj
   `KanalAgordoFumTesto`.
+- **Incidento dum la JSONC-redakto**: forigo de la eksa statusmesaĝo-ŝlosilo
+  per skripto postlasis vosan kometon (`,`) post `apaj_novaĵoj` — la tuta
+  kanalkonfiguro fiaskis parsi kaj `KanalAgordoFumTesto` kaptis tion per
+  `JsonDecodingException: Trailing comma`. Leciono: post ĉia programema
+  redakto de la kanalkonfiguro rulu `./gradlew :shared:desktopTest`
+  antaŭ ol fidi la rezulton.
 
 ## Sentry-kvoto: protokolado severe limigita (PR #107)
 

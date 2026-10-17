@@ -5,8 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.test.ComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Alarmo
@@ -72,7 +74,12 @@ class EkranfotoTesto {
     private fun kaptuKajSavu(test: ComposeUiTest, nomo: String) {
         val dosiero = File("build/ekranfotoj", "$nomo.png")
         dosiero.parentFile.mkdirs()
-        val bitmap = test.onRoot().captureToImage().asSkiaBitmap()
+        // Malfermita dialogo estas aparta kompona radiko — kaptu la lastan
+        // (la dialogon se gxi malfermitas, alikaze la solan ekrano-radikon).
+        val radikoj = test.onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })
+        val nombro = radikoj.fetchSemanticsNodes().size
+        val lastaRadiko = radikoj[nombro - 1]
+        val bitmap = lastaRadiko.captureToImage().asSkiaBitmap()
         val pngBytes = SkiaImage.makeFromBitmap(bitmap).encodeToData(org.jetbrains.skia.EncodedImageFormat.PNG)?.bytes
         if (pngBytes != null) {
             dosiero.writeBytes(pngBytes)
@@ -197,6 +204,36 @@ class EkranfotoTesto {
         }
         waitForIdle()
         kaptuKajSavu(this, "06_alarmoj")
+    }
+
+    /** Redaktilo malfermita per klako sur ekzistanta alarmo — montras la ciferblidan tempo-elektilon. */
+    @Test
+    fun ekranfoto_alarmo_redaktilo() = runComposeUiTest {
+        val alarmoDeponejo = MemorAlarmoDeponejo(
+            listOf(
+                Alarmo(id = 1, horo = 10, minuto = 0, ripeto = 0x7f, kanaloSlug = "muzaiko", aktiva = true, etikedo = "Matene"),
+            )
+        )
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                AlarmoEkrano(alarmoDeponejo = alarmoDeponejo, kanaloDeponejo = falsaKanaloDeponejo(), onReen = {})
+            }
+        }
+        waitForIdle()
+        onNodeWithText("10:00").performClick()
+        waitForIdle()
+        kaptuKajSavu(this, "06a_alarmo_redaktilo")
+        // Tempo-elektilo kiel dialogo
+        onNodeWithText("10:00").performClick()
+        waitForIdle()
+        kaptuKajSavu(this, "06b_alarmo_tempo_dialogo")
+        // "Nuligi" ekzistas ankaux en la redaktilo malantaux la dialogo — fermu per "Bone"
+        onNodeWithText("Bone").performClick()
+        waitForIdle()
+        // Kanal-elektilo kiel dialogo
+        onNodeWithText("Muzaiko").performClick()
+        waitForIdle()
+        kaptuKajSavu(this, "06c_alarmo_kanalo_dialogo")
     }
 
     @Test

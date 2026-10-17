@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
@@ -72,6 +73,7 @@ fun AlarmoEkrano(
                 AlarmoRedaktilo(
                     kanaloj = kanaloj,
                     ekzistanta = redaktoModo!!,
+                    scaffoldPadding = padding,
                     onKonfirmi = { alarmo ->
                         logi("Klako", "konfirmu redaktadon de alarmo ${alarmo.id}")
                         scope.launch { alarmoDeponejo.ghisdatigi(alarmo) }
@@ -84,6 +86,7 @@ fun AlarmoEkrano(
                 AlarmoRedaktilo(
                     kanaloj = kanaloj,
                     ekzistanta = null,
+                    scaffoldPadding = padding,
                     onKonfirmi = { alarmo ->
                         logi("Klako", "konfirmu novan alarmon")
                         scope.launch { alarmoDeponejo.krei(alarmo) }
@@ -214,10 +217,12 @@ private fun AlarmoEro(
  * Redaktilo por krei novan aü redakti ekzistantan alarmon.
  * Se ekzistanta != null, la kampoj estas antaüplenigitaj kaj la butono diras "Konservi".
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmoRedaktilo(
     kanaloj: List<Kanalo>,
     ekzistanta: Alarmo?,
+    scaffoldPadding: PaddingValues,
     onKonfirmi: (Alarmo) -> Unit,
     onNuligi: () -> Unit,
 ) {
@@ -225,10 +230,13 @@ private fun AlarmoRedaktilo(
     var minuto by rememberSaveable { mutableStateOf(ekzistanta?.minuto ?: 0) }
     var elektitaKanaloSlug by rememberSaveable { mutableStateOf(ekzistanta?.kanaloSlug ?: kanaloj.firstOrNull()?.slug ?: "") }
     var ripeto by rememberSaveable { mutableStateOf(ekzistanta?.ripeto ?: 0x7f) }
+    var tempoDialogoMalfermita by rememberSaveable { mutableStateOf(false) }
+    var kanaloDialogoMalfermita by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(scaffoldPadding)
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
@@ -238,43 +246,36 @@ private fun AlarmoRedaktilo(
         )
         Spacer(Modifier.height(16.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Tempo: ")
-            OutlinedTextField(
-                value = horo.toString(),
-                onValueChange = { it.toIntOrNull()?.let { v -> horo = v.coerceIn(0, 23) } },
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                ),
-                modifier = Modifier.width(80.dp),
-                singleLine = true
-            )
-            Text(":")
-            OutlinedTextField(
-                value = minuto.toString(),
-                onValueChange = { it.toIntOrNull()?.let { v -> minuto = v.coerceIn(0, 59) } },
-                modifier = Modifier.width(80.dp),
-                singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                )
-            )
-        }
+        Text(
+            "Tempo",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            "${horo.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}",
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { tempoDialogoMalfermita = true }
+                .padding(vertical = 4.dp)
+        )
         Spacer(Modifier.height(16.dp))
 
-        Text("Kanalo:")
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+        Text(
+            "Kanalo",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        val elektitaKanaloNomo = kanaloj.find { it.slug == elektitaKanaloSlug }?.nomo ?: elektitaKanaloSlug
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { kanaloDialogoMalfermita = true }
+                .padding(vertical = 8.dp)
         ) {
-            items(kanaloj, key = { it.slug }) { kanalo ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = elektitaKanaloSlug == kanalo.slug,
-                        onClick = { elektitaKanaloSlug = kanalo.slug }
-                    )
-                    Text(kanalo.nomo)
-                }
-            }
+            Text(elektitaKanaloNomo, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            Icon(Icons.Filled.ArrowDropDown, contentDescription = "Elekti kanalon")
         }
         Spacer(Modifier.height(16.dp))
 
@@ -309,6 +310,109 @@ private fun AlarmoRedaktilo(
             OutlinedButton(onClick = onNuligi) { Text("Nuligi") }
         }
     }
+
+    if (tempoDialogoMalfermita) {
+        TempoElektiloDialogo(
+            komencaHoro = horo,
+            komencaMinuto = minuto,
+            onKonfirmi = { h, m ->
+                horo = h
+                minuto = m
+                tempoDialogoMalfermita = false
+            },
+            onNuligi = { tempoDialogoMalfermita = false }
+        )
+    }
+    if (kanaloDialogoMalfermita) {
+        KanalElektiloDialogo(
+            kanaloj = kanaloj,
+            elektitaSlug = elektitaKanaloSlug,
+            onElekti = { slug ->
+                elektitaKanaloSlug = slug
+                kanaloDialogoMalfermita = false
+            },
+            onNuligi = { kanaloDialogoMalfermita = false }
+        )
+    }
+}
+
+/**
+ * Dialogo kun la ciferblida tempo-elektilo (kun eblo ŝalti al klavara enigo).
+ * La elekto transiĝas al la alkutima ago nur per "Bone".
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TempoElektiloDialogo(
+    komencaHoro: Int,
+    komencaMinuto: Int,
+    onKonfirmi: (horo: Int, minuto: Int) -> Unit,
+    onNuligi: () -> Unit,
+) {
+    val tempoStato = rememberTimePickerState(
+        initialHour = komencaHoro,
+        initialMinute = komencaMinuto,
+        is24Hour = true,
+    )
+    var klavaraEnigo by rememberSaveable { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onNuligi,
+        title = { Text(if (klavaraEnigo) "Enigi tempon" else "Elektu tempon") },
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (klavaraEnigo) {
+                    TimeInput(state = tempoStato)
+                } else {
+                    TimePicker(state = tempoStato)
+                }
+                TextButton(onClick = { klavaraEnigo = !klavaraEnigo }) {
+                    Text(if (klavaraEnigo) "Elekti per ciferblido" else "Enigi klavare")
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onKonfirmi(tempoStato.hour, tempoStato.minute) }) { Text("Bone") }
+        },
+        dismissButton = {
+            TextButton(onClick = onNuligi) { Text("Nuligi") }
+        },
+    )
+}
+
+/** Dialogo kun la elektilo de kanalo por la alarmo. Elektita kanalo tuj fermas la dialogon. */
+@Composable
+private fun KanalElektiloDialogo(
+    kanaloj: List<Kanalo>,
+    elektitaSlug: String,
+    onElekti: (slug: String) -> Unit,
+    onNuligi: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onNuligi,
+        title = { Text("Elektu kanalon") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                kanaloj.forEach { kanalo ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onElekti(kanalo.slug) }
+                    ) {
+                        RadioButton(
+                            selected = kanalo.slug == elektitaSlug,
+                            onClick = { onElekti(kanalo.slug) }
+                        )
+                        Text(kanalo.nomo, modifier = Modifier.padding(vertical = 12.dp))
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onNuligi) { Text("Nuligi") } },
+    )
 }
 
 @Preview(name = "AlarmoEkrano", showBackground = true, heightDp = 350)

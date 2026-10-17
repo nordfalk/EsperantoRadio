@@ -418,7 +418,7 @@ dk/nordfalk/esperanto/
     uzas `javax.sound.sampled.Clip`, kiu ŝargas la TUTAN dosieron en memoron — ne taŭgas
     por podkastoj (100MB+) aŭ rekta radio. Krome mankas `seek` en la komuna API.
   - **ComposeMultiplatformMediaPlayer** (Chaintech, Apache-2.0) postulas Kotlin 2.3.0 /
-    Compose 1.10.0 — tiam tro nova por nia Kotlin (nun 2.2.20 / Compose 1.10.0, sed la biblioteko bezonas VLC sur Desktop).
+    Compose 1.10.0 — tiam tro nova por nia Kotlin (tiam 2.2.20; nun 2.4.21, sed la biblioteko bezonas VLC sur Desktop).
   - **JavaFX MediaPlayer** estis provita — `org.openjfx:javafx-media:17.0.13` kompilas
     kaj la naciaj bibliotekoj elŝutiĝas, sed ĉe rulado sur Linukso ĝi donas
     `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj

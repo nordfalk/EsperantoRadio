@@ -30,7 +30,7 @@ CHANGELOG-ŝanĝojn, ĝi NE konstruas — rulu `:shared:desktopTest` +
 `:androidApp:assembleDebug` post ĉiu merge.
 
 Aktualaj versioj (unu fonto de vero: `gradle/libs.versions.toml`; staka priskribo:
-`docs/nova/02_teknika_stako.md`): Kotlin 2.2.20, Compose Multiplatform 1.10.0,
+`docs/nova/02_teknika_stako.md`): Kotlin 2.4.21, Compose Multiplatform 1.10.0,
 Material3 1.10.0-alpha05, Ktor 3.1.3, Media3 1.5.1, Coil 3.0.4,
 kotlinx-datetime 0.7.0, kotlinx-coroutines 1.11.0.
 
@@ -49,8 +49,10 @@ kotlinx-datetime 0.7.0, kotlinx-coroutines 1.11.0.
 - **klib-ABI**: Wasm/Native-bibliotekoj (`.klib`) de pli nova Kotlin ne legeblas de
   la nuna → "Unresolved reference" NUR sur wasmJs (JVM/Android uzas jar).
   Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`.
-  Tial navigation3 restas `1.1.0-alpha02` ĝis Kotlin 2.3.
-- **ksoup 0.2.2** estas kongrua kun Kotlin 2.2.20 (0.2.6+ postulas Kotlin 2.3+).
+  Tial navigation3 restas `1.1.0-alpha02` ankaŭ kun Kotlin 2.4.21 (pli nova
+  eldono kiel 1.1.1 estas netestita).
+- **ksoup 0.2.2** funkcias kun Kotlin 2.4.21 (CI-verda kombino; la altgradigo
+  al 0.2.6+ estas nun ebla, sed netestita).
   `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`; `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —
   sen ĝi la MediaSession silente malsukcesas (`ClassNotFoundException:

@@ -20,6 +20,11 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - La protokola kvoto montriĝis ne-problema: "detala protokolado" estas nun defaŭlte ŝaltita, do ankaŭ la ordinaraj protokoloj (navigado, klakoj) denove sendiĝas; malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/109)
 - Erar-monitorado: eraroj estas duone specimenataj kaj atendantaj fiaskoj (reto, ludado, elŝuto) ne plu kalkuliĝas kiel eraroj — la preskaŭ elĉerpita monata eraroj-kvoto estas tiele protektata (https://github.com/nordfalk/EsperantoRadio/pull/109)
 
+### Riparita
+
+- La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
+- La rezerva alarm-sono (kiam la kanalo ne disponeblas) estas nun haltigebla per "Halti" aŭ per tuŝo de la sciigo kaj mem ĉesas post 5 minutoj — antaŭe ĝi sonis senfine
+
 ## [3.0.3] - 2026-10-12
 
 ### Aldonita
@@ -70,12 +75,6 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Luditaj elsendoj malaperas de "Kio novas" kaj aperas en "Lastatempe ludata" nur kiam la ludado vere ekis; la nune ludata karto restas en "Kio novas" (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - "Kio novas" montras maksimume 5 elsendojn po kanalo por lasi spacon al aliaj (https://github.com/nordfalk/EsperantoRadio/pull/85)
 - Varsovia Vento kaj Kernpunkto estas defaŭlte ŝatataj (sciigoj pri novaj elsendoj) (https://github.com/nordfalk/EsperantoRadio/pull/85)
-
-## [Neeldonita]
-
-### Riparita
-
-- La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
 
 ## [3.0.2] - 2026-10-08
 

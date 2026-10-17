@@ -170,6 +170,20 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 - **Arkitekturaj bazlinioj**: neniu DI-framintervalo (permana injektado en
   konstruktiloj); neniu datumbazo (la kliento kaŝenas servil-respondojn kiel
   dosierojn).
+- **Loka `remote.origin.fetch` estas limigita al master** (2026-10-14, revizio de
+  PR #109): `git fetch origin` (ankaŭ kun `--prune`) NE alportas PR-branĉojn —
+  la refspec estas `+refs/heads/master:refs/remotes/origin/master`. Por revizii
+  PR-on, alportu la kap-branĉon eksplicite:
+  `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
+- **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
+  (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
+  `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese
+  (`git merge --no-ff origin/master` en la PR-branĉo; konfliktoj en la
+  dokumentaj dosieroj (CHANGELOG/SXANGXOJ/AGENTS) estas kutimaj — solvu ilin
+  konservante ambaŭ flankojn).
+- **`mergeStateStatus: UNSTABLE`** (2026-10-14, PR #109): signifas "mergeable,
+  sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
+  kontroloj (aŭ atendu `CLEAN` antaŭ ol merĝi).
 
 ## Protokolado kaj Sentry — konvencio
 

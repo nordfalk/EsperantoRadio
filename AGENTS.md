@@ -153,9 +153,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 > [`SXANGXOJ.md`](SXANGXOJ.md).
 
 - **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
-  post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Ne faru
-  tion por PR-oj kiuj nur tuŝas agentajn dosierojn (AGENTS.md, `.vibe/skills/`,
-  `docs/`) — nenio kompiliĝas en ili (2026-10-17, regulo de la uzanto).
+  post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
+  nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
+  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
+  (2026-10-17, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
   (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.

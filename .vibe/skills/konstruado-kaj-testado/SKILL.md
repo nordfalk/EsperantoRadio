@@ -28,8 +28,9 @@ java -jar malnova/parse/build/libs/rssarkivserver.jar
 Konstruu post ĉiu kunfando de master kiu alportas kod-ŝanĝojn:
 `changelog-kontrolo`-CI nur kontrolas CHANGELOG-ŝanĝojn, ĝi NE konstruas — rulu
 `:shared:desktopTest` + `:androidApp:assembleDebug` post ĉiu merge. Por PR-oj
-kiuj nur tuŝas agentajn dosierojn (AGENTS.md, `.vibe/skills/`, `docs/`) tio ne
-necesas (2026-10-17, regulo de la uzanto).
+nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
+tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
+(2026-10-17, regulo de la uzanto).
 
 Aktualaj versioj (unu fonto de vero: `gradle/libs.versions.toml`; staka priskribo:
 `docs/nova/02_teknika_stako.md`): Kotlin 2.4.21, Compose Multiplatform 1.10.0,

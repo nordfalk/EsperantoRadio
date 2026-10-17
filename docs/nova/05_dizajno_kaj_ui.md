@@ -237,7 +237,12 @@ Stato persistebla per `SavedStateConfiguration` kun `polymorphic` serializers.
 - **Kanalŝanĝo:** kruc-fades inter kanalekranoj.
 - **Ludilbreto volvigo:** springo-bazita `BottomSheet` (ne abrupta).
 - **Ŝarĝado:** la Muzaiko-M kiel rotacia/peziganta indikilo (mozaikpecoj kunfandiĝas).
-- **Transiroj:** `AnimatedVisibility` / `Crossfade` — subtila, ne ŝika.
+- **Navigado-transiroj** (eksplicitaj `transitionSpec`/`popTransitionSpec` en
+  `NavDisplay`): langet-ŝanĝoj inter ĉefekranoj fadas (fade-through, 200/90 ms);
+  detalaj puŝoj kaj reenigoj glitas horizontale kvarone ekrane + fadas (240 ms).
+  LA IMPLIKITAJ TRANSIROJ DE `NavDisplay` NE SUFIĈAS: sur Android ili estas
+  nur fado, sur Desktop kaj Web tute mankas (`EnterTransition.None`) — tial
+  ili estas difinitaj eksplicite en `App.kt`.
 
 ## Alirebleco
 

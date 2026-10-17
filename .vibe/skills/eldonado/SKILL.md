@@ -68,6 +68,18 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 - **F-Droid** konstruas mem el la git-etikedo (duon-aŭtomata; vidu `docs/nova/07`).
 - **Aptoide** bezonas konton + API-ŝlosilon (vidu `docs/nova/07`).
 
+## GPP-versio kaj kongrueco
+
+- Ni uzas **GPP 4.1.1** (ekde la ĝisdatigo al Gradle 9.8.1 + AGP 9.4.1,
+  2026-10-17). GPP 4.0 subtenas nur AGP 9 — kun malnova AGP ĝi ne funkcius
+  (restu je 3.x). La versio estas fiksita en `androidApp/build.gradle.kts`.
+- Tasko-nomoj ne ŝanĝiĝis inter 3.x kaj 4.x (`publishReleaseApk` ktp. restas).
+- GPP 4.1.0 ŝanĝoj: ap-titolo en listing-metadatumoj maks. **30 signoj** (estis
+  50); nova agordo `retainInProgressRollout` (evitas haltigon de rulata
+  disvastigo dum promocio).
+- **La unua eldono post la GPP-4-ĝisdatigo ne estas ankoraŭ praktike testita** —
+  kontrolu la tasko-eligilon atente kaj komparu kun la atendaĵoj supre.
+
 ## Kontrolu post la eldono
 
 - La tasko-eligilo devas montri `Updating [completed] release (...:[N]) in track 'internal'`.

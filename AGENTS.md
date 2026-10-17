@@ -212,6 +212,22 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`; nuna AGP
   8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatenajn kaj
   compileSdk/AGP-postulojn antaŭ ol kunfandi versi-bumpon.
+- **Plena ĝisdatigo al AGP 9.4.1 + Gradle 9.8.1 eblas kaj estis provita**
+  (2026-10-17, branĉo `1017-dependecoj-gxisdatigo`; ĉiuj celoj verdaj:
+  desktopTest, androidApp assembleDebug, wasmJs-kompilo, :app:assembleDebug).
+  Necesaj ŝanĝoj: `jcenter()` foriĝis en Gradle 9 (→ `maven { url = ... }`);
+  AGP 9 forigis la agord-flagojn `android.defaults.buildfeatures.buildconfig`,
+  `android.enableJetifier`, `android.enableR8.fullMode` el `gradle.properties`;
+  la malnova apo bezonas `buildFeatures { buildConfig true }` kaj
+  `proguard-android-optimize.txt` (ne `-android.txt`) kaj restas kun
+  `android.nonTransitiveRClass=false` (ĜI estos forigita en AGP 10);
+  KMP+`androidTarget()` bezonas `android.newDsl=false` kaj
+  `android.builtInKotlin=false` (pretervojoj ĝis migrado al
+  `com.android.kotlin.multiplatform.library` — vidu https://kotl.in/gradle/agp-new-kmp);
+  GPP 3.12.2 → 4.1.1; platformon 37 AGP mem elŝutas se la permesiloj akceptitaj.
+  La material3-versio devas kongrui kun CMP (CMP 1.12.2 → material3 1.12.0-alpha03).
+  nav3 1.1.2 + Kotlin 2.4.21 bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
+  konfirmiĝis), kaj la `savedstate-ktx:1.3.1`-devigo ne plu necesas (1.4.0 ekzistas).
 
 ## Protokolado kaj Sentry — konvencio
 

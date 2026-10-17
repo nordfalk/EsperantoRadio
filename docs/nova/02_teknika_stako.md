@@ -24,7 +24,7 @@
 
 | Teknologio | Kialo |
 |---|---|
-| **Media3 ExoPlayer 1.5.1** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
+| **Media3 ExoPlayer 1.11.1** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
 | **Media3 MediaSessionService** | Malfona ludado, mediasciigo, mediabutonoj, sonfokuso (ĉio "senpaga") |
 | **DownloadManager** / **WorkManager** | Elŝutoj / sciigoj pri novaj elsendoj |
 | **AlarmManager** | Vekhorloĝo |
@@ -116,21 +116,23 @@ Nuna `gradle/libs.versions.toml` (oktobro 2026):
 ```toml
 [versions]
 kotlin = "2.4.21"
-compose-multiplatform = "1.10.0"
-compose-material3 = "1.10.0-alpha05"
-ktor = "3.1.3"
-kotlinx-serialization = "1.7.3"
-kotlinx-datetime = "0.7.0"
-media3 = "1.5.1"
-ksoup = "0.2.2"
-coil = "3.0.4"
+compose-multiplatform = "1.12.2"
+compose-material3 = "1.12.0-alpha03"
+ktor = "3.6.0"
+kotlinx-serialization = "1.11.0"
+kotlinx-datetime = "0.8.0"
+media3 = "1.11.1"
+ksoup = "0.2.6"
+coil = "3.6.3"
 multiplatform-settings = "1.3.0"
-turbine = "1.2.0"
+turbine = "1.2.1"
 mp3spi = "1.9.5.4"
-sentry-kmp = "0.27.0"
-multiplatform-nav3-ui = "1.1.0-alpha02"
+sentry-kmp = "0.28.0"
+multiplatform-nav3-ui = "1.1.2"
 ```
 
-> **ksoup 0.2.2** funkcias kun Kotlin 2.4.21 (CI-verda kombino; la altgradigo al
-> 0.2.6+ estas nun ebla, sed netestita).
-> **Material3** havas apartan version (`1.10.0-alpha05`), ne la saman kiel `compose-multiplatform`.
+> Plua ilo-ĝisdatigo de 2026-10-17: **Gradle 9.8.1, AGP 9.4.1, compileSdk 37**
+> (vidu la lecionon en AGENTS.md pri la necesaj pretervojoj `android.newDsl=false`
+> kaj `android.builtInKotlin=false`).
+> **Material3** havas apartan version (ekz. `1.12.0-alpha03` por CMP 1.12.2), ne
+> la saman kiel `compose-multiplatform` — prenu la parigon el la CMP-release-notoj.

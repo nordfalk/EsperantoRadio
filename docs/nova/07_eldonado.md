@@ -72,9 +72,13 @@ Agordita track: `internal` (interna testado — ŝanĝu al `alpha`, `beta` aŭ `
 - Google Play Console: https://play.google.com/console
 - Quick Start: https://github.com/Triple-T/gradle-play-publisher#usage
 
-> **Noto pri versioj**: GPP 4.x postulas Gradle 9.1.0+. Ni uzas 3.12.2 ĉar
-> nia Gradle-versio estas 8.11.1. Kiam la projekto ĝisdatigos al Gradle 9+,
-> ŝanĝu al 4.1.1 en `androidApp/build.gradle.kts`.
+> **Noto pri versioj**: ni uzas **GPP 4.1.1** (ekde la ĝisdatigo al Gradle 9.8.1 +
+> AGP 9.4.1). GPP 4.0 subtenas nur AGP 9 (malnova AGP/Gradle ne subtenata — restu
+> je 3.x se ne ĝisdatigita). Tasko-nomoj ne ŝanĝiĝis. Nova en 4.x: la ap-titolo
+> en listing-metadatumoj havas limon de 30 signoj (estis 50), kaj
+> `retainInProgressRollout` povas eviti haltigon de interrompita disvastigo dum
+> promocio. Kiam vi reeldonas la unuan fojon post la GPP-4-ĝisdatigo, kontrolu
+> la `publishReleaseApk`-eligilon atente (nova ĉefa versio).
 
 ### Sekurecaj notoj
 

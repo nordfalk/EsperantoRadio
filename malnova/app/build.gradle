@@ -16,6 +16,11 @@ android {
 
     compileSdk 35
 
+    // AGP 9: buildConfig-defaŭlto iĝis false; la malnova apo uzas BuildConfig (App.java k.a.)
+    buildFeatures {
+        buildConfig true
+    }
+
     compileOptions {
         sourceCompatibility 11
         targetCompatibility 11
@@ -38,7 +43,8 @@ android {
         release {
             minifyEnabled false
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            // AGP 9 rifuzas 'proguard-android.txt' (enhavas -dontoptimize)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
         }
         debug {
             applicationIdSuffix '.beta'

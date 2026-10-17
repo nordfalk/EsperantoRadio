@@ -20,9 +20,9 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Pli fluida navigado: langet-ŝanĝoj transiras per fado kaj detalaj ekranoj glitas horizontale — ankaŭ sur komputilo kaj retumilo, kie antaŭe ekranŝanĝo estis tute senmovigita (PR-ligilo aldonota)
-- Unueca navigado sur flankaj ekranoj: Elŝutoj, Ludvico kaj Diagnozo estas nun tutekranoj sen suba naviga breto, same kiel Agordoj kaj Alarmoj (PR-ligilo aldonota)
-- Ripeta klako (ekz. sur la mini-ludilbreto) ne plu povas malfermi du identajn ekranojn super unu la alia (PR-ligilo aldonota)
+- Pli fluida navigado: langet-ŝanĝoj transiras per fado kaj detalaj ekranoj glitas horizontale — ankaŭ sur komputilo kaj retumilo, kie antaŭe ekranŝanĝo estis tute senmovigita (https://github.com/nordfalk/EsperantoRadio/pull/116)
+- Unueca navigado sur flankaj ekranoj: Elŝutoj, Ludvico kaj Diagnozo estas nun tutekranoj sen suba naviga breto, same kiel Agordoj kaj Alarmoj (https://github.com/nordfalk/EsperantoRadio/pull/116)
+- Ripeta klako (ekz. sur la mini-ludilbreto) ne plu povas malfermi du identajn ekranojn super unu la alia (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Vekhorloĝo: la alarmoj ne plu montras fiksigitajn etikedojn (ekz. "Muzaiko semajnfine") kiuj ne kongruis kun la enhavo — la priskriba teksto nun generiĝas el la agordo de la alarmo (kanalo + ripetotagoj) (https://github.com/nordfalk/EsperantoRadio/pull/114)
 - Debug-konstruoj, komputilaj ruladoj (desktop) kaj emuliloj ne plu sendas ion ajn al la erar-monitorado — nur veraj uzantoj de la eldonitaj versioj (https://github.com/nordfalk/EsperantoRadio/pull/109)
 - La protokola kvoto montriĝis ne-problema: "detala protokolado" estas nun defaŭlte ŝaltita, do ankaŭ la ordinaraj protokoloj (navigado, klakoj) denove sendiĝas; malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/109)

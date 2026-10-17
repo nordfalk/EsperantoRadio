@@ -1,5 +1,11 @@
 package dk.nordfalk.esperanto
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -143,6 +149,12 @@ fun EsperantoRadioApp(
         }
 
         fun push(vojo: Vojo) {
+            // Evitu duplikatan ŝlosilon supre de la stako — ekz. klako sur la
+            // mini-ludilbreto dum la elsendo jam estas malfermita ne puŝu duan kopion
+            if (backStack.lastOrNull() == vojo) {
+                logi("Nav", "→ push preterlasita (jam supre): $vojo")
+                return
+            }
             val antauxa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ push: $vojo")
             Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo::class.simpleName ?: "?"))
@@ -162,13 +174,46 @@ fun EsperantoRadioApp(
             if (backStack.size > 1) backStack.removeLastOrNull()
         }
 
-        val montruSubanBreton = nunaVojo !is Vojo.Agordoj && nunaVojo !is Vojo.Alarmoj
+        // Flankaj ekranoj (dua nivelo) estas tutekranoj sen suba breto —
+        // unueca modelo por Agordoj, Alarmoj, Elŝutoj, Ludvico kaj Diagnozo
+        fun estasFlankaEkrano(vojo: Any?) = vojo is Vojo.Agordoj ||
+            vojo is Vojo.Alarmoj || vojo is Vojo.Elshutoj ||
+            vojo is Vojo.Ludvico || vojo is Vojo.Diagnozo
+
+        val montruSubanBreton = !estasFlankaEkrano(nunaVojo)
+
+        fun estasLangeto(vojo: Any?) =
+            vojo is Vojo.Hejmo || vojo is Vojo.Kanalaro ||
+            vojo is Vojo.Plejŝatataj || vojo is Vojo.Sercxo
+
+        // Langet-ŝanĝoj fadas (fade-through); detalaj puŝoj/reenigoj glitas horizontale.
+        // La implicitaj transiroj de NavDisplay estas platform-dependaj (sur Desktop kaj
+        // Web ili tute mankas), do ni difinas ilin eksplicite por ĉiuj platformoj.
 
         Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
             Box(modifier = Modifier.weight(1f)) {
                 NavDisplay(
                     backStack = backStack,
                     onBack = { reen() },
+                    transitionSpec = {
+                        if (estasLangeto(initialState.key) && estasLangeto(targetState.key)) {
+                            // langet-ŝanĝo: subtila fade-through
+                            fadeIn(tween(200)) togetherWith fadeOut(tween(90))
+                        } else {
+                            // detala puŝo: nova ekrano glitas el dekstre
+                            (slideInHorizontally(tween(240)) { it / 4 } + fadeIn(tween(240))) togetherWith
+                                (slideOutHorizontally(tween(240)) { -it / 4 } + fadeOut(tween(240)))
+                        }
+                    },
+                    popTransitionSpec = {
+                        if (estasLangeto(initialState.key) && estasLangeto(targetState.key)) {
+                            fadeIn(tween(200)) togetherWith fadeOut(tween(90))
+                        } else {
+                            // reenigo: detala ekrano glitas reen dekstren
+                            (slideInHorizontally(tween(240)) { -it / 4 } + fadeIn(tween(240))) togetherWith
+                                (slideOutHorizontally(tween(240)) { it / 4 } + fadeOut(tween(240)))
+                        }
+                    },
                     entryProvider = entryProvider {
                         entry<Vojo.Hejmo> {
                             HejmoEkrano(

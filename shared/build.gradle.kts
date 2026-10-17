@@ -149,7 +149,7 @@ kotlin.sourceSets.matching { it.name == "wasmJsMain" || it.name == "iosMain" }.c
 
 android {
     namespace = "dk.nordfalk.esperanto.shared"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -163,10 +163,4 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
-}
-
-// Temporary workaround: navigation3-runtime:1.1.1 requires savedstate:1.4.0
-// but savedstate-ktx:1.4.0 doesn't exist (only 1.3.1). Force to 1.3.1.
-configurations.all {
-    resolutionStrategy.force("androidx.savedstate:savedstate-ktx:1.3.1")
 }

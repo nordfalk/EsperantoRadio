@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     // Gradle Play Publisher — aŭtomata eldonado al Google Play
     // Dokumentaro: https://github.com/Triple-T/gradle-play-publisher
-    id("com.github.triplet.play") version "3.12.2"
+    id("com.github.triplet.play") version "4.1.1"
 }
 
 // Ŝargu sekretajn agordojn el secrets.properties en la radiko (NENIAM commitu aŭ legu)
@@ -37,7 +37,7 @@ kotlin {
 
 android {
     namespace = "dk.nordfalk.esperanto.android"
-    compileSdk = 36
+    compileSdk = 37
 
     signingConfigs {
         create("release") {

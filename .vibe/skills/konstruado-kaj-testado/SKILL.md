@@ -32,10 +32,13 @@ nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp
 tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
 (2026-10-17, regulo de la uzanto).
 
-Aktualaj versioj (unu fonto de vero: `gradle/libs.versions.toml`; staka priskribo:
-`docs/nova/02_teknika_stako.md`): Kotlin 2.4.21, Compose Multiplatform 1.10.0,
-Material3 1.10.0-alpha05, Ktor 3.1.3, Media3 1.5.1, Coil 3.0.4,
-kotlinx-datetime 0.7.0, kotlinx-coroutines 1.11.0.
+Versioj ne estas listigitaj ĉi tie — unu fonto de vero:
+`gradle/libs.versions.toml` (Gradle: `gradle/wrapper/gradle-wrapper.properties`;
+compileSdk: `androidApp/build.gradle.kts`; staka priskribo:
+`docs/nova/02_teknika_stako.md`). KMP-post `androidTarget()` bezonas
+`android.newDsl=false` kaj `android.builtInKotlin=false` en `gradle.properties`
+(AGP 9 — foriĝos en AGP 10;
+laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 
 ## Kompilado-limigoj kaj iliaj erarmesaĝoj
 
@@ -52,10 +55,11 @@ kotlinx-datetime 0.7.0, kotlinx-coroutines 1.11.0.
 - **klib-ABI**: Wasm/Native-bibliotekoj (`.klib`) de pli nova Kotlin ne legeblas de
   la nuna → "Unresolved reference" NUR sur wasmJs (JVM/Android uzas jar).
   Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`.
-  Tial navigation3 restas `1.1.0-alpha02` ankaŭ kun Kotlin 2.4.21 (pli nova
-  eldono kiel 1.1.1 estas netestita).
-- **ksoup 0.2.2** funkcias kun Kotlin 2.4.21 (CI-verda kombino; la altgradigo
-  al 0.2.6+ estas nun ebla, sed netestita).
+  (2026-10-17: la tiam nuna nav3-versio bone kompilas sur wasmJs — la malnova
+  timo ke ĉiu nav3-versio pli nova ol la eksperimenta 1.1.0-alfa rompos wasmJs
+  ne konfirmiĝis. Tamen kontrolu wasmJs-kompilon (`:webApp:compileKotlinWasmJs`)
+  post versi-bumo.)
+- **ksoup** funkcias kun la nuna Kotlin/CMP-kombino (CI-verda, 2026-10-17).
   `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`; `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —
   sen ĝi la MediaSession silente malsukcesas (`ClassNotFoundException:

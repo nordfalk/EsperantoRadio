@@ -28,18 +28,37 @@ data class Alarmo(
     val aktiva: Boolean = true,
     val etikedo: String? = null,
 ) {
-    val ripetoTeksto: String get() = when {
-        ripeto == 0 -> "Unufoje"
-        ripeto == 0x7f -> "Cxiutage"
-        else -> buildList {
-            if (ripeto and 0x01 != 0) add("Lu")
-            if (ripeto and 0x02 != 0) add("Ma")
-            if (ripeto and 0x04 != 0) add("Me")
-            if (ripeto and 0x08 != 0) add("Ja")
-            if (ripeto and 0x10 != 0) add("Ve")
-            if (ripeto and 0x20 != 0) add("Sa")
-            if (ripeto and 0x40 != 0) add("Di")
-        }.joinToString(" ")
+    /**
+     * Teksto priskribanta la ripeton, generata el la ripet-masko (ĉiam kongrua
+     * kun la agordo — neniu libera teksto el la konfiguro).
+     */
+    val ripetoTeksto: String get() = when (ripeto) {
+        0x00 -> "Unufoje"
+        0x7f -> "Ĉiutage"
+        0x1f -> "Labortage"
+        0x60 -> "Semajnfine"
+        0x01 -> "Lunde"
+        0x02 -> "Marde"
+        0x04 -> "Merkrede"
+        0x08 -> "Ĵaŭde"
+        0x10 -> "Vendrede"
+        0x20 -> "Sabate"
+        0x40 -> "Dimanĉe"
+        else -> {
+            val nomoj = tagNomoj(ripeto)
+            nomoj.dropLast(1).joinToString(", ") + " kaj " + nomoj.last()
+        }
+    }
+
+    /** Plenaj nomoj de la elektitaj tagoj, laŭvice (Lu → Di). */
+    private fun tagNomoj(ripeto: Int): List<String> = buildList {
+        if (ripeto and 0x01 != 0) add("Lundo")
+        if (ripeto and 0x02 != 0) add("Mardo")
+        if (ripeto and 0x04 != 0) add("Merkredo")
+        if (ripeto and 0x08 != 0) add("Ĵaŭdo")
+        if (ripeto and 0x10 != 0) add("Vendredo")
+        if (ripeto and 0x20 != 0) add("Sabato")
+        if (ripeto and 0x40 != 0) add("Dimanĉo")
     }
 
     val tempoTeksto: String get() = "${horo.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}"

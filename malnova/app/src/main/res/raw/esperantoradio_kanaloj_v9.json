@@ -189,22 +189,6 @@
 			"retpoŝto": "retradio@aldone.de",
 			"hejmpaĝoButono": "http://aldone.de/retradio"
 		}
-	,{
-			"kodo": "kaliningrada",
-			"nomo": "Kaliningrada E-radio",
-			"emblemoUrl": "https://radio.esperanto-ondo.ru/wp-content/uploads/2017/05/Re-banner-300x63.jpg",
-			"elsendojRssUrl": "https://radio.esperanto-ondo.ru/feed/podcast/radio-esperanto",
-			"retpoŝto": "sezonoj@mail.ru",
-			"hejmpaĝoButono": "https://radio.esperanto-ondo.ru/"
-		},
-		{
-			"kodo": "universeala-lindo",
-			"nomo": "Universeala Lindo, la argentina podkasto",
-			"emblemoUrl": "",
-			"elsendojRssUrl": "https://universealalindo.wordpress.com/feed/",
-			"retpoŝto": "",
-			"hejmpaĝoButono": "https://universealalindo.wordpress.com/"
-		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [
@@ -262,7 +246,7 @@
 			"retpoŝto": "arono@radioverda.com",
 			"hejmpaĝoButono": "http://radioverda.com/"
 		}
-	{
+	,{
 			"kodo": "vej",
 			"nomo": "Voĉoj el Japanio",
 			"emblemoUrl": "http://files.posterous.com/user_profile_pics/995825/VeJ40x40.png",

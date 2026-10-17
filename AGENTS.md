@@ -187,6 +187,22 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 - **`mergeStateStatus: UNSTABLE`** (2026-10-14, PR #109): signifas "mergeable,
   sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
   kontroloj (aŭ atendu `CLEAN` antaŭ ol merĝi).
+- **Dialogoj en Compose-testoj (EkranfotoTesto)** (2026-10-17): `AlertDialog`/`Dialog`
+  kreas APARTAN komponan radikon — `onRoot()` tiam fiaskas per "Expected exactly 1
+  node but found 2". Kaptu la lastan radikon per
+  `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` kaj
+  `.get(indekso)` sur `SemanticsNodeInteractionCollection`. ATENTU: `isRoot` estas
+  ECO (`val`), ne funkcio — `it.isRoot()` donas la konfuzan eraron "Cannot infer
+  type for T/R … DeepRecursiveFunction.invoke". Krome `onNodeWithText` serĉas en
+  ĈIUJ radikoj: buton-teksto kiu ekzistas kaj en la dialogo kaj en la ekrano
+  malantaŭ ĝi (ekz. "Nuligi") ne estas unika — fermu la dialogon per teksto kiu
+  aperas nur en ĝi (ekz. "Bone").
+- **Scaffold-enhavo DEVAS ricevi la `padding`-on el la content-lambda**
+  (2026-10-17, PR #114): forgeso ne fiaskas en testoj (la nodo restas
+  "displayed") — la TopAppBar simple kovras la unuajn liniojn de la enhavo
+  (en AlarmoRedaktilo la "Tempo"-etikedo malaperis malantaŭ la supra breto).
+  Sub-komponaĵoj de la enhavo bezonas `PaddingValues`-parametron; ĉiuj aliaj
+  ekranoj jam aplikas la padding-on en ĉiuj siaj branĉoj.
 - **Dependabot-versi-PR-oj povas esti interdependaj kaj konfliktaj** (2026-10-13,
   revizio de #99/#101/#102): la du Kotlin-bumpoj tuŝas apudajn liniojn de
   `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la

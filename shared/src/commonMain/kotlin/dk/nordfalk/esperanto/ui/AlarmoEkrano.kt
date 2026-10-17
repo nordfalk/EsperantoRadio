@@ -216,7 +216,7 @@ private fun AlarmoEro(
  * Redaktilo por krei novan aü redakti ekzistantan alarmon.
  * Se ekzistanta != null, la kampoj estas antaüplenigitaj kaj la butono diras "Konservi".
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun AlarmoRedaktilo(
     kanaloj: List<Kanalo>,
@@ -279,8 +279,8 @@ private fun AlarmoRedaktilo(
         Spacer(Modifier.height(16.dp))
 
         Text("Ripeto:")
-        Row {
-            val tagoj = listOf("Lu" to 0x01, "Ma" to 0x02, "Me" to 0x04, "Ja" to 0x08, "Ve" to 0x10, "Sa" to 0x20, "Di" to 0x40)
+        FlowRow {
+            val tagoj = listOf("Lundo" to 0x01, "Mardo" to 0x02, "Merkredo" to 0x04, "Ĵaŭdo" to 0x08, "Vendredo" to 0x10, "Sabato" to 0x20, "Dimanĉo" to 0x40)
             tagoj.forEach { (nomo, bito) ->
                 FilterChip(
                     selected = ripeto and bito != 0,

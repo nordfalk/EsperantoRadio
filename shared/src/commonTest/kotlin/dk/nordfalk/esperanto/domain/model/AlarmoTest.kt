@@ -81,7 +81,9 @@ class AlarmoTest {
         assertEquals("Semajnfine", alarmo(10, 0, 0x60).ripetoTeksto)
         assertEquals("Ĵaŭde", alarmo(21, 0, 0x08).ripetoTeksto)
         assertEquals("Dimanĉe", alarmo(8, 0, 0x40).ripetoTeksto)
-        // ne-specialigitaj kombinoj restas mallongigoj
-        assertEquals("Lu Ma", alarmo(6, 0, 0x03).ripetoTeksto)
+        // ne-specialigitaj kombinoj ricevas plenajn tag-nomojn kun "kaj"
+        assertEquals("Lundo kaj Mardo", alarmo(6, 0, 0x03).ripetoTeksto)
+        assertEquals("Merkredo kaj Dimanĉo", alarmo(16, 0, 0x44).ripetoTeksto)
+        assertEquals("Lundo, Mardo kaj Sabato", alarmo(6, 0, 0x23).ripetoTeksto)
     }
 }

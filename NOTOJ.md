@@ -270,7 +270,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
   servilon/prokurilon (vidu `docs/nova/06_servilo_arkivo.md`); bildoj ankaŭ ne aperas
 - Hejmekrana widget, Chromecast, parolsintezo
 
-## Deponeja koda mapo (translokigita el AGENTS.md, 2026-10-14)
+## Deponeja koda mapo (translokigita el AGENTS.md, 2026-10-14; ĝisdatigita kontraŭ la reala arbo 2026-10-17)
 
 
 ```
@@ -319,9 +319,11 @@ dk/nordfalk/esperanto/
 ├── SentryAgordo.kt           # Sentry.io-init (erarmonitorado)
 ├── navigation/Vojoj.kt       # NavKey-oj (Hejmo, Kanalaro, KanaloDetalo, ElsendoDetalo, …)
 ├── domain/
+│   ├── DiagnozoRegilo.kt     # Diagnozo de oftaj aparat-problemoj — expect/actual
 │   ├── model/Modeloj.kt      # Kanalo, Elsendo, Sonfonto, LudantoStato, LudataElsendo
 │   ├── model/Alarmo.kt       # Vekhorloĝo-modelo
 │   ├── model/ElshutStato.kt  # Elŝut-statoj + ElshutitaElsendo
+│   ├── model/Diagnozo.kt     # Rezulto de diagnoza kontrolo (problemo aŭ averto)
 │   ├── repository/Deponejoj.kt          # KanaloDeponejo, ElsendoDeponejo (interfacoj)
 │   └── repository/PersonigoDeponejoj.kt # Plejŝatataj, LastAŭskultitaj, Ludatoj, Serĉo, Agordoj, Elŝut, Alarmo (interfacoj)
 ├── data/
@@ -329,23 +331,31 @@ dk/nordfalk/esperanto/
 │   ├── config/PlatformResource.kt    # expect/actual por legi resurcojn
 │   ├── config/KreuSettings.kt        # expect/actual por Settings
 │   ├── parser/RssParsilo.kt          # RSS/Atom-parsilo (sep reguloj)
-│   ├── repository/KanaloDeponejoImpl.kt     # Kanal-deponejo
+│   ├── repository/KanalDeponejoImpl.kt     # Kanal-deponejo (StateFlow)
 │   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
+│   ├── repository/HttpMotoro.kt            # expect/actual: Ktor-motoro (CIO, aŭ Js-fetch sur wasmJs)
+│   ├── repository/DosierKasho.kt            # expect/actual dosier-kaŝmemoro
+│   ├── repository/DosierNomoj.kt            # Konvencioj por dosiernomoj
+│   ├── repository/ArchiveOrgDosiernomoKasho.kt # Persista kesto de archive.org-dosiernomoj (Peranto-parsilo)
 │   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
 │   ├── repository/PersistantaPlejŝatatajDeponejo.kt
 │   ├── repository/PersistantaAlarmoDeponejo.kt # Alarmoj (Settings+JSON)
+│   ├── repository/MemorAlarmoDeponejo.kt   # En-memora AlarmoDeponejo (testoj/Preview)
 │   ├── repository/PersonigoDeponejojImpl.kt  # AgordojDeponejoImpl, SerĉoDeponejoImpl
-│   ├── repository/DosierKasho.kt            # expect/actual dosier-kaŝmemoro
-│   ├── repository/DosierNomoj.kt            # Konvencioj por dosiernomoj
+│   ├── repository/ApajNovajxojDeponejo.kt  # Apaj novaĵoj el la kanalkonfiguro (versio-anonco al la uzanto)
+│   ├── repository/PendingElsendoNavigacio.kt # Elsendo de sciigo-intento → Compose-navigado
 │   ├── repository/AlarmoSkedilo.kt          # expect/actual por AlarmManager-skedado
 │   ├── repository/KreuAlarmoSkedilo.kt      # Fabriko
-│   ├── repository/ElshutDeponejo (Ktor→dosiero, expect/actual + NoOp)
+│   ├── repository/KreuElshutDeponejo.kt     # expect/actual fabriko por elŝuto (Android/Desktop: Ktor; wasmJs/iOS: NoOp)
+│   ├── repository/NoOpElshutDeponejo.kt      # NoOp por wasmJs/iOS
+│   ├── repository/SettingsKeys.kt           # Ŝlosiloj por Settings
 │   ├── repository/SciigPermeso.kt           # expect/actual por sciig-permeso
-│   ├── repository/GhisdatiguSciigSkedon.kt  # Ĝisdatigas WorkManager-skedon laŭ agordoj
-│   ├── repository/NovajElsendojSkedilo.kt   # (Android) WorkManager-skedado de novaj-elsendaj kontroloj
-│   └── repository/NoOpElshutDeponejo.kt      # NoOp por wasmJs/iOS
+│   └── repository/GhisdatiguSciigSkedon.kt  # Ĝisdatigas sciig-skedon laŭ agordoj
 ├── domain/player/
 │   ├── LudiloRegilo.kt       # Ludilo-interfaco + NoOpLudiloRegilo (kun simuluFinon)
+│   ├── ReprovoLogiko.kt      # Eksponenta reprovo post ludo-eraro (maks 10 provoj, 1s → 30s)
+│   ├── AlarmoElekto.kt      # Elektas elsendon por vekhorloĝo ĉe podkasta kanalo
+│   ├── SonfontoKodilo.kt    # Sonfonto ↔ JSON (vojaĝas en MediaMetadata.extras)
 │   ├── LudvicoLogiko.kt      # Pura decidlogiko por aŭtoludo (3 prioritatoj)
 │   ├── LudvicoRegilo.kt      # Kontrolilo: pozicio-spurado, resumigo, aŭtoludo, ludvico
 │   └── SciigoKontroloj.kt    # Sciigo-registroj (MediaSession-metadata)
@@ -361,16 +371,20 @@ dk/nordfalk/esperanto/
     ├── SercxoEkrano.kt      # Serĉo
     ├── ElshutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)
     ├── AlarmoEkrano.kt      # Vekhorloĝo (kreilo/redaktilo)
+    ├── DiagnozoEkrano.kt    # Kontrolas la aparaton (bateri-optimumado, sciig-permeso, DNS…)
     ├── AgordojEkrano.kt     # Agordoj (daŭrigo, sciigoj, evoluo, temo)
+    ├── PlatformLigilo.kt    # expect/actual: malfermi eksterajn ligilojn/retpoŝton
     ├── HtmlVido.kt / HtmlTeksto.kt # Riĉa HTML-vidigo (expect/actual)
     ├── Temo.kt              # Muzaiko-temo (koloroj, tiparo, formoj)
     └── Previews.kt / PreviewDatumoj.kt # Antaŭvidoj
 ```
 
-> Platformo-specifaj `expect`/`actual` ekzistas en `androidMain/` (ExoPlayer, AlarmManager, WorkManager,
-> Receiviloj), `desktopMain/` (DesktopLudiloRegilo mp3spi), `wasmJsMain/` (WasmJsLudiloRegilo HTMLAudioElement),
-> `iosMain/` (NoOp). Android-specifaj: `AlarmoReceivilo`, `LudiElsendoReceivilo`, `BootReceivilo`,
-> `NovajElsendojKontroloWorker` (WorkManager).
+> Platformo-specifaj `expect`/`actual` ekzistas en `androidMain/` (`ExoPlayerLudiloRegilo`,
+> `EraroKlasifiko`, AlarmManager, WorkManager — `NovajElsendojKontroloWorker`/`NovajElsendojSkedilo`,
+> Receiviloj: `AlarmoReceivilo`, `LudiElsendoReceivilo`, `BootReceivilo`; plue `Agadoj`,
+> `IntentSxlosilo`), `desktopMain/` (`DesktopLudiloRegilo` mp3spi, `KtorElshutDeponejo`),
+> `wasmJsMain/` (`WasmJsLudiloRegilo` HTMLAudioElement), `iosMain/` (NoOp-ludilo;
+> Xcode-projekto ankoraŭ ne kreita).
 
 ## Sonludado kaj ludado — arkitekturaj resumoj (translokigitaj el AGENTS.md)
 

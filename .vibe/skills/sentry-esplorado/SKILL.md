@@ -32,7 +32,7 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
   `lastSeen:-7d`; sort: `date`/`freq`/`user`/`recommended`).
 - `get_sentry_resource` — detaloj pri unu problemo (stacktrace, eventoj);
   `resourceType='issue'`, `resourceId='KMP-X'`.
-- `search_logs` — protokol-agregaĵoj. Ekzemplej:
+- `search_logs` — protokol-agregaĵoj. Ekzemple:
   - Plej oftaj mesaĝoj: `fields: ['count()', 'message']`, `sort: '-count()'`.
   - Uzantoj po eldono: `fields: ['release', 'count_unique(user.id)']` — proksimumo
     de aktivaj uzantoj.

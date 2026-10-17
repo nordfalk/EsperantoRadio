@@ -247,6 +247,19 @@ skill-o **`konstruado-kaj-testado`** (`.vibe/skills/`). Bazaj:
 mankas `jlink`); `./gradlew :shared:desktopTest` (ĉiuj testoj);
 `./gradlew :androidApp:assembleDebug` (APK).
 
+### Kaptindaĵoj en komuna kodo (commonMain)
+
+Tiuj kvin limigoj mordas jam dum la skribado de kodo — detaloj kaj erarmesaĝoj
+staras en la skill-o `konstruado-kaj-testado`:
+
+- `Dispatchers.IO` ne ekzistas sur wasmJs — uzu `Dispatchers.Default` en komuna kodo.
+- `@Volatile` bezonas `import kotlin.concurrent.Volatile` (wasmJs: "Unresolved reference").
+- `Dispatchers.Main` sur Desktop bezonas `kotlinx-coroutines-swing`.
+- Retezu per `HttpMotoro.kt` (expect/actual), neniam `HttpClient(CIO)` rekte —
+  CIO ne funkcias sur wasmJs; la Js-motoro ĵetas `kotlin.Error` (ne Exception).
+- Ne altgradigu .klib-bibliotekojn (navigation3 k.a.) sendepende de Kotlin —
+  .klib de pli nova Kotlin ne legeblas sur wasmJs ("Unresolved reference").
+
 ## Datumfluo (nova apo)
 
 ```

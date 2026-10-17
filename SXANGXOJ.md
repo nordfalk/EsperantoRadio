@@ -1,3 +1,25 @@
+# Ŝanĝoj — 2026-10-17
+
+## Post-revizio de PR #113: koda mapo ĝisdatigita + kompil-kaptindaĵoj en AGENTS.md
+
+Zorga revizio de PR #113 (mallongigo de AGENTS.md) konstatis, ke la "Deponeja
+koda mapo" translokigita al NOTOJ.md estis fuŝita de la realo: 13 novaj
+dosieroj mankis (ApajNovajxojDeponejo, Diagnozo*, ReprovoLogiko, HttpMotoro,
+MemorAlarmoDeponejo, k.a.), `KanaloDeponejoImpl.kt` estis erara nomo (reale
+`KanalDeponejoImpl.kt`), `NovajElsendojSkedilo.kt` estis listigita en
+commonMain kvankam ĝi vivas en androidMain, kaj `ElshutDeponejo` ne estis
+dosiero (reale `KreuElshutDeponejo.kt`). La mapo nun kongruas kun la arbo
+(63 commonMain-dosieroj, aŭtomate komparitaj per find+comm).
+
+Krome la kvin kompilad-kaptindaĵojn de commonMain (Dispatchers.IO, `@Volatile`,
+coroutines-swing, `HttpMotoro`, klib-ABI) oni remetis al AGENTS.md kiel
+kompaktan sekcion — ili mordas jam dum la skribado de kodo, antaŭ ol la agento
+ŝargas la konstru-skill-on. Korektitaj ankaŭ: literum-eraro "Ekzemplej" kaj
+malpreciza pado de `release-notes-arkivo/` en la skill-oj.
+
+Leciono: translokigitan dokumentaron ĉiam kontrolu kontraŭ la realo, ne
+kopiu ĝin vorte.
+
 # Ŝanĝoj — 2026-10-13
 
 ## GPP-eldona noto: trako-bazita, ne versio-bazita (malkovrita dum la 249-eldono)

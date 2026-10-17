@@ -30,7 +30,8 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    kiel retroiro) — NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.)
    estas ignoritaj de GPP (tiel ĉiuj eldonoj 3.0.2…249 eldoniĝis kun la malnovaj
    3.0.1-notoj; la 249-notoj korektiĝis permane). La historiaj `X.Y.Z.txt`-dosieroj
-   estas arkivigitaj en `release-notes-arkivo/` — ekster la de GPP skanata dosierujo.
+   estas arkivigitaj en `androidApp/src/main/play/release-notes-arkivo/` — ekster
+   la de GPP skanata dosierujo.
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
    la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
    ```bash

@@ -187,6 +187,15 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 - **`mergeStateStatus: UNSTABLE`** (2026-10-14, PR #109): signifas "mergeable,
   sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
   kontroloj (aŭ atendu `CLEAN` antaŭ ol merĝi).
+- **Dependabot-versi-PR-oj povas esti interdependaj kaj konfliktaj** (2026-10-13,
+  revizio de #99/#101/#102): la du Kotlin-bumpoj tuŝas apudajn liniojn de
+  `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la
+  PR-branĉon, ĉiuj kvar kromprogramoj je la sama versio. Coil 3.6.3 (#102) estis
+  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatenon 2.4.0,
+  nelegeblan de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
+  `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`; nuna AGP
+  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatenajn kaj
+  compileSdk/AGP-postulojn antaŭ ol kunfandi versi-bumpon.
 
 ## Protokolado kaj Sentry — konvencio
 

@@ -35,9 +35,10 @@ polaretradio havis ripeton 0x44 = merkredo+dimanĉo, dum la teksto diris
   (`Ĵaŭde`, `Dimanĉe` …), kaj plenaj tag-nomoj kun "kaj" por aliaj kombinoj
   (`Merkredo kaj Dimanĉo`, `Lundo, Mardo kaj Sabato`); "Cxiutage" iĝis
   "Ĉiutage". La alarmo-listo montras nun: tempo → kanalnomo → ripetoteksto —
-  ĉio derivata de la agordo. La ripet-ĉipoj en la redaktilo same ricevis
-  plenajn nomojn (`FlowRow` anstataŭ `Row` — 7 plenaj nomoj ne eniras en
-  unu linion).
+  ĉio derivata de la agordo. La ripet-ĉipoj en la redaktilo ricevis
+  3-literajn nomojn (Lun, Mar, Mer, Ĵaŭ, Ven, Sab, Dim — ĉiuj 7 eniras en
+  unu linion), en `FlowRow` kiel sekureco por mallarĝaj ekranoj kaj
+  grandaj tiparoj.
 - Nova testaro: `ripetoTekstoGeneratasElKonfiguro` (AlarmoTest);
   `ekranfoto_alarmo_redaktilo` kaptas redaktilon + ambaŭ dialogojn.
 

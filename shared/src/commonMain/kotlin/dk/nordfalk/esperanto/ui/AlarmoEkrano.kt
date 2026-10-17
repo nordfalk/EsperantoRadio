@@ -280,7 +280,8 @@ private fun AlarmoRedaktilo(
 
         Text("Ripeto:")
         FlowRow {
-            val tagoj = listOf("Lundo" to 0x01, "Mardo" to 0x02, "Merkredo" to 0x04, "Ĵaŭdo" to 0x08, "Vendredo" to 0x10, "Sabato" to 0x20, "Dimanĉo" to 0x40)
+            // 3-literaj nomoj — la 7 ĉipoj eniras en unu linio
+            val tagoj = listOf("Lun" to 0x01, "Mar" to 0x02, "Mer" to 0x04, "Ĵaŭ" to 0x08, "Ven" to 0x10, "Sab" to 0x20, "Dim" to 0x40)
             tagoj.forEach { (nomo, bito) ->
                 FilterChip(
                     selected = ripeto and bito != 0,

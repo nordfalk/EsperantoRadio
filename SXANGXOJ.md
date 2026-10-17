@@ -1,5 +1,56 @@
 # Ŝanĝoj — 2026-10-17
 
+## Vekhorloĝo: tempoelekto kaj kanalelekto per dialogoj (PR #114)
+
+La redaktilo de alarmoj uzis du nombrajn tekst-kampojn (horo, minuto) kaj longan
+radio-butonan kanalliston. Nun ĝi montras grandan klakeblan tempon
+(`displayMedium`) kaj klakeblan kanalnomon; klako malfermas dialogon:
+
+- `TempoElektiloDialogo` — Material3 `TimePicker` (ciferblido 00–23, kiel la
+  TimePickerDialog de la malnova apo) kun ŝaltilo al `TimeInput` por klavara
+  enigo (utila sur Desktop). La stato kreasĝiĝas nur ene de la dialogo, do
+  "Nuligi" forĵetas la elekton; nur "Bone" transigas horon/minuton.
+- `KanalElektiloDialogo` — `AlertDialog` kun la kanallisto; elekto tuj fermas.
+
+Riparo dum la laboro: la redaktilo ne ricevis la Scaffold-`padding`-on, do la
+etikedo "Tempo" kaŝiĝis malantaŭ la TopAppBar. `AlarmoRedaktilo` nun ricevas
+`scaffoldPadding: PaddingValues`. Kontrolinte ĉiujn 11 `Scaffold`-uzojn: neniu
+alia ekrano havas la problemon.
+
+### Forigitaj etikedoj — la teksto nun venas de la agordo
+
+La etikedoj de la alarmo-sugestoj el la JSONC ("Muzaiko semajnfine", "Pola
+Retradio vendrede kaj semajnfine" kc.) ne kongruis kun la enhavo (ekz.
+polaretradio havis ripeton 0x44 = merkredo+dimanĉo, dum la teksto diris
+"vendrede kaj semajnfine"). Ŝanĝoj:
+
+- La `=etikedo`-partoj de la 6 sugestoj malpleniĝis en ambaŭ JSONC-kopioj
+  (la parsilo `parsuSugestojnPorAlarmoj` restas malkonstruita kun la malnova
+  formato; malplena etikedo → `null`).
+- `AlarmoEro` ne plu montras `alarmo.etikedo` — la sola fonto de etikedoj estis
+  la sugestoj (la redaktilo ne havas etikedan kampon). Persistintaj etikedoj
+  restas en la datumoj sed ne videblas.
+- `Alarmo.ripetoTeksto` generas homecran tekston el la ripet-masko:
+  `Ĉiutage`, `Labortage` (0x1f), `Semajnfine` (0x60), unuopaj tagoj
+  (`Ĵaŭde`, `Dimanĉe` …), kaj plenaj tag-nomoj kun "kaj" por aliaj kombinoj
+  (`Merkredo kaj Dimanĉo`, `Lundo, Mardo kaj Sabato`); "Cxiutage" iĝis
+  "Ĉiutage". La alarmo-listo montras nun: tempo → kanalnomo → ripetoteksto —
+  ĉio derivata de la agordo. La ripet-ĉipoj en la redaktilo ricevis
+  3-literajn nomojn (Lun, Mar, Mer, Ĵaŭ, Ven, Sab, Dim — ĉiuj 7 eniras en
+  unu linion), en `FlowRow` kiel sekureco por mallarĝaj ekranoj kaj
+  grandaj tiparoj.
+- Nova testaro: `ripetoTekstoGeneratasElKonfiguro` (AlarmoTest);
+  `ekranfoto_alarmo_redaktilo` kaptas redaktilon + ambaŭ dialogojn.
+
+### Lecioj pri testado (ankaŭ en AGENTS.md)
+
+- `AlertDialog` estas aparta kompona radiko → `onRoot()` fiaskas per "found 2
+  nodes"; la ekranfoto-helpilo kaptas la lastan radikon per
+  `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` — `isRoot` estas
+  eco, ne metodo.
+- `onNodeWithText` serĉas ĉiujn radikojn: "Nuligi" ekzistas kaj en dialogo kaj
+  en la ekrano malantaŭ ĝi — fermu per teksto unika en la dialogo.
+
 ## Post-revizio de PR #113: koda mapo ĝisdatigita + kompil-kaptindaĵoj en AGENTS.md
 
 Zorga revizio de PR #113 (mallongigo de AGENTS.md) konstatis, ke la "Deponeja

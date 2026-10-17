@@ -14,12 +14,11 @@
 	},
 
 	"sugestoj_por_alarmoj":
-"10000/0/6/45/31/0/=muzaiko/=Muzaiko+matene+labortago/\
-10001/0/10/0/96/0/=muzaiko/=Muzaiko+semajnfine/\
-10002/0/17/0/127/0/=peranto/=Esperanta+retradio+%28%C4%89iutage%29/\
-10003/0/16/0/68/0/=polaretradio/=Pola+Retradio%0Avendrede+kaj+semajnfine/\
-10002/0/16/0/8/0/=radiohavanokubo/=Radio+Havano+Kubo%0A%C4%B4a%C5%ADde/\
-10003/0/21/0/8/0/=radiovatikana/=Radio+Vatikana%0A%C4%B4a%C5%ADde/\
+"10000/0/6/45/31/0/=muzaiko/=/\
+10001/0/10/0/96/0/=muzaiko/=/\
+10002/0/17/0/127/0/=peranto/=/\
+10003/0/16/0/68/0/=polaretradio/=/\
+10003/0/21/0/8/0/=radiovatikana/=/\
 ",
 
 	"intervals": {

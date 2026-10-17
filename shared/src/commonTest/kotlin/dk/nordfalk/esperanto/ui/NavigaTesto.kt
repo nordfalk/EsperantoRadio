@@ -254,7 +254,7 @@ class NavigaTesto {
         }
         waitForIdle()
         onNodeWithText("06:45").assertIsDisplayed()
-        onNodeWithText("Cxiutage").assertIsDisplayed()
+        onNodeWithText("Ĉiutage").assertIsDisplayed()
     }
 
     @Test

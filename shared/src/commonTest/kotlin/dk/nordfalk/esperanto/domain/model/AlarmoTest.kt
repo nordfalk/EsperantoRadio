@@ -72,4 +72,16 @@ class AlarmoTest {
         // merkredo-11:00 jam pasis (10:00) kaj merkredo ne estas en la masko → sabato
         assertEquals(LocalDateTime(2026, 9, 26, 11, 0), alarmo(11, 0, 0x123).sekvaEkigo(merkredo10))
     }
+
+    @Test // (PR #114) la ripet-teksto estas generata el la konfiguro, ne libera teksto
+    fun ripetoTekstoGeneratasElKonfiguro() {
+        assertEquals("Unufoje", alarmo(6, 0, 0x00).ripetoTeksto)
+        assertEquals("Ĉiutage", alarmo(6, 0, 0x7f).ripetoTeksto)
+        assertEquals("Labortage", alarmo(6, 45, 0x1f).ripetoTeksto)
+        assertEquals("Semajnfine", alarmo(10, 0, 0x60).ripetoTeksto)
+        assertEquals("Ĵaŭde", alarmo(21, 0, 0x08).ripetoTeksto)
+        assertEquals("Dimanĉe", alarmo(8, 0, 0x40).ripetoTeksto)
+        // ne-specialigitaj kombinoj restas mallongigoj
+        assertEquals("Lu Ma", alarmo(6, 0, 0x03).ripetoTeksto)
+    }
 }

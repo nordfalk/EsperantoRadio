@@ -196,11 +196,10 @@ private fun AlarmoEro(
                 modifier = Modifier.clickable { onRedakti() })
         },
         supportingContent = {
+            // La teksto estas generata el la konfiguro de la alarmo (kanalo + ripeto) —
+            // liberaj etikedoj el la konfiguro ne plu montriĝas (ili ne kongruis).
             Column(modifier = Modifier.clickable { onRedakti() }) {
                 Text(kanaloNomo)
-                if (!alarmo.etikedo.isNullOrBlank()) {
-                    Text(alarmo.etikedo!!, style = MaterialTheme.typography.bodySmall)
-                }
                 Text(alarmo.ripetoTeksto, style = MaterialTheme.typography.bodySmall)
             }
         },

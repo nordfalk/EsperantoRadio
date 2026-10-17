@@ -80,7 +80,7 @@ class AlarmoEkranoTest {
         waitForIdle()
         onNodeWithText("06:45").assertIsDisplayed()
         onNodeWithText("Muzaiko").assertIsDisplayed()
-        onNodeWithText("Cxiutage").assertIsDisplayed()
+        onNodeWithText("Ĉiutage").assertIsDisplayed()
         onNodeWithText("22:00").assertIsDisplayed()
         onNodeWithText("Unufoje").assertIsDisplayed()
     }

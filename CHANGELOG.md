@@ -14,8 +14,13 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Aldonita
+
+- Vekhorloĝo: la tempo elekteblas per ciferblido en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
+
 ### Ŝanĝita
 
+- Vekhorloĝo: la alarmoj ne plu montras fiksigitajn etikedojn (ekz. "Muzaiko semajnfine") kiuj ne kongruis kun la enhavo — la priskriba teksto nun generiĝas el la agordo de la alarmo (kanalo + ripetotagoj) (https://github.com/nordfalk/EsperantoRadio/pull/114)
 - Debug-konstruoj, komputilaj ruladoj (desktop) kaj emuliloj ne plu sendas ion ajn al la erar-monitorado — nur veraj uzantoj de la eldonitaj versioj (https://github.com/nordfalk/EsperantoRadio/pull/109)
 - La protokola kvoto montriĝis ne-problema: "detala protokolado" estas nun defaŭlte ŝaltita, do ankaŭ la ordinaraj protokoloj (navigado, klakoj) denove sendiĝas; malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/109)
 - Erar-monitorado: eraroj estas duone specimenataj kaj atendantaj fiaskoj (reto, ludado, elŝuto) ne plu kalkuliĝas kiel eraroj — la preskaŭ elĉerpita monata eraroj-kvoto estas tiele protektata (https://github.com/nordfalk/EsperantoRadio/pull/109)

@@ -28,9 +28,22 @@ data class Alarmo(
     val aktiva: Boolean = true,
     val etikedo: String? = null,
 ) {
-    val ripetoTeksto: String get() = when {
-        ripeto == 0 -> "Unufoje"
-        ripeto == 0x7f -> "Cxiutage"
+    /**
+     * Teksto priskribanta la ripeton, generata el la ripet-masko (ĉiam kongrua
+     * kun la agordo — neniu libera teksto el la konfiguro).
+     */
+    val ripetoTeksto: String get() = when (ripeto) {
+        0x00 -> "Unufoje"
+        0x7f -> "Ĉiutage"
+        0x1f -> "Labortage"
+        0x60 -> "Semajnfine"
+        0x01 -> "Lunde"
+        0x02 -> "Mardo"
+        0x04 -> "Merkrede"
+        0x08 -> "Ĵaŭde"
+        0x10 -> "Vendrede"
+        0x20 -> "Sabate"
+        0x40 -> "Dimanĉe"
         else -> buildList {
             if (ripeto and 0x01 != 0) add("Lu")
             if (ripeto and 0x02 != 0) add("Ma")

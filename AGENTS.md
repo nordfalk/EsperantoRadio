@@ -55,7 +55,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
    Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
-   `shared/src/commonTest/resources/feeds/` (4 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+   `shared/src/commonTest/resources/feeds/` (5 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
    La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
    devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
@@ -193,6 +193,8 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   la refspec estas `+refs/heads/master:refs/remotes/origin/master`. Por revizii
   PR-on, alportu la kap-branĉon eksplicite:
   `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
+  Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
+  "you must first push the current branch" — aldonu `--head <branĉnomo>`.
 - **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
   (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
   `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese

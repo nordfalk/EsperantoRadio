@@ -75,8 +75,137 @@ class RssParsiloTest {
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         for (e in elsendoj) {
+            // G16: kun guid la id estas <slug>:<guid> (unu prefikso) — la kernpunkto-
+            // fiksaĵo havas UUID-guidojn kiel "11a27dc1-…"
             assertTrue(e.id.startsWith("kernpunkto:"), "ID devas komenciĝi per 'kernpunkto:': ${e.id}")
+            assertFalse(e.id.startsWith("kernpunkto:kernpunkto:"), "Neniam duobla prefikso: ${e.id}")
         }
+        // Ĉiuj id-oj devas esti unikaj
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "Id-oj devas esti unikaj")
+    }
+
+    // === G16 — Id-konvencio (docs/nova/04, "Id-konvencioj") ===
+
+    @Test
+    fun idGvidasSenPrefiksoKiamGvidasJamKomencaPerSlugo() = kotlinx.coroutines.test.runTest {
+        // guid kiu jam komencas per "<slug>:" restas senŝanĝa — neniam duobla prefikso
+        val fluo = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/a.mp3" type="audio/mpeg"/>
+              <guid>test:1234-abc</guid></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        assertEquals("test:1234-abc", parsilo.parsuRss(fluo, kanalo)[0].id)
+    }
+
+    @Test
+    fun idAldonasPrecizeUnuPrefiksonAlEksteraGuid() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/a.mp3" type="audio/mpeg"/>
+              <guid>https://anchor.fm/ekzemplo/epizodo</guid></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        assertEquals("test:https://anchor.fm/ekzemplo/epizodo", parsilo.parsuRss(fluo, kanalo)[0].id)
+    }
+
+    @Test
+    fun deArkivoUzasGuidonSenAjnaPrefikso() = kotlinx.coroutines.test.runTest {
+        // La arkiva servilo skribas la jam FINAN id-on kiel guid; la apo devas uzi
+        // ĝin senŝanĝe — eĉ se ĝi ne komencas per "<slug>:" — alikaze la id kreskus
+        // ĉiun rondiron kaj la inkrementa kunfando (docs/nova/06) neniam trafus.
+        val fluo = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://arkivo.example/a.mp3" type="audio/mpeg"/>
+              <guid>kernpunkto:2022-11-09</guid></item>
+            <item><title>Test2</title><pubDate>Thu, 2 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://arkivo.example/b.mp3" type="audio/mpeg"/>
+              <guid>ekstera-id</guid></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(
+            slug = "kernpunkto", nomo = "Kernpunkto",
+            podkastaRssUrl = "https://servilo.example/podkasta_arkivo/kernpunkto.xml",
+        )
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+        assertEquals(listOf("kernpunkto:2022-11-09", "ekstera-id"), elsendoj.map { it.id })
+    }
+
+    @Test
+    fun idEstasStabilaTransRondiro() = kotlinx.coroutines.test.runTest {
+        // Rondiro kun la arkiva servilo: la apo konstruas id-on, la servilo skribas
+        // ĝin kiel guid en sian fluon, la apo re-parsas — la id devas resti SAMA.
+        val komencaFluo = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/a.mp3" type="audio/mpeg"/>
+              <guid>er-abc-123</guid></item>
+            </channel></rss>
+        """.trimIndent()
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+
+        val unua = parsilo.parsuRss(komencaFluo, kanalo)[0]
+        // La servilo skribas Elsendo.id kiel guid en sian eldonitan fluon:
+        val servilaFluo = """
+            <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
+            <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
+              <enclosure url="https://x.example/a.mp3" type="audio/mpeg"/>
+              <guid>${unua.id}</guid></item>
+            </channel></rss>
+        """.trimIndent()
+
+        assertEquals(unua.id, parsilo.parsuRss(servilaFluo, kanalo)[0].id,
+            "Re-parsado devas redoni la saman id-on (stabileco de la rondiro)")
+    }
+
+    @Test
+    fun konstruuIdSekvasLaKonvencion() {
+        val kanalo = Kanalo(slug = "test", nomo = "Test")
+        // senŝanĝe: jam prefiksita
+        assertEquals("test:abc", parsilo.konstruuId(kanalo, "test:abc", "2025-01-01"))
+        // unu prefikso
+        assertEquals("test:abc", parsilo.konstruuId(kanalo, "abc", "2025-01-01"))
+        // sen guid → <slug>:<dato>
+        assertEquals("test:2025-01-01", parsilo.konstruuId(kanalo, null, "2025-01-01"))
+        // deArkivo → guid ĉiam senŝanĝe
+        assertEquals("aliakanalo:xyz", parsilo.konstruuId(kanalo, "aliakanalo:xyz", "2025-01-01", deArkivo = true))
+        assertEquals("nuda-guid", parsilo.konstruuId(kanalo, "nuda-guid", "2025-01-01", deArkivo = true))
+    }
+
+    // === Regulo 6.1 — Ĝenerala parsado (La Malfamuloj, anchor.fm — G41-fiksaĵo) ===
+
+    @Test
+    fun parsasLamalfamulojn() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("lamalfamuloj_feed.xml")
+        val kanalo = Kanalo(
+            slug = "lamalfamuloj",
+            nomo = "La Malfamuloj",
+            podkastaRssUrl = "https://anchor.fm/s/1e1d5f38/podcast/rss",
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertTrue(elsendoj.size >= 114, "La Malfamuloj devas havi almenaŭ 114 elsendojn: ${elsendoj.size}")
+
+        // La konata ero (docs/nova/04, ora test-tabelo): Thu, 26 Dec 2024,
+        // daŭro 00:51:17, enclosure enhavanta 392138630…mp3
+        val e2sp6gp = elsendoj.first { it.dato == "2024-12-26" }
+        assertEquals(3_077L, e2sp6gp.dauro, "Dauro devas esti 00:51:17 = 3077 s")
+        assertTrue(e2sp6gp.fluo.startsWith("https://"), "Stream devas esti https: ${e2sp6gp.fluo}")
+        assertTrue(e2sp6gp.fluo.contains("392138630"), "Stream devas enhavi 392138630: ${e2sp6gp.fluo}")
+        assertTrue(e2sp6gp.fluo.endsWith(".mp3"), "Stream devas finii per .mp3: ${e2sp6gp.fluo}")
+
+        // G16: anchor.fm-eroj havas UUID-guidon → id = <slug>:<guid> (unu prefikso)
+        for (e in elsendoj) {
+            assertTrue(e.id.startsWith("lamalfamuloj:"), "ID devas komenciĝi per 'lamalfamuloj:': ${e.id}")
+            assertTrue(e.fluo.startsWith("https://"), "Ĉiuj fluoj devas esti https: ${e.fluo}")
+        }
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "Id-oj devas esti unikaj")
     }
 
     // === Regulo 6.2 — Varsovia Vento (pluraj <audio> po ero) ===
@@ -422,7 +551,7 @@ class RssParsiloTest {
 
         assertEquals(1, elsendoj.size)
         assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].fluo)
-        assertEquals("peranto:2025-05-03:1", elsendoj[0].id)
+        assertEquals("peranto:2025-05-03", elsendoj[0].id, "Sen guid la id estas <slug>:<dato> (G16)")
     }
 
     @Test

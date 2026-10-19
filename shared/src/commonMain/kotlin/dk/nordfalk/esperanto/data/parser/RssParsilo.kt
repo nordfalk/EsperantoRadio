@@ -87,7 +87,7 @@ class RssParsilo(
 
         val rezulto = if (deArkivo) {
             logd("RssParsilo", "${kanalo.slug}: uzas arkiv-parsilon")
-            parsuGxenerala(doc, kanalo)
+            parsuGxenerala(doc, kanalo, deArkivo = true)
         } else when (kanalo.slug) {
             "varsoviavento" -> {
                 logd("RssParsilo", "${kanalo.slug}: uzas VarsoviaVento-parsilon")
@@ -103,7 +103,7 @@ class RssParsilo(
             }
             else -> {
                 logd("RssParsilo", "${kanalo.slug}: uzas ĝeneralan parsilon")
-                parsuGxenerala(doc, kanalo)
+                parsuGxenerala(doc, kanalo, deArkivo = false)
             }
         }
 
@@ -119,10 +119,10 @@ class RssParsilo(
 
     // === Regulo 6.1 — Ĝenerala ===
 
-    private fun parsuGxenerala(doc: Document, kanalo: Kanalo): List<Elsendo> =
-        doc.select("item, entry").mapIndexedNotNull { i, ero -> parsuEroGxenerala(ero, kanalo, i) }
+    private fun parsuGxenerala(doc: Document, kanalo: Kanalo, deArkivo: Boolean): List<Elsendo> =
+        doc.select("item, entry").mapNotNull { ero -> parsuEroGxenerala(ero, kanalo, deArkivo) }
 
-    private fun parsuEroGxenerala(ero: Element, kanalo: Kanalo, indekso: Int): Elsendo? {
+    private fun parsuEroGxenerala(ero: Element, kanalo: Kanalo, deArkivo: Boolean): Elsendo? {
         val titolo = ero.selectFirst("title")?.text() ?: ""
         val priskriboKruda = ero.selectFirst("content|encoded")?.text()
             ?: ero.selectFirst("description")?.text()
@@ -171,9 +171,12 @@ class RssParsilo(
 
         val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboPurigita) else titolo
 
-        // Unika ID: uzu GUID se ekzistas, alie indekso (kiel Varsovia Vento)
-        val guid = ero.selectFirst("guid")?.text()
-        val id = if (guid != null) "${kanalo.slug}:$dato:$guid" else "${kanalo.slug}:$dato:${indekso + 1}"
+        // Id laŭ la dokumentita konvencio (docs/nova/04, "Id-konvencioj"):
+        // la guid senŝanĝa se ĝi jam komencas per "<slug>:" (ĉiam por deArkivo —
+        // la arkiva servilo skribas la jam finan id-on kiel guid kaj re-prefiksigo
+        // kreskus la id-on ĉiun rondiron, rompante la inkrementan kunfandon)
+        val guid = ero.selectFirst("guid")?.text() ?: ero.selectFirst("id")?.text()
+        val id = konstruuId(kanalo, guid, dato, deArkivo)
 
         return Elsendo(
             id = id,
@@ -236,7 +239,6 @@ class RssParsilo(
     /** Interrezulto de unu Peranto-ero dum la dufaza parsado. */
     private data class PerantoEro(
         val dato: String,
-        val indekso: Int,
         val guid: String?,
         val titolo: String,
         val priskribo: String,
@@ -254,12 +256,12 @@ class RssParsilo(
 
         // Paŝo 1: kolektu la erojn. Por archive.org la MP3-dosiernomo estas nur
         // divenita (identigilo + ".mp3") — la vera nomo estas demandata en paŝo 2.
-        val eroj = doc.select("entry").mapIndexedNotNull { i, ero ->
-            val published = ero.selectFirst("published")?.text() ?: return@mapIndexedNotNull null
-            val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapIndexedNotNull null
+        val eroj = doc.select("entry").mapNotNull { ero ->
+            val published = ero.selectFirst("published")?.text() ?: return@mapNotNull null
+            val dato = published.substringBefore("T").takeIf { it.length >= 10 } ?: return@mapNotNull null
 
             // Saltu konatajn malplenajn datojn
-            if (dato in malplenajDatoj) return@mapIndexedNotNull null
+            if (dato in malplenajDatoj) return@mapNotNull null
 
             // La enhavo estas HTML-eskapita en <content type='html'>
             val htmlEsprimite = ero.selectFirst("content")?.text() ?: ""
@@ -295,14 +297,13 @@ class RssParsilo(
                 }
                 // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo 6.3: la komuna
                 // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, (PR #91))
-                iframeSrc.isEmpty() -> return@mapIndexedNotNull null
-                estasSaltitaGastiganto(iframeSrc) -> return@mapIndexedNotNull null
-                else -> return@mapIndexedNotNull null
+                iframeSrc.isEmpty() -> return@mapNotNull null
+                estasSaltitaGastiganto(iframeSrc) -> return@mapNotNull null
+                else -> return@mapNotNull null
             }
 
             PerantoEro(
                 dato = dato,
-                indekso = i,
                 guid = ero.selectFirst("id")?.text(),
                 titolo = ero.selectFirst("title")?.text() ?: "",
                 priskribo = priskribo,
@@ -333,7 +334,7 @@ class RssParsilo(
                 val dosiernomo = dosiernomoj[ero.arkivaIdentigilo] ?: "${ero.arkivaIdentigilo}.mp3"
                 "https://archive.org/download/${ero.arkivaIdentigilo}/${dosiernomo.encodeURLPathPart()}"
             } else ero.fluo
-            val id = if (ero.guid != null) "peranto:${ero.dato}:${ero.guid}" else "peranto:${ero.dato}:${ero.indekso + 1}"
+            val id = konstruuId(kanalo, ero.guid, ero.dato)
 
             Elsendo(
                 id = id,
@@ -445,6 +446,29 @@ class RssParsilo(
         }
 
     // === Helpiloj ===
+
+    /**
+     * Konstruas la elsendo-id-on laŭ la dokumentita konvencio (docs/nova/04, "Id-konvencioj";
+     * G16-riparo):
+     * - la guid senŝanĝa, se ĝi jam komencas per "<kanalSlug>:" — aŭ ĉiam por `deArkivo`
+     *   (la arkiva servilo skribas la jam finan id-on kiel guid; re-prefiksigo kreskus
+     *   la id-on ĉiun rondiron kaj rompus la inkrementan kunfandon de docs/nova/06);
+     * - alie "<kanalSlug>:<guid>" (precize unu prefikso);
+     * - sen guid: "<kanalSlug>:<dato>" (kiel la malnova RomePodcastParser.parseAndre).
+     *
+     * La id ŝlosas uzantdatumojn (elŝutoj, ludpozicioj, plejŝatataj) kaj devas esti
+     * STABILA: dufoja parsado de la sama fluo redonas la saman id-on.
+     */
+    fun konstruuId(kanalo: Kanalo, guid: String?, dato: String, deArkivo: Boolean = false): String {
+        if (guid != null) {
+            return when {
+                deArkivo -> guid
+                guid.startsWith("${kanalo.slug}:") -> guid
+                else -> "${kanalo.slug}:$guid"
+            }
+        }
+        return "${kanalo.slug}:$dato"
+    }
 
     /**
      * Validigas URL-on el nefidinda RSS-enhavo: nur `http://`/`https://` permesataj.

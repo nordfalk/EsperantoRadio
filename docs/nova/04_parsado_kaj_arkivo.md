@@ -123,11 +123,16 @@ La radio.txt-formato (por referenco):
 
 | Fonto | id-formato |
 |---|---|
-| Ĝenerala | `entry.uri` aŭ `<kanalSlug>:<yyyy-MM-dd>` |
+| Ĝenerala | `<guid>` senŝanĝa se ĝi jam komencas per `<kanalSlug>:`, alie `<kanalSlug>:<guid>`; sen guid: `<kanalSlug>:<yyyy-MM-dd>` |
+| deArkivo (`podkasta_arkivo`) | `<guid>` ĉiam senŝanĝa — la servilo skribas la jam finan id-on kiel guid; re-prefiksigo kreskus la id-on ĉiun rondiron |
 | radio.txt | `<kanalSlug>:<yyyy-MM-dd>` |
 | Varsovia Vento | `<kanalSlug>:<yyyy-MM-dd>:<partnum>` |
 | Vinilkosmo | `vk:<publikig-sen-tempzonon>` |
 | Rekta (Muzaiko) | `<kanalSlug>_rekta` kun `dato=REKTA` |
+
+La kodo vicigita kun tio estas `RssParsilo.konstruuId`. La id ŝlosas uzantdatumojn
+(elŝutoj, ludpozicioj, plejŝatataj) kaj devas esti **stabila**: dufoja parsado de
+la sama fluo (inkluzive servila rondiro) redonas la saman id-on.
 
 ## Dat-normigo
 
@@ -139,9 +144,12 @@ La radio.txt-formato (por referenco):
 
 ## Golden-testoj (la plej grava kvalito-averto)
 
-Kopiu la kaŝenitajn fluojn el `RssArkivServer-filcache/` al
-`shared/src/commonTest/resources/feeds/`. Skribu testojn kiuj, por ĉiu fiksaĵo,
-asertas:
+La fiksaĵoj estas **versiigitaj en la deponejo** en
+`shared/src/commonTest/resources/feeds/` (kernpunkto, peranto, varsoviavento,
+vinilkosmo, lamalfamuloj) — la testoj devas ruli sen `RssArkivServer-filcache/`.
+Kiam vi aldonas novan fiksaĵon (el la loka `RssArkivServer-filcache/` aŭ rekte
+el la fonto), metu kopion en `feeds/` kune kun la testoj. Skribu testojn kiuj,
+por ĉiu fiksaĵo, asertas:
 
 | Testo | Atendo |
 |---|---|

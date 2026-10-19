@@ -1,3 +1,53 @@
+# Ŝanĝoj — 2026-10-19
+
+## FAROTA G25 — etikedo v3.0.2 rekreita sur la master-a eldona komito
+
+La etikedo `v3.0.2` montris al `16ae6d6` (ne sur master); la eldona komito sur
+master estas `9e835b9` (squash-merge de la sama PR). Riparite per
+`git tag -f v3.0.2 9e835b9 && git push -f origin v3.0.2` (kun uzanto-aprobo —
+re-verkado de publika etikedo). Kontrolita: `git merge-base --is-ancestor v3.0.2 HEAD` → jes.
+
+## FAROTA G16/G31/G41/G7 — id-konvencio, anchor.fm-fiksaĵo, FAROTA-higieno
+
+**G16 (id-skemo)**: la ĝenerala kaj Peranto-parsiloj konstruis la id-on kiel
+`<slug>:<dato>:<guid>` / `<slug>:<dato>:<indekso>`, dum la dokumento kaj la
+malnova `RomePodcastParser.parseAndre` uzas la guid senŝanĝe. Tio rompus la
+rondiron kun la planita arkiva servilo (re-parsado re-prefiksikus → la id
+kreskus ĉiun fojon; la inkrementa kunfando `e.id !in konataj` neniam trafus).
+
+Riparo: nova helpilo `RssParsilo.konstruuId(kanalo, guid, dato, deArkivo)`:
+
+- guid senŝanĝa se ĝi jam komencas per `<slug>:` (kaj ĉiam por `deArkivo` —
+  la servilo skribas la jam finan id-on kiel guid);
+- alie precize unu prefikso `<slug>:<guid>`;
+- sen guid: `<slug>:<dato>` (kiel la malnova parseAndre).
+
+La ĝenerala parsilo legas nun ankaŭ Atom-`<id>` (ekvivalento de `entry.uri`).
+`PerantoEro.indekso` foriĝis (mortinta kampo). Testoj: `kernpunktoIdFormato`
+(streĉita), `idGvidasSenPrefikso…`, `idAldonasPrecizeUnuPrefikson…`,
+`deArkivoUzasGuidonSenAjnaPrefikso`, `idEstasStabilaTransRondiro`,
+`konstruuIdSekvasLaKonvencion`. `docs/nova/04` "Id-konvencioj" vicigita kun la
+kodo. FLANKA EFIKO: la id-ŝanĝo restartigas uzantdatumojn ŝlositajn per id
+(ludpozicioj, elŝutoj, plej ŝatataj) por la koncernaj kanaloj — unufoje.
+
+**G31 (https-korekto)**: ne plu aktuala — `docs/nova/04` (regulo 6.1.6) jam
+priskribas la kernpunkto-nuran korekton kiel intenca historia konduto, kongrue
+kun la malnova kodo (`RomePodcastParser.parseAndre:206`). Forigita el FAROTA.
+
+**G41 (filcache-kontraŭdiro)**: la mankanta anchor.fm-fiksaĵo "La Malfamuloj"
+(121 eroj, https://anchor.fm/s/1e1d5f38/podcast/rss) nun estas versiigita kiel
+`shared/src/commonTest/resources/feeds/lamalfamuloj_feed.xml` kun ora testo
+(≥114 elsendoj; 2024-12-26 → daŭro 3077 s, fluo enhavanta `392138630…mp3`).
+`docs/nova/04` nun diras ke la fiksaĵoj estas versiigitaj en la deponejo kaj
+la testoj rulas sen `RssArkivServer-filcache/`. AGENTS.md ĝisdatigita (5 fiksaĵoj).
+
+**G7 (dependencoj/CVE)**: ne plu aktuala — Dependabot ekzistas
+(`.github/dependabot.yml`, gradle + actions, monate) kaj ĉiuj dependencoj estis
+ĝisdatigitaj per PR #117/#118 (Gradle 9.8.1, AGP 9.4.1, CMP 1.12.2, media3
+1.11.1, ktor 3.6.0, coil 3.6.3). Forigita el FAROTA.
+
+Kontrolrezulto: `:shared:desktopTest` 308/308 verdas, `:androidApp:assembleDebug` verda.
+
 # Ŝanĝoj — 2026-10-17
 
 ## Vekhorloĝo: tempoelekto kaj kanalelekto per dialogoj (PR #114)

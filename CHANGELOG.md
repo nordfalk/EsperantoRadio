@@ -20,7 +20,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- La „Apaj novaĵoj"-dialogo ne plu aperas en evoluaj medioj (debug-konstruoj, emuliloj, komputilaj kaj retumilaj ruladoj) — antaŭe ĝi malfermiĝis ĉe ĉiu freŝa instalaĵo kaj ĝenis dum programado (PR-ligilo aldonota)
+- La „Apaj novaĵoj"-dialogo ne plu aperas en evoluaj medioj (debug-konstruoj, emuliloj, komputilaj kaj retumilaj ruladoj) — antaŭe ĝi malfermiĝis ĉe ĉiu freŝa instalaĵo kaj ĝenis dum programado (https://github.com/nordfalk/EsperantoRadio/pull/125)
 - La malsupra naviga breto estas anstataŭigita per naviga tirkesto kiel en la malnova apo: ĝi malfermiĝas per la hamburgero en la supra breto (kiu morfas al reen-sago kaj reen per animacio, kaj kies tirkesto glitas enen kaj elen) aŭ per tiro de la maldekstra rando, kaj entenas ĉiujn ekranojn — Hejmo, Kanaloj, Plej ŝatataj, Serĉi, Elŝutoj, Vekhorloĝo kaj Agordoj; la supraj bretoj kun titoloj kaj agoj restas, la mallarĝa tirkesto malfermiĝas sub la supra breto kaj havas neniun propran titolon (https://github.com/nordfalk/EsperantoRadio/pull/120)
 - Pli fluida navigado: langet-ŝanĝoj transiras per fado kaj detalaj ekranoj glitas horizontale — ankaŭ sur komputilo kaj retumilo, kie antaŭe ekranŝanĝo estis tute senmovigita (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Unueca navigado sur flankaj ekranoj: Elŝutoj, Ludvico kaj Diagnozo estas nun tutekranoj sen suba naviga breto, same kiel Agordoj kaj Alarmoj (https://github.com/nordfalk/EsperantoRadio/pull/116)

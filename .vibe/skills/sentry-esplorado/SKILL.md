@@ -24,6 +24,16 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
    RustInvalidStateRejection(command_type='reconfigure', state='running')`
    (harness-replay-tavolo, nekaptrebla per try/catch) → same nur restarto de Vibe.
    (Ambaŭ variantoj: 2026-10-10/13.)
+3. **Iloj mankas en la seanco, sed la agordo ekzistas** (2026-10-17) → laborema
+   pretervojo sen restarto: parolu rekte al la servilo per JSON-RPC super
+   `POST https://mcp.sentry.dev/mcp` (streamable HTTP; kapo `Mcp-Session-Id` de la
+   respondo de `initialize`, poste `notifications/initialized`, poste `tools/call`).
+   La OAuth-ĵetonoj estas en la OS-kringo: servo `ai.mistral.vibe`, uzanto
+   `mcp-oauth:sentry:tokens` (atributoj), klient-id en `mcp-oauth:sentry:client_info`.
+   Se la ĵetono eksvalidiĝis, refreŝigu ĝin per `grant_type=refresh_token` kontraŭ
+   **`https://mcp.sentry.dev/oauth/token`** (laŭ `/.well-known/oauth-authorization-server`
+   de `mcp.sentry.dev`) — NE kontraŭ `sentry.io/oauth/token` (tie `invalid_client`)
+   nek `de.sentry.io` (404) — kaj konservu la novan ĵetonon reen en la keringo.
 
 ## La plej uzataj iloj
 

@@ -61,8 +61,16 @@ fun loge(tag: String, msg: String, e: Throwable) {
     Sentry.captureException(e)
 }
 
+/**
+ * Averto kun escepto — same kiel [logw]: la escepto-resumo (tipo + mesaĝo) kaj
+ * la staktraco iras al Sentry kiel avertoj (Sentry Logs — neniam error-evento,
+ * do neniam konsumas la erarojn-kvoton).
+ * Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu ĉi tion.
+ */
 fun logw(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLogw(tag, plenaMsg)
     platformLogw(tag, e.stackTraceToString())
+    Sentry.logger.warn("[$tag] $plenaMsg")
+    Sentry.logger.warn("[$tag] "+e.stackTraceToString())
 }

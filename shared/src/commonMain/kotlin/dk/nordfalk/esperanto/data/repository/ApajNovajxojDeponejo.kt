@@ -15,18 +15,12 @@ import kotlinx.coroutines.flow.asStateFlow
  * la mesaĝo montriĝas kiel dialogo **unufoje por ĉiu nova enhavo**:
  * la haŝaĵo de la konfirmita mesaĝo persistiĝas en [Settings], kaj
  * nur kiam la haŝaĵo ŝanĝiĝas la dialogo reaperas.
- *
- * **Evolua medio:** dum programado la dialogo ne montriĝas (kone
- * [montruDumEvoluo]) — ĉe ĉiu freŝa instalaĵo la konservita haŝaĵo
- * malaperas kaj la dialogo reaperus, kio ĝenus la programiston.
  */
 class ApajNovajxojDeponejo(
     private val settings: Settings,
     mesagxo: String?,
-    /** `false` en evolua medio (debug-konstruo/emulilo) — tiam neniam montriĝu */
-    montruDumEvoluo: Boolean = true,
 ) {
-    private val _montrata = MutableStateFlow(deciduMontratan(mesagxo?.trim().orEmpty(), leguKonservitanHeshon(), montruDumEvoluo))
+    private val _montrata = MutableStateFlow(deciduMontratan(mesagxo?.trim().orEmpty(), leguKonservitanHeshon()))
 
     /** La mesaĝo montriĝu, aŭ `null` se nenio novas. */
     fun observuMontratan(): StateFlow<String?> = _montrata.asStateFlow()
@@ -49,11 +43,9 @@ class ApajNovajxojDeponejo(
         /**
          * Pura decidlogiko: ĉu tiu ĉi mesaĝo devas montriĝi?
          * Malplena mesaĝo neniam montriĝas; ne-malplena montriĝas nur se
-         * ĝia haŝaĵo diferencas de la konservita. En evolua medio
-         * (`montruDumEvoluo = false`) neniam montriĝu.
+         * ĝia haŝaĵo diferencas de la konservita.
          */
-        fun deciduMontratan(mesagxo: String, konservitaHesho: Int, montruDumEvoluo: Boolean = true): String? =
-            if (!montruDumEvoluo) null
-            else if (mesagxo.isNotEmpty() && mesagxo.hashCode() != konservitaHesho) mesagxo else null
+        fun deciduMontratan(mesagxo: String, konservitaHesho: Int): String? =
+            if (mesagxo.isNotEmpty() && mesagxo.hashCode() != konservitaHesho) mesagxo else null
     }
 }

@@ -99,18 +99,4 @@ class ApajNovajxojTest {
         val deponejo = ApajNovajxojDeponejo(MapSettings(), null)
         assertNull(deponejo.observuMontratan().value)
     }
-
-    @Test
-    fun enEvoluaMedoNeniamMontrigxas() {
-        // Eĉ freŝa instalaĵo (neniu konservita haŝaĵo) kun nova mesaĝo
-        // ne montras la dialogon dum evoluo (debug-konstruo/emulilo/Desktop/Web)
-        val deponejo = ApajNovajxojDeponejo(MapSettings(), "Versio 3.0.2 eldoniĝis", montruDumEvoluo = false)
-        assertNull(deponejo.observuMontratan().value)
-
-        // La pura decidlogiko same: evolua medio → neniam montri
-        assertNull(ApajNovajxojDeponejo.deciduMontratan("nova", 12345, montruDumEvoluo = false))
-
-        // Kun montruDumEvoluo = true (produktado) la normala konduto restas
-        assertEquals("nova", ApajNovajxojDeponejo.deciduMontratan("nova", 12345, montruDumEvoluo = true))
-    }
 }

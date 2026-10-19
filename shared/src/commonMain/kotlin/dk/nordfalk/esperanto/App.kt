@@ -508,9 +508,11 @@ fun EsperantoRadioApp(
         }
 
         // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo unufoje
-        // por ĉiu nova mesaĝo; "Bone" persistas la haŝaĵon en la agordoj
+        // por ĉiu nova mesaĝo; "Bone" persistas la haŝaĵon en la agordoj.
+        // En evolua medio ĝi ne montriĝas — ĉe freŝa instalaĵo la haŝaĵo
+        // forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
         val apajNovajxoj by apajNovajxojDeponejo.observuMontratan().collectAsState()
-        apajNovajxoj?.let { mesagxo ->
+        apajNovajxoj?.takeIf { !AppStato.estasEvoluaMedo }?.let { mesagxo ->
             LaunchedEffect(mesagxo) {
                 logi("ApajNovajxoj", "Montras novajn apajn novaĵojn (hesho=${mesagxo.hashCode()})")
             }

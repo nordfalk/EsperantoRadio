@@ -165,7 +165,7 @@ object AppStato {
         alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
-        apajNovajxojDeponejo = ApajNovajxojDeponejo(settings, agordo.android?.apajNovajxoj, montruDumEvoluo = !estasEvoluaMedo)
+        apajNovajxojDeponejo = ApajNovajxojDeponejo(settings, agordo.android?.apajNovajxoj)
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,6 +31,8 @@ fun PlejŝatatajEkrano(
     plejŝatatajDeponejo: PlejŝatatajDeponejo,
     kanaloDeponejo: KanaloDeponejo,
     onKanalo: (Kanalo) -> Unit,
+    tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    tirkestEnhavo: @Composable () -> Unit = {},
 ) {
     val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
     val ĉiujKanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
@@ -39,16 +42,25 @@ fun PlejŝatatajEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("Plej ŝatataj") }
             )
         }
     ) { padding ->
+        // La tirkesto vivas SUB la supra breto: la titolo kaj la hamburgero
+        // restas videblaj kaj la tirkesto ne kovras ilin (kiel en la malnova apo)
+        ModalNavigationDrawer(
+            drawerState = tirkestStato,
+            drawerContent = { tirkestEnhavo() },
+            // La tirkesto kaj la ombreco vivas SUB la supra breto
+            modifier = Modifier.padding(padding),
+        ) {
         if (plejKanaloj.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                 Text("Neniu plej ŝatata kanalo. Premu la koron sur kanalo por aldoni.")
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
                     Text(
                         "Vi ricevos sciigon kiam aperas nova elsendo el ŝatata kanalo.",
@@ -73,6 +85,7 @@ fun PlejŝatatajEkrano(
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
+            }
             }
         }
     }

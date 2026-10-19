@@ -8,9 +8,10 @@ import kotlinx.serialization.Serializable
 /**
  * Vojoj (routes) por Navigation 3.
  *
- * Radikaj ekranoj (tab-oj): [Hejmo], [Kanalaro], [Plejŝatataj], [Sercxo]
+ * Radikaj ekranoj (elekteblaj en la naviga tirkesto): [Hejmo], [Kanalaro],
+ * [Plejŝatataj], [Sercxo] plus la flankaj [Elshutoj], [Alarmoj], [Agordoj].
  * Detal-ekranoj: [KanaloDetalo], [ElsendoDetalo]
- * Plenekranoj: [Elshutoj], [Alarmoj], [Agordoj]
+ * Plenekranoj (ekster la tirkesto): [Ludvico], [Diagnozo]
  */
 @Serializable
 sealed interface Vojo : NavKey {

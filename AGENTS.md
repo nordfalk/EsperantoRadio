@@ -55,7 +55,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
    `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
    Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
-   `shared/src/commonTest/resources/feeds/` (4 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+   `shared/src/commonTest/resources/feeds/` (5 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
    La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
    devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.

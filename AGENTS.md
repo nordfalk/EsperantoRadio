@@ -178,6 +178,8 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   la refspec estas `+refs/heads/master:refs/remotes/origin/master`. Por revizii
   PR-on, alportu la kap-branĉon eksplicite:
   `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
+  Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
+  "you must first push the current branch" — aldonu `--head <branĉnomo>`.
 - **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
   (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
   `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese

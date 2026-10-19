@@ -20,7 +20,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Elsendoj ricevas stabilajn identigilojn (sen kreskantaj prefiksoj); pro la ŝanĝo ludpozicioj, elŝutoj kaj plej ŝatataj povas unufoje restartiĝi por iuj kanaloj
+- Elsendoj ricevas stabilajn identigilojn (sen kreskantaj prefiksoj); pro la ŝanĝo ludpozicioj, elŝutoj kaj plej ŝatataj povas unufoje restartiĝi por iuj kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/122)
 - Pli fluida navigado: langet-ŝanĝoj transiras per fado kaj detalaj ekranoj glitas horizontale — ankaŭ sur komputilo kaj retumilo, kie antaŭe ekranŝanĝo estis tute senmovigita (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Unueca navigado sur flankaj ekranoj: Elŝutoj, Ludvico kaj Diagnozo estas nun tutekranoj sen suba naviga breto, same kiel Agordoj kaj Alarmoj (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Ripeta klako (ekz. sur la mini-ludilbreto) ne plu povas malfermi du identajn ekranojn super unu la alia (https://github.com/nordfalk/EsperantoRadio/pull/116)

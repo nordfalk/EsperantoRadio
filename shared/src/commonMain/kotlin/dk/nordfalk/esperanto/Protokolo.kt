@@ -9,7 +9,8 @@ package dk.nordfalk.esperanto
  * - wasmJs: println (console.log)
  * - iOS: NSLog
  *
- * La komunaj logi/logd/logw/loge funkcioj (kun Sentry-breadcrumb-oj)
+ * La komunaj logi/logd/logw/loge funkcioj, kiuj aldonas la malproksiman
+ * protokoladon (Sentry — vidu la cela matricon en ProtokoloUtil.kt),
  * estas en ProtokoloUtil.kt.
  *
  * Konvencio: [Komponanto] mesagxo

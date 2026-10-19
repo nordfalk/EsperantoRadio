@@ -238,7 +238,9 @@ debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #1
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.
 
-Niveloj (`ProtokoloUtil.kt`):
+Niveloj (`ProtokoloUtil.kt`). Ĝenerala regulo (FAROTA G46): **ĉio krom `logd`
+iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
+protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
   diskkaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
@@ -247,8 +249,11 @@ Niveloj (`ProtokoloUtil.kt`):
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
 - `logGrava` — ĉiam al Sentry. NUR la gravaj eventoj: malfermo de la apo,
   ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
-- `logw` — avertoj. Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu
-  `logw(tag, msg, e)` — ĝi restas LOKA kaj ne konsumas la Sentry-kvoton.
+- `logw` — avertoj. Ambaŭ formoj (kun kaj sen escepto) sendas `Sentry.logger.warn`
+  al Sentry Logs — NENIAM error-evento, do ili ne konsumas la erarojn-kvoton;
+  `logw(tag, msg, e)` sendas du liniojn: la escepto-resumon kaj la staktracon.
+  Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu `logw(tag, msg, e)`.
+  (Ĝis 2026-10-19 la 3-arg formo sendis NENION al Sentry — FAROTA G46.)
 - `loge` — veraj eraroj. **`loge(tag, msg, e)` vokas `captureException` kaj
   konsumas la MONATAN ERAROJ-KVOTON** — neniam uzu por atendataj fiaskoj;
   `loge(tag, msg)` sen escepto estas nur protokol-evento (aparta kvoto).

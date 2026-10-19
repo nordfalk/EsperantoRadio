@@ -6,7 +6,7 @@
 apoversio = "3.0.3"  # La versio de la apo
 kotlin = "2.4.21"
 compose-multiplatform = "1.12.2"
-compose-material3 = "1.13.0-alpha02"
+compose-material3 = "1.13.0-alpha01"
 ktor = "3.6.0"
 kotlinx-serialization = "1.11.0"
 kotlinx-datetime = "0.8.0"

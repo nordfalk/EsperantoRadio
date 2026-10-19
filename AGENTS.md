@@ -108,6 +108,11 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
    unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
    ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
+   **KUNFANDO (`gh pr merge`) BEZONAS APARTAN, EKPLICITAN aprobon** (ekz.
+   "kunfandu"). Rajtigo por commiti/puŝi/krei PR-on NE inkluzivas la
+   kunfandon. (2026-10-19: PR #120 estis kunfandita post kiam la uzanto
+   aprobis nur "commitos, puŝos kaj kreos la PR-on" — tio estis eraro;
+   lasu la PR-on malfermita kaj atendu "kunfandu".)
 7. **La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
    `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
    (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.

@@ -48,6 +48,15 @@ import kotlinx.serialization.json.Json
  * la ekzistantaj instancoj estas reuzataj anstataŭ krei novajn.
  */
 object AppStato {
+    /**
+     * Ĉu la apo ruliĝas en evolua medio (debug-konstruo aŭ emulilo sur
+     * Android; Desktop kaj Web ĉiam). La platforma enirpunkto ŝaltas ĝin
+     * ĉe starto, antaŭ la unua kunmetaĵo. En evolua medio la
+     * "Apaj novaĵoj"-dialogo ne montriĝas — ĝi aperus ĉe ĉiu freŝa
+     * instalaĵo (agordoj malaperas) kaj ĝenus dum programado.
+     */
+    var estasEvoluaMedo: Boolean = false
+
     var httpKliento: HttpClient? = null
         private set
     var kanaloDeponejo: KanaloDeponejoImpl? = null

@@ -18,36 +18,6 @@
 
 ## GRAVA
 
-#### G7 — Dependencoj 1–2 jarojn malnovaj; CVE-oj nekontrolitaj
-- **Statuso**: [ ]
-- **Loko**: `gradle/libs.versions.toml` (media3 1.5.1, ktor 3.1.3, coil 3.0.4, sentry 8.41.0, AGP 8.9.1, work 2.10.1, activity-compose 1.9.3)
-- **Priskribo**: Neniu CVE-kontrolo estis ebla (sen reto en la revizia medio). Precipe atentindaj: media3 (analizila surfaco nutrata de nefidindaj URL-oj, vidu G1/G2) kaj ktor.
-- **Sugesto**: `./gradlew dependencyCheckAnalyze` + Dependabot en CI; prioritatigu media3 kaj ktor.
-
-#### G16 — id-skemo `slug:dato:guid` malkongruas kun la dokumentita konvencio kaj rompas la servilan rondiron
-- **Statuso**: [ ]
-- **Loko**: `RssParsilo.kt:122-123` (ĝenerala), `:283` (Peranto); dokumento: `docs/nova/04` ("Id-konvencioj"); malnova: `RomePodcastParser.parseAndre:191`
-- **Priskribo**: La dokumento kaj la malnova kodo uzas la guid sen prefikso (`<slug>:<dato>`); la kodo uzas `<slug>:<dato>:<guid>`. Sekvoj: (a) rondiro kun la planita servilo: la servilo skribos `Elsendo.id` kiel `<guid>`, la apo re-parsas kaj denove prefiksas → la id kreskas ĉiun fojon kaj la inkrementa kunfando (`e.id !in konataj`, `docs/nova/06`) neniam trafas; (b) estonta migrado de uzantdatumo (elŝutoj, ludpozicioj, plejŝatataj estas ŝlositaj per `id`) rompiĝus; (c) la dokumenta tabelo estas malĝusta.
-- **Sugesto**: uzu la guid senŝanĝa se ĝi jam komenciĝas per `<kanaloSlug>:` (aŭ ĉiam por `deArkivo`), alie `<kanaloSlug>:<guid>` (unu prefikso); kaj vicigu la dokumenton kaj la kodon.
-
-#### G25 — Etikedo `v3.0.2` montras al commit, kiu ne estas sur master
-- **Statuso**: [ ]
-- **Loko**: git-etikedo `v3.0.2` → `16ae6d6` (gepatro `39dd2d8`); la master-a eldona komito estas `9e835b9` (squash-merge de la sama PR)
-- **Priskribo**: `git merge-base --is-ancestor 16ae6d6 HEAD` → ne. La enhavo de la APK estas identa (nur dokumentaro malsamas), sed la dokumentita proceduro ("etikedo sur la eldona komito") kaj F-Droid (konstruas el la etikedo) celas la master-an komiton, kaj la etikedo estas neatingebla de `master`.
-- **Sugesto**: rekrei la etiketon sur `9e835b9` kaj puŝi (`git tag -f v3.0.2 9e835b9 && git push -f origin v3.0.2`) — **atentu, tio estas re-verkado de publika etikedo (ekstera ŝanĝo, bezonas vian aprobon)**.
-
-#### G31 — https-korekto nur por `kernpunkto`, kontraŭ la dokumento "ĉiam"
-- **Statuso**: [ ]
-- **Loko**: `RssParsilo.kt:109-111` (`if (kanalo.slug == "kernpunkto" && fluo.startsWith("http://"))`); dokumento: `docs/nova/04`, regulo 6.1.6
-- **Priskribo**: Aliaj kanaloj kun `http://`-enclosure restus http (Android blokus ilin per cleartext-protekto; ankaŭ miksita enhavo en la UI). La nuna konfiguro uzas `https://` ĉie (kontrolita supraĵe), do nuntempe ne aktiva — sed la dokumento kaj la kodo kontraŭdiras.
-- **Sugesto**: korektu ĉiam (krom se iu kanalo eksplicite bezonas http — tiam per konfiguro), kaj aldonu ĝeneralan teston; aŭ korektu la dokumenton.
-
-#### G41 — `RssArkivServer-filcache/` kontraŭdiro: la oraj fiksaĵoj ne estas reprodukteblaj el la repo
-- **Statuso**: [ ]
-- **Loko**: `.gitignore` (`/RssArkivServer-filcache/`) kontraŭ AGENTS.md ("NE versiigu") kaj `docs/nova/04:141` ("Kopiu la kaŝenitajn fluojn el `RssArkivServer-filcache/`")
-- **Priskribo**: Sekve nur 4 fiksaĵoj estas en `shared/src/commonTest/resources/feeds/` (kernpunkto, peranto, varsoviavento, vinilkosmo), dum la ora test-tabelo priskribas pliajn fiksaĵojn — interalie anchor.fm "La Malfamuloj" (≥114 elsendoj, `docs/nova/04:153`), kiu **mankas** en la repo. La plena aro de golden fixtures ne estas reproduktebla el la repo.
-- **Sugesto**: solvi la kontraŭdiron: aŭ versiigu la fiksaĵojn (sen sekretoj), aŭ korektu AGENTS.md/dokumenton ("ne reproduktebla el la repo") kaj kopii la mankantajn fiksaĵojn (precipe anchor.fm) al `resources/feeds/`.
-
 #### G42 — KMP-X: `ForgottenCoroutineScopeException: rememberCoroutineScope left the composition` (212 okazoj / 58 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-X](https://esperantoradio.sentry.io/issues/KMP-X); 32 okazoj / 10 uzantoj en la lasta semajno, lasta 10-16)

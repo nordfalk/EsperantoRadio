@@ -1,9 +1,15 @@
 package dk.nordfalk.esperanto.android
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 
+import android.content.pm.ServiceInfo
 import android.os.Bundle
+import androidx.core.app.ServiceCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
@@ -25,7 +31,10 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -44,7 +53,12 @@ class EsperantoLudadoServo : MediaSessionService() {
 
     companion object {
         private val CMD_VENONTA = SessionCommand("venonta", Bundle.EMPTY)
+        private const val KANALO_DEFENDA = "ludado_defenda"
+        private const val DEFENDA_SCIIG_ID = 4242
+        private const val DEFENDA_TEMPO_MS = 4_000L
     }
+
+    private var defendTasko: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -153,6 +167,64 @@ class EsperantoLudadoServo : MediaSessionService() {
     }
 
     /**
+     * FAROTA K1 (Sentry KMP-1V): starto per `startForegroundService` devigas la servon
+     * voki `startForeground()` ene de la sistema limtempo. En la apo tion faras Media3 —
+     * sed nur kiam ludado aktiviĝas. Servo restartigita post procezo-morto (aŭ alia
+     * ekstera starto, ekz. mediabutono) havas malplenan ludilon: neniam ekbufferas
+     * ludado, do neniu `startForeground()` okazus kaj Android kraŝigus la apon per
+     * fatala RemoteServiceException (unufoje observita sur Android 11/MIUI, dist 249).
+     * Post mallonga prokrasto ni mem plenumas la kontrakton per provizora sciigo kaj
+     * haltigas la servon — ludilo kun media-eroj restas sub la mastrumado de Media3
+     * (la kontrakto jam estis plenumita kiam ludado ekbuferis: ludado, paŭzo kaj eĉ
+     * fonto-eraro kun sciigo).
+     */
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val rezulto = super.onStartCommand(intent, flags, startId)
+        defenduMalfonanKontrakton()
+        return rezulto
+    }
+
+    private fun defenduMalfonanKontrakton() {
+        defendTasko?.cancel()
+        defendTasko = serviceScope.launch {
+            delay(DEFENDA_TEMPO_MS)
+            val player = mediaSession?.player
+            if (player != null && player.mediaItemCount > 0) {
+                logd("LudadoServo", "Defenda kontrolo: ludilo havas enhavon — Media3 mastrumas")
+                return@launch
+            }
+            try {
+                val nm = getSystemService(NotificationManager::class.java)
+                nm.createNotificationChannel(
+                    NotificationChannel(
+                        KANALO_DEFENDA,
+                        "Ludado (provizora)",
+                        NotificationManager.IMPORTANCE_MIN,
+                    )
+                )
+                val sciigo = Notification.Builder(this@EsperantoLudadoServo, KANALO_DEFENDA)
+                    .setSmallIcon(android.R.drawable.ic_media_play)
+                    .setContentTitle("EsperantoRadio")
+                    .build()
+                ServiceCompat.startForeground(
+                    this@EsperantoLudadoServo,
+                    DEFENDA_SCIIG_ID,
+                    sciigo,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+                )
+                logi("LudadoServo", "Defenda startForeground() plenumita — neniu ludado komenciĝis")
+            } catch (e: Exception) {
+                logw("LudadoServo", "Defenda startForeground() malsukcesis", e)
+            } finally {
+                // Forigu la provizoran sciigon kaj finu la startitan parton de la servo;
+                // binditaj regiloj (ekz. la malfermita apo) tenas la servon vivanta, kiom necese.
+                stopForeground(Service.STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
+        }
+    }
+
+    /**
      * Kreas PendingIntent kiu malfermas MainActivity kiam la uzanto klakas la sciigon.
      */
     private fun kreiMainActivityPendingIntent(): PendingIntent {
@@ -181,6 +253,8 @@ class EsperantoLudadoServo : MediaSessionService() {
 
     override fun onDestroy() {
         logi("LudadoServo", "Servo detruata")
+        defendTasko?.cancel()
+        serviceScope.cancel()
         mediaSession?.run {
             player.release()
             release()

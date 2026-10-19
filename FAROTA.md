@@ -129,7 +129,7 @@
 
 #### C32 — Tuŝ-celoj sub 48 dp; `contentDescription = null`
 - **Statuso**: [ ]
-- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElshutitajEkrano.kt:140-148` (`IconButton` 36.dp); `MalsupraNavigaBreto.kt:30-54` (ikonoj kun `contentDescription = null`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
+- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElshutitajEkrano.kt:140-148` (`IconButton` 36.dp); `App.kt` (Menuo-butono, `IconButton` sen `minimumTouchTargetSize`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
 - **Sugesto**: `Modifier.minimumTouchTargetSize()` aŭ pligrandigo; aldonu `contentDescription` al la ikonoj.
 
 #### C34 — iOS: `PlatformLigilo` estas TODO; neniuj deep links

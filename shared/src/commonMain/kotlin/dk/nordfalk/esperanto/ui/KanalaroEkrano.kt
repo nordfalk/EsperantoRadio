@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
@@ -123,6 +124,8 @@ class KanalaroViewModel(
 fun KanalaroEkrano(
     viewModel: KanalaroViewModel,
     onKanalo: (Kanalo) -> Unit = {},
+    tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    tirkestEnhavo: @Composable () -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
     onElshutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
@@ -140,6 +143,7 @@ fun KanalaroEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("Kanaloj") },
                 actions = {
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
@@ -149,9 +153,17 @@ fun KanalaroEkrano(
             )
         }
     ) { padding ->
+        // La tirkesto vivas SUB la supra breto: la titolo kaj la hamburgero
+        // restas videblaj kaj la tirkesto ne kovras ilin (kiel en la malnova apo)
+        ModalNavigationDrawer(
+            drawerState = tirkestStato,
+            drawerContent = { tirkestEnhavo() },
+            // La tirkesto kaj la ombreco vivas SUB la supra breto
+            modifier = Modifier.padding(padding),
+        ) {
         if (sxargxas && kanaloj.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -159,7 +171,7 @@ fun KanalaroEkrano(
         } else PullToRefreshBox(
             isRefreshing = sxargxas,
             onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); viewModel.sxargxi(fortoRefresigi = true) },
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -179,6 +191,7 @@ fun KanalaroEkrano(
                     )
                 }
             }
+        }
         }
     }
 }

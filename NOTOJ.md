@@ -366,7 +366,7 @@ dk/nordfalk/esperanto/
     ├── ElsendoEkrano.kt     # Elsendodetalo (ludi, elŝuti, ludvico, "Daŭrigi de X:XX", riĉa HTML, horizontala svipo)
     ├── LudvicoEkrano.kt     # Ludvico-ekrano (forigi/malplenigi)
     ├── MiniLudilbreto.kt    # Malsupra ludilbreto (ludi/paŭzi/halti/ludvico)
-    ├── MalsupraNavigaBreto.kt # 4 langetoj (Hejmo, Kanaloj, Plej ŝatataj, Serĉi)
+    ├── NavigaTirkesto.kt    # Naviga tirkesto (Hejmo, Kanaloj, Plej ŝatataj, Serĉi, Elŝutoj, Vekhorloĝo, Agordoj)
     ├── PlejŝatatajEkrano.kt # Plej ŝatataj kanaloj
     ├── SercxoEkrano.kt      # Serĉo
     ├── ElshutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)

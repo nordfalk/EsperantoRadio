@@ -165,7 +165,17 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   skribis sen la intertempe postulita `mutex.withLock`).
 - **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
   ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
-  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`).
+  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`). Tio validas ankaŭ
+  por ĉenoj: supersignaj literoj kaj SPACETOj glitas preter la okulo
+  (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
+  teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
+  per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
+- **Komponantoj de `ModalNavigationDrawer` restas en la semantika arbo ankaŭ
+  kiam la tirkesto estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")`
+  trovas 2 nodojn (ekrana titolo + tirkest-ero). Asertu laŭ enhava teksto
+  (ekz. agordo-ŝaltilo), ne laŭ ekrana titolo; por la tirkest-butono uzu
+  unikan `contentDescription` ("Naviga menuo" — ne "Menuo", kiu ekzistas sur
+  ĉiu karto).
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
 - **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
@@ -268,9 +278,11 @@ Por la plenan dizajnospecifon (koloroj, tiparo, ekranoj, navigado), vidu
 [`docs/nova/05_dizajno_kaj_ui.md`](docs/nova/05_dizajno_kaj_ui.md).
 
 Nuna stato: la hejmekrano havas horizontalajn sekciojn (Kio novas, Lastatempe
-ludata, Kio popularas) + "Ĉiuj kanaloj". Malsupra naviga breto kun 4 langetoj
-(Hejmo, Kanaloj, Plej ŝatataj, Serĉi). MiniLudilbreto kun ludi/paŭzi/halti +
-ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
+ludata, Kio popularas) + "Ĉiuj kanaloj". Navigado per `ModalNavigationDrawer`-
+tirkesto (`ui/NavigaTirkesto.kt`, malfermiĝas per la hamburgero en la supra
+breto aŭ per tiro de la maldekstra rando); la supraj bretoj kun titoloj kaj
+agoj restas, la detalaj ekranoj havas reen-sagon. MiniLudilbreto kun ludi/paŭzi/halti + ludvico-butono.
+La Muzaiko-temo estas implementita en `Temo.kt`.
 
 ## Konstru-komandoj
 

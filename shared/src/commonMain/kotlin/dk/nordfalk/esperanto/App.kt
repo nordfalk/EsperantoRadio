@@ -174,21 +174,35 @@ fun EsperantoRadioApp(
             if (backStack.size > 1) backStack.removeLastOrNull()
         }
 
-        // Flankaj ekranoj (dua nivelo) estas tutekranoj sen suba breto —
+        // Flankaj ekranoj (dua nivelo) estas tutekranoj sen mini-ludilbreto —
         // unueca modelo por Agordoj, Alarmoj, Elŝutoj, Ludvico kaj Diagnozo
         fun estasFlankaEkrano(vojo: Any?) = vojo is Vojo.Agordoj ||
             vojo is Vojo.Alarmoj || vojo is Vojo.Elshutoj ||
             vojo is Vojo.Ludvico || vojo is Vojo.Diagnozo
 
-        val montruSubanBreton = !estasFlankaEkrano(nunaVojo)
+        val montruMiniLudilbreton = !estasFlankaEkrano(nunaVojo)
 
-        fun estasLangeto(vojo: Any?) =
+        fun estasCxefaEkrano(vojo: Any?) =
             vojo is Vojo.Hejmo || vojo is Vojo.Kanalaro ||
             vojo is Vojo.Plejŝatataj || vojo is Vojo.Sercxo
+
+        // Ĉiuj tirkest-eroj kondutas kiel supranivelaj celoj: la stako rekomenciĝas
+        // je [Hejmo, elektita vojo], reen-gesto revenas al Hejmo.
+        val tirkestStato = rememberDrawerState(DrawerValue.Closed)
+        fun elektuTirkeste(vojo: Vojo) {
+            scope.launch { tirkestStato.close() }
+            switchTab(vojo)
+        }
 
         // Langet-ŝanĝoj fadas (fade-through); detalaj puŝoj/reenigoj glitas horizontale.
         // La implicitaj transiroj de NavDisplay estas platform-dependaj (sur Desktop kaj
         // Web ili tute mankas), do ni difinas ilin eksplicite por ĉiuj platformoj.
+
+        // La tirkesto mem vivas interne de ĉiu ĉefekrano, sub la supra breto
+        // (vidu HejmoEkrano ktp.); ĉi tie ni transdonas nur la staton kaj la enhavon.
+        val tirkestEnhavo: @Composable () -> Unit = {
+            NavigaTirkesto(tirkestStato = tirkestStato, nunaVojo = nunaVojo, onElektu = ::elektuTirkeste)
+        }
 
         Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
             Box(modifier = Modifier.weight(1f)) {
@@ -196,7 +210,7 @@ fun EsperantoRadioApp(
                     backStack = backStack,
                     onBack = { reen() },
                     transitionSpec = {
-                        if (estasLangeto(initialState.key) && estasLangeto(targetState.key)) {
+                        if (estasCxefaEkrano(initialState.key) && estasCxefaEkrano(targetState.key)) {
                             // langet-ŝanĝo: subtila fade-through
                             fadeIn(tween(200)) togetherWith fadeOut(tween(90))
                         } else {
@@ -206,7 +220,7 @@ fun EsperantoRadioApp(
                         }
                     },
                     popTransitionSpec = {
-                        if (estasLangeto(initialState.key) && estasLangeto(targetState.key)) {
+                        if (estasCxefaEkrano(initialState.key) && estasCxefaEkrano(targetState.key)) {
                             fadeIn(tween(200)) togetherWith fadeOut(tween(90))
                         } else {
                             // reenigo: detala ekrano glitas reen dekstren
@@ -220,6 +234,8 @@ fun EsperantoRadioApp(
                                 kanaloDeponejo = kanaloDeponejo,
                                 elsendoDeponejo = elsendoDeponejo,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                tirkestStato = tirkestStato,
+                                tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onLudi = { elsendo ->
                                     logi("Nav", "Hejmo: ludas elsendon ${elsendo.id}")
@@ -250,6 +266,11 @@ fun EsperantoRadioApp(
                             KanalaroEkrano(
                                 viewModel = kanalaroViewModel,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                tirkestStato = tirkestStato,
+                                tirkestEnhavo = tirkestEnhavo,
+                                onElshutoj = { push(Vojo.Elshutoj) },
+                                onAlarmoj = { push(Vojo.Alarmoj) },
+                                onAgordoj = { push(Vojo.Agordoj) },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas: $fonto")
                                     scope.launch {
@@ -261,9 +282,6 @@ fun EsperantoRadioApp(
                                         }
                                     }
                                 },
-                                onElshutoj = { push(Vojo.Elshutoj) },
-                                onAlarmoj = { push(Vojo.Alarmoj) },
-                                onAgordoj = { push(Vojo.Agordoj) },
                             )
                         }
                         entry<Vojo.Plejŝatataj> {
@@ -271,11 +289,15 @@ fun EsperantoRadioApp(
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                                 kanaloDeponejo = kanaloDeponejo,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                tirkestStato = tirkestStato,
+                                tirkestEnhavo = tirkestEnhavo,
                             )
                         }
                         entry<Vojo.Sercxo> {
                             SercxoEkrano(
                                 sercxoDeponejo = sercxoDeponejo,
+                                tirkestStato = tirkestStato,
+                                tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                             )
                         }
@@ -421,7 +443,7 @@ fun EsperantoRadioApp(
                 )
             }
 
-            if (montruSubanBreton) {
+            if (montruMiniLudilbreton) {
                 val reprovo by ludvicoRegilo.reprovo.collectAsState()
 
                 // Sekvanta enhavo — kiam nenio ludas, la breto sekvas la navigadon
@@ -481,19 +503,6 @@ fun EsperantoRadioApp(
                         }
                     },
                     onLudvico = { push(Vojo.Ludvico) },
-                )
-                MalsupraNavigaBreto(
-                    nunaTab = when (nunaVojo) {
-                        is Vojo.Hejmo -> EkranoLangeto.HEJMO
-                        is Vojo.Kanalaro -> EkranoLangeto.KANALARO
-                        is Vojo.Plejŝatataj -> EkranoLangeto.PLEJŜATATAJ
-                        is Vojo.Sercxo -> EkranoLangeto.SERCXO
-                        else -> EkranoLangeto.NENIO
-                    },
-                    onHejmo = { switchTab(Vojo.Hejmo) },
-                    onKanalaro = { switchTab(Vojo.Kanalaro) },
-                    onPlejŝatataj = { switchTab(Vojo.Plejŝatataj) },
-                    onSercxo = { switchTab(Vojo.Sercxo) },
                 )
             }
         }

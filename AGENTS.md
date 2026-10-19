@@ -165,7 +165,17 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   skribis sen la intertempe postulita `mutex.withLock`).
 - **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
   ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
-  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`).
+  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`). Tio validas ankaŭ
+  por ĉenoj: supersignaj literoj kaj SPACETOj glitas preter la okulo
+  (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
+  teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
+  per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
+- **Komponantoj de `ModalNavigationDrawer` restas en la semantika arbo ankaŭ
+  kiam la tirkesto estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")`
+  trovas 2 nodojn (ekrana titolo + tirkest-ero). Asertu laŭ enhava teksto
+  (ekz. agordo-ŝaltilo), ne laŭ ekrana titolo; por la tirkest-butono uzu
+  unikan `contentDescription` ("Naviga menuo" — ne "Menuo", kiu ekzistas sur
+  ĉiu karto).
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
 - **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
@@ -240,7 +250,9 @@ debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #1
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.
 
-Niveloj (`ProtokoloUtil.kt`):
+Niveloj (`ProtokoloUtil.kt`). Ĝenerala regulo (FAROTA G46): **ĉio krom `logd`
+iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
+protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
   diskkaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
@@ -249,8 +261,11 @@ Niveloj (`ProtokoloUtil.kt`):
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
 - `logGrava` — ĉiam al Sentry. NUR la gravaj eventoj: malfermo de la apo,
   ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
-- `logw` — avertoj. Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu
-  `logw(tag, msg, e)` — ĝi restas LOKA kaj ne konsumas la Sentry-kvoton.
+- `logw` — avertoj. Ambaŭ formoj (kun kaj sen escepto) sendas `Sentry.logger.warn`
+  al Sentry Logs — NENIAM error-evento, do ili ne konsumas la erarojn-kvoton;
+  `logw(tag, msg, e)` sendas du liniojn: la escepto-resumon kaj la staktracon.
+  Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu `logw(tag, msg, e)`.
+  (Ĝis 2026-10-19 la 3-arg formo sendis NENION al Sentry — FAROTA G46.)
 - `loge` — veraj eraroj. **`loge(tag, msg, e)` vokas `captureException` kaj
   konsumas la MONATAN ERAROJ-KVOTON** — neniam uzu por atendataj fiaskoj;
   `loge(tag, msg)` sen escepto estas nur protokol-evento (aparta kvoto).
@@ -270,9 +285,11 @@ Por la plenan dizajnospecifon (koloroj, tiparo, ekranoj, navigado), vidu
 [`docs/nova/05_dizajno_kaj_ui.md`](docs/nova/05_dizajno_kaj_ui.md).
 
 Nuna stato: la hejmekrano havas horizontalajn sekciojn (Kio novas, Lastatempe
-ludata, Kio popularas) + "Ĉiuj kanaloj". Malsupra naviga breto kun 4 langetoj
-(Hejmo, Kanaloj, Plej ŝatataj, Serĉi). MiniLudilbreto kun ludi/paŭzi/halti +
-ludvico-butono. La Muzaiko-temo estas implementita en `Temo.kt`.
+ludata, Kio popularas) + "Ĉiuj kanaloj". Navigado per `ModalNavigationDrawer`-
+tirkesto (`ui/NavigaTirkesto.kt`, malfermiĝas per la hamburgero en la supra
+breto aŭ per tiro de la maldekstra rando); la supraj bretoj kun titoloj kaj
+agoj restas, la detalaj ekranoj havas reen-sagon. MiniLudilbreto kun ludi/paŭzi/halti + ludvico-butono.
+La Muzaiko-temo estas implementita en `Temo.kt`.
 
 ## Konstru-komandoj
 

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
@@ -377,6 +378,8 @@ fun HejmoEkrano(
     kanaloDeponejo: KanaloDeponejo,
     elsendoDeponejo: ElsendoDeponejo,
     onKanalo: (Kanalo) -> Unit = {},
+    tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    tirkestEnhavo: @Composable () -> Unit = {},
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
     onAgordoj: () -> Unit = {},
@@ -461,6 +464,7 @@ fun HejmoEkrano(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
@@ -470,9 +474,17 @@ fun HejmoEkrano(
             )
         }
     ) { padding ->
+        // La tirkesto vivas SUB la supra breto: la titolo kaj la hamburgero
+        // restas videblaj kaj la tirkesto ne kovras ilin (kiel en la malnova apo)
+        ModalNavigationDrawer(
+            drawerState = tirkestStato,
+            drawerContent = { tirkestEnhavo() },
+            // La tirkesto kaj la ombreco vivas SUB la supra breto
+            modifier = Modifier.padding(padding),
+        ) {
         if (sxargxas && novajElsendoj.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -483,7 +495,7 @@ fun HejmoEkrano(
         } else PullToRefreshBox(
             isRefreshing = sxargxas,
             onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); vm.sxargxi(fortoRefresigi = true) },
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -598,6 +610,7 @@ fun HejmoEkrano(
 
                 item { Spacer(Modifier.height(16.dp)) }
             }
+        }
         }
     }
 }

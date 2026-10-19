@@ -85,12 +85,12 @@ La ruĝo restas konstanta trans temoj — ĝi estas la marko. La fono varmiĝas
 │  • Kernpunkto                     │
 │  • Varsovia Vento                 │
 │  ...                             │
-├──────────────────────────────────┤
-│  [Hejmo] [Kanaloj] [★] [🔍]     │  Malsupra naviga breto (4 langetoj)
 └──────────────────────────────────┘
 ```
 
-- 4 langetoj en la malsupra naviga breto: Hejmo, Kanaloj, Plej ŝatataj, Serĉi.
+- Supra breto sur ĉiu ĉefekrano: hamburger-menuo (malfermas la navigan
+  tirkeston) + titolo + agoj (sur Hejmo kaj Kanaloj: Elŝutoj, Vekhorloĝo,
+  Agordoj).
 - Ĉiu karto en la horizontalaj sekcioj montras emblemon, titolon kaj subtitolon.
 - Kartoj en "Lastatempe ludata" montras ludprocenton.
 - Tripunkta menuo kaj ludbutono sur kartoj.
@@ -158,23 +158,35 @@ Konstanta malsupra breto:
 Klako sur la breto → volvigas al elsendodetalo.
 Ludvico-butono montras la nunan ludvicon.
 
-### 5. Malsupra naviga breto
+### 5. Naviga tirkesto (ModalNavigationDrawer)
 
-```
-┌──────────────────────────────────┐
-│  [Hejmo]  [Kanaloj]  [♥]  [🔍]  │  4 langetoj
-└──────────────────────────────────┘
-```
+La navigado okazas per `ModalNavigationDrawer` (`ui/NavigaTirkesto.kt`) — ne
+per malsupra naviga breto (tio estis provita intertempe kaj forigita denove).
+same kiel en la malnova apo. Kiel tie: la tirkesto vivas SUB la supra breto
+(ne kovras la titolon nek la hamburgeron), havas neniun propran titolon kaj
+estas nur tiom larĝa kiel bezonata (`width(IntrinsicSize.Max)`, minimume
+240 dp). Ĝi malfermiĝas per la hamburgero en la supra breto de ĉiu
+ĉefekrano (`TirkestButono` — la hamburgero MORFAS al reen-sago kaj reen per
+printempa animacio, `HamburgeroSagoIkono` en `NavigaTirkesto.kt`) aŭ per
+tiro de la maldekstra rando. La tirkesto mem glitas enen/elen per la
+implica MotionScheme-animacio de `ModalNavigationDrawer` (pruvite per la
+instrumentita testo `tirkestoAnimaciasDumMalfermo`). La ekranoj
+ricevas la staton per `tirkestStato` kaj la enhavon per `tirkestEnhavo`.
+
+Eroj (ĉiuj kondutas kiel supranivelaj celoj — la stako rekomenciĝas je
+`[Hejmo, elektita]`):
 
 - **Hejmo**: "Kio novas", "Lastatempe ludata", "Kio popularas", "Ĉiuj kanaloj"
 - **Kanaloj**: plena kanalaro (`LazyColumn` de `ListItem`-oj)
 - **Plej ŝatataj**: nur ŝatataj kanaloj
 - **Serĉi**: serĉo trans ĉiuj kanaloj
+- dividilo
+- **Elŝutoj**, **Vekhorloĝo**, **Agordoj** (flankaj ekranoj; sen mini-ludilbreto)
 
-La malnova plano havis `ModalNavigationDrawer`-tirkeston — tio estis anstataŭigita
-per la malsupra naviga breto (pli moderna, pli bona por unumana uzo).
-Aldonaj ekranoj (Alarmo, Agordoj, Elŝutitaj, Ludvico) estas atingeblaj per
-navigado ekde la ĉefekranoj.
+Aldonaj ekranoj ne en la tirkesto: Ludvico (de la mini-ludilbreto), Diagnozo
+(de Agordoj). La detalaj ekranoj (kanalo, elsendo) havas supran breton kun
+reen-sago anstataŭ hamburgero — sur Desktop/Web estas neniu reen-gesto, do
+la sago restas necesa.
 
 ### 6. Serĉo
 

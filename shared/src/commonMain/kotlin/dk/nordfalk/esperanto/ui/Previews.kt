@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
+import dk.nordfalk.esperanto.navigation.Vojo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -146,36 +147,11 @@ fun PreviewHejmoNova() {
     }
 }
 
-@Preview(name = "Malsupra naviga breto — Hejmo", showBackground = true, heightDp = 80)
+@Preview(name = "Naviga tirkesto", showBackground = true, widthDp = 360, heightDp = 600)
 @Composable
-fun PreviewMalsupraNavigaBretoHejmo() {
+fun PreviewNavigaTirkesto() {
     pTemo() {
-        MalsupraNavigaBreto(
-            nunaTab = EkranoLangeto.HEJMO,
-            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
-        )
-    }
-}
-
-@Preview(name = "Malsupra naviga breto — Kanaloj", showBackground = true, heightDp = 80)
-@Composable
-fun PreviewMalsupraNavigaBretoKanaloj() {
-    pTemo() {
-        MalsupraNavigaBreto(
-            nunaTab = EkranoLangeto.KANALARO,
-            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
-        )
-    }
-}
-
-@Preview(name = "Malsupra naviga breto — Serĉo", showBackground = true, heightDp = 80)
-@Composable
-fun PreviewMalsupraNavigaBretoSercxo() {
-    pTemo() {
-        MalsupraNavigaBreto(
-            nunaTab = EkranoLangeto.SERCXO,
-            onHejmo = {}, onKanalaro = {}, onPlejŝatataj = {}, onSercxo = {},
-        )
+        NavigaTirkesto(nunaVojo = Vojo.Hejmo, onElektu = {})
     }
 }
 

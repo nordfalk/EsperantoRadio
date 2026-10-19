@@ -83,6 +83,11 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 - La debug-APK instaliĝas kiel `dk.nordfalk.esperanto.radio.alfa` (applicationId +
   `.alfa`):
   `adb shell monkey -p dk.nordfalk.esperanto.radio.alfa -c android.intent.category.LAUNCHER 1`
+- **ATENTU pri permana adb-serĉado**: `connectedDebugAndroidTest` MALINSTALAS
+  la .alfa-APK-on post la testo (AGP-konduto). Aldone la emulilo havas orfan
+  prototipan pakon `dk.nordfalk.esperanto.android` (v0.1, sept. 2026) — lanĉu
+  ĝin NENIAM; por permana kontrolo unue instalu la debug-APK-on
+  (`adb install androidApp/build/outputs/apk/debug/*.apk`) kaj uzu la .alfa-pakon.
 - **GrantPermissionRule**: instrumentitaj Compose-testoj bezonas ĝin por
   `POST_NOTIFICATIONS` (vidu `AndroidUiTest`) — alie la permes-dialogo paŭzigas
   la Activity kaj la testregistro raportas "No compose hierarchies found".

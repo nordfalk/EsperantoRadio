@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.android
 
 import android.app.Application
 import android.os.Build
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logi
@@ -26,7 +27,10 @@ class EsperantoRadioAplikajho : Application() {
         super.onCreate()
         appContext = applicationContext
         val estasDebug = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        if (estasDebug || estasEmulilo()) {
+        // Evolua medio (debug-konstruo aŭ emulilo): ekz. la "Apaj novaĵoj"-
+        // dialogo ne montriĝu — ĝi aperus ĉe ĉiu freŝa instalaĵo
+        AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
+        if (AppStato.estasEvoluaMedo) {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
         }

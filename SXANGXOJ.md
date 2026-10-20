@@ -1,3 +1,42 @@
+# Ŝanĝoj — 2026-10-20
+
+## FAROTA G43/G45 — limigita korpo-legado (KMP-1H/1R), G43-verigo
+
+**G43 (KMP-1S, "escalating") — eraro en la FAROTA-listo, ne en la kodo**: la sugestitaj
+riparoj (a), (b) kaj (c) jam ekzistis sur master ekde PR #89/#109 — `leguKashitajnElsendojn`
+kaptas la ĵeton de `kontroluFluecon`, protokolas per `logw`, forigas la koruptitan kaŝon
+kaj redonas null; `kontroluFluecon` vokiĝas antaŭ `skribuKashon`; la testoj
+(`malpuraKashoEstasForigata` k.a.) estis jam tie. La Sentry-okazoj (dist 249, lasta
+10-14) kongruas kun la 249-eldonperiodo kaj ĉesis post ĝi. FAROTA-ero markita [x].
+
+**G45 (KMP-1H/1R, OOM)**: `bodyAsText()` enmemorigas la TUTAN korpon antaŭ kontroli —
+misdirektita respondo (60 MB MP3 anstataŭ fluo) mortigis la apoton per OutOfMemoryError
+sur malaltklasaj aparatoj.
+
+Riparo: nova commonMain-helpilo `KorpaLegilo.kt`:
+
+- `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ = 1 MB` (la plej granda konata legitima fluo ~310 KB;
+  laŭ decido de la uzanto — pli strikta ol la origine proponitaj 2–5 MB; observo-tasko
+  en FAROTA C49);
+- `HttpResponse.leguKorponLimigite(limo)`: ContentLength-antaŭkontrolo (ĵetas tuj, nul
+  bajtoj legataj) + peceta legado per `bodyAsChannel()`/`readAvailable` (devigas la
+  limon ankaŭ ĉe chunked/mensoganta Content-Length);
+- `RespondoTroGrandaException` — atendata fiasko, kaptata de la ekzistantaj
+  `logw`-catch-blokoj (nenia Sentry-eraro-kvoto).
+
+Anstataŭigoj: `ElsendoDeponejoImpl.sxargxiElsendojn` (commonMain) kaj
+`NovajElsendojKontroloWorker` (androidMain — ĝi elŝutas fluojn sendepende en fono).
+`arhivaPeto` (archive.org-metadatenoj, ~1-2 KB) restas ĉe `bodyAsText`.
+
+Kaptindaĵo: `readAvailable` estas ETENDO en `io.ktor.utils.io` (import devas esti
+aldonata en commonMain) — ne membro de `ByteReadChannel`.
+
+Testoj: `troGrandaRespondoNeAnstatauxigasKashon` (la kaŝo restas netuŝita),
+`leguKorponLimigiteSekvasLaLimon` (ĝusta legado + ContentLength-antaŭkontrolo),
+`leguKorponLimigiteFlueTranslimasSenContentLength` (chunked-reta translimo).
+Kontrolrezulto: `:shared:desktopTest` 311/311, `:androidApp:assembleDebug`,
+`:webApp:compileKotlinWasmJs` verdaj.
+
 # Ŝanĝoj — 2026-10-19
 
 ## FAROTA G25 — etikedo v3.0.2 rekreita sur la master-a eldona komito

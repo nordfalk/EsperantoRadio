@@ -116,7 +116,7 @@ class NovajElsendojKontroloWorker(
             for (kanalo in kanaloj) {
                 try {
                     logi("NovajElsendoj", "Kontrolas ${kanalo.slug}: ${kanalo.podkastaRssUrl}")
-                    val respondo = httpKliento.get(kanalo.podkastaRssUrl!!).bodyAsText()
+                    val respondo = httpKliento.get(kanalo.podkastaRssUrl!!).leguKorponLimigite()
                     logi("NovajElsendoj", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
                     val elsendoj = parsilo.parsuRss(respondo, kanalo) { httpKliento.get(it).bodyAsText() }
                     logi("NovajElsendoj", "${kanalo.slug}: ${elsendoj.size} elsendoj en RSS-fluo")

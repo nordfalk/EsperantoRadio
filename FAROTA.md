@@ -27,7 +27,14 @@
 - **Sugesto**: inspekti ĉiun uzon; laboro de la ekrano → `LaunchedEffect` aŭ nuligo en `DisposableEffect`; laboro transvivanta navigadon → `viewModelScope` (vidu la komenton en `HejmoEkrano.kt:224`); neniam teni la skopecon en longdaŭra objekto.
 
 #### G43 — KMP-1S: `IllegalArgumentException: La respondo ne estas RSS/Atom-fluo` el kaŝita fluo (substatuso: escalating)
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Solvo** (2026-10-19): jam plene riparita antaŭ la Sentry-analizo — `leguKashitajnElsendojn`
+  kaptas la ĵeton de `kontroluFluecon`, protokolas per `logw`, FORIGAS la koruptitan
+  kaŝon kaj redonas null (PR #89/#109); `kontroluFluecon` vokiĝas ankaŭ ANTAŬ
+  `skribuKashon` (fiaskpaĝo kun HTTP 200 ne estas kaŝata). La Sentry-okazoj (dist 249,
+  lasta 10-14) kongruas kun la 249-eldondato kaj ĉesis post ĝi. Testoj:
+  `malpuraKashoEstasForigata`, `http404NeAnstatauxigasKashon`,
+  `fiaskpaghoKunHttp200NeAnstatauxigasKashon` (ElsendoDeponejoImplTest).
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-1S](https://esperantoradio.sentry.io/issues/KMP-1S); 15 okazoj / 4 uzantoj, 10-13 → 10-14; staktraco: `HejmoEkrano → HejmoViewModel.sxargxi → ElsendoDeponejoImpl.leguKashitajnElsendojn`)
 - **Loko**: `ElsendoDeponejoImpl.kt:204` (`kontroluFluecon`), vokita ĉe `:149` ( legado de la kaŝo) kaj `:109` (antaŭ kaŝado)
 - **Priskribo**: Kaŝita respondo (verŝajne HTML-erarpaĝo aŭ koruptita dosiero) estas re-validata kiel RSS kaj ĵetas — unu korupta kaŝero rompas la ŝaradon de la koncerna kanalo por la uzanto.
@@ -41,7 +48,16 @@
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
 
 #### G45 — KMP-1H/1R: `OutOfMemoryError` — tuta respondo legata en la memoron (`readByteArray`)
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-10-20, branĉo `1019-g43-g45-kasxero-sanigado`): nova komuna helpilo
+  `KorpaLegilo.kt` — `HttpResponse.leguKorponLimigite()` (maks. 1 MB,
+  `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ`): (1) ContentLength-antaŭkontrolo ĵetas tuj sen
+  legi; (2) `bodyAsChannel()` + peceta legado devigas la limon ankaŭ sen/kun mensoganta
+  Content-Length. Anstataŭigis `bodyAsText()` en `ElsendoDeponejoImpl.sxargxiElsendojn`
+  kaj `NovajElsendojKontroloWorker`. La kaŝo-resta konduto kovrita per
+  `troGrandaRespondoNeAnstatauxigasKashon`; la helpilo mem per
+  `leguKorponLimigiteSekvasLaLimon` kaj `leguKorponLimigiteFlueTranslimasSenContentLength`.
+  La `arhivaPeto` (archive.org-metadatenoj, ~1-2 KB) restas kun `bodyAsText`.
 - **Fonto**: Sentry-analizo 2026-10-19 (issues [KMP-1H](https://esperantoradio.sentry.io/issues/KMP-1H), [KMP-1R](https://esperantoradio.sentry.io/issues/KMP-1R); 10-08 → 10-13; provoledo de 60 MB; malaltklasaj aparatoj, 2–3 uzantoj)
 - **Loko**: `ElsendoDeponejoImpl.kt:62,108` (`bodyAsText()` — ktor interne `SavedCallKt.save → kotlinx.io readByteArray`), `NovajElsendojKontroloWorker.kt:119-121`
 - **Priskribo**: La tuta korpo de respondo estas enmemorigata; ekstreme granda aŭ fuŝita respondo (misdirektita elŝuto anstataŭ fluo) mortigas la apoton sur malfortaj aparatoj.
@@ -201,6 +217,18 @@
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (bazlinio: 182 malfermoj / 336 ludadoj en 7 tagoj; eraro-taso 1–3/tago post 10-14, krom la nova KMP-1V)
 - **Sugesto**: post la sekva eldono kontroli: KMP-1V malaperis, la eraro-taso ne kreskas, KMP-X/KMP-1S fermiĝas; konsideri Sentry-atentigojn (alerts) por novaj fatalaj kraŝoj kaj por "RSS-malsukcesa kun 0 kaŝenitaj elsendoj" kiel frua averto pri mortaj kanaloj.
+
+#### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
+- **Statuso**: [ ]
+- **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
+  `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ = 1 MB` (la plej granda konata legitima fluo ~310 KB).
+- **Priskribo**: Se iam reala kanal-fluo transpasos 1 MB (ekz. podkasto kun centoj da
+  longaj priskriboj), la kanalo silente ne ŝargiĝos — la escepto estas nur `logw`-averto,
+  ne eraro. Tio estas intence (memor-protekto), sed necesas observado.
+- **Sugesto**: periode (ekz. ĉiusemajne, per la skill-o `sentry-esplorado`) serĉi en
+  Sentry la escepto-nomon `RespondoTroGrandaException` aŭ la protokolon "transpasas la
+  limon": se ĝi aperas por reala fluo (ne por misdirektita MP3), levu
+  `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ` aŭ serĉu la kaŭzon en la koncerna kanalo.
 
 ---
 

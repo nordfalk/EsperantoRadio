@@ -105,7 +105,9 @@ open class ElsendoDeponejoImpl(
             // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch sube redonas la kaŝitan
             // datumon. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
             // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
-            val respondo = httpKliento.get(url) { expectSuccess = true }.bodyAsText()
+            // leguKorponLimigite (G45): korpo pli granda ol 1 MB ne estas legata en la
+            // memoron — misdirektita respondo (MP3 anstataŭ fluo) kaŭzis OutOfMemoryError.
+            val respondo = httpKliento.get(url) { expectSuccess = true }.leguKorponLimigite()
             kontroluFluecon(respondo)
             logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
             skribuKashon(kanalo.slug, respondo)

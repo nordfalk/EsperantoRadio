@@ -62,9 +62,12 @@ class KanaloViewModel(
      */
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    /** Dedupigo + TTL: re-eniro al la ekrano ne reŝargas ĵus ŝargitan datenon. */
+    private val sxargilo = SxargxaKontrolilo()
+
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu la fluon denove (malsupren-tiro). */
     fun sxargxi(fortoRefresigi: Boolean = false) {
-        skopo.launch { sxargxiInterna(fortoRefresigi) }
+        skopo.launch { sxargilo.rulu("KanaloViewModel", fortoRefresigi) { sxargxiInterna(fortoRefresigi) } }
     }
 
     private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {

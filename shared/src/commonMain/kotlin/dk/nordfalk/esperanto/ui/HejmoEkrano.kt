@@ -230,9 +230,12 @@ class HejmoViewModel(
      */
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    /** Dedupigo + TTL: re-eniro al la ekrano ne reŝargas ĵus ŝargitan datenon. */
+    private val sxargilo = SxargxaKontrolilo()
+
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
     fun sxargxi(fortoRefresigi: Boolean = false) {
-        skopo.launch { sxargxiInterna(fortoRefresigi) }
+        skopo.launch { sxargilo.rulu("HejmoViewModel", fortoRefresigi) { sxargxiInterna(fortoRefresigi) } }
     }
 
     private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {

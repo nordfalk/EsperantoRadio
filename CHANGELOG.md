@@ -33,6 +33,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- La kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekran-vizito — ŝargadoj dedupliĝas, havas 5-minutan aĝ-limon, kaj la ŝarĝindikilo aperas nur kiam efektive ŝargiĝas (PR-ligilo sekvos post kreo)
 - Malofte la apo tute kraŝis, kiam Android restartigis la fonan ludado-servon sen aktiva ludado (ekz. post kiam la sistemo liberigis memoron) (https://github.com/nordfalk/EsperantoRadio/pull/124)
 - La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
 - La rezerva alarm-sono (kiam la kanalo ne disponeblas) estas nun haltigebla per "Halti" aŭ per tuŝo de la sciigo kaj mem ĉesas post 5 minutoj — antaŭe ĝi sonis senfine

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -211,6 +212,37 @@ class NavigaTesto {
         waitForIdle()
         // ♥ = ŝatata
         onNodeWithContentDescription("Forigi ŝaton").assertIsDisplayed()
+    }
+
+    @Test
+    fun kanalEkranoSnackbarNavigasAlAgordoj() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            private val _set = MutableStateFlow<Set<String>>(emptySet())
+            override fun observiPlejŝatatajn() = _set.asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {
+                _set.value = _set.value + kanaloSlug
+            }
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in _set.value
+        }
+        val elsendoDeponejo = PreviewElsendoDeponejo(listOf(testElsendo))
+        var navigisAlAgordoj = false
+        setContent {
+            KanaloEkrano(
+                kanalo = testKanaloj[1],
+                elsendoDeponejo = elsendoDeponejo,
+                plejŝatatajDeponejo = plejDeponejo,
+                agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(),
+                onReen = {},
+                onAgordoj = { navigisAlAgordoj = true },
+            )
+        }
+        waitForIdle()
+        onNodeWithContentDescription("Aldoni ŝaton").performClick()
+        waitForIdle()
+        onNodeWithText("Malŝalti en la agordoj").assertIsDisplayed()
+        onNodeWithText("Malŝalti en la agordoj").performClick()
+        waitForIdle()
+        kotlin.test.assertTrue(navigisAlAgordoj)
     }
 
     @Test

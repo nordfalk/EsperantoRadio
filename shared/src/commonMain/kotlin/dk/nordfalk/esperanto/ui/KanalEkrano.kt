@@ -98,6 +98,7 @@ fun KanaloEkrano(
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
+    onAgordoj: () -> Unit = {},
     ludilo: LudiloRegilo? = null,
 ) {
     val viewModel = remember(kanalo.slug) {
@@ -132,12 +133,12 @@ fun KanaloEkrano(
                             if (!antauxa && sciigoj) {
                                 snackbarStato.showSnackbar(
                                     message = "Vi ricevos sciigon kiam aperas nova elsendo el ${kanalo.nomo}.",
-                                    actionLabel = "Malŝalti",
+                                    actionLabel = "Malŝalti en la agordoj",
                                     duration = SnackbarDuration.Long,
                                 )?.let { rezulto ->
                                     if (rezulto == SnackbarResult.ActionPerformed) {
-                                        agordojDeponejo.fiksiSciigojn(false)
-                                        logi("Klako", "Malŝaltis sciigojn de Snackbar")
+                                        onAgordoj()
+                                        logi("Klako", "Navigas al Agordoj de Snackbar")
                                     }
                                 }
                             }
@@ -254,6 +255,7 @@ fun KanalEkranoKunSvipo(
     onReen: () -> Unit,
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
+    onAgordoj: () -> Unit = {},
     ludilo: LudiloRegilo? = null,
 ) {
     if (kanaloj.size <= 1) {
@@ -266,6 +268,7 @@ fun KanalEkranoKunSvipo(
             onReen = onReen,
             onElsendo = onElsendo,
             onLudi = onLudi,
+            onAgordoj = onAgordoj,
             ludilo = ludilo,
         )
         return
@@ -283,6 +286,7 @@ fun KanalEkranoKunSvipo(
             onReen = onReen,
             onElsendo = onElsendo,
             onLudi = onLudi,
+            onAgordoj = onAgordoj,
             ludilo = ludilo,
         )
     }

@@ -358,6 +358,7 @@ fun EsperantoRadioApp(
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                                 agordojDeponejo = agordojDeponejo,
                                 onReen = { reen() },
+                                onAgordoj = { push(Vojo.Agordoj) },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas rekte: ${vojo.kanalo.slug}")

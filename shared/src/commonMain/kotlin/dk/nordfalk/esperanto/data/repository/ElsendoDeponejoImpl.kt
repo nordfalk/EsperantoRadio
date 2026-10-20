@@ -143,6 +143,10 @@ open class ElsendoDeponejoImpl(
      * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      */
     suspend fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
+        // La en-memora kaŝo jam havas la kanalon (el aŭ disko aŭ reto) — ne
+        // re-legu kaj re-parsu la diskon senbezone (KMP-esplorado 2026-10-20:
+        // la ekranoj vokas tion je ĉiu eniro).
+        kaŝmemoro[kanalo.slug]?.let { return it }
         val respondo = leguKashon(kanalo.slug) ?: return null
         logd("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {

@@ -78,8 +78,10 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
    **unu linion** al la `## [Neeldonita]`-sekcio **ene de la sama PR**: konciza
    priskribo sen teknikaj detaloj + ligilo al la PR, ekz.:
    `- Vekhorloĝo ludas ankaŭ podkastojn (https://github.com/nordfalk/EsperantoRadio/pull/123)`.
-   Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; se la
-   CI-kontrolo erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
+   Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; ankaŭ
+   bagatelaj uzantvidaj ŝanĝoj (ekz. minora vortumo de buton-teksto aŭ klaraigo)
+   ne indas eniron (2026-10-20, decido de la posedanto). Se la CI-kontrolo
+   erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
    la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
 11. **Aŭtomate aldonu viajn lecionojn.** Post ĉiu laboro — precipe post
     eraro, incidento aŭ neatendita rezulto — skribu koncizan lecionon (kun
@@ -175,6 +177,12 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
   teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
   per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
+- **`LaunchedEffect(Unit) { vm.sxargxi() }` lanĉas la ŝargadon je ĈIU ekran-eniro** (2026-10-20):
+  navigado rekomponas la ekranon, do reveno al Hejmo/Kanalaro reŝargis ĉion — ĝis 7 plenaj
+  ŝarĝoj en 90 sekundoj ĉe unu uzanto (Sentry: 24 ŝarĝoj vs 6 apomfermoj). Ĉiu ŝargado,
+  kiun ekrano ekigas, devas iri tra `SxargxaKontrolilo` (dedupigo + TTL 5 min;
+  `ui/SxargxaKontrolilo.kt`) — kaj `leguKashitajnElsendojn` ne re-parsu kiam la en-memora
+  kaŝo jam havas la kanalon.
 - **Komponantoj de `ModalNavigationDrawer` restas en la semantika arbo ankaŭ
   kiam la tirkesto estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")`
   trovas 2 nodojn (ekrana titolo + tirkest-ero). Asertu laŭ enhava teksto

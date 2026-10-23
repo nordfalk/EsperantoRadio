@@ -10,7 +10,11 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.ui.geometry.Offset
 import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
@@ -461,5 +465,52 @@ class HejmoEkranoTest {
         // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
         waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun klakoSurSekcioTitoloKanalojVokasOnKanalaro() = runComposeUiTest {
+        var kanalaroVokita = false
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                onKanalaro = { kanalaroVokita = true },
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithText("Kanaloj").assertIsDisplayed()
+        onNodeWithText("Kanaloj").performClick()
+        assertTrue(kanalaroVokita, "Klako sur \"Kanaloj\" devas navigi al la kanala vido")
+    }
+
+    @Test
+    fun dekstraTroTiroSurVicoMalfermasLaTirkeston() = runComposeUiTest {
+        val tirkestStato = DrawerState(DrawerValue.Closed)
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                tirkestStato = tirkestStato,
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        assertEquals(DrawerValue.Closed, tirkestStato.currentValue)
+
+        // Tro-tiro dekstren sur la "Kanaloj"-vico, kiu estas ĉe sia komenco:
+        // tiru sur la vertikala pozicio de la unua kanal-karto
+        val karto = onAllNodesWithText("Kernpunkto epizodo 1").fetchSemanticsNodes().first()
+        val y = karto.positionInRoot.y + karto.size.height / 2f
+        onRoot().performTouchInput {
+            swipe(
+                start = Offset(centerX - width * 0.2f, y),
+                end = Offset(centerX + width * 0.5f, y),
+            )
+        }
+        waitForIdle()
+        assertEquals(DrawerValue.Open, tirkestStato.currentValue, "Dekstra tro-tiro sur vico devas malfermi la tirkeston")
     }
 }

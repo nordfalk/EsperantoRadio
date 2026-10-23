@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
@@ -381,6 +382,8 @@ fun HejmoEkrano(
     kanaloDeponejo: KanaloDeponejo,
     elsendoDeponejo: ElsendoDeponejo,
     onKanalo: (Kanalo) -> Unit = {},
+    /** Klako sur la sekcio-titolo "Kanaloj" — navigas al la kanala vido (Kanalaro). */
+    onKanalaro: () -> Unit = {},
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     tirkestEnhavo: @Composable () -> Unit = {},
     onElsendo: (Elsendo) -> Unit = {},
@@ -519,9 +522,12 @@ fun HejmoEkrano(
                 // "Kanaloj" — unue la aktivaj kanaloj (elsendo en la pasinta jaro),
                 // poste dividilo kun "Arkivo" kaj la arkivaj (pli ol jaron malnovaj)
                 if (aktivajKanaloj.isNotEmpty() || arkivajKanaloj.isNotEmpty()) {
-                    item { SekcioTitolo("Kanaloj") }
+                    item { SekcioTitolo("Kanaloj", onClick = onKanalaro) }
                     item {
+                        val kanalaroVicoStato = rememberLazyListState()
                         LazyRow(
+                            state = kanalaroVicoStato,
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kanalaroVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -538,7 +544,10 @@ fun HejmoEkrano(
                 if (novajElsendoj.isNotEmpty()) {
                     item { SekcioTitolo("Kio novas") }
                     item {
+                        val kioNovasVicoStato = rememberLazyListState()
                         LazyRow(
+                            state = kioNovasVicoStato,
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kioNovasVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -566,6 +575,7 @@ fun HejmoEkrano(
                     item {
                         LazyRow(
                             state = luditajVicoStato,
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, luditajVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -590,7 +600,10 @@ fun HejmoEkrano(
                 if (popularajElsendoj.isNotEmpty()) {
                     item { SekcioTitolo("Aliaj elsendoj") }
                     item {
+                        val aliajVicoStato = rememberLazyListState()
                         LazyRow(
+                            state = aliajVicoStato,
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, aliajVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -618,15 +631,44 @@ fun HejmoEkrano(
     }
 }
 
+/**
+ * Titolo de horizontala sekcio sur la hejmekrano. Kun [onClick] ĝi iĝas klakebla
+ * kaj montras sag-piktogramon kiel videblan indikon (ekz. "Kanaloj" → Kanalaro).
+ */
 @Composable
-private fun SekcioTitolo(titolo: String) {
-    Text(
-        text = titolo,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
-    )
+private fun SekcioTitolo(titolo: String, onClick: (() -> Unit)? = null) {
+    if (onClick == null) {
+        Text(
+            text = titolo,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+        )
+        return
+    }
+    Row(
+        modifier = Modifier
+            .clickable {
+                logi("Klako", "sekcio-titolo \"$titolo\"")
+                onClick()
+            }
+            .padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = titolo,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Icon(
+            Icons.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 /**

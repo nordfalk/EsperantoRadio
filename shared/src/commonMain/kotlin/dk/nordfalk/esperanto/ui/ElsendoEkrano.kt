@@ -433,6 +433,11 @@ fun ElsendoEkranoKunSvipo(
     komencaElsendo: Elsendo,
     elsendoj: List<Elsendo>,
     onReen: () -> Unit,
+    /**
+     * Raportas la nune VIDATAN elsendon (sekvas svipojn) — uzata de la mini-ludilbreto
+     * por proponi ĝin kiam nenio ludas.
+     */
+    onVidataElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
     onElshuti: (Elsendo) -> Unit = {},
     onHaltigiElshuton: (Elsendo) -> Unit = {},
@@ -469,11 +474,17 @@ fun ElsendoEkranoKunSvipo(
             onPauxzigi = onPauxzigi,
             onDaurigi = onDaurigi,
         )
+        LaunchedEffect(e) { onVidataElsendo(e) }
         return
     }
 
     val komencaPagho = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
     val paghoStato = rememberPagerState(initialPage = komencaPagho) { elsendoj.size }
+
+    // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam pagho ekvidiĝas (settledPage)
+    LaunchedEffect(paghoStato.settledPage, elsendoj) {
+        elsendoj.getOrNull(paghoStato.settledPage)?.let(onVidataElsendo)
+    }
 
     HorizontalPager(state = paghoStato) { pagho ->
         val e = elsendoj[pagho]

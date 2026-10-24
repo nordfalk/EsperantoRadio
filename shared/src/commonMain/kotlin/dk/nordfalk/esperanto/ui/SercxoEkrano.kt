@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
+import dk.nordfalk.compose.material3.DrawerState
+import dk.nordfalk.compose.material3.ModalNavigationDrawer
+import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CancellationException

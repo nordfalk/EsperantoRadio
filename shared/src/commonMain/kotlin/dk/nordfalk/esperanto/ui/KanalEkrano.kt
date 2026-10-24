@@ -256,6 +256,8 @@ fun KanalEkranoKunSvipo(
     plejŝatatajDeponejo: PlejŝatatajDeponejo,
     agordojDeponejo: AgordojDeponejo,
     onReen: () -> Unit,
+    /** Raportas la nune VIDATAN kanalon (sekvas svipojn) — por la mini-ludilbreto kiam nenio ludas. */
+    onVidataKanalo: (Kanalo) -> Unit = {},
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
     onAgordoj: () -> Unit = {},
@@ -274,11 +276,17 @@ fun KanalEkranoKunSvipo(
             onAgordoj = onAgordoj,
             ludilo = ludilo,
         )
+        LaunchedEffect(k) { onVidataKanalo(k) }
         return
     }
 
     val komencaPagho = kanaloj.indexOfFirst { it.slug == komencaKanalo.slug }.let { if (it < 0) 0 else it }
     val paghoStato = rememberPagerState(initialPage = komencaPagho) { kanaloj.size }
+
+    // Sekvu svipojn: la vidata kanalo ŝanĝiĝas kiam pagho ekvidiĝas (settledPage)
+    LaunchedEffect(paghoStato.settledPage, kanaloj) {
+        kanaloj.getOrNull(paghoStato.settledPage)?.let(onVidataKanalo)
+    }
 
     HorizontalPager(state = paghoStato) { pagho ->
         KanaloEkrano(

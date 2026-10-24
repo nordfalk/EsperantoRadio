@@ -12,16 +12,13 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,17 +36,19 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.navigation3.runtime.NavKey
+import dk.nordfalk.compose.material3.DrawerState
+import dk.nordfalk.compose.material3.ModalDrawerSheet
+import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.navigation.Vojo
 import kotlinx.coroutines.launch
 
 /**
- * Naviga tirkesto (ModalNavigationDrawer) — anstataŭas la iaman malsupran
- * navigan breton, laŭ la modelo de la malnova apo: sen titolo, nur tiom larĝa
- * kiel bezonata, kaj ĝi vivas SUB la supra breto (ĝi do ne kovras la titolon
- * nek la hamburgeron). Eroj: la 4 ĉefekranoj, poste dividilo kaj la flankaj
- * ekranoj. Ĉiuj eroj kondutas kiel supranivela celo: `onElektu` ricevas la
- * vojon kaj la navigado restas en App.kt.
+ * Naviga tirkesto — anstataŭas la iaman malsupran navigan breton, laŭ la modelo
+ * de la malnova apo: sen titolo, nur tiom larĝa kiel bezonata, kaj ĝi vivas SUB
+ * la supra breto (ĝi do ne kovras la titolon nek la hamburgeron). Eroj: la 4
+ * ĉefekranoj, poste dividilo kaj la flankaj ekranoj. Ĉiuj eroj kondutas kiel
+ * supranivela celo: `onElektu` ricevas la vojon kaj la navigado restas en App.kt.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +85,9 @@ fun NavigaTirkesto(
  * kaj, dum ĝi estas malfermita, fermas ĝin ree. La piktogramo MORFADAS inter
  * hamburgero (3 strekoj) kaj reen-sago per printempa animacio — same kiel la
  * `ActionBarDrawerToggle` de la malnova apo; la tirkesto mem glitas enen kaj
- * elen per la implicita MotionScheme-animacio de `ModalNavigationDrawer`.
+ * elen per la animacio de la forkigita `ModalNavigationDrawer`
+ * (dk.nordfalk.compose.material3 — la tro-rula gesto povas movi la tirkeston
+ * kun la fingro).
  */
 @Composable
 fun TirkestButono(tirkestStato: DrawerState) {

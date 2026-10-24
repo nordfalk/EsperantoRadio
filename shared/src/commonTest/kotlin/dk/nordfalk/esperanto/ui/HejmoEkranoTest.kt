@@ -10,8 +10,19 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
 import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
+import dk.nordfalk.compose.material3.DrawerState
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -466,5 +477,92 @@ class HejmoEkranoTest {
         // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
         waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+    }
+
+    @Test
+    fun klakoSurSekcioTitoloKanalojVokasOnKanalaro() = runComposeUiTest {
+        var kanalaroVokita = false
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                onKanalaro = { kanalaroVokita = true },
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithText("Kanaloj").assertIsDisplayed()
+        onNodeWithText("Kanaloj").performClick()
+        assertTrue(kanalaroVokita, "Klako sur \"Kanaloj\" devas navigi al la kanala vido")
+    }
+
+    /**
+     * Falsa tirkest-enhavo kun reala larĝo — sen ĝi la ankroj degeneras al nul
+     * kaj neniu tiro povas movi la tirkeston.
+     */
+    @Composable
+    private fun tirkestEnhavoFolieto() {
+        Box(Modifier.width(240.dp).height(320.dp)) { Text("Tirkesta enhavo") }
+    }
+
+    @Test
+    fun longaDekstraTroTiroGlitasLaTirkestonMalferme() = runComposeUiTest {
+        val tirkestStato = DrawerState(DrawerValue.Closed)
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                tirkestStato = tirkestStato,
+                tirkestEnhavo = { tirkestEnhavoFolieto() },
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        assertEquals(DrawerValue.Closed, tirkestStato.currentValue)
+
+        // Longa dekstra tro-tiro sur la "Kanaloj"-vico (ĉe sia komenco): la tirkesto
+        // sekvu la fingron kaj solviĝu MALFERMITA
+        val karto = onAllNodesWithText("Kernpunkto epizodo 1").fetchSemanticsNodes().first()
+        val y = karto.positionInRoot.y + karto.size.height / 2f
+        onRoot().performTouchInput {
+            swipe(
+                start = Offset(centerX - width * 0.2f, y),
+                end = Offset(centerX + width * 0.5f, y),
+            )
+        }
+        waitForIdle()
+        assertEquals(DrawerValue.Open, tirkestStato.currentValue, "Longa tro-tiro devas malfermi la tirkeston")
+    }
+
+    @Test
+    fun mallongaDekstraTroTiroRevenasFermita() = runComposeUiTest {
+        val tirkestStato = DrawerState(DrawerValue.Closed)
+        setContent {
+            HejmoEkrano(
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                tirkestStato = tirkestStato,
+                tirkestEnhavo = { tirkestEnhavoFolieto() },
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        assertEquals(DrawerValue.Closed, tirkestStato.currentValue)
+
+        // Mallonga tro-tiro (malpli ol duone de la tirkesta larĝo): la tirkesto
+        // sekvas la fingron sed revenas FERMITA kiam la gesto liberiĝas
+        val karto = onAllNodesWithText("Kernpunkto epizodo 1").fetchSemanticsNodes().first()
+        val y = karto.positionInRoot.y + karto.size.height / 2f
+        onRoot().performTouchInput {
+            swipe(
+                start = Offset(centerX - width * 0.4f, y),
+                end = Offset(centerX - width * 0.4f + 60f, y),
+            )
+        }
+        waitForIdle()
+        assertEquals(DrawerValue.Closed, tirkestStato.currentValue, "Mallonga tro-tiro devas reveni fermita")
     }
 }

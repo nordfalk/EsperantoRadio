@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
+import dk.nordfalk.compose.material3.DrawerState
+import dk.nordfalk.compose.material3.ModalNavigationDrawer
+import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 

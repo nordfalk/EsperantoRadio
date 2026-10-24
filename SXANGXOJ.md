@@ -672,7 +672,7 @@ sentry-android 8.41.0 (per sentry-kmp 0.27.0) kaj estas en ordo.
 
 ## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: #78)
 
-Regulo 6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
+Regulo L6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
 PR) antaŭ ol la uzanto trarigardis kaj aprobis la ŝanĝojn — eĉ se la uzanto petas
 commit/push/PR; nur eksplicita "commit sen mia trarigardo" preterpasas tion.
 La sama regulo aplikita en la tri lokaj klonoj (mobile-app4, EsperantoRadio, EsperantoRadio2).

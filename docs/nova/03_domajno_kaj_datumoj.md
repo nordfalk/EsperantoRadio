@@ -228,7 +228,7 @@ class ElsendoDeponejoImpl(
 
 ## Toleremeco al putrantaj fontoj
 
-Vidu regulojn 4 kaj 8 en `AGENTS.md`. Mallonge: ĉiu deponejo kaptas retajn
+Vidu regulojn A4 kaj A8 en `AGENTS.md`. Mallonge: ĉiu deponejo kaptas retajn
 erarojn kaj liveras kaŝenitan datumon; unu kanal-eraro ne haltigas la aliajn;
 ĉiu `catch` devas protokoli per `loge`/`logw`.
 

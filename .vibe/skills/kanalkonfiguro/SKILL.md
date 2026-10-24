@@ -61,4 +61,4 @@ enkondukon de Varsovia Vento). Uzu la temperitan formon `(?:(?!</p>).)` anstata�
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en
   `<content:encoded>` — uzu `getElementsByTag("content:encoded").firstOrNull()?.text()`
   (ne `html()`), poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
-- Aliajn regulojn (6.1–6.7, Peranto/archive.org) vidu en `docs/nova/04`.
+- Aliajn regulojn (P6.1–P6.7, Peranto/archive.org) vidu en `docs/nova/04`.

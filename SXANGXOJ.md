@@ -1,6 +1,6 @@
 # Ŝanĝoj — 2026-10-24
 
-## Hejmo: klakebla "Kanaloj", tro-rula tirkesto kiu sekvas la fingron, ĉiam videbla miniludilbreto (PR: <numero>)
+## Hejmo: klakebla "Kanaloj", tro-rula tirkesto kiu sekvas la fingron, ĉiam videbla miniludilbreto (PR: https://github.com/nordfalk/EsperantoRadio/pull/131)
 
 ### 1. Klakebla sekcio-titolo "Kanaloj"
 

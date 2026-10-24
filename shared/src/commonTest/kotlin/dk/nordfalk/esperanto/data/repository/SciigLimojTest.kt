@@ -161,4 +161,24 @@ class SciigLimojTest {
             "Neparsaj eroj (ne-numera ID, malplena slug) foriĝas sen ĵeti",
         )
     }
+
+    @Test
+    fun sciigIdKreskasNormale() {
+        assertEquals(1001, sekvaSciigId(1000))
+        assertEquals(1002, sekvaSciigId(1001))
+    }
+
+    @Test
+    fun sciigIdSaltasLaRezervitanZononDeLaAlarmo() {
+        // 4711 estas la fiksa ID de la alarmo-sciigo; 4710 ankaŭ evitiĝas
+        // (la „Ludi“-ago uzas sciigId + 1 kiel pet-identigilon)
+        assertEquals(4712, sekvaSciigId(4709))
+        assertEquals(4712, sekvaSciigId(4710))
+        assertEquals(4712, sekvaSciigId(4711))
+    }
+
+    @Test
+    fun sciigIdDaŭrasPostLaRezervitaZono() {
+        assertEquals(4713, sekvaSciigId(4712))
+    }
 }

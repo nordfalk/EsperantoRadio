@@ -43,7 +43,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 `webApp/` + `shared/` (la nova KMP-apo), `docs/malnova/` + `docs/nova/`
 (dokumentaro), `CHANGELOG.md` + `ŜANĜOJ.md` + `NOTOJ.md` + `FAROTA.md` +
 `AGENTS.md` (la protokolaro), `.vibe/skills/` (proceduraj skill-oj:
-`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`, `esperanto-lingvo`).
+`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`).
 
 ## Plej gravaj reguloj por agentoj
 
@@ -159,7 +159,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
 > La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan:
 > **`eldonado`** (versio-eldonado al Play), **`sentry-esplorado`** (legi/analizi
 > Sentry-n), **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, emulilo),
-> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj), **`esperanto-lingvo`**
+> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj)
 > (kanonaj terminoj kaj supersigno-skriboj). Historiaj lecionoj kaj
 > arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
 > [`ŜANĜOJ.md`](ŜANĜOJ.md).
@@ -190,7 +190,14 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@SerialName`-ŝlosiloj en
   `Modeloj.kt` (`retposhto`, `defaltSxatata`, `dauro`, `dauroMs`, `retpaghoUrl`) — ili
   tenas kongruon kun ekzistantaj uzant-datumoj. Antaŭ ol skribi, **grep-u kaj kopiu**;
-  bibliotekaj nomoj restas anglaj (`PullToRefreshBox`, `isRefreshing`). Detaloj: la skill-o **`esperanto-lingvo`**.
+  bibliotekaj nomoj restas anglaj (`PullToRefreshBox`, `isRefreshing`), kaj `fluxo`,
+  `cx`/`cy`-koordinatoj, `AUX`-regexo kaj kanal-slugs ne estas x-sistemo.
+  **Legi historian materialon** (malnova apo `malnova/`, protokoloj antaŭ 2026-10-24,
+  persistaj valoroj): x-sistemo = bazlitero+x (`sx`=ŝ, `cx`=ĉ, `gx`=ĝ, `jx`=ĵ, `ux`=ŭ);
+  h-sistemo mikse: `gh`=ĝ, `sh`=ŝ (`poshto`=poŝto, `malshalita`=malŝalita), `kash`=kaŝ;
+  la historia `hesh` estas la angla „hash" — Esperante **haketo** (ago) / **haketaĵo**
+  (rezulto; la konstanto nun: `APAJ_NOVAĴOJ_HAKETAĴO`). Nova kodo neniam enkonduku
+  x/h-sistemajn vortojn.
 - **`LaunchedEffect(Unit) { vm.ŝargi() }` lanĉas la ŝargadon je ĈIU ekran-eniro** (2026-10-20):
   navigado rekomponas la ekranon, do reveno al Hejmo/Kanalaro reŝargis ĉion — ĝis 7 plenaj
   ŝarĝoj en 90 sekundoj ĉe unu uzanto (Sentry: 24 ŝarĝoj vs 6 apomfermoj). Ĉiu ŝargado,
@@ -380,7 +387,6 @@ esperantoradio_kanaloj_v9.json (bundled resource)
 | Eldoni version al Google Play | la skill-o `eldonado` (`.vibe/skills/`) |
 | Legi/esplori Sentry-n | la skill-o `sentry-esplorado` (`.vibe/skills/`) |
 | Redakti la kanalkonfiguron / JSONC | la skill-o `kanalkonfiguro` (`.vibe/skills/`) |
-| Skribi Esperanton ĝuste (terminoj, supersignoj) | la skill-o `esperanto-lingvo` (`.vibe/skills/`) |
 | Arkitekturaj notoj kaj historiaj lecionoj | `NOTOJ.md` |
 
 ## La nova kodo — strukturo

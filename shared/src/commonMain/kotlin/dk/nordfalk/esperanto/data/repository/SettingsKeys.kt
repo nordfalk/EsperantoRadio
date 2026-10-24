@@ -12,11 +12,11 @@ object SettingsKeys {
     const val ALARMOJ = "alarmoj"
     /** Rezervo de la kruda alarmo-JSON kiam la ĉefa valoro ne plu estas parsebla (PR #95). */
     const val ALARMOJ_REZERVO = "alarmoj_rezervo"
-    const val AŬTOMATA_DAŬRIGO = "auxtomata_daurigo"
+    const val AŬTOMATA_DAŬRIGO = "aŭtomata_daŭrigo"
     const val EVOLO = "evoluo"
     /** Ĉu la uzanto ŝaltis "detalan protokoladon" (pliaj logi-vokoj al Sentry). */
     const val DETALA_PROTOKOLADO = "detala_protokolado"
-    const val KAŜITAJ_AVERTOJ = "kasxitaj_avertoj"
+    const val KAŜITAJ_AVERTOJ = "kaŝitaj_avertoj"
     /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (PR #89). */
     const val INTENT_NONCE = "intent_nonce"
     /** Kreskanta kontraŭo por unikaj sciig-ID-oj ((PR #93) — hashCode-kolizioj anstataŭigis sciigojn). */
@@ -24,5 +24,14 @@ object SettingsKeys {
     /** Registrejo de la aktivaj sciigoj ("id:slug,id:slug") por la sciig-limoj (maks. 7 / maks. 3 po kanalo). */
     const val SCIIG_REGISTREJO = "sciig_registrejo"
     /** Haŝaĵo de la lasta konfirmitaj apaj novaĵoj (nul = neniam montrita / malplena). */
-    const val APAJ_NOVAĴOJ_HEŜ = "apaj_novajxoj_hesh"
+    const val APAJ_NOVAĴOJ_HEŜ = "apaj_novaĵoj_haŝ"
+
+    /**
+     * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —
+     * uzataj NUR de AgordoMigrado por retrodefaŭlta legado; ĉiu skribo iras al
+     * la nova ŝlosilo kaj forigas la malnovan.
+     */
+    const val AŬTOMATA_DAŬRIGO_MALNOVA = "auxtomata_daurigo"
+    const val KAŜITAJ_AVERTOJ_MALNOVA = "kasxitaj_avertoj"
+    const val APAJ_NOVAĴOJ_HEŜ_MALNOVA = "apaj_novajxoj_hesh"
 }

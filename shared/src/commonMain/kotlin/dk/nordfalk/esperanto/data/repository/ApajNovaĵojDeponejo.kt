@@ -29,12 +29,12 @@ class ApajNovaĵojDeponejo(
      * La uzanto konfirmis la mesaĝon — persistigu la haŝaĵon kaj fermu.
      */
     fun konfirmu() {
-        settings.putInt(SettingsKeys.APAJ_NOVAĴOJ_HEŜ, _montrata.value.orEmpty().hashCode())
+        settings.skribuMigritanEntjeron(SettingsKeys.APAJ_NOVAĴOJ_HEŜ, SettingsKeys.APAJ_NOVAĴOJ_HEŜ_MALNOVA, _montrata.value.orEmpty().hashCode())
         _montrata.value = null
     }
 
     private fun leguKonservitanHaŝon(): Int =
-        settings.getIntOrNull(SettingsKeys.APAJ_NOVAĴOJ_HEŜ) ?: MALPLENA_HESH
+        settings.leguMigritanEntjeroKunNulo(SettingsKeys.APAJ_NOVAĴOJ_HEŜ, SettingsKeys.APAJ_NOVAĴOJ_HEŜ_MALNOVA) ?: MALPLENA_HESH
 
     companion object {
         /** Haŝaĵo de malplena mesaĝo — ankaŭ la komenca valoro por novaj instalaĵoj. */

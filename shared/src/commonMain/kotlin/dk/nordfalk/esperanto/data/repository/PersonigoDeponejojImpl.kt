@@ -141,7 +141,7 @@ class AgordojDeponejoImpl(
     private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
     override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
-    private val _aŭtomataDaŭrigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AŬTOMATA_DAŬRIGO, true) ?: true)
+    private val _aŭtomataDaŭrigo = MutableStateFlow(settings?.leguMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, true) ?: true)
     override val aŭtomataDaŭrigo: StateFlow<Boolean> = _aŭtomataDaŭrigo.asStateFlow()
 
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
@@ -151,7 +151,7 @@ class AgordojDeponejoImpl(
     override val detalaProtokolado: StateFlow<Boolean> = _detalaProtokolado.asStateFlow()
 
     private val _kaŝitajAvertoj = MutableStateFlow(
-        settings?.getString(SettingsKeys.KAŜITAJ_AVERTOJ, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
+        settings?.leguMigritanĈenon(SettingsKeys.KAŜITAJ_AVERTOJ, SettingsKeys.KAŜITAJ_AVERTOJ_MALNOVA, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
     )
     override val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kaŝitajAvertoj.asStateFlow()
 
@@ -162,7 +162,7 @@ class AgordojDeponejoImpl(
 
     /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
     private fun persistu(tipoj: Set<DiagnozoTipo>) {
-        settings?.putString(SettingsKeys.KAŜITAJ_AVERTOJ, tipoj.joinToString(",") { it.name })
+        settings?.skribuMigritanĈenon(SettingsKeys.KAŜITAJ_AVERTOJ, SettingsKeys.KAŜITAJ_AVERTOJ_MALNOVA, tipoj.joinToString(",") { it.name })
     }
 
     private fun tipoDeNomo(nomo: String): DiagnozoTipo? =
@@ -179,7 +179,7 @@ class AgordojDeponejoImpl(
     }
     override fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean) {
         _aŭtomataDaŭrigo.value = ŝaltita
-        settings?.putBoolean(SettingsKeys.AŬTOMATA_DAŬRIGO, ŝaltita)
+        settings?.skribuMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, ŝaltita)
         logi("Agordoj", "AŭtomataDaŭrigo → $ŝaltita")
     }
     override fun fiksiEvoluon(ŝaltita: Boolean) {

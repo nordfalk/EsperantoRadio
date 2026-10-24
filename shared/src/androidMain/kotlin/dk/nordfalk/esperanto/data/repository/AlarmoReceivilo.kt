@@ -8,7 +8,7 @@ import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import dk.nordfalk.esperanto.AppStato
-import dk.nordfalk.esperanto.data.config.IntentSxlosilo
+import dk.nordfalk.esperanto.data.config.IntentŜlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
@@ -97,7 +97,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
          * daŭra alarm-sciigo estas nuligata (sen tio la alarmo sonus por ĉiam).
          * Test-ŝanĝebla.
          */
-        @Volatile var ringtonoMaksDauroMs: Long = 5 * 60 * 1000L
+        @Volatile var ringtonoMaksDaŭroMs: Long = 5 * 60 * 1000L
 
         /** Ĉu la fallback-ringtono nun sonas (por testoj). */
         val fallbackRingtonoAktiva: Boolean get() = fallbackRingtono?.isPlaying == true
@@ -165,7 +165,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 putExtra("alarmo_kanal_slug", kanaloSlug)
                 putExtra("alarmo_etikedo", etikedo)
                 // La eksportita Activity kontrolas la nonce-on (PR #89)
-                IntentSxlosilo.aldonuNomon(this)
+                IntentŜlosilo.aldonuNomon(this)
             }
             context.startActivity(launchIntent)
             logi("AlarmoReceivilo", "Lanĉis MainActivity (best-effort) kun kanalo=$kanaloSlug")
@@ -319,7 +319,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             // De la sciigo: MainActivity haltigu la fallback-ringtonon — sed NE la
             // best-effort startActivity de la ricevilo mem (vd. MainActivity).
             putExtra("de_sciigo", true)
-            IntentSxlosilo.aldonuNomon(this)
+            IntentŜlosilo.aldonuNomon(this)
         }
         val pi = android.app.PendingIntent.getActivity(
             context, kanaloSlug.hashCode(), launchIntent,
@@ -344,7 +344,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
      * alarmo devas SONI eĉ kiam la fluo/reto tute ne disponeblas.
      *
      * La sono estas haltigebla per haltuFallbackRingon() (vokata de haltuAlarmRingon
-     * kiam la uzanto haltigas la ludadon) kaj mem haltas post [ringtonoMaksDauroMs]
+     * kiam la uzanto haltigas la ludadon) kaj mem haltas post [ringtonoMaksDaŭroMs]
      * (Ringtone.play() alie ripetiĝus senfine — kaj la daŭra sciigo restus).
      */
     private fun luduFallbackRingtonon(context: Context) {
@@ -361,14 +361,14 @@ class AlarmoReceivilo : BroadcastReceiver() {
                         .build()
                     it.play()
                     // Konservu la tenilon por haltuFallbackRingon() kaj mem-haltu
-                    // post ringtonoMaksDauroMs. La referenca komparo (===) certigas
+                    // post ringtonoMaksDaŭroMs. La referenca komparo (===) certigas
                     // ke malnova tempumilo ne haltigu novan sonon.
                     fallbackRingtono = it
                     val mia = it
                     CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
-                        delay(ringtonoMaksDauroMs)
+                        delay(ringtonoMaksDaŭroMs)
                         if (fallbackRingtono === mia) {
-                            logi("AlarmoReceivilo", "Fallback-ringtono mem haltigita post ${ringtonoMaksDauroMs} ms")
+                            logi("AlarmoReceivilo", "Fallback-ringtono mem haltigita post ${ringtonoMaksDaŭroMs} ms")
                             haltuFallbackRingon()
                             nuliguSciigon(context.applicationContext)
                         }

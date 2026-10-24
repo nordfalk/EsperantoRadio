@@ -71,7 +71,7 @@ class AndroidUiTest {
     }
 
     @Test
-    fun navigadoAlSercxo() {
+    fun navigadoAlSerĉo() {
         elektu("Serĉi")
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Trovu elsendon...").assertIsDisplayed()

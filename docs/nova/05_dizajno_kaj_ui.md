@@ -200,7 +200,7 @@ la sago restas necesa.
 │  ...                              │
 └──────────────────────────────────┘
 ```
-Serĉo trans ĉiuj kanaloj (uzante `ElsendoDeponejo.sercxiElsendojn`).
+Serĉo trans ĉiuj kanaloj (uzante `ElsendoDeponejo.serĉiElsendojn`).
 
 ### 7. Agordoj (aktuala stato)
 
@@ -230,9 +230,9 @@ fun EsperantoRadioApp() {
             entry<Vojo.Kanalaro> { KanalaroEkrano(...) }
             entry<Vojo.KanaloDetalo> { KanalEkrano(...) }
             entry<Vojo.ElsendoDetalo> { ElsendoEkrano(...) }
-            entry<Vojo.Sercxi> { SercxiEkrano(...) }
-            entry<Vojo.Plejsxatataj> { PlejstatatajEkrano(...) }
-            entry<Vojo.Elshutitaj> { ElshutitajEkrano(...) }
+            entry<Vojo.Serĉi> { SerĉiEkrano(...) }
+            entry<Vojo.Plejŝatataj> { PlejstatatajEkrano(...) }
+            entry<Vojo.Elŝutitaj> { ElŝutitajEkrano(...) }
             entry<Vojo.Alarmoj> { AlarmoEkrano(...) }
             entry<Vojo.Agordoj> { AgordojEkrano(...) }
             entry<Vojo.Ludvico> { LudvicoEkrano(...) }

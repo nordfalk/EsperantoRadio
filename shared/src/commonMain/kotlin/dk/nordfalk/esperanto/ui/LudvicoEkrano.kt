@@ -124,8 +124,8 @@ fun LudvicoEkranoMalplenaPreview() {
             override fun observiElsendojn(kanaloSlug: String) = kotlinx.coroutines.flow.MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>())
             override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
             override suspend fun getElsendo(id: String) = null
-            override suspend fun sercxiElsendojn(teksto: String, limo: Int) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
-            override suspend fun sxargxiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
+            override suspend fun serĉiElsendojn(teksto: String, limo: Int) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
+            override suspend fun ŝargiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<dk.nordfalk.esperanto.domain.model.Elsendo>()
         },
         kanaloDeponejo = object : dk.nordfalk.esperanto.domain.repository.KanaloDeponejo {
             override fun observiKanalojn() = kotlinx.coroutines.flow.MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Kanalo>())

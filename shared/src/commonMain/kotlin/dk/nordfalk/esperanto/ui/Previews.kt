@@ -22,10 +22,10 @@ fun PreviewKanalaroAntonia() {
     }
 }
 
-@Preview(name = "Kanalaro — Rugxa", showBackground = true, heightDp = 250)
+@Preview(name = "Kanalaro — Ruĝa", showBackground = true, heightDp = 250)
 @Composable
-fun PreviewKanalaroRugxa() {
-    pTemo(TemoNomo.RUGXA) {
+fun PreviewKanalaroRuĝa() {
+    pTemo(TemoNomo.RUĜA) {
         KanalaroEkrano(viewModel = KanalaroViewModel(pKanaloDeponejo()))
     }
 }
@@ -56,7 +56,7 @@ fun PreviewKanaloEkrano() {
 @Composable
 fun PreviewElsendoDetalo() {
     pTemo() {
-        ElsendoEkrano(elsendo = pElsendo, onReen = {}, onLudi = {}, onElshuti = {})
+        ElsendoEkrano(elsendo = pElsendo, onReen = {}, onLudi = {}, onElŝuti = {})
     }
 }
 
@@ -64,7 +64,7 @@ fun PreviewElsendoDetalo() {
 @Composable
 fun PreviewSerchxo() {
     pTemo() {
-        SercxoEkrano(sercxoDeponejo = pSercxoDeponejo(), onElsendo = {})
+        SerĉoEkrano(serĉoDeponejo = pSerĉoDeponejo(), onElsendo = {})
     }
 }
 
@@ -76,11 +76,11 @@ fun PreviewPlejŝatataj() {
     }
 }
 
-@Preview(name = "Elshutitaj", showBackground = true, heightDp = 250)
+@Preview(name = "Elŝutitaj", showBackground = true, heightDp = 250)
 @Composable
-fun PreviewElshutitaj() {
+fun PreviewElŝutitaj() {
     pTemo() {
-        ElshutitajEkrano(elshutDeponejo = pElshutDeponejo(), ludilo = PreviewLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
+        ElŝutitajEkrano(elŝutDeponejo = pElŝutDeponejo(), ludilo = PreviewLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
     }
 }
 
@@ -104,7 +104,7 @@ fun PreviewAgordoj() {
 @Composable
 fun PreviewMiniLudilbretoLudas() {
     val ludilo = PreviewLudiloRegilo(
-        LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(pElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
+        LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(pElsendo), pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false)
     )
     pTemo() {
         MiniLudilbreto(ludilo = ludilo)
@@ -115,7 +115,7 @@ fun PreviewMiniLudilbretoLudas() {
 @Composable
 fun PreviewMiniLudilbretoRekta() {
     val ludilo = PreviewLudiloRegilo(
-        LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.RektaKanalo(pKanaloj[0]), pozicioMs = 0, dauroMs = 0, estasRekta = true)
+        LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.RektaKanalo(pKanaloj[0]), pozicioMs = 0, daŭroMs = 0, estasRekta = true)
     )
     pTemo() {
         MiniLudilbreto(ludilo = ludilo)
@@ -126,7 +126,7 @@ fun PreviewMiniLudilbretoRekta() {
 @Composable
 fun PreviewMiniLudilbretoHaltita() {
     val ludilo = PreviewLudiloRegilo(
-        LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = Sonfonto.ElsendoFonto(pElsendo), pozicioMs = 120000, dauroMs = 6916000, estasRekta = false)
+        LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = Sonfonto.ElsendoFonto(pElsendo), pozicioMs = 120000, daŭroMs = 6916000, estasRekta = false)
     )
     pTemo() {
         MiniLudilbreto(ludilo = ludilo)
@@ -164,8 +164,8 @@ fun PreviewLudvicoKunEroj() {
             override fun observiElsendojn(kanaloSlug: String) = kotlinx.coroutines.flow.MutableStateFlow(emptyList<Elsendo>())
             override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean) = emptyList<Elsendo>()
             override suspend fun getElsendo(id: String): Elsendo? = null
-            override suspend fun sercxiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
-            override suspend fun sxargxiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
+            override suspend fun serĉiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
+            override suspend fun ŝargiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
         },
         kanaloDeponejo = object : dk.nordfalk.esperanto.domain.repository.KanaloDeponejo {
             override fun observiKanalojn() = kotlinx.coroutines.flow.MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Kanalo>())

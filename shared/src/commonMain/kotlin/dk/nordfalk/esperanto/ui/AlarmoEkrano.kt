@@ -25,7 +25,7 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.data.repository.ekzaktajAlarmojPermesataj
-import dk.nordfalk.esperanto.data.repository.subtenasVekhorlogxn
+import dk.nordfalk.esperanto.data.repository.subtenasVekhorloĝon
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.launch
 
@@ -38,7 +38,7 @@ fun AlarmoEkrano(
 ) {
     val alarmoj by alarmoDeponejo.observiAlarmojn().collectAsState()
     val kanaloj by kanaloDeponejo.observiKanalojn().collectAsState()
-    var redaktoModo by remember { mutableStateOf<Alarmo?>(null) } // null = listo, ne-null = redakti cxi tiun
+    var redaktoModo by remember { mutableStateOf<Alarmo?>(null) } // null = listo, ne-null = redakti ĉi tiun
     var kreiModo by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -76,7 +76,7 @@ fun AlarmoEkrano(
                     scaffoldPadding = padding,
                     onKonfirmi = { alarmo ->
                         logi("Klako", "konfirmu redaktadon de alarmo ${alarmo.id}")
-                        scope.launch { alarmoDeponejo.ghisdatigi(alarmo) }
+                        scope.launch { alarmoDeponejo.ĝisdatigi(alarmo) }
                         redaktoModo = null
                     },
                     onNuligi = { redaktoModo = null }
@@ -102,7 +102,7 @@ fun AlarmoEkrano(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text("Neniu alarmo. Premu + por krei.")
-                    if (!subtenasVekhorlogxn) {
+                    if (!subtenasVekhorloĝon) {
                         Spacer(Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -118,10 +118,10 @@ fun AlarmoEkrano(
             }
             else -> {
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
-                    if (subtenasVekhorlogxn && alarmoj.any { it.aktiva }) {
+                    if (subtenasVekhorloĝon && alarmoj.any { it.aktiva }) {
                         item { EkzaktajAlarmojAverto() }
                     }
-                    if (!subtenasVekhorlogxn) {
+                    if (!subtenasVekhorloĝon) {
                         item {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
                                 Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)

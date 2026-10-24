@@ -50,12 +50,12 @@ class PersistantaAlarmoDeponejoTest {
     }
 
     @Test
-    fun nekonataAlarmoNeSxangxasIon() = runTest {
+    fun nekonataAlarmoNeŜanĝasIon() = runTest {
         val deponejo = deponejoKun(Alarmo(id = 0, horo = 7, minuto = 0, ripeto = 0, kanaloSlug = "peranto"))
-        val antaux = deponejo.observiAlarmojn().value
+        val antaŭ = deponejo.observiAlarmojn().value
 
         deponejo.ekigis(-42)
 
-        assertEquals(antaux, deponejo.observiAlarmojn().value)
+        assertEquals(antaŭ, deponejo.observiAlarmojn().value)
     }
 }

@@ -27,16 +27,16 @@ import javax.sound.sampled.SourceDataLine
  *
  * Pura Java MP3-fluado super HTTP — neniu nacia dependeco.
  * mp3spi (com.googlecode.soundlibs:mp3spi) registrigas MP3-malkodilon
- * cxe AudioSystem, kiu tiam povas legi MP3-fluojn kaj konverti ilin al PCM.
+ * ĉe AudioSystem, kiu tiam povas legi MP3-fluojn kaj konverti ilin al PCM.
  *
- * Protokolado: cxiuj protokoloj iras al stderr (videbla en terminalo).
+ * Protokolado: ĉiuj protokoloj iras al stderr (videbla en terminalo).
  */
 class DesktopLudiloRegilo : LudiloRegilo {
 
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-    private val _lauxteco = MutableStateFlow(1f)
-    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+    private val _laŭteco = MutableStateFlow(1f)
+    override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
 
     /** mp3spi-fluado ne subtenas saltadon — la UI montras nur pozicio-indikilon. */
     override val subtenasSaltadon: Boolean get() = false
@@ -50,7 +50,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Volatile private var ludas = false
-    @Volatile private var pauxzita = false
+    @Volatile private var paŭzita = false
     @Volatile private var totalBytesLuditaj: Long = 0
     private var pcmFormat: AudioFormat? = null
 
@@ -129,25 +129,25 @@ class DesktopLudiloRegilo : LudiloRegilo {
                 e.printStackTrace(System.err)
             }
 
-            // Dauro
+            // Daŭro
             val frameLength = decodedStream.frameLength
             if (frameLength > 0) {
-                val dauroMs = (frameLength * 1000L / decodedFormat.sampleRate.toLong())
-                log("fiksiFonton: dauro = ${dauroMs}ms ($frameLength kadroj)")
+                val daŭroMs = (frameLength * 1000L / decodedFormat.sampleRate.toLong())
+                log("fiksiFonton: daŭro = ${daŭroMs}ms ($frameLength kadroj)")
                 _stato.value = LudantoInformo(
                     stato = LudantoStato.Haltita,
                     nunaFonto = fonto,
                     pozicioMs = komencoPozicioMs,
-                    dauroMs = dauroMs,
+                    daŭroMs = daŭroMs,
                     estasRekta = fonto is Sonfonto.RektaKanalo
                 )
             } else {
-                log("fiksiFonton: dauro nekonata (streaming)")
+                log("fiksiFonton: daŭro nekonata (streaming)")
                 _stato.value = LudantoInformo(
                     stato = LudantoStato.Haltita,
                     nunaFonto = fonto,
                     pozicioMs = komencoPozicioMs,
-                    dauroMs = if (fonto is Sonfonto.ElsendoFonto) (fonto.elsendo.dauro ?: 0L) * 1000 else 0,
+                    daŭroMs = if (fonto is Sonfonto.ElsendoFonto) (fonto.elsendo.daŭro ?: 0L) * 1000 else 0,
                     estasRekta = fonto is Sonfonto.RektaKanalo
                 )
             }
@@ -161,7 +161,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             _stato.value = LudantoInformo(
                 // Retaj eraroj estas pasemaj; FileNotFoundException (HTTP 404) kaj nesubtenata formato ne
                 stato = LudantoStato.Eraro(
-                    "Ne eblis sxargxi: ${e.message}",
+                    "Ne eblis ŝargi: ${e.message}",
                     reprovebla = e is java.io.IOException && e !is java.io.FileNotFoundException,
                 ),
                 nunaFonto = fonto,
@@ -186,7 +186,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             var legoEraro: Exception? = null
 
             while (isActive && ludas) {
-                if (pauxzita) {
+                if (paŭzita) {
                     delay(50)
                     continue
                 }
@@ -235,21 +235,21 @@ class DesktopLudiloRegilo : LudiloRegilo {
         // Daŭrigo post paŭzo (PR #92): NE rekomencu la korutinon — `komenciLudadon`
         // nuligus `totalBytesLuditaj`, do la pozicio rekomencus je 0 dum la fluo
         // daŭras meze (kaj la 5s-pozicia savilo de LudvicoRegilo superskribus la ĝustan valoron).
-        if (ludaJob?.isActive == true && pauxzita) {
-            pauxzita = false
+        if (ludaJob?.isActive == true && paŭzita) {
+            paŭzita = false
             line.start()
             _stato.value = _stato.value.copy(stato = LudantoStato.Ludas)
             return
         }
         ludas = true
-        pauxzita = false
+        paŭzita = false
         _stato.value = _stato.value.copy(stato = LudantoStato.Ludas)
         komenciLudadon()
     }
 
-    override fun pauxzigi() {
-        log("pauxzigi()")
-        pauxzita = true
+    override fun paŭzigi() {
+        log("paŭzigi()")
+        paŭzita = true
         sourceDataLine?.stop()
         _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
     }
@@ -257,7 +257,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
     override fun halti() {
         log("halti()")
         ludas = false
-        pauxzita = false
+        paŭzita = false
         ludaJob?.cancel()
         ludaJob = null
         try {
@@ -284,20 +284,20 @@ class DesktopLudiloRegilo : LudiloRegilo {
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
     }
 
-    override fun fiksiLauxtecon(volumeno: Float) {
+    override fun fiksiLaŭtecon(volumeno: Float) {
         val v = volumeno.coerceIn(0f, 1f)
         this.volumeno = v
-        _lauxteco.value = v
-        log("fiksiLauxtecon($v)")
+        _laŭteco.value = v
+        log("fiksiLaŭtecon($v)")
         try {
             val line = sourceDataLine ?: return
             val ctrl = line.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
             val min = ctrl.minimum
             val max = ctrl.maximum
             ctrl.value = min + (max - min) * v
-            log("fiksiLauxtecon: gain=${ctrl.value}dB")
+            log("fiksiLaŭtecon: gain=${ctrl.value}dB")
         } catch (e: Exception) {
-            log("fiksiLauxtecon: ne eblis: ${e.message}")
+            log("fiksiLaŭtecon: ne eblis: ${e.message}")
             e.printStackTrace(System.err)
         }
     }

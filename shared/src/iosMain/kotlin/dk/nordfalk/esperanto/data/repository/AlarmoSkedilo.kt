@@ -12,9 +12,9 @@ actual class AlarmoSkedilo actual constructor() {
         logd("AlarmoSkedilo", "malplani (NoOp): $alarmoId")
     }
 
-    actual fun reskediCxiujn(alarmoj: List<Alarmo>) {
-        logd("AlarmoSkedilo", "reskediCxiujn (NoOp): ${alarmoj.size} alarmoj")
+    actual fun reskediĈiujn(alarmoj: List<Alarmo>) {
+        logd("AlarmoSkedilo", "reskediĈiujn (NoOp): ${alarmoj.size} alarmoj")
     }
 }
-actual val subtenasVekhorlogxn: Boolean = false
+actual val subtenasVekhorloĝon: Boolean = false
 actual fun ekzaktajAlarmojPermesataj(): Boolean = true

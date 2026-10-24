@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
  */
 object SonfontoKodilo {
     /** Ŝlosilo en `MediaMetadata.extras`. */
-    const val SXLOSILO = "dk.nordfalk.esperanto.sonfonto"
+    const val ŜLOSILO = "dk.nordfalk.esperanto.sonfonto"
 
     private val json = Json { ignoreUnknownKeys = true }
 

@@ -31,7 +31,7 @@ open class ElsendoDeponejoImpl(
 
     /**
      * Nemutablaj momentfotoj anstataŭ mutableMapOf (PR #91): la mapoj estas
-     * legitaj (getElsendo/sercxi) dum alia korutino skribas — kun mutable mapo
+     * legitaj (getElsendo/serĉi) dum alia korutino skribas — kun mutable mapo
      * tio estis ConcurrentModificationException-risko. Skriboj nur per [konservu]
      * (Mutex); legoj estas sekuraj ĉar la momentfoto neniam ŝanĝiĝas surloke.
      */
@@ -87,7 +87,7 @@ open class ElsendoDeponejoImpl(
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    open suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
+    open suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
         val url = kanalo.podkastaRssUrl ?: run {
             logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
             return kaŝmemoro[kanalo.slug] ?: emptyList()
@@ -110,9 +110,9 @@ open class ElsendoDeponejoImpl(
             val respondo = httpKliento.get(url) { expectSuccess = true }.leguKorponLimigite()
             kontroluFluecon(respondo)
             logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
-            skribuKashon(kanalo.slug, respondo)
+            skribuKaŝon(kanalo.slug, respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto)
-                .ordigitajPlejFreshajUnue()
+                .ordigitajPlejFreŝajUnue()
             logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
             konservu(kanalo.slug, elsendoj)
             elsendoj
@@ -134,26 +134,26 @@ open class ElsendoDeponejoImpl(
         }
     }
 
-    override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
-        sxargxiElsendojn(kanalo, fortoRefresigi)
+    override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
+        ŝargiElsendojn(kanalo, fortoRefresigi)
 
     /**
      * Legas la krudan RSS-tekston el diskkaŝmemoro kaj re-parsas ĝin.
      * Se neniu kaŝo ekzistas, revenigas null.
      * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      */
-    suspend fun leguKashitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
+    suspend fun leguKaŝitajnElsendojn(kanalo: Kanalo): List<Elsendo>? {
         // La en-memora kaŝo jam havas la kanalon (el aŭ disko aŭ reto) — ne
         // re-legu kaj re-parsu la diskon senbezone (KMP-esplorado 2026-10-20:
         // la ekranoj vokas tion je ĉiu eniro).
         kaŝmemoro[kanalo.slug]?.let { return it }
-        val respondo = leguKashon(kanalo.slug) ?: return null
+        val respondo = leguKaŝon(kanalo.slug) ?: return null
         logd("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
         return try {
             // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
             // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
             kontroluFluecon(respondo)
-            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto).ordigitajPlejFreshajUnue()
+            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto).ordigitajPlejFreŝajUnue()
             konservu(kanalo.slug, elsendoj)
             logd("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj
@@ -164,7 +164,7 @@ open class ElsendoDeponejoImpl(
             // kaŝon, alikaze tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S).
             // logw (ne loge): tolerita, atendebla situacio — ne erar-evento.
             logw("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron — forigas la kaŝon", e)
-            foriguKashon(kanalo.slug)
+            foriguKaŝon(kanalo.slug)
             null
         }
     }
@@ -174,11 +174,11 @@ open class ElsendoDeponejoImpl(
      * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      * Redonas ĉiujn elsendojn kune (flat list).
      */
-    suspend fun leguĈiujnKashitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
+    suspend fun leguĈiujnKaŝitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
         val ĉiuj = mutableListOf<Elsendo>()
         for (kanalo in kanaloj) {
             if (!kanalo.havasPodkastojn) continue
-            leguKashitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
+            leguKaŝitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
         }
         logd("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
         return ĉiuj
@@ -192,7 +192,7 @@ open class ElsendoDeponejoImpl(
         return null
     }
 
-    override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> {
+    override suspend fun serĉiElsendojn(teksto: String, limo: Int): List<Elsendo> {
         val ĉiuj = kaŝmemoro.values.flatten()
         val rezulto = ĉiuj.filter {
             it.titolo.contains(teksto, ignoreCase = true) ||
@@ -223,4 +223,4 @@ open class ElsendoDeponejoImpl(
  * `LudvicoLogiko` kaj la kanal-vido supozas plej-freŝe-unue) — tial la deponejo
  * devigas la ordon ĉe unu loko.
  */
-internal fun List<Elsendo>.ordigitajPlejFreshajUnue(): List<Elsendo> = sortedByDescending { it.dato }
+internal fun List<Elsendo>.ordigitajPlejFreŝajUnue(): List<Elsendo> = sortedByDescending { it.dato }

@@ -29,7 +29,7 @@ class AgordojEkranoTest {
     }
 
     @Test
-    fun montrasAvertosignonCxeDiagnozoKiamProblemojEkzistas() = runComposeUiTest {
+    fun montrasAvertosignonĈeDiagnozoKiamProblemojEkzistas() = runComposeUiTest {
         val problemoj = kotlinx.coroutines.flow.MutableStateFlow(
             listOf(
                 DiagnozoRezulto(
@@ -52,7 +52,7 @@ class AgordojEkranoTest {
     }
 
     @Test
-    fun montrasSxaltilonPorDetalaProtokolado() = runComposeUiTest {
+    fun montrasŜaltilonPorDetalaProtokolado() = runComposeUiTest {
         setContent {
             AgordojEkrano(agordojDeponejo = AgordojDeponejoImpl(), onReen = {})
         }

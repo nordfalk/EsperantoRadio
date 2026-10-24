@@ -17,7 +17,7 @@ class DosierNomojTest {
     }
 
     @Test
-    fun sanigasChiujnNevalidajnSignojn() {
+    fun sanigasĈiujnNevalidajnSignojn() {
         val id = "a:b/c\\d?e*f\"g<h>i|j"
         val rezulto = sanigiDosiernomon(id)
         assertEquals("a-b-c-d-e-f-g-h-i-j", rezulto)

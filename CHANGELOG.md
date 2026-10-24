@@ -3,7 +3,7 @@
 Ĉiuj rimarkindaj, uzantvideblaj ŝanĝoj de EsperantoRadio.
 
 Unu linio po ŝanĝo: konciza priskribo + ligilo al la PR. Sen teknikaj detaloj —
-tiuj staras en [`SXANGXOJ.md`](SXANGXOJ.md) kaj en la PR-priskriboj.
+tiuj staras en [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj en la PR-priskriboj.
 La versioj sekvas `apoversio` en [`gradle/libs.versions.toml`](gradle/libs.versions.toml);
 la formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/) kun
 kategorioj **Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**, **Sekureco**.

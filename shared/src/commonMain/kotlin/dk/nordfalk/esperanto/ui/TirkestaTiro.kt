@@ -33,9 +33,9 @@ fun Modifier.tirkestoJeTroRulo(
     val konekto = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val sxovumo = tirkestStato.anchoredDraggableState
-                val ofseto = sxovumo.offset
-                val fermitaAnkro = sxovumo.anchors.positionOf(DrawerValue.Closed)
+                val ŝovumo = tirkestStato.anchoredDraggableState
+                val ofseto = ŝovumo.offset
+                val fermitaAnkro = ŝovumo.anchors.positionOf(DrawerValue.Closed)
                 if (ofseto.isNaN() || fermitaAnkro.isNaN()) return Offset.Zero
 
                 // Jam tirita per ĉi tiu gesto: sekvu la fingron ankaŭ reen (maldekstren)
@@ -43,14 +43,14 @@ fun Modifier.tirkestoJeTroRulo(
                 // Alie: komencu nur kiam la vico ne povas ruli pli reen kaj la tiro iras dekstren
                 if (!estasTirita && (vicoStato.canScrollBackward || available.x <= 0f)) return Offset.Zero
 
-                val konsumita = sxovumo.dispatchRawDelta(available.x)
+                val konsumita = ŝovumo.dispatchRawDelta(available.x)
                 return Offset(konsumita, 0f)
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                val sxovumo = tirkestStato.anchoredDraggableState
-                val ofseto = sxovumo.offset
-                val fermitaAnkro = sxovumo.anchors.positionOf(DrawerValue.Closed)
+                val ŝovumo = tirkestStato.anchoredDraggableState
+                val ofseto = ŝovumo.offset
+                val fermitaAnkro = ŝovumo.anchors.positionOf(DrawerValue.Closed)
                 if (ofseto.isNaN() || fermitaAnkro.isNaN()) return Velocity.Zero
 
                 if (ofseto > fermitaAnkro + 0.5f) {
@@ -58,7 +58,7 @@ fun Modifier.tirkestoJeTroRulo(
                     // kun la sojloj de la vera tirkesta gesto
                     logi("Tiro", "tro-tiro finita: solvas la tirkeston (ofseto=$ofseto, rapido=${available.x})")
                     @Suppress("DEPRECATION") // rapido-konscia settle — kiel la tirkesta gesto mem
-                    sxovumo.settle(available.x)
+                    ŝovumo.settle(available.x)
                 }
                 return Velocity.Zero
             }

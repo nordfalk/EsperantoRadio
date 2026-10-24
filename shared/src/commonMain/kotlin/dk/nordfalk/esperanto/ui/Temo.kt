@@ -16,44 +16,44 @@ import androidx.compose.ui.unit.sp
 // === Temoj ===
 
 enum class TemoNomo(val etikedo: String) {
-    RUGXA("Ruĝa Muzaiko"),
+    RUĜA("Ruĝa Muzaiko"),
     ANTONIA("Antonia (Figma)"),
     VERDA("Verda Esperanto"),
 }
 
 // === Ruĝa Muzaiko-koloroj ===
 
-private val Rugxo = Color(0xFFD0002F)
-private val RugxoMalhela = Color(0xFF9F001E)
-private val RugxoProfunda = Color(0xFF4F000E)
+private val Ruĝo = Color(0xFFD0002F)
+private val RuĝoMalhela = Color(0xFF9F001E)
+private val RuĝoProfunda = Color(0xFF4F000E)
 private val Kremo = Color(0xFFFAF6F2)
-private val KarbonoRugxa = Color(0xFF1A1413)
+private val KarbonoRuĝa = Color(0xFF1A1413)
 private val Argento = Color(0xFFE8E2DD)
 
-private val RugxaHela = lightColorScheme(
-    primary = Rugxo, onPrimary = Color.White,
-    primaryContainer = RugxoMalhela, onPrimaryContainer = Kremo,
-    secondary = KarbonoRugxa, onSecondary = Kremo,
-    secondaryContainer = Argento, onSecondaryContainer = KarbonoRugxa,
-    tertiary = RugxoProfunda, onTertiary = Kremo,
-    background = Kremo, onBackground = KarbonoRugxa,
-    surface = Color.White, onSurface = KarbonoRugxa,
-    surfaceVariant = Argento, onSurfaceVariant = KarbonoRugxa,
+private val RuĝaHela = lightColorScheme(
+    primary = Ruĝo, onPrimary = Color.White,
+    primaryContainer = RuĝoMalhela, onPrimaryContainer = Kremo,
+    secondary = KarbonoRuĝa, onSecondary = Kremo,
+    secondaryContainer = Argento, onSecondaryContainer = KarbonoRuĝa,
+    tertiary = RuĝoProfunda, onTertiary = Kremo,
+    background = Kremo, onBackground = KarbonoRuĝa,
+    surface = Color.White, onSurface = KarbonoRuĝa,
+    surfaceVariant = Argento, onSurfaceVariant = KarbonoRuĝa,
     outline = Argento, outlineVariant = Kremo,
-    error = Rugxo, onError = Color.White,
+    error = Ruĝo, onError = Color.White,
 )
 
-private val RugxaMalhela = darkColorScheme(
-    primary = Rugxo, onPrimary = Color.White,
-    primaryContainer = RugxoProfunda, onPrimaryContainer = Kremo,
-    secondary = Kremo, onSecondary = KarbonoRugxa,
+private val RuĝaMalhela = darkColorScheme(
+    primary = Ruĝo, onPrimary = Color.White,
+    primaryContainer = RuĝoProfunda, onPrimaryContainer = Kremo,
+    secondary = Kremo, onSecondary = KarbonoRuĝa,
     secondaryContainer = Color(0xFF3A3030), onSecondaryContainer = Kremo,
-    tertiary = RugxoMalhela, onTertiary = Kremo,
-    background = KarbonoRugxa, onBackground = Kremo,
+    tertiary = RuĝoMalhela, onTertiary = Kremo,
+    background = KarbonoRuĝa, onBackground = Kremo,
     surface = Color(0xFF241D1B), onSurface = Kremo,
     surfaceVariant = Color(0xFF3A3030), onSurfaceVariant = Argento,
-    outline = Color(0xFF3A3030), outlineVariant = KarbonoRugxa,
-    error = Rugxo, onError = Color.White,
+    outline = Color(0xFF3A3030), outlineVariant = KarbonoRuĝa,
+    error = Ruĝo, onError = Color.White,
 )
 
 // === Antonia-koloroj (de Figma) ===
@@ -127,7 +127,7 @@ private val VerdaMalhela = darkColorScheme(
 // === Elektilo ===
 
 fun temuKolorskemo(temo: TemoNomo, malhela: Boolean): ColorScheme = when (temo) {
-    TemoNomo.RUGXA -> if (malhela) RugxaMalhela else RugxaHela
+    TemoNomo.RUĜA -> if (malhela) RuĝaMalhela else RuĝaHela
     TemoNomo.ANTONIA -> if (malhela) AntoniaMalhela else AntoniaHela
     TemoNomo.VERDA -> if (malhela) VerdaMalhela else VerdaHela
 }

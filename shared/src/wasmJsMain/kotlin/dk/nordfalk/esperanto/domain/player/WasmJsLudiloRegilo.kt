@@ -16,9 +16,9 @@ import org.w3c.dom.events.Event
  */
 class WasmJsLudiloRegilo : LudiloRegilo {
     private var audio: HTMLAudioElement? = null
-    private var nunaLauxteco = 1f
-    private val _lauxteco = MutableStateFlow(1f)
-    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+    private var nunaLaŭteco = 1f
+    private val _laŭteco = MutableStateFlow(1f)
+    override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
     private var nunaFonto: Sonfonto? = null
@@ -35,14 +35,14 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         val url = getStreamUrl(fonto)
         audio = document.createElement("audio") as HTMLAudioElement
         audio!!.src = url
-        audio!!.volume = nunaLauxteco.toDouble() // reapliku la laŭtecon ankaŭ al nova fonto
+        audio!!.volume = nunaLaŭteco.toDouble() // reapliku la laŭtecon ankaŭ al nova fonto
         audio!!.currentTime = (komencoPozicioMs / 1000.0)
         audio!!.addEventListener("playing", { _ ->
             _stato.value = LudantoInformo(
                 stato = LudantoStato.Ludas,
                 nunaFonto = fonto,
                 pozicioMs = (audio!!.currentTime * 1000).toLong(),
-                dauroMs = if (audio!!.duration.isNaN()) 0 else (audio!!.duration * 1000).toLong(),
+                daŭroMs = if (audio!!.duration.isNaN()) 0 else (audio!!.duration * 1000).toLong(),
                 estasRekta = fonto is Sonfonto.RektaKanalo
             )
         })
@@ -63,14 +63,14 @@ class WasmJsLudiloRegilo : LudiloRegilo {
             val a = audio ?: return@addEventListener
             _stato.value = _stato.value.copy(
                 pozicioMs = (a.currentTime * 1000).toLong(),
-                dauroMs = if (a.duration.isNaN()) 0 else (a.duration * 1000).toLong(),
+                daŭroMs = if (a.duration.isNaN()) 0 else (a.duration * 1000).toLong(),
             )
         })
         _stato.value = LudantoInformo(
             stato = LudantoStato.Konektas,
             nunaFonto = fonto,
             pozicioMs = komencoPozicioMs,
-            dauroMs = 0,
+            daŭroMs = 0,
             estasRekta = fonto is Sonfonto.RektaKanalo
         )
     }
@@ -88,12 +88,12 @@ class WasmJsLudiloRegilo : LudiloRegilo {
             null
         }
     }
-    override fun pauxzigi() { audio?.pause() }
+    override fun paŭzigi() { audio?.pause() }
     override fun halti() { audio?.pause(); audio = null; nunaFonto = null; _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { audio?.currentTime = pozicioMs / 1000.0 }
-    override fun fiksiLauxtecon(volumeno: Float) {
-        nunaLauxteco = volumeno.coerceIn(0f, 1f)
-        audio?.volume = nunaLauxteco.toDouble()
-        _lauxteco.value = nunaLauxteco
+    override fun fiksiLaŭtecon(volumeno: Float) {
+        nunaLaŭteco = volumeno.coerceIn(0f, 1f)
+        audio?.volume = nunaLaŭteco.toDouble()
+        _laŭteco.value = nunaLaŭteco
     }
 }

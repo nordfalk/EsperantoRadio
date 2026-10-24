@@ -217,7 +217,7 @@ Aptoide havas API por aŭtomata alŝuto de APK/AAB.
 
 > **ATENTU (2026-10-13):** la CI-eldonado nuntempe **malsukcesas** — la GitHub-sekretoj
 > (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`) ne estas
-> konfiguritaj (vidu `SXANGXOJ.md`, 2026-10-12). Eldonu per la **loka maŝino**:
+> konfiguritaj (vidu `ŜANĜOJ.md`, 2026-10-12). Eldonu per la **loka maŝino**:
 > `./gradlew :androidApp:publishReleaseApk` kaj poste promocii permane en Play Console.
 
 La workflow-dosiero `.github/workflows/eldonado.yml` aŭtomate konstruas kaj eldonas:

@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 class KanalAgordoFumTesto {
 
     @Test
-    fun veraKanalkonfiguroParsigxasKajEstasSana() {
+    fun veraKanalkonfiguroParsiĝasKajEstasSana() {
         val teksto = leguBundledKanalkonfiguron()
         assertTrue(teksto.isNotBlank(), "La bundled konfiguro ne estu malplena")
 
@@ -44,7 +44,7 @@ class KanalAgordoFumTesto {
         // La ŝlosilo de apaj novaĵoj devas ekzisti en la konfiguro
         // (la enhavo povas esti malplena — tiam neniu dialogo montriĝas)
         assertNotNull(agordo.android, "La android-sekcio devas ekzisti en la konfiguro")
-        assertNotNull(agordo.android!!.apajNovajxoj, "apaj_novaĵoj devas ekzisti en la konfiguro")
+        assertNotNull(agordo.android!!.apajNovaĵoj, "apaj_novaĵoj devas ekzisti en la konfiguro")
 
         // Regulo P6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (PR #91)
         val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }

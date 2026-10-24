@@ -4,17 +4,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
-import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
@@ -36,10 +36,10 @@ internal val pElsendo = Elsendo(
     id = "kernpunkto:2024-01-01",
     kanaloSlug = "kernpunkto",
     titolo = "KP204 Pigmentoj kaj koloroj en la naturo",
-    priskribo = "Hodiaux ni parolas pri pigmentoj kaj koloroj en la naturon.",
+    priskribo = "Hodiaŭ ni parolas pri pigmentoj kaj koloroj en la naturon.",
     fluo = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
     dato = "2024-01-01",
-    dauro = 6916,
+    daŭro = 6916,
 )
 
 internal fun pKanaloDeponejo() = object : KanaloDeponejo {
@@ -49,8 +49,8 @@ internal fun pKanaloDeponejo() = object : KanaloDeponejo {
     override suspend fun getKanalo(slug: String) = f.value.find { it.slug == slug }
 }
 
-internal fun pSercxoDeponejo() = object : SercxoDeponejo {
-    override suspend fun sercxi(teksto: String, limo: Int) =
+internal fun pSerĉoDeponejo() = object : SerĉoDeponejo {
+    override suspend fun serĉi(teksto: String, limo: Int) =
         if (teksto.length >= 2) listOf(pElsendo) else emptyList()
 }
 
@@ -61,15 +61,15 @@ internal fun pPlejŝatatajDeponejo() = object : PlejŝatatajDeponejo {
     override suspend fun estasPlejŝatata(kanaloSlug: String) = kanaloSlug in s.value
 }
 
-internal fun pElshutDeponejo() = object : ElshutDeponejo {
-    private val e = MutableStateFlow(mapOf(pElsendo.id to ElshutitaElsendo(pElsendo, "/tmp/test.mp3", ElshutStato.Preta, dosierGrando = 55_300_000)))
-    override fun observiElshutojn() = e.asStateFlow()
-    override fun observiElshutStaton(elsendoId: String) = MutableStateFlow(ElshutStato.Preta).asStateFlow()
-    override suspend fun elshuti(elsendo: Elsendo) {}
+internal fun pElŝutDeponejo() = object : ElŝutDeponejo {
+    private val e = MutableStateFlow(mapOf(pElsendo.id to ElŝutitaElsendo(pElsendo, "/tmp/test.mp3", ElŝutStato.Preta, dosierGrando = 55_300_000)))
+    override fun observiElŝutojn() = e.asStateFlow()
+    override fun observiElŝutStaton(elsendoId: String) = MutableStateFlow(ElŝutStato.Preta).asStateFlow()
+    override suspend fun elŝuti(elsendo: Elsendo) {}
     override suspend fun haltigi(elsendoId: String) {}
     override suspend fun forigi(elsendoId: String) {}
     override suspend fun getLokaDosieroVojo(elsendoId: String) = "/tmp/test.mp3"
-    override fun estasElshutita(elsendoId: String) = true
+    override fun estasElŝutita(elsendoId: String) = true
 }
 
 internal fun pAlarmoDeponejo() = MemorAlarmoDeponejo(
@@ -85,7 +85,7 @@ internal fun pLudatojDeponejo(
             elsendoId = pElsendo.id,
             kanaloSlug = "kernpunkto",
             pozicioMs = 3_000_000,
-            dauroMs = 6_916_000,
+            daŭroMs = 6_916_000,
             finita = false,
             lasteLudita = 1_704_067_200_000, // 2024-01-01
         ),
@@ -93,7 +93,7 @@ internal fun pLudatojDeponejo(
 ) = object : dk.nordfalk.esperanto.domain.repository.LudatojDeponejo {
     private val f = MutableStateFlow(ludatoj)
     override fun observiLudatojn() = f.asStateFlow()
-    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {}
+    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long) {}
     override suspend fun markiLudita(elsendoId: String, kanaloSlug: String) {}
     override suspend fun markiFinita(elsendoId: String, kanaloSlug: String) {}
     override suspend fun markiErara(elsendoId: String, kanaloSlug: String) {}
@@ -117,17 +117,17 @@ internal class PreviewLudiloRegilo(initial: LudantoInformo = LudantoInformo(stat
         s.value = LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = fonto, pozicioMs = komencoPozicioMs, estasRekta = fonto is Sonfonto.RektaKanalo)
     }
     override fun ludi() { s.value = s.value.copy(stato = LudantoStato.Ludas) }
-    override fun pauxzigi() { s.value = s.value.copy(stato = LudantoStato.Haltita) }
+    override fun paŭzigi() { s.value = s.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { s.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { s.value = s.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
-    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
+    override fun fiksiLaŭtecon(volumeno: Float) {}
+    override val laŭteco: StateFlow<Float> = MutableStateFlow(1f)
 }
 
 internal class PreviewElsendoDeponejo(
     private val elsendoj: List<Elsendo>,
 ) : ElsendoDeponejoImpl(HttpClient(httpMotoro)) {
-    override suspend fun sxargxiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
+    override suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
         konservu(kanalo.slug, elsendoj)
         return elsendoj
     }

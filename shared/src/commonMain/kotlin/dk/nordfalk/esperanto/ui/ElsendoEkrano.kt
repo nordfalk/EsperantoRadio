@@ -33,13 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
@@ -52,28 +52,28 @@ fun ElsendoEkrano(
     elsendo: Elsendo,
     onReen: () -> Unit,
     onLudi: () -> Unit = {},
-    onElshuti: () -> Unit = {},
-    onHaltigiElshuton: () -> Unit = {},
-    onForigiElshuton: () -> Unit = {},
+    onElŝuti: () -> Unit = {},
+    onHaltigiElŝuton: () -> Unit = {},
+    onForigiElŝuton: () -> Unit = {},
     onKanalo: (Kanalo) -> Unit = {},
     onAldoniAlVico: () -> Unit = {},
     onMontriLudvicon: () -> Unit = {},
     kanalo: Kanalo? = null,
-    elshutDeponejo: ElshutDeponejo? = null,
+    elŝutDeponejo: ElŝutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
     agordojDeponejo: AgordojDeponejo? = null,
     /**
      * Paŭzigi/daŭrigi tra [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] (PR #92):
-     * rekta `ludilo.pauxzigi()` ne nuligas planitan reprovon, kiu rekomencigus la ludadon.
+     * rekta `ludilo.paŭzigi()` ne nuligas planitan reprovon, kiu rekomencigus la ludadon.
      */
-    onPauxzigi: () -> Unit = { ludilo?.pauxzigi() },
-    onDaurigi: () -> Unit = { ludilo?.ludi() },
+    onPaŭzigi: () -> Unit = { ludilo?.paŭzigi() },
+    onDaŭrigi: () -> Unit = { ludilo?.ludi() },
 ) {
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
 
-    val elshutStato by (elshutDeponejo?.observiElshutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElshutStato>(ElshutStato.NeElshutita) })
+    val elŝutStato by (elŝutDeponejo?.observiElŝutStaton(elsendo.id)?.collectAsState() ?: remember { mutableStateOf<ElŝutStato>(ElŝutStato.NeElŝutita) })
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap<String, LudataElsendo>()) })
     val ludato = ludatojMapo[elsendo.id]
     val savitaPozicio = ludato?.pozicioMs?.takeIf { it > 0 && !ludato.finita }
@@ -85,7 +85,7 @@ fun ElsendoEkrano(
         is Sonfonto.LokaElsendo -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Ludas
         else -> false
     }
-    val tiuElsendoPauxzita = when (nunaFonto) {
+    val tiuElsendoPaŭzita = when (nunaFonto) {
         is Sonfonto.ElsendoFonto -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Haltita
         is Sonfonto.LokaElsendo -> nunaFonto.elsendo.id == elsendo.id && ludantoStato.stato is LudantoStato.Haltita
         else -> false
@@ -147,22 +147,22 @@ fun ElsendoEkrano(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IkonoButono(
-                        ikono = when (elshutStato) {
-                            is ElshutStato.Preta -> Icons.Filled.Check
-                            is ElshutStato.Elshutanta -> Icons.Filled.Stop
+                        ikono = when (elŝutStato) {
+                            is ElŝutStato.Preta -> Icons.Filled.Check
+                            is ElŝutStato.Elŝutanta -> Icons.Filled.Stop
                             else -> Icons.Filled.Download
                         },
-                        label = when (elshutStato) {
-                            is ElshutStato.Elshutanta -> "Haltigi elŝuton"
+                        label = when (elŝutStato) {
+                            is ElŝutStato.Elŝutanta -> "Haltigi elŝuton"
                             else -> "Elŝuti"
                         },
                         onClick = {
-                            when (elshutStato) {
-                                is ElshutStato.NeElshutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") }
-                                is ElshutStato.Elshutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElshuton(); montruMesaĝon("Elŝuto haltigita") }
-                                is ElshutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton(); montruMesaĝon("Elŝuto forigita") }
-                                is ElshutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") }
-                                is ElshutStato.Pauxzita -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") }
+                            when (elŝutStato) {
+                                is ElŝutStato.NeElŝutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta...") }
+                                is ElŝutStato.Elŝutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") }
+                                is ElŝutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") }
+                                is ElŝutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
+                                is ElŝutStato.Paŭzita -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
                                 else -> {}
                             }
                         },
@@ -174,8 +174,8 @@ fun ElsendoEkrano(
                         label = if (tiuElsendoLudas) "Paŭzigi" else "Ludi",
                         onClick = {
                             when {
-                                tiuElsendoLudas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); onPauxzigi(); montruMesaĝon("Paŭzigita") }
-                                tiuElsendoPauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaurigi(); montruMesaĝon("Daŭriganta") }
+                                tiuElsendoLudas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); onPaŭzigi(); montruMesaĝon("Paŭzigita") }
+                                tiuElsendoPaŭzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaŭrigi(); montruMesaĝon("Daŭriganta") }
                                 else -> { logi("Klako", "aŭskulti — ${elsendo.id}"); onLudi(); montruMesaĝon("Ludanta: ${elsendo.titolo}") }
                             }
                         },
@@ -201,17 +201,17 @@ fun ElsendoEkrano(
             )
             Spacer(Modifier.height(4.dp))
 
-            // Dato kaj dauro
-            val dauro = elsendo.dauro
-            val dauroTeksto = if (dauro != null && dauro > 0) {
-                val hor = dauro / 3600
-                val min = (dauro % 3600) / 60
+            // Dato kaj daŭro
+            val daŭro = elsendo.daŭro
+            val daŭroTeksto = if (daŭro != null && daŭro > 0) {
+                val hor = daŭro / 3600
+                val min = (daŭro % 3600) / 60
                 "${elsendo.dato} · ${hor}:${min.toString().padStart(2, '0')}"
             } else {
                 elsendo.dato
             }
             Text(
-                text = dauroTeksto,
+                text = daŭroTeksto,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -238,8 +238,8 @@ fun ElsendoEkrano(
                 val min = savitaPozicio / 60000
                 val sek = (savitaPozicio % 60000) / 1000
                 val pozicioTeksto = "${min}:${sek.toString().padStart(2, '0')}"
-                val dauroMs = (elsendo.dauro ?: 0L) * 1000
-                val progreso = if (dauroMs > 0) (savitaPozicio.toFloat() / dauroMs).coerceIn(0f, 1f) else 0f
+                val daŭroMs = (elsendo.daŭro ?: 0L) * 1000
+                val progreso = if (daŭroMs > 0) (savitaPozicio.toFloat() / daŭroMs).coerceIn(0f, 1f) else 0f
                 LinearProgressIndicator(
                     progress = { progreso },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
@@ -255,12 +255,12 @@ fun ElsendoEkrano(
 
             // Priskribo
             val evoluo = agordojDeponejo?.evoluo?.collectAsState()?.value ?: false
-            val defauxltaUzuWebView = kanalo?.uzuWebViewPorElsendo == true
+            val defaŭltaUzuWebView = kanalo?.uzuWebViewPorElsendo == true
 
             // Evolua reĝimo: elektiloj por fonto kaj vidmaniero
             if (evoluo) {
                 var fontoHtml by remember(elsendo.id) { mutableStateOf(true) }
-                var vidmaniero by remember(elsendo.id) { mutableStateOf(if (defauxltaUzuWebView) 0 else 1) }
+                var vidmaniero by remember(elsendo.id) { mutableStateOf(if (defaŭltaUzuWebView) 0 else 1) }
 
                 Surface(
                     tonalElevation = 2.dp,
@@ -320,7 +320,7 @@ fun ElsendoEkrano(
                 if (!html.isNullOrBlank()) {
                     HtmlVido(
                         html = html,
-                        uzuWebView = defauxltaUzuWebView,
+                        uzuWebView = defaŭltaUzuWebView,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -333,12 +333,12 @@ fun ElsendoEkrano(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     tiuElsendoLudas -> Button(
-                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); onPauxzigi(); montruMesaĝon("Paŭzigita") },
+                        onClick = { logi("Klako", "paŭzigi — ${elsendo.id}"); onPaŭzigi(); montruMesaĝon("Paŭzigita") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzigi") }
 
-                    tiuElsendoPauxzita -> Button(
-                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaurigi(); montruMesaĝon("Daŭriganta") },
+                    tiuElsendoPaŭzita -> Button(
+                        onClick = { logi("Klako", "daŭrigi — ${elsendo.id}"); onDaŭrigi(); montruMesaĝon("Daŭriganta") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.PlayArrow, contentDescription = null); Text(" Daŭrigi") }
 
@@ -351,32 +351,32 @@ fun ElsendoEkrano(
                     }
                 }
 
-                when (elshutStato) {
-                    is ElshutStato.NeElshutita -> OutlinedButton(
-                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Elŝutanta...") },
+                when (elŝutStato) {
+                    is ElŝutStato.NeElŝutita -> OutlinedButton(
+                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta...") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Download, contentDescription = null); Text(" Elŝuti") }
 
-                    is ElshutStato.Elshutanta -> {
-                        val p = (elshutStato as ElshutStato.Elshutanta).progreso
+                    is ElŝutStato.Elŝutanta -> {
+                        val p = (elŝutStato as ElŝutStato.Elŝutanta).progreso
                         OutlinedButton(
-                            onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElshuton(); montruMesaĝon("Elŝuto haltigita") },
+                            onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") },
                             modifier = Modifier.weight(1f)
                         ) { Icon(Icons.Filled.Stop, contentDescription = null); Text(" ${((p * 100).toInt())}%") }
                     }
 
-                    is ElshutStato.Preta -> OutlinedButton(
-                        onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElshuton(); montruMesaĝon("Elŝuto forigita") },
+                    is ElŝutStato.Preta -> OutlinedButton(
+                        onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Check, contentDescription = null); Text(" Elŝutita — Forigi") }
 
-                    is ElshutStato.Eraro -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
+                    is ElŝutStato.Eraro -> OutlinedButton(
+                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Warning, contentDescription = null); Text(" Eraro — reprovi") }
 
-                    is ElshutStato.Pauxzita -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElshuti(); montruMesaĝon("Reprovas elŝuti") },
+                    is ElŝutStato.Paŭzita -> OutlinedButton(
+                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzita — reprovi") }
                 }
@@ -403,12 +403,12 @@ fun ElsendoEkrano(
                     modifier = Modifier.weight(1f)
                 ) { Icon(Icons.Filled.QueueMusic, contentDescription = null); Text(" Aldoni al ludvico") }
 
-                if (kanalo?.retposhto != null) {
+                if (kanalo?.retpoŝto != null) {
                     OutlinedButton(
                         onClick = {
                             logi("Klako", "retpoŝto el elsendo ${elsendo.id}")
-                            malfermuRetposhton(
-                                retposhto = kanalo.retposhto,
+                            malfermuRetpoŝton(
+                                retpoŝto = kanalo.retpoŝto,
                                 temo = "Pri ${kanalo.nomo}",
                                 teksto = "Mi aŭskultas la elsendon (${elsendo.titolo} — ${elsendo.dato}) kaj havas komenton",
                             )
@@ -439,19 +439,19 @@ fun ElsendoEkranoKunSvipo(
      */
     onVidataElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
-    onElshuti: (Elsendo) -> Unit = {},
-    onHaltigiElshuton: (Elsendo) -> Unit = {},
-    onForigiElshuton: (Elsendo) -> Unit = {},
+    onElŝuti: (Elsendo) -> Unit = {},
+    onHaltigiElŝuton: (Elsendo) -> Unit = {},
+    onForigiElŝuton: (Elsendo) -> Unit = {},
     onKanalo: (Kanalo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     onMontriLudvicon: () -> Unit = {},
     kanalo: Kanalo? = null,
-    elshutDeponejo: ElshutDeponejo? = null,
+    elŝutDeponejo: ElŝutDeponejo? = null,
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
     agordojDeponejo: AgordojDeponejo? = null,
-    onPauxzigi: () -> Unit = { ludilo?.pauxzigi() },
-    onDaurigi: () -> Unit = { ludilo?.ludi() },
+    onPaŭzigi: () -> Unit = { ludilo?.paŭzigi() },
+    onDaŭrigi: () -> Unit = { ludilo?.ludi() },
 ) {
     if (elsendoj.size <= 1) {
         // Ne eblas svipi — montru nur la unuan elsendon
@@ -460,51 +460,51 @@ fun ElsendoEkranoKunSvipo(
             elsendo = e,
             onReen = onReen,
             onLudi = { onLudi(e) },
-            onElshuti = { onElshuti(e) },
-            onHaltigiElshuton = { onHaltigiElshuton(e) },
-            onForigiElshuton = { onForigiElshuton(e) },
+            onElŝuti = { onElŝuti(e) },
+            onHaltigiElŝuton = { onHaltigiElŝuton(e) },
+            onForigiElŝuton = { onForigiElŝuton(e) },
             onKanalo = onKanalo,
             onAldoniAlVico = { onAldoniAlVico(e) },
             onMontriLudvicon = onMontriLudvicon,
             kanalo = kanalo,
-            elshutDeponejo = elshutDeponejo,
+            elŝutDeponejo = elŝutDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
             agordojDeponejo = agordojDeponejo,
-            onPauxzigi = onPauxzigi,
-            onDaurigi = onDaurigi,
+            onPaŭzigi = onPaŭzigi,
+            onDaŭrigi = onDaŭrigi,
         )
         LaunchedEffect(e) { onVidataElsendo(e) }
         return
     }
 
-    val komencaPagho = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
-    val paghoStato = rememberPagerState(initialPage = komencaPagho) { elsendoj.size }
+    val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
+    val paĝoStato = rememberPagerState(initialPage = komencaPaĝo) { elsendoj.size }
 
-    // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam pagho ekvidiĝas (settledPage)
-    LaunchedEffect(paghoStato.settledPage, elsendoj) {
-        elsendoj.getOrNull(paghoStato.settledPage)?.let(onVidataElsendo)
+    // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam paĝo ekvidiĝas (settledPage)
+    LaunchedEffect(paĝoStato.settledPage, elsendoj) {
+        elsendoj.getOrNull(paĝoStato.settledPage)?.let(onVidataElsendo)
     }
 
-    HorizontalPager(state = paghoStato) { pagho ->
-        val e = elsendoj[pagho]
+    HorizontalPager(state = paĝoStato) { paĝo ->
+        val e = elsendoj[paĝo]
         ElsendoEkrano(
             elsendo = e,
             onReen = onReen,
             onLudi = { onLudi(e) },
-            onElshuti = { onElshuti(e) },
-            onHaltigiElshuton = { onHaltigiElshuton(e) },
-            onForigiElshuton = { onForigiElshuton(e) },
+            onElŝuti = { onElŝuti(e) },
+            onHaltigiElŝuton = { onHaltigiElŝuton(e) },
+            onForigiElŝuton = { onForigiElŝuton(e) },
             onKanalo = onKanalo,
             onAldoniAlVico = { onAldoniAlVico(e) },
             onMontriLudvicon = onMontriLudvicon,
             kanalo = kanalo,
-            elshutDeponejo = elshutDeponejo,
+            elŝutDeponejo = elŝutDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             ludilo = ludilo,
             agordojDeponejo = agordojDeponejo,
-            onPauxzigi = onPauxzigi,
-            onDaurigi = onDaurigi,
+            onPaŭzigi = onPaŭzigi,
+            onDaŭrigi = onDaŭrigi,
         )
     }
 }
@@ -541,5 +541,5 @@ private fun IkonoButono(
 @Preview(name = "ElsendoEkrano", showBackground = true, heightDp = 500)
 @Composable
 fun ElsendoEkranoPreview() {
-    pTemo { ElsendoEkrano(elsendo = pElsendo, onReen = {}, onLudi = {}, onElshuti = {}) }
+    pTemo { ElsendoEkrano(elsendo = pElsendo, onReen = {}, onLudi = {}, onElŝuti = {}) }
 }

@@ -15,18 +15,18 @@ import kotlinx.coroutines.flow.asStateFlow
  * Decido: Uzas Settings (key-value store) kun komma-disigita listo.
  * Simplaj kaj sufiĉa por malgranda nombro da kanaloj.
  *
- * Je unua lanĉo (kiam la ŝlosilo ne ekzistas en Settings), la [defaltajSxatataj]
+ * Je unua lanĉo (kiam la ŝlosilo ne ekzistas en Settings), la [defaŭltajŜatataj]
  * estas uzataj kiel komencaj ŝatataj kanaloj. La uzanto povas poste aldoni aŭ
  * forigi kanalojn libere — la malplena listo estas respektata post unua skribo.
  */
 class PersistantaPlejŝatatajDeponejo(
     private val settings: Settings,
-    private val defaltajSxatataj: Set<String> = emptySet(),
+    private val defaŭltajŜatataj: Set<String> = emptySet(),
 ) : PlejŝatatajDeponejo {
 
     private fun legu(): Set<String> {
         if (!settings.hasKey(SettingsKeys.PLEJŜATATAJ_KANALOJ)) {
-            return defaltajSxatataj
+            return defaŭltajŜatataj
         }
         val str = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
         return if (str.isEmpty()) emptySet() else str.split(",").toSet()

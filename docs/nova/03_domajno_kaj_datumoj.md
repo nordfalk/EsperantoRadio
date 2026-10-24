@@ -18,7 +18,7 @@ data class Kanalo(
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,            // hejmpaĝoButono
-    val retposhto: String? = null,
+    val retpoŝto: String? = null,
     val ignoruTitolon: Boolean = false,        // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
@@ -43,13 +43,13 @@ data class Elsendo(
     val kanaloSlug: String,
     val kanaloNomo: String? = null,   // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,
-    val priskribo: String? = null,    // purigita plata teksto (por listoj, sercxo)
+    val priskribo: String? = null,    // purigita plata teksto (por listoj, serĉo)
     val priskriboHtml: String? = null, // purigita HTML kun etikedoj (por detala vido)
     val bildoUrl: String? = null,
     val dato: String,                 // yyyy-MM-dd
-    val dauro: Long? = null,          // sekundoj
+    val daŭro: Long? = null,          // sekundoj
     val fluo: String,                 // audio-URL (mp3) — la plej grava kampo
-    val retpaghoUrl: String? = null,
+    val retpaĝoUrl: String? = null,
     val estasRekta: Boolean = false,
 )
 ```
@@ -83,7 +83,7 @@ data class LudantoInformo(
     val stato: LudantoStato,
     val nunaFonto: Sonfonto? = null,
     val pozicioMs: Long = 0,
-    val dauroMs: Long = 0,
+    val daŭroMs: Long = 0,
     val estasRekta: Boolean = false,
 )
 ```
@@ -96,7 +96,7 @@ data class LudataElsendo(
     val elsendoId: String,
     val kanaloSlug: String,
     val pozicioMs: Long = 0,
-    val dauroMs: Long = 0,
+    val daŭroMs: Long = 0,
     val finita: Boolean = false,
     val erara: Boolean = false,
     val lasteLudita: Long = 0,  // epoch ms
@@ -110,8 +110,8 @@ Uzata de `LudvicoRegilo`.
 
 ```kotlin
 @Serializable data class Alarmo(val id: Int, val horo: Int, val minuto: Int, val ripeto: String, val kanaloSlug: String, val aktiva: Boolean)
-@Serializable data class ElshutStato(val elsendoId: String, val stato: ElshutStatoEnum, val progres: Float, val dosieroVojo: String?)
-@Serializable data class ElshutitaElsendo(val elsendo: Elsendo, val dosieroVojo: String, val grandeco: Long, val dauroMs: Long?)
+@Serializable data class ElŝutStato(val elsendoId: String, val stato: ElŝutStatoEnum, val progres: Float, val dosieroVojo: String?)
+@Serializable data class ElŝutitaElsendo(val elsendo: Elsendo, val dosieroVojo: String, val grandeco: Long, val daŭroMs: Long?)
 ```
 
 ## Deponej-interfacoj (`shared/domain/repository/`)
@@ -127,8 +127,8 @@ interface ElsendoDeponejo {
     fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>>
     suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean = false): List<Elsendo>
     suspend fun getElsendo(id: String): Elsendo?
-    suspend fun sercxiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
-    suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo>
+    suspend fun serĉiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo>
 }
 ```
 
@@ -137,19 +137,19 @@ Personigo-interfacoj (`PersonigoDeponejoj.kt`):
 ```kotlin
 interface PlejŝatatajDeponejo {
     fun observiPlejŝatatajn(): StateFlow<Set<String>>  // kanalo-slugs
-    suspend fun baskuliPlejsxaton(kanaloSlug: String)
-    suspend fun estasPlejsxatata(kanaloSlug: String): Boolean
+    suspend fun baskuliPlejŝaton(kanaloSlug: String)
+    suspend fun estasPlejŝatata(kanaloSlug: String): Boolean
 }
 
-interface LastAuxskultitajDeponejo {
-    fun observiLastAuxskultitajn(): StateFlow<List<Elsendo>>
+interface LastAŭskultitajDeponejo {
+    fun observiLastAŭskultitajn(): StateFlow<List<Elsendo>>
     suspend fun registri(elsendo: Elsendo)
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
 interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
-    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long)
     suspend fun markiFinita(elsendoId: String, kanaloSlug: String)
     suspend fun markiErara(elsendoId: String, kanaloSlug: String)
     suspend fun malmarkiFinita(elsendoId: String, kanaloSlug: String)
@@ -158,35 +158,35 @@ interface LudatojDeponejo {
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
-interface SercxoDeponejo {
-    suspend fun sercxi(teksto: String, limo: Int = 50): List<Elsendo>
+interface SerĉoDeponejo {
+    suspend fun serĉi(teksto: String, limo: Int = 50): List<Elsendo>
 }
 
 interface AgordojDeponejo {
     val temo: StateFlow<String>
     val sciigoj: StateFlow<Boolean>
-    val auxtomataDaurigo: StateFlow<Boolean>
+    val aŭtomataDaŭrigo: StateFlow<Boolean>
     val evoluo: StateFlow<Boolean>
     fun fiksiTemon(temo: String)
-    fun fiksiSciigojn(sxaltita: Boolean)
-    fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
-    fun fiksiEvoluon(sxaltita: Boolean)
+    fun fiksiSciigojn(ŝaltita: Boolean)
+    fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
+    fun fiksiEvoluon(ŝaltita: Boolean)
 }
 
-interface ElshutDeponejo {
-    fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>>
-    fun observiElshutStaton(elsendoId: String): StateFlow<ElshutStato>
-    suspend fun elshuti(elsendo: Elsendo)
+interface ElŝutDeponejo {
+    fun observiElŝutojn(): StateFlow<Map<String, ElŝutitaElsendo>>
+    fun observiElŝutStaton(elsendoId: String): StateFlow<ElŝutStato>
+    suspend fun elŝuti(elsendo: Elsendo)
     suspend fun haltigi(elsendoId: String)
     suspend fun forigi(elsendoId: String)
     suspend fun getLokaDosieroVojo(elsendoId: String): String?
-    fun estaElshutita(elsendoId: String): Boolean
+    fun estaElŝutita(elsendoId: String): Boolean
 }
 
 interface AlarmoDeponejo {
     fun observiAlarmojn(): StateFlow<List<Alarmo>>
     suspend fun krei(alarmo: Alarmo)
-    suspend fun ghisdatigi(alarmo: Alarmo)
+    suspend fun ĝisdatigi(alarmo: Alarmo)
     suspend fun forigi(alarmoId: Int)
     suspend fun baskuliAktivon(alarmoId: Int)
 }
@@ -215,7 +215,7 @@ Ne ekzistas aparta reto-interfaco — la `HttpClient` estas enketigata rekte.
 ```kotlin
 class ElsendoDeponejoImpl(
     val httpKliento: HttpClient,
-    val dosierKasho: DosierKasho,
+    val dosierKaŝo: DosierKaŝo,
 ) : ElsendoDeponejo { ... }
 ```
 
@@ -224,7 +224,7 @@ class ElsendoDeponejoImpl(
 - **multiplatform-settings** por agordoj (temo, sciigoj, daŭrigo, evoluo)
 - **JSON-dosieroj** (legitaj/skribitaj per Settings + kotlinx.serialization) por:
   alarmoj, ludpozicioj (`LudataElsendo`), elŝutitaj elsendoj, plejŝatataj
-- **dosierkaŝmemoro** (`DosierKasho`, expect/actual) por servil-respondoj
+- **dosierkaŝmemoro** (`DosierKaŝo`, expect/actual) por servil-respondoj
 
 ## Toleremeco al putrantaj fontoj
 
@@ -242,14 +242,14 @@ interface LudiloRegilo {
     val stato: StateFlow<LudantoInformo>
     suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
     fun ludi()
-    fun pauxzigi()
+    fun paŭzigi()
     fun halti()
     fun saltiAl(pozicioMs: Long)
-    fun fiksiLauxtecon(volumeno: Float)
+    fun fiksiLaŭtecon(volumeno: Float)
 }
 
 // commonMain — expect-fabriko
-expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
+expect fun kreuDefaŭltanLudiloRegilon(): LudiloRegilo
 ```
 
 - **Android:** Media3 ExoPlayer + `MediaSessionService` → malfona ludado, mediasciigo, mediabutonoj.

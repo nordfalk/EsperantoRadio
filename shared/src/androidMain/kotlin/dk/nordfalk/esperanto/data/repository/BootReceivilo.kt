@@ -12,9 +12,9 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import kotlinx.serialization.json.Json
 
 /**
- * BroadcastReceiver kiu re-planas cxiujn alarmojn post kiam la aparato restartis.
+ * BroadcastReceiver kiu re-planas ĉiujn alarmojn post kiam la aparato restartis.
  *
- * Legas la persistitajn alarmojn el Settings kaj vokas AlarmoSkedilo.reskediCxiujn().
+ * Legas la persistitajn alarmojn el Settings kaj vokas AlarmoSkedilo.reskediĈiujn().
  */
 class BootReceivilo : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -34,12 +34,12 @@ class BootReceivilo : BroadcastReceiver() {
             val sciigoj = settings.getBoolean(SettingsKeys.SCIIGOJ, true)
             val plejStr = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
             val plejŝatataj = if (plejStr.isBlank()) emptySet() else plejStr.split(",").toSet()
-            ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
+            ĝisdatiguSciigSkedon(plejŝatataj, sciigoj)
             val alarmoj = leguPersistitajnAlarmojn()
             logi("BootReceivilo", "Legis ${alarmoj.size} alarmojn, re-planas")
 
             val skedilo = AlarmoSkedilo()
-            skedilo.reskediCxiujn(alarmoj)
+            skedilo.reskediĈiujn(alarmoj)
         } catch (e: Exception) {
             logw("BootReceivilo", "Eraro re-planante alarmojn", e)
         }

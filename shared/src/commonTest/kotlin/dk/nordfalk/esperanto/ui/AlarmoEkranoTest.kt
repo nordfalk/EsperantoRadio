@@ -25,7 +25,7 @@ class AlarmoEkranoTest {
         private val _alarmoj = MutableStateFlow(alarmoj)
         override fun observiAlarmojn(): StateFlow<List<Alarmo>> = _alarmoj.asStateFlow()
         override suspend fun krei(alarmo: Alarmo) { _alarmoj.value = _alarmoj.value + alarmo }
-        override suspend fun ghisdatigi(alarmo: Alarmo) {
+        override suspend fun ĝisdatigi(alarmo: Alarmo) {
             _alarmoj.value = _alarmoj.value.map { if (it.id == alarmo.id) alarmo else it }
         }
         override suspend fun forigi(alarmoId: Int) {
@@ -51,7 +51,7 @@ class AlarmoEkranoTest {
     )
 
     @Test
-    fun montrasHelpmesagxonKiamMalplena() = runComposeUiTest {
+    fun montrasHelpmesaĝonKiamMalplena() = runComposeUiTest {
         val deponejo = FalsaAlarmoDeponejo(emptyList())
         setContent {
             AlarmoEkrano(

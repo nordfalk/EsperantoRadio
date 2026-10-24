@@ -58,7 +58,7 @@ fun MiniLudilbreto(
     reprovo: Int = 0,
     /** Ĉu la ludilbreto estas elfaldigita (hoistita ŝtato — regata de App.kt). */
     elfaldita: Boolean = false,
-    onElfalditaSxangxo: (Boolean) -> Unit = {},
+    onElfalditaŜanĝo: (Boolean) -> Unit = {},
     /** Sekvanta enhavo kiam nenio ludas — la breto sekvas la navigadon. */
     sekvantaTitolo: String? = null,
     sekvantaSubtitolo: String? = null,
@@ -69,10 +69,10 @@ fun MiniLudilbreto(
      * Rekta `ludilo.halti()` ne nuligas reprovon kaj povas reprovo-rekomencigi la ludadon (PR #89).
      */
     onHaltigi: suspend () -> Unit = { ludilo.halti() },
-    /** Paŭzigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.pauxziguLudadon] (PR #92). */
-    onPauxzigi: suspend () -> Unit = { ludilo.pauxzigi() },
-    /** Daŭrigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.dauriguLudadon] (PR #92). */
-    onDaurigi: suspend () -> Unit = { ludilo.ludi() },
+    /** Paŭzigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.paŭziguLudadon] (PR #92). */
+    onPaŭzigi: suspend () -> Unit = { ludilo.paŭzigi() },
+    /** Daŭrigi — transdonu [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.daŭriguLudadon] (PR #92). */
+    onDaŭrigi: suspend () -> Unit = { ludilo.ludi() },
 ) {
     val stato by ludilo.stato.collectAsState()
     val info = stato
@@ -115,7 +115,7 @@ fun MiniLudilbreto(
         is Sonfonto.LokaElsendo -> fonto.elsendo.bildoUrl
     }
 
-    val estasPodkasto = !info.estasRekta && info.dauroMs > 0
+    val estasPodkasto = !info.estasRekta && info.daŭroMs > 0
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -196,7 +196,7 @@ fun MiniLudilbreto(
                 IconButton(onClick = {
                     logi("Klako", if (ludas) "paŭzigi" else "ludi")
                     scope.launch {
-                        if (ludas) onPauxzigi() else onDaurigi()
+                        if (ludas) onPaŭzigi() else onDaŭrigi()
                     }
                 }) {
                     val konektas = info.stato is LudantoStato.Konektas ||
@@ -231,7 +231,7 @@ fun MiniLudilbreto(
                 )
                 IconButton(onClick = {
                     logi("Klako", if (elfaldita) "enfoldigi la ludilon" else "elfaldi la ludilon")
-                    onElfalditaSxangxo(!elfaldita)
+                    onElfalditaŜanĝo(!elfaldita)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
@@ -244,10 +244,10 @@ fun MiniLudilbreto(
             if (elfaldita) {
                 // Serĉbreto (nur por podkastoj) — ŝovebla se la ludilo subtenas saltadon
                 if (estasPodkasto) {
-                    val pozicioMs = info.pozicioMs.coerceIn(0L, info.dauroMs)
-                    var sxtiraValoro by remember(info.nunaFonto) { mutableStateOf<Float?>(null) }
-                    val valoro = sxtiraValoro ?: (pozicioMs.toFloat() / info.dauroMs)
-                    val montrataPozicioMs = (valoro * info.dauroMs).toLong()
+                    val pozicioMs = info.pozicioMs.coerceIn(0L, info.daŭroMs)
+                    var ŝtiraValoro by remember(info.nunaFonto) { mutableStateOf<Float?>(null) }
+                    val valoro = ŝtiraValoro ?: (pozicioMs.toFloat() / info.daŭroMs)
+                    val montrataPozicioMs = (valoro * info.daŭroMs).toLong()
 
                     if (ludilo.subtenasSaltadon) {
                         Row(
@@ -263,21 +263,21 @@ fun MiniLudilbreto(
                             )
                             Slider(
                                 value = valoro,
-                                onValueChange = { sxtiraValoro = it },
+                                onValueChange = { ŝtiraValoro = it },
                                 onValueChangeFinished = {
-                                    val frakcio = sxtiraValoro ?: valoro
-                                    val celo = (frakcio * info.dauroMs).toLong()
+                                    val frakcio = ŝtiraValoro ?: valoro
+                                    val celo = (frakcio * info.daŭroMs).toLong()
                                     logi("Klako", "salti al $celo ms (de ${info.pozicioMs} ms)")
                                     ludilo.saltiAl(celo)
-                                    sxtiraValoro = null
+                                    ŝtiraValoro = null
                                 },
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(horizontal = 8.dp)
-                                    .testTag("sercxbreto"),
+                                    .testTag("serĉbreto"),
                             )
                             Text(
-                                text = formatuTempon(info.dauroMs),
+                                text = formatuTempon(info.daŭroMs),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -307,9 +307,9 @@ fun MiniLudilbreto(
 
                 // Laŭteco-regilo (funkcias kaj por rekta kaj por podkasto).
                 // La fluo sekvas ankaŭ eksterajn ŝanĝojn (ekz. hardvaraj laŭteco-klavoj sur Android).
-                val lauxtecoFluo by ludilo.lauxteco.collectAsState()
-                var sxtiraLauxteco by remember(ludilo) { mutableStateOf<Float?>(null) }
-                val lauxteco = (sxtiraLauxteco ?: lauxtecoFluo).coerceIn(0f, 1f)
+                val laŭtecoFluo by ludilo.laŭteco.collectAsState()
+                var ŝtiraLaŭteco by remember(ludilo) { mutableStateOf<Float?>(null) }
+                val laŭteco = (ŝtiraLaŭteco ?: laŭtecoFluo).coerceIn(0f, 1f)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -323,23 +323,23 @@ fun MiniLudilbreto(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Slider(
-                        value = lauxteco,
-                        onValueChange = { sxtiraLauxteco = it },
+                        value = laŭteco,
+                        onValueChange = { ŝtiraLaŭteco = it },
                         onValueChangeFinished = {
-                            val nova = sxtiraLauxteco ?: lauxteco
-                            logi("Klako", "lauxteco → $nova")
-                            ludilo.fiksiLauxtecon(nova)
-                            sxtiraLauxteco = null
+                            val nova = ŝtiraLaŭteco ?: laŭteco
+                            logi("Klako", "laŭteco → $nova")
+                            ludilo.fiksiLaŭtecon(nova)
+                            ŝtiraLaŭteco = null
                         },
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 8.dp)
-                            .testTag("lauxteco"),
+                            .testTag("laŭteco"),
                     )
                 }
             } else if (estasPodkasto) {
                 // Enfoldigite: nur maldika, neinteraga pozicio-linio
-                val progreso = (info.pozicioMs.toFloat() / info.dauroMs).coerceIn(0f, 1f)
+                val progreso = (info.pozicioMs.toFloat() / info.daŭroMs).coerceIn(0f, 1f)
                 LinearProgressIndicator(
                     progress = { progreso },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
@@ -418,8 +418,8 @@ private fun MiniLudilbretoSekvanta(
 
 /** Saltas [direkto]-foje 5% de la elsendo-daŭro (negativa = reen), kiel en la malnova apo. */
 private fun saltuDiference(ludilo: LudiloRegilo, info: LudantoInformo, direkto: Int) {
-    val diferenco = (info.dauroMs * SALTA_KVOCOTO).toLong() * direkto
-    val celo = (info.pozicioMs + diferenco).coerceIn(0L, info.dauroMs)
+    val diferenco = (info.daŭroMs * SALTA_KVOCOTO).toLong() * direkto
+    val celo = (info.pozicioMs + diferenco).coerceIn(0L, info.daŭroMs)
     logi("Klako", "salti ${if (direkto < 0) "reen" else "antaŭen"} ${(SALTA_KVOCOTO * 100).toInt()}% al $celo ms (de ${info.pozicioMs} ms)")
     ludilo.saltiAl(celo)
 }
@@ -444,7 +444,7 @@ fun MiniLudilbretoPreview() {
         dk.nordfalk.esperanto.domain.model.LudantoInformo(
             stato = dk.nordfalk.esperanto.domain.model.LudantoStato.Ludas,
             nunaFonto = dk.nordfalk.esperanto.domain.model.Sonfonto.ElsendoFonto(pElsendo),
-            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
         )
     )
     pTemo { MiniLudilbreto(ludilo = ludilo) }
@@ -457,12 +457,12 @@ fun MiniLudilbretoElfalditaPreview() {
         dk.nordfalk.esperanto.domain.model.LudantoInformo(
             stato = dk.nordfalk.esperanto.domain.model.LudantoStato.Ludas,
             nunaFonto = dk.nordfalk.esperanto.domain.model.Sonfonto.ElsendoFonto(pElsendo),
-            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
         )
     )
     pTemo {
         var elfaldita by remember { mutableStateOf(true) }
-        MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
+        MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaŜanĝo = { elfaldita = it })
     }
 }
 

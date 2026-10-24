@@ -19,7 +19,7 @@ class SekvantaEnhavoRegiloTest {
     private val kanaloK = Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x.com/m.m3u8")
 
     @Test
-    fun semoUzigxasKiamNenioEstasVidataAuxLudata() {
+    fun semoUziĝasKiamNenioEstasVidataAŭLudata() {
         val regilo = SekvantaEnhavoRegilo(semo = { elsendoA })
         // Post restarto, nenio vidata/ludata → la persista laste ludata elsendo
         assertEquals(elsendoA, regilo.elsendo())
@@ -45,7 +45,7 @@ class SekvantaEnhavoRegiloTest {
     }
 
     @Test
-    fun haltoNeSxangxasLaEnhavon() {
+    fun haltoNeŜanĝasLaEnhavon() {
         val regilo = SekvantaEnhavoRegilo(semo = { elsendoA })
         regilo.ludisFonton(Sonfonto.ElsendoFonto(elsendoB))
         // Haltigo (nenio ludas) — la laste ludata restas la sekvanta enhavo
@@ -54,7 +54,7 @@ class SekvantaEnhavoRegiloTest {
     }
 
     @Test
-    fun vidataKanaloForpusxasLaElsendon() {
+    fun vidataKanaloForpuŝasLaElsendon() {
         val regilo = SekvantaEnhavoRegilo(semo = { elsendoA })
         regilo.vidisElsendon(elsendoB)
         regilo.vidisKanalon(kanaloK)
@@ -63,7 +63,7 @@ class SekvantaEnhavoRegiloTest {
     }
 
     @Test
-    fun vidataElsendoForpusxasLaKanalon() {
+    fun vidataElsendoForpuŝasLaKanalon() {
         val regilo = SekvantaEnhavoRegilo(semo = { elsendoA })
         regilo.vidisKanalon(kanaloK)
         regilo.vidisElsendon(elsendoB)

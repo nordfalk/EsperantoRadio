@@ -43,49 +43,49 @@ class MiniLudilbretoTesto {
         id = "kernpunkto:2024-01-01",
         kanaloSlug = "kernpunkto",
         titolo = "KP204 Pigmentoj kaj koloroj en la naturo",
-        priskribo = "Hodiaux ni parolas pri pigmentoj kaj koloroj en la naturon.",
+        priskribo = "Hodiaŭ ni parolas pri pigmentoj kaj koloroj en la naturon.",
         fluo = "https://kern.punkto.info/podkasto.mp3",
         dato = "2024-01-01",
-        dauro = 1200,
+        daŭro = 1200,
     )
 
-    /** Falsa ludilo kiu registras saltiAl/fiksiLauxtecon-vokojn (subtenas saltadon, kiel ExoPlayer). */
+    /** Falsa ludilo kiu registras saltiAl/fiksiLaŭtecon-vokojn (subtenas saltadon, kiel ExoPlayer). */
     private class TestaLudiloRegilo(initial: LudantoInformo) : LudiloRegilo {
         private val _stato = MutableStateFlow(initial)
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
         val saltVokoj = mutableListOf<Long>()
-        val lauxtecoVokoj = mutableListOf<Float>()
-        private val _lauxteco = MutableStateFlow(1f)
-        override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+        val laŭtecoVokoj = mutableListOf<Float>()
+        private val _laŭteco = MutableStateFlow(1f)
+        override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
         override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {}
         override fun ludi() {}
-        override fun pauxzigi() {}
+        override fun paŭzigi() {}
         override fun halti() {}
         override fun saltiAl(pozicioMs: Long) {
             saltVokoj.add(pozicioMs)
             _stato.value = _stato.value.copy(pozicioMs = pozicioMs)
         }
-        override fun fiksiLauxtecon(volumeno: Float) {
-            lauxtecoVokoj.add(volumeno)
-            _lauxteco.value = volumeno
+        override fun fiksiLaŭtecon(volumeno: Float) {
+            laŭtecoVokoj.add(volumeno)
+            _laŭteco.value = volumeno
         }
 
         /** Simulas eksteran laŭteco-ŝanĝon (ekz. hardvaran klavon). */
-        fun simuluEksteranLauxtecon(volumeno: Float) { _lauxteco.value = volumeno }
+        fun simuluEksteranLaŭtecon(volumeno: Float) { _laŭteco.value = volumeno }
     }
 
-    private fun ludilo(pozicioMs: Long = 0, dauroMs: Long = 1_200_000L) = TestaLudiloRegilo(
+    private fun ludilo(pozicioMs: Long = 0, daŭroMs: Long = 1_200_000L) = TestaLudiloRegilo(
         LudantoInformo(
             stato = LudantoStato.Ludas,
             nunaFonto = Sonfonto.ElsendoFonto(testElsendo),
             pozicioMs = pozicioMs,
-            dauroMs = dauroMs,
+            daŭroMs = daŭroMs,
             estasRekta = false,
         )
     )
 
     @Test
-    fun sercxbreto_mankas_enfoldigite() = runComposeUiTest {
+    fun serĉbreto_mankas_enfoldigite() = runComposeUiTest {
         val ludilo = ludilo(pozicioMs = 0)
         setContent {
             MaterialTheme {
@@ -94,87 +94,87 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        onNodeWithTag("sercxbreto").assertDoesNotExist()
+        onNodeWithTag("serĉbreto").assertDoesNotExist()
         onNodeWithContentDescription("Elfaldigi la ludilon").assertExists()
     }
 
     @Test
-    fun sercxbreto_saltas_al_elektita_pozicio() = runComposeUiTest {
-        val dauroMs = 1_200_000L
-        val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
+    fun serĉbreto_saltas_al_elektita_pozicio() = runComposeUiTest {
+        val daŭroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
 
         // Ŝovu la serĉbreton al 25% de la elsendo
-        onNodeWithTag("sercxbreto")
+        onNodeWithTag("serĉbreto")
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
         waitForIdle()
 
         assertEquals(1, ludilo.saltVokoj.size, "saltiAl devas esti vokita unufoje")
-        val atendaPozicio = dauroMs / 4
+        val atendaPozicio = daŭroMs / 4
         assertTrue(
-            abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs / 100,
+            abs(ludilo.saltVokoj[0] - atendaPozicio) < daŭroMs / 100,
             "saltiAl devas celi 25% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
         )
     }
 
     @Test
-    fun sercxbreto_tuŝetas_por_salti() = runComposeUiTest {
-        val dauroMs = 1_200_000L
-        val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
+    fun serĉbreto_tuŝetas_por_salti() = runComposeUiTest {
+        val daŭroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
 
         // Tuŝeto je 50% de la larĝo
-        onNodeWithTag("sercxbreto").performTouchInput {
+        onNodeWithTag("serĉbreto").performTouchInput {
             click(percentOffset(0.5f, 0.5f))
         }
         waitForIdle()
 
         assertEquals(1, ludilo.saltVokoj.size, "saltiAl devas esti vokita unufoje post la tuŝeto")
-        val atendaPozicio = dauroMs / 2
+        val atendaPozicio = daŭroMs / 2
         assertTrue(
-            abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs / 100,
+            abs(ludilo.saltVokoj[0] - atendaPozicio) < daŭroMs / 100,
             "saltiAl devas celi ~50% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
         )
     }
 
     @Test
-    fun sercxbreto_ŝovas_per_treno() = runComposeUiTest {
-        val dauroMs = 1_200_000L
-        val ludilo = ludilo(pozicioMs = 0, dauroMs = dauroMs)
+    fun serĉbreto_ŝovas_per_treno() = runComposeUiTest {
+        val daŭroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
 
         // Treno sur la serĉbreto de 75% ĝis 50% de la larĝo. La norma Slider finas
         // la valoron kelkajn rastrumerojn (tuŝ-slop) post la fingro, do tolero 3%.
-        onNodeWithTag("sercxbreto").performTouchInput {
+        onNodeWithTag("serĉbreto").performTouchInput {
             swipe(percentOffset(0.75f, 0.5f), percentOffset(0.5f, 0.5f))
         }
         waitForIdle()
 
         assertEquals(1, ludilo.saltVokoj.size, "saltiAl devas esti vokita unufoje post la treno")
-        val atendaPozicio = dauroMs / 2
+        val atendaPozicio = daŭroMs / 2
         assertTrue(
-            abs(ludilo.saltVokoj[0] - atendaPozicio) < dauroMs * 3 / 100,
+            abs(ludilo.saltVokoj[0] - atendaPozicio) < daŭroMs * 3 / 100,
             "saltiAl devas celi ~50% (${atendaPozicio} ms), estis ${ludilo.saltVokoj[0]} ms",
         )
     }
 
     @Test
-    fun sercxbreto_mankas_por_rekta_elsendo() = runComposeUiTest {
+    fun serĉbreto_mankas_por_rekta_elsendo() = runComposeUiTest {
         val ludilo = TestaLudiloRegilo(
             LudantoInformo(
                 stato = LudantoStato.Ludas,
@@ -190,16 +190,16 @@ class MiniLudilbretoTesto {
         )
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
 
-        onNodeWithTag("sercxbreto").assertDoesNotExist()
+        onNodeWithTag("serĉbreto").assertDoesNotExist()
         onNodeWithContentDescription("Reen 5%").assertDoesNotExist()
         onNodeWithContentDescription("Antaŭen 5%").assertDoesNotExist()
         // La laŭteco-regilo funkcias ankaŭ ĉe rekta elsendo
-        onNodeWithTag("lauxteco").assertExists()
+        onNodeWithTag("laŭteco").assertExists()
     }
 
     @Test
@@ -208,28 +208,28 @@ class MiniLudilbretoTesto {
         setContent {
             MaterialTheme {
                 var elfaldita by remember { mutableStateOf(false) }
-                MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
+                MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaŜanĝo = { elfaldita = it })
             }
         }
         waitForIdle()
 
-        onNodeWithTag("sercxbreto").assertDoesNotExist()
+        onNodeWithTag("serĉbreto").assertDoesNotExist()
         onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
         waitForIdle()
-        onNodeWithTag("sercxbreto").assertExists()
+        onNodeWithTag("serĉbreto").assertExists()
 
         onNodeWithContentDescription("Enfoldigi la ludilon").performClick()
         waitForIdle()
-        onNodeWithTag("sercxbreto").assertDoesNotExist()
+        onNodeWithTag("serĉbreto").assertDoesNotExist()
     }
 
     @Test
     fun saltbutonoj_saltas_5procentojn() = runComposeUiTest {
-        val dauroMs = 1_200_000L
-        val ludilo = ludilo(pozicioMs = 600_000, dauroMs = dauroMs) // 50%
+        val daŭroMs = 1_200_000L
+        val ludilo = ludilo(pozicioMs = 600_000, daŭroMs = daŭroMs) // 50%
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
@@ -239,20 +239,20 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         assertEquals(2, ludilo.saltVokoj.size)
-        val kvinProcentoj = dauroMs / 20
-        assertEquals(600_000 - kvinProcentoj, ludilo.saltVokoj[0], "reen devas salti 5% de la dauro")
+        val kvinProcentoj = daŭroMs / 20
+        assertEquals(600_000 - kvinProcentoj, ludilo.saltVokoj[0], "reen devas salti 5% de la daŭro")
         assertEquals(600_000, ludilo.saltVokoj[1], "antaŭen devas resalti al la origina pozicio")
     }
 
     @Test
-    fun elfoldighas_glate() = runComposeUiTest {
+    fun elfoldiĝas_glate() = runComposeUiTest {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
                 var elfaldita by remember { mutableStateOf(false) }
                 // Malsupra alcentrigo: la pozicio de la breto moviĝas kiam ĝia alteco ŝanĝiĝas
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                    MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaSxangxo = { elfaldita = it })
+                    MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaŜanĝo = { elfaldita = it })
                 }
             }
         }
@@ -274,32 +274,32 @@ class MiniLudilbretoTesto {
     }
 
     @Test
-    fun lauxtecobreto_fiksas_lauxtecon() = runComposeUiTest {
+    fun laŭtecobreto_fiksas_laŭtecon() = runComposeUiTest {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
 
-        onNodeWithTag("lauxteco")
+        onNodeWithTag("laŭteco")
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.4f) }
         waitForIdle()
 
-        assertEquals(1, ludilo.lauxtecoVokoj.size, "fiksiLauxtecon devas esti vokita unufoje")
+        assertEquals(1, ludilo.laŭtecoVokoj.size, "fiksiLaŭtecon devas esti vokita unufoje")
         assertTrue(
-            abs(ludilo.lauxtecoVokoj[0] - 0.4f) < 0.05f,
-            "fiksiLauxtecon devas ricevi ~0,4, estis ${ludilo.lauxtecoVokoj[0]}",
+            abs(ludilo.laŭtecoVokoj[0] - 0.4f) < 0.05f,
+            "fiksiLaŭtecon devas ricevi ~0,4, estis ${ludilo.laŭtecoVokoj[0]}",
         )
     }
 
     @Test
-    fun lauxtecobreto_sekvas_eksterajn_sxangxojn() = runComposeUiTest {
+    fun laŭtecobreto_sekvas_eksterajn_ŝanĝojn() = runComposeUiTest {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
-                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
@@ -307,15 +307,15 @@ class MiniLudilbretoTesto {
         // La montrilo komenciĝas je la defaŭlta laŭteco (1)
         assertEquals(
             1f,
-            onNodeWithTag("lauxteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
+            onNodeWithTag("laŭteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
 
         // Ekstera ŝanĝo (ekz. hardvara laŭteco-klavo sur Android) devas speguliĝi en la regilo
-        ludilo.simuluEksteranLauxtecon(0.3f)
+        ludilo.simuluEksteranLaŭtecon(0.3f)
         waitForIdle()
         assertEquals(
             0.3f,
-            onNodeWithTag("lauxteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
+            onNodeWithTag("laŭteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
     }
 

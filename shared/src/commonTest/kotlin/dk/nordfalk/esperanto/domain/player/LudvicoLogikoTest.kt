@@ -101,7 +101,7 @@ class LudvicoLogikoTest {
     }
 
     @Test
-    fun sekvaSamkanala_nenioSeChiujFinitaj() {
+    fun sekvaSamkanala_nenioSeĈiujFinitaj() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val e3 = elsendo("k1:2024-01-01", "k1", "2024-01-01")
@@ -121,72 +121,72 @@ class LudvicoLogikoTest {
     // =========================================================================
 
     @Test
-    fun elSxatataj_plejFreshaNefinita() {
+    fun elŜatataj_plejFreŝaNefinita() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val e2 = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
-        val e3 = elsendo("sx1:2024-02-01", "sx1", "2024-02-01")
-        val cxiuj = listOf(e1, e2, e3)
-        val sxatataj = setOf("sx1")
+        val e2 = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
+        val e3 = elsendo("ŝ1:2024-02-01", "ŝ1", "2024-02-01")
+        val ĉiuj = listOf(e1, e2, e3)
+        val ŝatataj = setOf("ŝ1")
 
         // e1 estas lasta en k1 (ne ŝatata), do priority 1 donas nenion
-        // Priority 2 devus trovi la plej freŝan el sx1
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, sxatataj, emptyMap())
+        // Priority 2 devus trovi la plej freŝan el ŝ1
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, ŝatataj, emptyMap())
 
         assertEquals(e2, sekva, "Devus ludi plej freŝan nefinitan elsendon el ŝatata kanalo")
     }
 
     @Test
-    fun elSxatataj_saltasFinitajn() {
+    fun elŜatataj_saltasFinitajn() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val sx1_nova = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
-        val sx1_malnova = elsendo("sx1:2024-02-01", "sx1", "2024-02-01")
-        val cxiuj = listOf(e1, sx1_nova, sx1_malnova)
-        val sxatataj = setOf("sx1")
+        val ŝ1_nova = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
+        val ŝ1_malnova = elsendo("ŝ1:2024-02-01", "ŝ1", "2024-02-01")
+        val ĉiuj = listOf(e1, ŝ1_nova, ŝ1_malnova)
+        val ŝatataj = setOf("ŝ1")
         val ludatoj = mapOf(
-            "sx1:2024-02-15" to ludato("sx1:2024-02-15", "sx1", finita = true)
+            "ŝ1:2024-02-15" to ludato("ŝ1:2024-02-15", "ŝ1", finita = true)
         )
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, sxatataj, ludatoj)
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, ŝatataj, ludatoj)
 
-        assertEquals(sx1_malnova, sekva, "Devus salti la finitan kaj ludi la malnovan")
+        assertEquals(ŝ1_malnova, sekva, "Devus salti la finitan kaj ludi la malnovan")
     }
 
     @Test
-    fun elSxatataj_parteLudataElektebla() {
+    fun elŜatataj_parteLudataElektebla() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val sx1_e = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
-        val cxiuj = listOf(e1, sx1_e)
-        val sxatataj = setOf("sx1")
+        val ŝ1_e = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
+        val ĉiuj = listOf(e1, ŝ1_e)
+        val ŝatataj = setOf("ŝ1")
         val ludatoj = mapOf(
-            "sx1:2024-02-15" to ludato("sx1:2024-02-15", "sx1", pozicio = 60000, finita = false)
+            "ŝ1:2024-02-15" to ludato("ŝ1:2024-02-15", "ŝ1", pozicio = 60000, finita = false)
         )
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, sxatataj, ludatoj)
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, ŝatataj, ludatoj)
 
-        assertEquals(sx1_e, sekva, "Parte ludata sed ne finita el ŝatata kanalo estas elektebla")
+        assertEquals(ŝ1_e, sekva, "Parte ludata sed ne finita el ŝatata kanalo estas elektebla")
     }
 
     @Test
-    fun elSxatataj_nenioSeNeniuSxatataKanalo() {
+    fun elŜatataj_nenioSeNeniuŜatataKanalo() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val cxiuj = listOf(e1)
+        val ĉiuj = listOf(e1)
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, emptySet(), emptyMap())
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, emptySet(), emptyMap())
 
         assertNull(sekva, "Sen ŝatataj kanaloj, priority 2 ne donas nenion")
     }
 
     @Test
-    fun elSxatataj_elektasPlejFreshanElPlurajSxatatajKanaloj() {
+    fun elŜatataj_elektasPlejFreŝanElPlurajŜatatajKanaloj() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val sx1_e = elsendo("sx1:2024-02-01", "sx1", "2024-02-01")
-        val sx2_e = elsendo("sx2:2024-02-15", "sx2", "2024-02-15")
-        val cxiuj = listOf(e1, sx1_e, sx2_e)
-        val sxatataj = setOf("sx1", "sx2")
+        val ŝ1_e = elsendo("ŝ1:2024-02-01", "ŝ1", "2024-02-01")
+        val ŝ2_e = elsendo("ŝ2:2024-02-15", "ŝ2", "2024-02-15")
+        val ĉiuj = listOf(e1, ŝ1_e, ŝ2_e)
+        val ŝatataj = setOf("ŝ1", "ŝ2")
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, sxatataj, emptyMap())
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, ŝatataj, emptyMap())
 
-        assertEquals(sx2_e, sekva, "Devus elekti la plej freŝan (2024-02-15 > 2024-02-01)")
+        assertEquals(ŝ2_e, sekva, "Devus elekti la plej freŝan (2024-02-15 > 2024-02-01)")
     }
 
     // =========================================================================
@@ -194,43 +194,43 @@ class LudvicoLogikoTest {
     // =========================================================================
 
     @Test
-    fun plejFreshaNeludata_trovigxasKiamNeniuSxatata() {
+    fun plejFreŝaNeludata_troviĝasKiamNeniuŜatata() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k2:2024-02-15", "k2", "2024-02-15")
         val e3 = elsendo("k3:2024-02-01", "k3", "2024-02-01")
-        val cxiuj = listOf(e1, e2, e3)
+        val ĉiuj = listOf(e1, e2, e3)
 
         // e1 estas la nuna, neniuj ŝatataj, neniuj ludatoj
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, emptySet(), emptyMap())
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, emptySet(), emptyMap())
 
         assertEquals(e2, sekva, "Devus ludi la plej freŝan neludatan (e2, 2024-02-15)")
     }
 
     @Test
-    fun plejFreshaNeludata_ignorasLuditajn() {
+    fun plejFreŝaNeludata_ignorasLuditajn() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k2:2024-02-15", "k2", "2024-02-15")
         val e3 = elsendo("k3:2024-02-01", "k3", "2024-02-01")
-        val cxiuj = listOf(e1, e2, e3)
+        val ĉiuj = listOf(e1, e2, e3)
         val ludatoj = mapOf(
             "k2:2024-02-15" to ludato("k2:2024-02-15", "k2", pozicio = 1000, finita = false)
         )
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, emptySet(), ludatoj)
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, emptySet(), ludatoj)
 
         assertEquals(e3, sekva, "Devus ignari e2 (jam ludata) kaj ludi e3")
     }
 
     @Test
-    fun plejFreshaNeludata_nenioSeChiujLuditaj() {
+    fun plejFreŝaNeludata_nenioSeĈiujLuditaj() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k2:2024-02-15", "k2", "2024-02-15")
-        val cxiuj = listOf(e1, e2)
+        val ĉiuj = listOf(e1, e2)
         val ludatoj = mapOf(
             "k2:2024-02-15" to ludato("k2:2024-02-15", "k2", pozicio = 1000, finita = false)
         )
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, emptySet(), ludatoj)
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, emptySet(), ludatoj)
 
         assertNull(sekva, "Se ĉiuj estis luditaj, priority 3 donas nenion")
     }
@@ -244,11 +244,11 @@ class LudvicoLogikoTest {
         // Priority 1 (sekva samkanala) ekzistas → uzu ĝin, ne priority 2
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val sekva_k1 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
-        val sx1_e = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
-        val cxiuj = listOf(e1, sekva_k1, sx1_e)
-        val sxatataj = setOf("sx1")
+        val ŝ1_e = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
+        val ĉiuj = listOf(e1, sekva_k1, ŝ1_e)
+        val ŝatataj = setOf("ŝ1")
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, cxiuj, cxiuj, sxatataj, emptyMap())
+        val sekva = LudvicoLogiko.deciduSekvan(e1, ĉiuj, ĉiuj, ŝatataj, emptyMap())
 
         assertEquals(sekva_k1, sekva, "Priority 1 (samkanala) devus superi priority 2 (ŝatata)")
     }
@@ -257,29 +257,29 @@ class LudvicoLogikoTest {
     fun prioritato2_superasPrioritaton3() {
         // Neniu sekva samkanala, sed ekzistas nefinita el ŝatata kanalo
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val sx1_e = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
+        val ŝ1_e = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
         val k2_e = elsendo("k2:2024-02-20", "k2", "2024-02-20") // pli freŝa sed ne ŝatata
-        val cxiuj = listOf(e1, sx1_e, k2_e)
-        val sxatataj = setOf("sx1")
+        val ĉiuj = listOf(e1, ŝ1_e, k2_e)
+        val ŝatataj = setOf("ŝ1")
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), cxiuj, sxatataj, emptyMap())
+        val sekva = LudvicoLogiko.deciduSekvan(e1, listOf(e1), ĉiuj, ŝatataj, emptyMap())
 
-        assertEquals(sx1_e, sekva, "Priority 2 (ŝatata nefinita) devus superi priority 3 (freŝa neludata)")
+        assertEquals(ŝ1_e, sekva, "Priority 2 (ŝatata nefinita) devus superi priority 3 (freŝa neludata)")
     }
 
     @Test
-    fun nenioSeChiujFinitajKajLuditaj() {
+    fun nenioSeĈiujFinitajKajLuditaj() {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val e3 = elsendo("k2:2024-02-15", "k2", "2024-02-15")
-        val cxiuj = listOf(e1, e2, e3)
-        val sxatataj = setOf("k2")
+        val ĉiuj = listOf(e1, e2, e3)
+        val ŝatataj = setOf("k2")
         val ludatoj = mapOf(
             "k1:2024-02-01" to ludato("k1:2024-02-01", "k1", finita = true),
             "k2:2024-02-15" to ludato("k2:2024-02-15", "k2", finita = true),
         )
 
-        val sekva = LudvicoLogiko.deciduSekvan(e1, cxiuj, cxiuj, sxatataj, ludatoj)
+        val sekva = LudvicoLogiko.deciduSekvan(e1, ĉiuj, ĉiuj, ŝatataj, ludatoj)
 
         assertNull(sekva, "Se ĉiuj estas finitaj/luditaj, nenio por ludi")
     }
@@ -307,45 +307,45 @@ class LudvicoLogikoTest {
     }
 
     // =========================================================================
-    // trovNefinitanElSxatataj — detala testado
+    // trovNefinitanElŜatataj — detala testado
     // =========================================================================
 
     @Test
-    fun trovNefinitanElSxatataj_elektasPlejFreshan() {
-        val malnova = elsendo("sx:2024-01-01", "sx", "2024-01-01")
-        val nova = elsendo("sx:2024-03-01", "sx", "2024-03-01")
-        val cxiuj = listOf(malnova, nova)
+    fun trovNefinitanElŜatataj_elektasPlejFreŝan() {
+        val malnova = elsendo("ŝ:2024-01-01", "ŝ", "2024-01-01")
+        val nova = elsendo("ŝ:2024-03-01", "ŝ", "2024-03-01")
+        val ĉiuj = listOf(malnova, nova)
 
-        val rezulto = LudvicoLogiko.trovNefinitanElSxatataj(cxiuj, setOf("sx"), emptyMap())
+        val rezulto = LudvicoLogiko.trovNefinitanElŜatataj(ĉiuj, setOf("ŝ"), emptyMap())
 
         assertEquals(nova, rezulto)
     }
 
     @Test
-    fun trovNefinitanElSxatataj_neniuSxatata() {
+    fun trovNefinitanElŜatataj_neniuŜatata() {
         val e = elsendo("k1:2024-01-01", "k1", "2024-01-01")
-        assertNull(LudvicoLogiko.trovNefinitanElSxatataj(listOf(e), emptySet(), emptyMap()))
+        assertNull(LudvicoLogiko.trovNefinitanElŜatataj(listOf(e), emptySet(), emptyMap()))
     }
 
     // =========================================================================
-    // trovPlejFresxanNeludatan — detala testado
+    // trovPlejFreŝanNeludatan — detala testado
     // =========================================================================
 
     @Test
-    fun trovPlejFresxanNeludatan_neniuNeludata() {
+    fun trovPlejFreŝanNeludatan_neniuNeludata() {
         val e = elsendo("k1:2024-01-01", "k1", "2024-01-01")
         val ludatoj = mapOf("k1:2024-01-01" to ludato("k1:2024-01-01", "k1"))
-        assertNull(LudvicoLogiko.trovPlejFresxanNeludatan(listOf(e), ludatoj))
+        assertNull(LudvicoLogiko.trovPlejFreŝanNeludatan(listOf(e), ludatoj))
     }
 
     @Test
-    fun trovPlejFresxanNeludatan_elektasPlejFreshan() {
+    fun trovPlejFreŝanNeludatan_elektasPlejFreŝan() {
         val malnova = elsendo("k1:2024-01-01", "k1", "2024-01-01")
         val meza = elsendo("k2:2024-02-01", "k2", "2024-02-01")
         val nova = elsendo("k3:2024-03-01", "k3", "2024-03-01")
-        val cxiuj = listOf(malnova, meza, nova)
+        val ĉiuj = listOf(malnova, meza, nova)
 
-        val rezulto = LudvicoLogiko.trovPlejFresxanNeludatan(cxiuj, emptyMap())
+        val rezulto = LudvicoLogiko.trovPlejFreŝanNeludatan(ĉiuj, emptyMap())
 
         assertEquals(nova, rezulto)
     }

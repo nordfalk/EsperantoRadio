@@ -109,7 +109,7 @@ class SciigLimojTest {
         assertTrue(rezulto.forigotaj.isEmpty())
     }
 
-    /** Eta memor-bazita Settings por testoj (sama ŝajlo kiel ApajNovajxojTest). */
+    /** Eta memor-bazita Settings por testoj (sama ŝajlo kiel ApajNovaĵojTest). */
     private class MapSettings : com.russhwolf.settings.Settings {
         private val map = mutableMapOf<String, Any>()
         override val keys: Set<String> get() = map.keys.toSet()

@@ -50,7 +50,7 @@ class LudvicoRegiloTest {
         plejŝatataj: Set<String> = emptySet(),
         ludatojDeponejo: LudatojDeponejo = LudatojDeponejoMaketo(),
         lokaDosiero: Map<String, String> = emptyMap(),
-        auxtomataDaurigo: Boolean = true,
+        aŭtomataDaŭrigo: Boolean = true,
         scope: TestScope,
         reprovoAtendo: (Int) -> Long? = { null },
     ): Triple<LudvicoRegilo, LudiloRegilo, LudatojDeponejo> {
@@ -67,8 +67,8 @@ class LudvicoRegiloTest {
             override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean) =
                 elsendoj[kanaloSlug] ?: emptyList()
             override suspend fun getElsendo(id: String) = elsendoj.values.flatten().find { it.id == id }
-            override suspend fun sercxiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
-            override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean) =
+            override suspend fun serĉiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
+            override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean) =
                 elsendoj[kanalo.slug] ?: emptyList()
         }
         val kanaloDeponejo = object : KanaloDeponejo {
@@ -84,7 +84,7 @@ class LudvicoRegiloTest {
             plejŝatatajDeponejo = plejDeponejo,
             ludatojDeponejo = ludatojDeponejo,
             getLokaDosieroVojo = { id -> lokaDosiero[id] },
-            auxtomataDaurigo = MutableStateFlow(auxtomataDaurigo),
+            aŭtomataDaŭrigo = MutableStateFlow(aŭtomataDaŭrigo),
             scope = regiloScope,
             reprovoAtendo = reprovoAtendo,
         )
@@ -96,7 +96,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun resumigxo_komencasDeSavitaPozicio() = runTest {
+    fun resumiĝo_komencasDeSavitaPozicio() = runTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1")
@@ -113,7 +113,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun resumigxo_komencasDeNuloSeNeniuSavitaPozicio() = runTest {
+    fun resumiĝo_komencasDeNuloSeNeniuSavitaPozicio() = runTest {
         val ludilo = NoOpLudiloRegilo()
         val e = elsendo("e1")
 
@@ -125,7 +125,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun resumigxo_komencasDeNuloSeFinita() = runTest {
+    fun resumiĝo_komencasDeNuloSeFinita() = runTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1")
@@ -248,7 +248,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun auxtoludo_ludasSekvanSamkanalan() = runTest {
+    fun aŭtoludo_ludasSekvanSamkanalan() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
@@ -274,21 +274,21 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun auxtolodo_ludasElSxatatajKiamNeniuSekvaSamkanala() = runTest {
+    fun aŭtoludo_ludasElŜatatajKiamNeniuSekvaSamkanala() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
-        val sx1_e = elsendo("sx1:2024-02-15", "sx1", "2024-02-15")
+        val ŝ1_e = elsendo("ŝ1:2024-02-15", "ŝ1", "2024-02-15")
         val elsendoj = mapOf(
             "k1" to listOf(e1), // e1 estas la sola en k1
-            "sx1" to listOf(sx1_e)
+            "ŝ1" to listOf(ŝ1_e)
         )
         val kanaloj = listOf(
             Kanalo(slug = "k1", nomo = "K1"),
-            Kanalo(slug = "sx1", nomo = "SX1", podkastaRssUrl = "https://x.com/sx1.xml")
+            Kanalo(slug = "ŝ1", nomo = "SX1", podkastaRssUrl = "https://x.com/ŝ1.xml")
         )
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
             ludilo, elsendoj = elsendoj, kanaloj = kanaloj,
-            plejŝatataj = setOf("sx1"), scope = this
+            plejŝatataj = setOf("ŝ1"), scope = this
         )
 
         regilo.komenci()
@@ -299,14 +299,14 @@ class LudvicoRegiloTest {
         ludilo.simuluFinon()
 
 
-        // Devus ludi sx1_e (el ŝatata kanalo)
+        // Devus ludi ŝ1_e (el ŝatata kanalo)
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)
         val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
-        assertEquals("sx1:2024-02-15", fonto.elsendo.id)
+        assertEquals("ŝ1:2024-02-15", fonto.elsendo.id)
     }
 
     @Test
-    fun auxtolodo_ludasPlejFreshanNeludatanKielLastaResurso() = runTest {
+    fun aŭtoludo_ludasPlejFreŝanNeludatanKielLastaResurso() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val k2_e = elsendo("k2:2024-02-15", "k2", "2024-02-15")
         val elsendoj = mapOf(
@@ -338,7 +338,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun auxtolodo_haltasSeNenioPorLudi() = runTest {
+    fun aŭtoludo_haltasSeNenioPorLudi() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val ludatoj = LudatojDeponejoMaketo()
         // Marku e1 kiel finita anticipe
@@ -366,7 +366,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun servoVoko_traktiFinonPublika_vokasAuxtoludon() = runTest {
+    fun servoVoko_traktiFinonPublika_vokasAŭtoludon() = runTest {
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
@@ -442,13 +442,13 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun auxtomataDaurigo_haltasKiamMalshalitaKunSekvaElsendo() = runTest {
+    fun aŭtomataDaŭrigo_haltasKiamMalŝalitaKunSekvaElsendo() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, ludatoj) = kreuRegilon(
-            ludilo, elsendoj = elsendoj, auxtomataDaurigo = false, scope = this
+            ludilo, elsendoj = elsendoj, aŭtomataDaŭrigo = false, scope = this
         )
 
         regilo.komenci()
@@ -465,13 +465,13 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun auxtomataDaurigo_dauxrigxasKiamEnshalitaKunSekvaElsendo() = runTest {
+    fun aŭtomataDaŭrigo_daŭriĝasKiamEnŝalitaKunSekvaElsendo() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
-            ludilo, elsendoj = elsendoj, auxtomataDaurigo = true, scope = this
+            ludilo, elsendoj = elsendoj, aŭtomataDaŭrigo = true, scope = this
         )
 
         regilo.komenci()
@@ -489,12 +489,12 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun auxtomataDaurigo_haltasKiamMalshalitaKunVicoNeMalplena() = runTest {
+    fun aŭtomataDaŭrigo_haltasKiamMalŝalitaKunVicoNeMalplena() = runTest {
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
-            ludilo, auxtomataDaurigo = false, scope = this
+            ludilo, aŭtomataDaŭrigo = false, scope = this
         )
 
         regilo.komenci()
@@ -557,7 +557,7 @@ class LudvicoRegiloTest {
     @Test
     fun lokaDosiero_uzasLokanElsendonSeEkzistas() = runTest {
         val e = elsendo("e1")
-        val lokaVojo = "/tmp/elshutoj/e1.mp3"
+        val lokaVojo = "/tmp/elŝutoj/e1.mp3"
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
             ludilo, lokaDosiero = mapOf("e1" to lokaVojo), scope = this
@@ -587,7 +587,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun pozicio_savitaKiamSxangxasAlAliaElsendo() = runTest {
+    fun pozicio_savitaKiamŜanĝasAlAliaElsendo() = runTest {
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val ludatoj = LudatojDeponejoMaketo()
@@ -598,11 +598,11 @@ class LudvicoRegiloTest {
         // Simulu pozicio-progreson
         ludilo.simuluPozicion(45_000, 300_000)
 
-        // Sxangxu al alia elsendo — tio devas savi la pozicion de e1
+        // Ŝanĝu al alia elsendo — tio devas savi la pozicion de e1
         regilo.ludiElsendon(e2)
 
         val savita = ludatoj.getPozicio(e1.id)
-        assertEquals(45_000, savita, "Pozicio de e1 devus esti savita antaux ol ludi e2")
+        assertEquals(45_000, savita, "Pozicio de e1 devus esti savita antaŭ ol ludi e2")
     }
 
     // =========================================================================
@@ -610,7 +610,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun pozicio_savitaKiamPauxzigxas() = runTest {
+    fun pozicio_savitaKiamPaŭziĝas() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
         val ludilo = NoOpLudiloRegilo()
@@ -620,15 +620,15 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(e)
         ludilo.simuluPozicion(60_000, 300_000)
 
-        // Pauxzigu — tio sxangxas staton al Haltita kaj savuPozicion estas vokita
-        ludilo.pauxzigi()
+        // Paŭzigu — tio ŝanĝas staton al Haltita kaj savuPozicion estas vokita
+        ludilo.paŭzigi()
 
         val savita = ludatoj.getPozicio(e.id)
         assertEquals(60_000, savita, "Pozicio devus esti savita kiam paŭzigitas")
     }
 
     @Test
-    fun pozicio_savitaKiamHaltigxas() = runTest {
+    fun pozicio_savitaKiamHaltiĝas() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
         val ludilo = NoOpLudiloRegilo()
@@ -642,12 +642,12 @@ class LudvicoRegiloTest {
         // Savu pozicion antaŭ ol halti (kiel la pozicioSavanto farus en reala uzo)
         regilo.savuPozicionNun()
 
-        // Haltigu — tio sxangxas staton al Haltita kaj forigas nunaFonto
+        // Haltigu — tio ŝanĝas staton al Haltita kaj forigas nunaFonto
         // savuPozicion devus uzi la konservitan retroiron (lastaFonto/lastaPozicioMs)
         ludilo.halti()
 
         val savita = ludatoj.getPozicio(e.id)
-        assertEquals(90_000, savita, "Pozicio devus esti savita kiam haltigxas (per retroiro)")
+        assertEquals(90_000, savita, "Pozicio devus esti savita kiam haltiĝas (per retroiro)")
     }
 
     // =========================================================================
@@ -655,7 +655,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun lasteLudita_mankasGxisLudadoEkis() = runTest {
+    fun lasteLudita_mankasĜisLudadoEkis() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
         val ludilo = NoOpLudiloRegilo()
@@ -675,7 +675,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun lasteLudita_neSxangxasPozicion() = runTest {
+    fun lasteLudita_neŜanĝasPozicion() = runTest {
         val e = elsendo("e1")
         val ludatoj = LudatojDeponejoMaketo()
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 30_000, 300_000)
@@ -695,19 +695,19 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun vico_konkurantajAldonojNeKauxzasDuoblanLudadon() = runTest {
+    fun vico_konkurantajAldonojNeKaŭzasDuoblanLudadon() = runTest {
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(ludilo, scope = this)
 
-        // Aldonu ambaux unu post la alia (simulas preskaŭ-samtempan)
+        // Aldonu ambaŭ unu post la alia (simulas preskaŭ-samtempan)
         regilo.aldoniAlVico(e1)
         regilo.aldoniAlVico(e2)
 
         // Nur unu devus esti ludata, la alia restas en la vico
         val vicoGrando = regilo.vico.value.size
-        assertTrue(vicoGrando <= 1, "Vico devus havi maksimume 1 eron (unu ludigxas, unu restas)")
+        assertTrue(vicoGrando <= 1, "Vico devus havi maksimume 1 eron (unu ludiĝas, unu restas)")
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Io devus ludi")
     }
 
@@ -728,7 +728,7 @@ class LudvicoRegiloTest {
         regilo.komenci()
 
         // La regilo devus agnoski la ludantan staton kaj ne panei
-        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Ludado devus dauxri")
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Ludado devus daŭri")
     }
 
     // =========================================================================
@@ -736,7 +736,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun eraro_markasEraranKajDauxrigasKunSekva() = runTest {
+    fun eraro_markasEraranKajDaŭrigasKunSekva() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val elsendoj = mapOf("k1" to listOf(e1, e2))
@@ -753,7 +753,7 @@ class LudvicoRegiloTest {
 
 
         // Devus ludi e2 (sekva samkanala) malgraŭ la eraro
-        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas dauxrigi kun sekva post eraro")
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas daŭrigi kun sekva post eraro")
         val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
         assertEquals("k1:2024-02-01", fonto.elsendo.id)
 
@@ -785,7 +785,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun eraro_saltasEraranEnAuxtoludo() = runTest {
+    fun eraro_saltasEraranEnAŭtoludo() = runTest {
         val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
         val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
         val e3 = elsendo("k1:2024-01-01", "k1", "2024-01-01")
@@ -824,13 +824,13 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(elsendoj[0])
 
 
-        // Simulu 10 sinsekvajn erarojn — cxiu elsendo tuj eraras
+        // Simulu 10 sinsekvajn erarojn — ĉiu elsendo tuj eraras
         repeat(LudvicoRegilo.MAKS_ERAROJ) {
             ludilo.simuluEraron("404")
         }
 
 
-        // Post 10 eraroj, devas esti haltita — ne dauxrigi al la 11-a
+        // Post 10 eraroj, devas esti haltita — ne daŭrigi al la 11-a
         assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato, "Devas halti post ${LudvicoRegilo.MAKS_ERAROJ} sinsekvaj eraroj")
     }
 
@@ -854,8 +854,8 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(e1)
         ludilo.simuluEraron("404")
 
-        // Tio estas eraro 1 post rekomencigxo — devas dauxrigi
-        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas dauxrigi cxe eraro 1 post rekomencigxo per ludiElsendon")
+        // Tio estas eraro 1 post rekomenciĝo — devas daŭrigi
+        assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato, "Devas daŭrigi ĉe eraro 1 post rekomenciĝo per ludiElsendon")
     }
 
     // =========================================================================
@@ -863,20 +863,20 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     /** Ludilo kiu ĉiam malsukcesas sinkrone per pasema eraro (kiel Desktop sen reto). */
-    private class CxiamEraraLudilo : LudiloRegilo {
+    private class ĈiamEraraLudilo : LudiloRegilo {
         private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-        override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
+        override val laŭteco: StateFlow<Float> = MutableStateFlow(1f)
         var fiksoj = 0
         override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
             fiksoj++
             _stato.value = LudantoInformo(stato = LudantoStato.Konektas, nunaFonto = fonto, pozicioMs = komencoPozicioMs)
         }
         override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Reto mankas", reprovebla = true)) }
-        override fun pauxzigi() {}
+        override fun paŭzigi() {}
         override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
         override fun saltiAl(pozicioMs: Long) {}
-        override fun fiksiLauxtecon(volumeno: Float) {}
+        override fun fiksiLaŭtecon(volumeno: Float) {}
     }
 
     @Test
@@ -902,7 +902,7 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun reprovo_dauxraEraroNeEstasReprovata() = runTest {
+    fun reprovo_daŭraEraroNeEstasReprovata() = runTest {
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
         val ludilo = NoOpLudiloRegilo()
@@ -923,7 +923,7 @@ class LudvicoRegiloTest {
     @Test
     fun reprovo_rezignasPostMaksKajSaltasAlSekva() = runTest {
         val e1 = elsendo("e1")
-        val ludilo = CxiamEraraLudilo()
+        val ludilo = ĈiamEraraLudilo()
         val (regilo, _, ludatoj) = kreuRegilon(
             ludilo, elsendoj = mapOf("k1" to listOf(e1)), scope = this,
             reprovoAtendo = { n -> if (n <= 3) 0L else null },
@@ -997,8 +997,8 @@ class LudvicoRegiloTest {
     private class PostHaltiEraraLudilo : LudiloRegilo {
         private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
         override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-        private val _lauxteco = MutableStateFlow(1f)
-        override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+        private val _laŭteco = MutableStateFlow(1f)
+        override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
 
         /** Kiom ofte fiksiFonton estis vokita — kreskas se reprovo/aŭtoludo erare lanĉiĝas. */
         var fiksoj = 0
@@ -1013,10 +1013,10 @@ class LudvicoRegiloTest {
             )
         }
         override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
-        override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+        override fun paŭzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
         override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
         override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-        override fun fiksiLauxtecon(volumeno: Float) { _lauxteco.value = volumeno }
+        override fun fiksiLaŭtecon(volumeno: Float) { _laŭteco.value = volumeno }
 
         /** Simulas la rostan Eraron post halti() — sen nunaFonto (kia sur Android). */
         fun simuluEraronPostHalti() {
@@ -1055,7 +1055,7 @@ class LudvicoRegiloTest {
     // =========================================================================
 
     @Test
-    fun pauxzigiNuligasPlanitanReprovon() = runTest {
+    fun paŭzigiNuligasPlanitanReprovon() = runTest {
         val e1 = elsendo("e1")
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(
@@ -1068,7 +1068,7 @@ class LudvicoRegiloTest {
         assertEquals(1, regilo.reprovo.value, "Reprovo 1 planita")
 
         // Paŭzigi — la planita reprovo devas esti nuligita
-        regilo.pauxziguLudadon()
+        regilo.paŭziguLudadon()
 
         assertEquals(0, regilo.reprovo.value, "Paŭzigi nuligas la planitan reprovon")
         assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato)

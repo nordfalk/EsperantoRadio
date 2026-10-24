@@ -25,7 +25,7 @@ class PersistaLudatojDeponejoTest {
     fun purigu() = nodo.removeNode()
 
     @Test
-    fun pozicioKonservigxasTransRestarton() = runTest {
+    fun pozicioKonserviĝasTransRestarton() = runTest {
         val deponejo = PersistaLudatojDeponejo(settings)
         deponejo.registriPozicion("e1", "k1", 30_000, 300_000)
 
@@ -34,12 +34,12 @@ class PersistaLudatojDeponejoTest {
         val ludato = restartita.getLudato("e1")
         assertNotNull(ludato, "La pozicio devas pluvivi restarton")
         assertEquals(30_000, ludato.pozicioMs)
-        assertEquals(300_000, ludato.dauroMs)
+        assertEquals(300_000, ludato.daŭroMs)
         assertFalse(ludato.finita, "Ne finita — nur pozicio savita")
     }
 
     @Test
-    fun finitaMarkoKonservigxasTransRestarton() = runTest {
+    fun finitaMarkoKonserviĝasTransRestarton() = runTest {
         val deponejo = PersistaLudatojDeponejo(settings)
         deponejo.registriPozicion("e1", "k1", 300_000, 300_000)
         deponejo.markiFinita("e1", "k1")
@@ -65,7 +65,7 @@ class PersistaLudatojDeponejoTest {
     }
 
     @Test
-    fun eraraMarkoKonservigxas() = runTest {
+    fun eraraMarkoKonserviĝas() = runTest {
         val deponejo = PersistaLudatojDeponejo(settings)
         deponejo.registriPozicion("e1", "k1", 10_000, 300_000)
         deponejo.markiErara("e1", "k1")
@@ -75,7 +75,7 @@ class PersistaLudatojDeponejoTest {
     }
 
     @Test
-    fun koruptaJSONKomencasFreshke() = runTest {
+    fun koruptaJSONKomencasFreŝke() = runTest {
         // Korupta persistita valoro → legu() revenas al malplena, ne kraŝas
         nodo.put("ludatoj", "{NE VALIDA JSON")
 

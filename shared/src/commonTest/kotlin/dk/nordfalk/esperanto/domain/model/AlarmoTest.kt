@@ -20,23 +20,23 @@ class AlarmoTest {
     }
 
     @Test
-    fun unufojeHodiauxSeTempoNeJamPasis() {
+    fun unufojeHodiaŭSeTempoNeJamPasis() {
         assertEquals(LocalDateTime(2026, 9, 23, 11, 30), alarmo(11, 30, 0).sekvaEkigo(merkredo10))
     }
 
     @Test
-    fun unufojeMorgauxSeTempoJamPasis() {
+    fun unufojeMorgaŭSeTempoJamPasis() {
         assertEquals(LocalDateTime(2026, 9, 24, 7, 0), alarmo(7, 0, 0).sekvaEkigo(merkredo10))
     }
 
     @Test
-    fun samaMinutoEstasMorgaux() {
+    fun samaMinutoEstasMorgaŭ() {
         // Ekigo ĝuste nun ne validas — alie AlarmoReceivilo re-skedus la saman momenton
         assertEquals(LocalDateTime(2026, 9, 24, 10, 0), alarmo(10, 0, 0x7f).sekvaEkigo(merkredo10))
     }
 
     @Test
-    fun cxiutageMorgauxSeHodiauxPasis() {
+    fun ĉiutageMorgaŭSeHodiaŭPasis() {
         assertEquals(LocalDateTime(2026, 9, 24, 7, 0), alarmo(7, 0, 0x7f).sekvaEkigo(merkredo10))
     }
 

@@ -16,10 +16,10 @@ actual fun malfermuLigon(url: String) {
     }
 }
 
-actual fun malfermuRetposhton(retposhto: String, temo: String, teksto: String) {
-    logi("Ligilo", "Malfermas retpoŝton al: $retposhto")
+actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
+    logi("Ligilo", "Malfermas retpoŝton al: $retpoŝto")
     try {
-        val uri = URI("mailto:$retposhto?subject=${java.net.URLEncoder.encode(temo, "UTF-8")}&body=${java.net.URLEncoder.encode(teksto, "UTF-8")}")
+        val uri = URI("mailto:$retpoŝto?subject=${java.net.URLEncoder.encode(temo, "UTF-8")}&body=${java.net.URLEncoder.encode(teksto, "UTF-8")}")
         if (Desktop.isDesktopSupported()) {
             Desktop.getDesktop().mail(uri)
         }

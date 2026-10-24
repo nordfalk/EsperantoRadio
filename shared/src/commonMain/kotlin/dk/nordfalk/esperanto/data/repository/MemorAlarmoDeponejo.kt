@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * En-memora AlarmoDeponejo. Platform-specifa planado (AlarmManager) venos poste.
  *
  * Konduto:
- * - Se sugestoj estas provizitaj, ili estas montritaj cxe starto (cxiuj malaktivaj).
+ * - Se sugestoj estas provizitaj, ili estas montritaj ĉe starto (ĉiuj malaktivaj).
  * - La uzanto povas libere baskuli, forigi aŭ krei alarmojn.
  * - Ne persistas — post restarto la sugestoj revenas (persisto venos poste).
  */
@@ -48,16 +48,16 @@ class MemorAlarmoDeponejo(
         logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanaloSlug} (nova id=${nova.id})")
     }
 
-    override suspend fun ghisdatigi(alarmo: Alarmo) {
-        val antauxa = _alarmoj.value.find { it.id == alarmo.id }
+    override suspend fun ĝisdatigi(alarmo: Alarmo) {
+        val antaŭa = _alarmoj.value.find { it.id == alarmo.id }
         _alarmoj.value = _alarmoj.value.map { if (it.id == alarmo.id) alarmo else it }
-        logi("AlarmoDeponejo", "Ĝisdatigis: id=${alarmo.id} tempo=${alarmo.tempoTeksto} (antaŭe: ${antauxa?.tempoTeksto})")
+        logi("AlarmoDeponejo", "Ĝisdatigis: id=${alarmo.id} tempo=${alarmo.tempoTeksto} (antaŭe: ${antaŭa?.tempoTeksto})")
     }
 
     override suspend fun forigi(alarmoId: Int) {
-        val antauxa = _alarmoj.value.find { it.id == alarmoId }
+        val antaŭa = _alarmoj.value.find { it.id == alarmoId }
         _alarmoj.value = _alarmoj.value.filter { it.id != alarmoId }
-        logi("AlarmoDeponejo", "Forigis: id=$alarmoId tempo=${antauxa?.tempoTeksto} — restas ${_alarmoj.value.size} alarmoj: [${_alarmoj.value.joinToString { "${it.id}:${it.tempoTeksto}" }}]")
+        logi("AlarmoDeponejo", "Forigis: id=$alarmoId tempo=${antaŭa?.tempoTeksto} — restas ${_alarmoj.value.size} alarmoj: [${_alarmoj.value.joinToString { "${it.id}:${it.tempoTeksto}" }}]")
     }
 
     override suspend fun baskuliAktivon(alarmoId: Int) {

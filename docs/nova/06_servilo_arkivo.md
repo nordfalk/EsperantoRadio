@@ -57,20 +57,20 @@ suspend fun konstruuArkivon() {
         try {
             val konataj = stokado.getElsendojn(kanal.slug)
             val plejMalnova = konataj.minByOrNull { it.dato }
-            var paghoUrl = kanal.podkastaRssUrl
+            var paĝoUrl = kanal.podkastaRssUrl
             val novaj = mutableListOf<Elsendo>()
-            while (paghoUrl != null) {
-                val fluo = httpKliento.get(paghoUrl).bodyAsText()
+            while (paĝoUrl != null) {
+                val fluo = httpKliento.get(paĝoUrl).bodyAsText()
                 val elsendoj = parsilo.parsRss(fluo, kanal)
                 // Haltu ĉe jamkonata id (inkrementa)
                 val neKonataj = elsendoj.takeWhile { e -> e.id !in konataj.map { it.id } }
                 if (neKonataj.isEmpty()) break
                 novaj.addAll(neKonataj)
-                paghoUrl = leguNextLink(fluo)   // rel="next" (regulo P6.7)
+                paĝoUrl = leguNextLink(fluo)   // rel="next" (regulo P6.7)
             }
-            val cxiuj = (konataj + novaj).distinctBy { it.id }.sortedByDescending { it.dato }
-            stokado.skribu(cxiuj, kanal.slug)
-            skribuFluDosierojn(cxiuj, kanal)   // monato/jaro/kunfandita
+            val ĉiuj = (konataj + novaj).distinctBy { it.id }.sortedByDescending { it.dato }
+            stokado.skribu(ĉiuj, kanal.slug)
+            skribuFluDosierojn(ĉiuj, kanal)   // monato/jaro/kunfandita
         } catch (e: Exception) {
             protokolo("Kanalo ${kanal.slug} fiaskis: ${e.message}")
             // daŭrigu — unu eraro ne haltigas la aliajn
@@ -108,9 +108,9 @@ Kiam la apo vidas `podkasta_arkivo` en la URL, ĝi uzas la **ĝenerala** parsado
 ```
 GET /api/kanaloj                       → List<KanalDto>
 GET /api/kanaloj/<slug>                 → KanalDto
-GET /api/kanaloj/<slug>/elsendojn       → List<ElsendoDto> (?pagho=, ?ekde=)
+GET /api/kanaloj/<slug>/elsendojn       → List<ElsendoDto> (?paĝo=, ?ekde=)
 GET /api/kanaloj/<slug>/elsendojn/<id>  → ElsendoDto
-GET /api/sercxi?q=<teksto>              → List<ElsendoDto>
+GET /api/serĉi?q=<teksto>              → List<ElsendoDto>
 GET /api/radio.txt                      → la kunfandita radio.txt
 GET /api/stato                          → servil-stato, kanal-sano, lasta konstru-tempo
 ```
@@ -126,14 +126,14 @@ GET /api/stato                          → servil-stato, kanal-sano, lasta kons
       "id": "kernpunkto:2022-11-09",
       "titolo": "KP204 Pigmentoj",
       "dato": "2022-11-09",
-      "dauro": 6916,
+      "daŭro": 6916,
       "stream": "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
       "bildUrl": "https://kern.punkto.info/bildoj/kp204-pigmentoj.jpg",
       "priskribo": "Ekde nia infaneco ... la pigmentoj"
     }
   ],
-  "pagho": {
-    "sekva": "/api/kanaloj/kernpunkto/elsendojn?pagho=2"
+  "paĝo": {
+    "sekva": "/api/kanaloj/kernpunkto/elsendojn?paĝo=2"
   }
 }
 ```
@@ -169,7 +169,7 @@ rekta font-fluo.
 | Apcjelo elŝutas kanalojn | `GET /api/kanaloj` |
 | Apo bezonas la plej novajn elsendojn de Kernpunkto | `GET /feed-kernpunkto-aktuala.xml` aŭ `GET /api/kanaloj/kernpunkto/elsendojn` |
 | Font-fluo de Varsovia Vento mortis | servilo jam havas la arkivitan fluon; apo uzas `podkasta_arkivo`-URL → ĝenerala parsado |
-| Uzanto serĉas "pigmentoj" | `GET /api/sercxi?q=pigmentoj` |
+| Uzanto serĉas "pigmentoj" | `GET /api/serĉi?q=pigmentoj` |
 | Prizorganto volas scii kiuj kanaloj fiaskis | `GET /api/stato` |
 
 ## Rilato al la malnova `RssArkivServer`

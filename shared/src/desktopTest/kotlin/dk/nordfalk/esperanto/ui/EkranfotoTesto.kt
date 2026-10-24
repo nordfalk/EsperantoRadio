@@ -15,14 +15,14 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Severeco
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
@@ -40,7 +40,7 @@ import org.jetbrains.skia.Image as SkiaImage
 import kotlin.test.Test
 
 /**
- * Ekranfota testoj — kaptas cxiun ekranon kiel PNG-dosieron.
+ * Ekranfota testoj — kaptas ĉiun ekranon kiel PNG-dosieron.
  *
  * Rulu per: ./gradlew :shared:desktopTest --tests "*EkranfotoTesto*"
  * Dosieroj estas savitaj al shared/build/ekranfotoj/
@@ -58,10 +58,10 @@ class EkranfotoTesto {
         id = "kernpunkto:2024-01-01",
         kanaloSlug = "kernpunkto",
         titolo = "KP204 Pigmentoj kaj koloroj en la naturo",
-        priskribo = "Hodiaux ni parolas pri pigmentoj kaj koloroj en la naturon.",
+        priskribo = "Hodiaŭ ni parolas pri pigmentoj kaj koloroj en la naturon.",
         fluo = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
         dato = "2024-01-01",
-        dauro = 6916,
+        daŭro = 6916,
     )
 
     private fun falsaKanaloDeponejo() = object : KanaloDeponejo {
@@ -75,7 +75,7 @@ class EkranfotoTesto {
         val dosiero = File("build/ekranfotoj", "$nomo.png")
         dosiero.parentFile.mkdirs()
         // Malfermita dialogo estas aparta kompona radiko — kaptu la lastan
-        // (la dialogon se gxi malfermitas, alikaze la solan ekrano-radikon).
+        // (la dialogon se ĝi malfermitas, alikaze la solan ekrano-radikon).
         val radikoj = test.onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })
         val nombro = radikoj.fetchSemanticsNodes().size
         val lastaRadiko = radikoj[nombro - 1]
@@ -100,15 +100,15 @@ class EkranfotoTesto {
     }
 
     @Test
-    fun ekranfoto_kanalaro_rugxa() = runComposeUiTest {
+    fun ekranfoto_kanalaro_ruĝa() = runComposeUiTest {
         val viewModel = KanalaroViewModel(falsaKanaloDeponejo())
         setContent {
-            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.RUGXA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.RUĜA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
                 KanalaroEkrano(viewModel = viewModel)
             }
         }
         waitForIdle()
-        kaptuKajSavu(this, "temo_rugxa_kanalaro")
+        kaptuKajSavu(this, "temo_ruĝa_kanalaro")
     }
 
     @Test
@@ -127,7 +127,7 @@ class EkranfotoTesto {
     fun ekranfoto_elsendo_detalo() = runComposeUiTest {
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, onElshuti = {})
+                ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, onElŝuti = {})
             }
         }
         waitForIdle()
@@ -136,13 +136,13 @@ class EkranfotoTesto {
 
     @Test
     fun ekranfoto_serchxo() = runComposeUiTest {
-        val sercxoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SercxoDeponejo {
-            override suspend fun sercxi(teksto: String, limo: Int) =
+        val serĉoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo {
+            override suspend fun serĉi(teksto: String, limo: Int) =
                 if (teksto.length >= 2) listOf(testElsendo) else emptyList()
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onElsendo = {})
+                SerĉoEkrano(serĉoDeponejo = serĉoDeponejo, onElsendo = {})
             }
         }
         waitForIdle()
@@ -167,26 +167,26 @@ class EkranfotoTesto {
     }
 
     @Test
-    fun ekranfoto_elshutitaj() = runComposeUiTest {
-        val elshutDeponejo = object : ElshutDeponejo {
-            private val _elshutoj = MutableStateFlow(
-                mapOf(testElsendo.id to ElshutitaElsendo(testElsendo, "/tmp/test.mp3", ElshutStato.Preta))
+    fun ekranfoto_elŝutitaj() = runComposeUiTest {
+        val elŝutDeponejo = object : ElŝutDeponejo {
+            private val _elŝutoj = MutableStateFlow(
+                mapOf(testElsendo.id to ElŝutitaElsendo(testElsendo, "/tmp/test.mp3", ElŝutStato.Preta))
             )
-            override fun observiElshutojn() = _elshutoj.asStateFlow()
-            override fun observiElshutStaton(elsendoId: String) = MutableStateFlow(ElshutStato.Preta).asStateFlow()
-            override suspend fun elshuti(elsendo: Elsendo) {}
+            override fun observiElŝutojn() = _elŝutoj.asStateFlow()
+            override fun observiElŝutStaton(elsendoId: String) = MutableStateFlow(ElŝutStato.Preta).asStateFlow()
+            override suspend fun elŝuti(elsendo: Elsendo) {}
             override suspend fun haltigi(elsendoId: String) {}
             override suspend fun forigi(elsendoId: String) {}
             override suspend fun getLokaDosieroVojo(elsendoId: String) = "/tmp/test.mp3"
-            override fun estasElshutita(elsendoId: String) = true
+            override fun estasElŝutita(elsendoId: String) = true
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                ElshutitajEkrano(elshutDeponejo = elshutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
+                ElŝutitajEkrano(elŝutDeponejo = elŝutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {})
             }
         }
         waitForIdle()
-        kaptuKajSavu(this, "05_elshutitaj")
+        kaptuKajSavu(this, "05_elŝutitaj")
     }
 
     @Test
@@ -227,7 +227,7 @@ class EkranfotoTesto {
         onNodeWithText("10:00").performClick()
         waitForIdle()
         kaptuKajSavu(this, "06b_alarmo_tempo_dialogo")
-        // "Nuligi" ekzistas ankaux en la redaktilo malantaux la dialogo — fermu per "Bone"
+        // "Nuligi" ekzistas ankaŭ en la redaktilo malantaŭ la dialogo — fermu per "Bone"
         onNodeWithText("Bone").performClick()
         waitForIdle()
         // Kanal-elektilo kiel dialogo
@@ -251,7 +251,7 @@ class EkranfotoTesto {
     @Test
     fun ekranfoto_mini_ludilbreto() = runComposeUiTest {
         val ludilo = EkranfotoLudiloRegilo(
-            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
+            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false)
         )
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
@@ -265,11 +265,11 @@ class EkranfotoTesto {
     @Test
     fun ekranfoto_mini_ludilbreto_elfaldita() = runComposeUiTest {
         val ludilo = EkranfotoLudiloRegilo(
-            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
+            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false)
         )
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
-                MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize(), elfaldita = true, onElfalditaSxangxo = {})
+                MiniLudilbreto(ludilo = ludilo, modifier = Modifier.fillMaxSize(), elfaldita = true, onElfalditaŜanĝo = {})
             }
         }
         waitForIdle()
@@ -282,8 +282,8 @@ class EkranfotoTesto {
         override fun observiElsendojn(kanaloSlug: String): StateFlow<List<Elsendo>> = fluo
         override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> = listOf(testElsendo)
         override suspend fun getElsendo(id: String): Elsendo? = testElsendo
-        override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> = listOf(testElsendo)
-        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> = listOf(testElsendo)
+        override suspend fun serĉiElsendojn(teksto: String, limo: Int): List<Elsendo> = listOf(testElsendo)
+        override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> = listOf(testElsendo)
     }
 
     /** Unu diagnoza problemo por la avertokartaj ekranfotoj. */
@@ -334,9 +334,9 @@ private class EkranfotoLudiloRegilo(initial: LudantoInformo = LudantoInformo(sta
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = fonto, pozicioMs = komencoPozicioMs, estasRekta = fonto is Sonfonto.RektaKanalo)
     }
     override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
-    override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+    override fun paŭzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
-    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
+    override fun fiksiLaŭtecon(volumeno: Float) {}
+    override val laŭteco: StateFlow<Float> = MutableStateFlow(1f)
 }

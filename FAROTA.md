@@ -4,7 +4,7 @@
 > **Pliigo 2026-10-19**: K1, G42–G45 kaj C46–C48 aldoniĝis el la Sentry-analizo (organizo `esperantoradio`, projekto `kmp` — uzoj, landoj, eraroj kaj kanaloj en la semajno 10-12 → 10-19; per la MCP-servilo `mcp.sentry.dev`, vidu la skill `sentry-esplorado`).
 > **Bazo**: `b92f739` + delto ĝis `c92766a` (la loka `master` estis ĝisdatigita per `git pull --ff-only` dum la revizio; liniaj referencoj estas al `c92766a`).
 > **Kiel uzi**: la punktoj estas ordigitaj laŭ graveco (KRITIKA → GRAVA → KONSILO). Marku la status-keston `[x]`, kiam finite. Ne forigu punkton sen riparo — anstataŭe movu ĝin al "Jam farita" sube.
-> **Rilato al la aliaj dosieroj** (ekde 2026-10-11): la DAŬRE VALIDA scio el la jam finitaj ([x]) trovindikoj staras en [`NOTOJ.md`](NOTOJ.md) (permanente notinde, laŭ temo); la historio de la riparoj (problemo→kaŭzo→testo) en [`SXANGXOJ.md`](SXANGXOJ.md) (enskribo 13). Ĉi tiu dosiero restas nur por la MALFERMAJ punktoj.
+> **Rilato al la aliaj dosieroj** (ekde 2026-10-11): la DAŬRE VALIDA scio el la jam finitaj ([x]) trovindikoj staras en [`NOTOJ.md`](NOTOJ.md) (permanente notinde, laŭ temo); la historio de la riparoj (problemo→kaŭzo→testo) en [`ŜANĜOJ.md`](ŜANĜOJ.md) (enskribo 13). Ĉi tiu dosiero restas nur por la MALFERMAJ punktoj.
 
 ## KRITIKA
 
@@ -22,20 +22,20 @@
 #### G42 — KMP-X: `ForgottenCoroutineScopeException: rememberCoroutineScope left the composition` (212 okazoj / 58 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-X](https://esperantoradio.sentry.io/issues/KMP-X); 32 okazoj / 10 uzantoj en la lasta semajno, lasta 10-16)
-- **Loko**: `rememberCoroutineScope` en `App.kt:99`, `SercxoEkrano.kt:34`, `PlejŝatatajEkrano.kt:37`, `HejmoEkrano.kt`, `ElshutitajEkrano.kt:39`, `DiagnozoEkrano.kt:37`, `ElsendoEkrano.kt:73`, `KanalEkrano.kt:108`
+- **Loko**: `rememberCoroutineScope` en `App.kt:99`, `SerĉoEkrano.kt:34`, `PlejŝatatajEkrano.kt:37`, `HejmoEkrano.kt`, `ElŝutitajEkrano.kt:39`, `DiagnozoEkrano.kt:37`, `ElsendoEkrano.kt:73`, `KanalEkrano.kt:108`
 - **Priskribo**: Korutino lanĉita el `rememberCoroutineScope` postvivas la komponaĵon — tipa kaŭzo: lanĉo en klik-lambdo, kies rezulto estas uzata post navigado foren.
 - **Sugesto**: inspekti ĉiun uzon; laboro de la ekrano → `LaunchedEffect` aŭ nuligo en `DisposableEffect`; laboro transvivanta navigadon → `viewModelScope` (vidu la komenton en `HejmoEkrano.kt:224`); neniam teni la skopecon en longdaŭra objekto.
 
 #### G43 — KMP-1S: `IllegalArgumentException: La respondo ne estas RSS/Atom-fluo` el kaŝita fluo (substatuso: escalating)
 - **Statuso**: [x]
-- **Solvo** (2026-10-19): jam plene riparita antaŭ la Sentry-analizo — `leguKashitajnElsendojn`
+- **Solvo** (2026-10-19): jam plene riparita antaŭ la Sentry-analizo — `leguKaŝitajnElsendojn`
   kaptas la ĵeton de `kontroluFluecon`, protokolas per `logw`, FORIGAS la koruptitan
   kaŝon kaj redonas null (PR #89/#109); `kontroluFluecon` vokiĝas ankaŭ ANTAŬ
-  `skribuKashon` (fiaskpaĝo kun HTTP 200 ne estas kaŝata). La Sentry-okazoj (dist 249,
+  `skribuKaŝon` (fiaskpaĝo kun HTTP 200 ne estas kaŝata). La Sentry-okazoj (dist 249,
   lasta 10-14) kongruas kun la 249-eldondato kaj ĉesis post ĝi. Testoj:
-  `malpuraKashoEstasForigata`, `http404NeAnstatauxigasKashon`,
-  `fiaskpaghoKunHttp200NeAnstatauxigasKashon` (ElsendoDeponejoImplTest).
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-1S](https://esperantoradio.sentry.io/issues/KMP-1S); 15 okazoj / 4 uzantoj, 10-13 → 10-14; staktraco: `HejmoEkrano → HejmoViewModel.sxargxi → ElsendoDeponejoImpl.leguKashitajnElsendojn`)
+  `malpuraKaŝoEstasForigata`, `http404NeAnstataŭigasKaŝon`,
+  `fiaskpaĝoKunHttp200NeAnstataŭigasKaŝon` (ElsendoDeponejoImplTest).
+- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-1S](https://esperantoradio.sentry.io/issues/KMP-1S); 15 okazoj / 4 uzantoj, 10-13 → 10-14; staktraco: `HejmoEkrano → HejmoViewModel.ŝargi → ElsendoDeponejoImpl.leguKaŝitajnElsendojn`)
 - **Loko**: `ElsendoDeponejoImpl.kt:204` (`kontroluFluecon`), vokita ĉe `:149` ( legado de la kaŝo) kaj `:109` (antaŭ kaŝado)
 - **Priskribo**: Kaŝita respondo (verŝajne HTML-erarpaĝo aŭ koruptita dosiero) estas re-validata kiel RSS kaj ĵetas — unu korupta kaŝero rompas la ŝaradon de la koncerna kanalo por la uzanto.
 - **Sugesto**: (a) dum legado de la kaŝo `kontroluFluecon` ne ĵetu — `logw` + traktu kiel malplenan kaj forigu la koruptitan kaŝeron; (b) validu la respondo (content-type / unuaj signoj `<`) **antaŭ** ol skribi en la kaŝon; (c) ampleksu la teston `ElsendoDeponejoImplTest.kt:95` per "korupta kaŝo ne rompas la legadon".
@@ -53,9 +53,9 @@
   `KorpaLegilo.kt` — `HttpResponse.leguKorponLimigite()` (maks. 1 MB,
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ`): (1) ContentLength-antaŭkontrolo ĵetas tuj sen
   legi; (2) `bodyAsChannel()` + peceta legado devigas la limon ankaŭ sen/kun mensoganta
-  Content-Length. Anstataŭigis `bodyAsText()` en `ElsendoDeponejoImpl.sxargxiElsendojn`
+  Content-Length. Anstataŭigis `bodyAsText()` en `ElsendoDeponejoImpl.ŝargiElsendojn`
   kaj `NovajElsendojKontroloWorker`. La kaŝo-resta konduto kovrita per
-  `troGrandaRespondoNeAnstatauxigasKashon`; la helpilo mem per
+  `troGrandaRespondoNeAnstataŭigasKaŝon`; la helpilo mem per
   `leguKorponLimigiteSekvasLaLimon` kaj `leguKorponLimigiteFlueTranslimasSenContentLength`.
   La `arhivaPeto` (archive.org-metadatenoj, ~1-2 KB) restas kun `bodyAsText`.
 - **Fonto**: Sentry-analizo 2026-10-19 (issues [KMP-1H](https://esperantoradio.sentry.io/issues/KMP-1H), [KMP-1R](https://esperantoradio.sentry.io/issues/KMP-1R); 10-08 → 10-13; provoledo de 60 MB; malaltklasaj aparatoj, 2–3 uzantoj)
@@ -67,7 +67,7 @@
 - **Statuso**: [x]
 - **Riparo** (2026-10-19, branĉo `1019-protokolo-logw-al-sentry`): 3-arg `logw` sendas la escepto-resumon kaj la staktracon kiel `Sentry.logger.warn` (du linioj) + KDoc; AGENTS.md kaj `Protokolo.kt`-KDoc korektitaj. Minimala diferenca ŝanĝo, sen nova test-infrastrukturo (laŭ deziro de la uzanto).
 - **Fonto**: Sentry-analizo 2026-10-19 (post-raporta diskuto; la ŝajna "eraro-kolapso" post 10-14 parte kaŭzita de tio)
-- **Loko**: `ProtokoloUtil.kt:54-58` (`logw(tag, msg)` → `Sentry.logger.warn`; `logw(tag, msg, e)` → nur `platformLogw`, neniu Sentry-voko; `platformLogw` = nur `android.util.Log.w`); dokumentoj: AGENTS.md ("logw(tag, msg, e) — ĝi restas LOKA" — vera nur por la 3-arg formo, sed tro ĝeneraligebla), la KDoc super `loge(tag,msg,e)` ("Eraroj estas ankaux kaptitaj de Sentry…") staras rekte super `logw(tag,msg,e)` sen propra KDoc, kaj `Protokolo.kt` (commonMain) asertas "kun Sentry-breadcrumb-oj" — sed `platformLog*` aldonas neniun breadcrumb.
+- **Loko**: `ProtokoloUtil.kt:54-58` (`logw(tag, msg)` → `Sentry.logger.warn`; `logw(tag, msg, e)` → nur `platformLogw`, neniu Sentry-voko; `platformLogw` = nur `android.util.Log.w`); dokumentoj: AGENTS.md ("logw(tag, msg, e) — ĝi restas LOKA" — vera nur por la 3-arg formo, sed tro ĝeneraligebla), la KDoc super `loge(tag,msg,e)` ("Eraroj estas ankaŭ kaptitaj de Sentry…") staras rekte super `logw(tag,msg,e)` sen propra KDoc, kaj `Protokolo.kt` (commonMain) asertas "kun Sentry-breadcrumb-oj" — sed `platformLog*` aldonas neniun breadcrumb.
 - **Priskribo**: Du samnomaj troŝarĝoj kondutas malsame pri malproksima protokolado, nevideble ĉe la vok-lokoj (22 vokoj 2-arg, 44 vokoj 3-arg — la silenta formo estas la pli ofta). Sekvoj: (a) la avertoj de la 3-arg formo (RSS-malsukcesa, lud-eraroj, Worker-eraroj) estas tute nevideblaj en Sentry ekde 247/249 — oni kredis, ke la eraro-taso "kolapsis", dum ĝi nur fariĝis nevidebla; (b) AGENTS.md kaj la kodo kontraŭdiras (por la 2-arg formo: `Sentry.logger.warn` ja sendas); (c) "sendata al Sentry" estas plursenca — Sentry Logs kontraŭ Sentry Errors (avertoj neniam aperas kiel issue), do laŭ la kontrolata UI oni konkludas aŭ "sendata" aŭ "ne sendata".
 - **Sugesto**: (1) 3-arg `logw` sendu `Sentry.logger.warn("[$tag] $msg: ${e::class.simpleName}: ${e.message}")` — unuforma regulo: "logw = averto en Sentry Logs, ĉiam; neniam error-evento; neniam eraro-kvoto"; (2) ĉio, krom logd iru al Sentry (kun la escepto ke la uzanto povas malŝalti ke logi iras al Sentry en la agordoj); (3) KDoc pri ĉiu troŝargo kun la celo-matriks (logcat / Sentry Logs nivelo / Sentry errors / kvoto), inkluzive de induko "ne sendata" aŭ "sendata al Sentry"; (4) korektu AGENTS.md kaj la Protokolo.kt-KDoc; (5) kontrakt-testo: malgranda interna Sentry-"sink" (anstataŭigebla per test-fako), kiu asertas en commonTest: logw 2-arg → warn, logw 3-arg → warn (post-riparo), loge 3-arg → captureException, logd → nenio malproksima.
 
@@ -163,22 +163,22 @@
 
 #### C32 — Tuŝ-celoj sub 48 dp; `contentDescription = null`
 - **Statuso**: [ ]
-- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElshutitajEkrano.kt:140-148` (`IconButton` 36.dp); `App.kt` (Menuo-butono, `IconButton` sen `minimumTouchTargetSize`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
+- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElŝutitajEkrano.kt:140-148` (`IconButton` 36.dp); `App.kt` (Menuo-butono, `IconButton` sen `minimumTouchTargetSize`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
 - **Sugesto**: `Modifier.minimumTouchTargetSize()` aŭ pligrandigo; aldonu `contentDescription` al la ikonoj.
 
 #### C34 — iOS: `PlatformLigilo` estas TODO; neniuj deep links
 - **Statuso**: [ ]
-- **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetposhton` malplenaj); neniu `ACTION_VIEW` intent-filter
+- **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
 - **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
 
 #### C38 — Morta kodo
 - **Statuso**: [ ]
-- **Loko**: `PersonigoDeponejojImpl.kt:36,48` (`LastAuxskultitajDeponejo.pozicioj` neniam plenigita — `getPozicio` ĉiam redonas `null`); `NoOpElshutDeponejo.kt:18` (nova `MutableStateFlow` je ĉiu voko de `observiElshutStaton`); `Diagnozo.kt:32` (`DiagnozoTipo.RETO` neniam konstruita; `Severeco.INFO` neniam produktata — la filtrilo en `HejmoEkrano.kt:332` estas senefika); `ElsendoDeponejoImpl.kt:38-46` (`getElsendojn` kaŝo-nur, sed la interfaco sugestas alie — dokumentu aŭ renomu)
+- **Loko**: `PersonigoDeponejojImpl.kt:36,48` (`LastAŭskultitajDeponejo.pozicioj` neniam plenigita — `getPozicio` ĉiam redonas `null`); `NoOpElŝutDeponejo.kt:18` (nova `MutableStateFlow` je ĉiu voko de `observiElŝutStaton`); `Diagnozo.kt:32` (`DiagnozoTipo.RETO` neniam konstruita; `Severeco.INFO` neniam produktata — la filtrilo en `HejmoEkrano.kt:332` estas senefika); `ElsendoDeponejoImpl.kt:38-46` (`getElsendojn` kaŝo-nur, sed la interfaco sugestas alie — dokumentu aŭ renomu)
 - **Sugesto**: forigu aŭ dokumentu; direktu la poziciojn al `LudatojDeponejo`.
 
 #### C39 — `AppStato`: duobla ŝargo de la sama kanalo (neniu in-flight dedup)
 - **Statuso**: [ ]
-- **Loko**: `ElsendoDeponejoImpl.kt` (`sxargxiElsendojn` — du samtempaj vokoj, ekz. pull-to-refresh + aŭtomata ŝargo, faras duoblan elŝuton)
+- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faras duoblan elŝuton)
 - **Sugesto**: Mutex/Deferred per kanalo.
 
 #### C40 — `gradle.properties`: `org.gradle.jvmargs=-Xmx1536m` malalta por KMP
@@ -193,7 +193,7 @@
 
 #### C43 — Semantiko de `FilCache` kaj scio de `RssArkivServer` por la estonta servilo
 - **Statuso**: [ ]
-- **Priskribo**: (a) `ændrerSigIkke=true` = "kaŝita → neniam refreŝi" — tio igas `RssArkivServer-filcache/` la determinismajn golden-fixture-ojn; la nova plano diras nur "reuzo de Ktor-HttpCache + RssArkivServer-filcache" sen precizigi tiun semantikon. (b) La malnova `RomeFeedWriter` skribis `enclosure length` el la loka kaŝo kaj **per-jarajn arkivdosierojn** `feed-<slug>-<yyyy>.xml` — la nova plano tion ne mencias. (c) La plan-snippet vokas `parsilo.parsRss(fluo, kanal)` **sen** `httpKliento` — por Peranto tio signifas divenitajn, ofte malĝustajn, archive.org-URL-ojn en la arkivo — la servilo devas transdoni klienton kaj persistentan `ArchiveOrgDosiernomoKasho` (vidu ankaŭ G16 kaj G34). (d) La id-rondira problemo (G16) rekte tuŝas la inkrementan kunfandon de la plano.
+- **Priskribo**: (a) `ændrerSigIkke=true` = "kaŝita → neniam refreŝi" — tio igas `RssArkivServer-filcache/` la determinismajn golden-fixture-ojn; la nova plano diras nur "reuzo de Ktor-HttpCache + RssArkivServer-filcache" sen precizigi tiun semantikon. (b) La malnova `RomeFeedWriter` skribis `enclosure length` el la loka kaŝo kaj **per-jarajn arkivdosierojn** `feed-<slug>-<yyyy>.xml` — la nova plano tion ne mencias. (c) La plan-snippet vokas `parsilo.parsRss(fluo, kanal)` **sen** `httpKliento` — por Peranto tio signifas divenitajn, ofte malĝustajn, archive.org-URL-ojn en la arkivo — la servilo devas transdoni klienton kaj persistentan `ArchiveOrgDosiernomoKaŝo` (vidu ankaŭ G16 kaj G34). (d) La id-rondira problemo (G16) rekte tuŝas la inkrementan kunfandon de la plano.
 - **Sugesto**: ĝisdatigu `docs/nova/06_servilo_arkivo.md` antaŭ ol konstrui la servilon.
 
 #### C44 — Perditaj kontraŭ la malnova apo (konsideroj, ne nepre riparoj)
@@ -236,6 +236,6 @@
 ---
 
 > **Pri la finitaj trovindikoj** (62): ilia daŭre valida scio staras en
-> [`NOTOJ.md`](NOTOJ.md); la historio de la riparoj en [`SXANGXOJ.md`](SXANGXOJ.md)
+> [`NOTOJ.md`](NOTOJ.md); la historio de la riparoj en [`ŜANĜOJ.md`](ŜANĜOJ.md)
 > (enskribo 13) kaj en la PR-oj #89–#95. La etikedoj (K…, G…, C…) restas
 > spureblaj per `git log` kaj per NOTOJ.md.

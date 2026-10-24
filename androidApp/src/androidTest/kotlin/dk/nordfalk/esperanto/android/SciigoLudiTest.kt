@@ -38,10 +38,10 @@ class SciigoLudiTest {
     @After
     fun haltu() = InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
 
-    /** Atendas ĝis [kondicxo] veras, maks [maksMs]. */
-    private fun atendu(maksMs: Long, kondicxo: () -> Boolean) {
+    /** Atendas ĝis [kondiĉo] veras, maks [maksMs]. */
+    private fun atendu(maksMs: Long, kondiĉo: () -> Boolean) {
         val limo = System.currentTimeMillis() + maksMs
-        while (!kondicxo()) {
+        while (!kondiĉo()) {
             check(System.currentTimeMillis() < limo) { "Kondiĉo ne plenumita post $maksMs ms" }
             Thread.sleep(100)
         }
@@ -59,7 +59,7 @@ class SciigoLudiTest {
             .setClass(kunteksto, LudiElsendoReceivilo::class.java)
             .putExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_ID, "testo:sciigo-1")
             .putExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_TITOLO, "Testa elsendo el sciigo")
-            .putExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_FLUO, "https://archive.org/download/skecxo_jarka/skecxo_jarka.mp3")
+            .putExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_FLUO, "https://archive.org/download/skeĉo_jarka/skeĉo_jarka.mp3")
             .putExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_DATO, "2026-09-23")
             .putExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_SLUG, "peranto")
             .putExtra(NovajElsendojKontroloWorker.EXTRA_KANALO_NOMO, "Esperanta Retradio")

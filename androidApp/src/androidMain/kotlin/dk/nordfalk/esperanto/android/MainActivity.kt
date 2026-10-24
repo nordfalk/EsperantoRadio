@@ -11,7 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dk.nordfalk.esperanto.EsperantoRadioApp
-import dk.nordfalk.esperanto.data.config.IntentSxlosilo
+import dk.nordfalk.esperanto.data.config.IntentŜlosilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
 import dk.nordfalk.esperanto.domain.player.haltuAlarmRingon
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             EsperantoRadioApp(ludilo = ludilo)
         }
-        // La sciig-skedo estas mastrumata de App.kt per ghisdatiguSciigSkedon()
+        // La sciig-skedo estas mastrumata de App.kt per ĝisdatiguSciigSkedon()
         traktuIntenton(intent)
         // testuSentry()
     }
@@ -61,14 +61,14 @@ class MainActivity : ComponentActivity() {
         if (intent == null) return
         when (intent.action) {
             "dk.nordfalk.esperanto.ALARMO_EKIGAS" -> {
-                if (!IntentSxlosilo.estasFidinda(intent)) {
+                if (!IntentŜlosilo.estasFidinda(intent)) {
                     logw("MainActivity", "Rifuzas falsitan ALARMO_EKIGAS-intenton (nonce mankas aŭ malĝustas)")
                     return
                 }
                 traktuAlarmIntent(intent)
             }
             NovajElsendojKontroloWorker.ACTION_MALFERMI_ELSENDON -> {
-                if (!IntentSxlosilo.estasFidinda(intent)) {
+                if (!IntentŜlosilo.estasFidinda(intent)) {
                     logw("MainActivity", "Rifuzas falsitan MALFERMI_ELSENDON-intenton (nonce mankas aŭ malĝustas)")
                     return
                 }

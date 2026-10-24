@@ -20,7 +20,7 @@ import dk.nordfalk.esperanto.logi
  * (2026-10-13, PR #109): debug-konstruoj (FLAG_DEBUGGABLE — la .alfa-APK) kaj
  * emuliloj tute ne raportas — la propra testado de la programisto ne poluu la
  * produktadajn datumojn nek la Sentry-kvoton (emulilaj OOM-kraŝoj aperis kiel
- * "produktado", vidu SXANGXOJ.md). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
+ * "produktado", vidu ŜANĜOJ.md). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
  */
 class EsperantoRadioAplikajho : Application() {
     override fun onCreate() {

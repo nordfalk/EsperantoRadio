@@ -67,7 +67,7 @@ fun NavigaTirkesto(
         windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
         tirkestEroj().forEach { (ikono, etikedo, vojo) ->
-            if (vojo is Vojo.Elshutoj) {
+            if (vojo is Vojo.Elŝutoj) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
             NavigationDrawerItem(
@@ -164,8 +164,8 @@ private fun tirkestEroj() = listOf(
     TirkestEro(Icons.Filled.Home, "Hejmo", Vojo.Hejmo),
     TirkestEro(Icons.Filled.MusicNote, "Kanaloj", Vojo.Kanalaro),
     TirkestEro(Icons.Filled.Favorite, "Plej ŝatataj", Vojo.Plejŝatataj),
-    TirkestEro(Icons.Filled.Search, "Serĉi", Vojo.Sercxo),
-    TirkestEro(Icons.Filled.Download, "Elŝutoj", Vojo.Elshutoj),
+    TirkestEro(Icons.Filled.Search, "Serĉi", Vojo.Serĉo),
+    TirkestEro(Icons.Filled.Download, "Elŝutoj", Vojo.Elŝutoj),
     TirkestEro(Icons.Filled.Alarm, "Vekhorloĝo", Vojo.Alarmoj),
     TirkestEro(Icons.Filled.Settings, "Agordoj", Vojo.Agordoj),
 )

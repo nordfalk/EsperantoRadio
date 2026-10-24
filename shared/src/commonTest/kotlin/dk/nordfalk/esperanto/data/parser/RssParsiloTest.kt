@@ -47,7 +47,7 @@ class RssParsiloTest {
         val kp226 = elsendoj.find { it.titolo.contains("KP226") }
         assertNotNull(kp226, "KP226 devas ekzisti")
         assertEquals("2025-04-06", kp226.dato)
-        assertTrue(kp226.dauro != null && kp226.dauro!! > 0, "Dauro devas esti > 0: ${kp226.dauro}")
+        assertTrue(kp226.daŭro != null && kp226.daŭro!! > 0, "Daŭro devas esti > 0: ${kp226.daŭro}")
     }
 
     @Test
@@ -195,7 +195,7 @@ class RssParsiloTest {
         // La konata ero (docs/nova/04, ora test-tabelo): Thu, 26 Dec 2024,
         // daŭro 00:51:17, enclosure enhavanta 392138630…mp3
         val e2sp6gp = elsendoj.first { it.dato == "2024-12-26" }
-        assertEquals(3_077L, e2sp6gp.dauro, "Dauro devas esti 00:51:17 = 3077 s")
+        assertEquals(3_077L, e2sp6gp.daŭro, "Daŭro devas esti 00:51:17 = 3077 s")
         assertTrue(e2sp6gp.fluo.startsWith("https://"), "Stream devas esti https: ${e2sp6gp.fluo}")
         assertTrue(e2sp6gp.fluo.contains("392138630"), "Stream devas enhavi 392138630: ${e2sp6gp.fluo}")
         assertTrue(e2sp6gp.fluo.endsWith(".mp3"), "Stream devas finii per .mp3: ${e2sp6gp.fluo}")
@@ -360,7 +360,7 @@ class RssParsiloTest {
     // === Sen fluo → forĵetu ===
 
     @Test
-    fun eroSenStreamEstasForjxetita() = kotlinx.coroutines.test.runTest {
+    fun eroSenStreamEstasForĵetita() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -459,7 +459,7 @@ class RssParsiloTest {
     // === iTunes-daŭro ===
 
     @Test
-    fun legasDauronFormatoHhMmSs() = kotlinx.coroutines.test.runTest {
+    fun legasDaŭronFormatoHhMmSs() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -479,11 +479,11 @@ class RssParsiloTest {
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
-        assertEquals(6916L, elsendoj[0].dauro)
+        assertEquals(6916L, elsendoj[0].daŭro)
     }
 
     @Test
-    fun legasDauronFormatoSekundoj() = kotlinx.coroutines.test.runTest {
+    fun legasDaŭronFormatoSekundoj() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -503,7 +503,7 @@ class RssParsiloTest {
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         assertEquals(1, elsendoj.size)
-        assertEquals(3077L, elsendoj[0].dauro)
+        assertEquals(3077L, elsendoj[0].daŭro)
     }
 
     // === Regulo P6.3 — Peranto (Esperanta Retradio) ===
@@ -796,7 +796,7 @@ class RssParsiloTest {
     // === HTML-stripa bug-riparo ===
 
     @Test
-    fun gxeneralaParsiloTraktasEntioEskapitanHtml() = kotlinx.coroutines.test.runTest {
+    fun ĝeneralaParsiloTraktasEntioEskapitanHtml() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -865,7 +865,7 @@ class RssParsiloTest {
     // === (PR #89) — nur http(s)-fluoj el nefidinda RSS ===
 
     @Test
-    fun forjxasElsendojnKunNeRetajSkemoj() = kotlinx.coroutines.test.runTest {
+    fun forĵasElsendojnKunNeRetajSkemoj() = kotlinx.coroutines.test.runTest {
         // file://, content:// kaj javascript:// el difektita/malica fluo ne estu ludeblaj:
         // ExoPlayer/Coil scipovas malfermi file:// kaj content://
         val rss = """
@@ -908,18 +908,18 @@ class RssParsiloTest {
             "<a href=\"intent://malico/#Intent;action=android.intent.action.CALL;end\">voku</a>" +
             "<a href=\"JaVaScRiPt:alert(1)\">kliku</a>" +
             "<a href=\"data:text/html;base64,PHNjcmlwdD4=\">datumo</a>" +
-            "<a href=\"https://bone.example/pagho\">ĝusta ligilo</a></p>"
+            "<a href=\"https://bone.example/paĝo\">ĝusta ligilo</a></p>"
         val purigita = parsilo.puriguHtmlKunEtikedojn(html)
         assertFalse(purigita.contains("intent://"), "intent:// devas esti forigita: $purigita")
         assertFalse(purigita.lowercase().contains("javascript:"), "javascript: devas esti forigita: $purigita")
         assertFalse(purigita.contains("data:text/html"), "data:-URL devas esti forigita: $purigita")
-        assertTrue(purigita.contains("https://bone.example/pagho"), "http(s)-ligilo devas resti: $purigita")
+        assertTrue(purigita.contains("https://bone.example/paĝo"), "http(s)-ligilo devas resti: $purigita")
     }
 
     // === (PR #91) — <audio>-fallback ene de la priskribo-HTML ===
 
     @Test
-    fun auxdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
+    fun aŭdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
         // Regulo P6.1.4: fluo kies sola sono estas en <audio><source> ene de la priskribo
         // (CDATA/eskapita) — antaŭe la serĉo okazis en la XML-dokumento kaj trovis nenion
         val rss = """
@@ -941,7 +941,7 @@ class RssParsiloTest {
     // === (PR #91) — ĝenerala skip-listo de nesubtenataj gastigantoj ===
 
     @Test
-    fun forjxasElsendojnKunNesubtenatajGastigantoj() = kotlinx.coroutines.test.runTest {
+    fun forĵasElsendojnKunNesubtenatajGastigantoj() = kotlinx.coroutines.test.runTest {
         val rss = """
             <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
             <item><title>Bona</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
@@ -977,10 +977,10 @@ class RssParsiloTest {
 
     @Test
     fun leguDaŭronKunFrakciajSekundoj() {
-        assertEquals(3_077L, parsilo.leguDauron("00:51:17.47"))
-        assertEquals(3_077L, parsilo.leguDauron("00:51:17"))
-        assertEquals(90L, parsilo.leguDauron("1:30"))
-        assertNull(parsilo.leguDauron("abc"))
+        assertEquals(3_077L, parsilo.leguDaŭron("00:51:17.47"))
+        assertEquals(3_077L, parsilo.leguDaŭron("00:51:17"))
+        assertEquals(90L, parsilo.leguDaŭron("1:30"))
+        assertNull(parsilo.leguDaŭron("abc"))
     }
 
     @Test

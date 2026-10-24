@@ -90,7 +90,7 @@ class EsperantoLudadoServo : MediaSessionService() {
                                 // LudvicoRegilo, kie la aŭtoludo eble jam avancis al la sekva
                                 val finantaFonto = SonfontoKodilo.malkodigu(
                                     player.currentMediaItem?.mediaMetadata?.extras
-                                        ?.getString(SonfontoKodilo.SXLOSILO)
+                                        ?.getString(SonfontoKodilo.ŜLOSILO)
                                 )
                                 regilo.traktiFinonPublika(LudantoStato.Finita, erara = false, finantaFonto = finantaFonto)
                             } else {

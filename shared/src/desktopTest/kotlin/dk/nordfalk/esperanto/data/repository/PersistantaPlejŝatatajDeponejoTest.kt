@@ -23,7 +23,7 @@ class PersistantaPlejŝatatajDeponejoTest {
     fun purigu() = nodo.removeNode()
 
     @Test
-    fun baskuloKonservigxasTransRestarton() = runTest {
+    fun baskuloKonserviĝasTransRestarton() = runTest {
         val deponejo = PersistantaPlejŝatatajDeponejo(settings)
         assertFalse(deponejo.estasPlejŝatata("muzaiko"))
 
@@ -47,7 +47,7 @@ class PersistantaPlejŝatatajDeponejoTest {
     }
 
     @Test
-    fun plurajKanalojKonservigxas() = runTest {
+    fun plurajKanalojKonserviĝas() = runTest {
         val deponejo = PersistantaPlejŝatatajDeponejo(settings)
         deponejo.baskuliPlejŝaton("muzaiko")
         deponejo.baskuliPlejŝaton("kernpunkto")

@@ -66,7 +66,7 @@ EsperantoRadio/
 │   │   │   │   ├── parser/          # RssParsilo (la sep parsreguloj — 04_parsado_kaj_arkivo.md)
 │   │   │   │   └── repository/     # deponej-implementaĵoj (Ktor, diskkaŝmemoro, persisto)
 │   │   │   ├── domain/
-│   │   │   │   ├── model/           # Kanalo, Elsendo, Sonfonto, LudantoStato, Alarmo, ElshutStato
+│   │   │   │   ├── model/           # Kanalo, Elsendo, Sonfonto, LudantoStato, Alarmo, ElŝutStato
 │   │   │   │   ├── player/          # LudiloRegilo, LudvicoLogiko, LudvicoRegilo
 │   │   │   │   └── repository/     # deponej-interfacoj (Deponejoj, PersonigoDeponejoj)
 │   │   │   └── ui/                  # Compose-ekranoj, Temo, HtmlVido, MiniLudilbreto, ktp

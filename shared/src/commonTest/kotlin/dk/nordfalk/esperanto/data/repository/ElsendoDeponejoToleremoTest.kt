@@ -34,7 +34,7 @@ class ElsendoDeponejoToleremoTest {
         )
 
         val rezultoj = coroutineScope {
-            kanaloj.map { k -> async { deponejo.sxargxiElsendojnPorKanal(k, fortoRefresigi = true) } }.awaitAll()
+            kanaloj.map { k -> async { deponejo.ŝargiElsendojnPorKanal(k, fortoRefresigi = true) } }.awaitAll()
         }
 
         // Ambaŭ revenas (malplenaj — neniu kaŝmemoro) anstataŭ ke la Error nuligu la tutan ŝargadon

@@ -29,12 +29,12 @@ class RssParsilo {
         val doc = Ksoup.parseXml(fluoTeksto, "")
         val deArkivo = kanalo.podkastaRssUrl?.contains("podkasta_arkivo") == true
         return if (deArkivo) {
-            parsuGxenerala(doc, kanalo)   // jam normigita
+            parsuĜenerala(doc, kanalo)   // jam normigita
         } else when (kanalo.slug) {
             "varsoviavento" -> parsuVarsoviaVento(doc, kanalo)
             "peranto" -> parsuPeranto(doc, kanalo, httpKliento)
             "vinilkosmo" -> parsuVinilkosmo(doc, kanalo)
-            else -> parsuGxenerala(doc, kanalo)
+            else -> parsuĜenerala(doc, kanalo)
         }
     }
 }
@@ -46,14 +46,14 @@ Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝi
 
 ## La sep reguloj — kiel reprodukti
 
-### Regulo P6.1 — Ĝenerala (`parsuGxenerala`)
+### Regulo P6.1 — Ĝenerala (`parsuĜenerala`)
 
 Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 1. `id = entry.uri` aŭ `<kanalo.slug>:<dato>`.
 2. Legu iTunes-modulon: `summary`, `duration`, `image`.
 3. `priskribo` = `<description>` aŭ iTunes-`summary`; se `<content:encoded>` ĉeestas, uzu ĝin.
 4. `fluo` = `<enclosure type="audio/*" url>`. Se neniu: parsu priskribo-HTML, prenu `<audio><source src>`. Se ankoraŭ neniu → **forĵetu**.
-5. `dauro` el iTunes; `bildoUrl` el iTunes-bildo.
+5. `daŭro` el iTunes; `bildoUrl` el iTunes-bildo.
 6. Se `fluo` komenciĝas per `http://` → `https://` (**nur por `kernpunkto`** — historia korekto,
    ĉar la malnova Rome-biblioteko reskribis https→http; aliaj kanaloj ricevas la URL-on el la fluo
    sen ŝanĝo kaj la cleartext-esceptoj staras en `network_security_config.xml`).

@@ -13,17 +13,17 @@ import kotlin.test.Test
 @OptIn(ExperimentalTestApi::class)
 class ElsendoEkranoSavitaPozicioTest {
 
-    private fun elsendo(id: String = "e1", dauro: Long? = 300) = Elsendo(
+    private fun elsendo(id: String = "e1", daŭro: Long? = 300) = Elsendo(
         id = id,
         kanaloSlug = "k1",
         titolo = "Testa elsendo",
         fluo = "https://x.com/$id.mp3",
         dato = "2024-01-01",
-        dauro = dauro,
+        daŭro = daŭro,
     )
 
     @Test
-    fun montrasDauxrigiKiamSavitaPozicioEkzistas() = runComposeUiTest {
+    fun montrasDaŭrigiKiamSavitaPozicioEkzistas() = runComposeUiTest {
         val ludatoj = LudatojDeponejoMaketo()
         runBlocking { ludatoj.registriPozicion("e1", "k1", 120_000, 300_000) } // 2:00 / 5:00
 

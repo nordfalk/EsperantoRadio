@@ -53,10 +53,10 @@ class AlarmoReceiviloTest {
         ludilo.halti() // halti() vokas haltuAlarmRingon() — tio ankaŭ haltigas eventualan fallback-ringtonon
     }
 
-    /** Atendas ĝis [kondicxo] veras, maks [maksMs]. */
-    private fun atendu(maksMs: Long, kondicxo: () -> Boolean) {
+    /** Atendas ĝis [kondiĉo] veras, maks [maksMs]. */
+    private fun atendu(maksMs: Long, kondiĉo: () -> Boolean) {
         val limo = System.currentTimeMillis() + maksMs
-        while (!kondicxo()) {
+        while (!kondiĉo()) {
             check(System.currentTimeMillis() < limo) { "Kondiĉo ne plenumita post $maksMs ms" }
             Thread.sleep(100)
         }
@@ -84,7 +84,7 @@ class AlarmoReceiviloTest {
             (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.kanaloSlug == "peranto",
         )
 
-        // ... kaj la ludado efektive komenciĝas (MP3 elshuto + preparo)
+        // ... kaj la ludado efektive komenciĝas (MP3 elŝuto + preparo)
         atendu(30_000) { ludilo.stato.value.stato is LudantoStato.Ludas }
     }
 
@@ -99,7 +99,7 @@ class AlarmoReceiviloTest {
      * elŝuto estas bezonata.
      */
     @Test
-    fun alarmoSciigoNuligxigxasKiamLudadoHaltigxas() {
+    fun alarmoSciigoNuliĝiĝasKiamLudadoHaltiĝas() {
         val nm = kunteksto.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val sciigoAktiva: () -> Boolean = { nm.activeNotifications.any { it.id == AlarmoReceivilo.SCIIGO_ID } }
 
@@ -140,7 +140,7 @@ class AlarmoReceiviloTest {
      * kaj la best-effort startActivity de la ricevilo ne estas uzanta ago.
      */
     @Test
-    fun fallbackRingtonoHaltigxigxasPerHalti() {
+    fun fallbackRingtonoHaltiĝiĝasPerHalti() {
         // Purigo de eventuala postrestaĵo
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
         AlarmoReceivilo.haltuFallbackRingon()
@@ -163,19 +163,19 @@ class AlarmoReceiviloTest {
     }
 
     /**
-     * La fallback-ringtono MEM haltas post [AlarmoReceivilo.ringtonoMaksDauroMs]
+     * La fallback-ringtono MEM haltas post [AlarmoReceivilo.ringtonoMaksDaŭroMs]
      * (defaŭlte 5 minutoj) kaj la daŭra alarm-sciigo estas nuligata kun ĝi —
      * Ringtone.play() alie ripetiĝus senfine kaj la ongoing-sciigo restus.
      *
      * Ret-ne-dependa: same uzas neekzistantan kanalon (tuja fallback, neniu reto).
      */
     @Test
-    fun fallbackRingtonoMemHaltigxigxasKajNuligxasSciigon() {
+    fun fallbackRingtonoMemHaltiĝiĝasKajNuliĝasSciigon() {
         val nm = kunteksto.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val sciigoAktiva: () -> Boolean = { nm.activeNotifications.any { it.id == AlarmoReceivilo.SCIIGO_ID } }
 
-        val originala = AlarmoReceivilo.ringtonoMaksDauroMs
-        AlarmoReceivilo.ringtonoMaksDauroMs = 2_000 // anstataŭ 5 minutoj
+        val originala = AlarmoReceivilo.ringtonoMaksDaŭroMs
+        AlarmoReceivilo.ringtonoMaksDaŭroMs = 2_000 // anstataŭ 5 minutoj
         try {
             // Purigo de eventuala postrestaĵo
             InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
@@ -198,7 +198,7 @@ class AlarmoReceiviloTest {
             atendu(10_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
             atendu(5_000) { !sciigoAktiva() }
         } finally {
-            AlarmoReceivilo.ringtonoMaksDauroMs = originala
+            AlarmoReceivilo.ringtonoMaksDaŭroMs = originala
         }
     }
 }

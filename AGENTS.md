@@ -41,9 +41,9 @@ konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esencoj:
 `malnova/` (la historia apo — ne tuŝebla), `androidApp/` + `desktopApp/` +
 `webApp/` + `shared/` (la nova KMP-apo), `docs/malnova/` + `docs/nova/`
-(dokumentaro), `CHANGELOG.md` + `SXANGXOJ.md` + `NOTOJ.md` + `FAROTA.md` +
+(dokumentaro), `CHANGELOG.md` + `ŜANĜOJ.md` + `NOTOJ.md` + `FAROTA.md` +
 `AGENTS.md` (la protokolaro), `.vibe/skills/` (proceduraj skill-oj:
-`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`).
+`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`, `esperanto-lingvo`).
 
 ## Plej gravaj reguloj por agentoj
 
@@ -91,7 +91,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
    eraro, incidento aŭ neatendita rezulto — skribu koncizan lecionon (kun
    dato): aktivaj reguloj en "Aktivaj reguloj kaj rimarkoj" (sube), procedura
    scio en la koncernan skill-on (`.vibe/skills/`), historiaj detaloj en
-   NOTOJ.md aŭ SXANGXOJ.md. Celo: ne ripeti la saman eraron.
+   NOTOJ.md aŭ ŜANĜOJ.md. Celo: ne ripeti la saman eraron.
 - **A12 — Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
    Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
    esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
@@ -134,10 +134,10 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 rimarkindaj ŝanĝoj. La formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/)
 kun esperantaj kategorioj (**Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**,
 **Sekureco**). Ĉiu eniro estas **unu linio**: konciza priskribo sen teknikaj
-detaloj + ligilo al la PR (regulo A10). Rilato al [`SXANGXOJ.md`](SXANGXOJ.md):
-CHANGELOG = "kio ŝanĝiĝis por la uzanto", SXANGXOJ = detala teknika
+detaloj + ligilo al la PR (regulo A10). Rilato al [`ŜANĜOJ.md`](ŜANĜOJ.md):
+CHANGELOG = "kio ŝanĝiĝis por la uzanto", ŜANĜOJ = detala teknika
 labortaglibro (problem-analizo, kialoj, kontrolrezultoj). La samo ne devas
-aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
+aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
 
 **Laborfluo (kiu tenas ĝin ĝisdatigata):**
 
@@ -159,9 +159,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 > La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan:
 > **`eldonado`** (versio-eldonado al Play), **`sentry-esplorado`** (legi/analizi
 > Sentry-n), **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, emulilo),
-> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj). Historiaj lecionoj kaj
+> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj), **`esperanto-lingvo`**
+> (kanonaj terminoj kaj supersigno-skriboj). Historiaj lecionoj kaj
 > arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
-> [`SXANGXOJ.md`](SXANGXOJ.md).
+> [`ŜANĜOJ.md`](ŜANĜOJ.md).
 
 - **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
   post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
@@ -181,11 +182,20 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
   teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
   per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
-- **`LaunchedEffect(Unit) { vm.sxargxi() }` lanĉas la ŝargadon je ĈIU ekran-eniro** (2026-10-20):
+- **Esperanto-ortografio: nur veraj supersignoj** (renomo 2026-10-24): ĉiuj identigiloj,
+  klasoj kaj dosier-nomoj uzas `ŝ ĝ ĉ ĵ ŭ` (`ŝargiElsendojnPorKanal`, `ElŝutStato.kt`,
+  `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
+  **ESCEPTOJ (persistigitaj valoroj — ne renomu)**: agord-ŝlosiloj `"auxtomata_daurigo"`,
+  `"kasxitaj_avertoj"`, `"apaj_novajxoj_hesh"` (valoroj de `SettingsKeys`, ne la konstantaj
+  nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@SerialName`-ŝlosiloj en
+  `Modeloj.kt` (`retposhto`, `defaltSxatata`, `dauro`, `dauroMs`, `retpaghoUrl`) — ili
+  tenas kongruon kun ekzistantaj uzant-datumoj. Antaŭ ol skribi, **grep-u kaj kopiu**;
+  bibliotekaj nomoj restas anglaj (`PullToRefreshBox`, `isRefreshing`). Detaloj: la skill-o **`esperanto-lingvo`**.
+- **`LaunchedEffect(Unit) { vm.ŝargi() }` lanĉas la ŝargadon je ĈIU ekran-eniro** (2026-10-20):
   navigado rekomponas la ekranon, do reveno al Hejmo/Kanalaro reŝargis ĉion — ĝis 7 plenaj
   ŝarĝoj en 90 sekundoj ĉe unu uzanto (Sentry: 24 ŝarĝoj vs 6 apomfermoj). Ĉiu ŝargado,
-  kiun ekrano ekigas, devas iri tra `SxargxaKontrolilo` (dedupigo + TTL 5 min;
-  `ui/SxargxaKontrolilo.kt`) — kaj `leguKashitajnElsendojn` ne re-parsu kiam la en-memora
+  kiun ekrano ekigas, devas iri tra `ŜargaKontrolilo` (dedupigo + TTL 5 min;
+  `ui/ŜargaKontrolilo.kt`) — kaj `leguKaŝitajnElsendojn` ne re-parsu kiam la en-memora
   kaŝo jam havas la kanalon.
 - **Komponantoj de `ModalNavigationDrawer` restas en la semantika arbo ankaŭ
   kiam la tirkesto estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")`
@@ -216,7 +226,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
   `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese
   (`git merge --no-ff origin/master` en la PR-branĉo; konfliktoj en la
-  dokumentaj dosieroj (CHANGELOG/SXANGXOJ/AGENTS) estas kutimaj — solvu ilin
+  dokumentaj dosieroj (CHANGELOG/ŜANĜOJ/AGENTS) estas kutimaj — solvu ilin
   konservante ambaŭ flankojn).
 - **`mergeStateStatus: UNSTABLE`** (2026-10-14, PR #109): signifas "mergeable,
   sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
@@ -370,6 +380,7 @@ esperantoradio_kanaloj_v9.json (bundled resource)
 | Eldoni version al Google Play | la skill-o `eldonado` (`.vibe/skills/`) |
 | Legi/esplori Sentry-n | la skill-o `sentry-esplorado` (`.vibe/skills/`) |
 | Redakti la kanalkonfiguron / JSONC | la skill-o `kanalkonfiguro` (`.vibe/skills/`) |
+| Skribi Esperanton ĝuste (terminoj, supersignoj) | la skill-o `esperanto-lingvo` (`.vibe/skills/`) |
 | Arkitekturaj notoj kaj historiaj lecionoj | `NOTOJ.md` |
 
 ## La nova kodo — strukturo

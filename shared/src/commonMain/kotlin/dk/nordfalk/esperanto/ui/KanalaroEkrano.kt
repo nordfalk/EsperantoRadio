@@ -52,8 +52,8 @@ class KanalaroViewModel(
 ) {
     val kanaloj = deponejo.observiKanalojn()
 
-    private val _sxargxas = MutableStateFlow(false)
-    val sxargxas = _sxargxas.asStateFlow()
+    private val _ŝargas = MutableStateFlow(false)
+    val ŝargas = _ŝargas.asStateFlow()
 
     /** Mapo: kanaloSlug → nombro da elsendoj */
     private val _elsendoKontoj = MutableStateFlow<Map<String, Int>>(emptyMap())
@@ -70,24 +70,24 @@ class KanalaroViewModel(
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /** Dedupigo + TTL: re-eniro al la ekrano ne reŝargas ĵus ŝargitan datenon. */
-    private val sxargilo = SxargxaKontrolilo()
+    private val ŝargilo = ŜargaKontrolilo()
 
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
-    fun sxargxi(fortoRefresigi: Boolean = false) {
-        skopo.launch { sxargilo.rulu("KanalaroViewModel", fortoRefresigi) { sxargxiInterna(fortoRefresigi) } }
+    fun ŝargi(fortoRefresigi: Boolean = false) {
+        skopo.launch { ŝargilo.rulu("KanalaroViewModel", fortoRefresigi) { ŝargiInterna(fortoRefresigi) } }
     }
 
-    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
+    private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
         val kanaloj = deponejo.getKanalojn()
 
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         if (elsendoDeponejo != null) {
-            val kashitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKashitajnElsendojn(kanaloj) ?: emptyList()
-            if (kashitaj.isNotEmpty()) {
+            val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
+            if (kaŝitaj.isNotEmpty()) {
                 val kontoj = mutableMapOf<String, Int>()
                 val lastaj = mutableMapOf<String, Elsendo>()
                 for (kanalo in kanaloj.filter { it.havasPodkastojn }) {
-                    val els = kashitaj.filter { it.kanaloSlug == kanalo.slug }
+                    val els = kaŝitaj.filter { it.kanaloSlug == kanalo.slug }
                     kontoj[kanalo.slug] = els.size
                     els.maxByOrNull { it.dato }?.let { lastaj[kanalo.slug] = it }
                 }
@@ -98,13 +98,13 @@ class KanalaroViewModel(
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
-        _sxargxas.value = true
+        _ŝargas.value = true
         try {
             if (elsendoDeponejo != null) {
                 val rezultoj = coroutineScope {
                     kanaloj
                         .filter { it.havasPodkastojn }
-                        .map { kanalo -> async { kanalo to elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo, fortoRefresigi) } }
+                        .map { kanalo -> async { kanalo to elsendoDeponejo.ŝargiElsendojnPorKanal(kanalo, fortoRefresigi) } }
                         .awaitAll()
                 }
                 val kontoj = mutableMapOf<String, Int>()
@@ -120,7 +120,7 @@ class KanalaroViewModel(
         } catch (e: Exception) {
             loge("KanalaroViewModel", "Malsukcesis sargi kanalojn", e)
         } finally {
-            _sxargxas.value = false
+            _ŝargas.value = false
         }
     }
 }
@@ -133,17 +133,17 @@ fun KanalaroEkrano(
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     tirkestEnhavo: @Composable () -> Unit = {},
     onLudi: (Sonfonto) -> Unit = {},
-    onElshutoj: () -> Unit = {},
+    onElŝutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
     onAgordoj: () -> Unit = {},
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
-    val sxargxas by viewModel.sxargxas.collectAsState()
+    val ŝargas by viewModel.ŝargas.collectAsState()
     val elsendoKontoj by viewModel.elsendoKontoj.collectAsState()
     val lastajElsendoj by viewModel.lastajElsendoj.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.sxargxi()
+        viewModel.ŝargi()
     }
 
     Scaffold(
@@ -152,7 +152,7 @@ fun KanalaroEkrano(
                 navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("Kanaloj") },
                 actions = {
-                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
+                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }
@@ -167,7 +167,7 @@ fun KanalaroEkrano(
             // La tirkesto kaj la ombreco vivas SUB la supra breto
             modifier = Modifier.padding(padding),
         ) {
-        if (sxargxas && kanaloj.isEmpty()) {
+        if (ŝargas && kanaloj.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -175,8 +175,8 @@ fun KanalaroEkrano(
                 CircularProgressIndicator()
             }
         } else PullToRefreshBox(
-            isRefreshing = sxargxas,
-            onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); viewModel.sxargxi(fortoRefresigi = true) },
+            isRefreshing = ŝargas,
+            onRefresh = { logi("Klako", "malsupren-tiro (Kanalaro)"); viewModel.ŝargi(fortoRefresigi = true) },
             modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(

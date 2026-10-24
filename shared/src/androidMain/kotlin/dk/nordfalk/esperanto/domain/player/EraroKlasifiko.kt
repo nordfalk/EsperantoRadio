@@ -28,10 +28,10 @@ private fun estasPasemaErarKodo(kodo: Int): Boolean = when (kodo) {
 
 /** Serĉas HTTP 5xx en la kaŭz-ĉeno (InvalidResponseCodeException.responseCode). */
 private fun estasServileraro(error: PlaybackException): Boolean {
-    var kauxzo: Throwable? = error
-    while (kauxzo != null) {
-        if (kauxzo is HttpDataSource.InvalidResponseCodeException && kauxzo.responseCode in 500..599) return true
-        kauxzo = kauxzo.cause
+    var kaŭzo: Throwable? = error
+    while (kaŭzo != null) {
+        if (kaŭzo is HttpDataSource.InvalidResponseCodeException && kaŭzo.responseCode in 500..599) return true
+        kaŭzo = kaŭzo.cause
     }
     return false
 }

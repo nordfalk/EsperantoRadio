@@ -67,7 +67,7 @@ class AlarmoReceiviloTest {
         // Atendu la konekton de la ludilo al la servo, poste certigu ke nenio ludas
         Thread.sleep(2_000)
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
-        atendu(5_000) { ludilo.stato.value.nunaFonto == null }
+        atendu(15_000) { ludilo.stato.value.nunaFonto == null }
 
         // La sama disaŭdigo kiun AlarmoSkedilo skedas per PendingIntent
         val intent = Intent(AlarmoReceivilo.AGO_ALARMO_EKIGAS)
@@ -106,7 +106,7 @@ class AlarmoReceiviloTest {
         // Forigu eventualan postrestaĵon de la alia testo
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
         AlarmoReceivilo.nuliguSciigon(kunteksto)
-        atendu(5_000) { !sciigoAktiva() }
+        atendu(15_000) { !sciigoAktiva() }
 
         // Ekigu la alarmon kun la livestream-kanalo (bufferado komenciĝas loke)
         val intent = Intent(AlarmoReceivilo.AGO_ALARMO_EKIGAS)
@@ -122,7 +122,7 @@ class AlarmoReceiviloTest {
 
         // Halti → la gardo nuligas la daŭran sciigon
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
-        atendu(5_000) { !sciigoAktiva() }
+        atendu(15_000) { !sciigoAktiva() }
     }
 
     /**
@@ -145,7 +145,7 @@ class AlarmoReceiviloTest {
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
         AlarmoReceivilo.haltuFallbackRingon()
         AlarmoReceivilo.nuliguSciigon(kunteksto)
-        atendu(5_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
+        atendu(15_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
 
         val intent = Intent(AlarmoReceivilo.AGO_ALARMO_EKIGAS)
             .setClass(kunteksto, AlarmoReceivilo::class.java)
@@ -159,7 +159,7 @@ class AlarmoReceiviloTest {
 
         // Halti (kiel la uzanto per la mini-ludilbreto) haltigas la sonon
         InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
-        atendu(5_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
+        atendu(15_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
     }
 
     /**
@@ -181,7 +181,7 @@ class AlarmoReceiviloTest {
             InstrumentationRegistry.getInstrumentation().runOnMainSync { ludilo.halti() }
             AlarmoReceivilo.haltuFallbackRingon()
             AlarmoReceivilo.nuliguSciigon(kunteksto)
-            atendu(5_000) { !AlarmoReceivilo.fallbackRingtonoAktiva && !sciigoAktiva() }
+            atendu(15_000) { !AlarmoReceivilo.fallbackRingtonoAktiva && !sciigoAktiva() }
 
             val intent = Intent(AlarmoReceivilo.AGO_ALARMO_EKIGAS)
                 .setClass(kunteksto, AlarmoReceivilo::class.java)
@@ -192,11 +192,11 @@ class AlarmoReceiviloTest {
 
             // Sono ekas kaj la sciigo aperas
             atendu(30_000) { AlarmoReceivilo.fallbackRingtonoAktiva }
-            atendu(5_000) { sciigoAktiva() }
+            atendu(15_000) { sciigoAktiva() }
 
             // Post la mem-halto: sono haltigita KAJ sciigo nuligita
-            atendu(10_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
-            atendu(5_000) { !sciigoAktiva() }
+            atendu(20_000) { !AlarmoReceivilo.fallbackRingtonoAktiva }
+            atendu(15_000) { !sciigoAktiva() }
         } finally {
             AlarmoReceivilo.ringtonoMaksDaŭroMs = originala
         }

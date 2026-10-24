@@ -157,7 +157,9 @@ class NovajElsendojKontroloWorker(
     /** Kreskanta, persistita sciig-ID (PR #93) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
     private fun novaSciigId(): Int {
         val settings = kreuSettings()
-        val id = (settings.getInt(SettingsKeys.SCIIG_ID, 1000) + 1).coerceAtMost(Int.MAX_VALUE - 2)
+        // sekvaSciigId saltas la rezervitan zonon de la alarmo-sciigo (4710–4711) —
+        // vidu SciigLimoj.kt; la serio povus iam atingi ĝin (plibonigo, 2026-10-24).
+        val id = sekvaSciigId(settings.getInt(SettingsKeys.SCIIG_ID, 1000))
         settings.putInt(SettingsKeys.SCIIG_ID, id)
         return id
     }

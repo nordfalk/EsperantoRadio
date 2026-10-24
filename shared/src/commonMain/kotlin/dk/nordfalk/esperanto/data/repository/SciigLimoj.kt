@@ -28,6 +28,26 @@ const val SCIIG_LIMO_SUMA = 7
 const val SCIIG_LIMO_PO_KANALO = 3
 
 /**
+ * La fiksa sciig-ID de la alarmo (vidu `AlarmoReceivilo.SCIIGO_ID` en androidMain) —
+ * la kreskanta serio de sciigoj pri novaj elsendoj devas neniam transpreni ĝin.
+ */
+const val REZERVITA_SCIIG_ID = 4711
+
+/**
+ * La sekva sciig-ID el la kreskanta serio — sed neniam en la rezervita zono de la
+ * alarmo-sciigo: transpreno anstataŭigus la alarmo-sciigon per sciigo pri nova
+ * elsendo (kaj inverse). Ankaŭ [REZERVITA_SCIIG_ID] - 1 evitiĝas, ĉar la
+ * „Ludi“-ago de sciigo uzas la pet-identigilon sciigId + 1.
+ */
+fun sekvaSciigId(nuna: Int): Int {
+    var id = (nuna + 1).coerceAtMost(Int.MAX_VALUE - 2)
+    if (id == REZERVITA_SCIIG_ID - 1 || id == REZERVITA_SCIIG_ID) {
+        id = REZERVITA_SCIIG_ID + 1
+    }
+    return id
+}
+
+/**
  * Enmetas novan sciigon en la registrejon kaj aplikas la limojn.
  *
  * La po-kanala limo aplikiĝas unue (je la kanalo de la nova sciigo), poste la

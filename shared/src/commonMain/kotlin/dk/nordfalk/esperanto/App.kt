@@ -32,7 +32,6 @@ import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ghisdatiguSciigSkedon
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
@@ -133,11 +132,6 @@ fun EsperantoRadioApp(
         // klako ekstere povu kolapsi ĝin
         var elfaldita by rememberSaveable { mutableStateOf(false) }
 
-        // La nune VIDATA kanalo/elsendo sur la detalaj ekranoj — sekvata de svipoj
-        // (HorizontalPager); vidado movas la gluiĝeman sekvantan enhavon.
-        var vidataKanalo by remember { mutableStateOf<Kanalo?>(null) }
-        var vidataElsendo by remember { mutableStateOf<Elsendo?>(null) }
-
         // Regulo 1 (gluiĝema): kiam nenio ludas, la miniludilbreto montras la
         // LASTE MONSTRITAN enhavon — la lastan vidatan detalan celon (sekvante
         // svipojn) aŭ la lastan ludatan elsendon/kanalon. Nur vidado kaj ludado
@@ -150,8 +144,6 @@ fun EsperantoRadioApp(
         val sekvantaRegilo = remember {
             SekvantaEnhavoRegilo(semo = { lastatempeLudataj.firstOrNull() })
         }
-        LaunchedEffect(vidataElsendo) { vidataElsendo?.let { sekvantaRegilo.vidisElsendon(it) } }
-        LaunchedEffect(vidataKanalo) { vidataKanalo?.let { sekvantaRegilo.vidisKanalon(it) } }
         LaunchedEffect(ludantoStato.nunaFonto) { sekvantaRegilo.ludisFonton(ludantoStato.nunaFonto) }
 
         // Observi ŝanĝojn de ŝatoj kaj sciigoj por ĝisdatigi la fonan skedon
@@ -377,8 +369,8 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.KanaloDetalo> { vojo ->
-                            // Restarigu la vidatan kanalon ĉe ĉiu eniro — svipoj poste transprenas
-                            LaunchedEffect(vojo) { vidataKanalo = vojo.kanalo }
+                            // La vidata kanalo (eniro kaj svipoj) movas la sekvantan enhavon
+                            LaunchedEffect(vojo) { sekvantaRegilo.vidisKanalon(vojo.kanalo) }
                             KanalEkranoKunSvipo(
                                 komencaKanalo = vojo.kanalo,
                                 kanaloj = kanaloj,
@@ -387,7 +379,7 @@ fun EsperantoRadioApp(
                                 agordojDeponejo = agordojDeponejo,
                                 onReen = { reen() },
                                 onAgordoj = { push(Vojo.Agordoj) },
-                                onVidataKanalo = { vidataKanalo = it },
+                                onVidataKanalo = { sekvantaRegilo.vidisKanalon(it) },
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas rekte: ${vojo.kanalo.slug}")
@@ -405,15 +397,15 @@ fun EsperantoRadioApp(
                                     elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo)
                                 }
                             }
-                            // Restarigu la vidatan elsendon ĉe ĉiu eniro — svipoj poste transprenas
-                            LaunchedEffect(vojo) { vidataElsendo = vojo.elsendo }
+                            // La vidata elsendo (eniro kaj svipoj) movas la sekvantan enhavon
+                            LaunchedEffect(vojo) { sekvantaRegilo.vidisElsendon(vojo.elsendo) }
                             ElsendoEkranoKunSvipo(
                                 komencaElsendo = elsendo,
                                 elsendoj = elsendoj,
                                 kanalo = kanalo,
                                 onKanalo = { k -> push(Vojo.KanaloDetalo(k)) },
                                 onReen = { reen() },
-                                onVidataElsendo = { vidataElsendo = it },
+                                onVidataElsendo = { sekvantaRegilo.vidisElsendon(it) },
                                 onLudi = { e ->
                                     logi("Nav", "Ludas elsendon: ${e.id}")
                                     scope.launch { ludvicoRegilo.ludiElsendon(e) }
@@ -483,7 +475,7 @@ fun EsperantoRadioApp(
                 // montras la laste montritan enhavon el la regilo: kanalo venas unue,
                 // poste elsendo (gluiĝema aŭ la restarta semo).
                 val k = sekvantaRegilo.sekvantaKanalo
-                val e = if (k == null) sekvantaRegilo.elsendo() else null
+                val e = sekvantaRegilo.elsendo()
                 val sekvantaTitolo: String?
                 val sekvantaSubtitolo: String?
                 val sekvantaBildoUrl: String?

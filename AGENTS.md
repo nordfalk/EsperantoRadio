@@ -191,6 +191,11 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
   ĉiu karto).
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
+  `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 ("non-pending") —
+  korektu per GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId`
+  = `node_id` de la recenzo). Aldone: kontrolu la AFIŜITAN tekston post la
+  afiŝo (en la unua recenzo de #126 glitis ne-esperanta artefakto en la teksto).
 - **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
   `git add -A`) kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la uzanto.
 - **Arkitekturaj bazlinioj**: neniu DI-framintervalo (permana injektado en

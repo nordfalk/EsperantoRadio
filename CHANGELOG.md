@@ -20,6 +20,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
+- Sciigoj pri novaj elsendoj ne plu amasiĝas: maksimume 7 samtempe kaj maksimume 3 po kanalo — kiam la limoj atingiĝas, la plej malnovaj sciigoj malaperas (PR-ligilo sekvos post kreo)
 - La „Apaj novaĵoj"-dialogo ne plu aperas en evoluaj medioj (debug-konstruoj, emuliloj, komputilaj kaj retumilaj ruladoj) — antaŭe ĝi malfermiĝis ĉe ĉiu freŝa instalaĵo kaj ĝenis dum programado (https://github.com/nordfalk/EsperantoRadio/pull/125)
 - Elsendoj ricevas stabilajn identigilojn (sen kreskantaj prefiksoj); pro la ŝanĝo ludpozicioj, elŝutoj kaj plej ŝatataj povas unufoje restartiĝi por iuj kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/122)
 - La malsupra naviga breto estas anstataŭigita per naviga tirkesto kiel en la malnova apo: ĝi malfermiĝas per la hamburgero en la supra breto (kiu morfas al reen-sago kaj reen per animacio, kaj kies tirkesto glitas enen kaj elen) aŭ per tiro de la maldekstra rando, kaj entenas ĉiujn ekranojn — Hejmo, Kanaloj, Plej ŝatataj, Serĉi, Elŝutoj, Vekhorloĝo kaj Agordoj; la supraj bretoj kun titoloj kaj agoj restas, la mallarĝa tirkesto malfermiĝas sub la supra breto kaj havas neniun propran titolon (https://github.com/nordfalk/EsperantoRadio/pull/120)

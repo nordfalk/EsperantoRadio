@@ -23,10 +23,12 @@
 //   1. `DrawerState.anchoredDraggableState` estas PUBLIKA (tie `internal`) —
 //      la sola API-diferenco. Ĝi ebligas al la tro-rula gesto sur la hejmaj
 //      vicoj (ui/TirkestaTiro.kt) movi la tirkeston kun la fingro.
-//   2. MotionSchemeKeyTokens, ScrimTokens kaj la internaj `Strings`-rimedoj de
-//      material3 ne estas atingeblaj: la animacioj uzas `tween(256)` (la
-//      implicita `AnchoredDraggableDefaultAnimationSpec`) kaj la tekstoj
-//      (paneTitle, skermo-priskribo) estas fiksitaj esperantaj.
+//   2. MotionSchemeKeyTokens, ScrimTokens, NavigationDrawerTokens kaj la internaj
+//      `Strings`-rimedoj de material3 ne estas atingeblaj: la animacioj uzas
+//      `tween(256)` (la implicita `AnchoredDraggableDefaultAnimationSpec`), la
+//      tekstoj (paneTitle, skermo-priskribo) estas fiksitaj esperantaj kaj la
+//      tirkest-pecoj de `NavigationDrawerTokens` venas tra la publikaj
+//      `DrawerDefaults` (samaj valoroj).
 //   3. La prognoza-reena maŝino (DrawerPredictiveBackState/Handler, interna)
 //      mankas; reen fermas la malfermitan tirkeston per NavigationBackHandler
 //      (nav3), en ModalDrawerSheet — sama loko kiel la originalo.
@@ -68,6 +70,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -335,7 +338,7 @@ public fun ModalNavigationDrawer(
     val navigationMenu = "Naviga menuo"
     val density = LocalDensity.current
     var anchorsInitialized by remember { mutableStateOf(false) }
-    var minValue by remember(density) { mutableStateOf(0f) }
+    var minValue by remember(density) { mutableFloatStateOf(0f) }
     val maxValue = 0f
     val focusRequester = remember { FocusRequester() }
 

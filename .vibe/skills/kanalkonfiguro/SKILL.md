@@ -7,7 +7,7 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
 
 > Antaŭ ĉio legu `docs/nova/04_parsado_kaj_arkivo.md` kaj
 > `docs/malnova/03_parsado_kaj_fontoj.md` — la sep parsreguloj kaj la skip-listo
-> devas esti konservitaj. La konfiguro estas daten-movita (regulo 5):
+> devas esti konservitaj. La konfiguro estas daten-movita (regulo A5):
 > per-kanalaj apartaĵoj en agordo, ne en logiko.
 
 ## La du kopioj kaj la du aroj

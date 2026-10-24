@@ -19,7 +19,7 @@ class RssParsiloTest {
         return fluo.bufferedReader().use { it.readText() }
     }
 
-    // === Regulo 6.1 — Ĝenerala parsado (Kernpunkto) ===
+    // === Regulo P6.1 — Ĝenerala parsado (Kernpunkto) ===
 
     @Test
     fun parsasKernpunkton() = kotlinx.coroutines.test.runTest {
@@ -177,7 +177,7 @@ class RssParsiloTest {
         assertEquals("nuda-guid", parsilo.konstruuId(kanalo, "nuda-guid", "2025-01-01", deArkivo = true))
     }
 
-    // === Regulo 6.1 — Ĝenerala parsado (La Malfamuloj, anchor.fm — G41-fiksaĵo) ===
+    // === Regulo P6.1 — Ĝenerala parsado (La Malfamuloj, anchor.fm — G41-fiksaĵo) ===
 
     @Test
     fun parsasLamalfamulojn() = kotlinx.coroutines.test.runTest {
@@ -208,12 +208,12 @@ class RssParsiloTest {
         assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "Id-oj devas esti unikaj")
     }
 
-    // === Regulo 6.2 — Varsovia Vento (pluraj <audio> po ero) ===
+    // === Regulo P6.2 — Varsovia Vento (pluraj <audio> po ero) ===
 
     @Test
     fun parsasVarsoviaVenton() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("varsoviavento_feed.xml")
-        // La purigaj modeloj kiel en la vera kanalkonfiguro (regulo 6.6, PR #91).
+        // La purigaj modeloj kiel en la vera kanalkonfiguro (regulo P6.6, PR #91).
         // Temperitaj modeloj (?:(?!</p>).) — ili ne povas transiri alineon.
         val kanalo = Kanalo(
             slug = "varsoviavento",
@@ -252,7 +252,7 @@ class RssParsiloTest {
             "La enkonduko devas pluvivi: ${vv185.first().priskribo?.take(80)}",
         )
 
-        // Regulo 6.6 (PR #91): la priskribo estas purigata — neniu parto-listilo,
+        // Regulo P6.6 (PR #91): la priskribo estas purigata — neniu parto-listilo,
         // neniu reklamo, neniu enkonstruita <audio>-ludilo
         for (e in elsendoj) {
             val priskribo = e.priskribo ?: ""
@@ -270,12 +270,12 @@ class RssParsiloTest {
         }
     }
 
-    // === Regulo 6.4 — Vinilkosmo (ipernity-Atom) ===
+    // === Regulo P6.4 — Vinilkosmo (ipernity-Atom) ===
 
     @Test
     fun parsasVinilkosmon() = kotlinx.coroutines.test.runTest {
         val fluo = leguFiksaĵon("vinilkosmo_feed.xml")
-        // La puriga modelo kiel en la vera kanalkonfiguro (regulo 6.6, (PR #91))
+        // La puriga modelo kiel en la vera kanalkonfiguro (regulo P6.6, (PR #91))
         val kanalo = Kanalo(
             slug = "vinilkosmo",
             nomo = "Vinilkosmo",
@@ -312,7 +312,7 @@ class RssParsiloTest {
         }
     }
 
-    // === Regulo 6.5 — Titol-derivado ===
+    // === Regulo P6.5 — Titol-derivado ===
 
     @Test
     fun ignoruTitolonDerivasTitolonElPriskribo() = kotlinx.coroutines.test.runTest {
@@ -345,7 +345,7 @@ class RssParsiloTest {
         assertTrue(titolo.length <= 200, "Titolo devas esti ≤ 200 signoj: ${titolo.length}")
     }
 
-    // === Regulo 6.7 — Paĝigo ===
+    // === Regulo P6.7 — Paĝigo ===
 
     @Test
     fun leguNextLinkElKernpunkto() = kotlinx.coroutines.test.runTest {
@@ -506,7 +506,7 @@ class RssParsiloTest {
         assertEquals(3077L, elsendoj[0].dauro)
     }
 
-    // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
+    // === Regulo P6.3 — Peranto (Esperanta Retradio) ===
 
     @Test
     fun parsasPeranton() = kotlinx.coroutines.test.runTest {
@@ -681,7 +681,7 @@ class RssParsiloTest {
     /**
      * La MP3-dosiernomo ene de archive.org-arkivaĵo ne ĉiam egalas al la identigilo:
      * `malapero-benda-3` enhavas `Malapero_Benda3.mp3`. La parsilo devas demandi
-     * la metadaten-API kaj uzi la veran dosiernomon (regulo 6.3).
+     * la metadaten-API kaj uzi la veran dosiernomon (regulo P6.3).
      */
     @Test
     fun perantoArchiveOrgUzasVeraDosiernomonElMetadatenoj() = kotlinx.coroutines.test.runTest {
@@ -717,7 +717,7 @@ class RssParsiloTest {
         )
     }
 
-    /** Se la metadaten-peto eraras (CORS, senrete), la elsendo tamen aperas kun la divenita URL (regulo 4). */
+    /** Se la metadaten-peto eraras (CORS, senrete), la elsendo tamen aperas kun la divenita URL (regulo A4). */
     @Test
     fun perantoArchiveOrgTolerasMetadatanEraron() = kotlinx.coroutines.test.runTest {
         val fluo = """
@@ -920,7 +920,7 @@ class RssParsiloTest {
 
     @Test
     fun auxdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
-        // Regulo 6.1.4: fluo kies sola sono estas en <audio><source> ene de la priskribo
+        // Regulo P6.1.4: fluo kies sola sono estas en <audio><source> ene de la priskribo
         // (CDATA/eskapita) — antaŭe la serĉo okazis en la XML-dokumento kaj trovis nenion
         val rss = """
             <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>

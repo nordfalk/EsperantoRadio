@@ -66,7 +66,7 @@ suspend fun konstruuArkivon() {
                 val neKonataj = elsendoj.takeWhile { e -> e.id !in konataj.map { it.id } }
                 if (neKonataj.isEmpty()) break
                 novaj.addAll(neKonataj)
-                paghoUrl = leguNextLink(fluo)   // rel="next" (regulo 6.7)
+                paghoUrl = leguNextLink(fluo)   // rel="next" (regulo P6.7)
             }
             val cxiuj = (konataj + novaj).distinctBy { it.id }.sortedByDescending { it.dato }
             stokado.skribu(cxiuj, kanal.slug)

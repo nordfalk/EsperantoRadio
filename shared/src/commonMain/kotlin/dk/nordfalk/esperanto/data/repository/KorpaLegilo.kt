@@ -19,7 +19,7 @@ const val MAKSIMUMA_FLUA_GRANDECO_BAJTOJ: Long = 1L * 1024 * 1024
 
 /**
  * Ĵetata kiam la respondo-korpo transpasas la permesatan limon — ĉu laŭ la
- * deklarita `Content-Length`, ĉu dum la flu-legado. Atendata fiasko (regulo 4):
+ * deklarita `Content-Length`, ĉu dum la flu-legado. Atendata fiasko (regulo A4):
  * kaptu per `logw`, ne `loge` — ĝi ne devas konsumi la Sentry-eraro-kvoton.
  */
 class RespondoTroGrandaException(val grandeco: Long, val limo: Long) :

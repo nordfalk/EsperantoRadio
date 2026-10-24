@@ -46,7 +46,7 @@ Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝi
 
 ## La sep reguloj — kiel reprodukti
 
-### Regulo 6.1 — Ĝenerala (`parsuGxenerala`)
+### Regulo P6.1 — Ĝenerala (`parsuGxenerala`)
 
 Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 1. `id = entry.uri` aŭ `<kanalo.slug>:<dato>`.
@@ -57,15 +57,15 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 6. Se `fluo` komenciĝas per `http://` → `https://` (**nur por `kernpunkto`** — historia korekto,
    ĉar la malnova Rome-biblioteko reskribis https→http; aliaj kanaloj ricevas la URL-on el la fluo
    sen ŝanĝo kaj la cleartext-esceptoj staras en `network_security_config.xml`).
-7. Se `kanalo.ignoruTitolon` → derivu titolon el priskribo (regulo 6.5).
+7. Se `kanalo.ignoruTitolon` → derivu titolon el priskribo (regulo P6.5).
 
-### Regulo 6.2 — Varsovia Vento (`parsuVarsoviaVento`)
+### Regulo P6.2 — Varsovia Vento (`parsuVarsoviaVento`)
 
-1. Purigu enhavo-HTML per `kanal.puriguModeloj` (regulo 6.6).
+1. Purigu enhavo-HTML per `kanal.puriguModeloj` (regulo P6.6).
 2. Por **ĉiu** `<audio>`-elemento: prenu `<source src>`, faru po unu elsendo.
 3. `titolo = entry.titolo + " " + partnum + "a parto"`, `id = <slug>:<dato>:<partnum>`.
 
-### Regulo 6.3 — Peranto (`parsuPeranto`)
+### Regulo P6.3 — Peranto (`parsuPeranto`)
 
 1. Saltu konatajn malplenajn datojn (konstanta aro: `2019-11-08`, `2019-09-29`).
 2. Eltiru `bildUrl` el unua `<img>`; forigu `<img>`, `<iframe>`, `<div class="separator">`.
@@ -76,25 +76,25 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
    - Neniu iframe → saltu.
 4. `id = peranto:<dato>` (aŭ `entry.uri` se ĉeestas).
 
-### Regulo 6.4 — Vinilkosmo (`parsuVinilkosmo`)
+### Regulo P6.4 — Vinilkosmo (`parsuVinilkosmo`)
 
 Pura Atom-parsado. `<link rel="enclosure" type="audio/mpeg">` → stream;
 `<link type="image/jpeg">` → bildo; `<link type="text/html">` → ligo;
 `<published>` → dato (teksto antaŭ `T`); `id = vk:<publikig-sen-tempzonon>`.
 Purigu priskribon per `kanal.puriguModeloj` (forigu `<p class="who">…</p>`).
 
-### Regulo 6.5 — Titol-derivado
+### Regulo P6.5 — Titol-derivado
 
 Por `kanal.ignoruTitolon == true`: deriva titolo el priskribo — stripi HTML-etikedojn,
 malkodi entitojn, anstataŭigi linisaltigojn per spacoj, fortondi, **tranĉi al 200 signoj**.
 
-### Regulo 6.6 — HTML-purigado
+### Regulo P6.6 — HTML-purigado
 
 Purig-modeloj estas en `kanal.puriguModeloj` (regex-listo). Aplikataj al
 `priskribo` antaŭ montro/stokado. La malnovaj malmolaj modeloj (por Varsovia Vento,
 Vinilkosmo) iĝas agordaj datumoj.
 
-### Regulo 6.7 — Paĝigo
+### Regulo P6.7 — Paĝigo
 
 Sekvu `<atom:link rel="next" href=...>` ĝis ne plu paĝoj. Konservu la sekva-paĝan
 URL (`rss_nextLink`). Uzata de la arkiva servilo por marŝi malantaŭen.

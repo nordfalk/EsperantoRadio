@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
  * Fum-testo de la VERA kanalkonfiguro (PR #89).
  *
  * `KanalAgordoLegantoTest` testas nur sintezitan JSONC. Sed la vera
- * `esperantoradio_kanaloj_v9.json` estas la kerno de la apo (AGENTS.md regulo 5):
+ * `esperantoradio_kanaloj_v9.json` estas la kerno de la apo (AGENTS.md regulo A5):
  * se iu enmetas eraron en ĝin (ekz. `/* */`-blokkomenton, kiun la striptigilo ne
  * subtenas, aŭ forgesitan komon), la apo kraŝus ĉe ekfunkciigo — kaj neniu alia
  * testo kaptus tion.
@@ -46,7 +46,7 @@ class KanalAgordoFumTesto {
         assertNotNull(agordo.android, "La android-sekcio devas ekzisti en la konfiguro")
         assertNotNull(agordo.android!!.apajNovajxoj, "apaj_novaĵoj devas ekzisti en la konfiguro")
 
-        // Regulo 6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (PR #91)
+        // Regulo P6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (PR #91)
         val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }
         assertTrue(varsoviavento.puriguModeloj.isNotEmpty(), "varsoviavento havas puriguModelojn")
         assertTrue(varsoviavento.puriguModeloj.any { it.contains("audio") }, "varsoviavento purigas <audio>-ludilojn")

@@ -47,82 +47,86 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 
 ## Plej gravaj reguloj por agentoj
 
-1. **Ne tuŝu la malnovan kodon** krom se eksplice petite. Ĝi estas historika.
-   La celo estas rekreado, ne riparado.
-2. **La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
-   `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-   La sep parsreguloj kaj la skip-listo devas esti konservitaj.
-3. **Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
-   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
-   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
-   `shared/src/commonTest/resources/feeds/` (5 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
-   La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
-4. **Unu fonto-eraro ne devas panei la apot.** Se unu kanal-fluo mortas, la aliaj
-   devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
-5. **Konservu la kanalkonfiguron** (`esperantoradio_kanaloj_v9.json`). Ĝi estas
-   daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
-   en agordo, ne en logiko.
-6. **GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
-7. **Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
-   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
-   faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
-   Ne nur skribu kodon — ankaŭ validigu ĝin. Se estas UI-ŝanĝo, antaŭ ol fari 
-   commit, kontrolu ke navigado funkcias, kaj ke la enhavo estas videbla.
-8. **Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
-   eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
-   Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.
-9. **Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
-   uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
-   La commit-mesaĝo estu la titolo de la PR + ligo al la PR
-10. **Ĝisdatigu `CHANGELOG.md` en ĉiu PR kun uzantvidebla ŝanĝo.** Aldonu
-   **unu linion** al la `## [Neeldonita]`-sekcio **ene de la sama PR**: konciza
-   priskribo sen teknikaj detaloj + ligilo al la PR, ekz.:
-   `- Vekhorloĝo ludas ankaŭ podkastojn (https://github.com/nordfalk/EsperantoRadio/pull/123)`.
-   Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; ankaŭ
-   bagatelaj uzantvidaj ŝanĝoj (ekz. minora vortumo de buton-teksto aŭ klaraigo)
-   ne indas eniron (2026-10-20, decido de la posedanto). Se la CI-kontrolo
-   erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
-   la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
-11. **Aŭtomate aldonu viajn lecionojn.** Post ĉiu laboro — precipe post
-    eraro, incidento aŭ neatendita rezulto — skribu koncizan lecionon (kun
-    dato): aktivaj reguloj en "Aktivaj reguloj kaj rimarkoj" (sube), procedura
-    scio en la koncernan skill-on (`.vibe/skills/`), historiaj detaloj en
-    NOTOJ.md aŭ SXANGXOJ.md. Celo: ne ripeti la saman eraron.
-12. **Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
-    Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
-    esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
-    de `.gitignore`. Se vi trovas ili en la deponejo, tuj forigu ilin kun `git rm`
-    kaj informu la deponejan posedanton.
+> La reguloj portas stabilajn nomojn (**A1–A12**); same la git-laborfluaj reguloj
+> (**L1–L8**) kaj la sep parsreguloj (**P6.1–P6.7**, vidu `docs/malnova/03`). La FAROTA-eroj
+> uzas la literojn C/G/K/X. Referencu regulojn ĉiam per tiuj nomoj, ne per nura numero.
+
+- **A1 — Ne tuŝu la malnovan kodon** krom se eksplice petite. Ĝi estas historika.
+  La celo estas rekreado, ne riparado.
+- **A2 — La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
+  `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
+  La sep parsreguloj kaj la skip-listo devas esti konservitaj.
+- **A3 — Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
+  `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
+  Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
+  `shared/src/commonTest/resources/feeds/` (5 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
+  La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
+- **A4 — Unu fonto-eraro ne devas panei la apon.** Se unu kanal-fluo mortas, la aliaj
+  devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
+- **A5 — Konservu la kanalkonfiguron** (`esperantoradio_kanaloj_v9.json`). Ĝi estas
+  daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
+  en agordo, ne en logiko.
+- **A6 — GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
+- **A7 — Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
+  regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
+  faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
+  Ne nur skribu kodon — ankaŭ validigu ĝin. Se estas UI-ŝanĝo, antaŭ ol fari 
+  commit, kontrolu ke navigado funkcias, kaj ke la enhavo estas videbla.
+- **A8 — Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
+  eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
+  Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.
+- **A9 — Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
+  uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
+  La commit-mesaĝo estu la titolo de la PR + ligo al la PR
+- **A10 — Ĝisdatigu `CHANGELOG.md` en ĉiu PR kun uzantvidebla ŝanĝo.** Aldonu
+  **unu linion** al la `## [Neeldonita]`-sekcio **ene de la sama PR**: konciza
+  priskribo sen teknikaj detaloj + ligilo al la PR, ekz.:
+  `- Vekhorloĝo ludas ankaŭ podkastojn (https://github.com/nordfalk/EsperantoRadio/pull/123)`.
+  Pura interno (testoj, refaktorado, dokumentaro, CI) ne bezonas eniron; ankaŭ
+  bagatelaj uzantvidaj ŝanĝoj (ekz. minora vortumo de buton-teksto aŭ klaraigo)
+  ne indas eniron (2026-10-20, decido de la posedanto). Se la CI-kontrolo
+  erare postulas ĝin, aldonu la etikedon `preterlasu-changelog` al
+  la PR. Detalojn vidu en la sekcio "Ŝanĝoprotokolo (CHANGELOG.md)".
+- **A11 — Aŭtomate aldonu viajn lecionojn.** Post ĉiu laboro — precipe post
+   eraro, incidento aŭ neatendita rezulto — skribu koncizan lecionon (kun
+   dato): aktivaj reguloj en "Aktivaj reguloj kaj rimarkoj" (sube), procedura
+   scio en la koncernan skill-on (`.vibe/skills/`), historiaj detaloj en
+   NOTOJ.md aŭ SXANGXOJ.md. Celo: ne ripeti la saman eraron.
+- **A12 — Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
+   Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
+   esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
+   de `.gitignore`. Se vi trovas ili en la deponejo, tuj forigu ilin kun `git rm`
+   kaj informu la deponejan posedanton.
 
 ## Git-laborfluo
 
-1. Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
-   plia kommito en ekzistanta PR).
-   **Branĉnomo**: `MMdd-nomo` — ekz. `1009-hejmo-luditaj-kio-novas`.
-   La `MMdd`-prefikso estas la nuna dato (ekz. 1009 = 9-a de oktobro).
-   Uzu la saman nomon loke kaj sur GitHub.
-2. Faru ŝanĝojn, skribu testojn, kompilu kaj rulu testojn.
-3. Commit, push, kreu PR kun `gh pr create`.
-4. Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
-   Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
-5. Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
-   kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
-6. **Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
-   unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
-   ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
-   **KUNFANDO (`gh pr merge`) BEZONAS APARTAN, EKPLICITAN aprobon** (ekz.
-   "kunfandu"). Rajtigo por commiti/puŝi/krei PR-on NE inkluzivas la
-   kunfandon. (2026-10-19: PR #120 estis kunfandita post kiam la uzanto
-   aprobis nur "commitos, puŝos kaj kreos la PR-on" — tio estis eraro;
-   lasu la PR-on malfermita kaj atendu "kunfandu".)
-7. **La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
-   `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
-   (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.
-   (2026-10-11: PR #85 naskas el `hejmo-luditaj-kio-novas`, ne `pr-85`.)
-8. **Por ĝisdatigi malfermitan PR-on de master, uzu merge, ne rebazo** — rebazo
-   reskribas la historion kaj postulas force-push; `git merge origin/master` en la
-   PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
-   ricevis master-ĝisdatigojn.)
+- **L1 —** Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
+  plia kommito en ekzistanta PR).
+  **Branĉnomo**: `MMdd-nomo` — ekz. `1009-hejmo-luditaj-kio-novas`.
+  La `MMdd`-prefikso estas la nuna dato (ekz. 1009 = 9-a de oktobro).
+  Uzu la saman nomon loke kaj sur GitHub.
+- **L2 —** Faru ŝanĝojn, skribu testojn, kompilu kaj rulu testojn.
+- **L3 —** Commit, push, kreu PR kun `gh pr create`.
+- **L4 —** Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
+  Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
+- **L5 —** Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
+  kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
+- **L6 — Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
+  unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
+  ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
+  **KUNFANDO (`gh pr merge`) BEZONAS APARTAN, EKPLICITAN aprobon** (ekz.
+  "kunfandu"). Rajtigo por commiti/puŝi/krei PR-on NE inkluzivas la
+  kunfandon. (2026-10-19: PR #120 estis kunfandita post kiam la uzanto
+  aprobis nur "commitos, puŝos kaj kreos la PR-on" — tio estis eraro;
+  lasu la PR-on malfermita kaj atendu "kunfandu".)
+- **L7 — La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
+  `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
+  (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.
+  (2026-10-11: PR #85 naskas el `hejmo-luditaj-kio-novas`, ne `pr-85`.)
+- **L8 — Por ĝisdatigi malfermitan PR-on de master, uzu merge, ne rebazo** — rebazo
+  reskribas la historion kaj postulas force-push; `git merge origin/master` en la
+  PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
+  ricevis master-ĝisdatigojn.)
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -130,7 +134,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 rimarkindaj ŝanĝoj. La formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/)
 kun esperantaj kategorioj (**Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**,
 **Sekureco**). Ĉiu eniro estas **unu linio**: konciza priskribo sen teknikaj
-detaloj + ligilo al la PR (regulo 10). Rilato al [`SXANGXOJ.md`](SXANGXOJ.md):
+detaloj + ligilo al la PR (regulo A10). Rilato al [`SXANGXOJ.md`](SXANGXOJ.md):
 CHANGELOG = "kio ŝanĝiĝis por la uzanto", SXANGXOJ = detala teknika
 labortaglibro (problem-analizo, kialoj, kontrolrezultoj). La samo ne devas
 aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
@@ -138,7 +142,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, SXANGXOJ la kialojn.
 **Laborfluo (kiu tenas ĝin ĝisdatigata):**
 
 1. Ĉiu PR, kiu ŝanĝas uzantvideblan konduton, aldonas sian eniron al
-   `## [Neeldonita]` en la sama PR (regulo 10).
+   `## [Neeldonita]` en la sama PR (regulo A10).
 2. La CI (`.github/workflows/changelog-kontrolo.yaml`) rifuzas PR-ojn, kiuj
    ŝanĝas la ĉefan fontkodon (`*Main`-dosierujoj) sen ŝanĝo de `CHANGELOG.md`.
    Preterpaso: PR-etikedo `preterlasu-changelog` (puraj internaj ŝanĝoj).
@@ -289,7 +293,7 @@ protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvo
   `loge(tag, msg)` sen escepto estas nur protokol-evento (aparta kvoto).
 - `Sentry.captureMessage` rekte en la kodo — NE uzu (po-ŝanĝaj eventoj
   plenigas la kvoton; la „Aŭtoludo“-mesaĝoj estis tial forigitaj).
-- Ĉiu `catch` devas protokoli (regulo 8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
+- Ĉiu `catch` devas protokoli (regulo A8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
   kun stacktrace — neniam engluti escepton silente.
 - En produktado eraroj estas 50 %-specimenataj (`options.sampleRate`, PR #109).
   Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
@@ -341,7 +345,7 @@ esperantoradio_kanaloj_v9.json (bundled resource)
    KanalaroEkrano (Compose UI — LazyColumn de kanaloj)
         ↓ Ktor-kliento (HttpClient CIO) elŝutas RSS-fluon
    RssParsilo.parsRss(fluoTeksto, kanal)
-        ↓ (reguloj 6.1–6.7)
+        ↓ (reguloj P6.1–P6.7)
    List<Elsendo>
         ↓ KanalEkrano — elsendlisto (dat-grupigo, diskkaŝmemoro)
 ```

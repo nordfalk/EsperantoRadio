@@ -21,7 +21,7 @@ data class Kanalo(
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
-    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6) — datum-movita, el la JSONC. */
+    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
     val defaltSxatata: Boolean = false,
 ) {

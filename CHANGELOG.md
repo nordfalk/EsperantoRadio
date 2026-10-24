@@ -21,6 +21,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
+- Sciigoj pri novaj elsendoj ne plu amasiĝas: maksimume 7 samtempe kaj maksimume 3 po kanalo — kiam la limoj atingiĝas, la plej malnovaj sciigoj malaperas (https://github.com/nordfalk/EsperantoRadio/pull/130)
 - Dekstra tro-tiro sur la horizontalaj vicoj de la ĉefekrano (kiam la vico ne povas ruli pli reen) malfermas la navigan tirkeston — ĝi sekvas la fingron kaj solviĝas kiel la normala tirkesto-gesto (https://github.com/nordfalk/EsperantoRadio/pull/131)
 - La mini-ludilbreto restas videbla ankaŭ kiam nenio ludas: ĝi montras la laste vidatan kanalon/elsendon (sekvante svipojn) aŭ la laste ludatan enhavon kun ludi-butono kaj ne ŝanĝas la enhavon je nura navigado — reen-iro al la ĉefekrano ne plu ŝanĝas la montratan elsendon; klako sur la breto ludas la enhavon kiam oni jam estas sur ĝia ekrano — kanalo kun rekta fluo ludas la fluon, podkasta kanalo ludas sian plej novan elsendon (https://github.com/nordfalk/EsperantoRadio/pull/131)
 - La „Apaj novaĵoj"-dialogo ne plu aperas en evoluaj medioj (debug-konstruoj, emuliloj, komputilaj kaj retumilaj ruladoj) — antaŭe ĝi malfermiĝis ĉe ĉiu freŝa instalaĵo kaj ĝenis dum programado (https://github.com/nordfalk/EsperantoRadio/pull/125)
@@ -36,6 +37,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- Kaŝita averto-karto (ekz. "Bateri-optimumado estas ŝaltita") ne plu reaperas post ĉiu relanĉo de la apo (https://github.com/nordfalk/EsperantoRadio/pull/132)
 - La kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekran-vizito — ŝargadoj dedupliĝas, havas 5-minutan aĝ-limon, kaj la ŝarĝindikilo aperas nur kiam efektive ŝargiĝas (https://github.com/nordfalk/EsperantoRadio/pull/129)
 - La apo ne plu kraŝas pro manko de memoro kiam kanal-fluo redonas tro grandan aŭ misdirektitan respondon (ekz. son-dosieron anstataŭ RSS-fluo) — la legado estas limigata al 1 MB (https://github.com/nordfalk/EsperantoRadio/pull/128)
 - Malofte la apo tute kraŝis, kiam Android restartigis la fonan ludado-servon sen aktiva ludado (ekz. post kiam la sistemo liberigis memoron) (https://github.com/nordfalk/EsperantoRadio/pull/124)

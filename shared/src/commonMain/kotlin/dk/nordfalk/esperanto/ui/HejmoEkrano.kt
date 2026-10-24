@@ -470,7 +470,11 @@ fun HejmoEkrano(
         )
     }
 
+    val snackbarStato = remember { SnackbarHostState() }
+    val amplekso = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarStato) },
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
@@ -517,7 +521,22 @@ fun HejmoEkrano(
                         DiagnozoAvertoKarto(
                             problemoj = neKasxitajProblemoj,
                             onAgordoj = onAgordoj,
-                            onKasxu = onKasxuHejmajnAvertojn,
+                            onKasxu = {
+                                onKasxuHejmajnAvertojn()
+                                // Montru kiel trovi la kaŝitan averton poste
+                                amplekso.launch {
+                                    snackbarStato.showSnackbar(
+                                        message = "Vi povas poste solvi en la agordoj.",
+                                        actionLabel = "Agordoj",
+                                        duration = SnackbarDuration.Long,
+                                    )?.let { rezulto ->
+                                        if (rezulto == SnackbarResult.ActionPerformed) {
+                                            logi("Klako", "Navigas al Agordoj de Snackbar")
+                                            onAgordoj()
+                                        }
+                                    }
+                                }
+                            },
                         )
                     }
                 }

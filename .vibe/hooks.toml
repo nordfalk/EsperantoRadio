@@ -1,0 +1,24 @@
+# Son-signaloj de la agento, vidu .vibe/sonoj/ludu.sh.
+# La nomoj atentSono kaj demandoSono anstataŭas la samnomajn hokojn en ~/.vibe/hooks.toml.
+
+[[hooks]]
+name = "vicoKomenco"
+type = "pre_tool"
+command = 'sh "$(git rev-parse --show-toplevel)/.vibe/sonoj/ludu.sh" komenco'
+timeout = 10.0
+description = "Notas la komencon de la vico"
+
+[[hooks]]
+name = "demandoSono"
+type = "pre_tool"
+match = "ask_user_question"
+command = 'sh "$(git rev-parse --show-toplevel)/.vibe/sonoj/ludu.sh" demando'
+timeout = 10.0
+description = "La agento prezentas demandon"
+
+[[hooks]]
+name = "atentSono"
+type = "post_agent"
+command = 'sh "$(git rev-parse --show-toplevel)/.vibe/sonoj/ludu.sh" fino'
+timeout = 10.0
+description = "Vico finita"

@@ -189,6 +189,20 @@ class NovajElsendojKontroloWorker(
         // eksterminatinge celus la alian elsendon. Ĉiu sciigo estas unika okazo.
         val sciigId = novaSciigId()
 
+        // Sciig-limoj (maks. 7 samtempaj, maks. 3 po kanalo): la plej malnovaj
+        // malaperas. Perado kontraŭ nm.activeNotifications forigas el la
+        // registrejo la sciigojn kiujn la uzanto jam forigis aŭ kiuj malaperis
+        // (ekz. post restarto) — alikaze forigitaj sciigoj okupus la limojn.
+        val settings = kreuSettings()
+        val aktivajIdj = nm.activeNotifications.map { it.id }.toSet()
+        val registrejo = leguSciigRegistrejon(settings).filter { it.sciigId in aktivajIdj }
+        val limaRezulto = limiguSciigojn(registrejo, SciigRegistrejoEro(sciigId, kanalo.slug))
+        limaRezulto.forigotaj.forEach { nm.cancel(it) }
+        if (limaRezulto.forigotaj.isNotEmpty()) {
+            logi("NovajElsendoj", "Sciig-limoj: forigas ${limaRezulto.forigotaj.size} malnovajn sciigojn (${limaRezulto.forigotaj})")
+        }
+        skribuSciigRegistrejon(settings, limaRezulto.aktivaj)
+
         val malfermiPI = PendingIntent.getActivity(
             ctx, sciigId,
             pleniguEkstraĵojn(

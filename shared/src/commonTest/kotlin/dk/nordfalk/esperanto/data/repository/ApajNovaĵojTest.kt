@@ -7,7 +7,7 @@ import kotlin.test.assertNull
 
 /**
  * Testoj por [ApajNovaĵojDeponejo] — la apaj novaĵoj: montrataj
- * unufoje por ĉiu nova enhavo, haŝaĵo persistas je konfirmo.
+ * unufoje por ĉiu nova enhavo, haketaĵo persistas je konfirmo.
  */
 class ApajNovaĵojTest {
 
@@ -55,7 +55,7 @@ class ApajNovaĵojTest {
     }
 
     @Test
-    fun konfirmoPersistasHaŝonKajNeRemontras() {
+    fun konfirmoPersistasHaketaĵonKajNeRemontras() {
         val settings = MapSettings()
         val mesaĝo = "Majo 2022: Muzaiko ne plu funkcias"
         val deponejo = ApajNovaĵojDeponejo(settings, mesaĝo)
@@ -63,7 +63,7 @@ class ApajNovaĵojTest {
 
         deponejo.konfirmu()
         assertNull(deponejo.observuMontratan().value)
-        assertEquals(mesaĝo.hashCode(), settings.getInt(SettingsKeys.APAJ_NOVAĴOJ_HEŜ, -1))
+        assertEquals(mesaĝo.hashCode(), settings.getInt(SettingsKeys.APAJ_NOVAĴOJ_HAKETAĴO, -1))
 
         // Nova lego (ekz. restarto) kun la sama mesaĝo ne plu montras
         val restarto = ApajNovaĵojDeponejo(settings, mesaĝo)
@@ -81,17 +81,17 @@ class ApajNovaĵojTest {
 
     @Test
     fun decidlogikoEstasPuraKajKongruaKunMalnovaApo() {
-        // Malplena mesaĝo neniam montriĝas — eĉ sen konservita haŝaĵo
-        assertNull(ApajNovaĵojDeponejo.deciduMontratan("", ApajNovaĵojDeponejo.MALPLENA_HESH))
+        // Malplena mesaĝo neniam montriĝas — eĉ sen konservita haketaĵo
+        assertNull(ApajNovaĵojDeponejo.deciduMontratan("", ApajNovaĵojDeponejo.MALPLENA_HAKETAĴO))
 
-        // Ne-malplena mesaĝo kun ne-kongrua haŝaĵo montriĝas
+        // Ne-malplena mesaĝo kun ne-kongrua haketaĵo montriĝas
         assertEquals("nova", ApajNovaĵojDeponejo.deciduMontratan("nova", 12345))
 
-        // Kongrua haŝaĵo (jam konfirmita) ne montriĝas
+        // Kongrua haketaĵo (jam konfirmita) ne montriĝas
         assertNull(ApajNovaĵojDeponejo.deciduMontratan("nova", "nova".hashCode()))
 
-        // La haŝaĵo de malplena ĉeno estas MALPLENA_HESH (komenca stato de novaj instalaĵoj)
-        assertEquals(ApajNovaĵojDeponejo.MALPLENA_HESH, "".hashCode())
+        // La haketaĵo de malplena ĉeno estas MALPLENA_HAKETAĴO (komenca stato de novaj instalaĵoj)
+        assertEquals(ApajNovaĵojDeponejo.MALPLENA_HAKETAĴO, "".hashCode())
     }
 
     @Test

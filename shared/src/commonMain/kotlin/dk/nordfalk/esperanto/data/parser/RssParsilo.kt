@@ -144,7 +144,7 @@ class RssParsilo(
         }
         if (fluo.isEmpty()) {
             // Regulo P6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
-            // serchu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
+            // serĉu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
             fluo = Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src") ?: ""
         }
         if (fluo.isEmpty()) return null

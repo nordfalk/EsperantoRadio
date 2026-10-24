@@ -60,9 +60,9 @@ fun PreviewElsendoDetalo() {
     }
 }
 
-@Preview(name = "Serchxo", showBackground = true, heightDp = 350)
+@Preview(name = "Serĉo", showBackground = true, heightDp = 350)
 @Composable
-fun PreviewSerchxo() {
+fun PreviewSerĉo() {
     pTemo() {
         SerĉoEkrano(serĉoDeponejo = pSerĉoDeponejo(), onElsendo = {})
     }

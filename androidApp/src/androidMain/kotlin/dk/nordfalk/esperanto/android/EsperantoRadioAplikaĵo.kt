@@ -22,7 +22,7 @@ import dk.nordfalk.esperanto.logi
  * produktadajn datumojn nek la Sentry-kvoton (emulilaj OOM-kraŝoj aperis kiel
  * "produktado", vidu ŜANĜOJ.md). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
  */
-class EsperantoRadioAplikajho : Application() {
+class EsperantoRadioAplikaĵo : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = applicationContext

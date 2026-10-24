@@ -135,7 +135,7 @@ class EkranfotoTesto {
     }
 
     @Test
-    fun ekranfoto_serchxo() = runComposeUiTest {
+    fun ekranfoto_serĉo() = runComposeUiTest {
         val serĉoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo {
             override suspend fun serĉi(teksto: String, limo: Int) =
                 if (teksto.length >= 2) listOf(testElsendo) else emptyList()
@@ -146,7 +146,7 @@ class EkranfotoTesto {
             }
         }
         waitForIdle()
-        kaptuKajSavu(this, "03_serchxo")
+        kaptuKajSavu(this, "03_serĉo")
     }
 
     @Test

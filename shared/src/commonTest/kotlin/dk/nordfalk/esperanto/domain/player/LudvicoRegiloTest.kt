@@ -283,7 +283,7 @@ class LudvicoRegiloTest {
         )
         val kanaloj = listOf(
             Kanalo(slug = "k1", nomo = "K1"),
-            Kanalo(slug = "ŝ1", nomo = "SX1", podkastaRssUrl = "https://x.com/ŝ1.xml")
+            Kanalo(slug = "ŝ1", nomo = "Ŝ1", podkastaRssUrl = "https://x.com/ŝ1.xml")
         )
         val ludilo = NoOpLudiloRegilo()
         val (regilo, _, _) = kreuRegilon(

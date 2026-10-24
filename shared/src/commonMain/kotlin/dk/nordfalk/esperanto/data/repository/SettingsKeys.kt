@@ -23,8 +23,8 @@ object SettingsKeys {
     const val SCIIG_ID = "sciig_id"
     /** Registrejo de la aktivaj sciigoj ("id:slug,id:slug") por la sciig-limoj (maks. 7 / maks. 3 po kanalo). */
     const val SCIIG_REGISTREJO = "sciig_registrejo"
-    /** Haŝaĵo de la lasta konfirmitaj apaj novaĵoj (nul = neniam montrita / malplena). */
-    const val APAJ_NOVAĴOJ_HEŜ = "apaj_novaĵoj_haŝ"
+    /** Haketaĵo de la lasta konfirmitaj apaj novaĵoj (nul = neniam montrita / malplena). */
+    const val APAJ_NOVAĴOJ_HAKETAĴO = "apaj_novaĵoj_haketaĵo"
 
     /**
      * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —
@@ -33,5 +33,5 @@ object SettingsKeys {
      */
     const val AŬTOMATA_DAŬRIGO_MALNOVA = "auxtomata_daurigo"
     const val KAŜITAJ_AVERTOJ_MALNOVA = "kasxitaj_avertoj"
-    const val APAJ_NOVAĴOJ_HEŜ_MALNOVA = "apaj_novajxoj_hesh"
+    const val APAJ_NOVAĴOJ_HAKETAĴO_MALNOVA = "apaj_novajxoj_hesh"
 }

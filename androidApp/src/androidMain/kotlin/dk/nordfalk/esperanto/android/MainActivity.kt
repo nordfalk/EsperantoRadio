@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikajho (Application) —
+        // appContext kaj Sentry estas inicialigitaj de EsperantoRadioAplikaĵo (Application) —
         // tio funkcias ankaŭ en procezoj lanĉitaj de WorkManager/riceviloj (PR #89)
         petiSciigPermeson()
         // Procez-nivela — la sama instanco post ĉiu rekreo de la Activity

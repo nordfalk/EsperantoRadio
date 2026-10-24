@@ -67,3 +67,7 @@ description: Ŝargu ĉi tiun skill-on kiam vi skribas aŭ ŝanĝas Esperanto-tek
   `malshalita`), `kash` = kaŝ (`leguKashon` en protokoloj antaŭ 2026-10-24).
 - La h-sistemo estas tute malpermesata por nova kodo (`shargi`, `ghisdatigu`
   ŝtatan): ĝi kolizias kun veraj h-vortoj kaj restas ambigua.
+- La historia `hesh` (ekz. la agord-ŝlosilo `apaj_novajxoj_hesh`) estas la
+  angla „hash" — en Esperanto **haketo**, kaj la rezulto estas **haketaĵo**
+  (la konstanto nomiĝas `APAJ_NOVAĴOJ_HAKETAĴO`; la ŝlosil-VALORO restas
+  historia, ĉar ĝi estas persistigita datumo).

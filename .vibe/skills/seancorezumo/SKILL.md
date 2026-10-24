@@ -1,6 +1,6 @@
 ---
 name: seancorezumo
-description: Kreas HTML-resumon de ĉiuj uzantomesaĝoj kaj asistantaj respondoj el Vibe-seancoprotokoloj por ĉiuj dosierujoj de la sama git-repo. Ŝargu cxi tiun skill kiam la uzanto petas resumon de siaj mesaĝoj al Mistral Vibe.
+description: Kreas HTML-resumon de ĉiuj uzantomesaĝoj kaj asistantaj respondoj el Vibe-seancoprotokoloj por ĉiuj dosierujoj de la sama git-repo. Ŝargu ĉi tiun skill kiam la uzanto petas resumon de siaj mesaĝoj al Mistral Vibe.
 user-invocable: true
 allowed-tools: bash read_file
 ---
@@ -21,7 +21,7 @@ Kiam la uzanto petas ion kiel:
 
 ## Procezo
 
-1. Rulu la Python-skripton `krei_html.py` kiu troviĝas apud tiu cxi SKILL.md:
+1. Rulu la Python-skripton `krei_html.py` kiu troviĝas apud tiu ĉi SKILL.md:
    ```bash
    python3 "$(dirname "$0")/krei_html.py" "$(pwd)" "$(pwd)/seancorezumo.html"
    ```
@@ -37,13 +37,13 @@ Kiam la uzanto petas ion kiel:
    - Trovas ĉiujn seanc-dosierujojn en `~/.vibe/logs/session/`
    - Inkluzivas seancojn el ĉiuj dosierujoj kiuj havas la saman git-remote-URL
      (ekz. `EsperantoRadio` kaj `EsperantoRadio2` ambaŭ inkluziviĝas)
-   - Legas `messages.jsonl` el cxiu seanco
-   - Por cxiu uzantomesaĝo (`role=user`, `injected=false`) trovas la finan
+   - Legas `messages.jsonl` el ĉiu seanco
+   - Por ĉiu uzantomesaĝo (`role=user`, `injected=false`) trovas la finan
      asistantan respondon (lasta `role=assistant` kun `content` kaj sen `tool_calls`)
    - Fortondas mesaĝojn pli longajn ol 1000 signojn
    - Ordigas seancojn kronologie
    - Generas HTML-grupigitan laŭ seanco, kun:
-     - tempohoro por cxiu seanco
+     - tempohoro por ĉiu seanco
      - la dosierujo (cwd) en la session-header, emfazita flave kiam ĝi
        ŝtanĝas inter seancoj
      - liston de ĉiuj dosierujoj en la resumo

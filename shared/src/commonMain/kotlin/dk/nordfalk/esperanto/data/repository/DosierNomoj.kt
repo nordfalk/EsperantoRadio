@@ -25,8 +25,8 @@ fun sanigiDosiernomon(id: String): String {
     if (nomo.length > MAKS_DOSIERNOMO) {
         // Haketaĵo de la PLENA ID — la mallongigita nomo restas unika;
         // String.hashCode estas platform-kongrua (difinita en la Kotlin-specifo)
-        val haketajho = (id.hashCode().toLong() and 0xffffffffL).toString(16).padStart(8, '0')
-        nomo = nomo.take(MAKS_DOSIERNOMO - haketajho.length) + haketajho
+        val haketaĵo = (id.hashCode().toLong() and 0xffffffffL).toString(16).padStart(8, '0')
+        nomo = nomo.take(MAKS_DOSIERNOMO - haketaĵo.length) + haketaĵo
     }
     return nomo
 }

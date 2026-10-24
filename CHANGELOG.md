@@ -18,7 +18,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Vekhorloĝo: la tempo elekteblas per ciferblido en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
+- Vekhorloĝo: la tempo elekteblas per ciferplato en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
 - Hejmo: klako sur la sekcio-titolo „Kanaloj“ kondukas al la kanala vido (https://github.com/nordfalk/EsperantoRadio/pull/131)
 
 ### Ŝanĝita
@@ -43,7 +43,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - La kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekran-vizito — ŝargadoj dedupliĝas, havas 5-minutan aĝ-limon, kaj la ŝarĝindikilo aperas nur kiam efektive ŝargiĝas (https://github.com/nordfalk/EsperantoRadio/pull/129)
 - La apo ne plu kraŝas pro manko de memoro kiam kanal-fluo redonas tro grandan aŭ misdirektitan respondon (ekz. son-dosieron anstataŭ RSS-fluo) — la legado estas limigata al 1 MB (https://github.com/nordfalk/EsperantoRadio/pull/128)
 - Malofte la apo tute kraŝis, kiam Android restartigis la fonan ludado-servon sen aktiva ludado (ekz. post kiam la sistemo liberigis memoron) (https://github.com/nordfalk/EsperantoRadio/pull/124)
-- La alarmo-sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
+- La alarma sciigo (daŭra dum la alarmo sonas) estas nun nuligata kiam la ludado haltiĝas aŭ finiĝas — antaŭe ĝi restis en la ombrumo por ĉiam
 - La rezerva alarm-sono (kiam la kanalo ne disponeblas) estas nun haltigebla per "Halti" aŭ per tuŝo de la sciigo kaj mem ĉesas post 5 minutoj — antaŭe ĝi sonis senfine
 
 ## [3.0.3] - 2026-10-12
@@ -101,8 +101,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Elfaldebla ludilbreto, ŝovebla serĉbreto, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
-- Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo) kontrolas la aparaton por oftaj problemoj (bateri-optimumado, sciig-permeso, ekzaktaj alarmoj, DNS) kaj gvidas al la ĝustaj sistem-agordoj (https://github.com/nordfalk/EsperantoRadio/pull/79)
+- Elfaldebla ludilbreto, ŝovebla progresoŝovilo, reen-/antaŭen-butonoj kaj laŭteco-regilo, kiel en la malnova apo (https://github.com/nordfalk/EsperantoRadio/pull/77)
+- Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo) kontrolas la aparaton por oftaj problemoj (bateri-optimumigo, sciigpermeso, ekzaktaj alarmoj, DNS) kaj gvidas al la ĝustaj sistem-agordoj (https://github.com/nordfalk/EsperantoRadio/pull/79)
 - Avertosigno pri detektitaj problemoj aperas sur la ĉefekrano kaj kondukas rekte al la diagnozo (https://github.com/nordfalk/EsperantoRadio/pull/79)
 
 ### Ŝanĝita

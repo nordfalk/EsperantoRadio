@@ -10,10 +10,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Regres-testo por la freŝ-proceza (pura-fallback) kazo de la vekhorloĝo
+ * Regres-testo por la freŝ-proceza (pura-rezerva) kazo de la vekhorloĝo
  * (PR #111): sen transicia gardilo la unua `updateState()` post la
- * MediaController-konekto kalkulis `Haltita` (malplena media listo) kaj vokis
- * `haltuAlarmRingon()` — tio mortigis la ĵus startintan fallback-ringtonon
+ * MediaController-konekto kalkulis `Haltita` (malplena ludlisto) kaj vokis
+ * `haltuAlarmVokosonon()` — tio ĉesigis la ĵus startintan rezervan vokosonon
  * kaj la alarmo restis silenta.
  *
  * Ĉi tiu testo INTENCE ne uzas `ActivityScenarioRule`: la ludilo
@@ -22,40 +22,40 @@ import org.junit.runner.RunWith
  * [AlarmoReceiviloTest] ne povas kapti tiun kazon, ĉar tie la ludilo jam
  * ekzistas kaj estas konektita kiam la alarmo estas sendita.
  *
- * Ret-ne-dependa: uzas neekzistantan kanalon (tuja fallback, neniu RSS-elŝuto).
+ * Ret-ne-dependa: uzas neekzistantan kanalon (tuja rezerva vokosono, neniu RSS-elŝuto).
  *
  * Rulu: ./gradlew :androidApp:connectedDebugAndroidTest \
- *   -Pandroid.testInstrumentationRunnerArguments.class=dk.nordfalk.esperanto.android.FreŝProcezaFallbackTest
+ *   -Pandroid.testInstrumentationRunnerArguments.class=dk.nordfalk.esperanto.android.FreŝProcezaRezervaTest
  */
 @RunWith(AndroidJUnit4::class)
-class FreŝProcezaFallbackTest {
+class FreŝProcezaRezervaTest {
 
     private val kunteksto = InstrumentationRegistry.getInstrumentation().targetContext
 
     @After
     fun purigu() {
-        AlarmoReceivilo.haltuFallbackRingon()
+        AlarmoReceivilo.haltuRezervanVokosonon()
         AlarmoReceivilo.nuliguSciigon(kunteksto)
     }
 
     @Test
-    fun fallbackRingtonoSupervivasKonektonDeLudilo() {
+    fun rezervaVokosonoSupervivasKonektonDeLudilo() {
         val intent = Intent(AlarmoReceivilo.AGO_ALARMO_EKIGAS)
             .setClass(kunteksto, AlarmoReceivilo::class.java)
             .putExtra("alarmo_id", -1)
-            .putExtra("kanal_slug", "neekzistanta-kanalo") // ne trovita → tuj fallback
+            .putExtra("kanal_slug", "neekzistanta-kanalo") // ne trovita → tuj rezerva vokosono
             .putExtra("etikedo", "Testa alarmo")
         kunteksto.sendBroadcast(intent)
 
-        // La fallback-ringtono ekas (neniu reto bezonata)
-        atendu(30_000) { AlarmoReceivilo.fallbackRingtonoAktiva }
+        // La rezerva vokosono ekas (neniu reto bezonata)
+        atendu(30_000) { AlarmoReceivilo.rezervaVokosonoAktiva }
 
         // Atendu preter la MediaController-konekton (kie updateState() unuafoje vokiĝas)
         Thread.sleep(10_000)
 
         assertTrue(
-            "La fallback-ringtono ankoraŭ devas aktivi post la ludilo-konekto — alie la alarmo estus silenta",
-            AlarmoReceivilo.fallbackRingtonoAktiva,
+            "La rezerva vokosono ankoraŭ devas aktivi post la ludilo-konekto — alie la alarmo estus silenta",
+            AlarmoReceivilo.rezervaVokosonoAktiva,
         )
     }
 

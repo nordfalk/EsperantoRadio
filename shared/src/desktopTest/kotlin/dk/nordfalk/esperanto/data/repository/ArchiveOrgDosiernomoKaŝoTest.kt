@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
 /**
  * Testoj por la persista kesto de archive.org-dosiernomoj (regulo P6.3).
  *
- * Kontrolas plurajn tavolojn: ke RssParsilo demandas la metadaten-API unufoje
+ * Kontrolas plurajn tavolojn: ke RssParsilo demandas la API de metadatumoj unufoje
  * po identigilo, ke la rezulto estas konservata daŭre (videbla ankaŭ por nova
  * kesto, kiel post restarto de la procezo), kaj ke la korektita dosiernomo
  * vere aperas en la elsendo-URL.
@@ -39,7 +39,7 @@ class ArchiveOrgDosiernomoKaŝoTest {
     private val kanalo = Kanalo(slug = "peranto", nomo = "Esperanta Retradio")
 
     @Test
-    fun demandasMetadatenojnUnufojeKajKonservasIlinDaure() = runTest {
+    fun demandasMetadatumojnUnufojeKajKonservasIlinDaure() = runTest {
         var petoj = 0
         val parsilo = RssParsilo(ArchiveOrgDosiernomoKaŝo(settings))
         val falsaKliento: suspend (String) -> String = { _ ->
@@ -47,10 +47,10 @@ class ArchiveOrgDosiernomoKaŝoTest {
             """{"files":[{"name":"Malapero_Benda3.mp3","source":"original","format":"VBR MP3"},{"name":"Malapero_Benda3.png","source":"derivative","format":"PNG"}]}"""
         }
 
-        // Unua parsado: demandas la metadatenojn
+        // Unua parsado: demandas la metadatumojn
         val unua = parsilo.parsuRss(perantoFluo, kanalo, falsaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3", unua[0].fluo)
-        assertEquals(1, petoj, "Metadaten-peto devas okazi unufoje")
+        assertEquals(1, petoj, "Peto pri metadatumoj devas okazi unufoje")
 
         // Dua parsado (alia fluo-kopio): la kesto jam konas la nomon
         val dua = parsilo.parsuRss(perantoFluo, kanalo, falsaKliento)

@@ -18,8 +18,8 @@ class KanalAgordoFumTesto {
 
     @Test
     fun veraKanalkonfiguroParsiĝasKajEstasSana() {
-        val teksto = leguBundledKanalkonfiguron()
-        assertTrue(teksto.isNotBlank(), "La bundled konfiguro ne estu malplena")
+        val teksto = leguPakititanKanalkonfiguron()
+        assertTrue(teksto.isNotBlank(), "La pakita konfiguro ne estu malplena")
 
         val agordo = KanalAgordoLeganto().legu(teksto)
 

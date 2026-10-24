@@ -33,7 +33,7 @@ class SerĉoEkranoTest {
         setContent { SerĉoEkrano(serĉoDeponejo = deponejo, onElsendo = {}) }
         waitForIdle()
 
-        onNodeWithText("Trovu elsendon...").performTextInput("a")
+        onNodeWithText("Trovu elsendon…").performTextInput("a")
 
         mainClock.advanceTimeBy(1000)
         waitForIdle()
@@ -46,7 +46,7 @@ class SerĉoEkranoTest {
         setContent { SerĉoEkrano(serĉoDeponejo = deponejo, onElsendo = {}) }
         waitForIdle()
 
-        val kampo = onNodeWithText("Trovu elsendon...")
+        val kampo = onNodeWithText("Trovu elsendon…")
         kampo.performTextInput("es")
         mainClock.advanceTimeBy(100)  // mezo de la debounce-Atendo — pliaj signoj venos
         kampo.performTextInput("per")

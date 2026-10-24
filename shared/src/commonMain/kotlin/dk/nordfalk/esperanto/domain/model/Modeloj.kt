@@ -14,7 +14,7 @@ data class Kanalo(
     val nomo: String,                          // vidiga nomo
     val priskribo: String? = null,              // mallonga priskribo (1-2 linioj) el la kanalkonfiguro
     val emblemoUrl: String? = null,
-    val rektaElsendaSonoUrl: String? = null,   // livestream (nur Muzaiko)
+    val rektaElsendaSonoUrl: String? = null,   // tuja elsendfluo (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,             // hejmpaĝoButono
@@ -35,7 +35,7 @@ data class Kanalo(
  */
 @Serializable
 data class Elsendo(
-    val id: String,                   // slug — vidu id-konvenciojn
+    val id: String,                   // slug — vidu ID-konvenciojn
     val kanaloSlug: String,
     val kanaloNomo: String? = null,    // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,

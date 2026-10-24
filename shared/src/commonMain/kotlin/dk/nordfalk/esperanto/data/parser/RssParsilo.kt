@@ -35,10 +35,10 @@ class RssParsilo(
 ) {
 
     companion object {
-        /** Maksimuma tempo por unu archive.org-metadaten-peto (la respondo estas ~1-2 KB). */
-        const val METADATEN_LIMTEMPO_MS = 5_000L
+        /** Maksimuma tempo por unu peto pri archive.org-metadatumoj (la respondo estas ~1-2 KB). */
+        const val METADATUMOJ_LIMTEMPO_MS = 5_000L
 
-        /** Maksimumo da samtempaj archive.org-metadaten-petoj (PR #91). */
+        /** Maksimumo da samtempaj petoj pri archive.org-metadatumoj (PR #91). */
         const val PARALELA_PETO_LIMIGO = 8
 
         /**
@@ -134,7 +134,7 @@ class RssParsilo(
             ?: ""
         val dato = normigiDaton(pubDate) ?: return null
 
-        // Stream: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
+        // Fluo: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
         // Preferu enclosure kun type="audio/…" (regulo P6.1.4); iuj fluoj metas bildon unue (PR #91)
         var fluo = ero.selectFirst("enclosure[type^=audio]")?.attr("url")
             ?: ero.selectFirst("enclosure")?.attr("url")
@@ -171,10 +171,10 @@ class RssParsilo(
 
         val finaTitolo = if (kanalo.ignoruTitolon) derivuTitolon(priskriboPurigita) else titolo
 
-        // Id laŭ la dokumentita konvencio (docs/nova/04, "Id-konvencioj"):
+        // ID laŭ la dokumentita konvencio (docs/nova/04, "ID-konvencioj"):
         // la guid senŝanĝa se ĝi jam komencas per "<slug>:" (ĉiam por deArkivo —
-        // la arkiva servilo skribas la jam finan id-on kiel guid kaj re-prefiksigo
-        // kreskus la id-on ĉiun rondiron, rompante la inkrementan kunfandon)
+        // la arkiva servilo skribas la jam finan ID-on kiel guid kaj re-prefiksigo
+        // kreskus la ID-on ĉiun rondiron, rompante la inkrementan kunfandon)
         val guid = ero.selectFirst("guid")?.text() ?: ero.selectFirst("id")?.text()
         val id = konstruuId(kanalo, guid, dato, deArkivo)
 
@@ -296,7 +296,7 @@ class RssParsilo(
                     "https://drive.google.com/u/1/uc?id=$id&export=download"
                 }
                 // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo P6.3: la komuna
-                // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, (PR #91))
+                // salto-listo anstataŭas la iamajn unuopajn kontrolaĵojn, (PR #91))
                 iframeSrc.isEmpty() -> return@mapNotNull null
                 estasSaltitaGastiganto(iframeSrc) -> return@mapNotNull null
                 else -> return@mapNotNull null
@@ -352,27 +352,27 @@ class RssParsilo(
     }
 
     /**
-     * Trovas la veran MP3-dosiernomon ene de archive.org-arkivaĵo per la metadaten-API
-     * (https://archive.org/metadata/&lt;identigilo&gt;). Se la metadatenoj ne estas
+     * Trovas la veran MP3-dosiernomon ene de archive.org-arkivaĵo per la API de metadatumoj
+     * (https://archive.org/metadata/&lt;identigilo&gt;). Se la metadatumoj ne estas
      * haveblaj (ekz. sen rete), retrofalas al la divenita nomo `<identigilo>.mp3`.
      */
     private suspend fun trovuArchiveOrgMp3Dosiernomon(identigilo: String, httpKliento: suspend (String) -> String): String {
         archiveOrgKaŝo?.leguDosiernomon(identigilo)?.let { return it }
         val divenita = "$identigilo.mp3"
         return try {
-            // Limigu la metadaten-peton: ĝi estas aldonaĵo al la RSS-parsado kaj ne
+            // Limigu la peton pri metadatumoj: ĝi estas aldonaĵo al la RSS-parsado kaj ne
             // devas bloki ĝin longe (ekz. eksterrete, kiam nur retrofalas al la diveno).
             // Kun la sama kaŝo ĝi sukcesos poste.
-            val teksto = withTimeoutOrNull(METADATEN_LIMTEMPO_MS) {
+            val teksto = withTimeoutOrNull(METADATUMOJ_LIMTEMPO_MS) {
                 httpKliento("https://archive.org/metadata/$identigilo")
             }
             if (teksto == null) {
-                logw("RssParsilo", "archive.org/$identigilo: metadaten-peto translimis — uzas divenitan nomon $divenita")
+                logw("RssParsilo", "archive.org/$identigilo: peto pri metadatumoj translimis — uzas divenitan nomon $divenita")
                 return divenita
             }
-            val dosiernomo = eltiruMp3DosiernomonElMetadatenoj(teksto)
+            val dosiernomo = eltiruMp3DosiernomonElMetadatumoj(teksto)
             if (dosiernomo == null) {
-                logw("RssParsilo", "archive.org/$identigilo: neniu MP3 en metadatenoj — uzas divenitan nomon $divenita")
+                logw("RssParsilo", "archive.org/$identigilo: neniu MP3 en la metadatumoj — uzas divenitan nomon $divenita")
                 return divenita
             }
             logd("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
@@ -383,13 +383,13 @@ class RssParsilo(
         } catch (e: Throwable) {
             // Throwable, ne Exception: la Js-motoro ĵetas kotlin.Error ĉe CORS/reteraroj.
             // Unu arkivaĵo ne devas panei la tutan kanal-fluon (regulo A4).
-            logw("RssParsilo", "archive.org/$identigilo: metadaten-peto malsukcesa — uzas divenitan nomon $divenita", e)
+            logw("RssParsilo", "archive.org/$identigilo: peto pri metadatumoj malsukcesa — uzas divenitan nomon $divenita", e)
             divenita
         }
     }
 
-    /** Elektas la unuan originalan MP3-dosieron el archive.org-metadaten-JSON. */
-    private fun eltiruMp3DosiernomonElMetadatenoj(teksto: String): String? {
+    /** Elektas la unuan originalan MP3-dosieron el la metadatumoj-JSON de archive.org. */
+    private fun eltiruMp3DosiernomonElMetadatumoj(teksto: String): String? {
         if (teksto.isBlank()) return null
         return try {
             val dosieroj = Json.parseToJsonElement(teksto).jsonObject["files"]?.jsonArray ?: return null
@@ -398,13 +398,13 @@ class RssParsilo(
                 val obj = dosiero.jsonObject
                 val nomo = obj["name"]?.jsonPrimitive?.contentOrNull ?: continue
                 if (!nomo.endsWith(".mp3", ignoreCase = true)) continue
-                // Preferu originalan dosieron; derivaj (bildoj, spectrogramoj) ne taŭgas
+                // Preferu originalan dosieron; derivaj (bildoj, spektrogramoj) ne taŭgas
                 if (obj["source"]?.jsonPrimitive?.contentOrNull == "original") return nomo
                 if (unuaMp3 == null) unuaMp3 = nomo
             }
             unuaMp3
         } catch (e: Exception) {
-            loge("RssParsilo", "archive.org: malsukcesis analizi metadaten-JSON", e)
+            loge("RssParsilo", "archive.org: malsukcesis analizi la metadatumoj-JSON", e)
             null
         }
     }
@@ -448,16 +448,16 @@ class RssParsilo(
     // === Helpiloj ===
 
     /**
-     * Konstruas la elsendo-id-on laŭ la dokumentita konvencio (docs/nova/04, "Id-konvencioj";
+     * Konstruas la elsendo-ID-on laŭ la dokumentita konvencio (docs/nova/04, "ID-konvencioj";
      * G16-riparo):
      * - la guid senŝanĝa, se ĝi jam komencas per "<kanalSlug>:" — aŭ ĉiam por `deArkivo`
-     *   (la arkiva servilo skribas la jam finan id-on kiel guid; re-prefiksigo kreskus
-     *   la id-on ĉiun rondiron kaj rompus la inkrementan kunfandon de docs/nova/06);
+     *   (la arkiva servilo skribas la jam finan ID-on kiel guid; re-prefiksigo kreskus
+     *   la ID-on ĉiun rondiron kaj rompus la inkrementan kunfandon de docs/nova/06);
      * - alie "<kanalSlug>:<guid>" (precize unu prefikso);
      * - sen guid: "<kanalSlug>:<dato>" (kiel la malnova RomePodcastParser.parseAndre).
      *
-     * La id ŝlosas uzantdatumojn (elŝutoj, ludpozicioj, plejŝatataj) kaj devas esti
-     * STABILA: dufoja parsado de la sama fluo redonas la saman id-on.
+     * La ID ŝlosas uzantdatumojn (elŝutoj, ludpozicioj, plejŝatataj) kaj devas esti
+     * STABILA: dufoja parsado de la sama fluo redonas la saman ID-on.
      */
     fun konstruuId(kanalo: Kanalo, guid: String?, dato: String, deArkivo: Boolean = false): String {
         if (guid != null) {
@@ -477,7 +477,7 @@ class RssParsilo(
      * ExoPlayer/Coil denaske scipovas malfermi `file://` kaj `content://` — malica aŭ
      * difektita fluo devas ne igi nin ludi/montri lokan enhavon (PR #89).
      *
-     * @return la trimmed URL, aŭ null se la skemo ne estas permesata
+     * @return la URL sen ĉirkaŭaj spacetoj, aŭ null se la skemo ne estas permesata
      */
     fun saniguRetUrlon(url: String?): String? {
         if (url.isNullOrBlank()) return null

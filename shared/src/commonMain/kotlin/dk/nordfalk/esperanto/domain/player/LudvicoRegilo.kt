@@ -117,7 +117,7 @@ class LudvicoRegilo(
 
     /**
      * Komencas observi la ludilon-staton por detekti Finita kaj ĝisdatigi pozicion.
-     * Vokata unufoje ĉe app-starto.
+     * Vokata unufoje ĉe apo-starto.
      */
     fun komenci() {
         if (observanto != null) return
@@ -441,7 +441,7 @@ class LudvicoRegilo(
     }
 
     /**
-     * Ludas rektan kanalon (livestream) — tra la regilo, ne rekte al la ludilo (PR #92):
+     * Ludas rektan kanalon (tuja elsendfluo) — tra la regilo, ne rekte al la ludilo (PR #92):
      * la reprovo-, eraro-kalkulo- kaj dedup-statoj restas koheraj.
      */
     suspend fun ludiRektan(kanalo: Kanalo) {

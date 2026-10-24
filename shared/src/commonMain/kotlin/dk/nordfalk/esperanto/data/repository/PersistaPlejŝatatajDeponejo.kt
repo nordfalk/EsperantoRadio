@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Persistanta PlejŝatatajDeponejo. Uzas multiplatform-settings por persisti
+ * Persista PlejŝatatajDeponejo. Uzas multiplatform-settings por persisti
  * la plejŝatatajn kanalo-slugs inter restartoj.
  *
  * Decido: Uzas Settings (key-value store) kun komma-disigita listo.
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * estas uzataj kiel komencaj ŝatataj kanaloj. La uzanto povas poste aldoni aŭ
  * forigi kanalojn libere — la malplena listo estas respektata post unua skribo.
  */
-class PersistantaPlejŝatatajDeponejo(
+class PersistaPlejŝatatajDeponejo(
     private val settings: Settings,
     private val defaŭltajŜatataj: Set<String> = emptySet(),
 ) : PlejŝatatajDeponejo {

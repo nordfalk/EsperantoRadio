@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.data.repository
 
 /**
- * Platform-specifaj funkcioj por legi/skribi krudan tekston al diskkaŝmemoro.
+ * Platform-specifaj funkcioj por legi/skribi krudan tekston al diska kaŝmemoro.
  * Uzata por konservi krudajn RSS-respondojn, nomitajn laŭ kanalo-slug.
  *
  * - Android: `appContext.cacheDir/elsendoj_kasho/`

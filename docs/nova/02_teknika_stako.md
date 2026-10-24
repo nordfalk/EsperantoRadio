@@ -25,7 +25,7 @@
 | Teknologio | Kialo |
 |---|---|
 | **Media3 ExoPlayer** | Sonludado (HLS + MP3); MediaSessionService por malfona ludado |
-| **Media3 MediaSessionService** | Malfona ludado, mediasciigo, mediabutonoj, sonfokuso (ĉio "senpaga") |
+| **Media3 MediaSessionService** | Malfona ludado, ludada sciigo, ludbutonoj, sonfokuso (ĉio "senpaga") |
 | **DownloadManager** / **WorkManager** | Elŝutoj / sciigoj pri novaj elsendoj |
 | **AlarmManager** | Vekhorloĝo |
 
@@ -34,7 +34,7 @@
 | Teknologio | Kialo |
 |---|---|
 | **AVPlayer / AVFoundation** | Sonludado (HLS + MP3) |
-| **AVAudioSession** + **MPNowPlayingInfoCenter** + **RemoteCommandCenter** | Malfona sono, "Now Playing", mediabutonoj |
+| **AVAudioSession** + **MPNowPlayingInfoCenter** + **RemoteCommandCenter** | Malfona sono, "Now Playing", ludbutonoj |
 | **URLSession** (background) | Elŝutoj |
 
 ### Desktop (JVM)
@@ -52,7 +52,7 @@
 | Teknologio | Kialo |
 |---|---|
 | **`HTMLAudioElement`** | Sonludado (MP3) |
-| **retumilo** | HLS por Muzaiko-livestream (nativa en la retumilo) |
+| **retumilo** | HLS por la tuja elsendfluo de Muzaiko (nativa en la retumilo) |
 
 Elŝutoj, malfona ludado, widget, vekhorloĝo ne haveblas sur Web.
 

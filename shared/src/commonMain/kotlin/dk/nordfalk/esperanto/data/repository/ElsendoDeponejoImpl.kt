@@ -54,8 +54,8 @@ open class ElsendoDeponejoImpl(
     }
 
     /**
-     * Peto al archive.org-metadatenoj (regulo P6.3) — ankaŭ uzata ĉe la re-parsado
-     * de la diskkaŝo: sen ĝi la Peranto-elsendoj ricevus DIVENITAJN (ofte 404-ajn)
+     * Peto pri la metadatumoj de archive.org (regulo P6.3) — ankaŭ uzata ĉe la re-parsado
+     * de la diska kaŝo: sen ĝi la Peranto-elsendoj ricevus DIVENITAJN (ofte 404-ajn)
      * dosiernomojn ĝis la unua sukcesa reta refreŝo (PR #91).
      */
     private val arhivaPeto: suspend (String) -> String = { urlD ->
@@ -138,7 +138,7 @@ open class ElsendoDeponejoImpl(
         ŝargiElsendojn(kanalo, fortoRefresigi)
 
     /**
-     * Legas la krudan RSS-tekston el diskkaŝmemoro kaj re-parsas ĝin.
+     * Legas la krudan RSS-tekston el diska kaŝmemoro kaj re-parsas ĝin.
      * Se neniu kaŝo ekzistas, revenigas null.
      * Ankaŭ plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      */
@@ -148,14 +148,14 @@ open class ElsendoDeponejoImpl(
         // la ekranoj vokas tion je ĉiu eniro).
         kaŝmemoro[kanalo.slug]?.let { return it }
         val respondo = leguKaŝon(kanalo.slug) ?: return null
-        logd("ElsendoDeponejo", "${kanalo.slug}: legas diskkaŝmemoron (${respondo.length} signoj)")
+        logd("ElsendoDeponejo", "${kanalo.slug}: legas diskan kaŝmemoron (${respondo.length} signoj)")
         return try {
             // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
             // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
             kontroluFluecon(respondo)
             val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto).ordigitajPlejFreŝajUnue()
             konservu(kanalo.slug, elsendoj)
-            logd("ElsendoDeponejo", "${kanalo.slug}: diskkaŝmemoro parsita — ${elsendoj.size} elsendoj")
+            logd("ElsendoDeponejo", "${kanalo.slug}: diska kaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj
         } catch (e: CancellationException) {
             throw e
@@ -163,7 +163,7 @@ open class ElsendoDeponejoImpl(
             // Fiaskpaĝo (kaptiva portalo) aŭ rompita parsado: forigu la malpuran
             // kaŝon, alikaze tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S).
             // logw (ne loge): tolerita, atendebla situacio — ne erar-evento.
-            logw("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskkaŝmemoron — forigas la kaŝon", e)
+            logw("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskan kaŝmemoron — forigas la kaŝon", e)
             foriguKaŝon(kanalo.slug)
             null
         }
@@ -172,7 +172,7 @@ open class ElsendoDeponejoImpl(
     /**
      * Legas ĉiujn kaŝitajn RSS-dosierojn por la donitaj kanaloj kaj re-parsas ilin.
      * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
-     * Redonas ĉiujn elsendojn kune (flat list).
+     * Redonas ĉiujn elsendojn kune (plata listo).
      */
     suspend fun leguĈiujnKaŝitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
         val ĉiuj = mutableListOf<Elsendo>()
@@ -180,7 +180,7 @@ open class ElsendoDeponejoImpl(
             if (!kanalo.havasPodkastojn) continue
             leguKaŝitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
         }
-        logd("ElsendoDeponejo", "Diskkaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+        logd("ElsendoDeponejo", "Diska kaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
         return ĉiuj
     }
 

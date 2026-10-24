@@ -44,19 +44,19 @@ class DiagnozoTest {
 
     @Test
     fun diagnozoRezulto_havasKorektajnKampojn() {
-        val ago = DiagnozoAgo("Malfermi agordojn", "battery")
+        val ago = DiagnozoAgo("Malfermi agordojn", "baterio")
         val rezulto = DiagnozoRezulto(
             tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
-            titolo = "Bateri-optimumado estas ŝaltita",
+            titolo = "Bateri-optimumigo estas ŝaltita",
             priskribo = "La sistemo povas limigi la aplikon en la fono.",
             severeco = Severeco.ERARO,
             ago = ago,
         )
         assertEquals(DiagnozoTipo.BATERIO_OPTIMIZATION, rezulto.tipo)
-        assertEquals("Bateri-optimumado estas ŝaltita", rezulto.titolo)
+        assertEquals("Bateri-optimumigo estas ŝaltita", rezulto.titolo)
         assertEquals(Severeco.ERARO, rezulto.severeco)
         assertNotNull(rezulto.ago)
-        assertEquals("battery", rezulto.ago!!.intenco)
+        assertEquals("baterio", rezulto.ago!!.intenco)
     }
 
     @Test

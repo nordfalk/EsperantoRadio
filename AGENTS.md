@@ -55,7 +55,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
   La celo estas rekreado, ne riparado.
 - **A2 — La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
   `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-  La sep parsreguloj kaj la skip-listo devas esti konservitaj.
+  La sep parsreguloj kaj la salto-listo devas esti konservitaj.
 - **A3 — Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
@@ -257,10 +257,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   revizio de #99/#101/#102): la du Kotlin-bumpoj tuŝas apudajn liniojn de
   `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la
   PR-branĉon, ĉiuj kvar kromprogramoj je la sama versio. Coil 3.6.3 (#102) estis
-  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatenon 2.4.0,
-  nelegeblan de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
+  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatumojn 2.4.0,
+  nelegeblajn de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
   `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`; nuna AGP
-  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatenajn kaj
+  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatumajn kaj
   compileSdk/AGP-postulojn antaŭ ol kunfandi versi-bumpon.
 - **Plena ĝisdatigo de la ilaro (Gradle 9 + AGP 9) eblas kaj estis provita**
   (2026-10-17, PR #117; ĉiuj celoj verdaj: desktopTest, androidApp assembleDebug,
@@ -293,7 +293,7 @@ iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
 protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
-  diskkaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
+  diska kaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
 - `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
   protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
@@ -353,7 +353,7 @@ staras en la skill-o `konstruado-kaj-testado`:
 ## Datumfluo (nova apo)
 
 ```
-esperantoradio_kanaloj_v9.json (bundled resource)
+esperantoradio_kanaloj_v9.json (paktita risurco)
         ↓ KanalAgordoLeganto (striptigas // komentojn, traktas JSONC)
    List<Kanal>
         ↓ KanalDeponejoImpl (StateFlow)
@@ -363,7 +363,7 @@ esperantoradio_kanaloj_v9.json (bundled resource)
    RssParsilo.parsRss(fluoTeksto, kanal)
         ↓ (reguloj P6.1–P6.7)
    List<Elsendo>
-        ↓ KanalEkrano — elsendlisto (dat-grupigo, diskkaŝmemoro)
+        ↓ KanalEkrano — elsendlisto (dat-grupigo, diska kaŝmemoro)
 ```
 
 ## Kie trovi kion

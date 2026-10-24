@@ -11,11 +11,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Testoj por [PersistantaAlarmoDeponejo.ekigis] — kio okazas kiam alarmo sonis.
+ * Testoj por [PersistaAlarmoDeponejo.ekigis] — kio okazas kiam alarmo sonis.
  * Uzas veran persiston (java.util.prefs en provizora nodo), por kontroli ke la ŝanĝo
  * estas videbla ankaŭ por nova deponejo (kiel post restarto de la procezo).
  */
-class PersistantaAlarmoDeponejoTest {
+class PersistaAlarmoDeponejoTest {
 
     private val nodo = Preferences.userRoot().node("esperantoradio-test-${System.nanoTime()}")
     private val settings = PreferencesSettings(nodo)
@@ -23,7 +23,7 @@ class PersistantaAlarmoDeponejoTest {
     @AfterTest
     fun purigu() = nodo.removeNode()
 
-    private suspend fun deponejoKun(vararg alarmoj: Alarmo) = PersistantaAlarmoDeponejo(settings).apply {
+    private suspend fun deponejoKun(vararg alarmoj: Alarmo) = PersistaAlarmoDeponejo(settings).apply {
         alarmoj.forEach { krei(it) }
     }
 
@@ -36,7 +36,7 @@ class PersistantaAlarmoDeponejoTest {
 
         assertFalse(deponejo.observiAlarmojn().value.single().aktiva)
         // Nova deponejo (kiel post restarto) legas la saman staton el Settings
-        assertFalse(PersistantaAlarmoDeponejo(settings).observiAlarmojn().value.single().aktiva)
+        assertFalse(PersistaAlarmoDeponejo(settings).observiAlarmojn().value.single().aktiva)
     }
 
     @Test

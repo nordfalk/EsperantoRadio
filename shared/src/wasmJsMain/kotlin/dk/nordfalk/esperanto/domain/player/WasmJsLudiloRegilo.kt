@@ -55,10 +55,10 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         audio!!.addEventListener("error", { _ ->
             // MEDIA_ERR_NETWORK (2) estas pasema; aliaj (ekz. 4 = nesubtenata/404) estas daŭraj
             val kodo = audio?.error?.code?.toInt()
-            _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila audio-eraro ($kodo)", reprovebla = kodo == 2))
+            _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila aŭda eraro ($kodo)", reprovebla = kodo == 2))
         })
         // (PR #92) sen timeupdate la pozicio frostas ĉe la valoro de "playing" —
-        // la serĉbreto ne moviĝas kaj la pozicia savilo de LudvicoRegilo konservas malnovan valoron
+        // la ŝovilo ne moviĝas kaj la pozicia savilo de LudvicoRegilo konservas malnovan valoron
         audio!!.addEventListener("timeupdate", { _ ->
             val a = audio ?: return@addEventListener
             _stato.value = _stato.value.copy(

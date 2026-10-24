@@ -41,10 +41,10 @@ import kotlinx.coroutines.launch
  * Fona ludado-servo per Media3 MediaSessionService.
  *
  * Posedas la ExoPlayer kaj MediaSession. Kiam ludado komenciĝas, la servo
- * aŭtomate iĝas malfona kun mediasciigo (sic sciig-permeso estas donita).
+ * aŭtomate iĝas malfona kun ludada sciigo (se sciigpermeso estas donita).
  * Tiel la ludado daŭras eĉ kiam la apo estas en la fono.
  *
- * Sonfokuso, kapaŭskultil-malkonekto kaj mediabutonoj estas aŭtomate
+ * Sonfokuso, kapaŭskultil-malkonekto kaj ludbutonoj estas aŭtomate
  * traktataj de ExoPlayer per [AudioAttributes] kaj [setHandleAudioBecomingNoisy].
  */
 class EsperantoLudadoServo : MediaSessionService() {

@@ -77,11 +77,11 @@ class AlarmoTest {
     fun ripetoTekstoGeneratasElKonfiguro() {
         assertEquals("Unufoje", alarmo(6, 0, 0x00).ripetoTeksto)
         assertEquals("Ĉiutage", alarmo(6, 0, 0x7f).ripetoTeksto)
-        assertEquals("Labortage", alarmo(6, 45, 0x1f).ripetoTeksto)
+        assertEquals("Labortagoj", alarmo(6, 45, 0x1f).ripetoTeksto)
         assertEquals("Semajnfine", alarmo(10, 0, 0x60).ripetoTeksto)
         assertEquals("Ĵaŭde", alarmo(21, 0, 0x08).ripetoTeksto)
         assertEquals("Dimanĉe", alarmo(8, 0, 0x40).ripetoTeksto)
-        // ne-specialigitaj kombinoj ricevas plenajn tag-nomojn kun "kaj"
+        // ne-specialigitaj kombinoj ricevas plenajn tagnomojn kun "kaj"
         assertEquals("Lundo kaj Mardo", alarmo(6, 0, 0x03).ripetoTeksto)
         assertEquals("Merkredo kaj Dimanĉo", alarmo(16, 0, 0x44).ripetoTeksto)
         assertEquals("Lundo, Mardo kaj Sabato", alarmo(6, 0, 0x23).ripetoTeksto)

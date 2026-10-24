@@ -12,13 +12,13 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 /**
- * Persistanta AlarmoDeponejo. Uzas multiplatform-settings kun JSON-serializo.
+ * Persista AlarmoDeponejo. Uzas multiplatform-settings kun JSON-serializo.
  *
  * - Se persistitaj alarmoj ekzistas, ili estas ŝargitaj ĉe starto.
  * - Se ne, la sugestoj estas montritaj (malaktivaj).
  * - Ĉiu ŝanĝo estas tuj persistita.
  */
-class PersistantaAlarmoDeponejo(
+class PersistaAlarmoDeponejo(
     private val settings: Settings,
     sugestoj: List<Alarmo> = emptyList(),
     private val skedilo: AlarmoSkedilo? = null,
@@ -43,7 +43,7 @@ class PersistantaAlarmoDeponejo(
                 val unikaj = sugestoj.map { s ->
                     var id = s.id
                     while (id in uzitajIdj) {
-                        logi("AlarmoDeponejo", "ID-kolizio por $s — asignas novan")
+                        logi("AlarmoDeponejo", "ID-kolizio por $s — atribuas novan")
                         id = nextId++
                     }
                     uzitajIdj.add(id)
@@ -68,7 +68,7 @@ class PersistantaAlarmoDeponejo(
             try {
                 settings.putString(SettingsKeys.ALARMOJ_REZERVO, str)
             } catch (e2: Exception) {
-                logw("AlarmoDeponejo", "Ne eblis skribi la alarmo-rezervon", e2)
+                logw("AlarmoDeponejo", "Ne eblis skribi la alarman rezervon", e2)
             }
             sugestoj
         }

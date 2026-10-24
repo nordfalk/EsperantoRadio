@@ -24,8 +24,8 @@ import java.net.InetAddress
  * Android-implemento de DiagnozoRegilo.
  *
  * Kontrolas la ĉefajn kialojn kial fona ludado / aŭtoludo ĉesas:
- * 1. **Bateri-optimumado** (Samsung MARs, Android Doze) — `PowerManager.isIgnoringBatteryOptimizations`
- * 2. **Sciig-permeso** — `NotificationManagerCompat.areNotificationsEnabled`
+ * 1. **Bateri-optimumigo** (Samsung MARs, Android Doze) — `PowerManager.isIgnoringBatteryOptimizations`
+ * 2. **Sciigpermeso** — `NotificationManagerCompat.areNotificationsEnabled`
  * 3. **DNS-solvado** — provas solvi `archive.org` (ofte blokita de privata DNS / VPN)
  *
  * La rezulto estas konservita en [problemoj] (StateFlow) por ke la ĉefekrano
@@ -52,28 +52,28 @@ actual class DiagnozoRegilo(private val context: Context) {
         val rezultoj = mutableListOf<DiagnozoRezulto>()
         logi("Diagnozo", "Komencas kontrolojn (inkluziveDns=$inkluziveDns)…")
 
-        // 1. Bateri-optimumado
+        // 1. Bateri-optimumigo
         try {
             val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             if (!pm.isIgnoringBatteryOptimizations(context.packageName)) {
                 rezultoj.add(
                     DiagnozoRezulto(
                         tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
-                        titolo = "Bateri-optimumado estas ŝaltita",
-                        priskribo = "La sistemo (ekz. Samsung MARs aŭ Android Doze) povas limigi la retaliron kaj mortigi la aplikon en la fono. Tio kaŭzas ke aŭtomata daŭrigo kaj fona ludado ĉesas sen averto.",
+                        titolo = "Bateri-optimumigo estas ŝaltita",
+                        priskribo = "La sistemo (ekz. Samsung MARs aŭ Android Doze) povas limigi la retaliron kaj ĉesigi la aplikon en la fono. Tio kaŭzas ke aŭtomata daŭrigo kaj fona ludado ĉesas sen averto.",
                         severeco = Severeco.ERARO,
-                        ago = DiagnozoAgo("Malfermi bateriajn agordojn", "battery"),
+                        ago = DiagnozoAgo("Malfermi bateriajn agordojn", "baterio"),
                     )
                 )
-                logw("Diagnozo", "Bateri-optimumado ŝaltita por ${context.packageName}")
+                logw("Diagnozo", "Bateri-optimumigo ŝaltita por ${context.packageName}")
             } else {
-                logi("Diagnozo", "Bateri-optimumado: en ordo")
+                logi("Diagnozo", "Bateri-optimumigo: en ordo")
             }
         } catch (e: Exception) {
-            loge("Diagnozo", "Malsukcesis kontroli bateri-optimumadon", e)
+            loge("Diagnozo", "Malsukcesis kontroli bateri-optimumigon", e)
         }
 
-        // 2. Sciig-permeso
+        // 2. Sciigpermeso
         try {
             val nm = NotificationManagerCompat.from(context)
             if (!nm.areNotificationsEnabled()) {
@@ -81,17 +81,17 @@ actual class DiagnozoRegilo(private val context: Context) {
                     DiagnozoRezulto(
                         tipo = DiagnozoTipo.NOTIFICATIONS,
                         titolo = "Sciigoj ne estas permesitaj",
-                        priskribo = "La apliko ne povas montri sciigojn pri novaj elsendoj, kaj la media sciigo en la fono ne aperas.",
+                        priskribo = "La apliko ne povas montri sciigojn pri novaj elsendoj, kaj la ludada sciigo en la fono ne aperas.",
                         severeco = Severeco.AVERTO,
-                        ago = DiagnozoAgo("Malfermi sciig-agordojn", "notifications"),
+                        ago = DiagnozoAgo("Malfermi sciigagordojn", "sciigoj"),
                     )
                 )
-                logw("Diagnozo", "Sciig-permeso mankas")
+                logw("Diagnozo", "Sciigpermeso mankas")
             } else {
-                logi("Diagnozo", "Sciig-permeso: en ordo")
+                logi("Diagnozo", "Sciigpermeso: en ordo")
             }
         } catch (e: Exception) {
-            loge("Diagnozo", "Malsukcesis kontroli sciig-permeson", e)
+            loge("Diagnozo", "Malsukcesis kontroli sciigpermeson", e)
         }
 
         // 3. DNS-testo — nur en la kompleta kontrolo (povas esti malrapida)
@@ -104,9 +104,9 @@ actual class DiagnozoRegilo(private val context: Context) {
                     DiagnozoRezulto(
                         tipo = DiagnozoTipo.DNS,
                         titolo = "DNS-solvado malsukcesis",
-                        priskribo = "La apliko ne povas solvi retej-nomojn (ekz. archive.org). Ofte kaŭzas privata DNS (DNS-over-TLS), VPN, aŭ la sistemo limigas la aplikon en la fono (vidu bateri-optimumadon). Kontrolu la sendratajn agordojn.",
+                        priskribo = "La apliko ne povas solvi domajnajn nomojn (ekz. archive.org). Ofte kaŭzas privata DNS (DNS-over-TLS), VPN, aŭ la sistemo limigas la aplikon en la fono (vidu bateri-optimumigon). Kontrolu la sendratajn agordojn.",
                         severeco = Severeco.ERARO,
-                        ago = DiagnozoAgo("Malfermi sendratajn agordojn", "wireless"),
+                        ago = DiagnozoAgo("Malfermi sendratajn agordojn", "sendrata"),
                     )
                 )
                 logw("Diagnozo", "DNS-solvado malsukcesis por archive.org", e)
@@ -124,13 +124,13 @@ actual fun malfermiSistemAgordon(intenco: String) {
     val context = appContext
     try {
         val intent = when (intenco) {
-            "battery" -> Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            "baterio" -> Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
-            "notifications" -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            "sciigoj" -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
             }
 
-            "wireless" -> Intent(Settings.ACTION_WIRELESS_SETTINGS)
+            "sendrata" -> Intent(Settings.ACTION_WIRELESS_SETTINGS)
 
             else -> Intent(Settings.ACTION_SETTINGS)
         }

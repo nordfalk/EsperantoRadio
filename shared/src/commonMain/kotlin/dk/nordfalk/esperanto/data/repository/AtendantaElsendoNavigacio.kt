@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * Kiam la uzanto klakas sur sciigon, MainActivity metas la elsendon ĉi tie.
  * App.kt observas ĝin kaj puŝas Vojo.ElsendoDetalo kiam ĝi ŝanĝiĝas.
  */
-object PendingElsendoNavigacio {
+object AtendantaElsendoNavigacio {
     private val _elsendo = MutableStateFlow<Elsendo?>(null)
     val elsendo: StateFlow<Elsendo?> = _elsendo.asStateFlow()
 

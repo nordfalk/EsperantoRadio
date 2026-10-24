@@ -37,12 +37,12 @@ class EraroKlasifikoTest {
 
     @Test
     fun http500EstasReprovebla() {
-        assertTrue("Servileraro 500 devas esti reprovebla", estasReproveblaEraro(httpEraro(500)))
+        assertTrue("Servila eraro 500 devas esti reprovebla", estasReproveblaEraro(httpEraro(500)))
     }
 
     @Test
     fun http503EstasReprovebla() {
-        assertTrue("Servileraro 503 devas esti reprovebla", estasReproveblaEraro(httpEraro(503)))
+        assertTrue("Servila eraro 503 devas esti reprovebla", estasReproveblaEraro(httpEraro(503)))
     }
 
     @Test
@@ -58,7 +58,7 @@ class EraroKlasifikoTest {
             java.io.IOException("Connection reset"),
             PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
         )
-        assertTrue("Ret-eraro devas resti reprovebla", estasReproveblaEraro(error))
+        assertTrue("Reteraro devas resti reprovebla", estasReproveblaEraro(error))
     }
 
     @Test

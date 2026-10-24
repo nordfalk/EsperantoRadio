@@ -140,12 +140,12 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
 /**
  * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
  *
- * Formato: `id/enabled/horo/minuto/ripeto/time/=kanalo/=etikedo/`
+ * Formato: `ID/aktiva/horo/minuto/ripeto/tempo/=kanalo/=etikedo/`
  * kun `\` ĉe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
  * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
  *
  * Post JSONC-striptigo ĉiuj sugestoj estas sur unu linio, apartigitaj per `/`.
- * Ĉiu alarmo konsistas el 8 partoj + trailing `/` (9 elementoj per split).
+ * Ĉiu alarmo konsistas el 8 partoj + fina `/` (9 elementoj per disigo).
  */
 fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
     val partoj = teksto.split("/")
@@ -163,7 +163,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
             // ripeto: MASKU al la 7 tago-bitoj (ne limigu al 0x7f = ĉiutage) —
             // tiel la semantiko kongruas kun sekvaEkigo kaj konservas la intencitajn tagojn
             val ripeto = partoj[i + 4].toInt() and 0x7f
-            // partoj[i + 5] = time (malnova, ne uzata)
+            // partoj[i + 5] = tempo (malnova, ne uzata)
             val kanaloSlug = partoj[i + 6].removePrefix("=")
             val etikedo = malkoduUrlKoditaĵon(partoj[i + 7].removePrefix("="))
             rezulto.add(Alarmo(
@@ -193,11 +193,11 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
  */
 internal fun malkoduUrlKoditaĵon(teksto: String): String {
     val rezulto = StringBuilder()
-    val bajtoj = mutableListOf<Int>()
+    val bitokoj = mutableListOf<Int>()
     fun elfluigu() {
-        if (bajtoj.isNotEmpty()) {
-            rezulto.append(malkoduUtf8(bajtoj))
-            bajtoj.clear()
+        if (bitokoj.isNotEmpty()) {
+            rezulto.append(malkoduUtf8(bitokoj))
+            bitokoj.clear()
         }
     }
     var i = 0
@@ -209,7 +209,7 @@ internal fun malkoduUrlKoditaĵon(teksto: String): String {
                 val alta = hexCifero(teksto[i + 1])
                 val malalta = hexCifero(teksto[i + 2])
                 if (alta != null && malalta != null) {
-                    bajtoj.add((alta shl 4) or malalta)
+                    bitokoj.add((alta shl 4) or malalta)
                     i += 3
                 } else {
                     elfluigu(); rezulto.append(c); i++
@@ -230,23 +230,23 @@ private fun hexCifero(c: Char): Int? = when (c) {
     else -> null
 }
 
-/** Malkodas UTF-8-bajtosekvencon al signoĉeno (subtenas 1-4-bajtajn signojn). */
-private fun malkoduUtf8(bajtoj: List<Int>): String {
+/** Malkodas UTF-8-bitokosekvencon al signoĉeno (subtenas 1-4-bitokajn signojn). */
+private fun malkoduUtf8(bitokoj: List<Int>): String {
     val sb = StringBuilder()
     var i = 0
-    while (i < bajtoj.size) {
-        val b = bajtoj[i]
+    while (i < bitokoj.size) {
+        val b = bitokoj[i]
         when {
             b < 0x80 -> { sb.append(b.toChar()); i += 1 }
-            b and 0xE0 == 0xC0 && i + 1 < bajtoj.size -> {
-                sb.append((((b and 0x1F) shl 6) or (bajtoj[i + 1] and 0x3F)).toChar()); i += 2
+            b and 0xE0 == 0xC0 && i + 1 < bitokoj.size -> {
+                sb.append((((b and 0x1F) shl 6) or (bitokoj[i + 1] and 0x3F)).toChar()); i += 2
             }
-            b and 0xF0 == 0xE0 && i + 2 < bajtoj.size -> {
-                sb.append((((b and 0x0F) shl 12) or ((bajtoj[i + 1] and 0x3F) shl 6) or (bajtoj[i + 2] and 0x3F)).toChar()); i += 3
+            b and 0xF0 == 0xE0 && i + 2 < bitokoj.size -> {
+                sb.append((((b and 0x0F) shl 12) or ((bitokoj[i + 1] and 0x3F) shl 6) or (bitokoj[i + 2] and 0x3F)).toChar()); i += 3
             }
-            b and 0xF8 == 0xF0 && i + 3 < bajtoj.size -> {
-                val kodo = ((b and 0x07) shl 18) or ((bajtoj[i + 1] and 0x3F) shl 12) or
-                    ((bajtoj[i + 2] and 0x3F) shl 6) or (bajtoj[i + 3] and 0x3F)
+            b and 0xF8 == 0xF0 && i + 3 < bitokoj.size -> {
+                val kodo = ((b and 0x07) shl 18) or ((bitokoj[i + 1] and 0x3F) shl 12) or
+                    ((bitokoj[i + 2] and 0x3F) shl 6) or (bitokoj[i + 3] and 0x3F)
                 val m = kodo - 0x10000
                 sb.append((0xD800 + (m shr 10)).toChar())
                 sb.append((0xDC00 + (m and 0x3FF)).toChar())

@@ -128,12 +128,12 @@ Plenekrana malvolo de la mini-ludilbreto:
 │ Titolo de elsendo                 │
 │ Kanalnomo · Dato · Daŭro          │
 │                                   │
-│        [▶]  ━━━━●━━━━━━  12:34   │  Ludregiloj + serĉbreto
+│        [▶]  ━━━━●━━━━━━  12:34   │  Ludregiloj + progresoŝovilo
 │                                   │
 │ Priskribo (riĉa HTML-vido)        │
 │                                   │
 │ [⬇ Elŝuti] [♥ Plejŝati] [↗ Kunh.]│
-│ [Queueludvico]                   │
+│ [Ludvico]                        │
 │                                   │
 │ Daŭrigi de 12:34 [▶]             │  (se antaŭa pozicio ekzistas)
 └──────────────────────────────────┘
@@ -143,7 +143,7 @@ Plenekrana malvolo de la mini-ludilbreto:
 - "Daŭrigi de X:XX" butono se antaŭa ludpozicio ekzistas.
 - Ludvico-butono (Material 3 ikono) por eksplicite aldoni al ludvico.
 - Riĉa HTML-vido de priskribo (`HtmlVido`/`HtmlTeksto`).
-- Evolua reĝimo: elektiloj por priskribo-fonto kaj vidmaniero.
+- Programista reĝimo: elektiloj por priskribo-fonto kaj vidmaniero.
 
 ### 4. Ludilbreto (mini, malsupre)
 
@@ -169,7 +169,7 @@ estas nur tiom larĝa kiel bezonata (`width(IntrinsicSize.Max)`, minimume
 ĉefekrano (`TirkestButono` — la hamburgero MORFAS al reen-sago kaj reen per
 printempa animacio, `HamburgeroSagoIkono` en `NavigaTirkesto.kt`) aŭ per
 tiro de la maldekstra rando. La tirkesto mem glitas enen/elen per la
-implica MotionScheme-animacio de `ModalNavigationDrawer` (pruvite per la
+implicita MotionScheme-animacio de `ModalNavigationDrawer` (pruvite per la
 instrumentita testo `tirkestoAnimaciasDumMalfermo`). La ekranoj
 ricevas la staton per `tirkestStato` kaj la enhavon per `tirkestEnhavo`.
 
@@ -208,7 +208,7 @@ La agordoj estis simpligitaj ekde la originala plano. Nuna listo:
 
 - **Aŭtomate daŭrigu kun alia elsendo** (ŝaltilo)
 - **Ricevi sciigojn** (ŝaltilo, nur Android — kontrolas WorkManager-skedadon)
-- **Evolua reĝimo** (ŝaltilo — montras elektilojn por priskribo-fonto kaj vidmaniero en ElsendoEkrano)
+- **Programista reĝimo** (ŝaltilo — montras elektilojn por priskribo-fonto kaj vidmaniero en ElsendoEkrano)
 - **Temo** (hela/malhela/sistemo)
 
 > La originala plano havis lingvoelekton, elŝuthejmon, nur-WiFi, son-efikojn,

@@ -75,16 +75,16 @@ class RssParsiloTest {
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
 
         for (e in elsendoj) {
-            // G16: kun guid la id estas <slug>:<guid> (unu prefikso) — la kernpunkto-
+            // G16: kun guid la ID estas <slug>:<guid> (unu prefikso) — la kernpunkto-
             // fiksaĵo havas UUID-guidojn kiel "11a27dc1-…"
             assertTrue(e.id.startsWith("kernpunkto:"), "ID devas komenciĝi per 'kernpunkto:': ${e.id}")
             assertFalse(e.id.startsWith("kernpunkto:kernpunkto:"), "Neniam duobla prefikso: ${e.id}")
         }
-        // Ĉiuj id-oj devas esti unikaj
-        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "Id-oj devas esti unikaj")
+        // Ĉiuj ID-oj devas esti unikaj
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
     }
 
-    // === G16 — Id-konvencio (docs/nova/04, "Id-konvencioj") ===
+    // === G16 — ID-konvencio (docs/nova/04, "ID-konvencioj") ===
 
     @Test
     fun idGvidasSenPrefiksoKiamGvidasJamKomencaPerSlugo() = kotlinx.coroutines.test.runTest {
@@ -115,8 +115,8 @@ class RssParsiloTest {
 
     @Test
     fun deArkivoUzasGuidonSenAjnaPrefikso() = kotlinx.coroutines.test.runTest {
-        // La arkiva servilo skribas la jam FINAN id-on kiel guid; la apo devas uzi
-        // ĝin senŝanĝe — eĉ se ĝi ne komencas per "<slug>:" — alikaze la id kreskus
+        // La arkiva servilo skribas la jam FINAN ID-on kiel guid; la apo devas uzi
+        // ĝin senŝanĝe — eĉ se ĝi ne komencas per "<slug>:" — alikaze la ID kreskus
         // ĉiun rondiron kaj la inkrementa kunfando (docs/nova/06) neniam trafus.
         val fluo = """
             <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
@@ -125,7 +125,7 @@ class RssParsiloTest {
               <guid>kernpunkto:2022-11-09</guid></item>
             <item><title>Test2</title><pubDate>Thu, 2 Jan 2025 00:00:00 +0000</pubDate>
               <enclosure url="https://arkivo.example/b.mp3" type="audio/mpeg"/>
-              <guid>ekstera-id</guid></item>
+              <guid>ekstera-ID</guid></item>
             </channel></rss>
         """.trimIndent()
         val kanalo = Kanalo(
@@ -133,13 +133,13 @@ class RssParsiloTest {
             podkastaRssUrl = "https://servilo.example/podkasta_arkivo/kernpunkto.xml",
         )
         val elsendoj = parsilo.parsuRss(fluo, kanalo)
-        assertEquals(listOf("kernpunkto:2022-11-09", "ekstera-id"), elsendoj.map { it.id })
+        assertEquals(listOf("kernpunkto:2022-11-09", "ekstera-ID"), elsendoj.map { it.id })
     }
 
     @Test
     fun idEstasStabilaTransRondiro() = kotlinx.coroutines.test.runTest {
-        // Rondiro kun la arkiva servilo: la apo konstruas id-on, la servilo skribas
-        // ĝin kiel guid en sian fluon, la apo re-parsas — la id devas resti SAMA.
+        // Rondiro kun la arkiva servilo: la apo konstruas ID-on, la servilo skribas
+        // ĝin kiel guid en sian fluon, la apo re-parsas — la ID devas resti SAMA.
         val komencaFluo = """
             <?xml version="1.0"?><rss version="2.0"><channel><title>T</title>
             <item><title>Test</title><pubDate>Wed, 1 Jan 2025 00:00:00 +0000</pubDate>
@@ -160,7 +160,7 @@ class RssParsiloTest {
         """.trimIndent()
 
         assertEquals(unua.id, parsilo.parsuRss(servilaFluo, kanalo)[0].id,
-            "Re-parsado devas redoni la saman id-on (stabileco de la rondiro)")
+            "Re-parsado devas redoni la saman ID-on (stabileco de la rondiro)")
     }
 
     @Test
@@ -200,12 +200,12 @@ class RssParsiloTest {
         assertTrue(e2sp6gp.fluo.contains("392138630"), "Stream devas enhavi 392138630: ${e2sp6gp.fluo}")
         assertTrue(e2sp6gp.fluo.endsWith(".mp3"), "Stream devas finii per .mp3: ${e2sp6gp.fluo}")
 
-        // G16: anchor.fm-eroj havas UUID-guidon → id = <slug>:<guid> (unu prefikso)
+        // G16: anchor.fm-eroj havas UUID-guidon → ID = <slug>:<guid> (unu prefikso)
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("lamalfamuloj:"), "ID devas komenciĝi per 'lamalfamuloj:': ${e.id}")
             assertTrue(e.fluo.startsWith("https://"), "Ĉiuj fluoj devas esti https: ${e.fluo}")
         }
-        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "Id-oj devas esti unikaj")
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
     }
 
     // === Regulo P6.2 — Varsovia Vento (pluraj <audio> po ero) ===
@@ -287,7 +287,7 @@ class RssParsiloTest {
 
         assertTrue(elsendoj.isNotEmpty(), "Vinilkosmo devas havi elsendojn")
 
-        // G29: la titolo venas el <title> de la ero — NE derivata el la enhavo
+        // G29: la titolo venas el <title> de la ero — NE derivita el la enhavo
         // (antaŭe: "VINILKOSMO … has posted: …")
         val amsterdamo = elsendoj.first { it.titolo.contains("Amsterdam") }
         assertTrue(
@@ -303,7 +303,7 @@ class RssParsiloTest {
             assertFalse((e.priskribo ?: "").contains("has posted"), "Priskribo devas esti purigita")
         }
 
-        // ID-formato: vk:<publikig-sen-tempzonon>
+        // ID-formato: vk:<publikigita-sen-tempzono>
         for (e in elsendoj) {
             assertTrue(e.id.startsWith("vk:"), "ID devas komenciĝi per 'vk:': ${e.id}")
             assertTrue(e.fluo.contains("ipernity.com"), "Stream devas enhavi ipernity.com: ${e.fluo}")
@@ -551,7 +551,7 @@ class RssParsiloTest {
 
         assertEquals(1, elsendoj.size)
         assertEquals("https://archive.org/download/seksismo_sabotas/seksismo_sabotas.mp3", elsendoj[0].fluo)
-        assertEquals("peranto:2025-05-03", elsendoj[0].id, "Sen guid la id estas <slug>:<dato> (G16)")
+        assertEquals("peranto:2025-05-03", elsendoj[0].id, "Sen guid la ID estas <slug>:<dato> (G16)")
     }
 
     @Test
@@ -681,10 +681,10 @@ class RssParsiloTest {
     /**
      * La MP3-dosiernomo ene de archive.org-arkivaĵo ne ĉiam egalas al la identigilo:
      * `malapero-benda-3` enhavas `Malapero_Benda3.mp3`. La parsilo devas demandi
-     * la metadaten-API kaj uzi la veran dosiernomon (regulo P6.3).
+     * la API de metadatumoj kaj uzi la veran dosiernomon (regulo P6.3).
      */
     @Test
-    fun perantoArchiveOrgUzasVeraDosiernomonElMetadatenoj() = kotlinx.coroutines.test.runTest {
+    fun perantoArchiveOrgUzasVeraDosiernomonElMetadatumoj() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -698,7 +698,7 @@ class RssParsiloTest {
 
         val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
         val elsendoj = parsilo.parsuRss(fluo, kanalo) { url ->
-            // Falsa httpKliento: nur metadaten-petoj estas atendataj
+            // Falsa httpKliento: nur petoj pri metadatumoj estas atendataj
             assertEquals("https://archive.org/metadata/malapero-benda-3", url)
             """
                 {"files":[
@@ -713,11 +713,11 @@ class RssParsiloTest {
         assertEquals(
             "https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3",
             elsendoj[0].fluo,
-            "Devas uzi la veran dosiernomon el la metadatenoj, ne la divenitan"
+            "Devas uzi la veran dosiernomon el la metadatumoj, ne la divenitan"
         )
     }
 
-    /** Se la metadaten-peto eraras (CORS, senrete), la elsendo tamen aperas kun la divenita URL (regulo A4). */
+    /** Se la peto pri metadatumoj eraras (CORS, senrete), la elsendo tamen aperas kun la divenita URL (regulo A4). */
     @Test
     fun perantoArchiveOrgTolerasMetadatanEraron() = kotlinx.coroutines.test.runTest {
         val fluo = """
@@ -743,9 +743,9 @@ class RssParsiloTest {
         )
     }
 
-    /** Malplena aŭ rompita metadaten-respondo → retrofalo al la divenita dosiernomo. */
+    /** Malplena aŭ rompita respondo pri metadatumoj → retrofalo al la divenita dosiernomo. */
     @Test
-    fun perantoArchiveOrgMalplenajMetadatenojRetrofalas() = kotlinx.coroutines.test.runTest {
+    fun perantoArchiveOrgMalplenajMetadatumojRetrofalas() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -764,9 +764,9 @@ class RssParsiloTest {
         assertTrue(elsendoj[0].fluo.endsWith("/neniomp3-arkivo.mp3"), "Devas retrofali al la divenita nomo: ${elsendoj[0].fluo}")
     }
 
-    /** Metadaten-peto kiu daŭras tro longe → tempolimo, retrofalo al la divenita dosiernomo. */
+    /** Peto pri metadatumoj kiu daŭras tro longe → tempolimo, retrofalo al la divenita dosiernomo. */
     @Test
-    fun perantoArchiveOrgMetadatenPetoTranslimas() = kotlinx.coroutines.test.runTest {
+    fun perantoArchiveOrgMetadatumojPetoTranslimas() = kotlinx.coroutines.test.runTest {
         val fluo = """
             <?xml version="1.0" encoding="UTF-8"?>
             <feed xmlns="http://www.w3.org/2005/Atom">
@@ -781,7 +781,7 @@ class RssParsiloTest {
         val kanalo = Kanalo(slug = "peranto", nomo = "Peranto")
         // La falsa kliento pendegas preter la limtempo (runTest uzas virtualan horloĝon)
         val elsendoj = parsilo.parsuRss(fluo, kanalo) { _ ->
-            kotlinx.coroutines.delay(RssParsilo.METADATEN_LIMTEMPO_MS + 1_000)
+            kotlinx.coroutines.delay(RssParsilo.METADATUMOJ_LIMTEMPO_MS + 1_000)
             """{"files":[{"name":"Malapero_Benda3.mp3","source":"original"}]}"""
         }
 
@@ -789,7 +789,7 @@ class RssParsiloTest {
         assertEquals(
             "https://archive.org/download/malapero-benda-3/malapero-benda-3.mp3",
             elsendoj[0].fluo,
-            "Translima metadaten-peto devas retrofali al la divenita nomo"
+            "Translima peto pri metadatumoj devas retrofali al la divenita nomo"
         )
     }
 
@@ -916,7 +916,7 @@ class RssParsiloTest {
         assertTrue(purigita.contains("https://bone.example/paĝo"), "http(s)-ligilo devas resti: $purigita")
     }
 
-    // === (PR #91) — <audio>-fallback ene de la priskribo-HTML ===
+    // === (PR #91) — <audio>-rezervo ene de la priskribo-HTML ===
 
     @Test
     fun aŭdioFallbackElPriskriboHtml() = kotlinx.coroutines.test.runTest {
@@ -938,7 +938,7 @@ class RssParsiloTest {
         assertEquals("https://x.example/sono.mp3", elsendoj[0].fluo)
     }
 
-    // === (PR #91) — ĝenerala skip-listo de nesubtenataj gastigantoj ===
+    // === (PR #91) — ĝenerala salto-listo de nesubtenataj gastigantoj ===
 
     @Test
     fun forĵasElsendojnKunNesubtenatajGastigantoj() = kotlinx.coroutines.test.runTest {

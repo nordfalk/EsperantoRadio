@@ -16,7 +16,7 @@ Eldoni ĉe F-droid, Apptiode kaj aliaj vendejoj.
 Vidu https://github.com/nordfalk/EsperantoRadio/pull/66
 
 
-Uzkazoj el la malnova apo (`malnova/app/src/main/res/values/eo_strings.xml`) kiujn la nova ne kovras:
+Ukazoj el la malnova apo (`malnova/app/src/main/res/values/eo_strings.xml`) kiujn la nova ne kovras:
 - Konigi (kunhavigi) elsendon
 - Agordo por tuj ludi kiam la apo malfermiĝas
 - Elekti lokon de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`)
@@ -28,7 +28,7 @@ Uzkazoj el la malnova apo (`malnova/app/src/main/res/values/eo_strings.xml`) kiu
 - Averto ke vekhorloĝo ne povas garantii kontraŭ teknikaj problemoj
 
 
-- **HLS sur Desktop/Web**: bezonas VLCJ/hls.js. (La Muzaiko-livestream mem funkcias — kontrolita 2026-09-23; sur Android necesis `media3-exoplayer-hls`.)
+- **HLS sur Desktop/Web**: bezonas VLCJ/hls.js. (La tuja elsendfluo de Muzaiko mem funkcias — kontrolita 2026-09-23; sur Android necesis `media3-exoplayer-hls`.)
 - Eksponenta reprovo ne atendas je reta reveno (la malnova `venterPåAtKommeOnline`) — ĝi rezignas post ~3 minutoj.
 - Web: plej multaj RSS-fluoj estas blokitaj de CORS; bildoj ne aperas. Bezonas servilon/prokurilon.
 - Animacioj ĉie en la apo (nur la mini-ludilbreto havas; mankas ekz. ĉe ekrano-ŝanĝoj, listo-ŝanĝoj, sciigoj pri ŝargado)

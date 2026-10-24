@@ -80,7 +80,7 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 
 Pura Atom-parsado. `<link rel="enclosure" type="audio/mpeg">` → stream;
 `<link type="image/jpeg">` → bildo; `<link type="text/html">` → ligo;
-`<published>` → dato (teksto antaŭ `T`); `id = vk:<publikig-sen-tempzonon>`.
+`<published>` → dato (teksto antaŭ `T`); `id = vk:<publikigita-sen-tempzono>`.
 Purigu priskribon per `kanal.puriguModeloj` (forigu `<p class="who">…</p>`).
 
 ### Regulo P6.5 — Titol-derivado
@@ -119,7 +119,7 @@ La radio.txt-formato (por referenco):
 // Antaŭeco: se kanal jam havas datumFonto="rss", ignoru radio.txt-elsendojn por ĝi.
 ```
 
-## Id-konvencioj (devas esti precize reproduktitaj)
+## ID-konvencioj (devas esti precize reproduktitaj)
 
 | Fonto | id-formato |
 |---|---|
@@ -127,7 +127,7 @@ La radio.txt-formato (por referenco):
 | deArkivo (`podkasta_arkivo`) | `<guid>` ĉiam senŝanĝa — la servilo skribas la jam finan id-on kiel guid; re-prefiksigo kreskus la id-on ĉiun rondiron |
 | radio.txt | `<kanalSlug>:<yyyy-MM-dd>` |
 | Varsovia Vento | `<kanalSlug>:<yyyy-MM-dd>:<partnum>` |
-| Vinilkosmo | `vk:<publikig-sen-tempzonon>` |
+| Vinilkosmo | `vk:<publikigita-sen-tempzono>` |
 | Rekta (Muzaiko) | `<kanalSlug>_rekta` kun `dato=REKTA` |
 
 La kodo vicigita kun tio estas `RssParsilo.konstruuId`. La id ŝlosas uzantdatumojn

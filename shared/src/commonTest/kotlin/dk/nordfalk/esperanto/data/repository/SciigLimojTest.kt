@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Testoj por la sciig-limoj (maks. 7 samtempaj, maks. 3 po kanalo — la
+ * Testoj por la sciiglimoj (maks. 7 samtempaj, maks. 3 po kanalo — la
  * plej malnovaj malaperas kiam la limoj atingiĝas).
  */
 class SciigLimojTest {
@@ -170,7 +170,7 @@ class SciigLimojTest {
 
     @Test
     fun sciigIdSaltasLaRezervitanZononDeLaAlarmo() {
-        // 4711 estas la fiksa ID de la alarmo-sciigo; 4710 ankaŭ evitiĝas
+        // 4711 estas la fiksa ID de la alarma sciigo; 4710 ankaŭ evitiĝas
         // (la „Ludi“-ago uzas sciigId + 1 kiel pet-identigilon)
         assertEquals(4712, sekvaSciigId(4709))
         assertEquals(4712, sekvaSciigId(4710))

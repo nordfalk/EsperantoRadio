@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
  * Regilo por diagnozi oftajn problemojn de la aparato/agordoj.
  *
  * Platform-specifa:
- * - **Android**: kontrolas PowerManager (bateri-optimumado), NotificationManager
- *   (sciig-permeso), kaj provas DNS-solvadon.
+ * - **Android**: kontrolas PowerManager (bateri-optimumigo), NotificationManager
+ *   (sciigpermeso), kaj provas DNS-solvadon.
  * - **Desktop / Web / iOS**: redonas malplenan liston (nenio specifa).
  *
  * La rezultoj estas uzataj en [dk.nordfalk.esperanto.ui.DiagnozoEkrano] por
@@ -29,7 +29,7 @@ expect class DiagnozoRegilo {
     suspend fun kontroli(): List<DiagnozoRezulto>
 
     /**
-     * Rapida kontrolo sen la DNS-testo (por uzi ĉe app-starto en la fono,
+     * Rapida kontrolo sen la DNS-testo (por uzi ĉe apo-starto en la fono,
      * ne blokante la UI). Ĝisdatigas [problemoj].
      */
     suspend fun kontroliRapide(): List<DiagnozoRezulto>
@@ -42,9 +42,9 @@ expect fun kreuDiagnozoRegilon(): DiagnozoRegilo
  * Malfermas la sisteman agordon por la donita intenco-identigilo.
  *
  * Subtenataj intencoj (sur Android):
- * - `"battery"` — bateriaj optimumigoj (Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
- * - `"notifications"` — sciig-agordoj de la apo
- * - `"wireless"` — sendrataj agordoj (por privata DNS)
+ * - `"baterio"` — bateriaj optimumigoj (Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+ * - `"sciigoj"` — sciigagordoj de la apo
+ * - `"sendrata"` — sendrataj agordoj (por privata DNS)
  *
  * Sur aliaj platformoj: faras nenion.
  */

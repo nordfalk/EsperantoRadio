@@ -34,7 +34,7 @@ class DosierNomojTest {
         assertEquals("", sanigiDosiernomon(""))
     }
 
-    @Test // (PR #95) RSS-id-oj povas esti plenaj URL-oj — >255 bajtoj malsukcesigas elŝuton
+    @Test // (PR #95) RSS-ID-oj povas esti plenaj URL-oj — >255 bitokoj malsukcesigas elŝuton
     fun limigasLongonKajKonservasUnikecon() {
         val longa = "x".repeat(500)
         val rezulto = sanigiDosiernomon(longa)
@@ -53,8 +53,8 @@ class DosierNomojTest {
         assertEquals("abc", sanigiDosiernomon("abc "), "Fina spaco devas esti forigita")
     }
 
-    @Test // (PR #95) nul-bajtoj
-    fun forigasNulbajtojn() {
+    @Test // (PR #95) nul-bitokoj
+    fun forigasNulbitokojn() {
         assertEquals("ab", sanigiDosiernomon("a\u0000b"))
     }
 }

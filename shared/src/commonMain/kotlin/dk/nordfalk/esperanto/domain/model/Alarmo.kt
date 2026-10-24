@@ -35,7 +35,7 @@ data class Alarmo(
     val ripetoTeksto: String get() = when (ripeto) {
         0x00 -> "Unufoje"
         0x7f -> "Ĉiutage"
-        0x1f -> "Labortage"
+        0x1f -> "Labortagoj"
         0x60 -> "Semajnfine"
         0x01 -> "Lunde"
         0x02 -> "Marde"

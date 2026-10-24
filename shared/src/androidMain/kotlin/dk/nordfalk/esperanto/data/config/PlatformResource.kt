@@ -8,7 +8,7 @@ import android.content.Context
  */
 lateinit var appContext: Context
 
-actual fun leguBundledKanalkonfiguron(): String {
+actual fun leguPakititanKanalkonfiguron(): String {
     return appContext.assets.open("esperantoradio_kanaloj_v9.json")
         .bufferedReader().use { it.readText() }
 }

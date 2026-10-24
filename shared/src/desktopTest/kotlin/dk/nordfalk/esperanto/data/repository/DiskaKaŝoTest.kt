@@ -13,9 +13,9 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * Testoj por diskkaŝmemoro de RSS-respondoj.
+ * Testoj por diska kaŝmemoro de RSS-respondoj.
  *
- * Skribas krudan RSS-tekston al diskkaŝmemoro, legas ĝin reen,
+ * Skribas krudan RSS-tekston al diska kaŝmemoro, legas ĝin reen,
  * re-parsas per RssParsilo, kaj komparas la elsendojn.
  *
  * Rulas en desktopTest ĉar ĝi testas la Desktop-actualigon de la kaŝo
@@ -23,12 +23,12 @@ import kotlin.test.assertTrue
  * antaŭe la testoj skribis en la VERAN uzantan kaŝujon `~/.esperantoradio/cache/`
  * kaj "purigis" nur per malplenigo — 5 malplenaj dosieroj restis tie.
  */
-class DiskKaŝoTest {
+class DiskaKaŝoTest {
 
     private val parsilo = RssParsilo()
 
     private val malnovaBazo = dosierKaŝoBazo
-    private val provizora: File = File.createTempFile("esperantoradio-diskkaŝo", "").let { f ->
+    private val provizora: File = File.createTempFile("esperantoradio-diska-kaŝo", "").let { f ->
         f.delete()
         File(f.absolutePath + ".dir").apply { mkdirs() }
     }
@@ -52,7 +52,7 @@ class DiskKaŝoTest {
 
     @Test
     fun skribuKajLeguKaŝon() = kotlinx.coroutines.test.runTest {
-        val nomo = "test_diskkaŝo_roundtrip"
+        val nomo = "test_diska_kaŝo_roundtrip"
         val enhavo = "<rss><channel><title>Testo</title></channel></rss>"
         skribuKaŝon(nomo, enhavo)
         val legita = leguKaŝon(nomo)
@@ -68,14 +68,14 @@ class DiskKaŝoTest {
 
     @Test
     fun leguKaŝitajnElsendojnReParsasKorekte() = kotlinx.coroutines.test.runTest {
-        val slug = "test_diskkaŝo_kernpunkto"
+        val slug = "test_diska_kaŝo_kernpunkto"
         val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(
             slug = slug,
             nomo = "Testo Kernpunkto",
             podkastaRssUrl = "https://kern.punkto.info/feed/mp3/",
         )
-        // Skribu la krudan RSS-tekston al diskkaŝmemoro
+        // Skribu la krudan RSS-tekston al diska kaŝmemoro
         skribuKaŝon(slug, rssTeksto)
 
         // Parsu rekte por havi la atendojn
@@ -106,8 +106,8 @@ class DiskKaŝoTest {
 
     @Test
     fun leguĈiujnKaŝitajnElsendojnKolektasPlurajnKanalojn() = kotlinx.coroutines.test.runTest {
-        val slug1 = "test_diskkaŝo_kp1"
-        val slug2 = "test_diskkaŝo_kp2"
+        val slug1 = "test_diska_kaŝo_kp1"
+        val slug2 = "test_diska_kaŝo_kp2"
         val rss1 = leguFiksaĵon("kernpunkto_feed.xml")
         val rss2 = leguFiksaĵon("kernpunkto_feed.xml")
 
@@ -127,7 +127,7 @@ class DiskKaŝoTest {
 
     @Test
     fun leguĈiujnKaŝitajnElsendojnPlenigasKaŝmemoron() = kotlinx.coroutines.test.runTest {
-        val slug = "test_diskkaŝo_kernpunkto"
+        val slug = "test_diska_kaŝo_kernpunkto"
         val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
         val kanalo = Kanalo(slug = slug, nomo = "Testo KP", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
 
@@ -137,7 +137,7 @@ class DiskKaŝoTest {
         // Antaŭe: kaŝmemoro estas malplena
         assertNull(deponejo.getElsendo("neniu"))
 
-        // Legu diskkaŝmemoron — plenigas kaŝmemoron
+        // Legu diskan kaŝmemoron — plenigas kaŝmemoron
         val kaŝitaj = deponejo.leguKaŝitajnElsendojn(kanalo)
         assertNotNull(kaŝitaj)
         assertTrue(kaŝitaj.isNotEmpty())

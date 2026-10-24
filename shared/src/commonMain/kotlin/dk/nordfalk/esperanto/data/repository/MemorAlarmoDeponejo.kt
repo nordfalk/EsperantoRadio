@@ -30,7 +30,7 @@ class MemorAlarmoDeponejo(
             val unikaj = sugestoj.map { s ->
                 var id = s.id
                 while (id in uzitajIdj) {
-                    logi("AlarmoDeponejo", "ID-kolizio: $id — asignas novan")
+                    logi("AlarmoDeponejo", "ID-kolizio: $id — atribuas novan")
                     id = nextId++
                 }
                 uzitajIdj.add(id)

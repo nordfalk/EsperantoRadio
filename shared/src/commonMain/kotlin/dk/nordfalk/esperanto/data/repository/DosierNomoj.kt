@@ -6,10 +6,10 @@ package dk.nordfalk.esperanto.data.repository
  * - Anstataŭigas signojn kiuj estas nevalidaj aŭ danĝeraj en dosiernomoj
  *   (:, /, \, ?, *, ", <, >, |) per '-' — tio ankaŭ malebligas path-traversal
  *   (`../` iĝas `..-`).
- * - Forigas nul-bajtojn kaj finajn punktojn/spacojn (Windows).
+ * - Forigas nul-bitokojn kaj finajn punktojn/spacojn (Windows).
  * - Evitas Windows-rezervitajn nomojn (CON, PRN, AUX, NUL, COM1-9, LPT1-9).
- * - Limigas la longon (PR #95): RSS-id-oj ofte estas plenaj URL-oj —
- *   >255 bajtoj malsukcesigas la dosier-kreadon. Longaj nomoj ricevas
+ * - Limigas la longon (PR #95): RSS-ID-oj ofte estas plenaj URL-oj —
+ *   >255 bitokoj malsukcesigas la dosier-kreadon. Longaj nomoj ricevas
  *   8-signan haketaĵon de la plena ID por resti unikaj kaj koliziecaj
  *   nomoj restas distingeblaj.
  */
@@ -31,5 +31,5 @@ fun sanigiDosiernomon(id: String): String {
     return nomo
 }
 
-/** Maksimuma longo de la sankigita nomo (sen etendaĵo; NTFS/limo ~255 bajtoj). */
+/** Maksimuma longo de la sankigita nomo (sen etendaĵo; NTFS/limo ~255 bitokoj). */
 private const val MAKS_DOSIERNOMO = 120

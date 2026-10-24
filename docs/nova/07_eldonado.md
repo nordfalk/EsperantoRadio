@@ -107,7 +107,7 @@ konstruas la apon el via fontkodo kaj subskribas ĝin.
    - Iru al https://gitlab.com/fdroid/fdroiddata
    - Klaku "Fork"
 
-3. **Kopiu la metadatenon**:
+3. **Kopiu la metadatumojn**:
    ```bash
    git clone https://gitlab.com/VIA_UZANTNOMO/fdroiddata.git
    cp fdroid/metadata/dk.nordfalk.esperanto.radio.yml \
@@ -137,7 +137,7 @@ Por ke F-Droid povu kontroli ke ĝia konstruo kongruas kun via, la konstruo deva
 - Neniuj dependecoj kiuj varias inter konstruoj (ekz. tempor-markoj en dosiernomoj)
 - Konservu versionCode/versionName stabilaj inter etikedo kaj build.gradle
 
-Por reproduktebleco, oni povas specifi `AllowedAPKSigningKeys` en la metadateno
+Por reproduktebleco, oni povas specifi `AllowedAPKSigningKeys` en la metadatumoj
 kun la SHA-256 de via subskriba atestilo.
 
 ### Propra F-Droid-nightly-repo (opcia)

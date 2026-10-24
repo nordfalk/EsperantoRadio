@@ -80,9 +80,9 @@ class EkranfotoTesto {
         val nombro = radikoj.fetchSemanticsNodes().size
         val lastaRadiko = radikoj[nombro - 1]
         val bitmap = lastaRadiko.captureToImage().asSkiaBitmap()
-        val pngBytes = SkiaImage.makeFromBitmap(bitmap).encodeToData(org.jetbrains.skia.EncodedImageFormat.PNG)?.bytes
-        if (pngBytes != null) {
-            dosiero.writeBytes(pngBytes)
+        val pngBitokoj = SkiaImage.makeFromBitmap(bitmap).encodeToData(org.jetbrains.skia.EncodedImageFormat.PNG)?.bytes
+        if (pngBitokoj != null) {
+            dosiero.writeBytes(pngBitokoj)
             println("[EkranfotoTesto] Savis: ${dosiero.absolutePath}")
         }
     }
@@ -206,7 +206,7 @@ class EkranfotoTesto {
         kaptuKajSavu(this, "06_alarmoj")
     }
 
-    /** Redaktilo malfermita per klako sur ekzistanta alarmo — montras la ciferblidan tempo-elektilon. */
+    /** Redaktilo malfermita per klako sur ekzistanta alarmo — montras la ciferplatan tempo-elektilon. */
     @Test
     fun ekranfoto_alarmo_redaktilo() = runComposeUiTest {
         val alarmoDeponejo = MemorAlarmoDeponejo(
@@ -290,7 +290,7 @@ class EkranfotoTesto {
     private fun avertaProblemo() = listOf(
         DiagnozoRezulto(
             tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
-            titolo = "Bateri-optimumado estas ŝaltita",
+            titolo = "Bateri-optimumigo estas ŝaltita",
             priskribo = "La sistemo povas limigi la aplikon en la fono.",
             severeco = Severeco.ERARO,
         )

@@ -33,7 +33,7 @@ import org.junit.runner.RunWith
 class AndroidUiTest {
 
     /**
-     * Donu la sciig-permeson ANTAŬ ol la Activity lanĉiĝas. Alie MainActivity.petiSciigPermeson()
+     * Donu la sciigpermeson ANTAŬ ol la Activity lanĉiĝas. Alie MainActivity.petiSciigPermeson()
      * montras la sisteman permes-dialogon, MainActivity estas paŭzita, kaj la Compose-testregistro
      * (kiu nur akceptas radikojn en stato RESUMED) raportas "No compose hierarchies found".
      * connectedAndroidTest malinstalas la apon post ĉiu rulo, do la permeso ĉiam mankas komence.
@@ -85,7 +85,7 @@ class AndroidUiTest {
     fun navigadoAlSerĉo() {
         elektu("Serĉi")
         composeRule.waitForIdle()
-        composeRule.onNodeWithText("Trovu elsendon...").assertIsDisplayed()
+        composeRule.onNodeWithText("Trovu elsendon…").assertIsDisplayed()
     }
 
     @Test

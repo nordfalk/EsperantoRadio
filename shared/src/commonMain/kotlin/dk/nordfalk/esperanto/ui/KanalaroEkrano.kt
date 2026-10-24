@@ -80,7 +80,7 @@ class KanalaroViewModel(
     private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
         val kanaloj = deponejo.getKanalojn()
 
-        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         if (elsendoDeponejo != null) {
             val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
             if (kaŝitaj.isNotEmpty()) {
@@ -93,7 +93,7 @@ class KanalaroViewModel(
                 }
                 _elsendoKontoj.value = kontoj
                 _lastajElsendoj.value = lastaj
-                logi("KanalaroViewModel", "Diskkaŝmemoro: ${kontoj.values.sum()} elsendoj por ${kontoj.size} kanaloj")
+                logi("KanalaroViewModel", "Diska kaŝmemoro: ${kontoj.values.sum()} elsendoj por ${kontoj.size} kanaloj")
             }
         }
 
@@ -118,7 +118,7 @@ class KanalaroViewModel(
                 logi("KanalaroViewModel", "Ŝargis ${kontoj.values.sum()} elsendojn por ${kontoj.size} kanaloj")
             }
         } catch (e: Exception) {
-            loge("KanalaroViewModel", "Malsukcesis sargi kanalojn", e)
+            loge("KanalaroViewModel", "Malsukcesis ŝargi kanalojn", e)
         } finally {
             _ŝargas.value = false
         }

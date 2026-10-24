@@ -64,7 +64,7 @@ actual class AlarmoSkedilo actual constructor() {
     }
 
     actual fun reskediĈiujn(alarmoj: List<Alarmo>) {
-        logi("AlarmoSkedilo", "Re-planas ${alarmoj.size} alarmojn")
+        logi("AlarmoSkedilo", "Replanas ${alarmoj.size} alarmojn")
         for (alarmo in alarmoj) {
             if (alarmo.aktiva) {
                 skedi(alarmo)

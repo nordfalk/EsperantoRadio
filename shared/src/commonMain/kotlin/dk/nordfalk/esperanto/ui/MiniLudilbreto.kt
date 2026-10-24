@@ -45,8 +45,8 @@ const val SALTA_KVOCOTO = 0.05f
  *
  * Kiel en la malnova apo ĝi havas du statojn, ŝalteblajn per sago dekstre:
  * - **Enfoldigita**: bildeto, titolo, ludi/paŭzi, halti, ludvico + maldika pozicio-linio.
- * - **Elfaldigita**: aldone serĉbreto (ŝovebla), reen-/antaŭen-5%-butonoj kaj laŭteco-regilo.
- *   Serĉbreto kaj saltbutonoj aperas nur por podkastoj, ne por rekta elsendo.
+ * - **Elfaldigita**: aldone progresoŝovilo, reen-/antaŭen-5%-butonoj kaj laŭteco-regilo.
+ *   Progresoŝovilo kaj saltbutonoj aperas nur por podkastoj, ne por rekta elsendo.
  */
 @Composable
 fun MiniLudilbreto(
@@ -56,7 +56,7 @@ fun MiniLudilbreto(
     onLudvico: () -> Unit = {},
     /** Nuna reprovo-numero el [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.reprovo] (0 = neniu). */
     reprovo: Int = 0,
-    /** Ĉu la ludilbreto estas elfaldigita (hoistita ŝtato — regata de App.kt). */
+    /** Ĉu la ludilbreto estas elfaldigita (levita ŝtato — regata de App.kt). */
     elfaldita: Boolean = false,
     onElfalditaŜanĝo: (Boolean) -> Unit = {},
     /** Sekvanta enhavo kiam nenio ludas — la breto sekvas la navigadon. */
@@ -274,7 +274,7 @@ fun MiniLudilbreto(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(horizontal = 8.dp)
-                                    .testTag("serĉbreto"),
+                                    .testTag("ŝovilo"),
                             )
                             Text(
                                 text = formatuTempon(info.daŭroMs),

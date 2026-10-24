@@ -14,7 +14,7 @@ expect class AlarmoSkedilo() {
     fun skedi(alarmo: Alarmo)
     /** Mallas la PendingIntent por ĉi tiu alarmo. */
     fun malplani(alarmoId: Int)
-    /** Re-planas ĉiujn aktivajn alarmojn (ekz. post boot). */
+    /** Replanas ĉiujn aktivajn alarmojn (ekz. post praŝargo). */
     fun reskediĈiujn(alarmoj: List<Alarmo>)
 }
 

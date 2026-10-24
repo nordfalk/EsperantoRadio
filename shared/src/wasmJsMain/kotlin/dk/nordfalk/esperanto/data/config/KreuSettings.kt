@@ -4,7 +4,7 @@ import com.russhwolf.settings.Settings
 
 /**
  * wasmJs: provizore no-op (neniu persisto sur web).
- * TODO: Aldoni localStorage-bazitan Settings.
+ * TODO: Aldoni localStorage-bazitan `Settings`-implementon.
  */
 actual fun kreuSettings(): Settings = NoOpSettings()
 

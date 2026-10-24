@@ -418,7 +418,7 @@ class LudvicoRegiloTest {
 
     @Test
     fun servoVoko_senFontoNeFarasNenion() = runTest {
-        // La servo ne povas legi la fonton (ekz. malnova MediaItem sen extras) —
+        // La servo ne povas legi la fonton (ekz. malnova MediaItem sen ekstraĵoj) —
         // traktiFinon devas ignori la vokon anstataŭ marki/aŭtoludi ion ajn (PR #89)
         val e1 = elsendo("e1")
         val e2 = elsendo("e2")
@@ -719,7 +719,7 @@ class LudvicoRegiloTest {
     fun komenci_funkciasKiamLudiloJamLudas() = runTest {
         val e = elsendo("e1")
         val ludilo = NoOpLudiloRegilo()
-        // Simulu ke ludilo jam ludas (ekz. app restart dum ExoPlayer persistas)
+        // Simulu ke ludilo jam ludas (ekz. restartigo de la apo dum ExoPlayer persistas)
         kotlinx.coroutines.runBlocking { ludilo.fiksiFonton(Sonfonto.ElsendoFonto(e)) }
         ludilo.ludi()
         assertEquals(LudantoStato.Ludas, ludilo.stato.value.stato)

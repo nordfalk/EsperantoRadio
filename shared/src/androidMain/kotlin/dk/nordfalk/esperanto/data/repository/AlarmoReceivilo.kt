@@ -13,7 +13,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
-import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
+import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
  * en la fono kaj ĝia kodo ne plenumiĝas ĝis la uzanto vekas la telefonon.
  * La ricevilo ne havas tian limigon: ĝi povas ludi tuj (goAsync + WakeLock).
  *
- * Videbleco por la uzanto certigas alt-prioritate sciigon (CATEGORY_ALARM + PRIORITY_MAX).
+ * Videbleco por la uzanto certigas altprioritatan sciigon (CATEGORY_ALARM + PRIORITY_MAX).
  * Sen USE_FULL_SCREEN_INTENT la ekrano ne vekiĝas aŭtomate — la uzanto aŭdas la
  * alarmon kaj vidas la sciigon kiam li vekas la telefonon.
  */
@@ -49,7 +49,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
         private const val WAKELOCK_TAG = "EsperantoRadio::Alarmo"
         private const val WAKELOCK_TIMEOUT = 10 * 60 * 1000L // 10 minutoj
         private const val SCIIGO_KANALO = "alarmoj"
-        /** Fiksa ID de la alarm-sciigo — tiel oni povas nuligi ĝin (la sciigo estas daŭra). */
+        /** Fiksa ID de la alarma sciigo — tiel oni povas nuligi ĝin (la sciigo estas daŭra). */
         const val SCIIGO_ID = 4711
         const val AGO_ALARMO_EKIGAS = "dk.nordfalk.esperanto.ALARMO_EKIGAS"
 
@@ -71,7 +71,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
         }
 
         /**
-         * Nuligas la alarm-sciigon. La sciigo estas daŭra (ongoing) dum la alarmo
+         * Nuligas la alarman sciigon. La sciigo estas daŭra dum la alarmo
          * sonas — daŭraj sciigoj ne estas forviŝeblaj per svingo, do io devas esti
          * vokata kiam la ludado haltiĝas aŭ finiĝas (vidu la gardon en onReceive).
          * Krome la sciigo mem estas nuligata per setAutoCancel kiam la uzanto tuŝas ĝin.
@@ -81,43 +81,43 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 (context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager)
                     .cancel(SCIIGO_ID)
             } catch (e: Exception) {
-                logw("AlarmoReceivilo", "Ne eblis nuligi la alarm-sciigon", e)
+                logw("AlarmoReceivilo", "Ne eblis nuligi la alarman sciigon", e)
             }
         }
 
         /**
-         * Tenilo de la fallback-ringtono: Ringtone.play() ripetiĝas ĝis stop() —
+         * Tenilo de la rezerva vokosono: Ringtone.play() ripetiĝas ĝis stop() —
          * sen tenilo nenio povus haltigi ĝin (la sciigo diras "tuŝu por malŝalti",
          * sed antaŭe neniu vojo haltigis la sonon).
          */
-        @Volatile private var fallbackRingtono: android.media.Ringtone? = null
+        @Volatile private var rezervaVokosono: android.media.Ringtone? = null
 
         /**
-         * Maksimuma daŭro de la fallback-ringtono — poste ĝi mem haltas kaj la
-         * daŭra alarm-sciigo estas nuligata (sen tio la alarmo sonus por ĉiam).
+         * Maksimuma daŭro de la rezerva vokosono — poste ĝi mem haltas kaj la
+         * daŭra alarma sciigo estas nuligata (sen tio la alarmo sonus por ĉiam).
          * Test-ŝanĝebla.
          */
-        @Volatile var ringtonoMaksDaŭroMs: Long = 5 * 60 * 1000L
+        @Volatile var vokosonoMaksDaŭroMs: Long = 5 * 60 * 1000L
 
-        /** Ĉu la fallback-ringtono nun sonas (por testoj). */
-        val fallbackRingtonoAktiva: Boolean get() = fallbackRingtono?.isPlaying == true
+        /** Ĉu la rezerva vokosono nun sonas (por testoj). */
+        val rezervaVokosonoAktiva: Boolean get() = rezervaVokosono?.isPlaying == true
 
         /**
-         * Haltigas la fallback-ringtonon (idempotenta — sekura eĉ se neniu sonas).
-         * Vokata per haltuAlarmRingon() (vd. LudiloRegilo.kt) kiam la uzanto
-         * haltigas la ludadon, kaj de la mem-halto-tempujo en luduFallbackRingtonon.
+         * Haltigas la rezervan vokosonon (idempotenta — sekura eĉ se neniu sonas).
+         * Vokata per haltuAlarmVokosonon() (vd. LudiloRegilo.kt) kiam la uzanto
+         * haltigas la ludadon, kaj de la mem-halto-tempujo en luduRezervanVokosonon.
          */
-        fun haltuFallbackRingon() {
-            val ringtono = fallbackRingtono
-            if (ringtono != null) {
-                fallbackRingtono = null
+        fun haltuRezervanVokosonon() {
+            val vokosono = rezervaVokosono
+            if (vokosono != null) {
+                rezervaVokosono = null
                 try {
-                    if (ringtono.isPlaying) {
-                        ringtono.stop()
-                        logi("AlarmoReceivilo", "Haltigis fallback-ringtonon")
+                    if (vokosono.isPlaying) {
+                        vokosono.stop()
+                        logi("AlarmoReceivilo", "Haltigis rezervan vokosonon")
                     }
                 } catch (e: Exception) {
-                    logw("AlarmoReceivilo", "Ne eblis haltigi fallback-ringtonon", e)
+                    logw("AlarmoReceivilo", "Ne eblis haltigi rezervan vokosonon", e)
                 }
             }
         }
@@ -140,7 +140,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
         try {
             appContext = context.applicationContext
             val deponejo = AppStato.alarmoDeponejo
-                ?: PersistantaAlarmoDeponejo(kreuSettings(), skedilo = AlarmoSkedilo())
+                ?: PersistaAlarmoDeponejo(kreuSettings(), skedilo = AlarmoSkedilo())
             deponejo.ekigis(alarmoId)
         } catch (e: Exception) {
             logw("AlarmoReceivilo", "Eraro ĝisdatigante alarmon $alarmoId post ekigo", e)
@@ -150,9 +150,9 @@ class AlarmoReceivilo : BroadcastReceiver() {
         // (sen USE_FULL_SCREEN_INTENT la ekrano ne vekiĝas, sed la sciigo aperas
         // kiel heads-up kiam la uzanto ŝaltas la ekranon).
         try {
-            montruAltPrioritateSciigon(context, kanaloSlug, etikedo)
+            montruAltprioritatanSciigon(context, kanaloSlug, etikedo)
         } catch (e: Exception) {
-            logw("AlarmoReceivilo", "Alt-prioritata sciigo malsukcesis", e)
+            logw("AlarmoReceivilo", "Altprioritata sciigo malsukcesa", e)
         }
 
         // Best-effort: malfermu la UI rekte — funkcias nur se la apo estas videbla
@@ -170,7 +170,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             context.startActivity(launchIntent)
             logi("AlarmoReceivilo", "Lanĉis MainActivity (best-effort) kun kanalo=$kanaloSlug")
         } catch (e: Exception) {
-            logw("AlarmoReceivilo", "Ne lanĉis aktivon (_BAL-blokita aŭ eraro) — la sciigo kovras", e)
+            logw("AlarmoReceivilo", "Ne lanĉis aktivon (BAL-blokita aŭ eraro) — la sciigo kovras", e)
         }
 
         // La ludado mem — en korutino de la ricevilo, NE en MainActivity.
@@ -183,16 +183,16 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 throw e
             } catch (e: Exception) {
                 loge("AlarmoReceivilo", "Eraro dum alarmo-ludado", e)
-                luduFallbackRingtonon(context)
+                luduRezervanVokosonon(context)
             } finally {
                 liberiguAlarmoWakeLock()
                 pendingResult.finish()
             }
         }
 
-        // Gardo de la daŭra alarm-sciigo: nuligu ĝin kiam la alarm-ludado haltiĝas
+        // Gardo de la daŭra alarma sciigo: nuligu ĝin kiam la alarm-ludado haltiĝas
         // aŭ finiĝas (post kiam ĝi iam komenciĝis — Konektas/Ludas/Eraro). Sen tio
-        // la ongoing-sciigo restus en la ombrumo por ĉiam, ĉar daŭraj sciigoj ne
+        // la daŭra sciigo restus en la ombrumo por ĉiam, ĉar daŭraj sciigoj ne
         // estas forviŝeblaj per svingo.
         CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
             val ludilo = ExoPlayerLudiloRegilo.akiru(context.applicationContext)
@@ -218,14 +218,14 @@ class AlarmoReceivilo : BroadcastReceiver() {
     private suspend fun luduAlarmon(context: Context, kanaloSlug: String?) {
         if (kanaloSlug.isNullOrBlank()) {
             logw("AlarmoReceivilo", "Neniu kanalo-slug en alarm-intento")
-            luduFallbackRingtonon(context)
+            luduRezervanVokosonon(context)
             return
         }
 
         certiguMinimumanVolumenon(context)
 
         // Se la alarmo lanĉis freŝan procezon, AppStato ne estas inicialigita —
-        // faru nun (idempotent). La ludilo estas procez-nivela (ExoPlayerLudiloRegilo.akiru).
+        // faru nun (idempotenta). La ludilo estas procez-nivela (ExoPlayerLudiloRegilo.akiru).
         try {
             AppStato.inicialigu(
                 ludilo = ExoPlayerLudiloRegilo.akiru(context.applicationContext),
@@ -236,16 +236,16 @@ class AlarmoReceivilo : BroadcastReceiver() {
             logw("AlarmoReceivilo", "Ne povis inicialigi AppStaton — provas daŭrigi", e)
         }
 
-        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
+        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
         val kanalo: Kanalo = agordo.kanaloj.find { it.kodo == kanaloSlug }?.alKanalo() ?: run {
             logw("AlarmoReceivilo", "Kanalo ne trovita: $kanaloSlug")
-            luduFallbackRingtonon(context)
+            luduRezervanVokosonon(context)
             return
         }
 
         val regilo = AppStato.ludvicoRegilo ?: run {
             logw("AlarmoReceivilo", "LudvicoRegilo ne havebla")
-            luduFallbackRingtonon(context)
+            luduRezervanVokosonon(context)
             return
         }
         val ludilo = ExoPlayerLudiloRegilo.akiru(context.applicationContext)
@@ -256,8 +256,8 @@ class AlarmoReceivilo : BroadcastReceiver() {
         } else {
             val elsendo = AppStato.trovuAlarmElsendon(kanalo)
             if (elsendo == null) {
-                logw("AlarmoReceivilo", "Neniu ludebla elsendo por $kanaloSlug — ludas fallback ringtonon")
-                luduFallbackRingtonon(context)
+                logw("AlarmoReceivilo", "Neniu ludebla elsendo por $kanaloSlug — ludas rezervan vokosonon")
+                luduRezervanVokosonon(context)
                 return
             }
             logi("AlarmoReceivilo", "Alarmo ludas podkaston: ${elsendo.id} (${elsendo.dato})")
@@ -270,8 +270,8 @@ class AlarmoReceivilo : BroadcastReceiver() {
         delay(10_000)
         val stato = ludilo.stato.value
         if (stato.stato is LudantoStato.Eraro) {
-            logw("AlarmoReceivilo", "Ludado malsukcesis post 10s (${stato.stato}) — ludas fallback ringtonon")
-            luduFallbackRingtonon(context)
+            logw("AlarmoReceivilo", "Ludado malsukcesis post 10s (${stato.stato}) — ludas rezervan vokosonon")
+            luduRezervanVokosonon(context)
         }
     }
 
@@ -297,11 +297,11 @@ class AlarmoReceivilo : BroadcastReceiver() {
      * Altprioritata sciigo (CATEGORY_ALARM + PRIORITY_MAX) — permesata el fono.
      * Sen USE_FULL_SCREEN_INTENT ĝi montriĝas kiel heads-up kiam la ekrano estas
      * ŝaltita; la alarmsono tamen ĉiam ludas (vidu luduAlarmon).
-     * La sciigo estas daŭra (ongoing) dum la alarmo sonas — tial ĝi ne estu
+     * La sciigo estas daŭra dum la alarmo sonas — tial ĝi ne estu
      * forviŝebla per svingo; ĝi estas nuligata kiam la ludado haltiĝas aŭ finiĝas
      * (vidu la gardon en onReceive) aŭ kiam la uzanto tuŝas ĝin (setAutoCancel).
      */
-    private fun montruAltPrioritateSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
+    private fun montruAltprioritatanSciigon(context: Context, kanaloSlug: String?, etikedo: String?) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nm.createNotificationChannel(
@@ -316,7 +316,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             action = AGO_ALARMO_EKIGAS
             putExtra("alarmo_kanal_slug", kanaloSlug)
             putExtra("alarmo_etikedo", etikedo)
-            // De la sciigo: MainActivity haltigu la fallback-ringtonon — sed NE la
+            // De la sciigo: MainActivity haltigu la rezervan vokosonon — sed NE la
             // best-effort startActivity de la ricevilo mem (vd. MainActivity).
             putExtra("de_sciigo", true)
             IntentŜlosilo.aldonuNomon(this)
@@ -336,45 +336,45 @@ class AlarmoReceivilo : BroadcastReceiver() {
             .setOngoing(true)
             .build()
         nm.notify(SCIIGO_ID, sciigo)
-        logi("AlarmoReceivilo", "Montris alt-prioritate sciigon por kanalo=$kanaloSlug")
+        logi("AlarmoReceivilo", "Montris altprioritatan sciigon por kanalo=$kanaloSlug")
     }
 
     /**
-     * Fallback: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (PR #94) —
+     * Rezerva kazo: ludas la sisteman alarm-sonon kaj vibras rekte en la ricevilo (PR #94) —
      * alarmo devas SONI eĉ kiam la fluo/reto tute ne disponeblas.
      *
-     * La sono estas haltigebla per haltuFallbackRingon() (vokata de haltuAlarmRingon
-     * kiam la uzanto haltigas la ludadon) kaj mem haltas post [ringtonoMaksDaŭroMs]
+     * La sono estas haltigebla per haltuRezervanVokosonon() (vokata de haltuAlarmVokosonon
+     * kiam la uzanto haltigas la ludadon) kaj mem haltas post [vokosonoMaksDaŭroMs]
      * (Ringtone.play() alie ripetiĝus senfine — kaj la daŭra sciigo restus).
      */
-    private fun luduFallbackRingtonon(context: Context) {
+    private fun luduRezervanVokosonon(context: Context) {
         try {
             val uri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
                 ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
                 ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
             if (uri != null) {
                 // Unue haltigu eventualan antaŭan sonon — neniam duobla alarmo
-                haltuFallbackRingon()
+                haltuRezervanVokosonon()
                 android.media.RingtoneManager.getRingtone(context, uri)?.let {
                     it.audioAttributes = android.media.AudioAttributes.Builder()
                         .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                         .build()
                     it.play()
-                    // Konservu la tenilon por haltuFallbackRingon() kaj mem-haltu
-                    // post ringtonoMaksDaŭroMs. La referenca komparo (===) certigas
+                    // Konservu la tenilon por haltuRezervanVokosonon() kaj mem-haltu
+                    // post vokosonoMaksDaŭroMs. La referenca komparo (===) certigas
                     // ke malnova tempumilo ne haltigu novan sonon.
-                    fallbackRingtono = it
+                    rezervaVokosono = it
                     val mia = it
                     CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
-                        delay(ringtonoMaksDaŭroMs)
-                        if (fallbackRingtono === mia) {
-                            logi("AlarmoReceivilo", "Fallback-ringtono mem haltigita post ${ringtonoMaksDaŭroMs} ms")
-                            haltuFallbackRingon()
+                        delay(vokosonoMaksDaŭroMs)
+                        if (rezervaVokosono === mia) {
+                            logi("AlarmoReceivilo", "Rezerva vokosono mem haltigita post ${vokosonoMaksDaŭroMs} ms")
+                            haltuRezervanVokosonon()
                             nuliguSciigon(context.applicationContext)
                         }
                     }
                 }
-                logi("AlarmoReceivilo", "Ludas fallback-ringtonon: $uri")
+                logi("AlarmoReceivilo", "Ludas rezervan vokosonon: $uri")
             }
 
             // Vibradu 4 sekundojn
@@ -384,7 +384,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
                 logi("AlarmoReceivilo", "Vibras 4s")
             }
         } catch (e: Exception) {
-            logw("AlarmoReceivilo", "Eraro dum fallback-ringtono", e)
+            logw("AlarmoReceivilo", "Eraro dum rezerva vokosono", e)
         }
     }
 }

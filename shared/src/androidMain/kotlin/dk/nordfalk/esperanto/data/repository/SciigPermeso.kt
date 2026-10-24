@@ -29,6 +29,6 @@ actual fun malfermuSciigAgordojn() {
     try {
         appContext.startActivity(intent)
     } catch (e: Exception) {
-        dk.nordfalk.esperanto.logw("SciigPermeso", "Ne povis malfermi la sciig-agordojn", e)
+        dk.nordfalk.esperanto.logw("SciigPermeso", "Ne povis malfermi la sciigagordojn", e)
     }
 }

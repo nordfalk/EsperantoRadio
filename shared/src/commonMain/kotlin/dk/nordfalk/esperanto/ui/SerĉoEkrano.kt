@@ -93,7 +93,7 @@ fun SerĉoEkrano(
             OutlinedTextField(
                 value = teksto,
                 onValueChange = { teksto = it },
-                label = { Text("Trovu elsendon...") },
+                label = { Text("Trovu elsendon…") },
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 singleLine = true
             )

@@ -369,8 +369,6 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.KanaloDetalo> { vojo ->
-                            // La vidata kanalo (eniro kaj svipoj) movas la sekvantan enhavon
-                            LaunchedEffect(vojo) { sekvantaRegilo.vidisKanalon(vojo.kanalo) }
                             KanalEkranoKunSvipo(
                                 komencaKanalo = vojo.kanalo,
                                 kanaloj = kanaloj,
@@ -397,8 +395,8 @@ fun EsperantoRadioApp(
                                     elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo)
                                 }
                             }
-                            // La vidata elsendo (eniro kaj svipoj) movas la sekvantan enhavon
-                            LaunchedEffect(vojo) { sekvantaRegilo.vidisElsendon(vojo.elsendo) }
+                            // La vidata elsendon raportas ElsendoEkranoKunSvipo mem
+                            // (eniro kaj svipoj) al la sekvanta regilo
                             ElsendoEkranoKunSvipo(
                                 komencaElsendo = elsendo,
                                 elsendoj = elsendoj,
@@ -476,18 +474,12 @@ fun EsperantoRadioApp(
                 // poste elsendo (gluiĝema aŭ la restarta semo).
                 val k = sekvantaRegilo.sekvantaKanalo
                 val e = sekvantaRegilo.elsendo()
-                val sekvantaTitolo: String?
-                val sekvantaSubtitolo: String?
-                val sekvantaBildoUrl: String?
-                val onLudiSekvantan: () -> Unit
-                // Klako sur la sekvanta breto navigas al la enhavo; null = jam sur
-                // ĝia ekrano — tiam la klako ludas la enhavon (vidu onClick malsupre)
-                val sekvantaVojo: Vojo? = when {
-                    k != null -> {
-                        sekvantaTitolo = k.nomo
-                        sekvantaSubtitolo = "Kanalo"
-                        sekvantaBildoUrl = k.emblemoUrl
-                        onLudiSekvantan = {
+                val sekvantaTitolo = k?.nomo ?: e?.titolo
+                val sekvantaSubtitolo = if (k != null) "Kanalo" else e?.kanaloNomo
+                val sekvantaBildoUrl = k?.emblemoUrl ?: e?.bildoUrl
+                val onLudiSekvantan: () -> Unit =
+                    if (k != null) {
+                        {
                             // Kiel la ludo-butono en la Kanalaro-listo: rekta kanalo
                             // → la rekta fluo; podkasta kanalo → la plej nova elsendo
                             if (k.estasRekta) {
@@ -508,27 +500,24 @@ fun EsperantoRadioApp(
                                 }
                             }
                         }
-                        if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null
-                        else Vojo.KanaloDetalo(k)
-                    }
-                    e != null -> {
-                        sekvantaTitolo = e.titolo
-                        sekvantaSubtitolo = e.kanaloNomo
-                        sekvantaBildoUrl = e.bildoUrl
-                        onLudiSekvantan = {
+                    } else if (e != null) {
+                        {
                             logi("Nav", "Sekvanta: ludas elsendon ${e.id}")
                             scope.launch { ludvicoRegilo.ludiElsendon(e) }
                         }
+                    } else {
+                        {}
+                    }
+                // Klako sur la sekvanta breto navigas al la enhavo; null = jam sur
+                // ĝia ekrano — tiam la klako ludas la enhavon (vidu onClick malsupre)
+                val sekvantaVojo: Vojo? = when {
+                    k != null ->
+                        if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null
+                        else Vojo.KanaloDetalo(k)
+                    e != null ->
                         if (nunaVojo is Vojo.ElsendoDetalo && nunaVojo.elsendo.id == e.id) null
                         else Vojo.ElsendoDetalo(e)
-                    }
-                    else -> {
-                        sekvantaTitolo = null
-                        sekvantaSubtitolo = null
-                        sekvantaBildoUrl = null
-                        onLudiSekvantan = {}
-                        null
-                    }
+                    else -> null
                 }
 
                 MiniLudilbreto(

@@ -134,26 +134,25 @@ fun EsperantoRadioApp(
         var elfaldita by rememberSaveable { mutableStateOf(false) }
 
         // La nune VIDATA kanalo/elsendo sur la detalaj ekranoj — sekvata de svipoj
-        // (HorizontalPager); uzata de la mini-ludilbreto kiam nenio ludas.
+        // (HorizontalPager); vidado movas la gluiĝeman sekvantan enhavon.
         var vidataKanalo by remember { mutableStateOf<Kanalo?>(null) }
         var vidataElsendo by remember { mutableStateOf<Elsendo?>(null) }
 
-        // La laste ludata elsendo — por la mini-ludilbreto kiam nenio ludas sur
-        // ekranoj sen specifa kanalo/elsendo (kiel en Spotify).
-        var lasteLudataElsendo by remember { mutableStateOf<Elsendo?>(null) }
-        LaunchedEffect(ludantoStato.nunaFonto) {
-            when (val fonto = ludantoStato.nunaFonto) {
-                is Sonfonto.ElsendoFonto -> lasteLudataElsendo = fonto.elsendo
-                is Sonfonto.LokaElsendo -> lasteLudataElsendo = fonto.elsendo
-                // Rekta kanalo ne havas elsendon; lasu la lastan podkaston
-                else -> {}
-            }
-        }
-        // Bazo-eltenaĵo post restarto: la lasta elsendo laŭ la persistaj ludatoj
+        // Regulo 1 (gluiĝema): kiam nenio ludas, la miniludilbreto montras la
+        // LASTE MONSTRITAN enhavon — la lastan vidatan detalan celon (sekvante
+        // svipojn) aŭ la lastan ludatan elsendon/kanalon. Nur vidado kaj ludado
+        // ĝisdatigas ĝin; nura navigado (reen, langetoj, tirkesto) ne.
+        // Bazo-eltenaĵo post restarto: la lasta elsendo laŭ la persistaj ludatoj.
         val lastatempeLudatajFluo = remember {
             AppStato.hejmoViewModel?.lastatempeLudataj ?: MutableStateFlow(emptyList<Elsendo>())
         }
         val lastatempeLudataj by lastatempeLudatajFluo.collectAsState()
+        val sekvantaRegilo = remember {
+            SekvantaEnhavoRegilo(semo = { lastatempeLudataj.firstOrNull() })
+        }
+        LaunchedEffect(vidataElsendo) { vidataElsendo?.let { sekvantaRegilo.vidisElsendon(it) } }
+        LaunchedEffect(vidataKanalo) { vidataKanalo?.let { sekvantaRegilo.vidisKanalon(it) } }
+        LaunchedEffect(ludantoStato.nunaFonto) { sekvantaRegilo.ludisFonton(ludantoStato.nunaFonto) }
 
         // Observi ŝanĝojn de ŝatoj kaj sciigoj por ĝisdatigi la fonan skedon
         val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
@@ -480,17 +479,18 @@ fun EsperantoRadioApp(
             if (montruMiniLudilbreton) {
                 val reprovo by ludvicoRegilo.reprovo.collectAsState()
 
-                // Sekvanta enhavo — kiam nenio ludas, la breto montras la nunan navigan
-                // celon (kanalo/elsendo detalo, sekvante svipojn) aŭ — sur aliaj ekranoj —
-                // la laste ludatan elsendon.
+                // Sekvanta enhavo (regulo 1, gluiĝema) — kiam nenio ludas, la breto
+                // montras la laste montritan enhavon el la regilo: kanalo venas unue,
+                // poste elsendo (gluiĝema aŭ la restarta semo).
+                val k = sekvantaRegilo.sekvantaKanalo
+                val e = if (k == null) sekvantaRegilo.elsendo() else null
                 val sekvantaTitolo: String?
                 val sekvantaSubtitolo: String?
                 val sekvantaBildoUrl: String?
                 val onLudiSekvantan: () -> Unit
                 // Klako sur la sekvanta breto navigas tien; null = jam sur tiu ekrano
-                val sekvantaVojo: Vojo? = when (val vojo = nunaVojo) {
-                    is Vojo.KanaloDetalo -> {
-                        val k = vidataKanalo ?: vojo.kanalo
+                val sekvantaVojo: Vojo? = when {
+                    k != null -> {
                         sekvantaTitolo = k.nomo
                         sekvantaSubtitolo = "Kanalo"
                         sekvantaBildoUrl = k.emblemoUrl
@@ -501,11 +501,10 @@ fun EsperantoRadioApp(
                                 scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                             }
                         }
-                        null
+                        if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null
+                        else Vojo.KanaloDetalo(k)
                     }
-                    is Vojo.ElsendoDetalo -> {
-                        // Svipoj ŝanĝas la vidatan elsendon — uzu ĝin, ne la eniran
-                        val e = vidataElsendo?.takeIf { it.kanaloSlug == vojo.elsendo.kanaloSlug } ?: vojo.elsendo
+                    e != null -> {
                         sekvantaTitolo = e.titolo
                         sekvantaSubtitolo = e.kanaloNomo
                         sekvantaBildoUrl = e.bildoUrl
@@ -513,20 +512,15 @@ fun EsperantoRadioApp(
                             logi("Nav", "Sekvanta: ludas elsendon ${e.id}")
                             scope.launch { ludvicoRegilo.ludiElsendon(e) }
                         }
-                        null
+                        if (nunaVojo is Vojo.ElsendoDetalo && nunaVojo.elsendo.id == e.id) null
+                        else Vojo.ElsendoDetalo(e)
                     }
                     else -> {
-                        val e = lasteLudataElsendo ?: lastatempeLudataj.firstOrNull()
-                        sekvantaTitolo = e?.titolo
-                        sekvantaSubtitolo = e?.kanaloNomo
-                        sekvantaBildoUrl = e?.bildoUrl
-                        onLudiSekvantan = {
-                            if (e != null) {
-                                logi("Nav", "Sekvanta: daŭrigas laste ludatan elsendon ${e.id}")
-                                scope.launch { ludvicoRegilo.ludiElsendon(e) }
-                            }
-                        }
-                        e?.let { Vojo.ElsendoDetalo(it) }
+                        sekvantaTitolo = null
+                        sekvantaSubtitolo = null
+                        sekvantaBildoUrl = null
+                        onLudiSekvantan = {}
+                        null
                     }
                 }
 

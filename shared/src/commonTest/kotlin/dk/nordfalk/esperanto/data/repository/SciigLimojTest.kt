@@ -181,4 +181,10 @@ class SciigLimojTest {
     fun sciigIdDaŭrasPostLaRezervitaZono() {
         assertEquals(4713, sekvaSciigId(4712))
     }
+
+    @Test
+    fun sciigIdNeniamTranspasasLaPlenan() {
+        assertEquals(Int.MAX_VALUE - 2, sekvaSciigId(Int.MAX_VALUE - 1))
+        assertEquals(Int.MAX_VALUE - 2, sekvaSciigId(Int.MAX_VALUE - 2))
+    }
 }

@@ -13,10 +13,14 @@ prefiksoj, kiuj ne kolizias kun la FAROTA-literoj (C/G/K/X):
 - **L1–L8** — la git-laborfluaj reguloj (AGENTS.md)
 - **P6.1–P6.7** (+ subpunktoj P6.1.4, P6.1.6) — la sep parsreguloj (docs/malnova/03, docs/nova/04); la historiaj numeroj 6.x restas, nur la P-prefikso diferencigas ilin de la aliaj aroj
 
-17+ dosieroj ĝisdatigitaj: la difinoj (AGENTS.md-listoj, dok-kapoj) kaj ĉiuj
-referencoj (kodo-komentoj, NOTOJ/SXANGXOJ, .vibe/skills). Pura kontrolo:
-`grep 'regulo [0-9]'` nun trovas neniun sen prefikso. La kaduka "(regulo 8)" en
-docs/malnova/03 (pri paĝigo, ene de la P6.7-sekcio) ĝustigita al P6.7.
+22 dosieroj ĝisdatigitaj: la difinoj (AGENTS.md-listoj, dok-kapoj) kaj ĉiuj
+referencoj (kodo-komentoj, NOTOJ/SXANGXOJ, .vibe/skills, ambaŭ JSONC-kopietoj
+de la kanalkonfiguro). Pura kontrolo: uskleco-sentema serĉo
+`git grep -i -E 'regulo(j|n|jn)? ?\(?[0-9]'` trovas nun nur la intencajn citaĵojn
+en ĉi tiu noto mem. La kaduka "(regulo 8)" en docs/malnova/03 (pri paĝigo, ene de
+la P6.7-sekcio) ĝustigita al P6.7. (Fina revizio post la unua balao: la JSONC-komentoj
+havis majusklan "Regulo 6.6" — la komenca `grep 'regulo [0-9]'` estis uskleco-sentema
+kaj maltrafis ilin.)
 
 ## Hejmo: klakebla "Kanaloj", tro-rula tirkesto kiu sekvas la fingron, ĉiam videbla miniludilbreto (PR: https://github.com/nordfalk/EsperantoRadio/pull/131)
 

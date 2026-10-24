@@ -57,7 +57,7 @@
 			"montruTitolojn": "true",
 			"retpoŝto": "podkasto@onet.eu",
 			"hejmpaĝoButono": "https://podkasto.net/",
-			// Regulo 6.6: purigaj modeloj por la priskribo (reklamoj kaj enkonstruitaj <audio>-ludiloj).
+			// Regulo P6.6: purigaj modeloj por la priskribo (reklamoj kaj enkonstruitaj <audio>-ludiloj).
 			// La modeloj uzas (?:(?!</p>).) anstataŭ .+? — ili ne povas transiri alineon, do
 			// ili neniam "manĝas" la veran enhavon (la malnovaj modeloj el EoRssParsado
 			// havis <p>.+?FRazo.+?</p>-formon kiu forviŝis ekde la unua alineo ĝis la reklamo).
@@ -168,7 +168,7 @@
 			"montruTitolojn": "true",
 			"uziWebViewPorElsendo": true,
 			"hejmpaĝoButono": "https://www.vinilkosmo-mp3.com/index.php?language=eo",
-			// Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (el la malnova apo)
+			// Regulo P6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (el la malnova apo)
 			"puriguModeloj": [
 				"<p class=\"who\">(?:(?!</p>).)*?</p>"
 			]

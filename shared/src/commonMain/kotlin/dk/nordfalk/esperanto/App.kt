@@ -480,17 +480,21 @@ fun EsperantoRadioApp(
                 val sekvantaSubtitolo: String?
                 val sekvantaBildoUrl: String?
                 val onLudiSekvantan: () -> Unit
-                // Klako sur la sekvanta breto navigas tien; null = jam sur tiu ekrano
+                // Klako sur la sekvanta breto navigas al la enhavo; null = jam sur
+                // ĝia ekrano — tiam la klako ludas la enhavon (vidu onClick malsupre)
                 val sekvantaVojo: Vojo? = when {
                     k != null -> {
                         sekvantaTitolo = k.nomo
                         sekvantaSubtitolo = "Kanalo"
                         sekvantaBildoUrl = k.emblemoUrl
                         onLudiSekvantan = {
+                            // Kiel la "Rekta elsendo"-butono de la kanala ekrano mem
                             val fonto = k.rektaElsendaSonoUrl?.let { Sonfonto.RektaKanalo(k) }
                             if (fonto != null) {
                                 logi("Nav", "Sekvanta: ludas rekte ${k.slug}")
                                 scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                            } else {
+                                logi("Nav", "Sekvanta: ${k.slug} ne havas rektan fluon — nenio ludebla")
                             }
                         }
                         if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null
@@ -534,9 +538,10 @@ fun EsperantoRadioApp(
                             is Sonfonto.ElsendoFonto -> push(Vojo.ElsendoDetalo(fonto.elsendo))
                             is Sonfonto.LokaElsendo -> push(Vojo.ElsendoDetalo(fonto.elsendo))
                             is Sonfonto.RektaKanalo -> push(Vojo.KanaloDetalo(fonto.kanalo))
-                            // Nenio ludas: klaku al la sekvan enhavon (laste ludata elsendo);
-                            // sur detalaj ekranoj la breto jam montras tiun enhavon (null)
-                            null -> sekvantaVojo?.let { push(it) }
+                            // Nenio ludas: navigu al la sekvanta enhavo; se oni jam
+                            // estas sur ĝia ekrano (ekz. klako sur la breto sur la
+                            // kanala ekrano), ludu ĝin kiel la lud-butono de la ekrano
+                            null -> sekvantaVojo?.let { push(it) } ?: onLudiSekvantan()
                         }
                     },
                     onLudvico = { push(Vojo.Ludvico) },

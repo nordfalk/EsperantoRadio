@@ -1,10 +1,9 @@
-Nova en 3.0.3:
+Nova en 3.0.4-beta24okt (interna testo):
 
-📻 9 novaj kanaloj — nun 27 entute!
-🎧 Faldebla mini-ludilbreto
-⏰ Vekhorloĝo plibonigita: ludas tuj, ankaŭ kun malŝaltita ekrano
-🩺 Avertokarto pri problemoj kun gvido al agordoj
-📢 Novaĵ-dialogo pri gravaj sciigoj
-🔒 Pli bona privateco: malpli da protokolado sendiĝas defaŭlte
-
-Kaj multaj riparoj: elŝutoj, sciigoj, serĉo, ludvico kaj pli.
+⚡ Kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito
+🔔 Sciigoj pri novaj elsendoj: maks. 7 samtempe, maks. 3 po kanalo
+🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston,
+   la mini-ludilbreto restas ĉiam videbla
+🩺 Kaŝitaj averto-kartoj ne reaperas post relanĉo
+🛡️ Protekto kontraŭ tro grandaj/eraraj respondoj de kanal-fluoj
+🧹 (interna) la kodo uzas ĝustan Esperanto-ortografion

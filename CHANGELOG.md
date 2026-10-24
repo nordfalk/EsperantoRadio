@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Ŝanĝita
+
+- Plibonigita esperanta lingvaĵo en la tuta apo kaj dokumentaro: pli ĝustaj terminoj kaj frazoj en kanaloj, diagnozo, alarmoj kaj sciigoj (https://github.com/nordfalk/EsperantoRadio/pull/137)
+
 ## [3.0.4-beta24okt] - 2026-10-24
 
 ### Aldonita

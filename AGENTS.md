@@ -280,6 +280,8 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
+- **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn.
+
 ## Protokolado kaj Sentry — konvencio
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,

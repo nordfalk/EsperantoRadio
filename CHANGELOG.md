@@ -17,6 +17,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - Vekhorloĝo: la tempo elekteblas per ciferblido en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
+- Post kaŝo de la averto-karto aperas mallonga mesaĝo kun butono kiu rekte kondukas al la agordoj (https://github.com/nordfalk/EsperantoRadio/pull/132)
 
 ### Ŝanĝita
 
@@ -33,6 +34,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- Kaŝita averto-karto (ekz. "Bateri-optimumado estas ŝaltita") ne plu reaperas post ĉiu relanĉo de la apo (https://github.com/nordfalk/EsperantoRadio/pull/132)
 - La kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekran-vizito — ŝargadoj dedupliĝas, havas 5-minutan aĝ-limon, kaj la ŝarĝindikilo aperas nur kiam efektive ŝargiĝas (https://github.com/nordfalk/EsperantoRadio/pull/129)
 - La apo ne plu kraŝas pro manko de memoro kiam kanal-fluo redonas tro grandan aŭ misdirektitan respondon (ekz. son-dosieron anstataŭ RSS-fluo) — la legado estas limigata al 1 MB (https://github.com/nordfalk/EsperantoRadio/pull/128)
 - Malofte la apo tute kraŝis, kiam Android restartigis la fonan ludado-servon sen aktiva ludado (ekz. post kiam la sistemo liberigis memoron) (https://github.com/nordfalk/EsperantoRadio/pull/124)

@@ -3,13 +3,14 @@ package dk.nordfalk.esperanto.navigation
 import androidx.navigation3.runtime.NavKey
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Vojoj (routes) por Navigation 3.
  *
  * Radikaj ekranoj (elekteblaj en la naviga tirkesto): [Hejmo], [Kanalaro],
- * [Plejŝatataj], [Sercxo] plus la flankaj [Elshutoj], [Alarmoj], [Agordoj].
+ * [Plejŝatataj], [Serĉo] plus la flankaj [Elŝutoj], [Alarmoj], [Agordoj].
  * Detal-ekranoj: [KanaloDetalo], [ElsendoDetalo]
  * Plenekranoj (ekster la tirkesto): [Ludvico], [Diagnozo]
  */
@@ -18,8 +19,13 @@ sealed interface Vojo : NavKey {
     @Serializable data object Hejmo : Vojo
     @Serializable data object Kanalaro : Vojo
     @Serializable data object Plejŝatataj : Vojo
-    @Serializable data object Sercxo : Vojo
-    @Serializable data object Elshutoj : Vojo
+    // La klasa nomo estas la diskriminilo de la persistigita navig-stato. La
+    // HISTORIAJ nomoj restas por ke la nova apo legu staton skribitan de malnova
+    // versio; la diskriminilo ne subtenas plurajn leg-nomojn (kampo-ŝlosiloj
+    // havas @JsonNames en Modeloj.kt, diskriminiloj ne), do la skribo daŭre
+    // uzas la historian nomon — malnova versio ne devas scii pri la nova.
+    @Serializable @SerialName("dk.nordfalk.esperanto.navigation.Vojo.Sercxo") data object Serĉo : Vojo
+    @Serializable @SerialName("dk.nordfalk.esperanto.navigation.Vojo.Elshutoj") data object Elŝutoj : Vojo
     @Serializable data object Ludvico : Vojo
     @Serializable data object Alarmoj : Vojo
     @Serializable data object Agordoj : Vojo

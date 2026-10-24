@@ -14,8 +14,8 @@ expect fun malfermuLigon(url: String)
 /**
  * Malfermas la retpoŝto-programon kun antaŭplenigitaj temo kaj teksto.
  *
- * @param retposhto retpoŝtadreso de la ricevonto
+ * @param retpoŝto retpoŝtadreso de la ricevonto
  * @param temo temo de la mesaĝo
  * @param teksto korpa teksto de la mesaĝo
  */
-expect fun malfermuRetposhton(retposhto: String, temo: String, teksto: String)
+expect fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String)

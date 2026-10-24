@@ -11,7 +11,7 @@ class KanalAgordoLegantoTest {
     private val leganto = KanalAgordoLeganto()
 
     @Test
-    fun legasKomentojnKajPlurliniajnCxenojn() {
+    fun legasKomentojnKajPlurliniajnĈenojn() {
         val jsonc = """
             {
                 // Tio estas komento
@@ -113,7 +113,7 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
-    fun legasApajnNovajxojn() {
+    fun legasApajnNovaĵojn() {
         val jsonc = """
             {
                 "android": {
@@ -126,7 +126,7 @@ class KanalAgordoLegantoTest {
         val agordo = leganto.legu(jsonc)
 
         assertNotNull(agordo.android)
-        assertEquals("Majo 2022: Muzaiko ne plu funkcias", agordo.android!!.apajNovajxoj)
+        assertEquals("Majo 2022: Muzaiko ne plu funkcias", agordo.android!!.apajNovaĵoj)
     }
 
     @Test
@@ -158,30 +158,30 @@ class KanalAgordoLegantoTest {
     // === (PR #89) — ĝusta percent-malkodado de supersignoj ===
 
     @Test
-    fun malkoduUrlKoditajxonCxiujSupersignoj() {
+    fun malkoduUrlKoditaĵonĈiujSupersignoj() {
         // %C4%A5 = ĥ (la malnova tabelo erare mapis ĝin al ĵ),
         // %C5%9C = Ŝ (ne ŝ), %C5%AC = Ŭ (ne Ŝ — kaj la linio aperis dufoje)
         assertEquals(
             "ĈĉĜĝĤĥĴĵŜŝŬŭ",
-            malkoduUrlKoditajxon("%C4%88%C4%89%C4%9C%C4%9D%C4%A4%C4%A5%C4%B4%C4%B5%C5%9C%C5%9D%C5%AC%C5%AD")
+            malkoduUrlKoditaĵon("%C4%88%C4%89%C4%9C%C4%9D%C4%A4%C4%A5%C4%B4%C4%B5%C5%9C%C5%9D%C5%AC%C5%AD")
         )
     }
 
     @Test
-    fun malkoduUrlKoditajxonPlusKajLinisalto() {
-        assertEquals("Muzaiko matene\nlabortago", malkoduUrlKoditajxon("Muzaiko+matene%0Alabortago"))
+    fun malkoduUrlKoditaĵonPlusKajLinisalto() {
+        assertEquals("Muzaiko matene\nlabortago", malkoduUrlKoditaĵon("Muzaiko+matene%0Alabortago"))
         // Jam-malkoditaj signoj estas trairataj senŝanĝe
-        assertEquals("Ĥoro Ŭato", malkoduUrlKoditajxon("Ĥoro Ŭato"))
+        assertEquals("Ĥoro Ŭato", malkoduUrlKoditaĵon("Ĥoro Ŭato"))
         // Ne-heksa %-sekvenco restas senŝanĝe
-        assertEquals("100% certa", malkoduUrlKoditajxon("100%+certa"))
+        assertEquals("100% certa", malkoduUrlKoditaĵon("100%+certa"))
         // %25 = %
-        assertEquals("100%", malkoduUrlKoditajxon("100%25"))
+        assertEquals("100%", malkoduUrlKoditaĵon("100%25"))
     }
 
     @Test
-    fun malkoduUrlKoditajxonKun4BajtaSigno() {
+    fun malkoduUrlKoditaĵonKun4BajtaSigno() {
         // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bajtajn UTF-8-signojn
-        assertEquals("😀", malkoduUrlKoditajxon("%F0%9F%98%80"))
+        assertEquals("😀", malkoduUrlKoditaĵon("%F0%9F%98%80"))
     }
 
     @Test

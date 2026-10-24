@@ -4,9 +4,9 @@ import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
-import dk.nordfalk.esperanto.domain.repository.LastAuxskultitajDeponejo
+import dk.nordfalk.esperanto.domain.repository.LastAŭskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
-import dk.nordfalk.esperanto.domain.repository.SercxoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logd
@@ -33,18 +33,18 @@ class PlejŝatatajDeponejoImpl : PlejŝatatajDeponejo {
     override suspend fun estasPlejŝatata(kanaloSlug: String): Boolean = kanaloSlug in _plejŝatataj.value
 }
 
-class LastAuxskultitajDeponejoImpl : LastAuxskultitajDeponejo {
+class LastAŭskultitajDeponejoImpl : LastAŭskultitajDeponejo {
     private val _listo = MutableStateFlow<List<Elsendo>>(emptyList())
     private val pozicioj = mutableMapOf<String, Long>()
 
-    override fun observiLastAuxskultitajn(): StateFlow<List<Elsendo>> = _listo.asStateFlow()
+    override fun observiLastAŭskultitajn(): StateFlow<List<Elsendo>> = _listo.asStateFlow()
 
     override suspend fun registri(elsendo: Elsendo) {
         val nuna = _listo.value.toMutableList()
         nuna.removeAll { it.id == elsendo.id }
         nuna.add(0, elsendo)
         _listo.value = nuna.take(50) // LRU-maks 50
-        logd("LastAuxskultitaj", "Registras: ${elsendo.id} — ${elsendo.titolo}")
+        logd("LastAŭskultitaj", "Registras: ${elsendo.id} — ${elsendo.titolo}")
     }
 
     override suspend fun getPozicio(elsendoId: String): Long? = pozicioj[elsendoId]
@@ -59,14 +59,14 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
     private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(emptyMap())
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
-    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {
+    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long) {
         val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
         nuna[elsendoId] = LudataElsendo(
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = pozicioMs,
-            dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
+            daŭroMs = if (daŭroMs > 0) daŭroMs else (ekzista?.daŭroMs ?: 0),
             finita = ekzista?.finita ?: false,
             erara = ekzista?.erara ?: false,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
@@ -88,7 +88,7 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = ekzista?.pozicioMs ?: 0,
-            dauroMs = ekzista?.dauroMs ?: 0,
+            daŭroMs = ekzista?.daŭroMs ?: 0,
             finita = true,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
         )
@@ -102,7 +102,7 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
             elsendoId = elsendoId,
             kanaloSlug = kanaloSlug,
             pozicioMs = ekzista?.pozicioMs ?: 0,
-            dauroMs = ekzista?.dauroMs ?: 0,
+            daŭroMs = ekzista?.daŭroMs ?: 0,
             finita = true,
             erara = true,
             lasteLudita = Clock.System.now().toEpochMilliseconds(),
@@ -122,12 +122,12 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
     override suspend fun getPozicio(elsendoId: String): Long? = _ludatoj.value[elsendoId]?.pozicioMs?.takeIf { it > 0 }
 }
 
-class SercxoDeponejoImpl(
+class SerĉoDeponejoImpl(
     private val elsendoDeponejo: ElsendoDeponejo,
-) : SercxoDeponejo {
-    override suspend fun sercxi(teksto: String, limo: Int): List<Elsendo> {
-        val rezulto = elsendoDeponejo.sercxiElsendojn(teksto, limo)
-        logd("Sercxo", "Serĉas '$teksto' (limo=$limo) — ${rezulto.size} trovoj")
+) : SerĉoDeponejo {
+    override suspend fun serĉi(teksto: String, limo: Int): List<Elsendo> {
+        val rezulto = elsendoDeponejo.serĉiElsendojn(teksto, limo)
+        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — ${rezulto.size} trovoj")
         return rezulto
     }
 }
@@ -141,8 +141,8 @@ class AgordojDeponejoImpl(
     private val _sciigoj = MutableStateFlow(settings?.getBoolean(SettingsKeys.SCIIGOJ, true) ?: true)
     override val sciigoj: StateFlow<Boolean> = _sciigoj.asStateFlow()
 
-    private val _auxtomataDaurigo = MutableStateFlow(settings?.getBoolean(SettingsKeys.AUXTOMATA_DAURIGO, true) ?: true)
-    override val auxtomataDaurigo: StateFlow<Boolean> = _auxtomataDaurigo.asStateFlow()
+    private val _aŭtomataDaŭrigo = MutableStateFlow(settings?.leguMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, true) ?: true)
+    override val aŭtomataDaŭrigo: StateFlow<Boolean> = _aŭtomataDaŭrigo.asStateFlow()
 
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
@@ -150,10 +150,10 @@ class AgordojDeponejoImpl(
     private val _detalaProtokolado = MutableStateFlow(settings?.getBoolean(SettingsKeys.DETALA_PROTOKOLADO, true) ?: true)
     override val detalaProtokolado: StateFlow<Boolean> = _detalaProtokolado.asStateFlow()
 
-    private val _kasxitajAvertoj = MutableStateFlow(
-        settings?.getString(SettingsKeys.KASXITAJ_AVERTOJ, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
+    private val _kaŝitajAvertoj = MutableStateFlow(
+        settings?.leguMigritanĈenon(SettingsKeys.KAŜITAJ_AVERTOJ, SettingsKeys.KAŜITAJ_AVERTOJ_MALNOVA, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
     )
-    override val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kasxitajAvertoj.asStateFlow()
+    override val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kaŝitajAvertoj.asStateFlow()
 
     init {
         // Sinkronigu la tutmondan protokol-flagon (legata de logi en ProtokoloUtil)
@@ -162,7 +162,7 @@ class AgordojDeponejoImpl(
 
     /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
     private fun persistu(tipoj: Set<DiagnozoTipo>) {
-        settings?.putString(SettingsKeys.KASXITAJ_AVERTOJ, tipoj.joinToString(",") { it.name })
+        settings?.skribuMigritanĈenon(SettingsKeys.KAŜITAJ_AVERTOJ, SettingsKeys.KAŜITAJ_AVERTOJ_MALNOVA, tipoj.joinToString(",") { it.name })
     }
 
     private fun tipoDeNomo(nomo: String): DiagnozoTipo? =
@@ -172,38 +172,38 @@ class AgordojDeponejoImpl(
         _temo.value = temo
         logi("Agordoj", "Temo → $temo")
     }
-    override fun fiksiSciigojn(sxaltita: Boolean) {
-        _sciigoj.value = sxaltita
-        settings?.putBoolean(SettingsKeys.SCIIGOJ, sxaltita)
-        logi("Agordoj", "Sciigoj → $sxaltita")
+    override fun fiksiSciigojn(ŝaltita: Boolean) {
+        _sciigoj.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.SCIIGOJ, ŝaltita)
+        logi("Agordoj", "Sciigoj → $ŝaltita")
     }
-    override fun fiksiAuxtomatanDaurigon(sxaltita: Boolean) {
-        _auxtomataDaurigo.value = sxaltita
-        settings?.putBoolean(SettingsKeys.AUXTOMATA_DAURIGO, sxaltita)
-        logi("Agordoj", "AuxtomataDaurigo → $sxaltita")
+    override fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean) {
+        _aŭtomataDaŭrigo.value = ŝaltita
+        settings?.skribuMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, ŝaltita)
+        logi("Agordoj", "AŭtomataDaŭrigo → $ŝaltita")
     }
-    override fun fiksiEvoluon(sxaltita: Boolean) {
-        _evoluo.value = sxaltita
-        settings?.putBoolean(SettingsKeys.EVOLO, sxaltita)
-        logi("Agordoj", "Evoluo → $sxaltita")
+    override fun fiksiEvoluon(ŝaltita: Boolean) {
+        _evoluo.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.EVOLO, ŝaltita)
+        logi("Agordoj", "Evoluo → $ŝaltita")
     }
-    override fun fiksiDetalanProtokoladon(sxaltita: Boolean) {
-        _detalaProtokolado.value = sxaltita
-        protokoloDetala = sxaltita
-        settings?.putBoolean(SettingsKeys.DETALA_PROTOKOLADO, sxaltita)
-        logi("Agordoj", "DetalaProtokolado → $sxaltita")
+    override fun fiksiDetalanProtokoladon(ŝaltita: Boolean) {
+        _detalaProtokolado.value = ŝaltita
+        protokoloDetala = ŝaltita
+        settings?.putBoolean(SettingsKeys.DETALA_PROTOKOLADO, ŝaltita)
+        logi("Agordoj", "DetalaProtokolado → $ŝaltita")
     }
-    override fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>) {
-        _kasxitajAvertoj.value = tipoj
+    override fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>) {
+        _kaŝitajAvertoj.value = tipoj
         persistu(tipoj)
-        logi("Agordoj", "KasxitajAvertoj → $tipoj")
+        logi("Agordoj", "KaŝitajAvertoj → $tipoj")
     }
-    override fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>) {
-        val purigita = _kasxitajAvertoj.value intersect ekzistantaj
-        if (purigita != _kasxitajAvertoj.value) {
-            _kasxitajAvertoj.value = purigita
+    override fun puriguKaŝitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>) {
+        val purigita = _kaŝitajAvertoj.value intersect ekzistantaj
+        if (purigita != _kaŝitajAvertoj.value) {
+            _kaŝitajAvertoj.value = purigita
             persistu(purigita)
-            logi("Agordoj", "Purigis kasxitajn avertojn → $purigita")
+            logi("Agordoj", "Purigis kaŝitajn avertojn → $purigita")
         }
     }
 }

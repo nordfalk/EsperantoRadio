@@ -50,8 +50,8 @@ import kotlin.concurrent.Volatile
  * @param kanaloDeponejo por trovi kanalon laŭ slug
  * @param plejŝatatajDeponejo por scii kiuj kanaloj estas ŝatataj (priority 2)
  * @param ludatojDeponejo por persisto de pozicioj kaj finstato
- * @param elshutDeponejo por kontrolado de loka dosiero (eksterreta ludado)
- * @param auxtomataDaurigo se true (defaŭlte), aŭtomate daŭrigas kun alia elsendo post fino;
+ * @param elŝutDeponejo por kontrolado de loka dosiero (eksterreta ludado)
+ * @param aŭtomataDaŭrigo se true (defaŭlte), aŭtomate daŭrigas kun alia elsendo post fino;
  *   se false, haltas post ĉiu finita elsendo
  */
 class LudvicoRegilo(
@@ -61,7 +61,7 @@ class LudvicoRegilo(
     private val plejŝatatajDeponejo: PlejŝatatajDeponejo,
     private val ludatojDeponejo: LudatojDeponejo,
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
-    private val auxtomataDaurigo: StateFlow<Boolean> = MutableStateFlow(true),
+    private val aŭtomataDaŭrigo: StateFlow<Boolean> = MutableStateFlow(true),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
     /** Atendo antaŭ reprovo n (null = rezignu). Anstataŭigebla en testoj. */
     private val reprovoAtendo: (Int) -> Long? = ReprovoLogiko::atendoMs,
@@ -76,7 +76,7 @@ class LudvicoRegilo(
     private var observanto: Job? = null
     private var pozicioSavanto: Job? = null
     private val ludMutex = Mutex()
-    @Volatile private var antauxaStato: LudantoStato = LudantoStato.Haltita
+    @Volatile private var antaŭaStato: LudantoStato = LudantoStato.Haltita
 
     /**
      * Numero de la nuna reprovo de la sama fonto post eraro (0 = neniu reprovo).
@@ -95,7 +95,7 @@ class LudvicoRegilo(
     @Volatile private var lastaFonto: Sonfonto? = null
     @Volatile private var lastaPozicioMs: Long = 0
     @Volatile private var lastaSavitaPozicioMs: Long = 0
-    @Volatile private var lastaDauroMs: Long = 0
+    @Volatile private var lastaDaŭroMs: Long = 0
     /**
      * Dedup-fenestro de la lastaj traktitaj fontoj — protektas kontraŭ malfruaj
      * duoblaj vokoj de la sama fino (servo + stato-observanto, eĉ post kiam la
@@ -124,25 +124,25 @@ class LudvicoRegilo(
         observanto = ludilo.stato
             .distinctUntilChangedBy { it.stato }
             .onEach { info ->
-                traktiStatoSxangxon(info)
+                traktiStatoŜanĝon(info)
             }
             .launchIn(scope)
     }
 
-    private suspend fun traktiStatoSxangxon(info: LudantoInformo) {
+    private suspend fun traktiStatoŜanĝon(info: LudantoInformo) {
         val stato = info.stato
         when {
-            stato == LudantoStato.Finita && antauxaStato != LudantoStato.Finita -> {
+            stato == LudantoStato.Finita && antaŭaStato != LudantoStato.Finita -> {
                 traktiFinon(stato, erara = false, finantaFonto = info.nunaFonto)
             }
-            stato is LudantoStato.Eraro && antauxaStato !is LudantoStato.Eraro -> {
+            stato is LudantoStato.Eraro && antaŭaStato !is LudantoStato.Eraro -> {
                 if (!stato.reprovebla || !provuReprovi()) traktiFinon(stato, erara = true, finantaFonto = info.nunaFonto)
             }
             stato == LudantoStato.Ludas -> {
                 if (_reprovo.value > 0) logi("Ludvico", "Reprovo ${_reprovo.value} sukcesis")
                 _reprovo.value = 0
                 markiLudataElsendon()
-                ghisdatiguLastaPozicion()
+                ĝisdatiguLastaPozicion()
                 komenciPozicianSpuradon()
             }
             stato == LudantoStato.Haltita -> {
@@ -152,7 +152,7 @@ class LudvicoRegilo(
             }
             else -> {}
         }
-        antauxaStato = stato
+        antaŭaStato = stato
     }
 
     /**
@@ -285,7 +285,7 @@ class LudvicoRegilo(
             _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
         }
         // Se aŭtomata daŭrigo estas malŝaltita, haltu post finio
-        if (!auxtomataDaurigo.value) {
+        if (!aŭtomataDaŭrigo.value) {
             logi("Ludvico", "Aŭtomata daŭrigo malŝaltita — haltas")
             ludilo.halti()
             return
@@ -337,7 +337,7 @@ class LudvicoRegilo(
         pozicioSavanto = scope.launch {
             while (true) {
                 delay(POZICIO_SAV_INTERVALO_MS)
-                ghisdatiguLastaPozicion()
+                ĝisdatiguLastaPozicion()
                 savuPozicion()
             }
         }
@@ -354,7 +354,7 @@ class LudvicoRegilo(
         if (info.nunaFonto != null) {
             lastaFonto = info.nunaFonto
             lastaPozicioMs = info.pozicioMs
-            lastaDauroMs = info.dauroMs
+            lastaDaŭroMs = info.daŭroMs
         }
         // Se nunaFonto estas null (halti forigis ĝin), uzu la konservitan retroiron
         val fonto = info.nunaFonto ?: lastaFonto ?: return
@@ -364,21 +364,21 @@ class LudvicoRegilo(
             else -> return
         }
         val pozicio = if (info.pozicioMs > 0) info.pozicioMs else lastaPozicioMs
-        val dauro = if (info.dauroMs > 0) info.dauroMs else lastaDauroMs
+        val daŭro = if (info.daŭroMs > 0) info.daŭroMs else lastaDaŭroMs
         if (pozicio > 0 && lastaSavitaPozicioMs != pozicio) {
-            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, pozicio, dauro)
+            ludatojDeponejo.registriPozicion(elsendo.id, elsendo.kanaloSlug, pozicio, daŭro)
             lastaSavitaPozicioMs = pozicio
             logd("Ludvico", "Savis pozicion: ${elsendo.id} @ ${pozicio}ms")
         }
     }
 
     /** Ĝisdatigas la konservitan retroiron — vokata dum ludado. */
-    private fun ghisdatiguLastaPozicion() {
+    private fun ĝisdatiguLastaPozicion() {
         val info = ludilo.stato.value
         if (info.nunaFonto != null) {
             lastaFonto = info.nunaFonto
             lastaPozicioMs = info.pozicioMs
-            lastaDauroMs = info.dauroMs
+            lastaDaŭroMs = info.daŭroMs
         }
     }
 
@@ -421,10 +421,10 @@ class LudvicoRegilo(
      * Paŭzigas la nunan ludadon — tra la regilo, ne rekte al la ludilo (PR #92):
      * nuligas planitan reprovon, alikaze ĝi rekomencigus la ludadon dum la paŭzo.
      */
-    suspend fun pauxziguLudadon() {
+    suspend fun paŭziguLudadon() {
         ludMutex.withLock {
             nuliguReprovon()
-            ludilo.pauxzigi()
+            ludilo.paŭzigi()
         }
     }
 
@@ -432,7 +432,7 @@ class LudvicoRegilo(
      * Daŭrigas la ludadon post paŭzo — tra la regilo (PR #92):
      * nuligas planitan reprovon kaj rekomencas la kalkulon de sinsekvaj eraroj.
      */
-    suspend fun dauriguLudadon() {
+    suspend fun daŭriguLudadon() {
         ludMutex.withLock {
             nuliguReprovon()
             erarojSinsekvaj = 0
@@ -532,14 +532,14 @@ class LudvicoRegilo(
                 emptyList()
             }
 
-            val cxiujElsendoj = cxiujSargitajElsendoj()
+            val ĉiujElsendoj = ĉiujSargitajElsendoj()
             val plejŝatataj = plejŝatatajDeponejo.observiPlejŝatatajn().value
             val ludatoj = ludatojDeponejo.observiLudatojn().value
 
             val sekva = LudvicoLogiko.deciduSekvan(
                 nunaElsendo = nunaElsendo,
                 samkanalajElsendoj = samkanalaj,
-                cxiujElsendoj = cxiujElsendoj,
+                ĉiujElsendoj = ĉiujElsendoj,
                 plejŝatatajKanaloj = plejŝatataj,
                 ludatoj = ludatoj,
             )
@@ -560,7 +560,7 @@ class LudvicoRegilo(
      * Ne uzas mutex — vokenda el mutex-kunteksto.
      *
      * Neniu lasteLudita estas skribata ĉi tie — tio okazas nur kiam la ludado
-     * vere ekis (stato Ludas, vidu [traktiStatoSxangxon]), por ke la elsendo
+     * vere ekis (stato Ludas, vidu [traktiStatoŜanĝon]), por ke la elsendo
      * ne tro frue moviĝu al "Lastatempe ludata".
      */
     private suspend fun ludiElsendonInterna(elsendo: Elsendo) {
@@ -594,7 +594,7 @@ class LudvicoRegilo(
      * Kolektas ĉiujn ŝargitajn elsendojn el ĉiuj kanaloj en la kaŝmemoro.
      * Uzas la ElsendoDeponejo por akiri la kaŝenitajn elsendojn.
      */
-    private suspend fun cxiujSargitajElsendoj(): List<Elsendo> {
+    private suspend fun ĉiujSargitajElsendoj(): List<Elsendo> {
         val kanaloj = kanaloDeponejo.observiKanalojn().value
         return kanaloj.flatMap { kanalo ->
             try {
@@ -615,9 +615,9 @@ class LudvicoRegilo(
         observanto = null
     }
 
-    /** Eksplicite savu la nunan pozicion (ekz. antaŭ ol la apo fermigxas). */
+    /** Eksplicite savu la nunan pozicion (ekz. antaŭ ol la apo fermiĝas). */
     suspend fun savuPozicionNun() {
-        ghisdatiguLastaPozicion()
+        ĝisdatiguLastaPozicion()
         savuPozicion()
     }
 

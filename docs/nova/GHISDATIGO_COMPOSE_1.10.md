@@ -1,4 +1,4 @@
-# Ghisdatigo al Compose Multiplatform 1.10 + Kotlin 2.2.20
+# Ĝisdatigo al Compose Multiplatform 1.10 + Kotlin 2.2.20
 
 > **Efektivigita: 2026-09-06** (PR #32/#35). La plan-dokumento estas forigita;
 > nur la rezulto kaj lernitaj lecionoj restas por referenco.

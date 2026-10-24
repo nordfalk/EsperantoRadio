@@ -36,7 +36,7 @@ class AlarmoElektoTest {
     }
 
     @Test
-    fun cxiujAuxskultitajDonasPlejNovan() {
+    fun ĉiujAŭskultitajDonasPlejNovan() {
         val ludatoj = listOf("a", "b", "c").associateWith { LudataElsendo(it, "peranto", finita = true) }
         assertEquals(nova, elektuAlarmElsendon(listOf(malnova, meza, nova), ludatoj))
     }
@@ -64,7 +64,7 @@ class AlarmoElektoTest {
     }
 
     @Test // (PR #95) se ĈIUJ estas erara → null (ringtono) — erara fluo tuj paneus
-    fun cxiujErarajDonasNull() {
+    fun ĉiujErarajDonasNull() {
         val ludatoj = listOf("a", "b", "c").associateWith { LudataElsendo(it, "peranto", erara = true) }
         assertNull(elektuAlarmElsendon(listOf(malnova, meza, nova), ludatoj))
     }

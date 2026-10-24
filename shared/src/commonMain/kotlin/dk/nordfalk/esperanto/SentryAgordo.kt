@@ -4,12 +4,12 @@ import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryOptions
 
 /**
- * Sentry-agordo — komuna por cxiuj platformoj (Android, Desktop/JVM, wasmJs).
+ * Sentry-agordo — komuna por ĉiuj platformoj (Android, Desktop/JVM, wasmJs).
  *
  * Sur wasmJs la SDK estas no-op (kompilas sed faras nenion).
- * Sur Android gxi uzas Sentry Android SDK, sur JVM Sentry Java SDK.
+ * Sur Android ĝi uzas Sentry Android SDK, sur JVM Sentry Java SDK.
  *
- * @param medio "produktado" aux "evoluo" — regas la medion kaj la specimenajn
+ * @param medio "produktado" aŭ "evoluo" — regas la medion kaj la specimenajn
  *   kvocientojn (traces: 1.0/0.1 de PR #93; eraroj: 1.0/0.5 de PR #109 — la
  *   eraroj-specimenado rekte protektas la monatan eraroj-kvoton).
  *   La PROTOKOLA kvanto ne dependas de la medio: logs estas ĉiam ŝaltitaj,
@@ -41,7 +41,7 @@ fun initialiguSentry(medio: String = "evoluo") {
         options.environment = medio
     }
 
-    // Globaj etikedoj — apearas cxe cxiuj eventoj kaj estas filtreblaj en Sentry
+    // Globaj etikedoj — apearas ĉe ĉiuj eventoj kaj estas filtreblaj en Sentry
     Sentry.configureScope { scope ->
         scope.setTag("apo", "EsperantoRadio")
     }
@@ -51,16 +51,16 @@ fun initialiguSentry(medio: String = "evoluo") {
  * Agordas Sentry-etikedon (tag) sur la aktuala amplekso.
  * Etikedoj estas filtreblaj en la Sentry-fasado.
  */
-fun agorduSentryEtikedon(sxlosilo: String, valoro: String) {
-    Sentry.configureScope { scope -> scope.setTag(sxlosilo, valoro) }
+fun agorduSentryEtikedon(ŝlosilo: String, valoro: String) {
+    Sentry.configureScope { scope -> scope.setTag(ŝlosilo, valoro) }
 }
 
 /**
  * Agordas Sentry-kuntekston (context) sur la aktuala amplekso.
- * Kunteksto provizas strukturitajn datumojn kiuj aperas cxe eventoj.
+ * Kunteksto provizas strukturitajn datumojn kiuj aperas ĉe eventoj.
  */
-fun agorduSentryKuntekston(sxlosilo: String, valoro: Any) {
-    Sentry.configureScope { scope -> scope.setContext(sxlosilo, valoro) }
+fun agorduSentryKuntekston(ŝlosilo: String, valoro: Any) {
+    Sentry.configureScope { scope -> scope.setContext(ŝlosilo, valoro) }
 }
 
 /**
@@ -68,7 +68,7 @@ fun agorduSentryKuntekston(sxlosilo: String, valoro: Any) {
  */
 fun testuSentry() {
     try {
-        throw Exception("Sentry-testo: cxi tio estas prova eraro.")
+        throw Exception("Sentry-testo: ĉi tio estas prova eraro.")
     } catch (e: Exception) {
         loge("Sentry", "Testa escepto kaptita", e)
     }

@@ -8,9 +8,9 @@ import kotlin.concurrent.Volatile
 /**
  * Protokolaj funkcioj por la tuta apo.
  *
- * Platform-specifa eligxo estas farata per platformLog* (expect/actual).
+ * Platform-specifa eliĝo estas farata per platformLog* (expect/actual).
  *
- * Konvencio: [Komponanto] mesagxo
+ * Konvencio: [Komponanto] mesaĝo
  * Niveloj: d = debug, i = info, g = grava info, w = warning, e = eraro
  */
 @Volatile
@@ -48,9 +48,9 @@ fun loge(tag: String, msg: String) {
 /**
  * Helpaj protokolaj funkcioj kun escepto-parametro.
  *
- * Cxiu try-catch en la apo devas uzi cxi tiujn — neniam engluti escepton silente.
- * La stacktrace estas protokolita cxe la erara nivelo.
- * Eraroj estas ankaux kaptitaj de Sentry por malproksima monitorado.
+ * Ĉiu try-catch en la apo devas uzi ĉi tiujn — neniam engluti escepton silente.
+ * La stacktrace estas protokolita ĉe la erara nivelo.
+ * Eraroj estas ankaŭ kaptitaj de Sentry por malproksima monitorado.
  *
  * Uzas platformLog* rekte (ne log*) por eviti duoblajn breadcrumb-ojn.
  */

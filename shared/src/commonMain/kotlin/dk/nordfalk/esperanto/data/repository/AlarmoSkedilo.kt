@@ -12,18 +12,18 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 expect class AlarmoSkedilo() {
     /** Plani alarmon — se aktiva, vekos la aparaton je la specifita tempo. */
     fun skedi(alarmo: Alarmo)
-    /** Mallas la PendingIntent por cxi tiu alarmo. */
+    /** Mallas la PendingIntent por ĉi tiu alarmo. */
     fun malplani(alarmoId: Int)
-    /** Re-planas cxiujn aktivajn alarmojn (ekz. post boot). */
-    fun reskediCxiujn(alarmoj: List<Alarmo>)
+    /** Re-planas ĉiujn aktivajn alarmojn (ekz. post boot). */
+    fun reskediĈiujn(alarmoj: List<Alarmo>)
 }
 
 /**
- * Cxu cxi tiu platformo vere subtenas vekhorlogxon (vekigas la aparaton).
+ * Ĉu ĉi tiu platformo vere subtenas vekhorloĝon (vekigas la aparaton).
  * - Android: true (AlarmManager)
  * - Desktop/wasmJs/iOS: false (nur UI, ne vere vekas)
  */
-expect val subtenasVekhorlogxn: Boolean
+expect val subtenasVekhorloĝon: Boolean
 
 /**
  * Ĉu la apo rajtas skedi ekzaktajn alarmojn.

@@ -145,8 +145,8 @@ private fun ludataTeksto(ludata: LudataElsendo): String? {
     if (ludata.lasteLudita <= 0) return null
     return when {
         ludata.finita -> "aŭdis"
-        ludata.pozicioMs > 0 && ludata.dauroMs > 0 -> {
-            val procento = (ludata.pozicioMs.toFloat() / ludata.dauroMs * 100).toInt().coerceIn(0, 99)
+        ludata.pozicioMs > 0 && ludata.daŭroMs > 0 -> {
+            val procento = (ludata.pozicioMs.toFloat() / ludata.daŭroMs * 100).toInt().coerceIn(0, 99)
             "aŭdis $procento%"
         }
         else -> null
@@ -200,7 +200,7 @@ class HejmoViewModel(
     val lastatempeLudataj = _lastatempeLudataj.asStateFlow()
 
     /** Kruda listo de ĉiuj elsendoj — uzata por reaktualigi kiam ludatoj ŝanĝiĝas. */
-    private var cxiujElsendoj: List<Elsendo> = emptyList()
+    private var ĉiujElsendoj: List<Elsendo> = emptyList()
 
     /**
      * ID de la elsendo kiu nun estas ŝargita en la ludilo (ludas aŭ paŭzita).
@@ -222,8 +222,8 @@ class HejmoViewModel(
     private val _arkivajKanaloj = MutableStateFlow<List<KanalKarto>>(emptyList())
     val arkivajKanaloj = _arkivajKanaloj.asStateFlow()
 
-    private val _sxargxas = MutableStateFlow(false)
-    val sxargxas = _sxargxas.asStateFlow()
+    private val _ŝargas = MutableStateFlow(false)
+    val ŝargas = _ŝargas.asStateFlow()
 
     /**
      * Fona skopo en la ViewModel — transvivas navigadon. rememberCoroutineScope
@@ -235,31 +235,31 @@ class HejmoViewModel(
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /** Dedupigo + TTL: re-eniro al la ekrano ne reŝargas ĵus ŝargitan datenon. */
-    private val sxargilo = SxargxaKontrolilo()
+    private val ŝargilo = ŜargaKontrolilo()
 
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu ĉiujn fluojn denove (malsupren-tiro). */
-    fun sxargxi(fortoRefresigi: Boolean = false) {
-        skopo.launch { sxargilo.rulu("HejmoViewModel", fortoRefresigi) { sxargxiInterna(fortoRefresigi) } }
+    fun ŝargi(fortoRefresigi: Boolean = false) {
+        skopo.launch { ŝargilo.rulu("HejmoViewModel", fortoRefresigi) { ŝargiInterna(fortoRefresigi) } }
     }
 
-    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
+    private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
         val kanaloj = kanaloDeponejo.getKanalojn()
         logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
-        val kashitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKashitajnElsendojn(kanaloj) ?: emptyList()
-        if (kashitaj.isNotEmpty()) {
-            plenigu(kanaloj, kashitaj)
-            logi("HejmoViewModel", "Diskkaŝmemoro: ${kashitaj.size} elsendoj — tuj montras")
+        val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
+        if (kaŝitaj.isNotEmpty()) {
+            plenigu(kanaloj, kaŝitaj)
+            logi("HejmoViewModel", "Diskkaŝmemoro: ${kaŝitaj.size} elsendoj — tuj montras")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
-        _sxargxas.value = true
+        _ŝargas.value = true
         try {
             val ĉiujElsendoj = coroutineScope {
                 kanaloj
                     .filter { it.havasPodkastojn }
-                    .map { kanalo -> async { elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo, fortoRefresigi) } }
+                    .map { kanalo -> async { elsendoDeponejo.ŝargiElsendojnPorKanal(kanalo, fortoRefresigi) } }
                     .awaitAll()
                     .flatten()
             }
@@ -268,7 +268,7 @@ class HejmoViewModel(
         } catch (e: Exception) {
             loge("HejmoViewModel", "Malsukcesis ŝargi hejmon", e)
         } finally {
-            _sxargxas.value = false
+            _ŝargas.value = false
         }
     }
 
@@ -277,19 +277,19 @@ class HejmoViewModel(
      */
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
-        cxiujElsendoj = elsendoj
+        ĉiujElsendoj = elsendoj
         // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
         // kun semo derivata de la enhavo — la ordo restas stabila inter rekomputadoj.
         aliajKandidatoj = elsendoj.shuffled(Random(elsendoj.hashCode().toLong()))
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
 
-        val cxiujKanalojKartog = kanaloj
+        val ĉiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
             .map { kanalo ->
                 KanalKarto(kanalo, elsendoj.filter { it.kanaloSlug == kanalo.slug }.maxByOrNull { it.dato })
             }
             .filter { it.plejNovaElsendo != null }
-        val (aktivaj, arkivaj) = dividuKanalojn(cxiujKanalojKartog, nunaDatumo)
+        val (aktivaj, arkivaj) = dividuKanalojn(ĉiujKanalojKartog, nunaDatumo)
         _aktivajKanaloj.value = aktivaj
         _arkivajKanaloj.value = arkivaj
 
@@ -312,7 +312,7 @@ class HejmoViewModel(
 
     @OptIn(ExperimentalTime::class)
     private fun aktualigiuLudatajnInterna() {
-        val elsendoj = cxiujElsendoj
+        val elsendoj = ĉiujElsendoj
         if (elsendoj.isEmpty()) return
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
 
@@ -354,7 +354,7 @@ class HejmoViewModel(
 
 /**
  * Determinas ĉu la donita elsendo nun ludas aŭ paŭzas, surbaze de la ludanto-stato.
- * Redonas (ludas, pauxzita).
+ * Redonas (ludas, paŭzita).
  */
 private fun elsendoLudas(elsendoId: String, stato: LudantoInformo): Pair<Boolean, Boolean> {
     val fonto = stato.nunaFonto
@@ -369,7 +369,7 @@ private fun elsendoLudas(elsendoId: String, stato: LudantoInformo): Pair<Boolean
 
 
 /**
- * Nova hejmekrano laux Figma-dizajno "Muzaiko — Antonia".
+ * Nova hejmekrano laŭ Figma-dizajno "Muzaiko — Antonia".
  *
  * Horizontalaj rulantaj sekcioj:
  * - "Kio novas" — novaj elsendoj de ĉiuj kanaloj (horizontala LazyRow de kartoj)
@@ -392,12 +392,12 @@ fun HejmoEkrano(
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
     onAgordoj: () -> Unit = {},
-    onElshutoj: () -> Unit = {},
+    onElŝutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
-    onKasxuHejmajnAvertojn: () -> Unit = {},
+    onKaŝuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
-    kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
-    onElshuti: (Elsendo) -> Unit = {},
+    kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
+    onElŝuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
@@ -410,10 +410,10 @@ fun HejmoEkrano(
     val lastatempeLudataj by vm.lastatempeLudataj.collectAsState()
     val aktivajKanaloj by vm.aktivajKanaloj.collectAsState()
     val arkivajKanaloj by vm.arkivajKanaloj.collectAsState()
-    val sxargxas by vm.sxargxas.collectAsState()
+    val ŝargas by vm.ŝargas.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
-    val kasxitaj by kasxitajAvertoj.collectAsState()
-    val neKasxitajProblemoj = problemoj.filter { it.tipo !in kasxitaj }
+    val kaŝitaj by kaŝitajAvertoj.collectAsState()
+    val neKaŝitajProblemoj = problemoj.filter { it.tipo !in kaŝitaj }
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
 
@@ -432,18 +432,18 @@ fun HejmoEkrano(
 
     // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
     val luditajVicoStato = rememberLazyListState()
-    var antauxaUnuaLudataId by remember { mutableStateOf<String?>(null) }
+    var antaŭaUnuaLudataId by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(lastatempeLudataj) {
         val unuaId = lastatempeLudataj.firstOrNull()?.id
-        if (unuaId != null && unuaId != antauxaUnuaLudataId) {
-            antauxaUnuaLudataId = unuaId
+        if (unuaId != null && unuaId != antaŭaUnuaLudataId) {
+            antaŭaUnuaLudataId = unuaId
             luditajVicoStato.animateScrollToItem(0)
         }
     }
 
     if (viewModel == null) {
         LaunchedEffect(Unit) {
-            vm.sxargxi()
+            vm.ŝargi()
         }
     }
 
@@ -464,7 +464,7 @@ fun HejmoEkrano(
             montruTekston = kalkuliAĝon(elsendo.dato),
             ludilo = ludilo,
             onLudi = onLudi,
-            onElshuti = { onElshuti(elsendo) },
+            onElŝuti = { onElŝuti(elsendo) },
             onAldoniAlVico = { onAldoniAlVico(elsendo) },
             onClick = { logi("Klako", "kanalo ${kanto.kanalo.slug}"); onKanalo(kanto.kanalo) },
         )
@@ -480,7 +480,7 @@ fun HejmoEkrano(
                 navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElshutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
+                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }
@@ -495,7 +495,7 @@ fun HejmoEkrano(
             // La tirkesto kaj la ombreco vivas SUB la supra breto
             modifier = Modifier.padding(padding),
         ) {
-        if (sxargxas && novajElsendoj.isEmpty()) {
+        if (ŝargas && novajElsendoj.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -506,8 +506,8 @@ fun HejmoEkrano(
                 }
             }
         } else PullToRefreshBox(
-            isRefreshing = sxargxas,
-            onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); vm.sxargxi(fortoRefresigi = true) },
+            isRefreshing = ŝargas,
+            onRefresh = { logi("Klako", "malsupren-tiro (Hejmo)"); vm.ŝargi(fortoRefresigi = true) },
             modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(
@@ -516,13 +516,13 @@ fun HejmoEkrano(
             ) {
 
                 // Avertosigno pri detektitaj problemoj
-                if (neKasxitajProblemoj.isNotEmpty()) {
+                if (neKaŝitajProblemoj.isNotEmpty()) {
                     item {
                         DiagnozoAvertoKarto(
-                            problemoj = neKasxitajProblemoj,
+                            problemoj = neKaŝitajProblemoj,
                             onAgordoj = onAgordoj,
-                            onKasxu = {
-                                onKasxuHejmajnAvertojn()
+                            onKaŝu = {
+                                onKaŝuHejmajnAvertojn()
                                 // Montru kiel trovi la kaŝitan averton poste
                                 amplekso.launch {
                                     snackbarStato.showSnackbar(
@@ -581,7 +581,7 @@ fun HejmoEkrano(
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
                                     ludilo = ludilo,
                                     onLudi = onLudi,
-                                    onElshuti = { onElshuti(elsendo) },
+                                    onElŝuti = { onElŝuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
@@ -609,7 +609,7 @@ fun HejmoEkrano(
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
                                     ludilo = ludilo,
                                     onLudi = onLudi,
-                                    onElshuti = { onElshuti(elsendo) },
+                                    onElŝuti = { onElŝuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
@@ -637,7 +637,7 @@ fun HejmoEkrano(
                                     montruTekston = montruTekston(elsendo, ludatojMapo[elsendo.id]),
                                     ludilo = ludilo,
                                     onLudi = onLudi,
-                                    onElshuti = { onElshuti(elsendo) },
+                                    onElŝuti = { onElŝuti(elsendo) },
                                     onAldoniAlVico = { onAldoniAlVico(elsendo) },
                                     onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) },
                                 )
@@ -718,13 +718,13 @@ private fun ArkivoDividilo() {
 }
 
 /** Ludo/paŭzo-logiko por specifa elsendo. */
-private fun ludiAuxPauxzigi(
-    elsendo: Elsendo, ludas: Boolean, pauxzita: Boolean,
+private fun ludiAŭPaŭzigi(
+    elsendo: Elsendo, ludas: Boolean, paŭzita: Boolean,
     ludilo: LudiloRegilo?, onLudi: (Elsendo) -> Unit,
 ) {
     when {
-        ludas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.pauxzigi() }
-        pauxzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() }
+        ludas -> { logi("Klako", "paŭzigi — ${elsendo.id}"); ludilo?.paŭzigi() }
+        paŭzita -> { logi("Klako", "daŭrigi — ${elsendo.id}"); ludilo?.ludi() }
         else -> { logi("Klako", "ludi — ${elsendo.id}"); onLudi(elsendo) }
     }
 }
@@ -737,13 +737,13 @@ private fun ElsendoKarto(
     montruTekston: String? = null,
     ludilo: LudiloRegilo? = null,
     onLudi: (Elsendo) -> Unit = {},
-    onElshuti: () -> Unit = {},
+    onElŝuti: () -> Unit = {},
     onAldoniAlVico: () -> Unit = {},
 ) {
     val ludantoStato by (ludilo?.stato?.collectAsState() ?: remember { mutableStateOf(LudantoInformo(stato = LudantoStato.Haltita)) })
     val kanaloNomo = kanalo?.nomo ?: elsendo.kanaloSlug
     val bildoUrl = elsendo.bildoUrl ?: kanalo?.emblemoUrl
-    val (ludas, pauxzita) = elsendoLudas(elsendo.id, ludantoStato)
+    val (ludas, paŭzita) = elsendoLudas(elsendo.id, ludantoStato)
     var menuMontrata by remember { mutableStateOf(false) }
 
     Surface(
@@ -821,7 +821,7 @@ private fun ElsendoKarto(
                                 onClick = {
                                     menuMontrata = false
                                     logi("Klako", "elŝuti — ${elsendo.id}")
-                                    onElshuti()
+                                    onElŝuti()
                                 }
                             )
                             DropdownMenuItem(
@@ -842,7 +842,7 @@ private fun ElsendoKarto(
                             .background(Color.Black.copy(alpha = 0.55f))
                             .clickable {
                                 logi("Klako", "ludo-butono — ${elsendo.id}")
-                                ludiAuxPauxzigi(elsendo, ludas, pauxzita, ludilo, onLudi)
+                                ludiAŭPaŭzigi(elsendo, ludas, paŭzita, ludilo, onLudi)
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -893,7 +893,7 @@ private fun ElsendoKartoPreviewLudata() {
         LudantoInformo(
             stato = LudantoStato.Ludas,
             nunaFonto = Sonfonto.ElsendoFonto(pElsendo),
-            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
         )
     )
     pTemo {
@@ -909,12 +909,12 @@ private fun ElsendoKartoPreviewLudata() {
 
 @Preview(name = "ElsendoKarto — paŭzita", showBackground = true, heightDp = 220, widthDp = 170)
 @Composable
-private fun ElsendoKartoPreviewPauxzita() {
+private fun ElsendoKartoPreviewPaŭzita() {
     val ludilo = PreviewLudiloRegilo(
         LudantoInformo(
             stato = LudantoStato.Haltita,
             nunaFonto = Sonfonto.ElsendoFonto(pElsendo),
-            pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+            pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
         )
     )
     pTemo {
@@ -935,7 +935,7 @@ private fun ElsendoKartoPreviewPauxzita() {
 private fun DiagnozoAvertoKarto(
     problemoj: List<DiagnozoRezulto>,
     onAgordoj: () -> Unit,
-    onKasxu: () -> Unit,
+    onKaŝu: () -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -970,7 +970,7 @@ private fun DiagnozoAvertoKarto(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            IconButton(onClick = { logi("Klako", "kaŝu hejmajn avertojn"); onKasxu() }) {
+            IconButton(onClick = { logi("Klako", "kaŝu hejmajn avertojn"); onKaŝu() }) {
                 Icon(
                     Icons.Filled.Close,
                     contentDescription = "Kaŝu avertojn",
@@ -1013,7 +1013,7 @@ fun HejmoEkranoPreview() {
             kanaloDeponejo = pKanaloDeponejo(),
             elsendoDeponejo = pElsendoDeponejo(),
             onLudi = {},
-            onElshuti = {},
+            onElŝuti = {},
             onAldoniAlVico = {},
             viewModel = vm,
         )

@@ -15,11 +15,11 @@ interface ElsendoDeponejo {
     fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>>
     suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean = false): List<Elsendo>
     suspend fun getElsendo(id: String): Elsendo?
-    suspend fun sercxiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun serĉiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
 
     /**
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo>
+    suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo>
 }

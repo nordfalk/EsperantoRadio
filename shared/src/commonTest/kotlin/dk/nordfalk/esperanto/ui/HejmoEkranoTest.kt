@@ -50,16 +50,16 @@ import kotlin.test.assertTrue
  * Uzas falsan ElsendoDeponejo kiu liveras realajn testelsendojn
  * por "Kio novas" kaj "Kio popularas".
  *
- * Datoj estas kalkulitaj dinamike relative al hodiaux por ke la testoj
- * cxiiam validu (ne malnovigxu post 6 monatoj).
+ * Datoj estas kalkulitaj dinamike relative al hodiaŭ por ke la testoj
+ * ĉiiam validu (ne malnoviĝu post 6 monatoj).
  */
 @OptIn(ExperimentalTestApi::class, ExperimentalTime::class)
 class HejmoEkranoTest {
 
-    private val hodiaux = Clock.System.todayIn(TimeZone.UTC)
+    private val hodiaŭ = Clock.System.todayIn(TimeZone.UTC)
 
-    private fun datoAntaux(tagoloj: Int): String =
-        (hodiaux.minus(DatePeriod(days = tagoloj))).toString()
+    private fun datoAntaŭ(tagoloj: Int): String =
+        (hodiaŭ.minus(DatePeriod(days = tagoloj))).toString()
 
     private val testKanaloj = listOf(
         Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://x.com/m.m3u8"),
@@ -68,13 +68,13 @@ class HejmoEkranoTest {
     )
 
     private val testElsendoj = listOf(
-        Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaux(5)),
-        Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaux(12)),
-        Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaux(3)),
-        Elsendo(id = "vv:2", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", fluo = "", dato = datoAntaux(17)),
+        Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaŭ(5)),
+        Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaŭ(12)),
+        Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaŭ(3)),
+        Elsendo(id = "vv:2", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", fluo = "", dato = datoAntaŭ(17)),
         // Malnovaj elsendoj (>6 monatoj) — ne aperas en "Kio novas", nur en "Kio popularas"
-        Elsendo(id = "kp:malnova", kanaloSlug = "kernpunkto", titolo = "Kernpunkto malnova", fluo = "", dato = datoAntaux(200)),
-        Elsendo(id = "vv:malnova", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento malnova", fluo = "", dato = datoAntaux(220)),
+        Elsendo(id = "kp:malnova", kanaloSlug = "kernpunkto", titolo = "Kernpunkto malnova", fluo = "", dato = datoAntaŭ(200)),
+        Elsendo(id = "vv:malnova", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento malnova", fluo = "", dato = datoAntaŭ(220)),
     )
 
     private fun falsaKanaloDeponejo(kanaloj: List<Kanalo> = testKanaloj) = object : KanaloDeponejo {
@@ -84,8 +84,8 @@ class HejmoEkranoTest {
         override suspend fun getKanalo(slug: String) = f.value.find { it.slug == slug }
     }
 
-    /** Registras la `fortoRefresigi`-parametron de ĉiu voko al sxargxiElsendojnPorKanal. */
-    private val refresxigoVokoj = mutableListOf<Boolean>()
+    /** Registras la `fortoRefresigi`-parametron de ĉiu voko al ŝargiElsendojnPorKanal. */
+    private val refreŝigoVokoj = mutableListOf<Boolean>()
 
     private fun falsaElsendoDeponejo(elsendoj: List<Elsendo> = testElsendoj) = object : ElsendoDeponejo {
         override fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>> =
@@ -96,17 +96,17 @@ class HejmoEkranoTest {
 
         override suspend fun getElsendo(id: String): Elsendo? = elsendoj.find { it.id == id }
 
-        override suspend fun sercxiElsendojn(teksto: String, limo: Int): List<Elsendo> =
+        override suspend fun serĉiElsendojn(teksto: String, limo: Int): List<Elsendo> =
             elsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
 
-        override suspend fun sxargxiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
-            refresxigoVokoj += fortoRefresigi
+        override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> {
+            refreŝigoVokoj += fortoRefresigi
             return elsendoj.filter { it.kanaloSlug == kanalo.slug }
         }
     }
 
     @Test
-    fun malsuprenTiroRefresxigasKunForto() = runComposeUiTest {
+    fun malsuprenTiroRefreŝigasKunForto() = runComposeUiTest {
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(),
@@ -117,14 +117,14 @@ class HejmoEkranoTest {
         // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
         waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
         // Unua ŝargo: 2 podkastaj kanaloj, sen forto
-        assertEquals(listOf(false, false), refresxigoVokoj)
+        assertEquals(listOf(false, false), refreŝigoVokoj)
 
         // Tiru de la supro de la listo ĝis la fundo (la sojlo estas ~80dp post rezisto)
         onRoot().performTouchInput { swipeDown(startY = top + height * 0.2f, endY = bottom) }
         waitForIdle()
-        waitUntil(timeoutMillis = 5_000) { refresxigoVokoj.size >= 3 }
-        assertTrue(refresxigoVokoj.drop(2).isNotEmpty(), "Malsupren-tiro ne ekigis refreŝigon: $refresxigoVokoj")
-        assertTrue(refresxigoVokoj.drop(2).all { it }, "Refreŝigo devas uzi fortoRefresigi=true: $refresxigoVokoj")
+        waitUntil(timeoutMillis = 5_000) { refreŝigoVokoj.size >= 3 }
+        assertTrue(refreŝigoVokoj.drop(2).isNotEmpty(), "Malsupren-tiro ne ekigis refreŝigon: $refreŝigoVokoj")
+        assertTrue(refreŝigoVokoj.drop(2).all { it }, "Refreŝigo devas uzi fortoRefresigi=true: $refreŝigoVokoj")
     }
 
     @Test
@@ -216,11 +216,11 @@ class HejmoEkranoTest {
             Kanalo(slug = "antikva", nomo = "Antikva Kanalo", podkastaRssUrl = "https://x.com/a.rss"),
         )
         val elsendoj = listOf(
-            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaux(5)),
+            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaŭ(5)),
             // Antaŭ 200 tagoj: pli aĝa ol 6 monatoj (ne en "Kio novas"), sed ene de unu jaro (aktiva)
-            Elsendo(id = "meznova:1", kanaloSlug = "meznova", titolo = "Meznova epizodo", fluo = "", dato = datoAntaux(200)),
+            Elsendo(id = "meznova:1", kanaloSlug = "meznova", titolo = "Meznova epizodo", fluo = "", dato = datoAntaŭ(200)),
             // Pli aĝa ol unu jaro: arkiva
-            Elsendo(id = "antikva:1", kanaloSlug = "antikva", titolo = "Antikva epizodo", fluo = "", dato = datoAntaux(400)),
+            Elsendo(id = "antikva:1", kanaloSlug = "antikva", titolo = "Antikva epizodo", fluo = "", dato = datoAntaŭ(400)),
         )
         setContent {
             HejmoEkrano(
@@ -255,11 +255,11 @@ class HejmoEkranoTest {
             Kanalo(slug = "nova", nomo = "Nova Kanalo", podkastaRssUrl = "https://x.com/n.rss"),
         )
         val elsendoj = listOf(
-            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaux(5)),
+            Elsendo(id = "nova:1", kanaloSlug = "nova", titolo = "Nova epizodo", fluo = "", dato = datoAntaŭ(5)),
         )
         // La uzanto aŭskultis 42% de la plej nova elsendo
         val ludatoj = LudatojDeponejoMaketo()
-        runBlocking { ludatoj.registriPozicion("nova:1", "nova", pozicioMs = 252_000, dauroMs = 600_000) }
+        runBlocking { ludatoj.registriPozicion("nova:1", "nova", pozicioMs = 252_000, daŭroMs = 600_000) }
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
@@ -285,13 +285,13 @@ class HejmoEkranoTest {
             Kanalo(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://x.com/v.rss"),
         )
         val elsendoj = listOf(
-            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaux(5)),
-            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaux(12)),
-            Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaux(3)),
+            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaŭ(5)),
+            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaŭ(12)),
+            Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaŭ(3)),
         )
         // La uzanto aŭskultis kp:1
         val ludatoj = LudatojDeponejoMaketo()
-        runBlocking { ludatoj.registriPozicion("kp:1", "kernpunkto", pozicioMs = 252_000, dauroMs = 600_000) }
+        runBlocking { ludatoj.registriPozicion("kp:1", "kernpunkto", pozicioMs = 252_000, daŭroMs = 600_000) }
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
@@ -319,7 +319,7 @@ class HejmoEkranoTest {
         )
         // 7 novaj elsendoj de sama kanalo — nur 5 aperu en "Kio novas"
         val elsendoj = (1..7).map { i ->
-            Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo $i", fluo = "", dato = datoAntaux(i))
+            Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo $i", fluo = "", dato = datoAntaŭ(i))
         }
         setContent {
             HejmoEkrano(
@@ -346,8 +346,8 @@ class HejmoEkranoTest {
     fun nunaLudataRestasEnKioNovasKajAperasEnLastatempeLudata() = runBlocking {
         val kanaloj = listOf(Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"))
         val elsendoj = listOf(
-            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Epizodo 1", fluo = "", dato = datoAntaux(1)),
-            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Epizodo 2", fluo = "", dato = datoAntaux(2)),
+            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Epizodo 1", fluo = "", dato = datoAntaŭ(1)),
+            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Epizodo 2", fluo = "", dato = datoAntaŭ(2)),
         )
         val ludatoj = LudatojDeponejoMaketo()
         val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), ludatoj)
@@ -371,7 +371,7 @@ class HejmoEkranoTest {
         val kanaloj = listOf(Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://x.com/k.rss"))
         // Sufiĉe multaj elsendoj por ke "Kio popularas" havu kandidatojn
         val elsendoj = (1..12).map { i ->
-            Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Epizodo $i", fluo = "", dato = datoAntaux(i))
+            Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Epizodo $i", fluo = "", dato = datoAntaŭ(i))
         }
         val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), null)
         vm.plenigu(kanaloj, elsendoj)
@@ -392,21 +392,21 @@ class HejmoEkranoTest {
     )
 
     @Test
-    fun avertokartoGvidasAlAgordojKajKasxeblasPerX() = runComposeUiTest {
+    fun avertokartoGvidasAlAgordojKajKaŝeblasPerX() = runComposeUiTest {
         val problemoj = MutableStateFlow(listOf(avertaProblemo()))
-        val kasxitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
+        val kaŝitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
         var agordojKlakoj = 0
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 onAgordoj = { agordojKlakoj++ },
-                onKasxuHejmajnAvertojn = {
+                onKaŝuHejmajnAvertojn = {
                     // simulas la App.kt-dratadon: kaŝi la nunajn problemo-tipojn
-                    kasxitaj.value = problemoj.value.map { it.tipo }.toSet()
+                    kaŝitaj.value = problemoj.value.map { it.tipo }.toSet()
                 },
                 diagnozoProblemoj = problemoj,
-                kasxitajAvertoj = kasxitaj,
+                kaŝitajAvertoj = kaŝitaj,
             )
         }
         waitForIdle()
@@ -431,16 +431,16 @@ class HejmoEkranoTest {
     @Test
     fun avertokartoReaperasKiamNovaProblemoAperas() = runComposeUiTest {
         val problemoj = MutableStateFlow(listOf(avertaProblemo()))
-        val kasxitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
+        val kaŝitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
-                onKasxuHejmajnAvertojn = {
-                    kasxitaj.value = problemoj.value.map { it.tipo }.toSet()
+                onKaŝuHejmajnAvertojn = {
+                    kaŝitaj.value = problemoj.value.map { it.tipo }.toSet()
                 },
                 diagnozoProblemoj = problemoj,
-                kasxitajAvertoj = kasxitaj,
+                kaŝitajAvertoj = kaŝitaj,
             )
         }
         waitForIdle()
@@ -464,13 +464,13 @@ class HejmoEkranoTest {
     }
 
     @Test
-    fun avertokartoNeAperasSeKasxita() = runComposeUiTest {
+    fun avertokartoNeAperasSeKaŝita() = runComposeUiTest {
         setContent {
             HejmoEkrano(
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 diagnozoProblemoj = MutableStateFlow(listOf(avertaProblemo())),
-                kasxitajAvertoj = MutableStateFlow(setOf(DiagnozoTipo.BATERIO_OPTIMIZATION)),
+                kaŝitajAvertoj = MutableStateFlow(setOf(DiagnozoTipo.BATERIO_OPTIMIZATION)),
             )
         }
         waitForIdle()

@@ -16,13 +16,13 @@ actual fun malfermuLigon(url: String) {
     }
 }
 
-actual fun malfermuRetposhton(retposhto: String, temo: String, teksto: String) {
-    logi("Ligilo", "Malfermas retpoŝton al: $retposhto")
+actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
+    logi("Ligilo", "Malfermas retpoŝton al: $retpoŝto")
     try {
         // Enkodu temon kaj tekston en la mailto-URI — pli fidinde ol EXTRA_* kiujn
         // multaj retpoŝto-programoj ignoras ĉe ACTION_SENDTO.
         val uri = Uri.parse(
-            "mailto:" + Uri.encode(retposhto) +
+            "mailto:" + Uri.encode(retpoŝto) +
             "?subject=" + Uri.encode(temo) +
             "&body=" + Uri.encode(teksto)
         )

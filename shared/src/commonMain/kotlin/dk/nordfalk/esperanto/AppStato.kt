@@ -5,25 +5,25 @@ import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
+import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKaŝo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.ApajNovajxojDeponejo
+import dk.nordfalk.esperanto.data.repository.ApajNovaĵojDeponejo
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
-import dk.nordfalk.esperanto.data.repository.SercxoDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.SerĉoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
-import dk.nordfalk.esperanto.data.repository.kreuElshutDeponejo
+import dk.nordfalk.esperanto.data.repository.kreuElŝutDeponejo
 import dk.nordfalk.esperanto.domain.DiagnozoRegilo
 import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
-import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.ui.HejmoViewModel
 import dk.nordfalk.esperanto.ui.KanalaroViewModel
 import dk.nordfalk.esperanto.ui.KanaloViewModel
@@ -68,9 +68,9 @@ object AppStato {
         private set
     var plejŝatatajDeponejo: PersistantaPlejŝatatajDeponejo? = null
         private set
-    var sercxoDeponejo: SercxoDeponejoImpl? = null
+    var serĉoDeponejo: SerĉoDeponejoImpl? = null
         private set
-    var elshutDeponejo: ElshutDeponejo? = null
+    var elŝutDeponejo: ElŝutDeponejo? = null
         private set
     var alarmoDeponejo: PersistantaAlarmoDeponejo? = null
         private set
@@ -80,7 +80,7 @@ object AppStato {
         private set
     var diagnozoRegilo: DiagnozoRegilo? = null
         private set
-    var apajNovajxojDeponejo: ApajNovajxojDeponejo? = null
+    var apajNovaĵojDeponejo: ApajNovaĵojDeponejo? = null
         private set
 
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
@@ -99,11 +99,11 @@ object AppStato {
     suspend fun trovuAlarmElsendon(kanalo: Kanalo): Elsendo? {
         val elsendoDeponejo = elsendoDeponejo
             ?: return null.also { logw("AppStato", "Ne inicialigita — ne povas trovi elsendon por alarmo") }
-        val elsendoj = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi = true)
-            .ifEmpty { elsendoDeponejo.leguKashitajnElsendojn(kanalo) ?: emptyList() }
+        val elsendoj = elsendoDeponejo.ŝargiElsendojn(kanalo, fortoRefresigi = true)
+            .ifEmpty { elsendoDeponejo.leguKaŝitajnElsendojn(kanalo) ?: emptyList() }
             .ifEmpty {
-                elshutDeponejo?.observiElshutojn()?.value?.values
-                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElshutStato.Preta }
+                elŝutDeponejo?.observiElŝutojn()?.value?.values
+                    ?.filter { it.elsendo.kanaloSlug == kanalo.slug && it.stato is ElŝutStato.Preta }
                     ?.map { it.elsendo } ?: emptyList()
             }
         val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
@@ -115,7 +115,7 @@ object AppStato {
      *
      * @param ludilo la ludilo-regilo (platform-specifa, transdonita de la enirpunkto)
      * @param settings platform-specifaj agordoj (SharedPreferences / Preferences)
-     * @param agordojDeponejo la agordoj-deponejo (necesas por auxtomataDaurigo-fluo)
+     * @param agordojDeponejo la agordoj-deponejo (necesas por aŭtomataDaŭrigo-fluo)
      */
     fun inicialigu(
         ludilo: LudiloRegilo,
@@ -144,27 +144,27 @@ object AppStato {
             bundledTeksto = ::leguBundledKanalkonfiguron
         )
 
-        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKasho(settings)))
+        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)))
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
         // Legu kanalkonfiguron unufoje — por defaŭltaj ŝatataj kaj alarm-sugestoj
         val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
-        val defaltajSxatataj = agordo.kanaloj
-            .filter { it.defaltSxatata }
+        val defaŭltajŜatataj = agordo.kanaloj
+            .filter { it.defaŭltŜatata }
             .map { it.kodo }
             .toSet()
-        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings, defaltajSxatataj)
+        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings, defaŭltajŜatataj)
 
-        sercxoDeponejo = SercxoDeponejoImpl(elsendoDeponejo!!)
+        serĉoDeponejo = SerĉoDeponejoImpl(elsendoDeponejo!!)
 
-        elshutDeponejo = kreuElshutDeponejo(httpKliento!!)
+        elŝutDeponejo = kreuElŝutDeponejo(httpKliento!!)
 
         val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
         alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
-        apajNovajxojDeponejo = ApajNovajxojDeponejo(settings, agordo.android?.apajNovajxoj)
+        apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj)
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 
@@ -176,8 +176,8 @@ object AppStato {
             kanaloDeponejo = kanaloDeponejo!!,
             plejŝatatajDeponejo = plejŝatatajDeponejo!!,
             ludatojDeponejo = ludatojDeponejo!!,
-            getLokaDosieroVojo = { id -> elshutDeponejo!!.getLokaDosieroVojo(id) },
-            auxtomataDaurigo = agordojDeponejo.auxtomataDaurigo,
+            getLokaDosieroVojo = { id -> elŝutDeponejo!!.getLokaDosieroVojo(id) },
+            aŭtomataDaŭrigo = agordojDeponejo.aŭtomataDaŭrigo,
         )
 
         diagnozoRegilo = kreuDiagnozoRegilon()
@@ -196,7 +196,7 @@ object AppStato {
         CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
             try {
                 val rezultoj = diagnozoRegilo?.kontroliRapide() ?: return@launch
-                agordojDeponejo.puriguKasxitajnAvertojn(rezultoj.map { it.tipo }.toSet())
+                agordojDeponejo.puriguKaŝitajnAvertojn(rezultoj.map { it.tipo }.toSet())
             } catch (e: Exception) {
                 logw("AppStato", "Malsukcesis kontroli diagnozon", e)
             }
@@ -215,13 +215,13 @@ object AppStato {
         kanalaroViewModel = null
         hejmoViewModel = null
         plejŝatatajDeponejo = null
-        sercxoDeponejo = null
-        elshutDeponejo = null
+        serĉoDeponejo = null
+        elŝutDeponejo = null
         alarmoDeponejo = null
         ludatojDeponejo = null
         ludvicoRegilo = null
         diagnozoRegilo = null
-        apajNovajxojDeponejo = null
+        apajNovaĵojDeponejo = null
         kanaloViewModelj.clear()
     }
 }

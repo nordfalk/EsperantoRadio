@@ -46,8 +46,8 @@ class ModelojTest {
             emblemoUrl = "https://esperanto-radio.com/_muzaiko.png",
             rektaElsendaSonoUrl = "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
             elsendojRssUrl = "https://javabog.dk/privat/muzaiko_malplena_podkasto.rss",
-            hejmpaghoButono = "https://muzaiko.info/",
-            retposhto = "info@muzaiko.info",
+            hejmpaĝoButono = "https://muzaiko.info/",
+            retpoŝto = "info@muzaiko.info",
             elsendojRssIgnoruTitolon = true,
             montruTitolojn = false,
         )
@@ -60,7 +60,7 @@ class ModelojTest {
         assertEquals("https://fluo.muzaiko.info/hls/muzaiko/live.m3u8", kanalo.rektaElsendaSonoUrl)
         assertEquals("https://javabog.dk/privat/muzaiko_malplena_podkasto.rss", kanalo.podkastaRssUrl)
         assertEquals("https://muzaiko.info/", kanalo.retejoUrl)
-        assertEquals("info@muzaiko.info", kanalo.retposhto)
+        assertEquals("info@muzaiko.info", kanalo.retpoŝto)
         assertTrue(kanalo.ignoruTitolon)
         assertFalse(kanalo.montruTitolojn)
         assertTrue(kanalo.estasRekta)
@@ -86,10 +86,10 @@ class ModelojTest {
             titolo = "KP204 Pigmentoj",
             fluo = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
             dato = "2022-11-09",
-            dauro = 6916,
+            daŭro = 6916,
         )
         assertEquals("kernpunkto:2022-11-09", elsendo.id)
-        assertEquals(6916, elsendo.dauro)
+        assertEquals(6916, elsendo.daŭro)
         assertFalse(elsendo.estasRekta)
     }
 
@@ -117,45 +117,45 @@ class ModelojTest {
     }
 
     @Test
-    fun elshutStatoNeElshutita() {
-        val stato = ElshutStato.NeElshutita
-        assertTrue(stato is ElshutStato.NeElshutita)
+    fun elŝutStatoNeElŝutita() {
+        val stato = ElŝutStato.NeElŝutita
+        assertTrue(stato is ElŝutStato.NeElŝutita)
     }
 
     @Test
-    fun elshutStatoElshutanta() {
-        val stato = ElshutStato.Elshutanta(0.5f, 500L, 1000L)
-        assertTrue(stato is ElshutStato.Elshutanta)
+    fun elŝutStatoElŝutanta() {
+        val stato = ElŝutStato.Elŝutanta(0.5f, 500L, 1000L)
+        assertTrue(stato is ElŝutStato.Elŝutanta)
         assertEquals(0.5f, stato.progreso)
-        assertEquals(500L, stato.elshutitajBitokoj)
+        assertEquals(500L, stato.elŝutitajBitokoj)
         assertEquals(1000L, stato.totalajBitokoj)
     }
 
     @Test
-    fun elshutStatoPreta() {
-        val stato = ElshutStato.Preta
-        assertTrue(stato is ElshutStato.Preta)
+    fun elŝutStatoPreta() {
+        val stato = ElŝutStato.Preta
+        assertTrue(stato is ElŝutStato.Preta)
     }
 
     @Test
-    fun elshutStatoEraro() {
-        val stato = ElshutStato.Eraro("HTTP 404")
-        assertTrue(stato is ElshutStato.Eraro)
-        assertEquals("HTTP 404", stato.mesagho)
+    fun elŝutStatoEraro() {
+        val stato = ElŝutStato.Eraro("HTTP 404")
+        assertTrue(stato is ElŝutStato.Eraro)
+        assertEquals("HTTP 404", stato.mesaĝo)
     }
 
     @Test
-    fun elshutStatoPauxzita() {
-        val stato = ElshutStato.Pauxzita
-        assertTrue(stato is ElshutStato.Pauxzita)
+    fun elŝutStatoPaŭzita() {
+        val stato = ElŝutStato.Paŭzita
+        assertTrue(stato is ElŝutStato.Paŭzita)
     }
 
     @Test
-    fun elshutitaElsendoKampoj() {
+    fun elŝutitaElsendoKampoj() {
         val elsendo = Elsendo(id = "x", kanaloSlug = "y", titolo = "t", fluo = "s", dato = "2024-01-01")
-        val elshutita = ElshutitaElsendo(elsendo, "/tmp/x.mp3", ElshutStato.Preta)
-        assertEquals("x", elshutita.elsendo.id)
-        assertEquals("/tmp/x.mp3", elshutita.dosieroVojo)
-        assertTrue(elshutita.stato is ElshutStato.Preta)
+        val elŝutita = ElŝutitaElsendo(elsendo, "/tmp/x.mp3", ElŝutStato.Preta)
+        assertEquals("x", elŝutita.elsendo.id)
+        assertEquals("/tmp/x.mp3", elŝutita.dosieroVojo)
+        assertTrue(elŝutita.stato is ElŝutStato.Preta)
     }
 }

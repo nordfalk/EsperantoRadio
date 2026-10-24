@@ -26,7 +26,7 @@ class AgordojDetalaProtokoladoTest {
     }
 
     @Test
-    fun defauxlteSxaltitaKajFlagoSinkronigita() {
+    fun defaŭlteŜaltitaKajFlagoSinkronigita() {
         protokoloDetala = false
         val deponejo = AgordojDeponejoImpl(settings)
         assertTrue(deponejo.detalaProtokolado.value)
@@ -34,7 +34,7 @@ class AgordojDetalaProtokoladoTest {
     }
 
     @Test
-    fun fiksiSxaltasPersistasKajSinkronigas() {
+    fun fiksiŜaltasPersistasKajSinkronigas() {
         protokoloDetala = false
         val deponejo = AgordojDeponejoImpl(settings)
         deponejo.fiksiDetalanProtokoladon(true)

@@ -26,10 +26,10 @@ interface LudiloRegilo {
 
     suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long = 0)
     fun ludi()
-    fun pauxzigi()
+    fun paŭzigi()
     fun halti()
     fun saltiAl(pozicioMs: Long)
-    fun fiksiLauxtecon(volumeno: Float)
+    fun fiksiLaŭtecon(volumeno: Float)
 
     /**
      * La nuna laŭteco (0 = mutigita … 1 = maksimume), kiun la laŭteco-regilo
@@ -38,7 +38,7 @@ interface LudiloRegilo {
      *   malnova apo — enketata ĉiun sekundon, do la montrilo sekvas la hardvarajn klavojn
      * - aliaj platformoj: la laŭteco de la ludilo mem (HTMLAudioElement.volume ktp.)
      */
-    val lauxteco: StateFlow<Float>
+    val laŭteco: StateFlow<Float>
 }
 
 /**
@@ -48,7 +48,7 @@ interface LudiloRegilo {
  * - wasmJs: WasmJsLudiloRegilo (HTMLAudioElement)
  * - iOS: NoOpLudiloRegilo (estonte: AVPlayer)
  */
-expect fun kreuDefauxltanLudiloRegilon(): LudiloRegilo
+expect fun kreuDefaŭltanLudiloRegilon(): LudiloRegilo
 
 /**
  * Haltigas la rezervan (fallback) alarm-sonon, se ĝi aktivas.
@@ -71,24 +71,24 @@ expect fun haltuAlarmRingon()
 class NoOpLudiloRegilo : LudiloRegilo {
     private val _stato = MutableStateFlow(LudantoInformo(stato = LudantoStato.Haltita))
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-    private val _lauxteco = MutableStateFlow(1f)
-    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
+    private val _laŭteco = MutableStateFlow(1f)
+    override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(
             stato = LudantoStato.Haltita,
             nunaFonto = fonto,
             pozicioMs = komencoPozicioMs,
-            dauroMs = 0,
+            daŭroMs = 0,
             estasRekta = fonto is Sonfonto.RektaKanalo,
         )
     }
 
     override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
-    override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+    override fun paŭzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) { _lauxteco.value = volumeno.coerceIn(0f, 1f) }
+    override fun fiksiLaŭtecon(volumeno: Float) { _laŭteco.value = volumeno.coerceIn(0f, 1f) }
 
     /**
      * Simulas naturfinon de la ludado — metas staton al Finita.
@@ -102,15 +102,15 @@ class NoOpLudiloRegilo : LudiloRegilo {
      * Simulas pozicio-ŝanĝon — ŝajnigas ke la ludado progresis.
      * Uzata en testoj.
      */
-    fun simuluPozicion(pozicioMs: Long, dauroMs: Long = 0) {
-        _stato.value = _stato.value.copy(pozicioMs = pozicioMs, dauroMs = dauroMs)
+    fun simuluPozicion(pozicioMs: Long, daŭroMs: Long = 0) {
+        _stato.value = _stato.value.copy(pozicioMs = pozicioMs, daŭroMs = daŭroMs)
     }
 
     /**
      * Simulas ludantan eraron — metas staton al Eraro.
      * Uzata en testoj.
      */
-    fun simuluEraron(mesagho: String = "Testa eraro", reprovebla: Boolean = false) {
-        _stato.value = _stato.value.copy(stato = LudantoStato.Eraro(mesagho, reprovebla))
+    fun simuluEraron(mesaĝo: String = "Testa eraro", reprovebla: Boolean = false) {
+        _stato.value = _stato.value.copy(stato = LudantoStato.Eraro(mesaĝo, reprovebla))
     }
 }

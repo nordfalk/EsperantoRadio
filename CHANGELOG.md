@@ -3,7 +3,7 @@
 Ĉiuj rimarkindaj, uzantvideblaj ŝanĝoj de EsperantoRadio.
 
 Unu linio po ŝanĝo: konciza priskribo + ligilo al la PR. Sen teknikaj detaloj —
-tiuj staras en [`SXANGXOJ.md`](SXANGXOJ.md) kaj en la PR-priskriboj.
+tiuj staras en [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj en la PR-priskriboj.
 La versioj sekvas `apoversio` en [`gradle/libs.versions.toml`](gradle/libs.versions.toml);
 la formato estas [Keep a Changelog](https://keepachangelog.com/1.1.0/) kun
 kategorioj **Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**, **Sekureco**.
@@ -13,6 +13,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 [`fresxa_versio`](https://github.com/nordfalk/EsperantoRadio/releases/tag/fresxa_versio).
 
 ## [Neeldonita]
+
+## [3.0.4-beta24okt] - 2026-10-24
 
 ### Aldonita
 
@@ -159,6 +161,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.0.4-beta24okt]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.0.4-beta24okt
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master

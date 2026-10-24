@@ -13,9 +13,9 @@ import kotlinx.serialization.Serializable
  * @param id unika identigilo
  * @param horo horo (0-23)
  * @param minuto minuto (0-59)
- * @param ripeto bitmasko: 0x01=lundo ... 0x40=dimanĉo, 0x7f=cxiutage, 0x00=unufoje
+ * @param ripeto bitmasko: 0x01=lundo ... 0x40=dimanĉo, 0x7f=ĉiutage, 0x00=unufoje
  * @param kanaloSlug kanalo-slugo por ludi
- * @param aktiva cxu la alarmo estas sxaltita
+ * @param aktiva ĉu la alarmo estas ŝaltita
  * @param etikedo vidiga nomo (opcia)
  */
 @Serializable
@@ -74,7 +74,7 @@ fun Alarmo.sekvaEkigo(nun: LocalDateTime): LocalDateTime {
     // (PR #95) koercu — korupta agordo (ekz. horo=99 el mana JSON-redakto) devas
     // ne kraŝi la skedadon (LocalTime ĵetas IllegalArgumentException). La validigo
     // de NOVAJ alarmoj okazas en parsuSugestojnPorAlarmoj kaj AlarmoEkrano; tio ĉi
-    // estas la krash-defendo por jam persistintaj valoroj.
+    // estas la kraŝo-defendo por jam persistintaj valoroj.
     val tempo = LocalTime(horo.coerceIn(0, 23), minuto.coerceIn(0, 59))
     val sekuraRipeto = ripeto and 0x7f
     for (i in 0..7) {

@@ -66,7 +66,7 @@ class LudiElsendoReceivilo : BroadcastReceiver() {
                 runCatching { setArtworkUri(android.net.Uri.parse(it)) }
             }
             setExtras(Bundle().apply {
-                putString(SonfontoKodilo.SXLOSILO, SonfontoKodilo.kodigu(Sonfonto.ElsendoFonto(elsendo)))
+                putString(SonfontoKodilo.ŜLOSILO, SonfontoKodilo.kodigu(Sonfonto.ElsendoFonto(elsendo)))
             })
         }.build()
 

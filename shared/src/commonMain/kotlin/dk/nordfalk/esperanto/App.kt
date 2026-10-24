@@ -30,12 +30,12 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.savedstate.serialization.SavedStateConfiguration
 import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.ghisdatiguSciigSkedon
+import dk.nordfalk.esperanto.data.repository.ĝisdatiguSciigSkedon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
-import dk.nordfalk.esperanto.domain.player.kreuDefauxltanLudiloRegilon
+import dk.nordfalk.esperanto.domain.player.kreuDefaŭltanLudiloRegilon
 import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
 import io.sentry.kotlin.multiplatform.Sentry
@@ -57,8 +57,8 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.Hejmo::class, Vojo.Hejmo.serializer())
             subclass(Vojo.Kanalaro::class, Vojo.Kanalaro.serializer())
             subclass(Vojo.Plejŝatataj::class, Vojo.Plejŝatataj.serializer())
-            subclass(Vojo.Sercxo::class, Vojo.Sercxo.serializer())
-            subclass(Vojo.Elshutoj::class, Vojo.Elshutoj.serializer())
+            subclass(Vojo.Serĉo::class, Vojo.Serĉo.serializer())
+            subclass(Vojo.Elŝutoj::class, Vojo.Elŝutoj.serializer())
             subclass(Vojo.Ludvico::class, Vojo.Ludvico.serializer())
             subclass(Vojo.Alarmoj::class, Vojo.Alarmoj.serializer())
             subclass(Vojo.Agordoj::class, Vojo.Agordoj.serializer())
@@ -72,7 +72,7 @@ private val navConfig = SavedStateConfiguration {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EsperantoRadioApp(
-    ludilo: LudiloRegilo = kreuDefauxltanLudiloRegilon(),
+    ludilo: LudiloRegilo = kreuDefaŭltanLudiloRegilon(),
 ) {
     val malhela = androidx.compose.foundation.isSystemInDarkTheme()
     val settings = remember { kreuSettings() }
@@ -92,13 +92,13 @@ fun EsperantoRadioApp(
         val elsendoDeponejo = AppStato.elsendoDeponejo!!
         val kanalaroViewModel = AppStato.kanalaroViewModel!!
         val plejŝatatajDeponejo = AppStato.plejŝatatajDeponejo!!
-        val sercxoDeponejo = AppStato.sercxoDeponejo!!
-        val elshutDeponejo = AppStato.elshutDeponejo!!
+        val serĉoDeponejo = AppStato.serĉoDeponejo!!
+        val elŝutDeponejo = AppStato.elŝutDeponejo!!
         val alarmoDeponejo = AppStato.alarmoDeponejo!!
         val ludatojDeponejo = AppStato.ludatojDeponejo!!
         val ludvicoRegilo = AppStato.ludvicoRegilo!!
         val diagnozoRegilo = AppStato.diagnozoRegilo!!
-        val apajNovajxojDeponejo = AppStato.apajNovajxojDeponejo!!
+        val apajNovaĵojDeponejo = AppStato.apajNovaĵojDeponejo!!
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) { ludvicoRegilo.komenci() }
@@ -150,16 +150,16 @@ fun EsperantoRadioApp(
         val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
         val sciigoj by agordojDeponejo.sciigoj.collectAsState()
         LaunchedEffect(plejŝatataj, sciigoj) {
-            ghisdatiguSciigSkedon(plejŝatataj, sciigoj)
+            ĝisdatiguSciigSkedon(plejŝatataj, sciigoj)
         }
 
         // Observi pending elsendo-navigadon (de sciigo-klako)
         val pendingElsendo by dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.elsendo.collectAsState()
 
         fun switchTab(vojo: Vojo) {
-            val antauxa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
+            val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ tab: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo::class.simpleName ?: "?"))
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
             backStack.clear()
             backStack.add(Vojo.Hejmo)
             if (vojo !is Vojo.Hejmo) backStack.add(vojo)
@@ -172,9 +172,9 @@ fun EsperantoRadioApp(
                 logi("Nav", "→ push preterlasita (jam supre): $vojo")
                 return
             }
-            val antauxa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
+            val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ push: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antauxa, vojo::class.simpleName ?: "?"))
+            Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
             backStack.add(vojo)
         }
 
@@ -194,14 +194,14 @@ fun EsperantoRadioApp(
         // Flankaj ekranoj (dua nivelo) estas tutekranoj sen mini-ludilbreto —
         // unueca modelo por Agordoj, Alarmoj, Elŝutoj, Ludvico kaj Diagnozo
         fun estasFlankaEkrano(vojo: Any?) = vojo is Vojo.Agordoj ||
-            vojo is Vojo.Alarmoj || vojo is Vojo.Elshutoj ||
+            vojo is Vojo.Alarmoj || vojo is Vojo.Elŝutoj ||
             vojo is Vojo.Ludvico || vojo is Vojo.Diagnozo
 
         val montruMiniLudilbreton = !estasFlankaEkrano(nunaVojo)
 
-        fun estasCxefaEkrano(vojo: Any?) =
+        fun estasĈefaEkrano(vojo: Any?) =
             vojo is Vojo.Hejmo || vojo is Vojo.Kanalaro ||
-            vojo is Vojo.Plejŝatataj || vojo is Vojo.Sercxo
+            vojo is Vojo.Plejŝatataj || vojo is Vojo.Serĉo
 
         // Ĉiuj tirkest-eroj kondutas kiel supranivelaj celoj: la stako rekomenciĝas
         // je [Hejmo, elektita vojo], reen-gesto revenas al Hejmo.
@@ -227,7 +227,7 @@ fun EsperantoRadioApp(
                     backStack = backStack,
                     onBack = { reen() },
                     transitionSpec = {
-                        if (estasCxefaEkrano(initialState.key) && estasCxefaEkrano(targetState.key)) {
+                        if (estasĈefaEkrano(initialState.key) && estasĈefaEkrano(targetState.key)) {
                             // langet-ŝanĝo: subtila fade-through
                             fadeIn(tween(200)) togetherWith fadeOut(tween(90))
                         } else {
@@ -237,7 +237,7 @@ fun EsperantoRadioApp(
                         }
                     },
                     popTransitionSpec = {
-                        if (estasCxefaEkrano(initialState.key) && estasCxefaEkrano(targetState.key)) {
+                        if (estasĈefaEkrano(initialState.key) && estasĈefaEkrano(targetState.key)) {
                             fadeIn(tween(200)) togetherWith fadeOut(tween(90))
                         } else {
                             // reenigo: detala ekrano glitas reen dekstren
@@ -260,17 +260,17 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
                                 },
                                 onAgordoj = { push(Vojo.Agordoj) },
-                                onElshutoj = { push(Vojo.Elshutoj) },
+                                onElŝutoj = { push(Vojo.Elŝutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
-                                onKasxuHejmajnAvertojn = {
+                                onKaŝuHejmajnAvertojn = {
                                     // Kaŝu la NUNAJN problemo-tipojn; nova problemo poste reaperigos la karton
-                                    agordojDeponejo.kasxuAvertojn(diagnozoRegilo.problemoj.value.map { it.tipo }.toSet())
+                                    agordojDeponejo.kaŝuAvertojn(diagnozoRegilo.problemoj.value.map { it.tipo }.toSet())
                                 },
                                 diagnozoProblemoj = diagnozoRegilo.problemoj,
-                                kasxitajAvertoj = agordojDeponejo.kasxitajAvertoj,
-                                onElshuti = { elsendo ->
+                                kaŝitajAvertoj = agordojDeponejo.kaŝitajAvertoj,
+                                onElŝuti = { elsendo ->
                                     logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
-                                    scope.launch { elshutDeponejo.elshuti(elsendo) }
+                                    scope.launch { elŝutDeponejo.elŝuti(elsendo) }
                                 },
                                 onAldoniAlVico = { elsendo ->
                                     logi("Nav", "Hejmo: aldonas al ludvico ${elsendo.id}")
@@ -286,7 +286,7 @@ fun EsperantoRadioApp(
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
-                                onElshutoj = { push(Vojo.Elshutoj) },
+                                onElŝutoj = { push(Vojo.Elŝutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onLudi = { fonto ->
@@ -311,17 +311,17 @@ fun EsperantoRadioApp(
                                 tirkestEnhavo = tirkestEnhavo,
                             )
                         }
-                        entry<Vojo.Sercxo> {
-                            SercxoEkrano(
-                                sercxoDeponejo = sercxoDeponejo,
+                        entry<Vojo.Serĉo> {
+                            SerĉoEkrano(
+                                serĉoDeponejo = serĉoDeponejo,
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
                             )
                         }
-                        entry<Vojo.Elshutoj> {
-                            ElshutitajEkrano(
-                                elshutDeponejo = elshutDeponejo,
+                        entry<Vojo.Elŝutoj> {
+                            ElŝutitajEkrano(
+                                elŝutDeponejo = elŝutDeponejo,
                                 ludilo = ludilo,
                                 onReen = { reen() },
                                 onLudi = { fonto ->
@@ -392,7 +392,7 @@ fun EsperantoRadioApp(
                             val elsendoj by elsendoDeponejo.observiElsendojn(elsendo.kanaloSlug).collectAsState()
                             LaunchedEffect(kanalo?.slug) {
                                 if (kanalo != null && elsendoj.isEmpty()) {
-                                    elsendoDeponejo.sxargxiElsendojnPorKanal(kanalo)
+                                    elsendoDeponejo.ŝargiElsendojnPorKanal(kanalo)
                                 }
                             }
                             // La vidata elsendon raportas ElsendoEkranoKunSvipo mem
@@ -408,17 +408,17 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Ludas elsendon: ${e.id}")
                                     scope.launch { ludvicoRegilo.ludiElsendon(e) }
                                 },
-                                onElshuti = { e ->
+                                onElŝuti = { e ->
                                     logi("Nav", "Elŝutas elsendon: ${e.id}")
-                                    scope.launch { elshutDeponejo.elshuti(e) }
+                                    scope.launch { elŝutDeponejo.elŝuti(e) }
                                 },
-                                onHaltigiElshuton = { e ->
+                                onHaltigiElŝuton = { e ->
                                     logi("Nav", "Haltigas elŝuton: ${e.id}")
-                                    scope.launch { elshutDeponejo.haltigi(e.id) }
+                                    scope.launch { elŝutDeponejo.haltigi(e.id) }
                                 },
-                                onForigiElshuton = { e ->
+                                onForigiElŝuton = { e ->
                                     logi("Nav", "Forigas elŝuton: ${e.id}")
-                                    scope.launch { elshutDeponejo.forigi(e.id) }
+                                    scope.launch { elŝutDeponejo.forigi(e.id) }
                                 },
                                 onAldoniAlVico = { e ->
                                     logi("Nav", "Aldonas al ludvico: ${e.id}")
@@ -428,14 +428,14 @@ fun EsperantoRadioApp(
                                     logi("Nav", "Montri ludvicon")
                                     push(Vojo.Ludvico)
                                 },
-                                elshutDeponejo = elshutDeponejo,
+                                elŝutDeponejo = elŝutDeponejo,
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
                                 agordojDeponejo = agordojDeponejo,
                                 // (PR #92) paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
                                 // ne nuligas planitan reprovon
-                                onPauxzigi = { scope.launch { ludvicoRegilo.pauxziguLudadon() } },
-                                onDaurigi = { scope.launch { ludvicoRegilo.dauriguLudadon() } },
+                                onPaŭzigi = { scope.launch { ludvicoRegilo.paŭziguLudadon() } },
+                                onDaŭrigi = { scope.launch { ludvicoRegilo.daŭriguLudadon() } },
                             )
                         }
                     },
@@ -490,7 +490,7 @@ fun EsperantoRadioApp(
                             } else {
                                 scope.launch {
                                     // Tolerema ŝargilo — liveras kaŝaĵon ĉe ret-eraro
-                                    val lasta = elsendoDeponejo.sxargxiElsendojnPorKanal(k).maxByOrNull { it.dato }
+                                    val lasta = elsendoDeponejo.ŝargiElsendojnPorKanal(k).maxByOrNull { it.dato }
                                     if (lasta != null) {
                                         logi("Nav", "Sekvanta: ludas lastan elsendon de ${k.slug} (${lasta.id})")
                                         ludvicoRegilo.ludiElsendon(lasta)
@@ -524,14 +524,14 @@ fun EsperantoRadioApp(
                     ludilo = ludilo,
                     reprovo = reprovo,
                     elfaldita = elfaldita,
-                    onElfalditaSxangxo = { elfaldita = it },
+                    onElfalditaŜanĝo = { elfaldita = it },
                     sekvantaTitolo = sekvantaTitolo,
                     sekvantaSubtitolo = sekvantaSubtitolo,
                     sekvantaBildoUrl = sekvantaBildoUrl,
                     onLudiSekvantan = onLudiSekvantan,
                     onHaltigi = { ludvicoRegilo.haltuLudadon() },
-                    onPauxzigi = { ludvicoRegilo.pauxziguLudadon() },
-                    onDaurigi = { ludvicoRegilo.dauriguLudadon() },
+                    onPaŭzigi = { ludvicoRegilo.paŭziguLudadon() },
+                    onDaŭrigi = { ludvicoRegilo.daŭriguLudadon() },
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {
@@ -550,24 +550,24 @@ fun EsperantoRadioApp(
         }
 
         // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo unufoje
-        // por ĉiu nova mesaĝo; "Bone" persistas la haŝaĵon en la agordoj.
-        // En evolua medio ĝi ne montriĝas — ĉe freŝa instalaĵo la haŝaĵo
+        // por ĉiu nova mesaĝo; "Bone" persistas la haketaĵon en la agordoj.
+        // En evolua medio ĝi ne montriĝas — ĉe freŝa instalaĵo la haketaĵo
         // forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
-        val apajNovajxoj by apajNovajxojDeponejo.observuMontratan().collectAsState()
-        apajNovajxoj?.takeIf { !AppStato.estasEvoluaMedo }?.let { mesagxo ->
-            LaunchedEffect(mesagxo) {
-                logi("ApajNovajxoj", "Montras novajn apajn novaĵojn (hesho=${mesagxo.hashCode()})")
+        val apajNovaĵoj by apajNovaĵojDeponejo.observuMontratan().collectAsState()
+        apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedo }?.let { mesaĝo ->
+            LaunchedEffect(mesaĝo) {
+                logi("ApajNovaĵoj", "Montras novajn apajn novaĵojn (haketaĵo=${mesaĝo.hashCode()})")
             }
             AlertDialog(
                 // Kiel en la malnova apo: nur la "Bone"-butono fermas la dialogon
                 onDismissRequest = { },
                 title = { Text("Novaĵoj") },
                 // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
-                text = { HtmlVido(html = mesagxo, uzuWebView = false, modifier = Modifier.fillMaxWidth()) },
+                text = { HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth()) },
                 confirmButton = {
                     TextButton(onClick = {
-                        logi("ApajNovajxoj", "Uzanto konfirmis la apajn novaĵojn")
-                        apajNovajxojDeponejo.konfirmu()
+                        logi("ApajNovaĵoj", "Uzanto konfirmis la apajn novaĵojn")
+                        apajNovaĵojDeponejo.konfirmu()
                     }) { Text("Bone") }
                 },
             )

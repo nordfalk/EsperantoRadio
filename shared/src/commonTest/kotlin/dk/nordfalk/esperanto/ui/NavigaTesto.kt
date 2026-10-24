@@ -11,11 +11,11 @@ import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
-import dk.nordfalk.esperanto.domain.repository.ElshutDeponejo
+import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.NoOpLudiloRegilo
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.test.Test
 
 /**
- * Naviga UI-testo kiu testas cxiujn ekranojn.
+ * Naviga UI-testo kiu testas ĉiujn ekranojn.
  *
  * Rulu per: ./gradlew :shared:desktopTest --tests "*NavigaTesto*"
  */
@@ -43,10 +43,10 @@ class NavigaTesto {
         id = "test:2024-01-01",
         kanaloSlug = "kernpunkto",
         titolo = "KP204 Pigmentoj",
-        priskribo = "Hodiaux ni parolas pri pigmentoj kaj koloroj en la naturon.",
+        priskribo = "Hodiaŭ ni parolas pri pigmentoj kaj koloroj en la naturon.",
         fluo = "https://kern.punkto.info/podlove/file/2460/s/feed/c/mp3/kp204-pigmentoj.mp3",
         dato = "2024-01-01",
-        dauro = 6916,
+        daŭro = 6916,
     )
 
     private fun falsaKanaloDeponejo(kanaloj: List<Kanalo> = testKanaloj) = object : KanaloDeponejo {
@@ -70,19 +70,19 @@ class NavigaTesto {
     @Test
     fun montrasElsendoDetalon() = runComposeUiTest {
         setContent {
-            ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, onElshuti = {})
+            ElsendoEkrano(elsendo = testElsendo, onReen = {}, onLudi = {}, onElŝuti = {})
         }
         waitForIdle()
         onAllNodesWithText("KP204 Pigmentoj").assertCountEquals(2)
     }
 
     @Test
-    fun elsendoEkranoMontrasPauxzonSeLudas() = runComposeUiTest {
+    fun elsendoEkranoMontrasPaŭzonSeLudas() = runComposeUiTest {
         val ludilo = NavigaTestLudiloRegilo(
             LudantoInformo(
                 stato = LudantoStato.Ludas,
                 nunaFonto = Sonfonto.ElsendoFonto(testElsendo),
-                pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+                pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
             )
         )
         setContent {
@@ -94,12 +94,12 @@ class NavigaTesto {
     }
 
     @Test
-    fun elsendoEkranoMontrasDauxrigiSePauxzita() = runComposeUiTest {
+    fun elsendoEkranoMontrasDaŭrigiSePaŭzita() = runComposeUiTest {
         val ludilo = NavigaTestLudiloRegilo(
             LudantoInformo(
                 stato = LudantoStato.Haltita,
                 nunaFonto = Sonfonto.ElsendoFonto(testElsendo),
-                pozicioMs = 30000, dauroMs = 6916000, estasRekta = false,
+                pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false,
             )
         )
         setContent {
@@ -111,12 +111,12 @@ class NavigaTesto {
     }
 
     @Test
-    fun montrasSerchon() = runComposeUiTest {
-        val sercxoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SercxoDeponejo {
-            override suspend fun sercxi(teksto: String, limo: Int) =
+    fun montrasSerĉon() = runComposeUiTest {
+        val serĉoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo {
+            override suspend fun serĉi(teksto: String, limo: Int) =
                 if (teksto.length >= 2) listOf(testElsendo) else emptyList()
         }
-        setContent { SercxoEkrano(sercxoDeponejo = sercxoDeponejo, onElsendo = {}) }
+        setContent { SerĉoEkrano(serĉoDeponejo = serĉoDeponejo, onElsendo = {}) }
         waitForIdle()
         onNodeWithText("Serĉi").assertIsDisplayed()
     }
@@ -257,20 +257,20 @@ class NavigaTesto {
     }
 
     @Test
-    fun montrasElshutitajn() = runComposeUiTest {
-        val elshutDeponejo = object : ElshutDeponejo {
-            private val _elshutoj = MutableStateFlow(
-                mapOf(testElsendo.id to ElshutitaElsendo(testElsendo, "/tmp/test.mp3", ElshutStato.Preta))
+    fun montrasElŝutitajn() = runComposeUiTest {
+        val elŝutDeponejo = object : ElŝutDeponejo {
+            private val _elŝutoj = MutableStateFlow(
+                mapOf(testElsendo.id to ElŝutitaElsendo(testElsendo, "/tmp/test.mp3", ElŝutStato.Preta))
             )
-            override fun observiElshutojn() = _elshutoj.asStateFlow()
-            override fun observiElshutStaton(elsendoId: String) = MutableStateFlow(ElshutStato.Preta).asStateFlow()
-            override suspend fun elshuti(elsendo: Elsendo) {}
+            override fun observiElŝutojn() = _elŝutoj.asStateFlow()
+            override fun observiElŝutStaton(elsendoId: String) = MutableStateFlow(ElŝutStato.Preta).asStateFlow()
+            override suspend fun elŝuti(elsendo: Elsendo) {}
             override suspend fun haltigi(elsendoId: String) {}
-            override suspend fun forigi(elsendoId: String) { _elshutoj.value = _elshutoj.value - elsendoId }
+            override suspend fun forigi(elsendoId: String) { _elŝutoj.value = _elŝutoj.value - elsendoId }
             override suspend fun getLokaDosieroVojo(elsendoId: String) = "/tmp/test.mp3"
-            override fun estasElshutita(elsendoId: String) = true
+            override fun estasElŝutita(elsendoId: String) = true
         }
-        setContent { ElshutitajEkrano(elshutDeponejo = elshutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {}) }
+        setContent { ElŝutitajEkrano(elŝutDeponejo = elŝutDeponejo, ludilo = NoOpLudiloRegilo(), onReen = {}, onLudi = {}, onElsendo = {}) }
         waitForIdle()
         onNodeWithText("KP204 Pigmentoj").assertIsDisplayed()
         onNodeWithText("Preta").assertIsDisplayed()
@@ -302,7 +302,7 @@ class NavigaTesto {
     @Test
     fun montrasMiniLudilbreton() = runComposeUiTest {
         val ludilo = NavigaTestLudiloRegilo(
-            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, dauroMs = 6916000, estasRekta = false)
+            LudantoInformo(stato = LudantoStato.Ludas, nunaFonto = Sonfonto.ElsendoFonto(testElsendo), pozicioMs = 30000, daŭroMs = 6916000, estasRekta = false)
         )
         setContent { MiniLudilbreto(ludilo = ludilo) }
         waitForIdle()
@@ -314,13 +314,13 @@ class NavigaTesto {
 internal class NavigaTestLudiloRegilo(initial: LudantoInformo = LudantoInformo(stato = LudantoStato.Haltita)) : LudiloRegilo {
     private val _stato = MutableStateFlow(initial)
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
+    override val laŭteco: StateFlow<Float> = MutableStateFlow(1f)
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita, nunaFonto = fonto, pozicioMs = komencoPozicioMs, estasRekta = fonto is Sonfonto.RektaKanalo)
     }
     override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
-    override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+    override fun paŭzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
+    override fun fiksiLaŭtecon(volumeno: Float) {}
 }

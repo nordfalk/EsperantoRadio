@@ -10,13 +10,13 @@
 |---|---|
 | [NOTOJ.md](NOTOJ.md) | ĉi tiu dosiero — permanenta scio, laŭ temo |
 | [FAROTA.md](FAROTA.md) | la RESTANTAJ (malfermaj) taskoj de la revizio |
-| [SXANGXOJ.md](SXANGXOJ.md) | detala historia taglibro — problemo→kaŭzo→riparo→testo |
+| [ŜANĜOJ.md](ŜANĜOJ.md) | detala historia taglibro — problemo→kaŭzo→riparo→testo |
 | [AGENTS.md](AGENTS.md) | laborfluo kaj il-kutimoj (build, CI, git) |
 
 ## Ludado-arkitekturo
 
 - **La UI neniam vokas la ludilon rekte** — ĉiam `LudvicoRegilo` ([PR #92](https://github.com/nordfalk/EsperantoRadio/pull/92), [PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)):
-  `ludiElsendon`/`ludiRektan`/`pauxziguLudadon`/`dauriguLudadon`/`haltuLudadon`.
+  `ludiElsendon`/`ludiRektan`/`paŭziguLudadon`/`daŭriguLudadon`/`haltuLudadon`.
   Rekta `ludilo.halti()`/`ludi()` ne nuligas planitan reprovon, kiu tiam rekomencigus
   la ludadon (muziko revenas post kiam la uzanto premis "Halti"), kaj lasas la
   reprovo-/eraro-kalkulon-/dedup-statojn malkoheraj.
@@ -97,10 +97,10 @@
   "foreground", do tiu lanĉo ĉiam sukcesas, kio alie flakigus la testojn).
   Observi la staton ne sufiĉas: en la pura-fallback-kazo `halti()` metas
   `Haltita` egalan al la nuna valoro kaj la StateFlow nenion elsendas. Mem-halto
-  post `ringtonoMaksDauroMs` (defaŭlte 5 min) kiu ankaŭ nuligas la daŭran sciigon.
+  post `ringtonoMaksDaŭroMs` (defaŭlte 5 min) kiu ankaŭ nuligas la daŭran sciigon.
   (2026-10-14, PR #111: la `updateState()`-hoko estas vokata nur ĉe *transicio* al
   `Haltita` — alie la konekt-time `updateState()` en freŝa procezo mortigus la ĵus
-  startintan sonon; regres-testo `FresxProcezaFallbackTest`.)
+  startintan sonon; regres-testo `FreŝProcezaFallbackTest`.)
 - **Skribu al Settings ANTAŬ ol lanĉi ion** el la ricevilo: se la alarmo lanĉas
   freŝan procezon, `ekigis(alarmoId)` (unufoja → malaktiva; ripetanta → re-skedo)
   devas okazi antaŭ ol la startanta `AppStato` legas la liston.
@@ -120,7 +120,7 @@
   `intent://` kaj obfuskita `java\tscript:` ne. ExoPlayer/Coil scipovas malfermi
   lokajn URI-ojn — malica fluo devas ne igi nin ludi/montri lokan enhavon.
 - **Sama por HTML- ligiloj en priskriboj** ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)): nur http(s) kaj `mailto:` en
-  `retpaghoUrl`/ligiloj.
+  `retpaĝoUrl`/ligiloj.
 - **Ktor-tempolimoj** ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)): `requestTimeout`, `connectTimeout` KAJ `socketTimeout` —
   servilo kiu akceptas kaj poste silentegas povas alie teni la peton viva pli longe
   ol la limo.
@@ -175,7 +175,7 @@
 - **`INTENT_NONCE`** ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)): ĉiuj intencoj al la eksportita `MainActivity`
   (alarmo, sciigo-"Ludi") portas po-instalan hazardan nomon el Settings — sen ĝi
   iu ajn apo povus forĝi la ekstraĵojn (ludi ajnan URI-on, volumo-boost).
-  `MainActivity` kontrolas `IntentSxlosilo.estasFidinda(intent)`.
+  `MainActivity` kontrolas `IntentŜlosilo.estasFidinda(intent)`.
 - **`SCIIG_ID` kreskanta kaj persistita** ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)): `hashCode()`-kolizioj anstataŭigis
   sciigojn kaj la "Ludi"-PendingIntent de sciigo A celus elsendon B.
 - **`goAsync()` por nesinkrona ricevila laboro** (MediaController-konekto, Reto):
@@ -255,7 +255,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — gestoj**: horizontala svipo inter elsendoj de sama kanalo (ElsendoEkrano) kaj inter kanaloj (KanalEkrano)
 - **Nova apo — evolua reĝimo**: ŝaltilo en agordoj + elektiloj por priskribo-fonto kaj vidmaniero
 - **Nova apo — Sentry.io**: erarmonitorado trans ĉiuj platformoj
-- **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `sxargxi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
+- **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `ŝargi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
 - **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
 - **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
@@ -298,9 +298,9 @@ EsperantoRadio/
 ├── docs/nova/              # Esperanta plano por Compose Multiplatform + servilo
 ├── .github/workflows/       # CI (changelog-kontrolo)
 ├── CHANGELOG.md             # Konciza, uzantvida ŝanĝoprotokolo (Keep a Changelog)
-├── SXANGXOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
+├── ŜANĜOJ.md              # Detala teknika labortaglibro de la ŝanĝoj
 ├── NOTOJ.md                 # Permanentaj teknikaj notoj de la nova apo (laŭ temo, kun etikedoj)
-├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/SXANGXOJ)
+├── FAROTA.md                # La RESTANTAJ malfermaj trovoj el la kodrevizio (finitaj → NOTOJ/ŜANĜOJ)
 └── AGENTS.md               # Tiu ĉi dosiero
 ```
 
@@ -322,7 +322,7 @@ dk/nordfalk/esperanto/
 │   ├── DiagnozoRegilo.kt     # Diagnozo de oftaj aparat-problemoj — expect/actual
 │   ├── model/Modeloj.kt      # Kanalo, Elsendo, Sonfonto, LudantoStato, LudataElsendo
 │   ├── model/Alarmo.kt       # Vekhorloĝo-modelo
-│   ├── model/ElshutStato.kt  # Elŝut-statoj + ElshutitaElsendo
+│   ├── model/ElŝutStato.kt  # Elŝut-statoj + ElŝutitaElsendo
 │   ├── model/Diagnozo.kt     # Rezulto de diagnoza kontrolo (problemo aŭ averto)
 │   ├── repository/Deponejoj.kt          # KanaloDeponejo, ElsendoDeponejo (interfacoj)
 │   └── repository/PersonigoDeponejoj.kt # Plejŝatataj, LastAŭskultitaj, Ludatoj, Serĉo, Agordoj, Elŝut, Alarmo (interfacoj)
@@ -334,23 +334,23 @@ dk/nordfalk/esperanto/
 │   ├── repository/KanalDeponejoImpl.kt     # Kanal-deponejo (StateFlow)
 │   ├── repository/ElsendoDeponejoImpl.kt    # Elsendo-deponejo (Ktor, diskkaŝmemoro)
 │   ├── repository/HttpMotoro.kt            # expect/actual: Ktor-motoro (CIO, aŭ Js-fetch sur wasmJs)
-│   ├── repository/DosierKasho.kt            # expect/actual dosier-kaŝmemoro
+│   ├── repository/DosierKaŝo.kt            # expect/actual dosier-kaŝmemoro
 │   ├── repository/DosierNomoj.kt            # Konvencioj por dosiernomoj
-│   ├── repository/ArchiveOrgDosiernomoKasho.kt # Persista kesto de archive.org-dosiernomoj (Peranto-parsilo)
+│   ├── repository/ArchiveOrgDosiernomoKaŝo.kt # Persista kesto de archive.org-dosiernomoj (Peranto-parsilo)
 │   ├── repository/PersistaLudatojDeponejo.kt # Persisto de ludpozicioj (Settings+JSON)
 │   ├── repository/PersistantaPlejŝatatajDeponejo.kt
 │   ├── repository/PersistantaAlarmoDeponejo.kt # Alarmoj (Settings+JSON)
 │   ├── repository/MemorAlarmoDeponejo.kt   # En-memora AlarmoDeponejo (testoj/Preview)
 │   ├── repository/PersonigoDeponejojImpl.kt  # AgordojDeponejoImpl, SerĉoDeponejoImpl
-│   ├── repository/ApajNovajxojDeponejo.kt  # Apaj novaĵoj el la kanalkonfiguro (versio-anonco al la uzanto)
+│   ├── repository/ApajNovaĵojDeponejo.kt  # Apaj novaĵoj el la kanalkonfiguro (versio-anonco al la uzanto)
 │   ├── repository/PendingElsendoNavigacio.kt # Elsendo de sciigo-intento → Compose-navigado
 │   ├── repository/AlarmoSkedilo.kt          # expect/actual por AlarmManager-skedado
 │   ├── repository/KreuAlarmoSkedilo.kt      # Fabriko
-│   ├── repository/KreuElshutDeponejo.kt     # expect/actual fabriko por elŝuto (Android/Desktop: Ktor; wasmJs/iOS: NoOp)
-│   ├── repository/NoOpElshutDeponejo.kt      # NoOp por wasmJs/iOS
+│   ├── repository/KreuElŝutDeponejo.kt     # expect/actual fabriko por elŝuto (Android/Desktop: Ktor; wasmJs/iOS: NoOp)
+│   ├── repository/NoOpElŝutDeponejo.kt      # NoOp por wasmJs/iOS
 │   ├── repository/SettingsKeys.kt           # Ŝlosiloj por Settings
 │   ├── repository/SciigPermeso.kt           # expect/actual por sciig-permeso
-│   └── repository/GhisdatiguSciigSkedon.kt  # Ĝisdatigas sciig-skedon laŭ agordoj
+│   └── repository/ĜisdatiguSciigSkedon.kt  # Ĝisdatigas sciig-skedon laŭ agordoj
 ├── domain/player/
 │   ├── LudiloRegilo.kt       # Ludilo-interfaco + NoOpLudiloRegilo (kun simuluFinon)
 │   ├── ReprovoLogiko.kt      # Eksponenta reprovo post ludo-eraro (maks 10 provoj, 1s → 30s)
@@ -368,8 +368,8 @@ dk/nordfalk/esperanto/
     ├── MiniLudilbreto.kt    # Malsupra ludilbreto (ludi/paŭzi/halti/ludvico)
     ├── NavigaTirkesto.kt    # Naviga tirkesto (Hejmo, Kanaloj, Plej ŝatataj, Serĉi, Elŝutoj, Vekhorloĝo, Agordoj)
     ├── PlejŝatatajEkrano.kt # Plej ŝatataj kanaloj
-    ├── SercxoEkrano.kt      # Serĉo
-    ├── ElshutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)
+    ├── SerĉoEkrano.kt      # Serĉo
+    ├── ElŝutitajEkrano.kt  # Elŝutitaj elsendoj (grandeco, daŭro, paŭzo-butono)
     ├── AlarmoEkrano.kt      # Vekhorloĝo (kreilo/redaktilo)
     ├── DiagnozoEkrano.kt    # Kontrolas la aparaton (bateri-optimumado, sciig-permeso, DNS…)
     ├── AgordojEkrano.kt     # Agordoj (daŭrigo, sciigoj, evoluo, temo)
@@ -382,7 +382,7 @@ dk/nordfalk/esperanto/
 > Platformo-specifaj `expect`/`actual` ekzistas en `androidMain/` (`ExoPlayerLudiloRegilo`,
 > `EraroKlasifiko`, AlarmManager, WorkManager — `NovajElsendojKontroloWorker`/`NovajElsendojSkedilo`,
 > Receiviloj: `AlarmoReceivilo`, `LudiElsendoReceivilo`, `BootReceivilo`; plue `Agadoj`,
-> `IntentSxlosilo`), `desktopMain/` (`DesktopLudiloRegilo` mp3spi, `KtorElshutDeponejo`),
+> `IntentŜlosilo`), `desktopMain/` (`DesktopLudiloRegilo` mp3spi, `KtorElŝutDeponejo`),
 > `wasmJsMain/` (`WasmJsLudiloRegilo` HTMLAudioElement), `iosMain/` (NoOp-ludilo;
 > Xcode-projekto ankoraŭ ne kreita).
 
@@ -391,7 +391,7 @@ dk/nordfalk/esperanto/
 - **`ExoPlayerLudiloRegilo` estas procez-nivela** (`ExoPlayerLudiloRegilo.akiru(context)`), ne po Activity, kaj
   NE estas liberigita en `onDestroy`. `AppStato.ludvicoRegilo` tenas ĝin dum la tuta procezo. La nuna `Sonfonto`
   estas JSON en `MediaMetadata.extras` (`SonfontoKodilo`), do ludado komencita de alia MediaController
-  (ekz. `LudiElsendoReceivilo`) estas rekonata. Vidu `SXANGXOJ.md`.
+  (ekz. `LudiElsendoReceivilo`) estas rekonata. Vidu `ŜANĜOJ.md`.
 
 - **Platforma subteno — sonludado**:
 
@@ -420,7 +420,7 @@ dk/nordfalk/esperanto/
   - La sciigo havas "Ludi"-agon: `LudiElsendoReceivilo` ricevas la intenon kaj lanĉas ludadon
     rekte per `MediaController` (konektita al la MediaSession). Uzas `goAsync()` por teni la
     Receivilon vivanta dum la nesinkrona konekto.
-  - `GhisdatiguSciigSkedon` ĝisdatigas la WorkManager-skedon kiam la uzanto ŝaltas/malŝaltas sciigojn.
+  - `ĜisdatiguSciigSkedon` ĝisdatigas la WorkManager-skedon kiam la uzanto ŝaltas/malŝaltas sciigojn.
   - `BootReceivilo` re-skedas alarmojn post restarto de la aparato.
 
 - **Navigado**: uzas `navigation3` (`androidx.navigation3`) — `NavKey` ( sealed `Vojo`),
@@ -438,7 +438,7 @@ dk/nordfalk/esperanto/
     `ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED` por MP3, malgraŭ ĉiuj GStreamer-kromprogramoj
     estantaj instalitaj. La OpenJFX-jaro de Maven ne ĝuste ligiĝas al la sistema GStreamer.
   - **mp3spi + SourceDataLine** estis elektita: `com.googlecode.soundlibs:mp3spi` registrigas
-    MP3-malkodilon cxe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
+    MP3-malkodilon ĉe `javax.sound.sampled.AudioSystem`. Pura Java — neniu nacia dependeco.
     Fluas MP3 super HTTP (malfermas `URL.openStream()` → `AudioSystem.getAudioInputStream()` →
     `SourceDataLine.write()` en fona korutino). Subtenas volumon (`FloatControl.Type.MASTER_GAIN`),
     pozicion (kalkulita el bajtoj luditaj). Seek ne implementita (malfacila por streaming MP3).

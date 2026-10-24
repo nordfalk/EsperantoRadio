@@ -3,7 +3,7 @@ package dk.nordfalk.esperanto
 /**
  * Platform-specifaj protokolaj funkcioj (expect/actual).
  *
- * Cxiu platformo eligas per sia propra mekanismo:
+ * Ĉiu platformo eligas per sia propra mekanismo:
  * - Android: android.util.Log
  * - Desktop/JVM: System.err.println
  * - wasmJs: println (console.log)
@@ -13,7 +13,7 @@ package dk.nordfalk.esperanto
  * protokoladon (Sentry — vidu la cela matricon en ProtokoloUtil.kt),
  * estas en ProtokoloUtil.kt.
  *
- * Konvencio: [Komponanto] mesagxo
+ * Konvencio: [Komponanto] mesaĝo
  * Niveloj: d = debug, i = info, w = warning, e = error
  */
 expect fun platformLogi(tag: String, msg: String)

@@ -52,7 +52,7 @@ class PersistaLudatojDeponejo(
      */
     private val mutex = Mutex()
 
-    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long) {
+    override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long) {
         mutex.withLock {
             val nuna = _ludatoj.value.toMutableMap()
             val ekzista = nuna[elsendoId]
@@ -60,7 +60,7 @@ class PersistaLudatojDeponejo(
                 elsendoId = elsendoId,
                 kanaloSlug = kanaloSlug,
                 pozicioMs = pozicioMs,
-                dauroMs = if (dauroMs > 0) dauroMs else (ekzista?.dauroMs ?: 0),
+                daŭroMs = if (daŭroMs > 0) daŭroMs else (ekzista?.daŭroMs ?: 0),
                 finita = ekzista?.finita ?: false,
                 erara = ekzista?.erara ?: false,
                 lasteLudita = Clock.System.now().toEpochMilliseconds(),
@@ -89,7 +89,7 @@ class PersistaLudatojDeponejo(
                 elsendoId = elsendoId,
                 kanaloSlug = kanaloSlug,
                 pozicioMs = ekzista?.pozicioMs ?: 0,
-                dauroMs = ekzista?.dauroMs ?: 0,
+                daŭroMs = ekzista?.daŭroMs ?: 0,
                 finita = true,
                 lasteLudita = Clock.System.now().toEpochMilliseconds(),
             )
@@ -107,7 +107,7 @@ class PersistaLudatojDeponejo(
                 elsendoId = elsendoId,
                 kanaloSlug = kanaloSlug,
                 pozicioMs = ekzista?.pozicioMs ?: 0,
-                dauroMs = ekzista?.dauroMs ?: 0,
+                daŭroMs = ekzista?.daŭroMs ?: 0,
                 finita = true,
                 erara = true,
                 lasteLudita = Clock.System.now().toEpochMilliseconds(),

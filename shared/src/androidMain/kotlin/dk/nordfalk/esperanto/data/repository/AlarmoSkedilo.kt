@@ -63,7 +63,7 @@ actual class AlarmoSkedilo actual constructor() {
         logi("AlarmoSkedilo", "Malplanis alarmon $alarmoId")
     }
 
-    actual fun reskediCxiujn(alarmoj: List<Alarmo>) {
+    actual fun reskediĈiujn(alarmoj: List<Alarmo>) {
         logi("AlarmoSkedilo", "Re-planas ${alarmoj.size} alarmojn")
         for (alarmo in alarmoj) {
             if (alarmo.aktiva) {
@@ -103,7 +103,7 @@ actual class AlarmoSkedilo actual constructor() {
         const val FENESTRO_MS = 10 * 60 * 1000L
     }
 }
-actual val subtenasVekhorlogxn: Boolean = true
+actual val subtenasVekhorloĝon: Boolean = true
 
 actual fun ekzaktajAlarmojPermesataj(): Boolean {
     // Sen SCHEDULE_EXACT_ALARM/USE_EXACT_ALARM en la manifest, canScheduleExactAlarms()

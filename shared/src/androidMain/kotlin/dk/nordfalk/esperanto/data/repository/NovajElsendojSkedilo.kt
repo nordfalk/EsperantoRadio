@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Skedas la NovajElsendojKontroloWorker per WorkManager.
  *
- * Rulas 2 fojojn tage — cxe 7:00 kaj 16:00 (±1h), kiam retkonekto ekzistas
+ * Rulas 2 fojojn tage — ĉe 7:00 kaj 16:00 (±1h), kiam retkonekto ekzistas
  * kaj la baterio ne estas malalta.
  */
 object NovajElsendojSkedilo {
@@ -28,8 +28,8 @@ object NovajElsendojSkedilo {
 
     /**
      * Skedas du periodajn Worker-ojn (24h ciklo):
-     * - unu cxe 7:00 (matena kontrolo)
-     * - unu cxe 16:00 (posttagmeza kontrolo)
+     * - unu ĉe 7:00 (matena kontrolo)
+     * - unu ĉe 16:00 (posttagmeza kontrolo)
      */
     fun skedu(context: Context) {
         val wm = WorkManager.getInstance(context)

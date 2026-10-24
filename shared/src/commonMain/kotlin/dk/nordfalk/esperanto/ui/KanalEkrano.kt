@@ -53,8 +53,8 @@ class KanaloViewModel(
     private val _elsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val elsendoj = _elsendoj.asStateFlow()
 
-    private val _sxargxas = MutableStateFlow(false)
-    val sxargxas = _sxargxas.asStateFlow()
+    private val _ŝargas = MutableStateFlow(false)
+    val ŝargas = _ŝargas.asStateFlow()
 
     /**
      * Fona skopo en la ViewModel — transvivas navigadon (KMP-X/KMP-W:
@@ -63,30 +63,30 @@ class KanaloViewModel(
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /** Dedupigo + TTL: re-eniro al la ekrano ne reŝargas ĵus ŝargitan datenon. */
-    private val sxargilo = SxargxaKontrolilo()
+    private val ŝargilo = ŜargaKontrolilo()
 
     /** @param fortoRefresigi true = ignoru la memoran kaŝmemoron kaj elŝutu la fluon denove (malsupren-tiro). */
-    fun sxargxi(fortoRefresigi: Boolean = false) {
-        skopo.launch { sxargilo.rulu("KanaloViewModel", fortoRefresigi) { sxargxiInterna(fortoRefresigi) } }
+    fun ŝargi(fortoRefresigi: Boolean = false) {
+        skopo.launch { ŝargilo.rulu("KanaloViewModel", fortoRefresigi) { ŝargiInterna(fortoRefresigi) } }
     }
 
-    private suspend fun sxargxiInterna(fortoRefresigi: Boolean) {
+    private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
         // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
-        val kashitaj = elsendoDeponejo.leguKashitajnElsendojn(kanalo)
-        if (kashitaj != null && kashitaj.isNotEmpty()) {
-            _elsendoj.value = kashitaj
-            logi("KanaloViewModel", "${kanalo.slug}: diskkaŝmemoro — ${kashitaj.size} elsendoj")
+        val kaŝitaj = elsendoDeponejo.leguKaŝitajnElsendojn(kanalo)
+        if (kaŝitaj != null && kaŝitaj.isNotEmpty()) {
+            _elsendoj.value = kaŝitaj
+            logi("KanaloViewModel", "${kanalo.slug}: diskkaŝmemoro — ${kaŝitaj.size} elsendoj")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
-        _sxargxas.value = true
+        _ŝargas.value = true
         try {
-            val rezulto = elsendoDeponejo.sxargxiElsendojn(kanalo, fortoRefresigi)
+            val rezulto = elsendoDeponejo.ŝargiElsendojn(kanalo, fortoRefresigi)
             _elsendoj.value = rezulto
         } catch (e: Exception) {
             loge("KanaloViewModel", "Malsukcesis sargi elsendojn por ${kanalo.slug}", e)
         } finally {
-            _sxargxas.value = false
+            _ŝargas.value = false
         }
     }
 }
@@ -108,7 +108,7 @@ fun KanaloEkrano(
         AppStato.kanaloViewModelj.getOrPut(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
     }
     val elsendoj by viewModel.elsendoj.collectAsState()
-    val sxargxas by viewModel.sxargxas.collectAsState()
+    val ŝargas by viewModel.ŝargas.collectAsState()
     val scope = rememberCoroutineScope()
     val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
@@ -116,7 +116,7 @@ fun KanaloEkrano(
     val snackbarStato = remember { SnackbarHostState() }
 
     LaunchedEffect(kanalo.slug) {
-        viewModel.sxargxi()
+        viewModel.ŝargi()
     }
 
     Scaffold(
@@ -129,11 +129,11 @@ fun KanaloEkrano(
                 actions = {
                     IconButton(onClick = {
                         logi("Klako", "baskulas plejŝaton: ${kanalo.slug}")
-                        val antauxa = estasPlejŝatata
+                        val antaŭa = estasPlejŝatata
                         scope.launch {
                             plejŝatatajDeponejo.baskuliPlejŝaton(kanalo.slug)
                             // Montru sciigon nur kiam oni ALDONAS ŝaton (ne kiam oni forigas)
-                            if (!antauxa && sciigoj) {
+                            if (!antaŭa && sciigoj) {
                                 snackbarStato.showSnackbar(
                                     message = "Vi ricevos sciigon kiam aperas nova elsendo el ${kanalo.nomo}.",
                                     actionLabel = "Malŝalti en la agordoj",
@@ -159,8 +159,8 @@ fun KanaloEkrano(
         snackbarHost = { SnackbarHost(snackbarStato) }
     ) { padding -> PullToRefreshBox(
         // La granda spinilo en la listo montras la unuan ŝarĝon; ĉi tiu nur kiam jam estas elsendoj
-        isRefreshing = sxargxas && elsendoj.isNotEmpty(),
-        onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); viewModel.sxargxi(fortoRefresigi = true) },
+        isRefreshing = ŝargas && elsendoj.isNotEmpty(),
+        onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); viewModel.ŝargi(fortoRefresigi = true) },
         modifier = Modifier.fillMaxSize().padding(padding),
     ) {
         LazyColumn(
@@ -171,7 +171,7 @@ fun KanaloEkrano(
             item { KanalInformoj(kanalo, ludilo) }
 
             // Ŝargado
-            if (sxargxas && elsendoj.isEmpty()) {
+            if (ŝargas && elsendoj.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
@@ -280,17 +280,17 @@ fun KanalEkranoKunSvipo(
         return
     }
 
-    val komencaPagho = kanaloj.indexOfFirst { it.slug == komencaKanalo.slug }.let { if (it < 0) 0 else it }
-    val paghoStato = rememberPagerState(initialPage = komencaPagho) { kanaloj.size }
+    val komencaPaĝo = kanaloj.indexOfFirst { it.slug == komencaKanalo.slug }.let { if (it < 0) 0 else it }
+    val paĝoStato = rememberPagerState(initialPage = komencaPaĝo) { kanaloj.size }
 
-    // Sekvu svipojn: la vidata kanalo ŝanĝiĝas kiam pagho ekvidiĝas (settledPage)
-    LaunchedEffect(paghoStato.settledPage, kanaloj) {
-        kanaloj.getOrNull(paghoStato.settledPage)?.let(onVidataKanalo)
+    // Sekvu svipojn: la vidata kanalo ŝanĝiĝas kiam paĝo ekvidiĝas (settledPage)
+    LaunchedEffect(paĝoStato.settledPage, kanaloj) {
+        kanaloj.getOrNull(paĝoStato.settledPage)?.let(onVidataKanalo)
     }
 
-    HorizontalPager(state = paghoStato) { pagho ->
+    HorizontalPager(state = paĝoStato) { paĝo ->
         KanaloEkrano(
-            kanalo = kanaloj[pagho],
+            kanalo = kanaloj[paĝo],
             elsendoDeponejo = elsendoDeponejo,
             plejŝatatajDeponejo = plejŝatatajDeponejo,
             agordojDeponejo = agordojDeponejo,
@@ -345,7 +345,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
         }
 
         // Retejo kaj retpoŝto butonoj
-        if (kanalo.retejoUrl != null || kanalo.retposhto != null) {
+        if (kanalo.retejoUrl != null || kanalo.retpoŝto != null) {
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -359,10 +359,10 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                     )
                     Spacer(Modifier.width(8.dp))
                 }
-                if (kanalo.retposhto != null) {
+                if (kanalo.retpoŝto != null) {
                     AssistChip(
                         onClick = {
-                            logi("Klako", "retposhto ${kanalo.slug}")
+                            logi("Klako", "retpoŝto ${kanalo.slug}")
                             val stato = ludilo?.stato?.value
                             val nunaElsendo: Elsendo? = when (stato?.nunaFonto) {
                                 is Sonfonto.ElsendoFonto -> (stato.nunaFonto as Sonfonto.ElsendoFonto).elsendo
@@ -376,8 +376,8 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                             } else {
                                 "Mi aŭskultas la elsendon kaj havas komenton"
                             }
-                            malfermuRetposhton(
-                                retposhto = kanalo.retposhto,
+                            malfermuRetpoŝton(
+                                retpoŝto = kanalo.retpoŝto,
                                 temo = "Pri ${kanalo.nomo}",
                                 teksto = teksto,
                             )
@@ -409,10 +409,10 @@ private fun ElsendoEro(
             )
         },
         supportingContent = {
-            val dauro = elsendo.dauro
-            if (dauro != null && dauro > 0) {
-                val min = dauro / 60
-                val sek = dauro % 60
+            val daŭro = elsendo.daŭro
+            if (daŭro != null && daŭro > 0) {
+                val min = daŭro / 60
+                val sek = daŭro % 60
                 Text(
                     "$min:${sek.toString().padStart(2, '0')}",
                     style = MaterialTheme.typography.bodySmall,

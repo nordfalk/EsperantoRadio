@@ -3,7 +3,7 @@ package dk.nordfalk.esperanto.data.parser
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
-import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKasho
+import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKaŝo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.logd
@@ -27,11 +27,11 @@ import kotlinx.serialization.json.jsonPrimitive
  * La ĝenerala RSS/Atom-parsilo. Traktas la sep parsregulojn.
  * Vidu docs/malnova/03_parsado_kaj_fontoj.md kaj docs/nova/04_parsado_kaj_arkivo.md.
  *
- * @param archiveOrgKasho persista kesto de archive.org-dosiernomoj (regulo P6.3);
+ * @param archiveOrgKaŝo persista kesto de archive.org-dosiernomoj (regulo P6.3);
  *   null = sen persisto (testoj)
  */
 class RssParsilo(
-    private val archiveOrgKasho: ArchiveOrgDosiernomoKasho? = null,
+    private val archiveOrgKaŝo: ArchiveOrgDosiernomoKaŝo? = null,
 ) {
 
     companion object {
@@ -87,7 +87,7 @@ class RssParsilo(
 
         val rezulto = if (deArkivo) {
             logd("RssParsilo", "${kanalo.slug}: uzas arkiv-parsilon")
-            parsuGxenerala(doc, kanalo, deArkivo = true)
+            parsuĜenerala(doc, kanalo, deArkivo = true)
         } else when (kanalo.slug) {
             "varsoviavento" -> {
                 logd("RssParsilo", "${kanalo.slug}: uzas VarsoviaVento-parsilon")
@@ -103,7 +103,7 @@ class RssParsilo(
             }
             else -> {
                 logd("RssParsilo", "${kanalo.slug}: uzas ĝeneralan parsilon")
-                parsuGxenerala(doc, kanalo, deArkivo = false)
+                parsuĜenerala(doc, kanalo, deArkivo = false)
             }
         }
 
@@ -119,10 +119,10 @@ class RssParsilo(
 
     // === Regulo P6.1 — Ĝenerala ===
 
-    private fun parsuGxenerala(doc: Document, kanalo: Kanalo, deArkivo: Boolean): List<Elsendo> =
-        doc.select("item, entry").mapNotNull { ero -> parsuEroGxenerala(ero, kanalo, deArkivo) }
+    private fun parsuĜenerala(doc: Document, kanalo: Kanalo, deArkivo: Boolean): List<Elsendo> =
+        doc.select("item, entry").mapNotNull { ero -> parsuEroĜenerala(ero, kanalo, deArkivo) }
 
-    private fun parsuEroGxenerala(ero: Element, kanalo: Kanalo, deArkivo: Boolean): Elsendo? {
+    private fun parsuEroĜenerala(ero: Element, kanalo: Kanalo, deArkivo: Boolean): Elsendo? {
         val titolo = ero.selectFirst("title")?.text() ?: ""
         val priskriboKruda = ero.selectFirst("content|encoded")?.text()
             ?: ero.selectFirst("description")?.text()
@@ -144,7 +144,7 @@ class RssParsilo(
         }
         if (fluo.isEmpty()) {
             // Regulo P6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
-            // serchu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
+            // serĉu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
             fluo = Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src") ?: ""
         }
         if (fluo.isEmpty()) return null
@@ -157,14 +157,14 @@ class RssParsilo(
             fluo = "https://" + fluo.removePrefix("http://")
         }
 
-        val dauro = leguDauron(ero.selectFirst("itunes|duration")?.text())
+        val daŭro = leguDaŭron(ero.selectFirst("itunes|duration")?.text())
         // Regulo P6.6: kanal-specifaj purigaj modeloj (reklamoj, enkonstruitaj ludiloj)
         val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
         val bildoUrl = saniguRetUrlon(
             ero.selectFirst("itunes|image")?.attr("href")
                 ?: ero.selectFirst("image url")?.text()
         )
-        val retpaghoUrl = saniguRetUrlon(
+        val retpaĝoUrl = saniguRetUrlon(
             ero.selectFirst("link")?.text()?.ifEmpty { null }
                 ?: ero.selectFirst("link")?.attr("href")
         )
@@ -187,9 +187,9 @@ class RssParsilo(
             priskriboHtml = puriguHtmlKunEtikedojn(priskriboPurigita),
             bildoUrl = bildoUrl,
             dato = dato,
-            dauro = dauro,
+            daŭro = daŭro,
             fluo = fluo,
-            retpaghoUrl = retpaghoUrl,
+            retpaĝoUrl = retpaĝoUrl,
         )
     }
 
@@ -244,7 +244,7 @@ class RssParsilo(
         val priskribo: String,
         val priskriboHtml: String,
         val bildoUrl: String?,
-        val retpaghoUrl: String?,
+        val retpaĝoUrl: String?,
         /** Identigilo de archive.org-arkivaĵo, aŭ null se la fluo venas de alia gastiganto */
         val arkivaIdentigilo: String?,
         /** Fluvo-URL; por archive.org unue nur divenita, korektata en paŝo 2 */
@@ -309,7 +309,7 @@ class RssParsilo(
                 priskribo = priskribo,
                 priskriboHtml = puriguHtmlKunEtikedojn(htmlEsprimite),
                 bildoUrl = bildoUrl,
-                retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[rel=alternate]")?.attr("href")),
+                retpaĝoUrl = saniguRetUrlon(ero.selectFirst("link[rel=alternate]")?.attr("href")),
                 arkivaIdentigilo = arkivaIdentigilo,
                 fluo = fluo,
             )
@@ -346,7 +346,7 @@ class RssParsilo(
                 bildoUrl = ero.bildoUrl,
                 dato = ero.dato,
                 fluo = fluo,
-                retpaghoUrl = ero.retpaghoUrl,
+                retpaĝoUrl = ero.retpaĝoUrl,
             )
         }
     }
@@ -357,12 +357,12 @@ class RssParsilo(
      * haveblaj (ekz. sen rete), retrofalas al la divenita nomo `<identigilo>.mp3`.
      */
     private suspend fun trovuArchiveOrgMp3Dosiernomon(identigilo: String, httpKliento: suspend (String) -> String): String {
-        archiveOrgKasho?.leguDosiernomon(identigilo)?.let { return it }
+        archiveOrgKaŝo?.leguDosiernomon(identigilo)?.let { return it }
         val divenita = "$identigilo.mp3"
         return try {
             // Limigu la metadaten-peton: ĝi estas aldonaĵo al la RSS-parsado kaj ne
             // devas bloki ĝin longe (ekz. eksterrete, kiam nur retrofalas al la diveno).
-            // Kun la sama kasho ĝi sukcesos poste.
+            // Kun la sama kaŝo ĝi sukcesos poste.
             val teksto = withTimeoutOrNull(METADATEN_LIMTEMPO_MS) {
                 httpKliento("https://archive.org/metadata/$identigilo")
             }
@@ -376,7 +376,7 @@ class RssParsilo(
                 return divenita
             }
             logd("RssParsilo", "archive.org/$identigilo: vera MP3-dosiernomo estas $dosiernomo")
-            archiveOrgKasho?.konservuDosiernomon(identigilo, dosiernomo)
+            archiveOrgKaŝo?.konservuDosiernomon(identigilo, dosiernomo)
             dosiernomo
         } catch (e: CancellationException) {
             throw e
@@ -419,7 +419,7 @@ class RssParsilo(
             val fluo = saniguRetUrlon(ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href"))
                 ?: return@mapNotNull null
             val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
-            val retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
+            val retpaĝoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
             // Regulo P6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (PR #91)
             val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
@@ -441,7 +441,7 @@ class RssParsilo(
                 bildoUrl = bildoUrl,
                 dato = dato,
                 fluo = fluo,
-                retpaghoUrl = retpaghoUrl,
+                retpaĝoUrl = retpaĝoUrl,
             )
         }
 
@@ -507,7 +507,7 @@ class RssParsilo(
         return "${m.groupValues[3]}-$monato-$tago"
     }
 
-    fun leguDauron(teksto: String?): Long? {
+    fun leguDaŭron(teksto: String?): Long? {
         if (teksto.isNullOrBlank()) return null
         // substringBefore('.'): "00:51:17.47" — frakciaj sekundoj (PR #95)
         val partoj = teksto.trim().split(":").map { it.substringBefore('.') }
@@ -543,13 +543,13 @@ class RssParsilo(
         // (usklec-miksita) tiel ne trafluas (PR #89).
         for (el in doc.select("*")) {
             for (attr in el.attributes().asList()) {
-                val sxlosilo = attr.key.lowercase()
+                val ŝlosilo = attr.key.lowercase()
                 val valoro = attr.value.trim()
                 val malalta = valoro.lowercase()
-                val danxeraAtributo = sxlosilo.startsWith("on") ||
+                val danxeraAtributo = ŝlosilo.startsWith("on") ||
                     malalta.startsWith("javascript:") ||
                     malalta.startsWith("data:") ||
-                    ((sxlosilo == "href" || sxlosilo == "src") && !(
+                    ((ŝlosilo == "href" || ŝlosilo == "src") && !(
                         malalta.startsWith("http://") || malalta.startsWith("https://") ||
                         malalta.startsWith("mailto:") || valoro.startsWith("#") || valoro.startsWith("/")
                     ))

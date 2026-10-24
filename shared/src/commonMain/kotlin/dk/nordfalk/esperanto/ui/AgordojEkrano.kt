@@ -34,7 +34,7 @@ fun AgordojEkrano(
 ) {
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
-    val auxtomataDaurigo by agordojDeponejo.auxtomataDaurigo.collectAsState()
+    val aŭtomataDaŭrigo by agordojDeponejo.aŭtomataDaŭrigo.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
@@ -55,8 +55,8 @@ fun AgordojEkrano(
                 supportingContent = { Text("Kiam elsendo finiĝas, aŭtomate ludu la sekvan") },
                 trailingContent = {
                     Switch(
-                        checked = auxtomataDaurigo,
-                        onCheckedChange = { logi("Klako", "auxtomataDaurigo → $it"); agordojDeponejo.fiksiAuxtomatanDaurigon(it) }
+                        checked = aŭtomataDaŭrigo,
+                        onCheckedChange = { logi("Klako", "aŭtomataDaŭrigo → $it"); agordojDeponejo.fiksiAŭtomatanDaŭrigon(it) }
                     )
                 }
             )

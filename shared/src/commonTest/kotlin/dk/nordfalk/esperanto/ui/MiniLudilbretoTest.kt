@@ -21,7 +21,7 @@ import kotlin.test.Test
 class MiniLudilbretoTest {
 
     @Test
-    fun neMontrigxasKiamNenioLudigxas() = runComposeUiTest {
+    fun neMontriĝasKiamNenioLudiĝas() = runComposeUiTest {
         val ludilo = NoOpLudiloRegilo()
         setContent { MiniLudilbreto(ludilo = ludilo) }
         waitForIdle()
@@ -42,7 +42,7 @@ class MiniLudilbretoTest {
             stato = LudantoStato.Ludas,
             nunaFonto = Sonfonto.ElsendoFonto(elsendo),
             pozicioMs = 0,
-            dauroMs = 60000,
+            daŭroMs = 60000,
             estasRekta = false
         ))
 
@@ -64,7 +64,7 @@ class MiniLudilbretoTest {
             stato = LudantoStato.Ludas,
             nunaFonto = Sonfonto.RektaKanalo(kanalo),
             pozicioMs = 0,
-            dauroMs = 0,
+            daŭroMs = 0,
             estasRekta = true
         ))
 
@@ -88,7 +88,7 @@ class MiniLudilbretoTest {
             stato = LudantoStato.Ludas,
             nunaFonto = Sonfonto.LokaElsendo(elsendo, "/tmp/test.mp3"),
             pozicioMs = 0,
-            dauroMs = 60000,
+            daŭroMs = 60000,
             estasRekta = false
         ))
 
@@ -104,7 +104,7 @@ class MiniLudilbretoTest {
 private class TestLudiloRegilo(initial: LudantoInformo) : LudiloRegilo {
     private val _stato = MutableStateFlow(initial)
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
-    override val lauxteco: StateFlow<Float> = MutableStateFlow(1f)
+    override val laŭteco: StateFlow<Float> = MutableStateFlow(1f)
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         _stato.value = LudantoInformo(
@@ -115,8 +115,8 @@ private class TestLudiloRegilo(initial: LudantoInformo) : LudiloRegilo {
         )
     }
     override fun ludi() { _stato.value = _stato.value.copy(stato = LudantoStato.Ludas) }
-    override fun pauxzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
+    override fun paŭzigi() { _stato.value = _stato.value.copy(stato = LudantoStato.Haltita) }
     override fun halti() { _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
     override fun saltiAl(pozicioMs: Long) { _stato.value = _stato.value.copy(pozicioMs = pozicioMs) }
-    override fun fiksiLauxtecon(volumeno: Float) {}
+    override fun fiksiLaŭtecon(volumeno: Float) {}
 }

@@ -71,7 +71,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
 
     private var nunaFonto: Sonfonto? = null
 
-    private val cxefaFadeno = Handler(Looper.getMainLooper())
+    private val ĉefaFadeno = Handler(Looper.getMainLooper())
 
     private val appContext = context.applicationContext
     private val sessionToken = SessionToken(appContext, ComponentName(appContext, Agadoj.LUDADO_SERVO))
@@ -101,7 +101,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
 
     /** Legas la Sonfonton el la ekstraĵoj de MediaItem (null se mankas — ekz. malnova aĵo). */
     private fun fontoDe(mediaItem: MediaItem?): Sonfonto? =
-        SonfontoKodilo.malkodigu(mediaItem?.mediaMetadata?.extras?.getString(SonfontoKodilo.SXLOSILO))
+        SonfontoKodilo.malkodigu(mediaItem?.mediaMetadata?.extras?.getString(SonfontoKodilo.ŜLOSILO))
 
     init {
         controllerFuture.addListener({
@@ -135,7 +135,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
      */
     private fun getMediaMetadata(fonto: Sonfonto): MediaMetadata {
         val builder = MediaMetadata.Builder()
-            .setExtras(Bundle().apply { putString(SonfontoKodilo.SXLOSILO, SonfontoKodilo.kodigu(fonto)) })
+            .setExtras(Bundle().apply { putString(SonfontoKodilo.ŜLOSILO, SonfontoKodilo.kodigu(fonto)) })
         when (fonto) {
             is Sonfonto.RektaKanalo -> {
                 builder.setTitle(fonto.kanalo.nomo)
@@ -187,7 +187,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             stato = ludantoStato,
             nunaFonto = nunaFonto,
             pozicioMs = c.currentPosition,
-            dauroMs = if (c.duration > 0) c.duration else 0,
+            daŭroMs = if (c.duration > 0) c.duration else 0,
             estasRekta = nunaFonto is Sonfonto.RektaKanalo,
         )
     }
@@ -207,15 +207,15 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             stato = LudantoStato.Konektas,
             nunaFonto = fonto,
             pozicioMs = komencoPozicioMs,
-            dauroMs = 0,
+            daŭroMs = 0,
             estasRekta = fonto is Sonfonto.RektaKanalo,
         )
     }
 
-    override fun ludi() { cxefaFadeno.post { controller?.play() } }
-    override fun pauxzigi() { cxefaFadeno.post { controller?.pause() } }
+    override fun ludi() { ĉefaFadeno.post { controller?.play() } }
+    override fun paŭzigi() { ĉefaFadeno.post { controller?.pause() } }
     override fun halti() {
-        cxefaFadeno.post {
+        ĉefaFadeno.post {
             controller?.stop()
             controller?.clearMediaItems()
         }
@@ -225,7 +225,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         haltuAlarmRingon()
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
-    override fun saltiAl(pozicioMs: Long) { cxefaFadeno.post { controller?.seekTo(pozicioMs) } }
+    override fun saltiAl(pozicioMs: Long) { ĉefaFadeno.post { controller?.seekTo(pozicioMs) } }
 
     /**
      * La laŭteco-regilo uzas la **sisteman** median laŭtecon (AudioManager.STREAM_MUSIC),
@@ -235,33 +235,33 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
     private val audioManager get() = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     /** Frakcio (0..1) de la sistema media laŭteco. */
-    private fun leguSistemanLauxtecon(): Float {
+    private fun leguSistemanLaŭtecon(): Float {
         val maks = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         if (maks <= 0) return 1f
         return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / maks
     }
 
     private val skopo = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val _lauxteco = MutableStateFlow(leguSistemanLauxtecon())
-    override val lauxteco: StateFlow<Float> = _lauxteco.asStateFlow()
-    private var lauxtecoEnketoJob: Job? = null
+    private val _laŭteco = MutableStateFlow(leguSistemanLaŭtecon())
+    override val laŭteco: StateFlow<Float> = _laŭteco.asStateFlow()
+    private var laŭtecoEnketoJob: Job? = null
     private var pozicioEnketoJob: Job? = null
 
     init {
         // Enketu la sisteman laŭtecon ĉiun sekundon dum la UI observas ĝin,
         // por ke la regilo sekvu ŝanĝojn de la hardvaraj klavoj (kiel la malnova apo).
         skopo.launch {
-            _lauxteco.subscriptionCount.collect { n ->
-                if (n > 0 && lauxtecoEnketoJob == null) {
-                    lauxtecoEnketoJob = skopo.launch {
+            _laŭteco.subscriptionCount.collect { n ->
+                if (n > 0 && laŭtecoEnketoJob == null) {
+                    laŭtecoEnketoJob = skopo.launch {
                         while (isActive) {
-                            _lauxteco.value = leguSistemanLauxtecon()
+                            _laŭteco.value = leguSistemanLaŭtecon()
                             delay(1000)
                         }
                     }
                 } else if (n == 0) {
-                    lauxtecoEnketoJob?.cancel()
-                    lauxtecoEnketoJob = null
+                    laŭtecoEnketoJob?.cancel()
+                    laŭtecoEnketoJob = null
                 }
             }
         }
@@ -275,7 +275,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
                 if (n > 0 && pozicioEnketoJob == null) {
                     pozicioEnketoJob = skopo.launch {
                         while (isActive) {
-                            cxefaFadeno.post { if (controller?.isPlaying == true) updateState() }
+                            ĉefaFadeno.post { if (controller?.isPlaying == true) updateState() }
                             delay(1000)
                         }
                     }
@@ -287,9 +287,9 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         }
     }
 
-    override fun fiksiLauxtecon(volumeno: Float) {
+    override fun fiksiLaŭtecon(volumeno: Float) {
         val frakcio = volumeno.coerceIn(0f, 1f)
-        cxefaFadeno.post {
+        ĉefaFadeno.post {
             try {
                 val maks = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 audioManager.setStreamVolume(
@@ -301,6 +301,6 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
                 loge("Ludilo", "Ne eblis agordi la sisteman laŭtecon", e)
             }
         }
-        _lauxteco.value = frakcio
+        _laŭteco.value = frakcio
     }
 }

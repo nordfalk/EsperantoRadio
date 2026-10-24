@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 class EraroKlasifikoTest {
 
     private fun httpEraro(statuso: Int): PlaybackException {
-        val kauxzo = HttpDataSource.InvalidResponseCodeException(
+        val kaŭzo = HttpDataSource.InvalidResponseCodeException(
             statuso,
             "HTTP $statuso",
             null,
@@ -32,7 +32,7 @@ class EraroKlasifikoTest {
             DataSpec(Uri.EMPTY),
             ByteArray(0),
         )
-        return PlaybackException("HTTP $statuso", kauxzo, PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
+        return PlaybackException("HTTP $statuso", kaŭzo, PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
     }
 
     @Test
@@ -46,7 +46,7 @@ class EraroKlasifikoTest {
     }
 
     @Test
-    fun http404RestasDauxra() {
+    fun http404RestasDaŭra() {
         // 404 = la dosiero vere mankas — tuj saltu al la sekva elsendo, ne perdu tempon per reprovoj
         assertFalse("HTTP 404 devas esti daŭra (ne reprovebla)", estasReproveblaEraro(httpEraro(404)))
     }
@@ -62,7 +62,7 @@ class EraroKlasifikoTest {
     }
 
     @Test
-    fun formatEraroRestasDauxra() {
+    fun formatEraroRestasDaŭra() {
         val error = PlaybackException(
             "Malkodilo",
             java.io.IOException("Bad audio"),

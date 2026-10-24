@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.domain.model
 
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
 
 /**
@@ -17,13 +18,13 @@ data class Kanalo(
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,             // hejmpaĝoButono
-    val retposhto: String? = null,
+    @JsonNames("retposhto") val retpoŝto: String? = null,
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
-    val defaltSxatata: Boolean = false,
+    @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
     val havasPodkastojn: Boolean get() = podkastaRssUrl != null
@@ -42,9 +43,9 @@ data class Elsendo(
     val priskriboHtml: String? = null,  // purigita HTML kun etikedoj (por detala vido)
     val bildoUrl: String? = null,
     val dato: String,                 // yyyy-MM-dd
-    val dauro: Long? = null,          // sekundoj
+    @JsonNames("dauro") val daŭro: Long? = null,          // sekundoj
     val fluo: String,              // audio-URL (mp3) — la plej grava kampo
-    val retpaghoUrl: String? = null,
+    @JsonNames("retpaghoUrl") val retpaĝoUrl: String? = null,
     val estasRekta: Boolean = false,
 )
 
@@ -71,14 +72,14 @@ sealed interface LudantoStato {
      *   [dk.nordfalk.esperanto.domain.player.LudvicoRegilo] reprovu; false por daŭraj eraroj
      *   (HTTP 404, nesubtenata formato) — tiam tuj saltu al la sekva.
      */
-    data class Eraro(val mesagho: String, val reprovebla: Boolean = true) : LudantoStato
+    data class Eraro(val mesaĝo: String, val reprovebla: Boolean = true) : LudantoStato
 }
 
 data class LudantoInformo(
     val stato: LudantoStato,
     val nunaFonto: Sonfonto? = null,
     val pozicioMs: Long = 0,
-    val dauroMs: Long = 0,
+    val daŭroMs: Long = 0,
     val estasRekta: Boolean = false,
 )
 
@@ -88,7 +89,7 @@ data class LudantoInformo(
  * @param elsendoId identigilo de la elsendo
  * @param kanaloSlug kiu kanalo
  * @param pozicioMs ĝis kiu pozicio (ms) la uzanto aŭskultis
- * @param dauroMs totala dauro (ms), aŭ 0 se nekonata
+ * @param daŭroMs totala daŭro (ms), aŭ 0 se nekonata
  * @param finita ĉu la elsendo estis tute ludita (naturfino)
  * @param lasteLudita tempmarko (epoch ms) de la lasta ludado
  */
@@ -97,7 +98,7 @@ data class LudataElsendo(
     val elsendoId: String,
     val kanaloSlug: String,
     val pozicioMs: Long = 0,
-    val dauroMs: Long = 0,
+    @JsonNames("dauroMs") val daŭroMs: Long = 0,
     val finita: Boolean = false,
     val erara: Boolean = false,
     val lasteLudita: Long = 0,

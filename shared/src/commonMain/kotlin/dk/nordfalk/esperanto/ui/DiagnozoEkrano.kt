@@ -36,13 +36,13 @@ fun DiagnozoEkrano(
 ) {
     val scope = rememberCoroutineScope()
     var rezultoj by remember { mutableStateOf<List<DiagnozoRezulto>?>(null) }
-    var ŝargxata by remember { mutableStateOf(true) }
+    var ŝarĝata by remember { mutableStateOf(true) }
 
     fun reKontroli() {
         scope.launch {
-            ŝargxata = true
+            ŝarĝata = true
             rezultoj = diagnozoRegilo.kontroli()
-            ŝargxata = false
+            ŝarĝata = false
         }
     }
 
@@ -80,7 +80,7 @@ fun DiagnozoEkrano(
             Spacer(Modifier.height(16.dp))
 
             when {
-                ŝargxata && rezultoj == null -> {
+                ŝarĝata && rezultoj == null -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         Spacer(Modifier.width(12.dp))
@@ -124,7 +124,7 @@ fun DiagnozoEkrano(
             OutlinedButton(
                 onClick = { logi("Klako", "re-kontroli (butono)"); reKontroli() },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !ŝargxata,
+                enabled = !ŝarĝata,
             ) {
                 Icon(Icons.Filled.Refresh, contentDescription = null)
                 Spacer(Modifier.width(8.dp))

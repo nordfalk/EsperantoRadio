@@ -28,7 +28,7 @@ object LudvicoLogiko {
     /**
      * @param nunaElsendo la elsendo kiu ĵus finiĝis (aŭ null)
      * @param samkanalajElsendoj elsendoj de la sama kanalo, ordigitaj plej-freŝe-unue
-     * @param cxiujElsendoj ĉiuj ŝargitaj elsendoj (por prioritatoj 2 kaj 3)
+     * @param ĉiujElsendoj ĉiuj ŝargitaj elsendoj (por prioritatoj 2 kaj 3)
      * @param plejŝatatajKanaloj aro de kanal-slugs kiuj estas plejŝatataj
      * @param ludatoj mapo elsendoId → LudataElsendo (ludstatuso)
      * @return la sekva elsendo ludi, aŭ null se neniu kandidato
@@ -36,7 +36,7 @@ object LudvicoLogiko {
     fun deciduSekvan(
         nunaElsendo: Elsendo?,
         samkanalajElsendoj: List<Elsendo>,
-        cxiujElsendoj: List<Elsendo>,
+        ĉiujElsendoj: List<Elsendo>,
         plejŝatatajKanaloj: Set<String>,
         ludatoj: Map<String, LudataElsendo>,
     ): Elsendo? {
@@ -47,11 +47,11 @@ object LudvicoLogiko {
         val nunaId = nunaElsendo?.id
 
         // Priority 2: nefinita elsendo de ŝatata kanalo
-        val elSxatataj = trovNefinitanElSxatataj(cxiujElsendoj, plejŝatatajKanaloj, ludatoj, nunaId)
-        if (elSxatataj != null) return elSxatataj
+        val elŜatataj = trovNefinitanElŜatataj(ĉiujElsendoj, plejŝatatajKanaloj, ludatoj, nunaId)
+        if (elŜatataj != null) return elŜatataj
 
         // Priority 3: plej freŝa elsendo ankoraŭ ne ludata
-        return trovPlejFresxanNeludatan(cxiujElsendoj, ludatoj, nunaId)
+        return trovPlejFreŝanNeludatan(ĉiujElsendoj, ludatoj, nunaId)
     }
 
     /**
@@ -84,13 +84,13 @@ object LudvicoLogiko {
      *
      * "Nefinita" signifas: aŭ neniam ludita, aŭ ludita sed ne tute finita.
      */
-    fun trovNefinitanElSxatataj(
-        cxiujElsendoj: List<Elsendo>,
+    fun trovNefinitanElŜatataj(
+        ĉiujElsendoj: List<Elsendo>,
         plejŝatatajKanaloj: Set<String>,
         ludatoj: Map<String, LudataElsendo>,
         nunaElsendoId: String? = null,
     ): Elsendo? {
-        return cxiujElsendoj
+        return ĉiujElsendoj
             .filter { it.kanaloSlug in plejŝatatajKanaloj }
             .filter { it.id != nunaElsendoId }
             .filter { ludatoj[it.id]?.finita != true }
@@ -101,12 +101,12 @@ object LudvicoLogiko {
      * Priority 3: Trovas la plej freŝan elsendon kiu neniam estis ludita
      * (neniu LudataElsendo ekzistas por ĝi).
      */
-    fun trovPlejFresxanNeludatan(
-        cxiujElsendoj: List<Elsendo>,
+    fun trovPlejFreŝanNeludatan(
+        ĉiujElsendoj: List<Elsendo>,
         ludatoj: Map<String, LudataElsendo>,
         nunaElsendoId: String? = null,
     ): Elsendo? {
-        return cxiujElsendoj
+        return ĉiujElsendoj
             .filter { it.id != nunaElsendoId }
             .filter { it.id !in ludatoj }
             .maxByOrNull { it.dato }

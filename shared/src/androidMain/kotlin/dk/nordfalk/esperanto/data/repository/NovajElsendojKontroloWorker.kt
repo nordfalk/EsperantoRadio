@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import dk.nordfalk.esperanto.data.config.IntentSxlosilo
+import dk.nordfalk.esperanto.data.config.IntentŜlosilo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
@@ -30,10 +30,10 @@ import kotlinx.coroutines.delay
 /**
  * Fona Worker kiu periode kontrolas ŝatatajn kanalojn por novaj elsendoj.
  *
- * Skedita per WorkManager cxe 7:00 kaj 16:00 (±1h). Por cxiu ŝatata kanalo:
+ * Skedita per WorkManager ĉe 7:00 kaj 16:00 (±1h). Por ĉiu ŝatata kanalo:
  * 1. Elŝutas la RSS-fluon
  * 2. Filtras novajn elsendojn (ne viditaj)
- * 3. Kreas sciigon por cxiu nova elsendo
+ * 3. Kreas sciigon por ĉiu nova elsendo
  *
  * La sciigo havas du agojn:
  * - Klako sur la sciigo → malfermas la elsendon en la apo
@@ -110,7 +110,7 @@ class NovajElsendojKontroloWorker(
                 // la per-kanala catch sube protokolas kaj daŭrigas kun la aliaj kanaloj
                 expectSuccess = true
             }
-            val parsilo = RssParsilo(ArchiveOrgDosiernomoKasho(settings))
+            val parsilo = RssParsilo(ArchiveOrgDosiernomoKaŝo(settings))
             var totalNovaj = 0
 
             for (kanalo in kanaloj) {
@@ -211,7 +211,7 @@ class NovajElsendojKontroloWorker(
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     // (PR #89) la eksportita Activity kontrolas la nonce-on — sen ĝi
                     // iu ajn apliko povus forĝi la ekstraĵojn (phishing, ludi ajnan URI-on)
-                    IntentSxlosilo.aldonuNomon(this)
+                    IntentŜlosilo.aldonuNomon(this)
                 }
             ),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,

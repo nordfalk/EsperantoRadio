@@ -15,10 +15,10 @@ actual fun malfermuLigon(url: String) {
     }
 }
 
-actual fun malfermuRetposhton(retposhto: String, temo: String, teksto: String) {
-    logi("Ligilo", "Malfermas retpoŝton al: $retposhto")
+actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
+    logi("Ligilo", "Malfermas retpoŝton al: $retpoŝto")
     try {
-        val url = "mailto:$retposhto?subject=${kodiguUriKomponanton(temo)}&body=${kodiguUriKomponanton(teksto)}"
+        val url = "mailto:$retpoŝto?subject=${kodiguUriKomponanton(temo)}&body=${kodiguUriKomponanton(teksto)}"
         kotlinx.browser.window.open(url, "_blank")
     } catch (e: Throwable) {
         logw("Ligilo", "Ne povas malfermi retpoŝto-programon", e)

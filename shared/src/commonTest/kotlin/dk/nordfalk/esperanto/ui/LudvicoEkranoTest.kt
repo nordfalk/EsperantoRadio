@@ -14,7 +14,7 @@ import kotlin.test.Test
 class LudvicoEkranoTest {
 
     @Test
-    fun montrasMalplenanMesagxonKiamVicoMalplenas() = runComposeUiTest {
+    fun montrasMalplenanMesaĝonKiamVicoMalplenas() = runComposeUiTest {
         val regilo = kreuRegilon()
         setContent { pTemo { LudvicoEkrano(ludvicoRegilo = regilo, onReen = {}) } }
         waitForIdle()
@@ -54,8 +54,8 @@ class LudvicoEkranoTest {
                 override fun observiElsendojn(kanaloSlug: String) = MutableStateFlow(emptyList<Elsendo>())
                 override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean) = emptyList<Elsendo>()
                 override suspend fun getElsendo(id: String) = null
-                override suspend fun sercxiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
-                override suspend fun sxargxiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
+                override suspend fun serĉiElsendojn(teksto: String, limo: Int) = emptyList<Elsendo>()
+                override suspend fun ŝargiElsendojnPorKanal(kanalo: dk.nordfalk.esperanto.domain.model.Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
             },
             kanaloDeponejo = object : dk.nordfalk.esperanto.domain.repository.KanaloDeponejo {
                 override fun observiKanalojn() = MutableStateFlow(emptyList<dk.nordfalk.esperanto.domain.model.Kanalo>())

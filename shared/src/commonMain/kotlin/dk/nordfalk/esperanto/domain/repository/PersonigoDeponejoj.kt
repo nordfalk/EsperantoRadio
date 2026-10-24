@@ -2,8 +2,8 @@ package dk.nordfalk.esperanto.domain.repository
 
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.ElshutStato
-import dk.nordfalk.esperanto.domain.model.ElshutitaElsendo
+import dk.nordfalk.esperanto.domain.model.ElŝutStato
+import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import kotlinx.coroutines.flow.Flow
@@ -15,8 +15,8 @@ interface PlejŝatatajDeponejo {
     suspend fun estasPlejŝatata(kanaloSlug: String): Boolean
 }
 
-interface LastAuxskultitajDeponejo {
-    fun observiLastAuxskultitajn(): StateFlow<List<Elsendo>>
+interface LastAŭskultitajDeponejo {
+    fun observiLastAŭskultitajn(): StateFlow<List<Elsendo>>
     suspend fun registri(elsendo: Elsendo)
     suspend fun getPozicio(elsendoId: String): Long?
 }
@@ -27,7 +27,7 @@ interface LastAuxskultitajDeponejo {
  */
 interface LudatojDeponejo {
     fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>>
-    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, dauroMs: Long)
+    suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long)
 
     /**
      * Metas la tempmarkon lasteLudita al nun — sen tuŝi pozicion aŭ daŭron.
@@ -43,14 +43,14 @@ interface LudatojDeponejo {
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
-interface SercxoDeponejo {
-    suspend fun sercxi(teksto: String, limo: Int = 50): List<Elsendo>
+interface SerĉoDeponejo {
+    suspend fun serĉi(teksto: String, limo: Int = 50): List<Elsendo>
 }
 
 interface AgordojDeponejo {
     val temo: StateFlow<String>
     val sciigoj: StateFlow<Boolean>
-    val auxtomataDaurigo: StateFlow<Boolean>
+    val aŭtomataDaŭrigo: StateFlow<Boolean>
     val evoluo: StateFlow<Boolean>
     val detalaProtokolado: StateFlow<Boolean>
 
@@ -58,19 +58,19 @@ interface AgordojDeponejo {
      * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
      * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
      */
-    val kasxitajAvertoj: StateFlow<Set<DiagnozoTipo>>
+    val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>>
 
     fun fiksiTemon(temo: String)
-    fun fiksiSciigojn(sxaltita: Boolean)
-    fun fiksiAuxtomatanDaurigon(sxaltita: Boolean)
-    fun fiksiEvoluon(sxaltita: Boolean)
-    fun fiksiDetalanProtokoladon(sxaltita: Boolean)
+    fun fiksiSciigojn(ŝaltita: Boolean)
+    fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
+    fun fiksiEvoluon(ŝaltita: Boolean)
+    fun fiksiDetalanProtokoladon(ŝaltita: Boolean)
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
-    fun kasxuAvertojn(tipoj: Set<DiagnozoTipo>)
+    fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>)
 
     /** Forgesas la kaŝojn de problemo-tipoj kiuj ne plu ekzistas */
-    fun puriguKasxitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>)
+    fun puriguKaŝitajnAvertojn(ekzistantaj: Set<DiagnozoTipo>)
 }
 
 /**
@@ -78,14 +78,14 @@ interface AgordojDeponejo {
  * - Android/Desktop: Ktor → dosiero
  * - wasmJs/iOS: NoOp (ne haveblas)
  */
-interface ElshutDeponejo {
-    fun observiElshutojn(): StateFlow<Map<String, ElshutitaElsendo>>  // elsendoId → stato
-    fun observiElshutStaton(elsendoId: String): StateFlow<ElshutStato>
-    suspend fun elshuti(elsendo: Elsendo)
+interface ElŝutDeponejo {
+    fun observiElŝutojn(): StateFlow<Map<String, ElŝutitaElsendo>>  // elsendoId → stato
+    fun observiElŝutStaton(elsendoId: String): StateFlow<ElŝutStato>
+    suspend fun elŝuti(elsendo: Elsendo)
     suspend fun haltigi(elsendoId: String)
     suspend fun forigi(elsendoId: String)
     suspend fun getLokaDosieroVojo(elsendoId: String): String?
-    fun estasElshutita(elsendoId: String): Boolean
+    fun estasElŝutita(elsendoId: String): Boolean
 }
 
 /**
@@ -96,7 +96,7 @@ interface ElshutDeponejo {
 interface AlarmoDeponejo {
     fun observiAlarmojn(): StateFlow<List<Alarmo>>
     suspend fun krei(alarmo: Alarmo)
-    suspend fun ghisdatigi(alarmo: Alarmo)
+    suspend fun ĝisdatigi(alarmo: Alarmo)
     suspend fun forigi(alarmoId: Int)
     suspend fun baskuliAktivon(alarmoId: Int)
 }

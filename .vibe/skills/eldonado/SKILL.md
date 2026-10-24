@@ -15,7 +15,8 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 2. **Baskulu `versionCode`** en `androidApp/build.gradle.kts` (`defaultConfig.versionCode`).
    GPP ne pliigas ĝin aŭtomate kaj la Play-API rifuzas re-uzi jam eldonitan
    versionCode ("Version code is too low or has already been used").
-   Historio: 246=3.0.2, 247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto (2026-10-13).
+   Historio: 246=3.0.2, 247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto,
+   250=3.0.4-19okt, 251=3.0.4-beta24okt (2026-10-24).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
@@ -30,8 +31,9 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    kiel retroiro) — NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.)
    estas ignoritaj de GPP (tiel ĉiuj eldonoj 3.0.2…249 eldoniĝis kun la malnovaj
    3.0.1-notoj; la 249-notoj korektiĝis permane). La historiaj `X.Y.Z.txt`-dosieroj
-   estas arkivigitaj en `androidApp/src/main/play/release-notes-arkivo/` — ekster
-   la de GPP skanata dosierujo.
+   estas arkivigitaj en `androidApp/release-notes-arkivo/`. NENIAM interne de
+   `src/main/play/`: GPP 4.x validigas ĈIUJN dosierojn tie kaj rifuzas la taskon
+   per „Unknown Play resource file“ (2026-10-24, la unua GPP-4-eldono).
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
    la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
    ```bash
@@ -78,8 +80,11 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 - GPP 4.1.0 ŝanĝoj: ap-titolo en listing-metadatumoj maks. **30 signoj** (estis
   50); nova agordo `retainInProgressRollout` (evitas haltigon de rulata
   disvastigo dum promocio).
-- **La unua eldono post la GPP-4-ĝisdatigo ne estas ankoraŭ praktike testita** —
-  kontrolu la tasko-eligilon atente kaj komparu kun la atendaĵoj supre.
+- **GPP 4.x estas nun praktike testita** (2026-10-24, 251): la tasko-nomoj kaj la
+  atendata eligilo (`Updating [completed] release (...:[N]) in track 'internal'`)
+  funkcias; du provoj lernitaj: la versio-nomitaj dosieroj rompas la validigilon
+  (vidu supre) kaj la versionCode-historio ĉi tie devas resti ĝisdata — 250 estis
+  jam okupita de 3.0.4-19okt kiam ĝi ankoraŭ mankis en la listo.
 
 ## Kontrolu post la eldono
 

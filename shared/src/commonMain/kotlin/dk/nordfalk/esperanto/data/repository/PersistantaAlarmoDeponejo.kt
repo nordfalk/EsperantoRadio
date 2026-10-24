@@ -14,9 +14,9 @@ import kotlinx.serialization.json.Json
 /**
  * Persistanta AlarmoDeponejo. Uzas multiplatform-settings kun JSON-serializo.
  *
- * - Se persistitaj alarmoj ekzistas, ili estas sxargxitaj cxe starto.
+ * - Se persistitaj alarmoj ekzistas, ili estas ŝargitaj ĉe starto.
  * - Se ne, la sugestoj estas montritaj (malaktivaj).
- * - Cxiu sxangxo estas tuj persistita.
+ * - Ĉiu ŝanĝo estas tuj persistita.
  */
 class PersistantaAlarmoDeponejo(
     private val settings: Settings,
@@ -58,12 +58,12 @@ class PersistantaAlarmoDeponejo(
         return try {
             val alarmoj = json.decodeFromString(ListSerializer(Alarmo.serializer()), str)
             nextId = maxOf(nextId, (alarmoj.maxOfOrNull { it.id } ?: 0) + 1)
-            logi("AlarmoDeponejo", "Sargxis ${alarmoj.size} persistitajn alarmojn")
+            logi("AlarmoDeponejo", "Sarĝis ${alarmoj.size} persistitajn alarmojn")
             alarmoj
         } catch (e: Exception) {
             logw("AlarmoDeponejo", "Ne eblis legi persistitajn alarmojn", e)
             // (PR #95) konservu la krudan valoron kiel rezervon — sen tio la sekvaj
-            // persistu()-vokoj (ekigis/krei/sxalti) anstataŭigas ĝin kaj la uzantaj
+            // persistu()-vokoj (ekigis/krei/ŝalti) anstataŭigas ĝin kaj la uzantaj
             // alarmoj estas definitive perditaj. Kun la rezervo ili estas reakireblaj.
             try {
                 settings.putString(SettingsKeys.ALARMOJ_REZERVO, str)
@@ -87,7 +87,7 @@ class PersistantaAlarmoDeponejo(
         logi("AlarmoDeponejo", "Kreis: ${nova.tempoTeksto} ${nova.ripetoTeksto} → ${nova.kanaloSlug} (nova id=${nova.id})")
     }
 
-    override suspend fun ghisdatigi(alarmo: Alarmo) {
+    override suspend fun ĝisdatigi(alarmo: Alarmo) {
         skedilo?.malplani(alarmo.id)
         _alarmoj.value = _alarmoj.value.map { if (it.id == alarmo.id) alarmo else it }
         persistu()
@@ -96,11 +96,11 @@ class PersistantaAlarmoDeponejo(
     }
 
     override suspend fun forigi(alarmoId: Int) {
-        val antauxa = _alarmoj.value.find { it.id == alarmoId }
+        val antaŭa = _alarmoj.value.find { it.id == alarmoId }
         skedilo?.malplani(alarmoId)
         _alarmoj.value = _alarmoj.value.filter { it.id != alarmoId }
         persistu()
-        logi("AlarmoDeponejo", "Forigis: id=$alarmoId tempo=${antauxa?.tempoTeksto} — restas ${_alarmoj.value.size} alarmoj")
+        logi("AlarmoDeponejo", "Forigis: id=$alarmoId tempo=${antaŭa?.tempoTeksto} — restas ${_alarmoj.value.size} alarmoj")
     }
 
     override suspend fun baskuliAktivon(alarmoId: Int) {

@@ -37,10 +37,10 @@ class KanalAgordoLeganto {
     private fun striptiguKomentojn(teksto: String): String {
         val sb = StringBuilder(teksto.length)
         var i = 0
-        var enCxeno = false
+        var enĈeno = false
         while (i < teksto.length) {
             val c = teksto[i]
-            if (enCxeno && c == '\\') {
+            if (enĈeno && c == '\\') {
                 // `\` + linisalto = lin-daŭrigo — forigu ambaŭ
                 if (i + 1 < teksto.length && (teksto[i + 1] == '\n' || teksto[i + 1] == '\r')) {
                     i++ // saltu `\`
@@ -59,12 +59,12 @@ class KanalAgordoLeganto {
                 continue
             }
             if (c == '"') {
-                enCxeno = !enCxeno
+                enĈeno = !enĈeno
                 sb.append(c)
                 i++
                 continue
             }
-            if (!enCxeno && c == '/' && i + 1 < teksto.length && teksto[i + 1] == '/') {
+            if (!enĈeno && c == '/' && i + 1 < teksto.length && teksto[i + 1] == '/') {
                 // Saltu ĝis linifino
                 while (i < teksto.length && teksto[i] != '\n') i++
                 continue
@@ -82,7 +82,7 @@ data class KanalAgordo(
     val intervals: Intervals? = null,
     val komenca_kanalo: String? = null,
     val elsendojUrl: String? = null,
-    val hejmpagho: String? = null,
+    val hejmpaĝo: String? = null,
     val kanaloj: List<KanaloDto> = emptyList(),
     val sugestoj_por_alarmoj: String? = null,
 ) {
@@ -91,7 +91,7 @@ data class KanalAgordo(
         val kontakt_url: String? = null,
         val kontakt_modtagere: List<String>? = null,
         val kontakt_titel: String? = null,
-        @SerialName("apaj_novaĵoj") val apajNovajxoj: String? = null,
+        @SerialName("apaj_novaĵoj") val apajNovaĵoj: String? = null,
     )
 
     @Serializable
@@ -110,14 +110,14 @@ data class KanaloDto(
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
     val rektaElsendaPriskriboUrl: String? = null,
-    @SerialName("hejmpaĝoButono") val hejmpaghoButono: String? = null,
-    @SerialName("retpoŝto") val retposhto: String? = null,
+    @SerialName("hejmpaĝoButono") val hejmpaĝoButono: String? = null, // Ĉu eblas forigi @SerialName("hejmpaĝoButono") kaj similaj?
+    @SerialName("retpoŝto") val retpoŝto: String? = null,
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
-    @SerialName("defaŭltŜatata") val defaltSxatata: Boolean = false,
+    @SerialName("defaŭltŜatata") val defaŭltŜatata: Boolean = false,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
@@ -128,24 +128,24 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     rektaElsendaSonoUrl = rektaElsendaSonoUrl,
     podkastaRssUrl = elsendojRssUrl,
     rektaElsendaPriskriboUrl = rektaElsendaPriskriboUrl,
-    retejoUrl = hejmpaghoButono,
-    retposhto = retposhto,
+    retejoUrl = hejmpaĝoButono,
+    retpoŝto = retpoŝto,
     ignoruTitolon = elsendojRssIgnoruTitolon,
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
-    defaltSxatata = defaltSxatata,
+    defaŭltŜatata = defaŭltŜatata,
 )
 
 /**
  * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
  *
  * Formato: `id/enabled/horo/minuto/ripeto/time/=kanalo/=etikedo/`
- * kun `\` cxe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
+ * kun `\` ĉe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
  * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
  *
- * Post JSONC-striptigo cxiuj sugestoj estas sur unu linio, apartigitaj per `/`.
- * Cxiu alarmo konsistas el 8 partoj + trailing `/` (9 elementoj per split).
+ * Post JSONC-striptigo ĉiuj sugestoj estas sur unu linio, apartigitaj per `/`.
+ * Ĉiu alarmo konsistas el 8 partoj + trailing `/` (9 elementoj per split).
  */
 fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
     val partoj = teksto.split("/")
@@ -165,7 +165,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
             val ripeto = partoj[i + 4].toInt() and 0x7f
             // partoj[i + 5] = time (malnova, ne uzata)
             val kanaloSlug = partoj[i + 6].removePrefix("=")
-            val etikedo = malkoduUrlKoditajxon(partoj[i + 7].removePrefix("="))
+            val etikedo = malkoduUrlKoditaĵon(partoj[i + 7].removePrefix("="))
             rezulto.add(Alarmo(
                 id = id,
                 horo = horo,
@@ -176,7 +176,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 etikedo = etikedo.ifBlank { null }
             ))
         } catch (e: Exception) {
-            logw("AlarmoSugestoj", "Ne eblis parsii alarmon cxe indekso $i", e)
+            logw("AlarmoSugestoj", "Ne eblis parsii alarmon ĉe indekso $i", e)
         }
         i += 8
     }
@@ -191,7 +191,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
  * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (PR #89).
  * Jam-malkoditaj signoj (kodo > 127) estas trairataj senŝanĝe.
  */
-internal fun malkoduUrlKoditajxon(teksto: String): String {
+internal fun malkoduUrlKoditaĵon(teksto: String): String {
     val rezulto = StringBuilder()
     val bajtoj = mutableListOf<Int>()
     fun elfluigu() {

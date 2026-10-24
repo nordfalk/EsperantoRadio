@@ -17,14 +17,14 @@ class DosierNomojTest {
     }
 
     @Test
-    fun sanigasChiujnNevalidajnSignojn() {
+    fun sanigasĈiujnNevalidajnSignojn() {
         val id = "a:b/c\\d?e*f\"g<h>i|j"
         val rezulto = sanigiDosiernomon(id)
         assertEquals("a-b-c-d-e-f-g-h-i-j", rezulto)
     }
 
     @Test
-    fun lasasValidajnSignojnNetushitajn() {
+    fun lasasValidajnSignojnNetuŝitajn() {
         val id = "k1_2024-03-01_epizodo-5"
         assertEquals(id, sanigiDosiernomon(id), "Validaj signoj devas resti netuŝitaj")
     }

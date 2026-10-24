@@ -520,7 +520,7 @@ fun HejmoEkrano(
                                 // Montru kiel trovi la kaŝitan averton poste
                                 amplekso.launch {
                                     snackbarStato.showSnackbar(
-                                        message = "Vi povas solvi ĝin poste en la agordoj.",
+                                        message = "Vi povas poste solvi en la agordoj.",
                                         actionLabel = "Agordoj",
                                         duration = SnackbarDuration.Long,
                                     )?.let { rezulto ->

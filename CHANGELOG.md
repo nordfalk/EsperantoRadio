@@ -17,7 +17,6 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - Vekhorloĝo: la tempo elekteblas per ciferblido en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
-- Post kaŝo de la averto-karto aperas mallonga mesaĝo kun butono kiu rekte kondukas al la agordoj (https://github.com/nordfalk/EsperantoRadio/pull/132)
 
 ### Ŝanĝita
 

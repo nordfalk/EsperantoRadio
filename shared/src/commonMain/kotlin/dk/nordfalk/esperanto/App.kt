@@ -488,13 +488,24 @@ fun EsperantoRadioApp(
                         sekvantaSubtitolo = "Kanalo"
                         sekvantaBildoUrl = k.emblemoUrl
                         onLudiSekvantan = {
-                            // Kiel la "Rekta elsendo"-butono de la kanala ekrano mem
-                            val fonto = k.rektaElsendaSonoUrl?.let { Sonfonto.RektaKanalo(k) }
-                            if (fonto != null) {
+                            // Kiel la ludo-butono en la Kanalaro-listo: rekta kanalo
+                            // → la rekta fluo; podkasta kanalo → la plej nova elsendo
+                            if (k.estasRekta) {
                                 logi("Nav", "Sekvanta: ludas rekte ${k.slug}")
-                                scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
+                                scope.launch {
+                                    ludilo.fiksiFonton(Sonfonto.RektaKanalo(k)); ludilo.ludi()
+                                }
                             } else {
-                                logi("Nav", "Sekvanta: ${k.slug} ne havas rektan fluon — nenio ludebla")
+                                scope.launch {
+                                    // Tolerema ŝargilo — liveras kaŝaĵon ĉe ret-eraro
+                                    val lasta = elsendoDeponejo.sxargxiElsendojnPorKanal(k).maxByOrNull { it.dato }
+                                    if (lasta != null) {
+                                        logi("Nav", "Sekvanta: ludas lastan elsendon de ${k.slug} (${lasta.id})")
+                                        ludvicoRegilo.ludiElsendon(lasta)
+                                    } else {
+                                        logi("Nav", "Sekvanta: ${k.slug} havas nek rektan fluon nek elsendojn — nenio ludebla")
+                                    }
+                                }
                             }
                         }
                         if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null

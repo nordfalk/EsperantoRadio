@@ -11,8 +11,9 @@ import kotlin.test.assertTrue
 
 /**
  * Regres-testoj por la persistigitaj JSON-ŝlosiloj (ortografia renomo, 2026-10-24):
- * la @SerialName-ŝlosiloj devas konservi la HISTORIAJN x-sistemajn nomojn, por ke
- * ekzistantaj uzant-datumoj (navig-stato, lastaj ludataj, elŝutoj) restu legeblaj.
+ * la nova apo devas LEGI datumon skribitan de malnova versio (historiaj
+ * x-sistemaj ŝlosiloj, per @JsonNames) kaj SKRIBI la novajn, ĝustliterajn
+ * ŝlosilojn (la posedanto decidis: malnova versio ne devas legi la novan).
  */
 class MigradoDeJSONTest {
 
@@ -28,11 +29,11 @@ class MigradoDeJSONTest {
     }
 
     @Test
-    fun kanaloSkribasHistoriajnŜlosilojn() {
+    fun kanaloSkribasNovajnŜlosilojn() {
         val kanalo = Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", retpoŝto = "a@b.c", defaŭltŜatata = true)
         val teksto = json.encodeToString(Kanalo.serializer(), kanalo)
-        assertTrue("retposhto" in teksto, "Skribado devas uzi la historian ŝlosilon retposhto: $teksto")
-        assertTrue("defaltSxatata" in teksto, "Skribado devas uzi la historian ŝlosilon defaltSxatata: $teksto")
+        assertTrue("\"retpoŝto\"" in teksto, "Skribado devas uzi la novan ŝlosilon retpoŝto: $teksto")
+        assertTrue("\"defaŭltŜatata\"" in teksto, "Skribado devas uzi la novan ŝlosilon defaŭltŜatata: $teksto")
     }
 
     @Test
@@ -45,14 +46,14 @@ class MigradoDeJSONTest {
     }
 
     @Test
-    fun elsendoSkribasHistoriajnŜlosilojn() {
+    fun elsendoSkribasNovajnŜlosilojn() {
         val elsendo = Elsendo(
             id = "kernpunkto:2026", kanaloSlug = "kernpunkto", titolo = "T", dato = "2026-01-01", fluo = "https://x/a.mp3",
             daŭro = 123, retpaĝoUrl = "https://ekzemplo.org",
         )
         val teksto = json.encodeToString(Elsendo.serializer(), elsendo)
-        assertTrue("\"dauro\"" in teksto, "Skribado devas uzi la historian ŝlosilon dauro: $teksto")
-        assertTrue("retpaghoUrl" in teksto, "Skribado devas uzi la historian ŝlosilon retpaghoUrl: $teksto")
+        assertTrue("\"daŭro\"" in teksto, "Skribado devas uzi la novan ŝlosilon daŭro: $teksto")
+        assertTrue("\"retpaĝoUrl\"" in teksto, "Skribado devas uzi la novan ŝlosilon retpaĝoUrl: $teksto")
     }
 
     @Test
@@ -62,7 +63,7 @@ class MigradoDeJSONTest {
         )
         assertEquals(65000L, ludata.daŭroMs)
         val teksto = json.encodeToString(LudataElsendo.serializer(), ludata)
-        assertTrue("\"dauroMs\"" in teksto, "Skribado devas uzi la historian ŝlosilon dauroMs: $teksto")
+        assertTrue("\"daŭroMs\"" in teksto, "Skribado devas uzi la novan ŝlosilon daŭroMs: $teksto")
     }
 
     @Test

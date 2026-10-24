@@ -1,6 +1,6 @@
 package dk.nordfalk.esperanto.domain.model
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
 
 /**
@@ -18,13 +18,13 @@ data class Kanalo(
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,             // hejmpaĝoButono
-    @SerialName("retposhto") val retpoŝto: String? = null,
+    @JsonNames("retposhto") val retpoŝto: String? = null,
     val ignoruTitolon: Boolean = false,         // elsendojRssIgnoruTitolon
     val montruTitolojn: Boolean = true,
     val uzuWebViewPorElsendo: Boolean = false,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
-    @SerialName("defaltSxatata") val defaŭltŜatata: Boolean = false,
+    @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
     val havasPodkastojn: Boolean get() = podkastaRssUrl != null
@@ -43,9 +43,9 @@ data class Elsendo(
     val priskriboHtml: String? = null,  // purigita HTML kun etikedoj (por detala vido)
     val bildoUrl: String? = null,
     val dato: String,                 // yyyy-MM-dd
-    @SerialName("dauro") val daŭro: Long? = null,          // sekundoj
+    @JsonNames("dauro") val daŭro: Long? = null,          // sekundoj
     val fluo: String,              // audio-URL (mp3) — la plej grava kampo
-    @SerialName("retpaghoUrl") val retpaĝoUrl: String? = null,
+    @JsonNames("retpaghoUrl") val retpaĝoUrl: String? = null,
     val estasRekta: Boolean = false,
 )
 
@@ -79,7 +79,7 @@ data class LudantoInformo(
     val stato: LudantoStato,
     val nunaFonto: Sonfonto? = null,
     val pozicioMs: Long = 0,
-    @SerialName("dauroMs") val daŭroMs: Long = 0,
+    val daŭroMs: Long = 0,
     val estasRekta: Boolean = false,
 )
 
@@ -98,7 +98,7 @@ data class LudataElsendo(
     val elsendoId: String,
     val kanaloSlug: String,
     val pozicioMs: Long = 0,
-    @SerialName("dauroMs") val daŭroMs: Long = 0,
+    @JsonNames("dauroMs") val daŭroMs: Long = 0,
     val finita: Boolean = false,
     val erara: Boolean = false,
     val lasteLudita: Long = 0,

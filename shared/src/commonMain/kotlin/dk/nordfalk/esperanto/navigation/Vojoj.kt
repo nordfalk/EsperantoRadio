@@ -19,6 +19,11 @@ sealed interface Vojo : NavKey {
     @Serializable data object Hejmo : Vojo
     @Serializable data object Kanalaro : Vojo
     @Serializable data object Plejŝatataj : Vojo
+    // La klasa nomo estas la diskriminilo de la persistigita navig-stato. La
+    // HISTORIAJ nomoj restas por ke la nova apo legu staton skribitan de malnova
+    // versio; la diskriminilo ne subtenas plurajn leg-nomojn (kampo-ŝlosiloj
+    // havas @JsonNames en Modeloj.kt, diskriminiloj ne), do la skribo daŭre
+    // uzas la historian nomon — malnova versio ne devas scii pri la nova.
     @Serializable @SerialName("dk.nordfalk.esperanto.navigation.Vojo.Sercxo") data object Serĉo : Vojo
     @Serializable @SerialName("dk.nordfalk.esperanto.navigation.Vojo.Elshutoj") data object Elŝutoj : Vojo
     @Serializable data object Ludvico : Vojo

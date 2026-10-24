@@ -132,7 +132,7 @@ fun EsperantoRadioApp(
         // klako ekstere povu kolapsi ĝin
         var elfaldita by rememberSaveable { mutableStateOf(false) }
 
-        // Regulo 1 (gluiĝema): kiam nenio ludas, la miniludilbreto montras la
+        // Gluiĝema sekvanta enhavo: kiam nenio ludas, la miniludilbreto montras la
         // LASTE MONSTRITAN enhavon — la lastan vidatan detalan celon (sekvante
         // svipojn) aŭ la lastan ludatan elsendon/kanalon. Nur vidado kaj ludado
         // ĝisdatigas ĝin; nura navigado (reen, langetoj, tirkesto) ne.
@@ -469,7 +469,7 @@ fun EsperantoRadioApp(
             if (montruMiniLudilbreton) {
                 val reprovo by ludvicoRegilo.reprovo.collectAsState()
 
-                // Sekvanta enhavo (regulo 1, gluiĝema) — kiam nenio ludas, la breto
+                // Sekvanta enhavo (gluiĝema) — kiam nenio ludas, la breto
                 // montras la laste montritan enhavon el la regilo: kanalo venas unue,
                 // poste elsendo (gluiĝema aŭ la restarta semo).
                 val k = sekvantaRegilo.sekvantaKanalo

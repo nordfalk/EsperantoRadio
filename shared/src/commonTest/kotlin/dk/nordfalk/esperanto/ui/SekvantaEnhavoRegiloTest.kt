@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 /**
- * Testoj por [SekvantaEnhavoRegilo] — regulo 1 (gluiĝema): la miniludilbreto
+ * Testoj por [SekvantaEnhavoRegilo] — gluiĝema enhavo: la miniludilbreto
  * montras la laste VIDATAN detalan celon aŭ LUDATAN fonton; nura navigado ne
  * ŝanĝas la enhavon (neniu metodo "navigas", do ĝi ne povas ŝanĝi ĝin).
  */

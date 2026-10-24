@@ -8,7 +8,7 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 
 /**
- * Regilo de la GLUIĜEMA sekvanta enhavo de la miniludilbreto (regulo 1).
+ * Regilo de la GLUIĜEMA sekvanta enhavo de la miniludilbreto.
  *
  * Kiam nenio ludas, la breto montras la LASTE MONSTRITAN enhavon: la lastan
  * vidatan detalan celon (kanalo/elsendo — sekvante ankaŭ svipojn) aŭ la lastan
@@ -19,8 +19,8 @@ import dk.nordfalk.esperanto.domain.model.Sonfonto
  * - **ludado** — [ludisFonton] (la ludata elsendo/kanalo iĝas la sekvanta enhavo,
  *   do ĝi restas ankaŭ post haltigo).
  *
- * Nura navigado (reen-butono, langetoj, tirkesto) NE ŝanĝas la enhavon — tio
- * estas la esenco de regulo 1: la breto ne saltas inter elsendoj je navigado.
+ * Nura navigado (reen-butono, langetoj, tirkesto) NE ŝanĝas la enhavon — la
+ * breto ne saltas inter elsendoj je navigado.
  *
  * La [semo] liveras la elsendon montrotan post restarto (el la persistaj
  * ludatoj), kiam nenio estis vidata/ludata dum ĉi tiu sesio.

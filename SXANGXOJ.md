@@ -54,17 +54,19 @@ Antaŭe la breto tute malaperis kiam nenio ludis (escepte detalo-ekranojn, kie
   post restarto bazita sur `HejmoViewModel.lastatempeLudataj`;
 - klako sur la breto navigas al la sekvan enhavon (`sekvantaVojo`).
 
-**Riparo post uzanta observo (regulo 1)**: la unua versio reagis al la NAVIGADO —
-sur detaloj la vidata celo, reen sur la ĉefekrano subite la laste ludata elsendo,
-do la breto "saltis" al alia elsendo je ĉiu reen-iro. Post diskuto (regulo 1
-"gluiĝema" kontraŭ regulo 2 "vidado venkas"; la sola diverĝa kazo: ludi elsendon
-sen rigardi ĝian detalon) la posedanto elektis regulon 1: la enhavo estas GLUIĜEMA
-— nur **vidado** de detala celo (eniro/svipo) kaj **ludado** ĝisdatigas ĝin.
-Nova `ui/SekvantaEnhavoRegilo.kt` (pure, rekte testebla): `vidisElsendon` /
-`vidisKanalon` / `ludisFonton` (la ludata elsendo/kanalo iĝas la sekvanta —
-rekta kanalo iĝas kanala sekvanto; haltigo ŝanĝas nenion), `elsendo()` kun la
-restarta semo el la persistaj ludatoj. App.kt nur konektas la eventojn;
-la klako-navigado evitas duoblan puŝon se oni jam estas sur tiu ekrano.
+**Riparo post uzanta observo — la sekvanta enhavo fariĝis gluiĝema**: la unua
+versio reagis al la NAVIGADO — sur detaloj la vidata celo, reen sur la ĉefekrano
+subite la laste ludata elsendo, do la breto "saltis" al alia elsendo je ĉiu
+reen-iro. Post diskuto de du alternativoj — (a) "la laste montrata enhavo
+venkas" kaj (b) "vidado venkas super ludado"; ili diferĝas nur kiam oni ludas
+elsendon sen rigardi ĝian detalon — la posedanto elektis (a): la enhavo estas
+GLUIĜEMA — nur **vidado** de detala celo (eniro/svipo) kaj **ludado**
+ĝisdatigas ĝin. Nova `ui/SekvantaEnhavoRegilo.kt` (pure, rekte testebla):
+`vidisElsendon` / `vidisKanalon` / `ludisFonton` (la ludata elsendo/kanalo
+iĝas la sekvanta — rekta kanalo iĝas kanala sekvanto; haltigo ŝanĝas nenion),
+`elsendo()` kun la restarta semo el la persistaj ludatoj. App.kt nur konektas
+la eventojn; la klako-navigado evitas duoblan puŝon se oni jam estas sur tiu
+ekrano.
 
 Kontrolrezulto: `:shared:desktopTest` (ĉiuj testoj verdaj, inkluzive la 2 novajn
 gestajn UI-testojn), `:androidApp:assembleDebug`, `:webApp:compileKotlinWasmJs` verdaj.

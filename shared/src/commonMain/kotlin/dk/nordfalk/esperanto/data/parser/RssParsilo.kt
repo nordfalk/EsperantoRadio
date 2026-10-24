@@ -27,7 +27,7 @@ import kotlinx.serialization.json.jsonPrimitive
  * La ĝenerala RSS/Atom-parsilo. Traktas la sep parsregulojn.
  * Vidu docs/malnova/03_parsado_kaj_fontoj.md kaj docs/nova/04_parsado_kaj_arkivo.md.
  *
- * @param archiveOrgKasho persista kesto de archive.org-dosiernomoj (regulo 6.3);
+ * @param archiveOrgKasho persista kesto de archive.org-dosiernomoj (regulo P6.3);
  *   null = sen persisto (testoj)
  */
 class RssParsilo(
@@ -42,9 +42,9 @@ class RssParsilo(
         const val PARALELA_PETO_LIMIGO = 8
 
         /**
-         * Regulo 6.1.4: eroj kies sola son-gastiganto estas nesubtenata (video-platformoj)
+         * Regulo P6.1.4: eroj kies sola son-gastiganto estas nesubtenata (video-platformoj)
          * estas saltataj — tia "fluo" ne estis ludebla (PR #91). Devas esti konservita
-         * el la malnova apo (AGENTS.md regulo 2).
+         * el la malnova apo (AGENTS.md regulo A2).
          */
         internal val SALTAJ_GASTIGANTOJ = listOf(
             "youtube.com", "youtu.be", "soundcloud.com", "vimeo.com",
@@ -59,9 +59,9 @@ class RssParsilo(
     }
 
     /**
-     * Aplikas la kanal-specifajn purigajn regex-modelojn al kruda HTML (regulo 6.6, (PR #91)).
+     * Aplikas la kanal-specifajn purigajn regex-modelojn al kruda HTML (regulo P6.6, (PR #91)).
      * La modeloj vivas en la kanalkonfiguro (`puriguModeloj`) — datum-movita, ne kodigita.
-     * Nevalida regex estas protokolata kaj preterpasata (regulo 4: unu eraro ne paneigu la kanalon).
+     * Nevalida regex estas protokolata kaj preterpasata (regulo A4: unu eraro ne paneigu la kanalon).
      */
     internal fun puriguPerModeloj(html: String, kanalo: Kanalo): String {
         if (kanalo.puriguModeloj.isEmpty()) return html
@@ -117,7 +117,7 @@ class RssParsilo(
             ?: doc.selectFirst("link[rel=next]")?.attr("href")
     }
 
-    // === Regulo 6.1 — Ĝenerala ===
+    // === Regulo P6.1 — Ĝenerala ===
 
     private fun parsuGxenerala(doc: Document, kanalo: Kanalo, deArkivo: Boolean): List<Elsendo> =
         doc.select("item, entry").mapNotNull { ero -> parsuEroGxenerala(ero, kanalo, deArkivo) }
@@ -135,7 +135,7 @@ class RssParsilo(
         val dato = normigiDaton(pubDate) ?: return null
 
         // Stream: enclosure (RSS) aŭ <link rel="enclosure"> (Atom) aŭ <audio><source>
-        // Preferu enclosure kun type="audio/…" (regulo 6.1.4); iuj fluoj metas bildon unue (PR #91)
+        // Preferu enclosure kun type="audio/…" (regulo P6.1.4); iuj fluoj metas bildon unue (PR #91)
         var fluo = ero.selectFirst("enclosure[type^=audio]")?.attr("url")
             ?: ero.selectFirst("enclosure")?.attr("url")
             ?: ""
@@ -143,7 +143,7 @@ class RssParsilo(
             fluo = ero.selectFirst("link[rel=enclosure]")?.attr("href") ?: ""
         }
         if (fluo.isEmpty()) {
-            // Regulo 6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
+            // Regulo P6.1.4: la sono povas esti ene de la priskribo-HTML (CDATA/eskapita) —
             // serchu en la HTML-enhavo, ne en la XML-dokumento (PR #91)
             fluo = Ksoup.parse(priskriboKruda).selectFirst("audio source")?.attr("src") ?: ""
         }
@@ -158,7 +158,7 @@ class RssParsilo(
         }
 
         val dauro = leguDauron(ero.selectFirst("itunes|duration")?.text())
-        // Regulo 6.6: kanal-specifaj purigaj modeloj (reklamoj, enkonstruitaj ludiloj)
+        // Regulo P6.6: kanal-specifaj purigaj modeloj (reklamoj, enkonstruitaj ludiloj)
         val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
         val bildoUrl = saniguRetUrlon(
             ero.selectFirst("itunes|image")?.attr("href")
@@ -193,7 +193,7 @@ class RssParsilo(
         )
     }
 
-    // === Regulo 6.2 — Varsovia Vento ===
+    // === Regulo P6.2 — Varsovia Vento ===
 
     private fun parsuVarsoviaVento(doc: Document, kanalo: Kanalo): List<Elsendo> {
         val rezulto = mutableListOf<Elsendo>()
@@ -213,7 +213,7 @@ class RssParsilo(
             val audioj = htmlDoc.select("audio source")
             if (audioj.isEmpty()) continue
 
-            // Regulo 6.6: la <audio>-ludiloj kaj reklamaj alineoj estas purigataj el la
+            // Regulo P6.6: la <audio>-ludiloj kaj reklamaj alineoj estas purigataj el la
             // PRISKRIBO — sed la fluo-ekstraktado supre uzas la KRUDAN enhavon (PR #91)
             val purigitaEnhavo = puriguPerModeloj(htmlEnhavo, kanalo)
 
@@ -234,7 +234,7 @@ class RssParsilo(
         return rezulto
     }
 
-    // === Regulo 6.3 — Peranto (Esperanta Retradio) ===
+    // === Regulo P6.3 — Peranto (Esperanta Retradio) ===
 
     /** Interrezulto de unu Peranto-ero dum la dufaza parsado. */
     private data class PerantoEro(
@@ -295,7 +295,7 @@ class RssParsilo(
                     val id = iframeSrc.substringAfter("/file/d/").substringBefore("/")
                     "https://drive.google.com/u/1/uc?id=$id&export=download"
                 }
-                // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo 6.3: la komuna
+                // Neniu iframe aŭ nesubtenata gastiganto → saltu (regulo P6.3: la komuna
                 // skip-listo anstataŭas la iamajn unuopajn kontrolaĵojn, (PR #91))
                 iframeSrc.isEmpty() -> return@mapNotNull null
                 estasSaltitaGastiganto(iframeSrc) -> return@mapNotNull null
@@ -382,7 +382,7 @@ class RssParsilo(
             throw e
         } catch (e: Throwable) {
             // Throwable, ne Exception: la Js-motoro ĵetas kotlin.Error ĉe CORS/reteraroj.
-            // Unu arkivaĵo ne devas panei la tutan kanal-fluon (regulo 4).
+            // Unu arkivaĵo ne devas panei la tutan kanal-fluon (regulo A4).
             logw("RssParsilo", "archive.org/$identigilo: metadaten-peto malsukcesa — uzas divenitan nomon $divenita", e)
             divenita
         }
@@ -409,7 +409,7 @@ class RssParsilo(
         }
     }
 
-    // === Regulo 6.4 — Vinilkosmo ===
+    // === Regulo P6.4 — Vinilkosmo ===
 
     private fun parsuVinilkosmo(doc: Document, kanalo: Kanalo): List<Elsendo> =
         doc.select("entry").mapNotNull { ero ->
@@ -421,7 +421,7 @@ class RssParsilo(
             val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
             val retpaghoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
-            // Regulo 6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (PR #91)
+            // Regulo P6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (PR #91)
             val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 

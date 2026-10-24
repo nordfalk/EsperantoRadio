@@ -13,7 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Regulo 4: unu fonto-eraro ne panei la aliajn.
+ * Regulo A4: unu fonto-eraro ne panei la aliajn.
  *
  * La retumila Ktor-motoro ĵetas `kotlin.Error("Fail to fetch")` (ne Exception) ĉe CORS-blokado.
  * Antaŭe tio eskapis el ElsendoDeponejoImpl kaj nuligis la paralelan ŝargadon de ĉiuj kanaloj.

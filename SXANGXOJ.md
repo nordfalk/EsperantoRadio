@@ -1,5 +1,27 @@
 # Ŝanĝoj — 2026-10-24
 
+## Stabilaj nomoj por la regul-aroj (A/L/P) — fino de "regulo 4"-ambiguecoj (PR: https://github.com/nordfalk/EsperantoRadio/pull/133)
+
+Bare numeritaj regul-referencoj ("regulo 4", "regulo 8", "regulo 6.3") estis ambiguj:
+la AGENTS-reguloj (1–12), la git-laborfluaj reguloj (1–8) kaj la sep parsreguloj
+(6.1–6.7) interkovriĝis nomere — "regulo 8" povis signifi la protokolan regulon A8
+aŭ la paĝigan parsregon (kaduka referenco en `docs/malnova/03` vere celis tiun).
+Decido de la posedanto: ĉiuj regul-aroj ricevas unikajn, stabilajn nomojn kun
+prefiksoj, kiuj ne kolizias kun la FAROTA-literoj (C/G/K/X):
+
+- **A1–A12** — "Plej gravaj reguloj por agentoj" (AGENTS.md)
+- **L1–L8** — la git-laborfluaj reguloj (AGENTS.md)
+- **P6.1–P6.7** (+ subpunktoj P6.1.4, P6.1.6) — la sep parsreguloj (docs/malnova/03, docs/nova/04); la historiaj numeroj 6.x restas, nur la P-prefikso diferencigas ilin de la aliaj aroj
+
+22 dosieroj ĝisdatigitaj: la difinoj (AGENTS.md-listoj, dok-kapoj) kaj ĉiuj
+referencoj (kodo-komentoj, NOTOJ/SXANGXOJ, .vibe/skills, ambaŭ JSONC-kopietoj
+de la kanalkonfiguro). Pura kontrolo: uskleco-sentema serĉo
+`git grep -i -E 'regulo(j|n|jn)? ?\(?[0-9]'` trovas nun nur la intencajn citaĵojn
+en ĉi tiu noto mem. La kaduka "(regulo 8)" en docs/malnova/03 (pri paĝigo, ene de
+la P6.7-sekcio) ĝustigita al P6.7. (Fina revizio post la unua balao: la JSONC-komentoj
+havis majusklan "Regulo 6.6" — la komenca `grep 'regulo [0-9]'` estis uskleco-sentema
+kaj maltrafis ilin.)
+
 ## Hejmo: klakebla "Kanaloj", tro-rula tirkesto kiu sekvas la fingron, ĉiam videbla miniludilbreto (PR: https://github.com/nordfalk/EsperantoRadio/pull/131)
 
 ### 1. Klakebla sekcio-titolo "Kanaloj"
@@ -142,7 +164,7 @@ La ĝenerala parsilo legas nun ankaŭ Atom-`<id>` (ekvivalento de `entry.uri`).
 kodo. FLANKA EFIKO: la id-ŝanĝo restartigas uzantdatumojn ŝlositajn per id
 (ludpozicioj, elŝutoj, plej ŝatataj) por la koncernaj kanaloj — unufoje.
 
-**G31 (https-korekto)**: ne plu aktuala — `docs/nova/04` (regulo 6.1.6) jam
+**G31 (https-korekto)**: ne plu aktuala — `docs/nova/04` (regulo P6.1.6) jam
 priskribas la kernpunkto-nuran korekton kiel intenca historia konduto, kongrue
 kun la malnova kodo (`RomePodcastParser.parseAndre:206`). Forigita el FAROTA.
 
@@ -523,7 +545,7 @@ korekto?"). Trovitaj kaj riparitaj:
 - **CHANGELOG**: la permeso-entry estis sub `[Neeldonita]`, sed ĝi estas en la
   eldonita 3.0.3 (versionCode 248) → movita al `## [3.0.3]` (`### Ŝanĝita`).
 - **AGENTS.md / NOTOJ.md**: tri respektive du malnovaj lokoj pri FSI kaj ekzaktaj
-  alarmoj ĝisdatigitaj; nova datita leciono en AGENTS.md (regulo 11).
+  alarmoj ĝisdatigitaj; nova datita leciono en AGENTS.md (regulo A11).
 
 ### Poste farita (ankora 2026-10-12)
 - Etikedo `v3.0.3` movita al `b834483` — la fonto de la eldonita APK (versionCode 248).
@@ -542,7 +564,7 @@ korekto?"). Trovitaj kaj riparitaj:
 ## Agentaj incidentoj kaj iliaj lecionoj (PR: #82)
 
 Du incidentoj okazis dum la laboro pri PR #79/#80 kaj la eldono 3.0.2 — ambaŭ
-riparitaj; la lecionoj estas registritaj en AGENTS.md (nova regulo 11 kaj kvar
+riparitaj; la lecionoj estas registritaj en AGENTS.md (nova regulo A11 kaj kvar
 novaj eroj en "Teknikaj scioj lernitaj dum la laboro").
 
 1. **Stash-perdo kaj reakiro.** `git stash list` estis malplena kvankam la stash
@@ -654,7 +676,7 @@ sentry-android 8.41.0 (per sentry-kmp 0.27.0) kaj estas en ordo.
 
 ## AGENTS.md: neniu commit antaŭ trarigardo de la uzanto (PR: #78)
 
-Regulo 6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
+Regulo L6 en "Git-laborfluo" ŝanĝita: la agento ne commitas (nek puŝas, nek kreas
 PR) antaŭ ol la uzanto trarigardis kaj aprobis la ŝanĝojn — eĉ se la uzanto petas
 commit/push/PR; nur eksplicita "commit sen mia trarigardo" preterpasas tion.
 La sama regulo aplikita en la tri lokaj klonoj (mobile-app4, EsperantoRadio, EsperantoRadio2).
@@ -869,7 +891,7 @@ Emulilo: simulita alarmo por `peranto` → `Alarmo ludas podkaston: peranto:2026
   `BEHIND_LIVE_WINDOW`, nespecifita → reprovebla; HTTP-stato, dosiero ne trovita, formato, malkodilo → ne.
 - `shared/src/desktopMain/.../DesktopLudiloRegilo.kt` — legado-eraro mez-flue → `Eraro("Reta eraro: …")`
   anstataŭ `Finita`; `FileNotFoundException` kaj malplena URL → `reprovebla = false`. La escepto nun
-  estas protokolita per `loge` (regulo 8).
+  estas protokolita per `loge` (regulo A8).
 - `shared/src/wasmJsMain/.../WasmJsLudiloRegilo.kt` — `MediaError.code == 2` (MEDIA_ERR_NETWORK) → reprovebla.
 - `shared/src/commonMain/.../domain/player/LudiloRegilo.kt` — `NoOpLudiloRegilo.simuluEraron(mesagho, reprovebla = false)`.
 - `shared/src/commonMain/.../ui/MiniLudilbreto.kt` — nova parametro `reprovo: Int`:
@@ -1094,13 +1116,13 @@ sed perioda laboro ne rulas antaŭ sia horaro ("being executed before schedule")
    resurcoj legeblas nur nesinkrone, sed la `expect fun` estas sinkrona. Solvo: nova Gradle-tasko
    `generuEnigitanKanalkonfiguron` (`shared/build.gradle.kts`, sama ŝablono kiel `generuApoVersio`) generas
    `EnigitaKanalkonfiguro.kt` kun la JSONC kiel Kotlin-ĉeno (eskapitaj `\`, `"`, `$`, linifinoj) por
-   `wasmJsMain` kaj `iosMain`. La fonto restas la sama JSONC-dosiero (regulo 5: neniu duobligita konfiguro).
+   `wasmJsMain` kaj `iosMain`. La fonto restas la sama JSONC-dosiero (regulo A5: neniu duobligita konfiguro).
    iOS havis la saman `error(...)` kaj nun ankaŭ uzas ĝin.
 7. **`Node.js net module is not available`** por ĉiu RSS-peto — Ktor CIO en wasmJs bezonas Node.js-ingojn.
    Nova `expect val httpMotoro` (`data/repository/HttpMotoro.kt`): CIO sur Android/Desktop/iOS, `Js`
    (retumila fetch) sur wasmJs; nova dependeco `ktor-client-js` nur por `wasmJsMain`. Uzata en `AppStato`
    kaj `PreviewDatumoj`. (AGENTS.md asertis ke CIO funkcias ĉie — korektita.)
-8. **Unu blokita fluo nuligis ĉiujn aliajn** (regulo 4!). La Js-motoro ĵetas `kotlin.Error("Fail to fetch")`,
+8. **Unu blokita fluo nuligis ĉiujn aliajn** (regulo A4!). La Js-motoro ĵetas `kotlin.Error("Fail to fetch")`,
    ne `Exception`; `ElsendoDeponejoImpl` kaptis nur `Exception`, do la eraro eskapis el `coroutineScope`
    kaj nuligis la paralelan ŝargadon de ĉiuj kanaloj (`JobCancellationException: Parent job is Cancelling`).
    Nun: `catch (e: CancellationException) { throw e } catch (e: Throwable) { … }`.

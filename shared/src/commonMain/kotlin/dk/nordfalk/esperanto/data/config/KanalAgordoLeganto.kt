@@ -115,7 +115,7 @@ data class KanaloDto(
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
-    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo 6.6). */
+    /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
     @SerialName("defaŭltŜatata") val defaltSxatata: Boolean = false,
 )
@@ -157,7 +157,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
             val aktiva = partoj[i + 1] == "1"
             // (PR #95) koercu — ekstervalora horo/minuto/ripeto el la agordo devas
             // ne kraŝi la skedadon (LocalTime/sekvaEkigo); ni ne ĵetas la tutan sugeston
-            // pro unu malbona kampo (regulo 4 — toleremo al putrantaj fontoj)
+            // pro unu malbona kampo (regulo A4 — toleremo al putrantaj fontoj)
             val horo = partoj[i + 2].toInt().coerceIn(0, 23)
             val minuto = partoj[i + 3].toInt().coerceIn(0, 59)
             // ripeto: MASKU al la 7 tago-bitoj (ne limigu al 0x7f = ĉiutage) —

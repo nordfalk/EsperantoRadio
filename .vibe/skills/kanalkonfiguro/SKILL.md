@@ -7,7 +7,7 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
 
 > Antaŭ ĉio legu `docs/nova/04_parsado_kaj_arkivo.md` kaj
 > `docs/malnova/03_parsado_kaj_fontoj.md` — la sep parsreguloj kaj la skip-listo
-> devas esti konservitaj. La konfiguro estas daten-movita (regulo 5):
+> devas esti konservitaj. La konfiguro estas daten-movita (regulo A5):
 > per-kanalaj apartaĵoj en agordo, ne en logiko.
 
 ## La du kopioj kaj la du aroj
@@ -61,4 +61,4 @@ enkondukon de Varsovia Vento). Uzu la temperitan formon `(?:(?!</p>).)` anstata�
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en
   `<content:encoded>` — uzu `getElementsByTag("content:encoded").firstOrNull()?.text()`
   (ne `html()`), poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
-- Aliajn regulojn (6.1–6.7, Peranto/archive.org) vidu en `docs/nova/04`.
+- Aliajn regulojn (P6.1–P6.7, Peranto/archive.org) vidu en `docs/nova/04`.

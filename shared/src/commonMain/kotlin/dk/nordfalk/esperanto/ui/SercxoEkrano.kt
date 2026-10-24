@@ -64,7 +64,7 @@ fun SercxoEkrano(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                // Throwable, ne Exception: regulo 8 + la Js-motoro ĵetas kotlin.Error
+                // Throwable, ne Exception: regulo A8 + la Js-motoro ĵetas kotlin.Error
                 logw("Sercxo", "Serĉado malsukcesis por '$teksto'", e)
                 rezultoj = emptyList()
                 sxargxas = false

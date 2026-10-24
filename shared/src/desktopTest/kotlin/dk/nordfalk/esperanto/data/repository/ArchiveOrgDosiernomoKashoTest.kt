@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Testoj por la persista kesto de archive.org-dosiernomoj (regulo 6.3).
+ * Testoj por la persista kesto de archive.org-dosiernomoj (regulo P6.3).
  *
  * Kontrolas plurajn tavolojn: ke RssParsilo demandas la metadaten-API unufoje
  * po identigilo, ke la rezulto estas konservata daŭre (videbla ankaŭ por nova

@@ -126,19 +126,19 @@
   ol la limo.
 - **Fiaskpaĝo ne estas fluo** ([PR #89](https://github.com/nordfalk/EsperantoRadio/pull/89)): kontrolu HTTP-statuson; 4xx/5xx/kaptiva-portalo
   devas ne esti parsata kiel RSS — la per-kanala catch protokolas kaj daŭrigas
-  kun la aliaj kanaloj (regulo 4: unu mortinta fonto ne paneigu la apot).
+  kun la aliaj kanaloj (regulo A4: unu mortinta fonto ne paneigu la apon).
 
 ## Parsado (RSS/Atom)
 
 - **Skip-listo anstataŭas unuopajn kontrolaĵojn** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)): nesubtenataj video-gastigantoj
   estas saltataj per komuna listo (`estasSaltitaGastiganto`), kiel en la malnova
-  `RomePodcastParser` (regulo 2).
+  `RomePodcastParser` (regulo A2).
 - **`<audio>` serĉendas en la HTML-enhavo, ne en la XML-dokumento** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)):
   `content:encoded`/`description` estas teksta nodo (CDATA/eskapita HTML) — uzu
   `Ksoup.parse(priskriboKruda)`, ne `ero.selectFirst("audio")`.
 - **`enclosure` prefere kun `type="audio/…"`** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)): iuj fluoj metas la bildo-enclosure
   unue.
-- **`puriguModeloj` (regulo 6.6) aplikiĝas NUR al la priskribo** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)): la
+- **`puriguModeloj` (regulo P6.6) aplikiĝas NUR al la priskribo** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)): la
   fluo-ekstraktado (ekz. `<audio>`-fontoj el Varsovia Vento) devas uzi la KRUDAN
   enhavon — purigita enhavo perdas la ludilojn.
 - **Titolo venas el `<title>`** ([PR #91](https://github.com/nordfalk/EsperantoRadio/pull/91)); derivaĵo el la enhavo nur ĉe
@@ -199,7 +199,7 @@
 ## Protokolado kaj Sentry
 
 - **Atendataj malsukcesoj estas `logw`, ne `loge`** ([PR #93](https://github.com/nordfalk/EsperantoRadio/pull/93)): unu mortinta kanal-fluo
-  estas normala okazaĵo (regulo 4) kaj devas NE iĝi erar-nivela Sentry-evento —
+  estas normala okazaĵo (regulo A4) kaj devas NE iĝi erar-nivela Sentry-evento —
   alikaze oni ne trovas la verajn paneojn. `loge` = paneo.
 - **`logd` por la datum-tavolo** (RssParsilo, ElsendoDeponejo): alie Sentry-`beforeSendLog`
   inundiĝus per raportoj pri ĉiu kanal-ŝargado.
@@ -220,9 +220,9 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 |---|---|---|---|
 | 0 | KMP-strukturo (shared, androidApp, desktopApp, webApp) | ✅ Farita | #5 |
 | 1a | Domajnmodeloj, JSONC-leganto, kanalaro-UI | ✅ Farita | #6 |
-| 1b | RSS-parsilo (reguloj 6.1, 6.2, 6.4–6.7) + golden-testoj | ✅ Farita | #7 |
+| 1b | RSS-parsilo (reguloj P6.1, P6.2, P6.4–P6.7) + golden-testoj | ✅ Farita | #7 |
 | 1c | Kanalvido (elsendlisto) + elsendodetalo + Ktor + Coil 3 | ✅ Farita | #9 |
-| 1d | Peranto-parsilo (archive.org + Google Drive, regulo 6.3) | ✅ Farita | #10 |
+| 1d | Peranto-parsilo (archive.org + Google Drive, regulo P6.3) | ✅ Farita | #10 |
 | 2 | Ludado (LudiloRegilo, Media3 ExoPlayer sur Android, mini-ludilbreto) | ✅ Farita | #11,#13 |
 | 3 | Personigo (plejŝatataj, serĉo, agordoj) + navigado | ✅ Farita | #12,#13 |
 | — | UI-testoj + Android assets-fix | ✅ Farita | #14 |

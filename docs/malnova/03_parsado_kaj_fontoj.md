@@ -64,7 +64,7 @@ parsado, aŭ uzi indulgentan JSON5/JSONC-parsilon.
 | `rektaElsendaPriskriboUrl` / `...JsonUrl` | "nun ludanta"-fonto (HTML/JSON) | rekta metadateno |
 | `hejmpaĝoButono` | Retejo-ligo | "vizitu retejon"-butono |
 | `retpoŝto` | Kontakt-retpoŝto | kontakto |
-| `elsendojRssIgnoruTitolon` | bulea — fluotitolo senutila (ofte nur dato) | → derivu titolon el priskribo (regulo 6.5) |
+| `elsendojRssIgnoruTitolon` | bulea — fluotitolo senutila (ofte nur dato) | → derivu titolon el priskribo (regulo P6.5) |
 | `montruTitolojn` | bulea — ĉu montri elsendotitolon en UI | UI |
 | `uziWebViewPorElsendo` | bulea — montri elsendon en retpaĝa vido anstataŭ ludilo | UI/ludado |
 
@@ -73,21 +73,21 @@ parsado, aŭ uzi indulgentan JSON5/JSONC-parsilon.
 | Slug | Nomo | Fluotipo / specialaĵo |
 |---|---|---|
 | `muzaiko` | Muzaiko | **Livestream HLS** + RSS-arkivo; ignoruTitolon |
-| `varsoviavento` | Varsovia Vento | WordPress, **pluraj `<audio>` po ero** (regulo 6.2) |
+| `varsoviavento` | Varsovia Vento | WordPress, **pluraj `<audio>` po ero** (regulo P6.2) |
 | `lamalfamuloj` | La Malfamuloj | anchor.fm norma-RSS (`<enclosure>`) |
 | `3zzzenesperanto` | 3ZZZ en Esperanto | (fluo nune markita difektita) |
 | `polaretradio` | Pola Retradio | norma-RSS; ignoruTitolon |
 | `babibejo` | BabiBEJO | anchor.fm norma-RSS |
-| `kernpunkto` | Kernpunkto | norma-RSS; **https→http- apartaĵo** (regulo 6.1) |
+| `kernpunkto` | Kernpunkto | norma-RSS; **https→http- apartaĵo** (regulo P6.1) |
 | `movada-vidpunkto` | Movada Vidpunkto | norma-RSS; retpaĝa vido |
 | `radioscienca` | Radio Scienca | norma-RSS |
 | `radiovatikana` | Radio Vatikana | norma-RSS |
 | `spiritismavocxo` | Spiritisma Voĉo | spreaker norma-RSS |
-| `vinilkosmo` | Vinilkosmo | **ipernity Atom** (regulo 6.4) |
+| `vinilkosmo` | Vinilkosmo | **ipernity Atom** (regulo P6.4) |
 | `bitmono` | Bitmono | anchor.fm norma-RSS |
 | `sano` | Pri Sano | anchor.fm norma-RSS |
 | `radiofrei` | Radio Frei | (fluo nune markita difektita) |
-| `peranto` | Esperanta Retradio | **Blogger/iframe → Google Drive/archive.org** (regulo 6.3) |
+| `peranto` | Esperanta Retradio | **Blogger/iframe → Google Drive/archive.org** (regulo P6.3) |
 
 ### Mortaj kanaloj (ignoru)
 
@@ -146,8 +146,8 @@ implementaĵo devas plenigi la samajn kampojn:
 |---|---|---|
 | `slug` | **unika id** | vidu id-konvenciojn sube — uzata por dedup, plejŝatataj, daŭriga pozicio |
 | `kanal` | posedanta kanal | |
-| `titel` | titolo | eble derivita el priskribo (regulo 6.5) |
-| `beskrivelse` | HTML/teksto | purigita de reklam-blokoj (regulo 6.6) |
+| `titel` | titolo | eble derivita el priskribo (regulo P6.5) |
+| `beskrivelse` | HTML/teksto | purigita de reklam-blokoj (regulo P6.6) |
 | `billedeUrl` | elsend/iTunes-bildo | povas esti malplena |
 | `startTid` / `startTidDato` | publikigdato | normigita al `yyyy-MM-dd` |
 | `stream` | **audio-URL (mp3)** | la plej grava kampo; elsendoj sen `stream` estas **forĵetataj** |
@@ -179,12 +179,12 @@ La parsado **branĉiĝas laŭ kanal-slug**:
 ```
 parsRss(fluoTeksto, kanal):
     deArkivo = kanal.elsendojRssUrl enhavas "podkasta_arkivo"   // servil-generata pura arkivo → ĉiam "ĝenerala"
-    se slug == "varsoviavento" kaj ne deArkivo → parsVarsoviaVento   (regulo 6.2)
-    alie se slug == "peranto" kaj ne deArkivo → parsePeranto         (regulo 6.3)
-    alie → parseGenerel                                           (regulo 6.1)
+    se slug == "varsoviavento" kaj ne deArkivo → parsVarsoviaVento   (regulo P6.2)
+    alie se slug == "peranto" kaj ne deArkivo → parsePeranto         (regulo P6.3)
+    alie → parseGenerel                                           (regulo P6.1)
 ```
 
-### Regulo 6.1 — Ĝenerala parsado (`parseAndre`)
+### Regulo P6.1 — Ĝenerala parsado (`parseAndre`)
 
 Majoritato de kanaloj. Uzata de Kernpunkto, anchor.fm-kanaloj (La Malfamuloj,
 BabiBEJO, Bitmono, Pri Sano), Pola Retradio, Radio Vatikana, Radio Scienca,
@@ -222,14 +222,14 @@ mem, sed devas certigi ke Kernpunkto finas per `https`.)
 → Elsendo: titolo `KP204 Pigmentoj`, stream `https://…/kp204-pigmentoj.mp3`,
 daŭro `6916 s`, bildo fiksita, dato `2022-11-09`.
 
-### Regulo 6.2 — Varsovia Vento: pluraj sonpartoj po ero (`parsVarsoviaVento`)
+### Regulo P6.2 — Varsovia Vento: pluraj sonpartoj po ero (`parsVarsoviaVento`)
 
 WordPress-fluo (`https://www.podkasto.net/feed/`). Ĉiu blogero (`<entry>`/`<item>`)
 enhavas **HTML kun pluraj `<audio>`-ludiloj** — elsendo ofte estas dividita en
 parto 1, 2, 3…
 
 Reguloj:
-1. Purigu enhavo-HTML per fiksaj regex-modeloj (regulo 6.6) — forigu Facebook-
+1. Purigu enhavo-HTML per fiksaj regex-modeloj (regulo P6.6) — forigu Facebook-
    reklamon, elŝut-ligojn, "subtenu nin" ktp.
 2. Por **ĉiu** `<audio>`-elemento: prenu `<source src>`. Faru **po unu elsendo por
    parto**.
@@ -250,7 +250,7 @@ Reguloj:
 → 3 elsendoj: `…:2025-04-24:1/2/3`, titoloj "… 1a parto / 2a parto / 3a parto",
 fluoj P1/P2/P3.mp3.
 
-### Regulo 6.3 — Esperanta Retradio / Peranto: iframe-detektiva laboro (`parsePeranto`)
+### Regulo P6.3 — Esperanta Retradio / Peranto: iframe-detektiva laboro (`parsePeranto`)
 
 La **plej rompiĝema** fonto. Blogger/Blogspot-Atom-fluo
 (`https://esperantaretradio.blogspot.com/feeds/posts/default`). Sono **ne**
@@ -286,7 +286,7 @@ En la kaŝenita fluoversio, **ĉiuj** son-iframes estas archive.org-embed-oj (ek
 `seksismo_sabotas`, `timis-telefonon`, `rentumas_nekalkuleba`, `kato_kapablas`,
 `eviti_mikroplastajhojn`). La Google Drive-branĉo ekzistas por pli malnovaj eroj.
 
-### Regulo 6.4 — Vinilkosmo: ipernity-Atom (`parsiElsendojnDeRssVinilkosmo`)
+### Regulo P6.4 — Vinilkosmo: ipernity-Atom (`parsiElsendojnDeRssVinilkosmo`)
 
 Atom-fluo (`http://api.ipernity.com/feed/doc?user_id=vinilkosmo&only=audio`).
 Po `<entry>`:
@@ -303,7 +303,7 @@ Po `<entry>`:
 → id `vk:2018-03-21T17:00:56`, dato `2018-03-21`, stream
 `https://cdn.ipernity.com/…/46405946.42a4e885.mp3`.
 
-### Regulo 6.5 — Titol-derivado (`elsendojRssIgnoruTitolon`)
+### Regulo P6.5 — Titol-derivado (`elsendojRssIgnoruTitolon`)
 
 Kelkaj fluoj havas senutulan titolon (ofte nur la dato, jam montrata aliloke):
 Muzaiko, Pola Retradio, 3ZZZ, Peranto. Por tiuj kanaloj
@@ -311,7 +311,7 @@ Muzaiko, Pola Retradio, 3ZZZ, Peranto. Por tiuj kanaloj
 HTML-etikedojn, malkodi entitojn, anstataŭigi linisaltigojn per spacoj, fortondi,
 kaj **tranĉi al maksimume 200 signoj**.
 
-### Regulo 6.6 — HTML-purigado (fiksaj "purigu"-modeloj)
+### Regulo P6.6 — HTML-purigado (fiksaj "purigu"-modeloj)
 
 Enhavo-HTML enhavas reklamon/promon forigi antaŭ montro. Por **Varsovia Vento**
 forigu (regex): sekcioj kun "Ĉe Facebook/Fejsbuko ni kreis …", "Paŝo post paŝo
@@ -321,13 +321,13 @@ kaj la `<audio>…</audio>`-blokoj (sono jam eltirita). Por **Vinilkosmo** forig
 `<p class="who">…</p>`. Nova implementaĵo devas meti tiujn purig-modelojn
 **po-kanale en dateno/agordo**, ne malmole en logiko, por facila prizorgado.
 
-### Regulo 6.7 — Paĝigo (`rel="next"`)
+### Regulo P6.7 — Paĝigo (`rel="next"`)
 
 Fluoj liveras nur la plej novajn N elsendojn. Por elŝuti la arkivon, sekvi
 `<atom:link rel="next" href=…>` ĝis ne plu paĝoj. Ekzemplo (Kernpunkto):
 `<atom:link rel="next" href="https://kern.punkto.info/feed/mp3/?paged=2" />`.
 La sekva-paĝa URL estas konservata (`rss_nextLink`) kaj uzata de la arkiva
-servilo (regulo 8) por marŝi malantaŭen en historio.
+servilo (regulo P6.7) por marŝi malantaŭen en historio.
 
 ## Neeltireblaj / mortaj fontoj
 
@@ -374,7 +374,7 @@ Nova parsilo estas "ĝusta" kiam por ĉiu fiksaĵo supre ĝi produktas:
 2. samajn **id**-ojn (slug-konvencioj),
 3. validan, rektan **MP3-`stream`** por ĉiu elsendo (kaj forĵetas elsendojn sen),
 4. ĝustan **daton** (`yyyy-MM-dd`),
-5. **purigitan** priskribon (purigu-modeloj, regulo 6.6),
+5. **purigitan** priskribon (purigu-modeloj, regulo P6.6),
 6. ĝustan **titolon** (inkluzive derivadon por `ignoruTitolon`, kaj "Na parto" por Varsovia Vento),
 7. la ĝustajn **saltojn** por nesubtenataj gastigantoj.
 

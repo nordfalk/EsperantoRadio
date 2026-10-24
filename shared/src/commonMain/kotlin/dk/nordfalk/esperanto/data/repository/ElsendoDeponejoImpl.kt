@@ -54,7 +54,7 @@ open class ElsendoDeponejoImpl(
     }
 
     /**
-     * Peto al archive.org-metadatenoj (regulo 6.3) — ankaŭ uzata ĉe la re-parsado
+     * Peto al archive.org-metadatenoj (regulo P6.3) — ankaŭ uzata ĉe la re-parsado
      * de la diskkaŝo: sen ĝi la Peranto-elsendoj ricevus DIVENITAJN (ofte 404-ajn)
      * dosiernomojn ĝis la unua sukcesa reta refreŝo (PR #91).
      */
@@ -120,7 +120,7 @@ open class ElsendoDeponejoImpl(
             throw e
         } catch (e: Throwable) {
             // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
-            // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo 4).
+            // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo A4).
             // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
             // ili devas NE iĝi erar-nivelaj Sentry-eventoj ((PR #93) antaŭe la sama fiasko
             // estis kaptita dufoje — loge→captureException + captureMessage).

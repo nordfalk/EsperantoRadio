@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 /**
  * Persista kesto de archive.org-dosiernomoj: arkivaĵo-identigilo → MP3-dosiernomo.
  *
- * La Peranto-parsilo (regulo 6.3) bezonas la veran MP3-dosiernomon ene de
+ * La Peranto-parsilo (regulo P6.3) bezonas la veran MP3-dosiernomon ene de
  * archive.org-arkivaĵo. La dosiernomo ne ĉiam egalas al la identigilo
  * (ekz. `malapero-benda-3` enhavas `Malapero_Benda3.mp3`), do ĝi estas demandata
  * per https://archive.org/metadata/&lt;identigilo&gt; kaj konservata ĉi tie,

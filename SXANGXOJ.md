@@ -1,3 +1,62 @@
+# Ŝanĝoj — 2026-10-24
+
+## Hejmo: klakebla "Kanaloj", tro-rula tirkesto kiu sekvas la fingron, ĉiam videbla miniludilbreto (PR: <numero>)
+
+### 1. Klakebla sekcio-titolo "Kanaloj"
+
+`SekcioTitolo` ricevis laŭvolan `onClick`; la titolo "Kanaloj" montras sag-piktogramon
+kaj navigas per `switchTab(Vojo.Kanalaro)` — la stako rekomenciĝas je [Hejmo, Kanalaro],
+reen revenas al Hejmo.
+
+### 2. Tro-rula tirkesto-malfermo kiu SEKVAS la FINGRON
+
+Unua provo estis sojl-bazita (akumulita 40dp-tiro → `tirkestStato.open()`); la uzanto
+ĝuste rifuzis: la tirkesto devas sekvi la fingron. Sed `DrawerState.anchoredDraggableState`
+estas `internal` en material3 1.13.0-alpha01 — la publika API ne povas movi la tirkeston
+dum gesto (nur open/close/snapTo). Pro tio **forkigo de `NavigationDrawer.kt`**
+(+ `Scrim.kt` + `internal/FloatProducer.kt`) en la apartan pakaĵon
+`dk.nordfalk.compose.material3` — kun la originaj nomoj (`DrawerState`,
+`rememberDrawerState`, `ModalNavigationDrawer`, `ModalDrawerSheet`) kaj kiel eble
+plej laŭvorta kopiaĵo, laŭ decido de la posedanto: bibliotek-kopioj ricevas la originajn
+nomojn en propra pakaĵo por minimumigi la diferencon. Nura API-diferenco:
+`anchoredDraggableState` estas `public`. Ĉiuj ceteraj devioj estas markitaj per
+`FORK-DIFF`-komentoj: MotionScheme-keytokenoj kaj internaj `Strings` (→ tween(256) +
+fiksitaj esperantaj tekstoj), la prognoza-reena maŝino (→ nav3-`NavigationBackHandler`
+en `ModalDrawerSheet`, sama loko), `fastMap`/`fastForEach` (→ `map`/`forEach`).
+
+`ui/TirkestaTiro.kt` — `NestedScrollConnection` sur la 4 horizontalaj vicoj de
+Hejmo (`Modifier.tirkestoJeTroRulo`): kiam la vico ne povas ruli pli reen kaj la uzanto
+tiras dekstren, la deltoj iras rekte en `dispatchRawDelta` (la tirkesto sekvas la
+fingron ambaŭdirekte; la delto estas konsumita, do neniu elasta tro-rul-efiko).
+`onPostFling` solvas per `settle(available.x)` — la rapido-konscia (deprecita, sed
+funkcia ĉar la forkigita `DrawerState` konstruas la `AnchoredDraggableState` kun la
+originaj sojloj: pozicia 50%, rapida 400 dp/s) — do tute sama decido-logiko kiel la
+vera tirkesto-gesto. NaN-gardoj: `offset`/`anchors.positionOf` antaŭ ĉia uzo.
+
+Kaptindaĵo: `onPostFling` de la konekto efektive vokiĝas ankaŭ kiam la vico mem konsumis
+nenion — la `scrollable` de LazyRow ĉiam eniras la flug-fazon post gesto. La
+UI-testoj pruvvas la tutan ĉenon: `longaDekstraTroTiroGlitasLaTirkestonMalferme` kaj
+`mallongaDekstraTroTiroRevenasFermita` (svipo tra la reala rul-mekanismo sur la
+"Kanaloj"-vico; la tirkesta folio en la testoj bezonas realan larĝon — 240dp, alie
+la ankroj degeneras al 0 kaj neniu tiro movas ion).
+
+### 3. Miniludilbreto ĉiam videbla kiam nenio ludas
+
+Antaŭe la breto tute malaperis kiam nenio ludis (escepte detalo-ekranojn, kie
+ĝi "sekvis la navigadon" — PR #87). Nun:
+
+- sur `KanaloDetalo`/`ElsendoDetalo` ĝi montras la nun VIDATAN kanalon/elsendon —
+  sekvante SVIPOJN inter paĝoj (novaj `onVidataKanalo`/`onVidataElsendo`-revenvokoj
+  el la `HorizontalPager`-oj per `LaunchedEffect(settledPage, …)`; `App.kt` resetas
+  la staton per `LaunchedEffect(vojo)` je ĉiu eniro);
+- sur ĉiuj aliaj ĉefekranoj ĝi montras la laste ludatan elsendon (elekto de la
+  posedanto, "kiel en Spotify"): `lasteLudataElsendo` kaptata el `ludantoStato.nunaFonto`,
+  post restarto bazita sur `HejmoViewModel.lastatempeLudataj`;
+- klako sur la breto navigas al la sekvan enhavon (`sekvantaVojo`).
+
+Kontrolrezulto: `:shared:desktopTest` (ĉiuj testoj verdaj, inkluzive la 2 novajn
+gestajn UI-testojn), `:androidApp:assembleDebug`, `:webApp:compileKotlinWasmJs` verdaj.
+
 # Ŝanĝoj — 2026-10-20
 
 ## FAROTA G43/G45 — limigita korpo-legado (KMP-1H/1R), G43-verigo

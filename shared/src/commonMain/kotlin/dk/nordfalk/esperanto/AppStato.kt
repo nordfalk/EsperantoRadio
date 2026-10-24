@@ -32,7 +32,6 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
@@ -183,27 +182,23 @@ object AppStato {
 
         diagnozoRegilo = kreuDiagnozoRegilon()
 
-        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la ĉefekrano.
-        // Dispatchers.Default, ne IO: IO ne ekzistas sur wasmJs (la DNS-testo de la
-        // Android-implemento rulas en propra fadeno interne).
+        // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la
+        // ĉefekrano. Dispatchers.Default, ne IO: IO ne ekzistas sur wasmJs (la
+        // DNS-testo de la Android-implemento rulas en propra fadeno interne).
+        // La rezulto ankaŭ purigas la kaŝojn de problemoj kiuj ne plu ekzistas:
+        // se problemo malaperas (ekz. la uzanto riparis ĝin), ĝia kaŝo
+        // forgesiĝas — se ĝi poste revenas, la avertokarto reaperos.
+        // ATENTU: purigu nur per la kontrol-REZULTO, neniam per elsendo de
+        // `problemoj` — la komenca elsendo de tiu StateFlow estas la malplena
+        // listo ANTAŬ la unua kontrolo, kaj purigi per ĝi forviŝus la
+        // persistitan kaŝon je ĉiu apstarto (2026-10-22: la averto-karto
+        // reaperis post ĉiu relanĉo).
         CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
             try {
-                diagnozoRegilo?.kontroliRapide()
+                val rezultoj = diagnozoRegilo?.kontroliRapide() ?: return@launch
+                agordojDeponejo.puriguKasxitajnAvertojn(rezultoj.map { it.tipo }.toSet())
             } catch (e: Exception) {
                 logw("AppStato", "Malsukcesis kontroli diagnozon", e)
-            }
-        }
-
-        // Kaŝitaj avertoj: kiam problemo malaperas (ekz. la uzanto riparis ĝin),
-        // ĝia kaŝo forgesiĝas — se ĝi poste revenas, la avertokarto reaperas
-        // sur la ĉefekrano.
-        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
-            diagnozoRegilo?.problemoj?.collect { problemoj ->
-                try {
-                    agordojDeponejo.puriguKasxitajnAvertojn(problemoj.map { it.tipo }.toSet())
-                } catch (e: Exception) {
-                    logw("AppStato", "Malsukcesis purigi kasxitajn avertojn", e)
-                }
             }
         }
 

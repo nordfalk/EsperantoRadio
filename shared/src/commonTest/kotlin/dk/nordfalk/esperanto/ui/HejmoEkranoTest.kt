@@ -410,6 +410,11 @@ class HejmoEkranoTest {
         waitForIdle()
         assertEquals(1, agordojKlakoj, "La 'x'-butono devas nur kaŝi, ne navigi al agordoj")
         onNodeWithText("1 problemo(j) detektitaj").assertDoesNotExist()
+        // Kaŝi montras mesaĝon kun rekte al la agordoj
+        onNodeWithText("Vi povas solvi ĝin poste en la agordoj.").assertIsDisplayed()
+        onNodeWithText("Agordoj").performClick()
+        waitForIdle()
+        assertEquals(2, agordojKlakoj, "La Snackbar-ago devas navigi al la agordoj")
     }
 
     @Test

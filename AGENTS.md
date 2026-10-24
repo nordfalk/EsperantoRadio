@@ -159,8 +159,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
 > La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan:
 > **`eldonado`** (versio-eldonado al Play), **`sentry-esplorado`** (legi/analizi
 > Sentry-n), **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, emulilo),
-> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj)
-> (kanonaj terminoj kaj supersigno-skriboj). Historiaj lecionoj kaj
+> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj). Historiaj lecionoj kaj
 > arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
 > [`ŜANĜOJ.md`](ŜANĜOJ.md).
 

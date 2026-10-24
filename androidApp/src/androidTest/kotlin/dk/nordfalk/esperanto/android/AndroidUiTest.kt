@@ -9,6 +9,10 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -42,13 +46,20 @@ class AndroidUiTest {
     @get:Rule(order = 1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    /** Nur tirkest-eroj (NavigationDrawerItem) havas la rolon Tab. */
+    private val langeto = SemanticsMatcher("estas langeto") { it.config.getOrNull(SemanticsProperties.Role) == Role.Tab }
+
     /** Malfermas la navigan tirkeston (menuo-butono supre maldekstre) kaj elektas eron. */
     private fun elektu(teksto: String) {
         composeRule.onNodeWithContentDescription("Naviga menuo").performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodes(hasText(teksto) and hasClickAction()).fetchSemanticsNodes().isNotEmpty()
         }
-        composeRule.onNode(hasText(teksto) and hasClickAction()).performClick()
+        // La hejma ekrano havas samnoman klakeblan karton (PR #131, ekz. "Kanaloj")
+        // kiu restas en la semantika arbo malantaŭ la malfermita tirkesto kaj ne
+        // respondas al klako tra la ombro. Tial elektu la TIRKEST-an eron —
+        // nur NavigationDrawerItem-oj havas la rolon Tab (emulilo, 2026-10-24).
+        composeRule.onNode(hasText(teksto) and hasClickAction() and langeto).performClick()
         composeRule.waitForIdle()
     }
 

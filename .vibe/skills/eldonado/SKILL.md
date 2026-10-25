@@ -10,16 +10,29 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## Resuma laborfluo (nova versio X.Y.Z)
 
+0. **Eldonoj ĉiam tra PR** (2026-10-25, decido de la posedanto): kreu branĉon
+   `MMdd-eldono-XY` de master, montru la ŝanĝojn al la posedanto ANTAŬ ol
+   komiti, kaj kunfandu nur post aparta eksplicita aprobo („kunfandu“ — regulo
+   L6). Neniam komitu eldonon rekte sur master. `gh pr create` bezonas
+   `--head <branĉo>` (la loka fetch-refspec estas limigita al master). La
+   paŝoj 4 (etikedo) kaj 6 (publish) okazas nur POST la squash-kunfando: la
+   etikedo devas stari sur la SQUASH-komito sur master, ne sur la branĉa komito.
 1. **`apoversio`** en `gradle/libs.versions.toml` ricevas la novan nombron (unu fonto de
    vero por `versionName`/Sentry — `ApoVersio.kt` generiĝas el ĝi).
 2. **Baskulu `versionCode`** en `androidApp/build.gradle.kts` (`defaultConfig.versionCode`).
    GPP ne pliigas ĝin aŭtomate kaj la Play-API rifuzas re-uzi jam eldonitan
    versionCode ("Version code is too low or has already been used").
    Historio: 246=3.0.2, 247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto,
-   250=3.0.4-19okt, 251=3.0.4-beta24okt (2026-10-24).
+   250=3.0.4-19okt, 251=3.0.4-beta24okt (2026-10-24), 252=3.1.0 (2026-10-25).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).
+   **Interna-testaj versioj ne atingas produktadon** (2026-10-25, 3.1.0): se
+   versio iris nur al la trako `internal` (ekz. 3.0.4-beta24okt), ĝia
+   CHANGELOG-sekcio kunfandiĝas en la sekvan veran version — produktaciaj
+   uzantoj neniam vidis ĝin, do la vera versio portas la tutan delton.
+   Forigu tiam ankaŭ la orfajn kompar-ligojn kaj uzu en la nova ligo la lastan
+   VERAN git-etikedon (interna-testaj komitoj ne ricevas etikedon).
 4. **Kreu git-etikedon** `vX.Y.Z` sur la eldona komito kaj puŝu ĝin
    (`git tag vX.Y.Z && git push origin vX.Y.Z`). F-Droid konstruas el la etikedo —
    do la eldonita APK devus kongrui kun etikedita komito (ne eldonu el nekompromita
@@ -34,6 +47,18 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    estas arkivigitaj en `androidApp/release-notes-arkivo/`. NENIAM interne de
    `src/main/play/`: GPP 4.x validigas ĈIUJN dosierojn tie kaj rifuzas la taskon
    per „Unknown Play resource file“ (2026-10-24, la unua GPP-4-eldono).
+   **La notoj resumu la delton ekde la lasta PRODUKTADA versio** — ne ekde la
+   lasta interna testo, kiun nur testantoj vidis (2026-10-25, 3.1.0).
+   **La signolimo 500 validas laŭ UTF-16-unuoj**, ne laŭ karpunktoj:
+   `len(s.encode('utf-16-le'))//2` en Python (emooj kiel 🗣️ kalkuliĝas po 2).
+   **Ĝisdatigu ankaŭ `apaj_novaĵoj`** en la `android`-sekcio de la
+   kanalkonfiguro — la versio-anonco, kiu montriĝas kiel dialogo al ĉiuj
+   uzantoj kiam ĝia haketaĵo ŝanĝiĝas (nova enhavo = nova dialogo). Ekzistas
+   DU bit-identaj kopioj de la kanalkonfiguro —
+   `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json` kaj
+   `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` —
+   ŝanĝu AMBAŬ kaj tenu ilin identaj (JSONC-detalon vidu en la
+   `kanalkonfiguro`-skill-o).
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
    la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
    ```bash

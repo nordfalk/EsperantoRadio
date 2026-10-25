@@ -110,14 +110,14 @@ data class KanaloDto(
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
     val rektaElsendaPriskriboUrl: String? = null,
-    @SerialName("hejmpaĝoButono") val hejmpaĝoButono: String? = null, // Ĉu eblas forigi @SerialName("hejmpaĝoButono") kaj similaj?
-    @SerialName("retpoŝto") val retpoŝto: String? = null,
+    val hejmpaĝoButono: String? = null,
+    val retpoŝto: String? = null,
     val elsendojRssIgnoruTitolon: Boolean = false,
     val montruTitolojn: Boolean = true,
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
-    @SerialName("defaŭltŜatata") val defaŭltŜatata: Boolean = false,
+    val defaŭltŜatata: Boolean = false,
 )
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(

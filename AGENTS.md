@@ -186,7 +186,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
   **ESCEPTOJ (persistigitaj valoroj — ne renomu)**: agord-ŝlosiloj `"auxtomata_daurigo"`,
   `"kasxitaj_avertoj"`, `"apaj_novajxoj_hesh"` (valoroj de `SettingsKeys`, ne la konstantaj
-  nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@SerialName`-ŝlosiloj en
+  nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@JsonNames`-kromnomoj en
   `Modeloj.kt` (`retposhto`, `defaltSxatata`, `dauro`, `dauroMs`, `retpaghoUrl`) — ili
   tenas kongruon kun ekzistantaj uzant-datumoj. Antaŭ ol skribi, **grep-u kaj kopiu**;
   bibliotekaj nomoj restas anglaj (`PullToRefreshBox`, `isRefreshing`), kaj `fluxo`,

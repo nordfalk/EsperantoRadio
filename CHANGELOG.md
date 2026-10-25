@@ -14,25 +14,20 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
-### Ŝanĝita
-
-- Plibonigita esperanta lingvaĵo en la tuta apo kaj dokumentaro: pli ĝustaj terminoj kaj frazoj en kanaloj, diagnozo, alarmoj kaj sciigoj (https://github.com/nordfalk/EsperantoRadio/pull/137)
-
-## [3.0.4-beta24okt] - 2026-10-24
+## [3.1.0] - 2026-10-25
 
 ### Aldonita
 
-- Vekhorloĝo: la tempo elekteblas per ciferplato en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
+- La malsupra naviga breto estas anstataŭigita per naviga tirkesto (https://github.com/nordfalk/EsperantoRadio/pull/120)
 - Hejmo: klako sur la sekcio-titolo „Kanaloj“ kondukas al la kanala vido (https://github.com/nordfalk/EsperantoRadio/pull/131)
+- Vekhorloĝo: la tempo elekteblas per ciferplato en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
 
 ### Ŝanĝita
 
+- La mini-ludilbreto restas videbla ankaŭ kiam nenio ludas: ĝi montras la laste vidatan kanalon/elsendon (sekvante svipojn) aŭ la laste ludatan enhavon kun ludi-butono kaj ne ŝanĝas la enhavon je nura navigado — reen-iro al la ĉefekrano ne plu ŝanĝas la montratan elsendon; klako sur la breto ludas la enhavon kiam oni jam estas sur ĝia ekrano — kanalo kun rekta fluo ludas la fluon, podkasta kanalo ludas sian plej novan elsendon (https://github.com/nordfalk/EsperantoRadio/pull/131)
+- Plibonigita esperanta lingvaĵo en la tuta apo kaj dokumentaro: pli ĝustaj terminoj kaj frazoj en kanaloj, diagnozo, alarmoj kaj sciigoj (https://github.com/nordfalk/EsperantoRadio/pull/137)
 - Sciigoj pri novaj elsendoj ne plu amasiĝas: maksimume 7 samtempe kaj maksimume 3 po kanalo — kiam la limoj atingiĝas, la plej malnovaj sciigoj malaperas (https://github.com/nordfalk/EsperantoRadio/pull/130)
 - Dekstra tro-tiro sur la horizontalaj vicoj de la ĉefekrano (kiam la vico ne povas ruli pli reen) malfermas la navigan tirkeston — ĝi sekvas la fingron kaj solviĝas kiel la normala tirkesto-gesto (https://github.com/nordfalk/EsperantoRadio/pull/131)
-- La mini-ludilbreto restas videbla ankaŭ kiam nenio ludas: ĝi montras la laste vidatan kanalon/elsendon (sekvante svipojn) aŭ la laste ludatan enhavon kun ludi-butono kaj ne ŝanĝas la enhavon je nura navigado — reen-iro al la ĉefekrano ne plu ŝanĝas la montratan elsendon; klako sur la breto ludas la enhavon kiam oni jam estas sur ĝia ekrano — kanalo kun rekta fluo ludas la fluon, podkasta kanalo ludas sian plej novan elsendon (https://github.com/nordfalk/EsperantoRadio/pull/131)
-- La „Apaj novaĵoj"-dialogo ne plu aperas en evoluaj medioj (debug-konstruoj, emuliloj, komputilaj kaj retumilaj ruladoj) — antaŭe ĝi malfermiĝis ĉe ĉiu freŝa instalaĵo kaj ĝenis dum programado (https://github.com/nordfalk/EsperantoRadio/pull/125)
-- Elsendoj ricevas stabilajn identigilojn (sen kreskantaj prefiksoj); pro la ŝanĝo ludpozicioj, elŝutoj kaj plej ŝatataj povas unufoje restartiĝi por iuj kanaloj (https://github.com/nordfalk/EsperantoRadio/pull/122)
-- La malsupra naviga breto estas anstataŭigita per naviga tirkesto kiel en la malnova apo: ĝi malfermiĝas per la hamburgero en la supra breto (kiu morfas al reen-sago kaj reen per animacio, kaj kies tirkesto glitas enen kaj elen) aŭ per tiro de la maldekstra rando, kaj entenas ĉiujn ekranojn — Hejmo, Kanaloj, Plej ŝatataj, Serĉi, Elŝutoj, Vekhorloĝo kaj Agordoj; la supraj bretoj kun titoloj kaj agoj restas, la mallarĝa tirkesto malfermiĝas sub la supra breto kaj havas neniun propran titolon (https://github.com/nordfalk/EsperantoRadio/pull/120)
 - Pli fluida navigado: langet-ŝanĝoj transiras per fado kaj detalaj ekranoj glitas horizontale — ankaŭ sur komputilo kaj retumilo, kie antaŭe ekranŝanĝo estis tute senmovigita (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Unueca navigado sur flankaj ekranoj: Elŝutoj, Ludvico kaj Diagnozo estas nun tutekranoj sen suba naviga breto, same kiel Agordoj kaj Alarmoj (https://github.com/nordfalk/EsperantoRadio/pull/116)
 - Ripeta klako (ekz. sur la mini-ludilbreto) ne plu povas malfermi du identajn ekranojn super unu la alia (https://github.com/nordfalk/EsperantoRadio/pull/116)
@@ -165,7 +160,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
-[3.0.4-beta24okt]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.0.4-beta24okt
+[3.1.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master

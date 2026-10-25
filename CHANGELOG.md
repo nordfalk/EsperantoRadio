@@ -14,11 +14,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
-### Ŝanĝita
-
-- Plibonigita esperanta lingvaĵo en la tuta apo kaj dokumentaro: pli ĝustaj terminoj kaj frazoj en kanaloj, diagnozo, alarmoj kaj sciigoj (https://github.com/nordfalk/EsperantoRadio/pull/137)
-
-## [3.0.4-beta24okt] - 2026-10-24
+## [3.1.0] - 2026-10-25
 
 ### Aldonita
 
@@ -27,6 +23,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
+- Plibonigita esperanta lingvaĵo en la tuta apo kaj dokumentaro: pli ĝustaj terminoj kaj frazoj en kanaloj, diagnozo, alarmoj kaj sciigoj (https://github.com/nordfalk/EsperantoRadio/pull/137)
 - Sciigoj pri novaj elsendoj ne plu amasiĝas: maksimume 7 samtempe kaj maksimume 3 po kanalo — kiam la limoj atingiĝas, la plej malnovaj sciigoj malaperas (https://github.com/nordfalk/EsperantoRadio/pull/130)
 - Dekstra tro-tiro sur la horizontalaj vicoj de la ĉefekrano (kiam la vico ne povas ruli pli reen) malfermas la navigan tirkeston — ĝi sekvas la fingron kaj solviĝas kiel la normala tirkesto-gesto (https://github.com/nordfalk/EsperantoRadio/pull/131)
 - La mini-ludilbreto restas videbla ankaŭ kiam nenio ludas: ĝi montras la laste vidatan kanalon/elsendon (sekvante svipojn) aŭ la laste ludatan enhavon kun ludi-butono kaj ne ŝanĝas la enhavon je nura navigado — reen-iro al la ĉefekrano ne plu ŝanĝas la montratan elsendon; klako sur la breto ludas la enhavon kiam oni jam estas sur ĝia ekrano — kanalo kun rekta fluo ludas la fluon, podkasta kanalo ludas sian plej novan elsendon (https://github.com/nordfalk/EsperantoRadio/pull/131)
@@ -165,7 +162,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
-[3.0.4-beta24okt]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.0.4-beta24okt
+[3.1.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/nordfalk/EsperantoRadio/compare/294834b...master

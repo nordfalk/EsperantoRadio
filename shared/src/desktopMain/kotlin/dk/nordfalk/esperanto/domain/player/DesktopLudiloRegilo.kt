@@ -114,7 +114,7 @@ class DesktopLudiloRegilo : LudiloRegilo {
             val line = AudioSystem.getSourceDataLine(decodedFormat)
             line.open(decodedFormat)
             sourceDataLine = line
-            log("fiksiFonton: SourceDataLine pretas, buffer = ${line.bufferSize} bitokoj")
+            log("fiksiFonton: SourceDataLine pretas, bufro = ${line.bufferSize} bitokoj")
 
             // Volumo
             try {

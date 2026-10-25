@@ -280,7 +280,46 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
-- **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn.
+- **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn. Post amasa anstataŭigo (find/replace) skanu la nove verkitajn liniojn por fuŝitaj vortoj — ekz. `nenieu` anstataŭ `neniu` (2026-10-24, PR #137). La kanonajn terminojn de la projekto listigas la sekcio "Terminaro — kanonaj terminoj" sube.
+
+## Terminaro — kanonaj terminoj
+
+Elektitaj kanonaj terminoj fiksitaj de la lingvaĵa korekto (2026-10-24, PR #137).
+Ĝeneralaj komputikaj terminoj estas en https://komputeko.net/data.json; ĉi tie
+estas la projekto-specifaj decidoj kaj la terminoj por prozo (por identigiloj
+sufiĉas grep-i kaj kopii el la kodo).
+
+| Angla (fonto) | Esperanta | Ekzemplo / rimarko |
+|---|---|---|
+| byte | **bitoko** | `MAKSIMUMA_FLUA_GRANDECO_BITOKOJ` ("bajto" akceptebla, sed bitoko preferata) |
+| disk cache | **diska kaŝmemoro** | "legas diskan kaŝmemoron" (kaŝmemoro = la tekniko, diska kaŝmemoro = la loko) |
+| ringtone | **vokosono** | rezerva vokosono, `haltuAlarmVokosonon` |
+| dial | **ciferplato** | "Elekti per ciferplato" (tempo-elektilo) |
+| slider | **ŝovilo** | progresoŝovilo, `testTag("ŝovilo")` |
+| optimization | **optimumigo** | "Bateri-optimumigo estas ŝaltita" |
+| server error | **servila eraro** | `estasServilaEraro` |
+| kill (process) | **ĉesigi** | "ĉesigi la aplikon en la fono" |
+| domain name | **domajna nomo** | "solvi domajnajn nomojn" |
+| buffer (verbo) | **bufri** | "ekbufras ludado" |
+| buffer (substantivo) | **bufro** | "bufro = … bitokoj" |
+| ongoing | **daŭra** | daŭra sciigo |
+| pending | **atendanta** | `AtendantaElsendoNavigacio` |
+| orphan | **orfo** | "Forigas orfan partan dosieron" |
+| metadata | **metadatumoj** | `METADATUMOJ_LIMTEMPO_MS` |
+| livestream | **tuja elsendfluo** | `rektaElsendaSonoUrl` |
+| media notification | **ludada sciigo** | (ne "mediasciigo") |
+| media button | **ludbutono** | (ne "mediabutono") |
+| audio | **aŭda** | "Retumila aŭda eraro" |
+| bundled | **paktita** | `leguPakititanKanalkonfiguron` |
+| developer mode | **programista reĝimo** | agordo "Programista reĝimo" |
+| spectrogram | **spektrogramo** | derivaj bildoj el metadatumoj |
+| skip list | **salto-listo** | salto-listo de neeltireblaj gastigantoj |
+| use case | **ukazo** | "Ukazoj el la malnova apo" |
+| download location | **elŝutejo** | elekti lokon de elŝutitaj elsendoj |
+
+Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sciiglimoj**
+(ne "sciig-permeso" ktp.). Esceptoj restas la persistitaj valoroj kaj API-nomoj
+(vidu la noton pri supersignoj en "Aktivaj reguloj kaj rimarkoj").
 
 ## Protokolado kaj Sentry — konvencio
 

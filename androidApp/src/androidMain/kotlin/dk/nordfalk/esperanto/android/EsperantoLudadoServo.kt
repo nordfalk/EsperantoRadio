@@ -170,12 +170,12 @@ class EsperantoLudadoServo : MediaSessionService() {
      * FAROTA K1 (Sentry KMP-1V): starto per `startForegroundService` devigas la servon
      * voki `startForeground()` ene de la sistema limtempo. En la apo tion faras Media3 —
      * sed nur kiam ludado aktiviĝas. Servo restartigita post procezo-morto (aŭ alia
-     * ekstera starto, ekz. mediabutono) havas malplenan ludilon: neniam ekbufferas
+     * ekstera starto, ekz. ludbutono) havas malplenan ludilon: neniam ekbufras
      * ludado, do neniu `startForeground()` okazus kaj Android kraŝigus la apon per
      * fatala RemoteServiceException (unufoje observita sur Android 11/MIUI, dist 249).
      * Post mallonga prokrasto ni mem plenumas la kontrakton per provizora sciigo kaj
-     * haltigas la servon — ludilo kun media-eroj restas sub la mastrumado de Media3
-     * (la kontrakto jam estis plenumita kiam ludado ekbuferis: ludado, paŭzo kaj eĉ
+     * haltigas la servon — ludilo kun ludadaj eroj restas sub la mastrumado de Media3
+     * (la kontrakto jam estis plenumita kiam ludado ekbufriĝis: ludado, paŭzo kaj eĉ
      * fonto-eraro kun sciigo).
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

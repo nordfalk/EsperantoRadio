@@ -211,7 +211,7 @@ La agordoj estis simpligitaj ekde la originala plano. Nuna listo:
 - **Programista reĝimo** (ŝaltilo — montras elektilojn por priskribo-fonto kaj vidmaniero en ElsendoEkrano)
 - **Temo** (hela/malhela/sistemo)
 
-> La originala plano havis lingvoelekton, elŝuthejmon, nur-WiFi, son-efikojn,
+> La originala plano havis lingvoelekton, elŝutejon, nur-WiFi, son-efikojn,
 > devigi portreton — tiuj estis forigitaj (#55, #37).
 
 ## Navigado (navigation3)

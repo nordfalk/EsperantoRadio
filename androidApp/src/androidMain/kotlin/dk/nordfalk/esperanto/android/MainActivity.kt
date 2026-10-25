@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
         // "Tuŝu por malŝalti": nur la TUŜO de la sciigo (de_sciigo=true) haltigu la
         // rezervan alarm-sonon — ne la best-effort startActivity de la ricevilo mem,
         // kiu alvenas sen ia ago de la uzanto. En la pura-rezerva-kazo (neniu
-        // mini-ludilbreto, nenieu ludada sciigo) la tuŝo de la sciigo estas la sola
+        // mini-ludilbreto, neniu ludada sciigo) la tuŝo de la sciigo estas la sola
         // halta afordanco. (setAutoCancel forigas la sciigon mem.)
         if (intent.getBooleanExtra("de_sciigo", false)) haltuAlarmVokosonon()
         logi("MainActivity", "Alarmo-UI malfermita: kanalo=$kanaloSlug etikedo=$etikedo — ludado estas lanĉita de AlarmoReceivilo")

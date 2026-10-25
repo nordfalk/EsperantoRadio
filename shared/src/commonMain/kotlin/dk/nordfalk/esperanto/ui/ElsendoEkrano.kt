@@ -158,7 +158,7 @@ fun ElsendoEkrano(
                         },
                         onClick = {
                             when (elŝutStato) {
-                                is ElŝutStato.NeElŝutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta...") }
+                                is ElŝutStato.NeElŝutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") }
                                 is ElŝutStato.Elŝutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") }
                                 is ElŝutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") }
                                 is ElŝutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
@@ -257,7 +257,7 @@ fun ElsendoEkrano(
             val evoluo = agordojDeponejo?.evoluo?.collectAsState()?.value ?: false
             val defaŭltaUzuWebView = kanalo?.uzuWebViewPorElsendo == true
 
-            // Evolua reĝimo: elektiloj por fonto kaj vidmaniero
+            // Programista reĝimo: elektiloj por fonto kaj vidmaniero
             if (evoluo) {
                 var fontoHtml by remember(elsendo.id) { mutableStateOf(true) }
                 var vidmaniero by remember(elsendo.id) { mutableStateOf(if (defaŭltaUzuWebView) 0 else 1) }
@@ -268,7 +268,7 @@ fun ElsendoEkrano(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(Modifier.padding(8.dp)) {
-                        Text("Evoluo — priskribo-fonto", style = MaterialTheme.typography.labelMedium)
+                        Text("Programisto — priskribo-fonto", style = MaterialTheme.typography.labelMedium)
                         Row {
                             FilterChip(
                                 selected = fontoHtml,
@@ -283,7 +283,7 @@ fun ElsendoEkrano(
                             )
                         }
                         Spacer(Modifier.height(8.dp))
-                        Text("Evoluo — vidmaniero", style = MaterialTheme.typography.labelMedium)
+                        Text("Programisto — vidmaniero", style = MaterialTheme.typography.labelMedium)
                         Row {
                             FilterChip(
                                 selected = vidmaniero == 0,
@@ -300,7 +300,7 @@ fun ElsendoEkrano(
                             FilterChip(
                                 selected = vidmaniero == 2,
                                 onClick = { vidmaniero = 2 },
-                                label = { Text("Text (kruda)") },
+                                label = { Text("Teksto (kruda)") },
                             )
                         }
                     }
@@ -353,7 +353,7 @@ fun ElsendoEkrano(
 
                 when (elŝutStato) {
                     is ElŝutStato.NeElŝutita -> OutlinedButton(
-                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta...") },
+                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") },
                         modifier = Modifier.weight(1f)
                     ) { Icon(Icons.Filled.Download, contentDescription = null); Text(" Elŝuti") }
 

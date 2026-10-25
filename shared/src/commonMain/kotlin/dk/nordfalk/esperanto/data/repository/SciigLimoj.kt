@@ -35,7 +35,7 @@ const val REZERVITA_SCIIG_ID = 4711
 
 /**
  * La sekva sciig-ID el la kreskanta serio — sed neniam en la rezervita zono de la
- * alarmo-sciigo: transpreno anstataŭigus la alarmo-sciigon per sciigo pri nova
+ * alarma sciigo: transpreno anstataŭigus la alarman sciigon per sciigo pri nova
  * elsendo (kaj inverse). Ankaŭ [REZERVITA_SCIIG_ID] - 1 evitiĝas, ĉar la
  * „Ludi“-ago de sciigo uzas la pet-identigilon sciigId + 1.
  */

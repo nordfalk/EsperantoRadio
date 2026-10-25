@@ -16,7 +16,7 @@ actual fun leguKaŝon(nomo: String): String? {
     return try {
         val dosiero = File(dosierKaŝoBazo, "$nomo.rss")
         if (!dosiero.exists()) return null
-        logd("DosierKaŝo", "Legitas: $nomo (${dosiero.length()} bajtoj)")
+        logd("DosierKaŝo", "Legitas: $nomo (${dosiero.length()} bitokoj)")
         dosiero.readText()
     } catch (e: Exception) {
         loge("DosierKaŝo", "Malsukcesis legi kaŝon: $nomo", e)

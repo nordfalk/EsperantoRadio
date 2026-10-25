@@ -12,7 +12,7 @@ import dk.nordfalk.esperanto.domain.model.Alarmo
 import kotlinx.serialization.json.Json
 
 /**
- * BroadcastReceiver kiu re-planas ĉiujn alarmojn post kiam la aparato restartis.
+ * BroadcastReceiver kiu replanas ĉiujn alarmojn post kiam la aparato restartiĝis.
  *
  * Legas la persistitajn alarmojn el Settings kaj vokas AlarmoSkedilo.reskediĈiujn().
  */
@@ -23,25 +23,25 @@ class BootReceivilo : BroadcastReceiver() {
             intent.action != "android.intent.action.LOCKED_BOOT_COMPLETED"
         ) return
 
-        logi("BootReceivilo", "Boot ricevita — re-planas alarmojn kaj sciigojn")
+        logi("BootReceivilo", "Praŝargo ricevita — replanas alarmojn kaj sciigojn")
 
         try {
-            // Agordu appContext por AlarmoSkedilo kaj kreuSettings (cexe boot, MainActivity ne jam rulis)
+            // Agordu appContext por AlarmoSkedilo kaj kreuSettings (ĉe praŝargo, MainActivity ne jam rulis)
             appContext = context.applicationContext
             val settings = kreuSettings()
 
-            // Re-skedu sciigojn nur se sciigoj ŝaltitaj kaj estas ŝatataj kanaloj
+            // Re-skedigu sciigojn nur se sciigoj ŝaltitaj kaj estas ŝatataj kanaloj
             val sciigoj = settings.getBoolean(SettingsKeys.SCIIGOJ, true)
             val plejStr = settings.getString(SettingsKeys.PLEJŜATATAJ_KANALOJ, "")
             val plejŝatataj = if (plejStr.isBlank()) emptySet() else plejStr.split(",").toSet()
             ĝisdatiguSciigSkedon(plejŝatataj, sciigoj)
             val alarmoj = leguPersistitajnAlarmojn()
-            logi("BootReceivilo", "Legis ${alarmoj.size} alarmojn, re-planas")
+            logi("BootReceivilo", "Legis ${alarmoj.size} alarmojn, replanas")
 
             val skedilo = AlarmoSkedilo()
             skedilo.reskediĈiujn(alarmoj)
         } catch (e: Exception) {
-            logw("BootReceivilo", "Eraro re-planante alarmojn", e)
+            logw("BootReceivilo", "Eraro dum replanado de alarmoj", e)
         }
     }
 }
@@ -54,11 +54,11 @@ internal fun leguPersistitajnAlarmojn(): List<Alarmo> {
     val str = kreuSettings().getString(SettingsKeys.ALARMOJ, "")
     if (str.isBlank()) return emptyList()
     // (PR #93) korupta JSON (ekz. duonfarita skribo) devas ne bloki la tutan
-    // boot-re-skedadon — reeniru al malplena listo kaj protokolu
+    // re-skedadon post praŝargo — reeniru al la malplena listo kaj protokolu
     return try {
         Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)
     } catch (e: Exception) {
-        logw("BootReceivilo", "Korupta alarmo-JSON — komencas sen persistitaj alarmoj", e)
+        logw("BootReceivilo", "Korupta alarma JSON — komencas sen persistitaj alarmoj", e)
         emptyList()
     }
 }

@@ -246,11 +246,11 @@ class HejmoViewModel(
         val kanaloj = kanaloDeponejo.getKanalojn()
         logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
-        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
         if (kaŝitaj.isNotEmpty()) {
             plenigu(kanaloj, kaŝitaj)
-            logi("HejmoViewModel", "Diskkaŝmemoro: ${kaŝitaj.size} elsendoj — tuj montras")
+            logi("HejmoViewModel", "Diska kaŝmemoro: ${kaŝitaj.size} elsendoj — tuj montras")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
@@ -279,7 +279,7 @@ class HejmoViewModel(
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
         ĉiujElsendoj = elsendoj
         // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
-        // kun semo derivata de la enhavo — la ordo restas stabila inter rekomputadoj.
+        // kun semo derivita de la enhavo — la ordo restas stabila inter rekomputadoj.
         aliajKandidatoj = elsendoj.shuffled(Random(elsendoj.hashCode().toLong()))
         val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
 
@@ -502,7 +502,7 @@ fun HejmoEkrano(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator()
-                    Text("Ŝarĝas elsendojn...", modifier = Modifier.padding(8.dp))
+                    Text("Ŝarĝas elsendojn…", modifier = Modifier.padding(8.dp))
                 }
             }
         } else PullToRefreshBox(

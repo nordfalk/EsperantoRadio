@@ -11,7 +11,7 @@ import kotlin.concurrent.Volatile
  * Platform-specifa eliĝo estas farata per platformLog* (expect/actual).
  *
  * Konvencio: [Komponanto] mesaĝo
- * Niveloj: d = debug, i = info, g = grava info, w = warning, e = eraro
+ * Niveloj: d = debug, i = info, g = grava informo, w = averto, e = eraro
  */
 @Volatile
 var protokoloDetala: Boolean = false

@@ -55,7 +55,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
   La celo estas rekreado, ne riparado.
 - **A2 — La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
   `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
-  La sep parsreguloj kaj la skip-listo devas esti konservitaj.
+  La sep parsreguloj kaj la salto-listo devas esti konservitaj.
 - **A3 — Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
@@ -186,7 +186,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
   **ESCEPTOJ (persistigitaj valoroj — ne renomu)**: agord-ŝlosiloj `"auxtomata_daurigo"`,
   `"kasxitaj_avertoj"`, `"apaj_novajxoj_hesh"` (valoroj de `SettingsKeys`, ne la konstantaj
-  nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@SerialName`-ŝlosiloj en
+  nomoj), la kaŝmemora dosierujo `"elsendoj_kasho"`, kaj la `@JsonNames`-kromnomoj en
   `Modeloj.kt` (`retposhto`, `defaltSxatata`, `dauro`, `dauroMs`, `retpaghoUrl`) — ili
   tenas kongruon kun ekzistantaj uzant-datumoj. Antaŭ ol skribi, **grep-u kaj kopiu**;
   bibliotekaj nomoj restas anglaj (`PullToRefreshBox`, `isRefreshing`), kaj `fluxo`,
@@ -257,10 +257,10 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   revizio de #99/#101/#102): la du Kotlin-bumpoj tuŝas apudajn liniojn de
   `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la
   PR-branĉon, ĉiuj kvar kromprogramoj je la sama versio. Coil 3.6.3 (#102) estis
-  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatenon 2.4.0,
-  nelegeblan de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
+  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatumojn 2.4.0,
+  nelegeblajn de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
   `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`; nuna AGP
-  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatenajn kaj
+  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatumajn kaj
   compileSdk/AGP-postulojn antaŭ ol kunfandi versi-bumpon.
 - **Plena ĝisdatigo de la ilaro (Gradle 9 + AGP 9) eblas kaj estis provita**
   (2026-10-17, PR #117; ĉiuj celoj verdaj: desktopTest, androidApp assembleDebug,
@@ -280,6 +280,47 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
+- **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn. Post amasa anstataŭigo (find/replace) skanu la nove verkitajn liniojn por fuŝitaj vortoj — ekz. `nenieu` anstataŭ `neniu` (2026-10-24, PR #137). La kanonajn terminojn de la projekto listigas la sekcio "Terminaro — kanonaj terminoj" sube.
+
+## Terminaro — kanonaj terminoj
+
+Elektitaj kanonaj terminoj fiksitaj de la lingvaĵa korekto (2026-10-24, PR #137).
+Ĝeneralaj komputikaj terminoj estas en https://komputeko.net/data.json; ĉi tie
+estas la projekto-specifaj decidoj kaj la terminoj por prozo (por identigiloj
+sufiĉas grep-i kaj kopii el la kodo).
+
+| Angla (fonto) | Esperanta | Ekzemplo / rimarko |
+|---|---|---|
+| byte | **bitoko** | `MAKSIMUMA_FLUA_GRANDECO_BITOKOJ` ("bajto" akceptebla, sed bitoko preferata) |
+| disk cache | **diska kaŝmemoro** | "legas diskan kaŝmemoron" (kaŝmemoro = la tekniko, diska kaŝmemoro = la loko) |
+| ringtone | **vokosono** | rezerva vokosono, `haltuAlarmVokosonon` |
+| dial | **ciferplato** | "Elekti per ciferplato" (tempo-elektilo) |
+| slider | **ŝovilo** | progresoŝovilo, `testTag("ŝovilo")` |
+| optimization | **optimumigo** | "Bateri-optimumigo estas ŝaltita" |
+| server error | **servila eraro** | `estasServilaEraro` |
+| kill (process) | **ĉesigi** | "ĉesigi la aplikon en la fono" |
+| domain name | **domajna nomo** | "solvi domajnajn nomojn" |
+| buffer (verbo) | **bufri** | "ekbufras ludado" |
+| buffer (substantivo) | **bufro** | "bufro = … bitokoj" |
+| ongoing | **daŭra** | daŭra sciigo |
+| pending | **atendanta** | `AtendantaElsendoNavigacio` |
+| orphan | **orfo** | "Forigas orfan partan dosieron" |
+| metadata | **metadatumoj** | `METADATUMOJ_LIMTEMPO_MS` |
+| livestream | **tuja elsendfluo** | `rektaElsendaSonoUrl` |
+| media notification | **ludada sciigo** | (ne "mediasciigo") |
+| media button | **ludbutono** | (ne "mediabutono") |
+| audio | **aŭda** | "Retumila aŭda eraro" |
+| bundled | **paktita** | `leguPakititanKanalkonfiguron` |
+| developer mode | **programista reĝimo** | agordo "Programista reĝimo" |
+| spectrogram | **spektrogramo** | derivaj bildoj el metadatumoj |
+| skip list | **salto-listo** | salto-listo de neeltireblaj gastigantoj |
+| use case | **ukazo** | "Ukazoj el la malnova apo" |
+| download location | **elŝutejo** | elekti lokon de elŝutitaj elsendoj |
+
+Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sciiglimoj**
+(ne "sciig-permeso" ktp.). Esceptoj restas la persistitaj valoroj kaj API-nomoj
+(vidu la noton pri supersignoj en "Aktivaj reguloj kaj rimarkoj").
+
 ## Protokolado kaj Sentry — konvencio
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
@@ -293,7 +334,7 @@ iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
 protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
-  diskkaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
+  diska kaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
 - `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
   protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
@@ -353,7 +394,7 @@ staras en la skill-o `konstruado-kaj-testado`:
 ## Datumfluo (nova apo)
 
 ```
-esperantoradio_kanaloj_v9.json (bundled resource)
+esperantoradio_kanaloj_v9.json (paktita risurco)
         ↓ KanalAgordoLeganto (striptigas // komentojn, traktas JSONC)
    List<Kanal>
         ↓ KanalDeponejoImpl (StateFlow)
@@ -363,7 +404,7 @@ esperantoradio_kanaloj_v9.json (bundled resource)
    RssParsilo.parsRss(fluoTeksto, kanal)
         ↓ (reguloj P6.1–P6.7)
    List<Elsendo>
-        ↓ KanalEkrano — elsendlisto (dat-grupigo, diskkaŝmemoro)
+        ↓ KanalEkrano — elsendlisto (dat-grupigo, diska kaŝmemoro)
 ```
 
 ## Kie trovi kion

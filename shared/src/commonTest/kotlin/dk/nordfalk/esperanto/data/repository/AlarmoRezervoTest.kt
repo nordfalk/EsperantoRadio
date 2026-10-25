@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Testoj por la korupta-JSON-rezervo de PersistantaAlarmoDeponejo (PR #95).
+ * Testoj por la korupta-JSON-rezervo de PersistaAlarmoDeponejo (PR #95).
  */
 class AlarmoRezervoTest {
 
@@ -47,7 +47,7 @@ class AlarmoRezervoTest {
     @Test
     fun legasKajPersistasAlarmojn() = runTest {
         val settings = MapSettings()
-        val deponejo = PersistantaAlarmoDeponejo(settings, sugestoj)
+        val deponejo = PersistaAlarmoDeponejo(settings, sugestoj)
 
         assertEquals(1, deponejo.observiAlarmojn().value.size, "Komenca stato montras la sugestojn")
         deponejo.krei(Alarmo(id = 0, horo = 16, minuto = 10, kanaloSlug = "peranto"))
@@ -55,7 +55,7 @@ class AlarmoRezervoTest {
         assertTrue(persistita.contains("\"peranto\""), "La nova alarmo devas esti persistita: $persistita")
 
         // Nova deponejo-lego devas vidi la persistitajn alarmojn
-        val deponejo2 = PersistantaAlarmoDeponejo(settings, sugestoj)
+        val deponejo2 = PersistaAlarmoDeponejo(settings, sugestoj)
         assertTrue(
             deponejo2.observiAlarmojn().value.any { it.kanaloSlug == "peranto" },
             "Persistita alarmo devas supervivi rekreon de la deponejo",
@@ -67,7 +67,7 @@ class AlarmoRezervoTest {
         val settings = MapSettings()
         settings.putString(SettingsKeys.ALARMOJ, "{\"NE VALIDAS")
 
-        val deponejo = PersistantaAlarmoDeponejo(settings, sugestoj)
+        val deponejo = PersistaAlarmoDeponejo(settings, sugestoj)
 
         assertEquals(1, deponejo.observiAlarmojn().value.size, "Falilo al la sugestoj")
         assertEquals(

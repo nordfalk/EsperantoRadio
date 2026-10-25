@@ -14,7 +14,7 @@ import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.IntentŜlosilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
-import dk.nordfalk.esperanto.domain.player.haltuAlarmRingon
+import dk.nordfalk.esperanto.domain.player.haltuAlarmVokosonon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
         val dato = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_DATO) ?: ""
         val priskribo = intent.getStringExtra(NovajElsendojKontroloWorker.EXTRA_ELSENDO_PRISKRIBO)
 
-        logi("MainActivity", "Malfermi elsendon de sciigo: id=$elsendoId titolo=$titolo")
+        logi("MainActivity", "Malfermi elsendon de sciigo: ID=$elsendoId titolo=$titolo")
 
         val elsendo = Elsendo(
             id = elsendoId,
@@ -116,11 +116,11 @@ class MainActivity : ComponentActivity() {
         }
 
         // Signalu al la Compose-tavolo por navigi al la elsenda detalo
-        dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.setu(elsendo)
+        dk.nordfalk.esperanto.data.repository.AtendantaElsendoNavigacio.setu(elsendo)
     }
 
     /**
-     * Alarmo-intento (de la alt-prioritata sciigo aŭ de la best-effort startActivity
+     * Alarmo-intento (de la altprioritata sciigo aŭ de la best-effort startActivity
      * de la ricevilo).
      *
      * La LUDADON faras AlarmoReceivilo mem — Activity lanĉita el fona ricevilo estas
@@ -135,10 +135,10 @@ class MainActivity : ComponentActivity() {
         val etikedo = intent.getStringExtra("alarmo_etikedo")
         // "Tuŝu por malŝalti": nur la TUŜO de la sciigo (de_sciigo=true) haltigu la
         // rezervan alarm-sonon — ne la best-effort startActivity de la ricevilo mem,
-        // kiu alvenas sen ia ago de la uzanto. En la pura-fallback-kazo (neniu
-        // mini-ludilbreto, neniu media sciigo) la tuŝo de la sciigo estas la sola
+        // kiu alvenas sen ia ago de la uzanto. En la pura-rezerva-kazo (neniu
+        // mini-ludilbreto, neniu ludada sciigo) la tuŝo de la sciigo estas la sola
         // halta afordanco. (setAutoCancel forigas la sciigon mem.)
-        if (intent.getBooleanExtra("de_sciigo", false)) haltuAlarmRingon()
+        if (intent.getBooleanExtra("de_sciigo", false)) haltuAlarmVokosonon()
         logi("MainActivity", "Alarmo-UI malfermita: kanalo=$kanaloSlug etikedo=$etikedo — ludado estas lanĉita de AlarmoReceivilo")
     }
 
@@ -149,8 +149,8 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Petas sciig-permeson por Android 13+ (API 33+).
-     * Necesa por la mediasciigo dum fona ludado.
+     * Petas sciigpermeson por Android 13+ (API 33+).
+     * Necesa por la ludada sciigo dum fona ludado.
      */
     private fun petiSciigPermeson() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

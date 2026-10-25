@@ -21,7 +21,7 @@ object SettingsKeys {
     const val INTENT_NONCE = "intent_nonce"
     /** Kreskanta kontraŭo por unikaj sciig-ID-oj ((PR #93) — hashCode-kolizioj anstataŭigis sciigojn). */
     const val SCIIG_ID = "sciig_id"
-    /** Registrejo de la aktivaj sciigoj ("id:slug,id:slug") por la sciig-limoj (maks. 7 / maks. 3 po kanalo). */
+    /** Registrejo de la aktivaj sciigoj ("id:slug,id:slug") por la sciiglimoj (maks. 7 / maks. 3 po kanalo). */
     const val SCIIG_REGISTREJO = "sciig_registrejo"
     /** Haketaĵo de la lasta konfirmitaj apaj novaĵoj (nul = neniam montrita / malplena). */
     const val APAJ_NOVAĴOJ_HAKETAĴO = "apaj_novaĵoj_haketaĵo"

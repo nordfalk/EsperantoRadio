@@ -4,7 +4,7 @@ package dk.nordfalk.esperanto.domain.model
  * Rezulto de diagnoza kontrolo — problemo aŭ averto pri la aparato/agordoj.
  *
  * La celo: frue detekti agordojn kiuj malhelpas fona ludado kaj aŭtomatan
- * daŭrigon (ekz. Samsung MARs / bateri-optimumado, blokita DNS, mankantaj permesoj).
+ * daŭrigon (ekz. Samsung MARs / bateri-optimumigo, blokita DNS, mankantaj permesoj).
  */
 data class DiagnozoRezulto(
     val tipo: DiagnozoTipo,
@@ -16,10 +16,10 @@ data class DiagnozoRezulto(
 
 /** Tipo de la problemo — uzata por ikonoj kaj intencoj. */
 enum class DiagnozoTipo {
-    /** Bateri-optimumado (Samsung MARs, Android Doze) limigas la aplikon en fono. */
+    /** Bateri-optimumigo (Samsung MARs, Android Doze) limigas la aplikon en fono. */
     BATERIO_OPTIMIZATION,
 
-    /** Sciig-permeso mankas — la media sciigo kaj sciigoj pri novaj elsendoj ne aperas. */
+    /** Sciigpermeso mankas — la ludada sciigo kaj sciigoj pri novaj elsendoj ne aperas. */
     NOTIFICATIONS,
 
     /** DNS-solvado malsukcesis — ofte pro privata DNS (DNS-over-TLS) aŭ VPN. */
@@ -41,7 +41,7 @@ enum class Severeco {
  * Proponita ago por ripari la problemon — ekz. "Malfermi bateriajn agordojn".
  *
  * La kampo [intenco] estas platform-specifa identigilo:
- * - Android: `"battery"`, `"notifications"`, `"wireless"`
+ * - Android: `"baterio"`, `"sciigoj"`, `"sendrata"`
  * - Aliaj platformoj: ne uzata (ago == null)
  */
 data class DiagnozoAgo(

@@ -113,7 +113,7 @@
 	,{
 			"kodo": "kernpunkto",
 			"nomo": "Kernpunkto",
-			"priskribo": "Eva kaj Johannes pri scienco, kulturo kaj socio - profundaj babiladoj kun gastoj.",
+			"priskribo": "Eva kaj Johannes pri scienco, kulturo kaj socio — profundaj babiladoj kun gastoj.",
 			"emblemoUrl": "https://esperanto-radio.com/_kernpunkto.png",
 			"elsendojRssUrl": "https://kern.punkto.info/feed/mp3/",
 			"montruTitolojn": "true",
@@ -134,7 +134,7 @@
 	,{
 			"kodo": "radioscienca",
 			"nomo": "Radio Scienca",
-			"priskribo": "Sciencaj temoj - de kosmo ĝis korpo - klarigitaj en Esperanto.",
+			"priskribo": "Sciencaj temoj — de kosmo ĝis korpo — klarigitaj en Esperanto.",
 			"emblemoUrl": "https://www.radioscienca.com/wp/wp-content/uploads/2017/01/bg-1.jpg",
 			"elsendojRssUrl": "https://www.radioscienca.com/feed/",
 			"montruTitolojn": "true",
@@ -176,7 +176,7 @@
 	,{
 			"kodo": "bitmono",
 			"nomo": "Bitmono",
-			"priskribo": "Pri bitmono kaj kriptovalutoj - klarigitaj simple, en Esperanto.",
+			"priskribo": "Pri bitmono kaj kriptovalutoj — klarigitaj simple, en Esperanto.",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded400/21881729/21881729-1666809337563-63459cc26442b.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/830574e4/podcast/rss",
 			"montruTitolojn": "false",
@@ -198,7 +198,7 @@
 	,{
 			"kodo": "radiofrei",
 			"nomo": "Radio Frei",
-			"priskribo": "Esperanto-podkastoj de la germana liberaj-tema radio «Radio Frei».",
+			"priskribo": "Esperanto-podkastoj de la germana libertema radio «Radio Frei».",
 			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
 			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
 			"uziWebViewPorElsendo": false,
@@ -235,7 +235,7 @@
 	,{
 			"kodo": "fremdulo",
 			"nomo": "Fremdulo 3",
-			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto - kun buntaj gastoj.",
+			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto — kun buntaj gastoj.",
 			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/9230236/9230236-1693648078634-efd5a4a43c6ca.jpg",
 			"hejmpaĝoButono": "https://tkubisiowski.eu/fremdulo"
@@ -251,7 +251,7 @@
 	,{
 			"kodo": "neparolupriesperanto",
 			"nomo": "Ne Parolu pri Esperanto",
-			"priskribo": "ManchaPod klarigas ĉion amuze: de vikingoj ĝis Mesopotamio - ĉiam en Esperanto.",
+			"priskribo": "ManchaPod klarigas ĉion amuze: de vikingoj ĝis Mesopotamio — ĉiam en Esperanto.",
 			"elsendojRssUrl": "https://www.spreaker.com/show/5202159/episodes/feed",
 			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/70e4cc48a445832bdc21f89ac01c9fd5.jpg",
 			"retpoŝto": "manchapod@gmail.com",
@@ -284,7 +284,7 @@
 	,{
 			"kodo": "rakontatempo",
 			"nomo": "Rakonta Tempo",
-			"priskribo": "Aŭsteno legas novelojn kaj fabelojn - ĉiu epizodo unu rakonto en Esperanto.",
+			"priskribo": "Aŭsteno legas novelojn kaj fabelojn — ĉiu epizodo unu rakonto en Esperanto.",
 			"elsendojRssUrl": "https://anchor.fm/s/dce1a654/podcast/rss",
 			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/36957757/36957757-1679199549737-8589e88bbf25b.jpg",
 			"hejmpaĝoButono": "https://podcasters.spotify.com/pod/show/au016dsteno"
@@ -322,7 +322,7 @@
 			"kodo": "amindaradioesperanto",
 			"nomo": "Aminda Radio",
 			"emblemoUrl": "https://amindaradio.files.wordpress.com/2016/05/cropped-rekl-are.jpg",
-			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias - do la fonto estas radio.txt ĝis eldoniĝos novan version de la apo",
+			"elsendojRssUrl_NOTU": "decembro 2017: La RSS havas audio/mpeg3 anstataŭ audio/mpeg kaj pro tio ne funkcias — do la fonto estas radio.txt ĝis eldoniĝos nova versio de la apo",
 			"elsendojRssUrl_ne_plu": "http://feeds.djpod.com/amindaesperanto",
 			"montruTitolojn": "false",
 			"uziWebViewPorElsendo": false,

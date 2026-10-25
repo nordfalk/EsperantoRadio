@@ -179,8 +179,8 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
-    fun malkoduUrlKoditaĵonKun4BajtaSigno() {
-        // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bajtajn UTF-8-signojn
+    fun malkoduUrlKoditaĵonKun4BitokaSigno() {
+        // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bitokajn UTF-8-signojn
         assertEquals("😀", malkoduUrlKoditaĵon("%F0%9F%98%80"))
     }
 

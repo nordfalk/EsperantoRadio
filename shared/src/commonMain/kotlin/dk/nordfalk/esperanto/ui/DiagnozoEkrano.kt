@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Diagnoza ekrano — kontrolas la aparaton por oftaj problemoj kiuj malhelpas
- * fona ludado kaj aŭtomata daŭrigo (bateri-optimumado, sciig-permeso, DNS, ktp.)
+ * fona ludado kaj aŭtomata daŭrigo (bateri-optimumigo, sciigpermeso, DNS, ktp.)
  * kaj proponas butonojn kiuj malfermas la ĝustajn sistem-agordojn.
  *
  * Alireble el Agordoj → Sistemo → Diagnozo.
@@ -38,7 +38,7 @@ fun DiagnozoEkrano(
     var rezultoj by remember { mutableStateOf<List<DiagnozoRezulto>?>(null) }
     var ŝarĝata by remember { mutableStateOf(true) }
 
-    fun reKontroli() {
+    fun rekontroli() {
         scope.launch {
             ŝarĝata = true
             rezultoj = diagnozoRegilo.kontroli()
@@ -46,7 +46,7 @@ fun DiagnozoEkrano(
         }
     }
 
-    LaunchedEffect(Unit) { reKontroli() }
+    LaunchedEffect(Unit) { rekontroli() }
 
     Scaffold(
         topBar = {
@@ -58,8 +58,8 @@ fun DiagnozoEkrano(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { logi("Klako", "re-kontroli"); reKontroli() }) {
-                        Icon(Icons.Filled.Refresh, contentDescription = "Re-kontroli")
+                    IconButton(onClick = { logi("Klako", "rekontroli"); rekontroli() }) {
+                        Icon(Icons.Filled.Refresh, contentDescription = "Rekontroli")
                     }
                 }
             )
@@ -122,13 +122,13 @@ fun DiagnozoEkrano(
 
             Spacer(Modifier.height(16.dp))
             OutlinedButton(
-                onClick = { logi("Klako", "re-kontroli (butono)"); reKontroli() },
+                onClick = { logi("Klako", "rekontroli (butono)"); rekontroli() },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !ŝarĝata,
             ) {
                 Icon(Icons.Filled.Refresh, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Re-kontroli")
+                Text("Rekontroli")
             }
         }
     }

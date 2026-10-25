@@ -32,15 +32,15 @@ fun main() {
     println("Kanaloj en konfiguro: ${kanaloj.size}")
 
     // 2. Elŝutu radio.txt
-    println("\nElŝutas radio.txt de $RADIO_TXT_URL ...")
+    println("\nElŝutas radio.txt de $RADIO_TXT_URL …")
     val radioTxt = httpGet(RADIO_TXT_URL)
     println("radio.txt: ${radioTxt.length} signoj, ${radioTxt.count { it == '\n' }} linioj")
 
-    // 3. Parse radio.txt
+    // 3. Parsu radio.txt
     val radioTxtEroj = parseRadioTxt(radioTxt)
     println("Eroj en radio.txt: ${radioTxtEroj.size}")
 
-    // 4. Group by channel name
+    // 4. Grupigu laŭ kanal-nomo
     val radioTxtPerKanalo = radioTxtEroj.groupBy { it.kanalNomo }
     println("Kanaloj en radio.txt: ${radioTxtPerKanalo.size}")
     radioTxtPerKanalo.toSortedMap().forEach { (nomo, eroj) ->
@@ -48,7 +48,7 @@ fun main() {
         println("  $nomo — ${eroj.size} elsendoj, datoj: ${datoj.first()}..${datoj.last()}")
     }
 
-    // 5. Build matching map: normalized(nomo) → slug
+    // 5. Konstruu la mapon de kongruoj: normigita(nomo) → slug
     val normNomoAlSlug = mutableMapOf<String, String>()
     val slugAlKanalo = mutableMapOf<String, Kanalo>()
     for (k in kanaloj) {
@@ -56,7 +56,7 @@ fun main() {
         slugAlKanalo[k.slug] = k
     }
 
-    // 6. Match radio.txt channels to config slugs
+    // 6. Kongruu radio.txt-kanalojn kun la slug-oj de la konfiguro
     val radioTxtAlSlug = mutableMapOf<String, String>()
     for (nomo in radioTxtPerKanalo.keys) {
         val slug = normNomoAlSlug[normaliguNomon(nomo)]
@@ -104,7 +104,7 @@ fun main() {
             continue
         }
 
-        print("  Elŝutas RSS de $rssUrl ... ")
+        print("  Elŝutas RSS de $rssUrl … ")
         val rssTeksto = try {
             httpGet(rssUrl)
         } catch (e: Exception) {

@@ -34,7 +34,7 @@ class AgordojEkranoTest {
             listOf(
                 DiagnozoRezulto(
                     tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
-                    titolo = "Bateri-optimumado estas ŝaltita",
+                    titolo = "Bateri-optimumigo estas ŝaltita",
                     priskribo = "La sistemo povas limigi la aplikon en la fono.",
                     severeco = Severeco.ERARO,
                 )

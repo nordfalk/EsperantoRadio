@@ -14,7 +14,7 @@ package dk.nordfalk.esperanto
  * estas en ProtokoloUtil.kt.
  *
  * Konvencio: [Komponanto] mesaĝo
- * Niveloj: d = debug, i = info, w = warning, e = error
+ * Niveloj: d = debug, i = info, w = averto, e = eraro
  */
 expect fun platformLogi(tag: String, msg: String)
 expect fun platformLogd(tag: String, msg: String)

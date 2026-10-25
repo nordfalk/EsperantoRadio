@@ -14,7 +14,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
-import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
+import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -72,9 +72,9 @@ class NovajElsendojKontroloWorker(
                 return Result.success()
             }
 
-            // Kontrolu sciig-permeson (Android 13+)
+            // Kontrolu sciigpermeson (Android 13+)
             if (!sciigPermesoDonita()) {
-                logw("NovajElsendoj", "Sciig-permeso (POST_NOTIFICATIONS) mankas — aŭtomate malŝaltas sciigojn")
+                logw("NovajElsendoj", "Sciigpermeso (POST_NOTIFICATIONS) mankas — aŭtomate malŝaltas sciigojn")
                 settings.putBoolean(SettingsKeys.SCIIGOJ, false)
                 return Result.success()
             }
@@ -87,7 +87,7 @@ class NovajElsendojKontroloWorker(
             val plejŝatataj = plejStr.split(",").toSet()
             logi("NovajElsendoj", "Kontrolas ${plejŝatataj.size} ŝatatajn kanalojn: $plejŝatataj")
 
-            val kanaloj = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron()).kanaloj
+            val kanaloj = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron()).kanaloj
                 .filter { it.kodo in plejŝatataj && it.elsendojRssUrl != null }
                 .map { it.alKanalo() }
             if (kanaloj.isEmpty()) {
@@ -157,7 +157,7 @@ class NovajElsendojKontroloWorker(
     /** Kreskanta, persistita sciig-ID (PR #93) — komencas je 1000 por eviti kolizion kun aliaj ID-oj. */
     private fun novaSciigId(): Int {
         val settings = kreuSettings()
-        // sekvaSciigId saltas la rezervitan zonon de la alarmo-sciigo (4710–4711) —
+        // sekvaSciigId saltas la rezervitan zonon de la alarma sciigo (4710–4711) —
         // vidu SciigLimoj.kt; la serio povus iam atingi ĝin (plibonigo, 2026-10-24).
         val id = sekvaSciigId(settings.getInt(SettingsKeys.SCIIG_ID, 1000))
         settings.putInt(SettingsKeys.SCIIG_ID, id)
@@ -188,10 +188,10 @@ class NovajElsendojKontroloWorker(
 
         // (PR #93) kreskanta persistita ID anstataŭ elsendo.id.hashCode() —
         // kolizio inter du ID-oj anstataŭigus la sciigon kaj la "Ludi"-PendingIntent
-        // eksterminatinge celus la alian elsendon. Ĉiu sciigo estas unika okazo.
+        // tiel estus direktita al la alia elsendo. Ĉiu sciigo estas unika okazo.
         val sciigId = novaSciigId()
 
-        // Sciig-limoj (maks. 7 samtempaj, maks. 3 po kanalo): la plej malnovaj
+        // Sciiglimoj (maks. 7 samtempaj, maks. 3 po kanalo): la plej malnovaj
         // malaperas. Perado kontraŭ nm.activeNotifications forigas el la
         // registrejo la sciigojn kiujn la uzanto jam forigis aŭ kiuj malaperis
         // (ekz. post restarto) — alikaze forigitaj sciigoj okupus la limojn.
@@ -201,7 +201,7 @@ class NovajElsendojKontroloWorker(
         val limaRezulto = limiguSciigojn(registrejo, SciigRegistrejoEro(sciigId, kanalo.slug))
         limaRezulto.forigotaj.forEach { nm.cancel(it) }
         if (limaRezulto.forigotaj.isNotEmpty()) {
-            logi("NovajElsendoj", "Sciig-limoj: forigas ${limaRezulto.forigotaj.size} malnovajn sciigojn (${limaRezulto.forigotaj})")
+            logi("NovajElsendoj", "Sciiglimoj: forigas ${limaRezulto.forigotaj.size} malnovajn sciigojn (${limaRezulto.forigotaj})")
         }
         skribuSciigRegistrejon(settings, limaRezulto.aktivaj)
 

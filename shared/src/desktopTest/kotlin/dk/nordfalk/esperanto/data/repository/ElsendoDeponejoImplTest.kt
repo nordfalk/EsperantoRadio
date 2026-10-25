@@ -22,9 +22,9 @@ import kotlin.test.assertTrue
  * Testoj por ElsendoDeponejoImpl — (PR #89) (fiaskpaĝo ne anstataŭigu la kaŝon)
  * kaj G9 (ordigo plej-freŝe-unue, anstataŭ la fluo-ordo de ekz. IRo).
  *
- * Rulas en desktopTest ĉar ĝi bezonas veran diskkaŝon — [dosierKaŝoBazo] estas
+ * Rulas en desktopTest ĉar ĝi bezonas veran diskan kaŝon — [dosierKaŝoBazo] estas
  * direktata al provizora dosierujo (nenia poluado de ~/.esperantoradio/cache/,
- * kontraste al DiskKaŝoTest — (PR #89) restas malfermita por tiu).
+ * kontraste al DiskaKaŝoTest — (PR #89) restas malfermita por tiu).
  */
 class ElsendoDeponejoImplTest {
 
@@ -90,7 +90,7 @@ class ElsendoDeponejoImplTest {
         assertEquals(2, duaj.size, "Kaŝitaj elsendoj devas esti liverataj, ne malplena listo")
         assertTrue(
             leguKaŝon("test_404")!!.contains("<rss"),
-            "La diskkaŝo devas enhavi la fluon, ne la fiaskpaĝon"
+            "La diska kaŝo devas enhavi la fluon, ne la fiaskpaĝon"
         )
     }
 
@@ -114,7 +114,7 @@ class ElsendoDeponejoImplTest {
         assertEquals(2, duaj.size, "Kaŝitaj elsendoj devas esti liverataj, ne malplena listo")
         assertTrue(
             leguKaŝon("test_200fiasko")!!.contains("<rss"),
-            "La diskkaŝo devas enhavi la fluon, ne la fiaskpaĝon"
+            "La diska kaŝo devas enhavi la fluon, ne la fiaskpaĝon"
         )
     }
 
@@ -136,13 +136,13 @@ class ElsendoDeponejoImplTest {
     @Test
     fun troGrandaRespondoNeAnstataŭigasKaŝon() = runTest {
         // Misdirektita respondo (ekz. 60 MB MP3 anstataŭ fluo): la ContentLength-
-        // antaŭkontrolo ĵetas tuj — neniu bajto estas legata, la kaŝo restas
+        // antaŭkontrolo ĵetas tuj — neniu bitoko estas legata, la kaŝo restas
         // kaj la apo ne provas enmemorigi la tutan korpon.
         var reĝimo = "bona"
         val motoro = MockEngine {
             if (reĝimo == "trogranda") respond(
                 fluoPlejMalnovajUnue, HttpStatusCode.OK,
-                headersOf(HttpHeaders.ContentLength, (MAKSIMUMA_FLUA_GRANDECO_BAJTOJ + 1).toString()),
+                headersOf(HttpHeaders.ContentLength, (MAKSIMUMA_FLUA_GRANDECO_BITOKOJ + 1).toString()),
             )
             else respond(fluoPlejMalnovajUnue, HttpStatusCode.OK)
         }
@@ -157,7 +157,7 @@ class ElsendoDeponejoImplTest {
         assertEquals(2, duaj.size, "Tro granda respondo devas liveri la kaŝitajn elsendojn, ne kraŝi")
         assertTrue(
             leguKaŝon("test_trogranda")!!.contains("<rss"),
-            "La diskkaŝo devas resti netuŝita — tro granda respondo ne estas kaŝata",
+            "La diska kaŝo devas resti netuŝita — tro granda respondo ne estas kaŝata",
         )
     }
 

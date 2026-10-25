@@ -34,13 +34,13 @@ class NoOpElŝutDeponejoTest {
     @Test
     fun estasElŝutitaRestasFalse() = runTest {
         val deponejo = kreiDeponejo()
-        assertFalse(deponejo.estasElŝutita("iu-id"))
+        assertFalse(deponejo.estasElŝutita("iu-ID"))
     }
 
     @Test
     fun getLokaDosieroVojoRestasNull() = runTest {
         val deponejo = kreiDeponejo()
-        assertNull(deponejo.getLokaDosieroVojo("iu-id"))
+        assertNull(deponejo.getLokaDosieroVojo("iu-ID"))
     }
 
     @Test
@@ -54,21 +54,21 @@ class NoOpElŝutDeponejoTest {
     @Test
     fun observiElŝutStatonLavasPerNeElŝutita() = runTest {
         val deponejo = kreiDeponejo()
-        val stato = deponejo.observiElŝutStaton("iu-id")
+        val stato = deponejo.observiElŝutStaton("iu-ID")
         assertTrue(stato.value is ElŝutStato.NeElŝutita)
     }
 
     @Test
     fun forigiNeEraras() = runTest {
         val deponejo = kreiDeponejo()
-        deponejo.forigi("iu-id")
+        deponejo.forigi("iu-ID")
         assertTrue(deponejo.observiElŝutojn().value.isEmpty())
     }
 
     @Test
     fun haltigiNeEraras() = runTest {
         val deponejo = kreiDeponejo()
-        deponejo.haltigi("iu-id")
+        deponejo.haltigi("iu-ID")
         assertTrue(deponejo.observiElŝutojn().value.isEmpty())
     }
 }

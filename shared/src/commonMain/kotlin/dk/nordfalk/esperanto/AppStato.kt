@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
-import dk.nordfalk.esperanto.data.config.leguBundledKanalkonfiguron
+import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
@@ -9,8 +9,8 @@ import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKaŝo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ApajNovaĵojDeponejo
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
-import dk.nordfalk.esperanto.data.repository.PersistantaAlarmoDeponejo
-import dk.nordfalk.esperanto.data.repository.PersistantaPlejŝatatajDeponejo
+import dk.nordfalk.esperanto.data.repository.PersistaAlarmoDeponejo
+import dk.nordfalk.esperanto.data.repository.PersistaPlejŝatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SerĉoDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
@@ -66,13 +66,13 @@ object AppStato {
         private set
     var hejmoViewModel: HejmoViewModel? = null
         private set
-    var plejŝatatajDeponejo: PersistantaPlejŝatatajDeponejo? = null
+    var plejŝatatajDeponejo: PersistaPlejŝatatajDeponejo? = null
         private set
     var serĉoDeponejo: SerĉoDeponejoImpl? = null
         private set
     var elŝutDeponejo: ElŝutDeponejo? = null
         private set
-    var alarmoDeponejo: PersistantaAlarmoDeponejo? = null
+    var alarmoDeponejo: PersistaAlarmoDeponejo? = null
         private set
     var ludatojDeponejo: PersistaLudatojDeponejo? = null
         private set
@@ -91,7 +91,7 @@ object AppStato {
     /**
      * Trovas la elsendon kiun alarmo ludu por podkasta kanalo (komuna por la
      * alarmo-ricevilo kaj la ĉefaktivon). Provas laŭvice:
-     * reton (freŝa RSS), diskkaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
+     * reton (freŝa RSS), diskan kaŝmemoron, kaj elŝutitajn elsendojn — ĉar ĉe vekiĝo
      * la reto ofte ankoraŭ ne pretas. Poste elektas per [elektuAlarmElsendon].
      *
      * Revenas null se AppStato ne estas inicialigita aŭ neniu elsendo troveblas.
@@ -111,7 +111,7 @@ object AppStato {
     }
 
     /**
-     * Kreas ĉiujn deponejojn kaj ViewModel-ojn. Idempotent — se jam inicialigita, faras nenion.
+     * Kreas ĉiujn deponejojn kaj ViewModel-ojn. Idempotenta — se jam inicialigita, faras nenion.
      *
      * @param ludilo la ludilo-regilo (platform-specifa, transdonita de la enirpunkto)
      * @param settings platform-specifaj agordoj (SharedPreferences / Preferences)
@@ -141,7 +141,7 @@ object AppStato {
 
         kanaloDeponejo = KanaloDeponejoImpl(
             leganto = KanalAgordoLeganto(),
-            bundledTeksto = ::leguBundledKanalkonfiguron
+            paktitaTeksto = ::leguPakititanKanalkonfiguron
         )
 
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)))
@@ -149,19 +149,19 @@ object AppStato {
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
         // Legu kanalkonfiguron unufoje — por defaŭltaj ŝatataj kaj alarm-sugestoj
-        val agordo = KanalAgordoLeganto().legu(leguBundledKanalkonfiguron())
+        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
         val defaŭltajŜatataj = agordo.kanaloj
             .filter { it.defaŭltŜatata }
             .map { it.kodo }
             .toSet()
-        plejŝatatajDeponejo = PersistantaPlejŝatatajDeponejo(settings, defaŭltajŜatataj)
+        plejŝatatajDeponejo = PersistaPlejŝatatajDeponejo(settings, defaŭltajŜatataj)
 
         serĉoDeponejo = SerĉoDeponejoImpl(elsendoDeponejo!!)
 
         elŝutDeponejo = kreuElŝutDeponejo(httpKliento!!)
 
         val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
-        alarmoDeponejo = PersistantaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
+        alarmoDeponejo = PersistaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
         apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj)

@@ -52,7 +52,7 @@ class KtorElŝutDeponejo(
     }
 
     /**
-     * Skanas la elŝuthejmon kaj rekonstruas la elŝut-liston el persistitaj JSON-metadatenoj.
+     * Skanas la elŝutan dosierujon kaj rekonstruas la elŝutliston el persistitaj JSON-metadatumoj.
      * Vokata aŭtomate en init, sed ankaŭ re-vokebla mane.
      */
     fun rekarĝiElŝutojn() {
@@ -88,7 +88,7 @@ class KtorElŝutDeponejo(
         hejjo.listFiles { f -> f.name.endsWith(".mp3") }?.forEach { mp3 ->
             val jsonNomo = mp3.name.removeSuffix(".mp3") + ".json"
             if (!File(hejjo, jsonNomo).exists()) {
-                logi("ElŝutDeponejo", "Forigas orphan partan dosieron: ${mp3.name} (${mp3.length()} bitokoj)")
+                logi("ElŝutDeponejo", "Forigas orfan partan dosieron: ${mp3.name} (${mp3.length()} bitokoj)")
                 mp3.delete()
             }
         }
@@ -146,13 +146,13 @@ class KtorElŝutDeponejo(
                     // G10: frua EOF (servilo fermis la konekton) — ne marku triligitan
                     // dosieron "Preta"; ĝi estus persistita kaj neniam re-elŝutata
                     if (totalajBitokoj > 0 && elŝutitaj < totalajBitokoj) {
-                        throw java.io.IOException("Triligita: ricevitaj $elŝutitaj el $totalajBitokoj bajtoj")
+                        throw java.io.IOException("Triligita: ricevitaj $elŝutitaj bitokoj el $totalajBitokoj")
                     }
                 }
 
                 stato.value = ElŝutStato.Preta
                 _elŝutoj.value = _elŝutoj.value + (id to ElŝutitaElsendo(elsendo, celdosiero.absolutePath, stato.value, dosierGrando = celdosiero.length()))
-                // Persistu metadatenojn por rekarĝo ce restarto
+                // Persistu metadatumojn por reŝargo ĉe restarto
                 val jsonDosiero = File(hejjo, "$dosiernomo.json")
                 jsonDosiero.writeText(json.encodeToString(Elsendo.serializer(), elsendo))
                 logi("ElŝutDeponejo", "Elŝuto kompleta: ${elsendo.titolo} → ${celdosiero.absolutePath} (${celdosiero.length()} bitokoj)")

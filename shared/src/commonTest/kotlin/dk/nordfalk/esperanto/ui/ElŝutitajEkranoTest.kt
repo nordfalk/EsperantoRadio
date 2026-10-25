@@ -120,7 +120,7 @@ class ElŝutitajEkranoTest {
         }
         waitForIdle()
         onNodeWithText("Mia podkasto").assertIsDisplayed()
-        onNodeWithText("Elŝutas... 50%").assertIsDisplayed()
+        onNodeWithText("Elŝutas… 50%").assertIsDisplayed()
     }
 
     @Test

@@ -63,7 +63,7 @@ class AlarmoElektoTest {
         assertEquals(meza, elektuAlarmElsendon(listOf(nova, meza, malnova), ludatoj))
     }
 
-    @Test // (PR #95) se ĈIUJ estas erara → null (ringtono) — erara fluo tuj paneus
+    @Test // (PR #95) se ĈIUJ estas erara → null (vokosono) — erara fluo tuj paneas
     fun ĉiujErarajDonasNull() {
         val ludatoj = listOf("a", "b", "c").associateWith { LudataElsendo(it, "peranto", erara = true) }
         assertNull(elektuAlarmElsendon(listOf(malnova, meza, nova), ludatoj))

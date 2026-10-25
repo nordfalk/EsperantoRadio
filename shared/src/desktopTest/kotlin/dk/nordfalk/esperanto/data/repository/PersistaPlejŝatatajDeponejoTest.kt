@@ -10,11 +10,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Testoj por [PersistantaPlejŝatatajDeponejo] — persisto de ŝatataj kanaloj
+ * Testoj por [PersistaPlejŝatatajDeponejo] — persisto de ŝatataj kanaloj
  * (PR #89). Uzas veran persiston (java.util.prefs en provizora nodo) por
  * kontroli ke la stato estas videbla ankaŭ por nova deponejo (kiel post restarto).
  */
-class PersistantaPlejŝatatajDeponejoTest {
+class PersistaPlejŝatatajDeponejoTest {
 
     private val nodo = Preferences.userRoot().node("esperantoradio-test-${System.nanoTime()}")
     private val settings = PreferencesSettings(nodo)
@@ -24,21 +24,21 @@ class PersistantaPlejŝatatajDeponejoTest {
 
     @Test
     fun baskuloKonserviĝasTransRestarton() = runTest {
-        val deponejo = PersistantaPlejŝatatajDeponejo(settings)
+        val deponejo = PersistaPlejŝatatajDeponejo(settings)
         assertFalse(deponejo.estasPlejŝatata("muzaiko"))
 
         deponejo.baskuliPlejŝaton("muzaiko")
         assertTrue(deponejo.estasPlejŝatata("muzaiko"))
 
         // Nova deponejo = kiel post restarto de la procezo
-        val restartita = PersistantaPlejŝatatajDeponejo(settings)
+        val restartita = PersistaPlejŝatatajDeponejo(settings)
         assertTrue(restartita.estasPlejŝatata("muzaiko"), "Ŝatateco devas pluvivi restarton")
         assertEquals(setOf("muzaiko"), restartita.observiPlejŝatatajn().value)
     }
 
     @Test
     fun duaBaskuloMalxatatas() = runTest {
-        val deponejo = PersistantaPlejŝatatajDeponejo(settings)
+        val deponejo = PersistaPlejŝatatajDeponejo(settings)
         deponejo.baskuliPlejŝaton("muzaiko")
         deponejo.baskuliPlejŝaton("muzaiko")
 
@@ -48,11 +48,11 @@ class PersistantaPlejŝatatajDeponejoTest {
 
     @Test
     fun plurajKanalojKonserviĝas() = runTest {
-        val deponejo = PersistantaPlejŝatatajDeponejo(settings)
+        val deponejo = PersistaPlejŝatatajDeponejo(settings)
         deponejo.baskuliPlejŝaton("muzaiko")
         deponejo.baskuliPlejŝaton("kernpunkto")
 
-        val restartita = PersistantaPlejŝatatajDeponejo(settings)
+        val restartita = PersistaPlejŝatatajDeponejo(settings)
         assertEquals(setOf("muzaiko", "kernpunkto"), restartita.observiPlejŝatatajn().value)
     }
 }

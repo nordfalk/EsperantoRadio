@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Testoj de la mini-ludilbreto: elfaldo, serĉbreto, reen-/antaŭen-butonoj, laŭteco.
+ * Testoj de la mini-ludilbreto: elfaldo, progresoŝovilo, reen-/antaŭen-butonoj, laŭteco.
  *
  * Rulu per: ./gradlew :shared:desktopTest --tests "*MiniLudilbretoTesto*"
  */
@@ -85,7 +85,7 @@ class MiniLudilbretoTesto {
     )
 
     @Test
-    fun serĉbreto_mankas_enfoldigite() = runComposeUiTest {
+    fun ŝovilo_mankas_enfoldigite() = runComposeUiTest {
         val ludilo = ludilo(pozicioMs = 0)
         setContent {
             MaterialTheme {
@@ -94,12 +94,12 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        onNodeWithTag("serĉbreto").assertDoesNotExist()
+        onNodeWithTag("ŝovilo").assertDoesNotExist()
         onNodeWithContentDescription("Elfaldigi la ludilon").assertExists()
     }
 
     @Test
-    fun serĉbreto_saltas_al_elektita_pozicio() = runComposeUiTest {
+    fun ŝovilo_saltas_al_elektita_pozicio() = runComposeUiTest {
         val daŭroMs = 1_200_000L
         val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
@@ -109,8 +109,8 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        // Ŝovu la serĉbreton al 25% de la elsendo
-        onNodeWithTag("serĉbreto")
+        // Ŝovu la ŝovilon al 25% de la elsendo
+        onNodeWithTag("ŝovilo")
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
         waitForIdle()
 
@@ -123,7 +123,7 @@ class MiniLudilbretoTesto {
     }
 
     @Test
-    fun serĉbreto_tuŝetas_por_salti() = runComposeUiTest {
+    fun ŝovilo_tuŝetas_por_salti() = runComposeUiTest {
         val daŭroMs = 1_200_000L
         val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
@@ -134,7 +134,7 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         // Tuŝeto je 50% de la larĝo
-        onNodeWithTag("serĉbreto").performTouchInput {
+        onNodeWithTag("ŝovilo").performTouchInput {
             click(percentOffset(0.5f, 0.5f))
         }
         waitForIdle()
@@ -148,7 +148,7 @@ class MiniLudilbretoTesto {
     }
 
     @Test
-    fun serĉbreto_ŝovas_per_treno() = runComposeUiTest {
+    fun ŝovilo_ŝovas_per_treno() = runComposeUiTest {
         val daŭroMs = 1_200_000L
         val ludilo = ludilo(pozicioMs = 0, daŭroMs = daŭroMs)
         setContent {
@@ -158,9 +158,9 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        // Treno sur la serĉbreto de 75% ĝis 50% de la larĝo. La norma Slider finas
+        // Treno sur la ŝovilo de 75% ĝis 50% de la larĝo. La norma Slider finas
         // la valoron kelkajn rastrumerojn (tuŝ-slop) post la fingro, do tolero 3%.
-        onNodeWithTag("serĉbreto").performTouchInput {
+        onNodeWithTag("ŝovilo").performTouchInput {
             swipe(percentOffset(0.75f, 0.5f), percentOffset(0.5f, 0.5f))
         }
         waitForIdle()
@@ -174,7 +174,7 @@ class MiniLudilbretoTesto {
     }
 
     @Test
-    fun serĉbreto_mankas_por_rekta_elsendo() = runComposeUiTest {
+    fun ŝovilo_mankas_por_rekta_elsendo() = runComposeUiTest {
         val ludilo = TestaLudiloRegilo(
             LudantoInformo(
                 stato = LudantoStato.Ludas,
@@ -195,7 +195,7 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        onNodeWithTag("serĉbreto").assertDoesNotExist()
+        onNodeWithTag("ŝovilo").assertDoesNotExist()
         onNodeWithContentDescription("Reen 5%").assertDoesNotExist()
         onNodeWithContentDescription("Antaŭen 5%").assertDoesNotExist()
         // La laŭteco-regilo funkcias ankaŭ ĉe rekta elsendo
@@ -213,14 +213,14 @@ class MiniLudilbretoTesto {
         }
         waitForIdle()
 
-        onNodeWithTag("serĉbreto").assertDoesNotExist()
+        onNodeWithTag("ŝovilo").assertDoesNotExist()
         onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
         waitForIdle()
-        onNodeWithTag("serĉbreto").assertExists()
+        onNodeWithTag("ŝovilo").assertExists()
 
         onNodeWithContentDescription("Enfoldigi la ludilon").performClick()
         waitForIdle()
-        onNodeWithTag("serĉbreto").assertDoesNotExist()
+        onNodeWithTag("ŝovilo").assertDoesNotExist()
     }
 
     @Test

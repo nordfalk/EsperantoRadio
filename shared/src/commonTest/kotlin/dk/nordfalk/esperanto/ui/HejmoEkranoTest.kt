@@ -50,7 +50,7 @@ import kotlin.test.assertTrue
  * Uzas falsan ElsendoDeponejo kiu liveras realajn testelsendojn
  * por "Kio novas" kaj "Kio popularas".
  *
- * Datoj estas kalkulitaj dinamike relative al hodiaŭ por ke la testoj
+ * Datoj estas kalkulitaj dinamike rilate al hodiaŭ por ke la testoj
  * ĉiiam validu (ne malnoviĝu post 6 monatoj).
  */
 @OptIn(ExperimentalTestApi::class, ExperimentalTime::class)
@@ -386,7 +386,7 @@ class HejmoEkranoTest {
     /** Averto-rezulto uzata de la diagnozaj testoj. */
     private fun avertaProblemo() = DiagnozoRezulto(
         tipo = DiagnozoTipo.BATERIO_OPTIMIZATION,
-        titolo = "Bateri-optimumado estas ŝaltita",
+        titolo = "Bateri-optimumigo estas ŝaltita",
         priskribo = "La sistemo povas limigi la aplikon en la fono.",
         severeco = Severeco.ERARO,
     )

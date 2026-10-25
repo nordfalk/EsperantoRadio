@@ -71,11 +71,11 @@ class KanaloViewModel(
     }
 
     private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
-        // Paŝo 1: Legu diskkaŝmemoron (rapida — loka dosier-I/O + re-parsado)
+        // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         val kaŝitaj = elsendoDeponejo.leguKaŝitajnElsendojn(kanalo)
         if (kaŝitaj != null && kaŝitaj.isNotEmpty()) {
             _elsendoj.value = kaŝitaj
-            logi("KanaloViewModel", "${kanalo.slug}: diskkaŝmemoro — ${kaŝitaj.size} elsendoj")
+            logi("KanaloViewModel", "${kanalo.slug}: diska kaŝmemoro — ${kaŝitaj.size} elsendoj")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
@@ -84,7 +84,7 @@ class KanaloViewModel(
             val rezulto = elsendoDeponejo.ŝargiElsendojn(kanalo, fortoRefresigi)
             _elsendoj.value = rezulto
         } catch (e: Exception) {
-            loge("KanaloViewModel", "Malsukcesis sargi elsendojn por ${kanalo.slug}", e)
+            loge("KanaloViewModel", "Malsukcesis ŝargi elsendojn por ${kanalo.slug}", e)
         } finally {
             _ŝargas.value = false
         }
@@ -179,7 +179,7 @@ fun KanaloEkrano(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
-                            Text("Ŝarĝas elsendojn...", modifier = Modifier.padding(8.dp))
+                            Text("Ŝarĝas elsendojn…", modifier = Modifier.padding(8.dp))
                         }
                     }
                 }
@@ -193,7 +193,7 @@ fun KanaloEkrano(
                     }
                 }
             } else {
-                // Rekta elsendo-butono se la kanalo havas livestream
+                // Rekta elsendo-butono se la kanalo havas tujan elsendfluon
                 if (kanalo.estasRekta) {
                     item {
                         Surface(

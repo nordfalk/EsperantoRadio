@@ -337,7 +337,7 @@ private fun AlarmoRedaktilo(
 }
 
 /**
- * Dialogo kun la ciferblida tempo-elektilo (kun eblo ŝalti al klavara enigo).
+ * Dialogo kun la ciferplata tempo-elektilo (kun eblo ŝalti al klavara enigo).
  * La elekto transiĝas al la alkutima ago nur per "Bone".
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -368,7 +368,7 @@ private fun TempoElektiloDialogo(
                     TimePicker(state = tempoStato)
                 }
                 TextButton(onClick = { klavaraEnigo = !klavaraEnigo }) {
-                    Text(if (klavaraEnigo) "Elekti per ciferblido" else "Enigi klavare")
+                    Text(if (klavaraEnigo) "Elekti per ciferplato" else "Enigi klavare")
                 }
             }
         },

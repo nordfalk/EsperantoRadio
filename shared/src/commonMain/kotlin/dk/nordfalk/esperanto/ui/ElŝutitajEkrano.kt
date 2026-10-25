@@ -93,7 +93,7 @@ private fun ElŝutitaEro(
     val elsendo = elŝutita.elsendo
     val statoTeksto = when (elŝutita.stato) {
         is ElŝutStato.NeElŝutita -> "Ne elŝutita"
-        is ElŝutStato.Elŝutanta -> "Elŝutas... ${((elŝutita.stato as ElŝutStato.Elŝutanta).progreso * 100).toInt()}%"
+        is ElŝutStato.Elŝutanta -> "Elŝutas… ${((elŝutita.stato as ElŝutStato.Elŝutanta).progreso * 100).toInt()}%"
         is ElŝutStato.Preta -> "Preta"
         is ElŝutStato.Eraro -> "Eraro: ${(elŝutita.stato as ElŝutStato.Eraro).mesaĝo}"
         is ElŝutStato.Paŭzita -> "Paŭzita"

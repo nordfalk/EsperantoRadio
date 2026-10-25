@@ -14,7 +14,7 @@ data class Kanalo(
     val slug: String,                         // kodo — unika ŝlosilo (ekz. "muzaiko")
     val nomo: String,                         // vidiga nomo
     val emblemoUrl: String? = null,
-    val rektaElsendaSonoUrl: String? = null,   // livestream (nur Muzaiko)
+    val rektaElsendaSonoUrl: String? = null,   // tuja elsendfluo (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,            // hejmpaĝoButono
@@ -39,7 +39,7 @@ data class Kanalo(
 ```kotlin
 @Serializable
 data class Elsendo(
-    val id: String,                   // slug — vidu id-konvenciojn (04_parsado_kaj_arkivo.md)
+    val id: String,                   // slug — vidu ID-konvenciojn (04_parsado_kaj_arkivo.md)
     val kanaloSlug: String,
     val kanaloNomo: String? = null,   // nomo de la kanalo (por sciigoj kaj UI)
     val titolo: String,
@@ -204,12 +204,12 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 
 ### Kanal-deponejo
 
-`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron (bundled resource) per
+`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron (paktita risurco) per
 `KanalAgordoLeganto` kaj liveras `StateFlow<List<Kanalo>>`.
 
 ### Elsendo-deponejo
 
-`ElsendoDeponejoImpl` faras ĉion: Ktor-peto → RSS-parsado → diskkaŝmemoro.
+`ElsendoDeponejoImpl` faras ĉion: Ktor-peto → RSS-parsado → diska kaŝmemoro.
 Ne ekzistas aparta reto-interfaco — la `HttpClient` estas enketigata rekte.
 
 ```kotlin
@@ -252,7 +252,7 @@ interface LudiloRegilo {
 expect fun kreuDefaŭltanLudiloRegilon(): LudiloRegilo
 ```
 
-- **Android:** Media3 ExoPlayer + `MediaSessionService` → malfona ludado, mediasciigo, mediabutonoj.
+- **Android:** Media3 ExoPlayer + `MediaSessionService` → malfona ludado, ludada sciigo, ludbutonoj.
 - **Desktop:** `DesktopLudiloRegilo` — mp3spi + SourceDataLine (pura Java, fluas MP3 super HTTP).
 - **Web (wasmJs):** `WasmJsLudiloRegilo` — HTMLAudioElement.
 - **iOS:** `NoOpLudiloRegilo` (estonte: AVPlayer).

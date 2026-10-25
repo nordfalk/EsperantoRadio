@@ -176,13 +176,13 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             Player.STATE_IDLE -> LudantoStato.Haltita
             else -> LudantoStato.Haltita
         }
-        // Stato IĜIS Haltita (ekz. halto el la media sciigo — Media3 direktas
+        // Stato IĜIS Haltita (ekz. halto el la ludada sciigo — Media3 direktas
         // CMD_STOP al la player, preter nia halti()) → ankaŭ haltigu rezervan alarm-sonon.
         // Nur ĉe TRANSICIO al Haltita: ĉe la unua updateState() post la konekto
-        // la stato estas Haltita kun malplena media listo — se fallback-ringtono
-        // ĵus startis (freŝa procezo, pura-fallback-kazo de la vekhorloĝo), ĝi
-        // tiam estus mortigita kaj la alarmo restus silenta.
-        if (ludantoStato is LudantoStato.Haltita && _stato.value.stato !is LudantoStato.Haltita) haltuAlarmRingon()
+        // la stato estas Haltita kun malplena ludlisto — se rezerva vokosono
+        // ĵus startis (freŝa procezo, pura-rezerva-kazo de la vekhorloĝo), ĝi
+        // tiam estus ĉesigita kaj la alarmo restus silenta.
+        if (ludantoStato is LudantoStato.Haltita && _stato.value.stato !is LudantoStato.Haltita) haltuAlarmVokosonon()
         _stato.value = LudantoInformo(
             stato = ludantoStato,
             nunaFonto = nunaFonto,
@@ -220,21 +220,21 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             controller?.clearMediaItems()
         }
         nunaFonto = null
-        // Ankaŭ haltigu rezervan alarm-sonon — en la pura-fallback-kazo la
+        // Ankaŭ haltigu rezervan alarm-sonon — en la pura-rezerva-kazo la
         // ExoPlayer neniam startis, do nur ĉi tiu hoko povas haltigi la sonon.
-        haltuAlarmRingon()
+        haltuAlarmVokosonon()
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
     override fun saltiAl(pozicioMs: Long) { ĉefaFadeno.post { controller?.seekTo(pozicioMs) } }
 
     /**
-     * La laŭteco-regilo uzas la **sisteman** median laŭtecon (AudioManager.STREAM_MUSIC),
+     * La laŭteco-regilo uzas la **sisteman** muzikfluan laŭtecon (AudioManager.STREAM_MUSIC),
      * kiel en la malnova apo — ne la ludilan laŭtecon de ExoPlayer. Tiel la montrilo
      * kongruas kun tio, kion faras la hardvaraj laŭteco-klavoj.
      */
     private val audioManager get() = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    /** Frakcio (0..1) de la sistema media laŭteco. */
+    /** Frakcio (0..1) de la sistema muzikflua laŭteco. */
     private fun leguSistemanLaŭtecon(): Float {
         val maks = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         if (maks <= 0) return 1f
@@ -268,7 +268,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
 
         // Pozicio-ĝisdatigo: updateState() vokiĝas nur ĉe ludant-eventoj, do dum
         // normala ludado la pozicio frostus. Enketu ĉiun sekundon dum la UI observas
-        // la staton kaj la ludilo ludas — tio movigas la serĉbreton kaj ankaŭ
+        // la staton kaj la ludilo ludas — tio movigas la ŝovilon kaj ankaŭ
         // ĝustigas la pozicio-persistigon de LudvicoRegilo (ĉiu 5 s).
         skopo.launch {
             _stato.subscriptionCount.collect { n ->

@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * KanaloDeponejo-implentaĵo. Legas la kanalkonfiguron el bundled resource.
+ * KanaloDeponejo-implentaĵo. Legas la kanalkonfiguron el pakita risurco.
  *
  * Estonte: ankaŭ elŝutas defore de https://javabog.dk/privat/esperantoradio_kanaloj_v9.json
- * kaj kaŝenas, kun rezervo al la bundled versio.
+ * kaj kaŝenas, kun rezervo al la pakita versio.
  */
 class KanaloDeponejoImpl(
     private val leganto: KanalAgordoLeganto,
-    private val bundledTeksto: () -> String,
+    private val paktitaTeksto: () -> String,
 ) : KanaloDeponejo {
 
     private val _kanaloj = MutableStateFlow<List<Kanalo>>(emptyList())
@@ -29,8 +29,8 @@ class KanaloDeponejoImpl(
             logd("KanaloDeponejo", "Kanaloj jam ŝargitaj (${_kanaloj.value.size}) — uzas kaŝon")
             return _kanaloj.value
         }
-        logi("KanaloDeponejo", "Legas kanalkonfiguron el bundled resource")
-        val teksto = bundledTeksto()
+        logi("KanaloDeponejo", "Legas kanalkonfiguron el pakita risurco")
+        val teksto = paktitaTeksto()
         val agordo = leganto.legu(teksto)
         val kanaloj = agordo.kanaloj.map { it.alKanalo() }
         _kanaloj.value = kanaloj

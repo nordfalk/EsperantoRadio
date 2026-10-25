@@ -4,7 +4,7 @@
 
 1. **Konservi ĉiun funkcion** de la malnova apo (kanaloj, livestreno, podkastoj,
    elŝutoj, plej ŝatataj, lastaŭskultitaj, serĉo, vekhorloĝo).
-2. **Konservi la pars-scio** — la sep parsreguloj, skip-listo, kanalkonfiguro
+2. **Konservi la pars-scio** — la sep parsreguloj, salto-listo, kanalkonfiguro
    (vidu `04_parsado_kaj_arkivo.md`).
 3. **Plursistema** — Android + iOS + Desktop (JVM) + Web (Wasm). Funkcioj
    malfacilaj sur iu platformo estas preterlasitaj tie ("graceful degradation").
@@ -42,7 +42,7 @@ Platformo (Android/iOS/Desktop-specifaj implementaĵoj)
 | Tavolo | Respondeco |
 |---|---|
 | **Prezento** | Compose-ekranoj, ViewModel-oj, UI-stato, navigado, temo |
-| **Domajno** | Purkotlinaj modeloj, deponej-interfacoj, uzkazoj, komerca logiko |
+| **Domajno** | Purkotlinaj modeloj, deponej-interfacoj, ukazoj, komerca logiko |
 | **Datumoj** | Reto (Ktor), parsado, kaŝmemoro, lokala stokado, deponej-implementaĵoj |
 | **Platformo** | Sonludado, sciigoj, elŝutoj, vekhorloĝo, malfona servo |
 
@@ -64,7 +64,7 @@ EsperantoRadio/
 │   │   │   ├── data/
 │   │   │   │   ├── config/          # JSONC-leganto + PlatformResource + KreuSettings
 │   │   │   │   ├── parser/          # RssParsilo (la sep parsreguloj — 04_parsado_kaj_arkivo.md)
-│   │   │   │   └── repository/     # deponej-implementaĵoj (Ktor, diskkaŝmemoro, persisto)
+│   │   │   │   └── repository/     # deponej-implementaĵoj (Ktor, diska kaŝmemoro, persisto)
 │   │   │   ├── domain/
 │   │   │   │   ├── model/           # Kanalo, Elsendo, Sonfonto, LudantoStato, Alarmo, ElŝutStato
 │   │   │   │   ├── player/          # LudiloRegilo, LudvicoLogiko, LudvicoRegilo
@@ -110,7 +110,7 @@ EsperantoRadio/
 |---|---|
 | La kanallisto kaj agordo (`esperantoradio_kanaloj_v9.json`) | RssArkivServer Java-jar |
 | La sep parsreguloj | Fragment-bazita UI |
-| La skip-listo de neeltireblaj gastigantoj | Singletona `App`-stato |
+| La salto-listo de neeltireblaj gastigantoj | Singletona `App`-stato |
 | radio.txt-formato kaj antaŭeco | Volley |
 | archive.org/Google Drive-skraptrikoj | ExoMedia |
 | Kernpunkto-https-korekto | AndroidQuery |
@@ -123,10 +123,10 @@ EsperantoRadio/
 |--------------------------------|:--:|:--:|:--:|:--:|
 | Kanalaro, elsendlistoj, detalo | ✅ | ✅ | ✅ | ✅ |
 | MP3-ludado                     | ✅ ExoPlayer | no-op | ✅ mp3spi | ✅ HTMLAudioElement |
-| HLS (Muzaiko livestream)       | ✅ ExoPlayer | no-op | ❌ | retumilo |
+| HLS (tuja elsendfluo de Muzaiko)       | ✅ ExoPlayer | no-op | ❌ | retumilo |
 | Serĉo, plejŝatataj             | ✅ | ✅ | ✅ | ✅ |
 | Ludvico + daŭra ludado         | ✅ | ✅ | ✅ | ✅ |
-| Malfona ludado + mediasciigo   | ✅ | no-op | ❌ | ❌ |
+| Malfona ludado + ludada sciigo | ✅ | no-op | ❌ | ❌ |
 | Sciigoj pri novaj elsendoj     | ✅ WorkManager | ❌ | ❌ | ❌ |
 | Elŝutoj (eksterrete)           | ✅ | no-op | ✅ | ❌ |
 | Vekhorloĝo                     | ✅ | ❌ | ❌ | ❌ |

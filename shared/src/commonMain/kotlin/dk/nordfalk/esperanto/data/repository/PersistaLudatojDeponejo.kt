@@ -17,7 +17,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 
 /**
- * Persistanta LudatojDeponejo. Uzas multiplatform-settings kun JSON-seriado.
+ * Persista LudatojDeponejo. Uzas multiplatform-settings kun JSON-seriado.
  *
  * Konservas Map<elsendoId, LudataElsendo> kiel JSON-ĉeno en Settings.
  */

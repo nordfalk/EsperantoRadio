@@ -115,7 +115,7 @@ fun EsperantoRadioApp(
             }
         }
 
-        // Savu pozicion kiam la komponanto detruiĝas (ekz. app fermo)
+        // Savu pozicion kiam la komponanto detruiĝas (ekz. fermo de la apo)
         DisposableEffect(ludvicoRegilo) {
             onDispose {
                 scope.launch { ludvicoRegilo.savuPozicionNun() }
@@ -153,8 +153,8 @@ fun EsperantoRadioApp(
             ĝisdatiguSciigSkedon(plejŝatataj, sciigoj)
         }
 
-        // Observi pending elsendo-navigadon (de sciigo-klako)
-        val pendingElsendo by dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.elsendo.collectAsState()
+        // Observi atendantan elsendo-navigadon (de sciigo-klako)
+        val atendantaElsendo by dk.nordfalk.esperanto.data.repository.AtendantaElsendoNavigacio.elsendo.collectAsState()
 
         fun switchTab(vojo: Vojo) {
             val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
@@ -178,11 +178,11 @@ fun EsperantoRadioApp(
             backStack.add(vojo)
         }
 
-        LaunchedEffect(pendingElsendo) {
-            pendingElsendo?.let {
+        LaunchedEffect(atendantaElsendo) {
+            atendantaElsendo?.let {
                 logi("Nav", "→ sciigo: malfermas elsendon ${it.id}")
                 push(Vojo.ElsendoDetalo(it))
-                dk.nordfalk.esperanto.data.repository.PendingElsendoNavigacio.setu(null)
+                dk.nordfalk.esperanto.data.repository.AtendantaElsendoNavigacio.setu(null)
             }
         }
 
@@ -441,20 +441,20 @@ fun EsperantoRadioApp(
                     },
                 )
 
-                // Scrim-overlay: klakoj ekstere kolapsas la elfalditan ludilbreton
+                // Malhela fono (scrim): klakoj ekstere kolapsas la elfalditan ludilbreton
                 if (elfaldita) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable {
-                                logi("Klako", "scrim → enfoldigi la ludilon")
+                                logi("Klako", "malhela fono → enfoldigi la ludilon")
                                 elfaldita = false
                             }
                     )
                 }
 
                 // Kaptu reen-butonon por enfoldigi la ludilbreton — devas esti post
-                // NavDisplay por havi prioritaton (laste komponita handler venkas)
+                // NavDisplay por havi prioritaton (laste komponita traktilo venkas)
                 val kolapsoStato = rememberNavigationEventState(NavigationEventInfo.None)
                 NavigationBackHandler(
                     state = kolapsoStato,

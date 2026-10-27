@@ -117,7 +117,7 @@ JSONC-parsilon.
 malaktualiĝas kaj duobla skribo kreus malakordon.
 
 > **Material3** havas apartan version de `compose-multiplatform` — prenu la
-> parigon el la CMP-release-notoj (tabelo „Libraries"), ne el la CMP-versinombro.
+> parigon el la CMP-eldon-notoj (tabelo „Libraries"), ne el la CMP-versinombro.
 > **AGP 9 + KMP**: `gradle.properties` enhavas la necesajn pretervojojn
 > `android.newDsl=false` kaj `android.builtInKotlin=false` (vidu la lecionon en
 > AGENTS.md).

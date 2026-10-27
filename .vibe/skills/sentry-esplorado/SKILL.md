@@ -6,9 +6,9 @@ description: Ŝargu ĉi tiun skill-on kiam vi devas legi aŭ analizi Sentry-datu
 # Sentry-esplorado (esperantoradio / projekto KMP)
 
 Organizo `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`.
-Agordo en la apo: `SentryAgordo.kt` — medio "produktado" por release-konstruoj,
+Agordo en la apo: `SentryAgordo.kt` — medio "produktado" por eldon-konstruoj,
 `release = "esperantoradio@<apoversio>"`, `dist` = versionCode (aŭtomate de la
-Android-SDK). **Nur release-konstruoj sur realaj aparatoj raportas** —
+Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n.
 
 ## Konekto (MCP) kaj ĝiaj malsanoj

@@ -76,7 +76,7 @@
 #### C5 — Subskrib-konfiguro: defaŭlta absoluta keystore-vojo en publika deponejo
 - **Statuso**: [ ]
 - **Loko**: `androidApp/build.gradle.kts:47` (`storeFile = file(System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")`, pasvortoj defaultas al `""`)
-- **Sugesto**: forigu la hardkoditan vojon; ĵetu eraron se `KEYSTORE_*` mankas ĉe release-konstruo (fail-fast). (La CI `eldonado.yml` faras tion ĝuste: GitHub-secrets → env.)
+- **Sugesto**: forigu la hardkoditan vojon; ĵetu eraron se `KEYSTORE_*` mankas ĉe eldon-konstruo (fail-fast). (La CI `eldonado.yml` faras tion ĝuste: GitHub-secrets → env.)
 
 #### C6 — R8/ProGuard: nenio aktiva (neniu keep-regula risko hodiaŭ)
 - **Statuso**: [ ]

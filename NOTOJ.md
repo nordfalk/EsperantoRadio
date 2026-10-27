@@ -291,7 +291,7 @@ EsperantoRadio/
 │   └── src/commonTest/    #   Testoj + desktopTest (ĉiuj pasas)
 ├── settings.gradle.kts     # Kotlin-DSL-build (unuecigita: malnova + nova; `iosApp`/`server` komentitaj)
 ├── build.gradle.kts        # Radika build (KMP + Compose + AGP aldonaĵoj)
-├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry-release)
+├── gradle/libs.versions.toml # Versikatalogo (inkl. versionName por Sentry eldono)
 ├── RssArkivServer/        # Kaŝenitaj RSS-fluoj (XML-fiksaĵoj)
 ├── RssArkivServer-filcache/ # Kaŝenitaj realaj fluoj = golden fixtures (NE versiigitaj — for de la repo per .gitignore; kiu bezonas pliajn fiksaĵojn kopiu ilin al shared/src/commonTest/resources/feeds/)
 ├── docs/malnova/           # Esperanta superrigordo de la malnova apo

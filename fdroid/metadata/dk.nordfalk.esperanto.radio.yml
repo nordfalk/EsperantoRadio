@@ -68,7 +68,7 @@ Builds:
 
 # Reproduktebleco
 # Por certigi ke F-Droid povas reprodukti la konstruitaĵon:
-# 1. Kreu release-konstruon: ./gradlew :androidApp:assembleRelease
+# 1. Kreu eldon-konstruon: ./gradlew :androidApp:assembleRelease
 # 2. Komparu la SHA-256 de la rezulta APK kun tiu de F-Droid
 # 3. Se ili kongruas, la apo estas reproduktebla
 # Vidu: https://f-droid.org/docs/Reproducible_Builds/

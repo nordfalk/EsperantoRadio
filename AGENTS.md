@@ -169,7 +169,9 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
   nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
   tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
-  (2026-10-17, regulo de la uzanto).
+  (2026-10-17, regulo de la uzanto). Same por kod-dosieroj, kiam la ŝanĝoj tuŝas
+  NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas ion ajn
+  (2026-10-25, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
   (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.
@@ -278,7 +280,7 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `com.android.kotlin.multiplatform.library` — vidu https://kotl.in/gradle/agp-new-kmp);
   GPP devas esti la 4.x-linio (3.x ne subtenas AGP 9); platformon la novan
   compileSdk AGP mem elŝutas se la permesiloj akceptitaj. La material3-versio
-  devas kongrui kun CMP (parigo el la CMP-release-notoj, ne la sama versinombro).
+  devas kongrui kun CMP (parigo el la CMP-eldon-notoj, ne la sama versinombro).
   La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
@@ -327,7 +329,7 @@ Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sci
 ## Protokolado kaj Sentry — konvencio
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
-projekto `KMP`). **Nur release-konstruoj sur realaj aparatoj raportas** —
+projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109).
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.

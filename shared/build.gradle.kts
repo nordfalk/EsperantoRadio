@@ -8,7 +8,7 @@ plugins {
 }
 
 // Generas ApoVersio.kt kun la versia konstanto el libs.versions.toml.
-// La fonto de vero por versionName (Android), packageVersion (Desktop) kaj Sentry release.
+// La fonto de vero por versionName (Android), packageVersion (Desktop) kaj Sentry eldono.
 val generuApoVersio by tasks.registering {
     val versio = libs.versions.apoversio.get()
     outputs.dir(layout.buildDirectory.dir("generated/sources/apoVersio/commonMain/kotlin"))

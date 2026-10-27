@@ -230,6 +230,147 @@
   limon": se ĝi aperas por reala fluo (ne por misdirektita MP3), levu
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ` aŭ serĉu la kaŭzon en la koncerna kanalo.
 
+#### C50 — Eldonaj kanaloj ekster Google Play: F-Droid, Aptoide
+- **Statuso**: [ ]
+- **Fonto**: README.md "Farota (notoj)" (2026-10-24, movita ĉi tien; prepara laboro en PR #66)
+- **Priskribo**: la apo eldoniĝas nur en Google Play; F-Droid kaj Aptoide estis planitaj
+  sed neniam realigitaj.
+- **Sugesto**: sekvu la skemon en la skill-o `eldonado` (F-Droid/Aptoide bezonas facile
+  troveblan, signitan APK-fluon; atentu: la apo ne estas en Play App Signing, do APK —
+  ne AAB). Vidu ankaŭ https://github.com/nordfalk/EsperantoRadio/pull/66
+
+#### C51 — Funkcioj de la malnova apo ankoraŭ ne portitaj
+- **Statuso**: [ ]
+- **Fonto**: README.md "Farota (notoj)" (2026-10-24, movitaj ĉi tien; la referencaj
+  ŝlosiloj el `malnova/app/src/main/res/values/eo_strings.xml`). Komplemento al C44.
+- **Priskribo**:
+  (a) konigi/kunhavigi elsendon (neniu partigo-intento en la nova apo —
+  `PlatformLigilo` malfermas nur ligilojn/retpoŝtojn);
+  (b) elektebla loko de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera
+  spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`);
+  (c) konfirmo antaŭ forigo de elŝuto (forigo mem jam ekzistas — tuj, sen dialogo);
+  (d) "Ĉu ĉesi ludi? / Daŭrigi fone" ĉe fermo de la apo;
+  (e) nombro da novaj elsendoj ĉe Plej ŝatataj, kaj nombroj (elŝutoj) + sekva
+  alarmtempo en la naviga tirkesto — la malnova tirkesto-skizo montris ilin;
+  (f) "Nun estas ludata" por la rekta elsendo — `rektaElsendaPriskriboUrl`
+  (muzaiko.info/data.json) estas legata sed ne montrata;
+  (g) Pri / Kontakto-ekrano;
+  (h) averto ke la vekhorloĝo ne povas garantii kontraŭ teknikaj problemoj.
+  Jam faritaj (forigitaj el la listo): aŭtoludo ĉe malfermo (ekzistas), elŝut-forigo
+  (ekzistas, sen konfirmo — vidu (c)).
+- **Sugesto**: decidu intence kiuj indas; (c), (f) kaj (h) estas malmultekostaj;
+  (e) postulas nombradon de novaj elsendoj (kun C47/C48 observado).
+
+#### C52 — Ideoj kaj plibonigoj (konsideroj, ne deciditaj)
+- **Statuso**: [ ]
+- **Fonto**: README.md "Farota (notoj)" (2026-10-24, movitaj ĉi tien)
+- **Priskribo**:
+  (a) animacioj pli ĉieaj — nun nur la mini-ludilbreto havas; mankas ekz. ĉe
+  ŝargado-indikoj, listo-ŝanĝoj (la nunaj ekran-transiroj venis en PR #116);
+  (b) post aŭtomata ludado de kelkaj podkastaj elsendoj, aŭtomate transiri al la
+  rektaj elsendoj (ideo);
+  (c) transskribo de elsendoj kun tempokodoj, montrataj dum ludado — por lerni
+  Esperanton (ideo; nature kunligi kun la estonta arkiv-servilo,
+  `docs/nova/06_servilo_arkivo.md`).
+- **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
+
+#### C53 — Nova kanalo: HUMILOPINIE (ManchaPod) — kaj kontrolo de la ceteraj ManchaPod-fluoj
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
+- **Priskribo**:
+  - **"Ne Parolu pri Esperanto"** (spreaker-show **5202159**,
+    `https://www.spreaker.com/show/5202159/episodes/feed`) **jam estas en la agordo**
+    (kodo `neparolupriesperanto`) — kontrolita 2026-10-24.
+  - **"HUMILOPINIE"** (spreaker-show **6684993**) mankas:
+    `https://www.spreaker.com/show/6684993/episodes/feed`
+    (pod.ligilo: `https://pod.link/aHR0cHM6Ly93d3cuc3ByZWFrZXIuY29tL3Nob3cvNjY4NDk5My9lcGlzb2Rlcy9mZWVk`).
+  - La allmylinks-paĝo listigas pliajn ManchaPod-elsendojn ("Una Vaga Idea",
+    "Cuéntame, Hermosura" — parte nacilingvaj): kontroli ĉu ili havas sufiĉe da
+    Esperanto-epizodoj antaŭ ol aldoni.
+  - Spreaker-antaŭvido ekzistas en la agordo (almenaŭ 2 kanaloj); G44 notas
+    pasemajn spreaker-tempolimojn (KMP-12/14/15).
+- **Sugesto**: sekvu la skill-on `kanalkonfiguro` (JSONC-kampoj, `puriguModeloj`-minacoj,
+  parsreguloj P6.1+, golden-testo laŭ A3). Datumoj: emblemo kaj retpoŝto
+  (`manchapod@gmail.com`) el la fluo/paĝo; `hejmpaĝoButono`
+  `https://www.spreaker.com/podcast/humilopinie-manchapod--6684993`. Post aldono:
+  `radioTxtKomparilo` kaj fluo-kontrollo (G44-stilo: ĉu HTTP 200 + RSS?).
+
+#### C54 — Kanal-RSS-fluo kopiebla kaj kunhavigebla al alia podkasta apo
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24)
+- **Priskribo**: butono en la kanal-ekrano, kiu kopiigas la `podkastaRssUrl` de la kanalo
+  (tondujo + partigo), por ke uzantoj abonu la kanalon en alia podkasta apo.
+- **Sugesto**: Android: `ClipboardManager` + partigo-intento (atentu: ĝi ankaŭ utilos por
+  C51(a) — kunhavigi ELSENDON; la partig-infrstrukturon kreu unufoje); la URL estas
+  jam en la kanal-objekto (agordo, A5) — neniu nova datumvojo necesas.
+
+#### C55 — Eldoni la komputilan (desktop) version
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24); AGENTS.md "Stato" jam listigas desktop-eldonom kiel estontan
+- **Priskribo**: `desktopApp` ekzistas kaj konstruiĝas (Gradle 9/AGP 9, PR #117), sed
+  estas nenie distribuita. Aparta tasko disde C50 (F-Droid/Aptoide = Android).
+- **Sugesto**: decidi eldonformon (Linukso: AppImage/deb/flatpak; Vindozo: porta
+  .zip/.exe; makinto?) kaj kanalon (GitHub-Releases estas la plej simpla komenco);
+  unue traktu la konatajn limojn (C16: `saltiAl` estas ŝajnigo sur desktop-mp3spi;
+  HLS ne funkcias — docs/nova/02) kaj provu sur sen-JDK-aparatoj (jlink/`jpackage`).
+
+#### C56 — Esploro: reta (WASM) versio kun datumoj de la servilo, ludado rekte el la fonto
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24); modelo: https://esperanto-radio.com/
+- **Priskribo**: esplori ĉu la reta versio povus funkcii tiel, ke la fluo- kaj
+  metadatumoj venas de la estonta arkiv-servilo (docs/nova/06, C43), sed la ludado mem
+  estas reta HTML-komponento kiu ludas rekte de la fonto. Ŝlosila fakto: CORS blokas
+  `fetch`/XHR (pro tio plej multaj RSS-fluoj kaj ankaŭ la Coil-bildoj ne ŝargeblas en
+  la nuna reta versio), sed **ne** `<audio src>` — la rekt-ludado do funkcias sen
+  prokurilo, kaj `WasmJsLudiloRegilo` jam uzas HTML-`<audio>`-elementon. Do:
+  datumvojoj (RSS, bildoj) devas veni samdevene (el la servilo aŭ per `<img>`-etikedoj
+  anstataŭ Coil-fetch); la sono restas rekt-flua el la fonto (nur anchor.fm-MP3 nun
+  funkcias, ĉar ĝi jam estas CORS-permesa).
+- **Sugesto**: prototipo post kiam la arkiv-servilo havas JSON-API-on (docs/nova/06):
+  samdevena listo de kanaloj/elsendoj → la ekzistanta ŝarga-logiko, kun la bild-URL-oj
+  servataj de la servilo aŭ rekte `<img>`-ebligataj. Kvanto-specimenado: mezuru ĉu la
+  servila datumvojo povas esti subflue (sen CORS-kapoj) por ĉiuj 26 kanaloj.
+
+#### C57 — "Proponu kanalon"-butono (retpoŝta)
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24)
+- **Priskribo**: butono kiu simple kreas retpoŝtan mesaĝon por proponi novan kanalon
+  (al la prizorganto; kun antaŭskribita temo/korpo: nomo, RSS-URL, priskribo).
+- **Sugesto**: `PlatformLigilo.malfermuRetpoŝton` jam ekzistas kaj funkcias (uzata sur
+  la kanal-ekrano por "Retpoŝto"); metu la butonon en la navigan tirkeston aŭ
+  Kanalaron (aŭ estontan Pri-ekranon, C51(g)); la retpoŝto-celo determinu la prizorganton.
+
+#### C58 — "White label"-ligilo por kanal-eldonantoj
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24)
+- **Priskribo**: ebleco por kanal-eldonanto kreii specialan ligilon al la apo, kiu
+  malfermas ĝin tiel, ke ĝuste tiu kanalo staras ĉe la frontpaĝo ("white label" —
+  ekz. ManchaPod alvokas siajn aŭskultantojn al "sia" EsperantoRadio).
+- **Sugesto**: Android App Links / intenco-ŝablono (ekz. `…/kanalo/<kodo>`) → nav3
+  deep-link (hodiaŭ la apo ne havas deep links — C34) → enscenigu `Vojo.KanaloDetalo`
+  kiel komenca ekrano (eble kun `Vojo.Hejmo` sube en la stako, por ke reen-gesto
+  kondutu nature); por la reta versio (C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
+  Play-Stor-listo ligilojn (`assetlinks.json`-kontrolo) kaj memoru: la kanalo devas
+  ekzisti en la agordo (A5).
+
+#### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-24)
+- **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
+  kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas
+  transsalti en la komenco. (b) Eble eĉ krei ilon kiu trovas tion: komparas la
+  komencajn sekundojn de pluraj epizodoj kaj elkalkulas la ripetan longon.
+- **Sugesto**: (a) nova kampo en `esperantoradio_kanaloj_v9.json` (ekz.
+  `saltiKomenceSekundojn` — daten-movita, A5; kontroli la JSONC-kampanimadon kaj la
+  parsajn regulojn P6.1+, ankaŭ la agord-kompateblecon kiam la kampo mankas);
+  la ludilo jam subtenas komencan pozicion — `LudiloRegilo.fiksiFonton(fonto,
+  komencoPozicioMs)` — do `LudvicoRegilo.ludiElsendon` transdonu
+  `max(komencoPozicioMs, savitaPozicio)` kaj la pozicio-indikilon ne montru la
+  transsaltitan parton (aŭ montru 0:xx de la komenco de la enhavo). (b) la detekta
+  ilo komparu la komencajn ~60 s (RMS/ampleks-envelopa korelacio aŭ audio-fingerprint);
+  natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
+  ĝi povus proponi la valoron por ĉiu kanalo.
+
 ---
 
 

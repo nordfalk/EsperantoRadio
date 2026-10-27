@@ -135,9 +135,11 @@ rimarkindaj ŝanĝoj. La formato estas [Keep a Changelog](https://keepachangelog
 kun esperantaj kategorioj (**Aldonita**, **Ŝanĝita**, **Riparita**, **Forigita**,
 **Sekureco**). Ĉiu eniro estas **unu linio**: konciza priskribo sen teknikaj
 detaloj + ligilo al la PR (regulo A10). Rilato al [`ŜANĜOJ.md`](ŜANĜOJ.md):
-CHANGELOG = "kio ŝanĝiĝis por la uzanto", ŜANĜOJ = detala teknika
-labortaglibro (problem-analizo, kialoj, kontrolrezultoj). La samo ne devas
-aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
+CHANGELOG = "kio ŝanĝiĝis por la uzanto", ŜANĜOJ = nur la **iom gravaj ŝanĝoj**
+kaj detaloj **memorindaj por la estonteco** — suplemento al la git-historio kaj
+la PR-priskriboj (problem-analizo, kialoj, kontrolrezultoj); ne ĉiu PR bezonas
+enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
+ŜANĜOJ la kialojn.
 
 **Laborfluo (kiu tenas ĝin ĝisdatigata):**
 

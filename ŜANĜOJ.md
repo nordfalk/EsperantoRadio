@@ -1,3 +1,10 @@
+# Ŝanĝoj — teknika labortaglibro
+
+> Nur la **iom gravaj ŝanĝoj** kaj detaloj **memorindaj por la estonteco** —
+> kiel suplemento al la git-historio kaj la PR-priskriboj. Ne ĉiu PR bezonas
+> enskribon; bagatelaj ŝanĝoj restas nur en la git-historio. Novaj enskriboj
+> supren, kun dato kaj ligilo al la PR.
+
 # Ŝanĝoj — 2026-10-24
 
 ## Stabilaj nomoj por la regul-aroj (A/L/P) — fino de "regulo 4"-ambiguecoj (PR: https://github.com/nordfalk/EsperantoRadio/pull/133)

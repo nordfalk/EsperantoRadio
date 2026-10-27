@@ -281,6 +281,7 @@ aperi duoble — CHANGELOG donas la koncizan fakton, ŜANĜOJ la kialojn.
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
 - **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn. Post amasa anstataŭigo (find/replace) skanu la nove verkitajn liniojn por fuŝitaj vortoj — ekz. `nenieu` anstataŭ `neniu` (2026-10-24, PR #137). La kanonajn terminojn de la projekto listigas la sekcio "Terminaro — kanonaj terminoj" sube.
+- **La persistigita navig-stato ne transvivas ĝisdatigon de la apo (2026-10-27, emulila eksperimento):** la pak-anzataŭigo (`adb install -r`, same kiel Play) forviŝas la task-rekordon kun la konservita stato — sur API 26, 30 kaj 35 la apo post ĝisdatigo startas freŝe ĉe Hejmo, dum post pura procez-morto (`am kill`) la navig-stato ja restaŭriĝas. La historiaj Vojo-diskriminiloj (`…Vojo.Sercxo`/`…Vojo.Elshutoj`, `@SerialName`-pingloj el #134) ŝirmis do okazintaĵon, kiu ne povas okazi; ili estas forigitaj (2026-10-27) — ne reenkonduku ilin. La `@JsonNames`-kromnomoj en `Modeloj.kt` restas necesaj: ili ŝirmas `Settings`/dosierojn, kiuj ja transvivas ĝisdatigojn.
 
 ## Terminaro — kanonaj terminoj
 

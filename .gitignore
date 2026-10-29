@@ -64,3 +64,5 @@ google-services.json
 .figma-scratch/
 img.png
 ekranfoto.svg
+
+__pycache__/

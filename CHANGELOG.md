@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Riparita
+
+- La mortinta hejmpaĝo-butono de La Malfamuloj nun iras al la nuna Patreon-paĝo de La Kompanio (https://github.com/nordfalk/EsperantoRadio/pull/143)
+
 ## [3.1.0] - 2026-10-25
 
 ### Aldonita

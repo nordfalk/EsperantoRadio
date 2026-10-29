@@ -126,7 +126,6 @@ Post jardeko la energio iom post iom malaperis. En aprilo 2022 Muzaiko ĉesis si
 Legu pli ĉe Vikipedio: [Muzaiko](https://eo.wikipedia.org/wiki/Muzaiko)
 
 # Dansk
-App'en er open sourpuce under GPL licensen og kan findes på https://github.com/nordfalk/EsperantoRadio
 
 EsperantoRadio bygger på arbejde på DR Radio lavet af Lund&Bendsen for DR.
 Det oprindelige arbejde ligger på https://github.com/androidlundogbendsen/dr-radio-android.

@@ -4,10 +4,10 @@
 
 ## Superrigardo
 
-| Vendejo | Aŭtomateco | Postuloj | Stato |
-|---|---|---|---|
-| **Google Play** | Tute aŭtomata per Gradle Play Publisher (GPP) | Servila konto JSON, $25-konto | Agordita — bezonas servilan konton |
-| **F-Droid** | Duon-aŭtomata (F-Droid konstruas mem el fonto) | GPL-licenco, GitLab-konto | Metadato pretigita — bezonas MR al fdroiddata |
+| Vendejo | Aŭtomateco | Postuloj                           | Stato |
+|---|---|------------------------------------|---|
+| **Google Play** | Tute aŭtomata per Gradle Play Publisher (GPP) | Servila konto JSON, $25-konto      | Agordita — bezonas servilan konton |
+| **F-Droid** | Duon-aŭtomata (F-Droid konstruas mem el fonto) | GPL-permesilo, GitLab-konto        | Metadato pretigita — bezonas MR al fdroiddata |
 | **Aptoide** | Duon-aŭtomata (API havebla) | Aptoide Connect-konto, API-ŝlosilo | Bezonas konton kaj API-ŝlosilon |
 
 ---
@@ -97,7 +97,7 @@ konstruas la apon el via fontkodo kaj subskribas ĝin.
 ### Kio estas pretigita
 
 - Metadatena ŝablono: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml`
-- GPL-3.0-or-later licenco (kongrua kun F-Droid-postuloj)
+- GPL-3.0-or-later permesilo (kongrua kun F-Droid-postuloj)
 
 ### Paŝoj por eldoni
 

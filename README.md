@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio"><img src="https://img.shields.io/badge/Google%20Play-Esperanto--radio%20Muzaiko-green?logo=googleplay" alt="Esperanto-radio Muzaiko ĉe Google Play"/></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licenco-GPL--3.0-blue" alt="GPL-3.0"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/permesilo-GPL--3.0-blue" alt="GPL-3.0"/></a>
   <img src="https://img.shields.io/badge/platformoj-Android%20·%20Desktop%20·%20Web-orange" alt="Android, Desktop, Web"/>
 </p>
 
@@ -19,9 +19,9 @@
   <img src="androidApp/src/main/play/listings/en-US/graphics/feature-graphic/1.jpg" width="512" alt="EsperantoRadio" />
 </p>
 
-## Aŭskultu Esperanton
+## Aŭskultu Esperantan radion
 
-Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en unu apo.
+27 radiokanaloj kaj podkastoj en Esperanto el la tuta mondo - en unu apo.
 
 📻 KANALOJ
 - [Esperanta Retradio](https://aldone.de/retradio) — ĉiutagaj «sonartikoloj» por lernantoj
@@ -63,11 +63,12 @@ Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en unu a
 
 - **Kanalaro** — superrigardo de ĉiuj kanaloj kun tuja elsendfluo kaj arkivitaj elsendoj
 - **Podkastoj** — esploru elsendojn, aŭskultu tuj aŭ elŝutu por aŭskulti eksterrete
-- **Plej ŝatataj** — marku kanalojn ❤️ kaj ricevu sciigon kiam nova elsendo disponiĝas
+- **Sciigoj** — marku ŝatatajn kanalojn per ❤️ kaj ricevu sciigon, kiam nova elsendo disponiĝas
 - **Serĉo** — tra ĉiuj kanaloj samtempe
-- **Vekhorloĝo** — vekiĝu kun via kanalo
-- **Ludvico** — metu elsendojn en vicon, mini-ludilbreto ĉiam videbla
-  ⬇️ Elŝutoj · ⏰ Vekhorloĝo · Plej ŝatataj · ▶️ Ludvico · 🔓 GPL 
+- **Vekhorloĝo** — vekiĝi ⏰ per via preferata kanalo
+- **Ludvico** — metu elsendojn en vicon ▶️, mini-ludilbreto ĉiam videbla
+- **Elŝutoj** ⬇️ — aŭskultado ankaŭ eksterrete
+- **Libera programaro** 🔓 — laŭ la GPL-3.0-permesilo
 
 Bonvolu raporti problemojn kiel [issue](https://github.com/nordfalk/EsperantoRadio/issues).
 
@@ -83,14 +84,14 @@ Konstruu mem: `./gradlew :androidApp:assembleDebug` (JDK 17 necesas).
 
 ## Dokumentaro
 
-| Vi volas... | Legu |
-|---|---|
+| Se vi volas vidi...         | Legu |
+|-----------------------------|---|
 | Arkitekturon kaj datenfluon | [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md) |
 | La parsadon de radiaj fluoj | [`docs/nova/04_parsado_kaj_arkivo.md`](docs/nova/04_parsado_kaj_arkivo.md) |
-| Dizajnon kaj UI | [`docs/nova/05_dizajno_kaj_ui.md`](docs/nova/05_dizajno_kaj_ui.md) |
-| Gvidlinioj por kontribuantoj | [`AGENTS.md`](AGENTS.md) |
-| Protokolaron | [`NOTOJ.md`](NOTOJ.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`ŜANĜOJ.md`](ŜANĜOJ.md) |
-| Malfermaj taskoj | [`FAROTA.md`](FAROTA.md) |
+| Dizajnon kaj UI             | [`docs/nova/05_dizajno_kaj_ui.md`](docs/nova/05_dizajno_kaj_ui.md) |
+| Gvidliniojn por agentoj     | [`AGENTS.md`](AGENTS.md) |
+| Protokolaron                | [`NOTOJ.md`](NOTOJ.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`ŜANĜOJ.md`](ŜANĜOJ.md) |
+| Malfermajn taskojn          | [`FAROTA.md`](FAROTA.md) |
 
 ## La arkivo de elsendoj
 
@@ -102,7 +103,7 @@ Por konstrui arkivon de Esperanto-elsendoj, mi uzas
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 ```
 
-## Licenco kaj historio
+## Permesilo kaj historio
 
 La apo estas libera programaro laŭ la **GPL-3.0**-permesilo — vidu [`LICENSE`](LICENSE).
 

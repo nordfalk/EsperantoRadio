@@ -371,7 +371,9 @@
   `enkonduk-detekto` kun `detekto.py`). Plena detekto farita 2026-10-29 (21 kanaloj
   analizitaj, 5 plej freŝaj elsendoj po kanalo; 6 preterlasitaj: muzaiko rekta-kanalo,
   radioscienca/spiritismavocxo/vinilkosmo/peranto/kaliningrada mortaj fluoj — G44):
-  **agorditaj valoroj**: kernpunkto 24.0 (disaj 22-26 — valoro laŭ la 3 plej freŝaj),
+  kernpunkto = 0 laŭ decido de la posedanto (la komunaĵo 8-25 s estas antaŭata de
+  varianta antaŝanonco, kiun oni ne transsaltu),
+  **agorditaj valoroj**:
   babibejo 50.0 (0-50 s identaj en ĉiuj 10 paroj), fremdulo 11.0, iro 21.0,
   lemondediplomatique 11.0 (ĉiuj kun 10/10 koheraj paroj), universeala-lindo 39.0
   kaj polaretradio 22.0 (nur 2 elsendoj haveblaj — malforta pruvo, rekontrolota).

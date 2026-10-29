@@ -7,6 +7,20 @@
 
 # Ŝanĝoj — 2026-10-24
 
+## Unuopa kanalkonfiguro + alinomo (PR: https://github.com/nordfalk/EsperantoRadio/pull/144)
+
+`esperantoradio_kanaloj_v9.json` → `esperantoradio_konfiguro.json`, kaj la duobla
+kopio en `androidApp/androidMain/assets` **forigita**: Android ricevas la agordon
+per `assets.srcDir` rekte el `shared/commonMain/resources` — unu dosiero por ĉiuj
+kvar platformoj (desktop: classpath; Android: asset; wasmJs/iOS: la enigita ĉeno,
+generata de `generuEnigitanKanalkonfiguron` el la sama dosiero). Pruvita po
+platformo (APK + emulilo; `radioTxtKomparilo`; devigita regenerado). Kaptindaĵo:
+`ignoreUnknownKeys = true` en la agord-leganto igis novajn/kadukajn ŝlosilojn
+(`aktuala_versio`, `funkcia_anonco`) sendanĝeraj; la mortaj DTO-kampoj
+(`kontakt_*`, `Intervals`) tamen foriĝis por ne porti mortan kodon. La
+procedura scio (unu kopio, la srcDir-mekanismo, la rimarko ke ĉio en
+`commonMain/resources` iĝas asset) staras en la `kanalkonfiguro`-skill-o.
+
 ## Stabilaj nomoj por la regul-aroj (A/L/P) — fino de "regulo 4"-ambiguecoj (PR: https://github.com/nordfalk/EsperantoRadio/pull/133)
 
 Bare numeritaj regul-referencoj ("regulo 4", "regulo 8", "regulo 6.3") estis ambiguj:

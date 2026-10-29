@@ -358,9 +358,11 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ] (parta — (a) FARITA 2026-10-24: nova agord-kampo `transsaltuKomenceSekundojn`
-  (DTO+modelo+LudvicoRegilo, `max(savitaPozicio, transsalto)`, 3 testoj); neniuj valoroj
-  agorditaj ĝis (b) trovos ilin. RESTAS: (b) la detekta-ilo kaj la valoroj po kanalo)
+- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceSekundojn: Float`
+  (frakcieblaj valoroj), efikas nur se la uzanto jam aŭkultis ion de la sama kanalo
+  dum la pasinta monato (TRANSSALTA_MONATO_MS = 30 tagoj); komenco = max(savitaPozicio,
+  transsalto); 6 testoj. Neniuj valoroj ankoraŭ agorditaj — ili atendas (b).
+  RESTAS: (b) la detekta-ilo kaj la valoroj po kanalo)
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas

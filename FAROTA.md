@@ -16,6 +16,7 @@
 - **Priskribo**: La servo startiĝas per `startForegroundService()` el fona vojo (sciigo/alarmo/aŭtoludo). Media3 vokas `startForeground()` nur kiam seanco kun ludanta legilo iĝas aktiva; se la fonto fiaskas (ĝuste la `ExoPlaybackException`-ersetego, KMP-H) aŭ la konekto malfruas, neniu `startForeground()` okazas kaj Android mortigas la apoton per `RemoteServiceException`. Unu uzanto, unu okazigo — sed sur la aktuala produktada build (249) kaj en la vojo, kiun la reverkata alarma PR (revertita `10e76e6`) tuŝos.
 - **Sugesto**: (a) en `EsperantoLudadoServo.onStartCommand`: se la servo startiĝis per `startForegroundService` kaj neniu seanco aktiviĝis ene de la limtempo, voku `startForeground()` per provizora sciigo — aŭ `stopSelf()` se neniu luda intenco restas; (b) en la regiloj (`ExoPlayerLudiloRegilo`, `LudiElsendoReceivilo`) traktu font-erarojn kaj ĉesu la kontrakton grace; (c) testu la sciigan kaj alarman vojon sur Android 11–16 (emulilo + vera aparato), precipe la alarman PR antaŭ ol merĝi; (d) post eldono observu Sentry: KMP-1V devas malaperi.
 - **Testo**: instrumentita testo: starti la servon el fono (sciigo-klako) kun rompita fonto-URL → neniu kraŝo, la servo haltiĝas mem.
+- **Konfirmo** (2026-10-27, Sentry): la sola evento de la lastaj 14 tagoj okazis sur dist **249** (la antaŭ-ripara konstruo); sur dist ≥ 250, inkluzive 3.1.0 (252), **nul** okazoj. KMP-1V solvita en Sentry.
 
 ## GRAVA
 
@@ -24,6 +25,7 @@
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-X](https://esperantoradio.sentry.io/issues/KMP-X); 32 okazoj / 10 uzantoj en la lasta semajno, lasta 10-16)
 - **Loko**: `rememberCoroutineScope` en `App.kt:99`, `SerĉoEkrano.kt:34`, `PlejŝatatajEkrano.kt:37`, `HejmoEkrano.kt`, `ElŝutitajEkrano.kt:39`, `DiagnozoEkrano.kt:37`, `ElsendoEkrano.kt:73`, `KanalEkrano.kt:108`
 - **Priskribo**: Korutino lanĉita el `rememberCoroutineScope` postvivas la komponaĵon — tipa kaŭzo: lanĉo en klik-lambdo, kies rezulto estas uzata post navigado foren.
+- **Ĝisdatigo 2026-10-27** (Sentry, 14 tagoj): 23 eventoj / 4 uzantoj — 22× dist **248**, 1× 246; sur 3.1.0 (252; 6 uzantoj, 50 %-specimenado) nul. Restas malfermita: la pruvo sur la nova konstruo estas malforta (malmultaj uzantoj + specimenado), kaj la kodvojo probable ekzistas plu.
 - **Sugesto**: inspekti ĉiun uzon; laboro de la ekrano → `LaunchedEffect` aŭ nuligo en `DisposableEffect`; laboro transvivanta navigadon → `viewModelScope` (vidu la komenton en `HejmoEkrano.kt:224`); neniam teni la skopecon en longdaŭra objekto.
 
 #### G43 — KMP-1S: `IllegalArgumentException: La respondo ne estas RSS/Atom-fluo` el kaŝita fluo (substatuso: escalating)
@@ -46,6 +48,7 @@
 - **Loko**: `esperantoradio_kanaloj_v9.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
 - **Priskribo**: Parto estas pasemaj ret-problemoj (timeout/DNS ĉe spreaker, anchor.fm, blogspot — KMP-12/14/15/M/Q), sed la ripetiĝo ĉe la samaj kanaloj sugestas mortajn aŭ ŝanĝitajn fluojn. `radiovatikana` aperas ankaŭ en lud-eraroj (`UnknownHostException` por `media.vaticannews.va`) — eble la tuta gastigo estas morta.
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
+- **Ĝisdatigo 2026-10-27** (Sentry 3.1.0/252, 14 tagoj + ekstera kontrolo): `radioscienca` fiaskas ankaŭ en la nuna eldono — ~15 eventoj ĉe ~5 uzantoj, ofte kun **0 kaŝenitaj elsendoj** (uzanto vidas malplenan kanalon). La fluo respondas HTTP 200 de ekstere (kontrolita per curl, ankaŭ kun Ktor/okhttp/apo-UA — do ne UA-blokado, sed intermita servila problemo de la gastiganto). Same aperas: `polaretradio`, `radiovatikana`, `spiritismavocxo` (0 kaŝenitaj), `lemondediplomatique`, `lamalfamuloj`, `vinilkosmo`. La DNS-avertoj (`UnresolvedAddressException`, 52 eventoj) venas de unu aparato sen reto kaj estas pritraktitaj ĝuste per kaŝmemoro.
 
 #### G45 — KMP-1H/1R: `OutOfMemoryError` — tuta respondo legata en la memoron (`readByteArray`)
 - **Statuso**: [x]
@@ -212,9 +215,11 @@
 - **Fonto**: Sentry-analizo 2026-10-19 (KMP-G "Aŭtoludo: …" 758 okazoj / 85 uzantoj — lasta evento sur dist 246/3.0.2; KMP-N "RSS-malsukcesa …" 1227 / 57 — lasta sur dist 245/3.0.1; ambaŭ vivas nur sur aparatoj kun dist ≤ 246)
 - **Priskribo**: **Ne solvita, nur malpliigite videbla**: "Aŭtoludo:"-mesaĝoj estis forigitaj (PR #107, en v3.0.3 ekde dist 247 — pro kvoto-plenigo per `captureMessage`); "RSS-malsukcesa" kaj lud-eraroj (KMP-H) estis malaltigitaj al `logw(tag, msg, e)` (PR #93 kaj #109), kio estas **nur loka** — la subaj problemoj (aŭtoludo fiaskas, fluoj neatingeblaj, fontoj mortaj) daŭre okazas, sed ekde 249 ili estas nevideblaj en Sentry krom kiel avertaj protokoloj (2-arg `logw` → `Sentry.logger.warn`). Ankaŭ la escepto-bazitaj retaj issues (KMP-12/14/15/M/Q — timeout/connect/DNS) venas nun nur de malnovaj buildoj: en la aktuala kodo ambaŭ ŝargo-vojoj (deponejo kaj `NovajElsendojKontroloWorker:140`) kaptas per 3-arg `logw` (loka). La eraro-taso kolapsis post 10-14 (225/tago → 1–3/tago) grandparte pro tio plus la 50 %-a specimenado (PR #109) — tio ne provas pliboniĝon de la stabileco.
 - **Sugesto**: versio-bazita `beforeSend`-forĵeto por eldonoj ≤ 3.0.2 (ligita al FAROTA C45 — la ĝisdatebla centra listo; AGENTS.md avertas ne malmoligi la liston en la apo); alternative: en Sentry ignori la eldonojn ≤ 3.0.2 aŭ marki la koncernajn problemojn "ne plu riparebla". Se la videbleco de aŭtoludo/RSS/ludado gravas, raportu ilin intence kiel avertojn (vidu C46).
+- **Ĝisdatigo 2026-10-27**: ankoraŭ aktuala — 55 erar-eventoj sur dist 248 kaj 30 sur 246 en 14 tagoj; ĉiuj erar-eventoj de la periodo venas de dist ≤ 249, dum 3.1.0 (252) produktis neniujn (nur `logw`-avertojn). La problemo malkreskos nature dum la uzantoj ĝisdatiĝas. KMP-1 ("Sentry-testo") montriĝis intenca provo-eraro (dist 1, release 0.1) — ignorita en Sentry.
 
 #### C48 — Post-ripara observo en Sentry
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-10-27, observado de 3.1.0/252 dum 14 tagoj): KMP-1V **malaperis** sur ≥ 250 (sola evento sur dist 249, la antaŭ-ripara konstruo) kaj estas solvita en Sentry; KMP-1S: 1 evento nur sur dist 248 (laŭ atendado de G43); KMP-X (G42) daŭre malfermita, sed nur sur malnovaj konstruoj; la eraro-taso sur 3.1.0 mem estas **nul** — ĉiuj erar-eventoj de la periodo venas de dist ≤ 249. La 152 avertoj de 3.1.0 estas ĉiuj atendataj ret-fiaskoj (`logw`) — konduto laŭregola. Sentry-atentigoj por fatalaj kraŝoj ankoraŭ ne agorditaj; la ideo de averto pri "RSS-malsukcesa kun 0 kaŝenitaj elsendoj" transiras al G44 (la freŝaj datenoj tie).
 - **Fonto**: Sentry-analizo 2026-10-19 (bazlinio: 182 malfermoj / 336 ludadoj en 7 tagoj; eraro-taso 1–3/tago post 10-14, krom la nova KMP-1V)
 - **Sugesto**: post la sekva eldono kontroli: KMP-1V malaperis, la eraro-taso ne kreskas, KMP-X/KMP-1S fermiĝas; konsideri Sentry-atentigojn (alerts) por novaj fatalaj kraŝoj kaj por "RSS-malsukcesa kun 0 kaŝenitaj elsendoj" kiel frua averto pri mortaj kanaloj.
 

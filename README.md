@@ -15,10 +15,6 @@
   <img src="https://img.shields.io/badge/platformoj-Android%20·%20Desktop%20·%20Web-orange" alt="Android, Desktop, Web"/>
 </p>
 
-<p align="center">
-  <img src="androidApp/src/main/play/listings/en-US/graphics/feature-graphic/1.jpg" width="512" alt="EsperantoRadio" />
-</p>
-
 ## Aŭskultu Esperantan radion
 
 27 radiokanaloj kaj podkastoj en Esperanto el la tuta mondo - en unu apo.
@@ -107,13 +103,30 @@ java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 La apo estas libera programaro laŭ la **GPL-3.0**-permesilo — vidu [`LICENSE`](LICENSE).
 
-EsperantoRadio estis origine forko de la dana ŝtata **DR Radio**-apo, kiun la aŭtoro iam prizorgis.
+EsperantoRadio estis origine en 2015 forko de la dana ŝtata **DR Radio**-apo, kiun la aŭtoro tiam prizorgis.
 Tiu versio troviĝas nun en la dosierujo [`malnova/`](malnova/).
+
 La nova versio estas plene farita per [Mistral Vibe](https://mistral.ai/products/vibe/).
-Vi povas vidi la historiajn komandojn al Vibe ĉi tie: [`docs/historio.html`](docs/historio.html)
+Vi povas vidi la historiajn komandojn al Vibe ĉi tie: [docs/historio.html](https://nordfalk.github.io/EsperantoRadio/historio.html)
+
+La apo daŭre tenas la ruĝan M de la iama kanalo Muzaiko en la emblemo kaj daŭre povas ludi la rektan elsendon de Muzaiko
+(kiu nun elsendas nur Esperanto-muzikon el la arkivo, sen veraj programeroj).
+
+### Muzaiko - kio estis?
+La apo estis farita kunlabore kun [Muzaiko](https://muzaiko.info/) — tuttempa interreta radiostacio en Esperanto.
+La ideo de Muzaiko naskiĝis en aprilo 2011 dum la Brita Kongreso de Esperanto (ĉefa antaŭenigantino: la hungarino Veronika Poór),
+kaj ekde la 1-a de julio 2011 ĝi elsendis muzikon, mondajn novaĵojn (ĉiuhore) kaj parolatajn programerojn,
+produktatajn de volontula internacia teamo de junaj esperantistoj.
+
+<p align="center">
+  <img src="androidApp/src/main/play/listings/en-US/graphics/feature-graphic/1.jpg" width="512" alt="EsperantoRadio" />
+</p>
+Post jardeko la energio iom post iom malaperis. En aprilo 2022 Muzaiko ĉesis siajn regulajn elsendojn.
+
+Legu pli ĉe Vikipedio: [Muzaiko](https://eo.wikipedia.org/wiki/Muzaiko)
 
 # Dansk
-App'en er open source under GPL licensen og kan findes på https://github.com/nordfalk/EsperantoRadio
+App'en er open sourpuce under GPL licensen og kan findes på https://github.com/nordfalk/EsperantoRadio
 
 EsperantoRadio bygger på arbejde på DR Radio lavet af Lund&Bendsen for DR.
 Det oprindelige arbejde ligger på https://github.com/androidlundogbendsen/dr-radio-android.

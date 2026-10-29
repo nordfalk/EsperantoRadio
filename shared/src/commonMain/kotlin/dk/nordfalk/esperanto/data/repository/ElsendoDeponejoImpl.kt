@@ -4,6 +4,7 @@ import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logw
+import dk.nordfalk.esperanto.raportadoAktiva
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
@@ -101,7 +102,7 @@ open class ElsendoDeponejoImpl(
 
         return try {
             logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
-            Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
+            if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
             // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch sube redonas la kaŝitan
             // datumon. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
             // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.

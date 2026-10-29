@@ -348,21 +348,26 @@ Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sci
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
 projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
-debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109).
+debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109)
+— **kaj nur post uzanto-konsento** (opt-in-agordo `erar_raportado`, defaŭlte
+malŝaltita: unufoja demando ĉe la unua starto + ŝaltilo en Agordoj → Privateco;
+2026-10-29, PR #148/C50 — sen tio F-Droid atribuas la kontraŭecon "Tracking").
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.
 
-Niveloj (`ProtokoloUtil.kt`). Ĝenerala regulo (FAROTA G46): **ĉio krom `logd`
-iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
-protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
+Niveloj (`ProtokoloUtil.kt`). Ĉiuj Sentry-vojoj estas protektataj per la
+tutmonda flago `raportadoAktiva` (konsento, PR #148). Ĝenerala regulo (FAROTA
+G46): **ĉio krom `logd` iras al Sentry** (post konsento); `logi` estas
+malŝaltebla per la agordo "Ŝaltu detalan protokoladon".
+Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
   diska kaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
 - `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
   protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
-- `logGrava` — ĉiam al Sentry. NUR la gravaj eventoj: malfermo de la apo,
-  ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
+- `logGrava` — al Sentry (post konsento). NUR la gravaj eventoj: malfermo de la
+  apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
 - `logw` — avertoj. Ambaŭ formoj (kun kaj sen escepto) sendas `Sentry.logger.warn`
   al Sentry Logs — NENIAM error-evento, do ili ne konsumas la erarojn-kvoton;
   `logw(tag, msg, e)` sendas du liniojn: la escepto-resumon kaj la staktracon.

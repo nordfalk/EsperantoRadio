@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Ŝanĝita
+
+- Erar-raportado nun okazas nur post via permeso (opt-in): unufoja demando ĉe la unua starto kaj ŝaltilo en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
+
 ## [3.1.0] - 2026-10-25
 
 ### Aldonita

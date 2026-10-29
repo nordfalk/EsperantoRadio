@@ -80,13 +80,14 @@ UpdateCheckMode: Tags
 CurrentVersion: 3.1.0
 CurrentVersionCode: 252
 
-# Sentry-konsidero (C50, decido de la posedanto):
-# La apo aŭtomate raportas erarojn al sentry.io kiam la agordo "detala
-# protokolado" estas ŝaltita kaj en ne-debug-konstruoj. Laŭ la F-Droid-lingvaĵo
-# tio estas la AntiFeature "Tracking" (raportado defaŭlte ŝaltita, ne opt-in).
-# La apo tamen NE estas blokita pro tio — ĝi nur aperas nur por uzantoj, kiuj
-# elektis vidi spurajn apojn. Se la Sentry-raportado iĝos opt-in (demando je
-# unua starto, defaŭlte malŝaltita), la kontraŭ-eco forigeblas.
+# Sentry-konsidero (C50, solvita en PR #148):
+# La erar-raportado al sentry.io estas OPT-IN ekde 2026-10-29 — defaŭlte
+# malŝaltita, unufoja konsento-demando ĉe la unua starto (Agordoj → Privateco).
+# Laŭ la F-Droid-lingvaĵo ne plu temas pri la kontraŭeco "Tracking"
+# (https://f-droid.org/en/docs/Anti-Features/ — "opt-in kaj defaŭlte malŝaltita"
+# estas eksplicite la kondiĉo SEN la kontraŭeco). Se la MR-kontrolisto tamen
+# demandas, referencu la konsento-dialogon en shared/.../App.kt kaj la
+# agordon "erar_raportado" (defaŭlte false).
 #
 # Reprodukteblaj konstruoj (opcia, ne bezonata por enigo):
 # se `dependenciesInfo { includeInApk = false }` estos agordita kaj la konstruo

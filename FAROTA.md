@@ -249,12 +249,15 @@
     per etikedoj);
   - fdroid-internaĵoj esploritaj kaj dokumentitaj: `gradlew-fdroid` trovas la
     radikan `gradle/wrapper` ankaŭ el `subdir: androidApp`; la `gradle:`-kampo
-    signifas gustumojn (`yes` = `assembleRelease`), ne taskojn.
-- **Restas (posedanto)**: (1) decido pri Sentry — aŭcepti la F-Droid-kontraŭecon
-  `Tracking` (apo kaŝita defaŭlte) aŭ igi la raportadon opt-in (sen kontraŭeco,
-  sed malpli da telemetrio); (2) GitLab-konto + fork de fdroiddata + MR kun la
-  metadateno; (3) Aptoide Connect-konto + pruvo de pako-posedo + alŝuto de la
-  subskribita APK. Vidu ankaŭ https://github.com/nordfalk/EsperantoRadio/pull/66
+    signifas gustumojn (`yes` = `assembleRelease`), ne taskojn;
+  - Sentry-raportado iĝis **opt-in** (PR #148): defaŭlte malŝaltita, unufoja
+    konsento-demando ĉe la unua starto, ŝaltilo en Agordoj → Privateco — la
+    F-Droid-kontraŭeco `Tracking` ne plu aplikeblas.
+- **Restas (posedanto)**: (1) GitLab-konto + fork de fdroiddata + MR kun la
+  metadateno; (2) Aptoide Connect-konto + pruvo de pako-posedo + alŝuto de la
+  subskribita APK; (3) atenti, ke la Sentry-telemetrio (C48/C49/G44) draste
+  malpliiĝas — nur konsentintaj uzantoj plu raportas. Vidu ankaŭ
+  https://github.com/nordfalk/EsperantoRadio/pull/66
 
 #### C51 — Funkcioj de la malnova apo ankoraŭ ne portitaj
 - **Statuso**: [ ]

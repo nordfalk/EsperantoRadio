@@ -8,8 +8,12 @@ description: Ŝargu ĉi tiun skill-on kiam vi devas legi aŭ analizi Sentry-datu
 Organizo `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`.
 Agordo en la apo: `SentryAgordo.kt` — medio "produktado" por eldon-konstruoj,
 `release = "esperantoradio@<apoversio>"`, `dist` = versionCode (aŭtomate de la
-Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
-debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n.
+Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj KAJ nur konsentintaj
+uzantoj raportas** — debug-konstruoj, Desktop kaj emuliloj ne inicialigas
+Sentry-n, kaj ekde PR #148 (2026-10-29, C50) la raportado estas opt-in:
+defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto (agordo
+`erar_raportado`). Konto ĉiuj datum-kvantaj analizoj: la malpliiĝo post la
+opt-in-ŝanĝo estas atendata, ne incidento.
 
 ## Konekto (MCP) kaj ĝiaj malsanoj
 

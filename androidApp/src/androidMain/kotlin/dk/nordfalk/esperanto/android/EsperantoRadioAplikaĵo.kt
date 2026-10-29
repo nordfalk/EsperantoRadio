@@ -4,8 +4,10 @@ import android.app.Application
 import android.os.Build
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.data.config.leguErarRaportadanKonsenton
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.raportadoAktiva
 
 /**
  * Procez-nivela inicialigo ((PR #89) + C7).
@@ -17,10 +19,10 @@ import dk.nordfalk.esperanto.logi
  * `MainActivity.onCreate` (duobla inicialigo ĉe Activity-rekreo).
  *
  * Sentry estas inicialigata NUR por ne-debug konstruoj sur realaj aparatoj
- * (2026-10-13, PR #109): debug-konstruoj (FLAG_DEBUGGABLE — la .alfa-APK) kaj
- * emuliloj tute ne raportas — la propra testado de la programisto ne poluu la
- * produktadajn datumojn nek la Sentry-kvoton (emulilaj OOM-kraŝoj aperis kiel
- * "produktado", vidu ŜANĜOJ.md). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
+ * KAJ nur post kiam la uzanto konsentis (opt-in-agordo "erar_raportado",
+ * defaŭlte malŝaltita — 2026-10-29, PR #148/C50: senkonsenta raportado
+ * atribuus al la apo la F-Droid-kontraŭecon "Tracking"). Sen inicialigo ĉiuj
+ * Sentry-vokoj estas no-op.
  */
 class EsperantoRadioAplikaĵo : Application() {
     override fun onCreate() {
@@ -34,7 +36,12 @@ class EsperantoRadioAplikaĵo : Application() {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
         }
-        initialiguSentry("produktado")
+        if (leguErarRaportadanKonsenton()) {
+            initialiguSentry("produktado")
+            raportadoAktiva = true
+        } else {
+            logi("Sentry", "Erar-raportado ne konsentita (opt-in) — ne raportas")
+        }
     }
 
     /** La kutimaj Android-emulilaj bildoj: AVD (sdk_gphone, goldfish, ranchu), Genymotion k.a. */

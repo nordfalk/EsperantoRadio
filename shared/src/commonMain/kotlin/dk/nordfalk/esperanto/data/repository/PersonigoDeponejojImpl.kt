@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.repository
 
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
@@ -9,9 +10,11 @@ import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
+import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.protokoloDetala
+import dk.nordfalk.esperanto.raportadoAktiva
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -150,14 +153,24 @@ class AgordojDeponejoImpl(
     private val _detalaProtokolado = MutableStateFlow(settings?.getBoolean(SettingsKeys.DETALA_PROTOKOLADO, true) ?: true)
     override val detalaProtokolado: StateFlow<Boolean> = _detalaProtokolado.asStateFlow()
 
+    private val _erarRaportado = MutableStateFlow(settings?.getBoolean(SettingsKeys.ERAR_RAPORTADO, false) ?: false)
+    override val erarRaportado: StateFlow<Boolean> = _erarRaportado.asStateFlow()
+
+    // Se la raportado jam estas ŝaltita, la demando estas principe respondita
+    private val _erarRaportadoDemandita = MutableStateFlow(
+        settings?.getBoolean(SettingsKeys.ERAR_RAPORTADO_DEMANDITA, _erarRaportado.value) ?: _erarRaportado.value
+    )
+    override val erarRaportadoDemandita: StateFlow<Boolean> = _erarRaportadoDemandita.asStateFlow()
+
     private val _kaŝitajAvertoj = MutableStateFlow(
         settings?.leguMigritanĈenon(SettingsKeys.KAŜITAJ_AVERTOJ, SettingsKeys.KAŜITAJ_AVERTOJ_MALNOVA, "")?.split(",")?.mapNotNull { tipoDeNomo(it) }?.toSet() ?: emptySet()
     )
     override val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kaŝitajAvertoj.asStateFlow()
 
     init {
-        // Sinkronigu la tutmondan protokol-flagon (legata de logi en ProtokoloUtil)
+        // Sinkronigu la tutmondajn protokol-flagojn (legataj de la log*-funkcioj en ProtokoloUtil)
         protokoloDetala = _detalaProtokolado.value
+        raportadoAktiva = _erarRaportado.value
     }
 
     /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
@@ -192,6 +205,25 @@ class AgordojDeponejoImpl(
         protokoloDetala = ŝaltita
         settings?.putBoolean(SettingsKeys.DETALA_PROTOKOLADO, ŝaltita)
         logi("Agordoj", "DetalaProtokolado → $ŝaltita")
+    }
+    override fun fiksiErarRaportadon(ŝaltita: Boolean) {
+        _erarRaportado.value = ŝaltita
+        raportadoAktiva = ŝaltita
+        settings?.putBoolean(SettingsKeys.ERAR_RAPORTADO, ŝaltita)
+        konfirmuErarRaportadoDemandon()
+        // Sur ne-evolua Android-konstruo ŝaltu Sentry tuj — la uzanto ĵus konsentis.
+        // Kraŝ-raportoj (nekapteblaj esceptoj) tamen ekagas plene nur post restarto.
+        if (ŝaltita && !AppStato.estasEvoluaMedo) {
+            initialiguSentry("produktado")
+        }
+        logi("Agordoj", "ErarRaportado → $ŝaltita")
+    }
+    override fun konfirmuErarRaportadoDemandon() {
+        if (!_erarRaportadoDemandita.value) {
+            _erarRaportadoDemandita.value = true
+            settings?.putBoolean(SettingsKeys.ERAR_RAPORTADO_DEMANDITA, true)
+            logi("Agordoj", "ErarRaportadoDemandita → true")
+        }
     }
     override fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>) {
         _kaŝitajAvertoj.value = tipoj

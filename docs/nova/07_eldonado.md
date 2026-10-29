@@ -161,18 +161,16 @@ Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
 `AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags` igas F-Droid-on
 aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
-### Sentry kaj la "Tracking"-kontraŭeco (DECIDO DE LA POSEDANTO)
+### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (opt-in, PR #148)
 
-La apo aŭtomate raportas erarojn kaj protokolojn al sentry.io (ne-debug-
-konstruoj sur realaj aparatoj, sen konsento de la uzanto). Laŭ la
-F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio estas la
-kontraŭeco **Tracking**. Konsekvencoj:
-
-- La apo **ne estas blokita** pro tio — ĝi ricevas la etikedon `Tracking` kaj
-  aperas en la defaŭlta listo nur al uzantoj, kiuj elektis montri tiajn apojn.
-- Sen la kontraŭeco eblas nur se la raportado iĝas **opt-in** (demando je la
-  unua starto, defaŭlte malŝaltita). Tio draste malpliigus la erar-raportojn,
-  sur kiuj la protokolita diagnoses dependas (C48/G44).
+La apo sendis erarojn kaj protokolojn al sentry.io defaŭlte, sen konsento —
+laŭ la F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio
+estus la kontraŭeco **Tracking**. Ekde PR #148 (2026-10-29) la raportado
+estas **opt-in**: defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua
+starto, ŝanĝebla en Agordoj → Privateco ("Sendu erar-raportojn").
+Sekvo: la apo ne ricevas la kontraŭecon, sed la telemetrio draste malpliiĝas
+(nur konsentintaj uzantoj raportas) — la Sentry-esplorado (C48/C49/G44) devas
+kalkuli kun tio.
 
 ### Reprodukteblaj konstruoj (opcia, estonta)
 

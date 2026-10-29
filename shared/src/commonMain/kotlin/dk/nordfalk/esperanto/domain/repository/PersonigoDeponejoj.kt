@@ -55,6 +55,15 @@ interface AgordojDeponejo {
     val detalaProtokolado: StateFlow<Boolean>
 
     /**
+     * Ĉu la uzanto konsentis al aŭtomata erar-raportado al Sentry
+     * (opt-in, defaŭlte MALŜALTITA — F-Droid "Tracking"-kontraŭeco, C50).
+     */
+    val erarRaportado: StateFlow<Boolean>
+
+    /** Ĉu la konsento-demando jam estis respondita (dialogo unufoje, ĉe la unua starto). */
+    val erarRaportadoDemandita: StateFlow<Boolean>
+
+    /**
      * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
      * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
      */
@@ -65,6 +74,12 @@ interface AgordojDeponejo {
     fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
     fun fiksiEvoluon(ŝaltita: Boolean)
     fun fiksiDetalanProtokoladon(ŝaltita: Boolean)
+
+    /** Ŝaltas/malŝaltas la erar-raportadon kaj memorigas, ke la demando estas respondita. */
+    fun fiksiErarRaportadon(ŝaltita: Boolean)
+
+    /** Memorigas rifuzon de la konsento-demando (sen ŝalti la raportadon). */
+    fun konfirmuErarRaportadoDemandon()
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
     fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>)

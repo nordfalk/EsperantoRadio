@@ -141,7 +141,7 @@ fun AgordojEkrano(
             Spacer(Modifier.height(8.dp))
             ListItem(
                 headlineContent = { Text("Sendu erar-raportojn") },
-                supportingContent = { Text("Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Defaŭlte malŝaltita; kraŝ-raportoj ekvalidas post restartigo de la apo") },
+                supportingContent = { Text("Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Ŝanĝoj de kraŝ-raportoj tute ekvalidas post restartigo de la apo") },
                 trailingContent = {
                     Switch(
                         checked = erarRaportado,

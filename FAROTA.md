@@ -250,9 +250,12 @@
   - fdroid-internaĵoj esploritaj kaj dokumentitaj: `gradlew-fdroid` trovas la
     radikan `gradle/wrapper` ankaŭ el `subdir: androidApp`; la `gradle:`-kampo
     signifas gustumojn (`yes` = `assembleRelease`), ne taskojn;
-  - Sentry-raportado iĝis **opt-in** (PR #148): defaŭlte malŝaltita, unufoja
-    konsento-demando ĉe la unua starto, ŝaltilo en Agordoj → Privateco — la
-    F-Droid-kontraŭeco `Tracking` ne plu aplikeblas.
+  - Sentry-raportado iĝis **dumoda** (PR #148): konstruoj sen nia subskribo
+    (tiel F-Droid konstruas) = opt-in kun unufoja konsento-demando; konstruoj
+    kun nia subskribo (Play/Aptoide) = defaŭlte ŝaltita, malŝaltebla en
+    Agordoj → Privateco (kun fina protokolo ĉe malŝalto kaj protokolo ĉe
+    reŝalto) — la F-Droid-kontraŭeco `Tracking` ne aplikeblas al la
+    F-Droid-konstruo.
 - **Restas (posedanto)**: (1) GitLab-konto + fork de fdroiddata + MR kun la
   metadateno; (2) Aptoide Connect-konto + pruvo de pako-posedo + alŝuto de la
   subskribita APK; (3) atenti, ke la Sentry-telemetrio (C48/C49/G44) draste

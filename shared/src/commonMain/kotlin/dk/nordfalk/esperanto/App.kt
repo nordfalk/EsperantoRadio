@@ -573,11 +573,12 @@ fun EsperantoRadioApp(
             )
         }
 
-        // Konsento pri erar-raportado (opt-in, defaŭlte malŝaltita — C50/F-Droid:
-        // senkonsenta raportado atribuas la kontraŭecon "Tracking"). Unufoja
-        // demando ĉe la unua starto; "Jes" ŝaltas, "Ne" nur memoras la respondon.
-        // Ŝanĝebla poste en Agordoj → Privateco. En evolua medio ĝi ne montriĝas
-        // (sama logiko kiel la Apaj novaĵoj).
+        // Konsento pri erar-raportado (C50/F-Droid). Nur en konstruoj SEN nia
+        // subskribo (tiel F-Droid konstruas) la defaŭlto estas malŝaltita kaj
+        // la uzanto ricevas unufojan demandon ĉe la unua starto; "Jes" ŝaltas,
+        // "Ne" nur memoras la respondon. Konstruoj KUN nia subskribo (Google
+        // Play, Aptoide) raportas defaŭlte kaj neniam montras la demandon.
+        // En evolua medio ĝi ne montriĝas (sama logiko kiel la Apaj novaĵoj).
         val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
         val erarRaportadoDemandita by agordojDeponejo.erarRaportadoDemandita.collectAsState()
         if (!AppStato.estasEvoluaMedo && !erarRaportado && !erarRaportadoDemandita) {

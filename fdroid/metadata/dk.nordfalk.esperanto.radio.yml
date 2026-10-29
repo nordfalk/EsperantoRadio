@@ -81,13 +81,17 @@ CurrentVersion: 3.1.0
 CurrentVersionCode: 252
 
 # Sentry-konsidero (C50, solvita en PR #148):
-# La erar-raportado al sentry.io estas OPT-IN ekde 2026-10-29 — defaŭlte
-# malŝaltita, unufoja konsento-demando ĉe la unua starto (Agordoj → Privateco).
-# Laŭ la F-Droid-lingvaĵo ne plu temas pri la kontraŭeco "Tracking"
-# (https://f-droid.org/en/docs/Anti-Features/ — "opt-in kaj defaŭlte malŝaltita"
-# estas eksplicite la kondiĉo SEN la kontraŭeco). Se la MR-kontrolisto tamen
-# demandas, referencu la konsento-dialogon en shared/.../App.kt kaj la
-# agordon "erar_raportado" (defaŭlte false).
+# F-Droid konstruas SEN nia keystore (vidu la signadon en androidApp/
+# build.gradle.kts) — en tiaj konstruoj la erar-raportado al sentry.io estas
+# OPT-IN: defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto
+# (ŝanĝebla en Agordoj → Privateco). Laŭ la F-Droid-lingvaĵo ne temas pri la
+# kontraŭeco "Tracking" (https://f-droid.org/en/docs/Anti-Features/ — "opt-in
+# kaj defaŭlte malŝaltita" estas eksplicite la kondiĉo SEN la kontraŭeco).
+# Konstruoj KUN nia subskribo (kiujn ni mem disdonas: Google Play, Aptoide)
+# raportas defaŭlte — tio ne koncernas la F-Droid-konstruon, ĉar F-Droid ĉiam
+# subskribas per SIA propra ŝlosilo kaj la apo rekonas tion (BuildConfig.
+# SEN_NIA_SUBSKRIBO). Se la MR-kontrolisto demandas, referencu la
+# konsento-dialogon en shared/.../App.kt.
 #
 # Reprodukteblaj konstruoj (opcia, ne bezonata por enigo):
 # se `dependenciesInfo { includeInApk = false }` estos agordita kaj la konstruo

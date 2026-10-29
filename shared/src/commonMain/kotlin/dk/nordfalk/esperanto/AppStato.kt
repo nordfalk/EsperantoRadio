@@ -56,6 +56,17 @@ object AppStato {
      */
     var estasEvoluaMedo: Boolean = false
 
+    /**
+     * Konstruo-specifa defaŭlto de la erar-raportado (PR #148/C50):
+     * - konstruo KUN nia subskribo (Google Play, Aptoide): `true` — la apo
+     *   raportas defaŭlte (sen demando; malŝaltebla en Agordoj → Privateco);
+     * - konstruo SEN nia subskribo (tiel F-Droid konstruas): `false` — opt-in
+     *   per unufoja konsento-demando (F-Droid-kontraŭeco "Tracking" alie).
+     * La platforma enirpunkto ŝaltas ĝin ĉe starto (Android:
+     * `!BuildConfig.SEN_NIA_SUBSKRIBO`; Desktop/Web lasas `false`).
+     */
+    var erarRaportadoDefaŭlta: Boolean = false
+
     var httpKliento: HttpClient? = null
         private set
     var kanaloDeponejo: KanaloDeponejoImpl? = null

@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Erar-raportado nun okazas nur post via permeso (opt-in): unufoja demando ĉe la unua starto kaj ŝaltilo en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
+- Erar-raportado: en konstruoj el eksteraj vendejoj (F-Droid) ĝi petas vian permeson unue; en la Play-eldono ĝi restas ŝaltita kaj estas malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
 
 ## [3.1.0] - 2026-10-25
 

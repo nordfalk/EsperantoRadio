@@ -52,6 +52,16 @@ android {
         }
     }
 
+    // Ĉu ĈI TIU konstruo okazas SEN nia subskriba keystore — tiel F-Droid kaj
+    // senkolora CI konstruas (la release-konstruo subskribiĝas nur kiam la
+    // keystore ekzistas, vidu malsupre). Uzata por la defaŭlto de la
+    // erar-raportado: sen nia subskribo → opt-in (konsento-demando, F-Droid);
+    // kun nia subskribo (Google Play, Aptoide) → defaŭlte ŝaltita (opt-out).
+    // C50/PR #148. En debug-konstruoj la valoro estas senefika (ne raportas).
+    val senNiaSubskribo = !(
+        signingConfigs.getByName("release").storeFile?.exists() == true
+        )
+
     defaultConfig {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
@@ -59,6 +69,12 @@ android {
         versionCode = 252
         versionName = libs.versions.apoversio.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("boolean", "SEN_NIA_SUBSKRIBO", senNiaSubskribo.toString())
+    }
+
+    buildFeatures {
+        // BuildConfig.SEN_NIA_SUBSKRIBO (supre) bezonas BuildConfig-klason
+        buildConfig = true
     }
 
     buildTypes {
@@ -68,7 +84,7 @@ android {
             // nesubskribitan release-konstruon en medioj SEN la sekretoj (F-Droid,
             // senkolora CI) — ili subskribas la APK-on mem per sia propra ŝlosilo.
             // Loke la keystore ekzistas, do la kutima subskribita konstruo ne ŝanĝiĝas.
-            if (signingConfigs.getByName("release").storeFile?.exists() == true) {
+            if (!senNiaSubskribo) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }

@@ -19,9 +19,12 @@ import dk.nordfalk.esperanto.raportadoAktiva
  * `MainActivity.onCreate` (duobla inicialigo ĉe Activity-rekreo).
  *
  * Sentry estas inicialigata NUR por ne-debug konstruoj sur realaj aparatoj
- * KAJ nur post kiam la uzanto konsentis (opt-in-agordo "erar_raportado",
- * defaŭlte malŝaltita — 2026-10-29, PR #148/C50: senkonsenta raportado
- * atribuus al la apo la F-Droid-kontraŭecon "Tracking"). Sen inicialigo ĉiuj
+ * KAJ nur kiam la erar-raportado estas ŝaltita (agordo "erar_raportado", PR
+ * #148/C50). La DEFAŬLTO dependas de la konstruo: kun nia subskribo (Google
+ * Play, Aptoide — la keystore ekzistis dum la konstruo) ĝi estas ŜALTITA
+ * (neniu demando; malŝaltebla en Agordoj → Privateco); sen nia subskribo
+ * (tiel F-Droid konstruas) MALŜALTITA kun unufoja konsento-demando — alie
+ * F-Droid atribuus la kontraŭecon "Tracking". Sen inicialigo ĉiuj
  * Sentry-vokoj estas no-op.
  */
 class EsperantoRadioAplikaĵo : Application() {
@@ -32,6 +35,8 @@ class EsperantoRadioAplikaĵo : Application() {
         // Evolua medio (debug-konstruo aŭ emulilo): ekz. la "Apaj novaĵoj"-
         // dialogo ne montriĝu — ĝi aperus ĉe ĉiu freŝa instalaĵo
         AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
+        // Konstruo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on)
+        AppStato.erarRaportadoDefaŭlta = !BuildConfig.SEN_NIA_SUBSKRIBO
         if (AppStato.estasEvoluaMedo) {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
@@ -40,7 +45,7 @@ class EsperantoRadioAplikaĵo : Application() {
             initialiguSentry("produktado")
             raportadoAktiva = true
         } else {
-            logi("Sentry", "Erar-raportado ne konsentita (opt-in) — ne raportas")
+            logi("Sentry", "Erar-raportado malŝaltita — ne raportas")
         }
     }
 

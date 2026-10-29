@@ -11,9 +11,12 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Testoj por la opt-in-erar-raportado (C50/F-Droid-kontraŭeco "Tracking"):
- * defaŭlte MALŜALTITA; fiksi ŝanĝas la StateFlow, persistas, sinkronigas la
- * tutmondan flagon (legata de la log*-funkcioj en ProtokoloUtil) kaj
+ * Testoj por la erar-raportado (C50/F-Droid-kontraŭeco "Tracking"):
+ * la defaŭlto estas KONSTRUO-SPECIFA (AppStato.erarRaportadoDefaŭlta) —
+ * malŝaltita en konstruoj sen nia subskribo (F-Droid, opt-in kun konsento-
+ * demando), ŝaltita en konstruoj kun nia subskribo (Google Play/Aptoide,
+ * opt-out en Agordoj). Fiksi ŝanĝas la StateFlow, persistas, sinkronigas la
+ * tutmondan flagon (legatan de la log*-funkcioj en ProtokoloUtil) kaj
  * memorigas la respondon de la konsento-demando (dialogo unufoje).
  *
  * EstasEvoluaMedo estas ŝaltita dum la testoj — tio samtempe kontrolas, ke
@@ -27,6 +30,7 @@ class AgordojErarRaportadoTest {
     @BeforeTest
     fun preparu() {
         AppStato.estasEvoluaMedo = true
+        AppStato.erarRaportadoDefaŭlta = false
     }
 
     @AfterTest
@@ -34,16 +38,47 @@ class AgordojErarRaportadoTest {
         nodo.removeNode()
         raportadoAktiva = false
         AppStato.estasEvoluaMedo = false
+        AppStato.erarRaportadoDefaŭlta = false
     }
 
     @Test
     fun defaŭlteMalŝaltitaKajFlagoSinkronigita() {
+        // Konstruo SEN nia subskribo (F-Droid): defaŭlte malŝaltita (opt-in)
         raportadoAktiva = true
         val deponejo = AgordojDeponejoImpl(settings)
         assertFalse(deponejo.erarRaportado.value)
         assertFalse(raportadoAktiva)
         // La konsento-demando ankoraŭ ne estis respondita
         assertFalse(deponejo.erarRaportadoDemandita.value)
+    }
+
+    @Test
+    fun defaŭltoLaŭKonstruoKunNiaSubskribo() {
+        // Konstruo KUN nia subskribo (Google Play/Aptoide): defaŭlte ŝaltita
+        // (opt-out) — la uzanto ricevas NENIAM demandon (demandita = vera)
+        AppStato.erarRaportadoDefaŭlta = true
+        raportadoAktiva = false
+        val deponejo = AgordojDeponejoImpl(settings)
+        assertTrue(deponejo.erarRaportado.value)
+        assertTrue(raportadoAktiva)
+        // La dialogo ne aperas: la defaŭlta ŝaltita raporto validas kiel respondita
+        assertTrue(deponejo.erarRaportadoDemandita.value)
+
+        // Malŝalto persistas trans "restarto" (nova deponejo legas ĝin)
+        deponejo.fiksiErarRaportadon(false)
+        val denove = AgordojDeponejoImpl(settings)
+        assertFalse(denove.erarRaportado.value)
+        assertFalse(raportadoAktiva)
+    }
+
+    @Test
+    fun eksplicitaUzantoDecidoVenkasLaKonstruoDefaŭlton() {
+        // F-Droid-konstruo, sed la uzanto jam enŝaltis (ekz. respondis "Jes"):
+        // nova deponejo legas la eksplicitan valon, ne la defaŭlton
+        settings.putBoolean("erar_raportado", true)
+        val deponejo = AgordojDeponejoImpl(settings)
+        assertTrue(deponejo.erarRaportado.value)
+        assertTrue(raportadoAktiva)
     }
 
     @Test

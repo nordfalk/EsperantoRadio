@@ -161,16 +161,28 @@ Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
 `AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags` igas F-Droid-on
 aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
-### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (opt-in, PR #148)
+### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, dumoda)
 
 La apo sendis erarojn kaj protokolojn al sentry.io defaŭlte, sen konsento —
 laŭ la F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio
-estus la kontraŭeco **Tracking**. Ekde PR #148 (2026-10-29) la raportado
-estas **opt-in**: defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua
-starto, ŝanĝebla en Agordoj → Privateco ("Sendu erar-raportojn").
-Sekvo: la apo ne ricevas la kontraŭecon, sed la telemetrio draste malpliiĝas
-(nur konsentintaj uzantoj raportas) — la Sentry-esplorado (C48/C49/G44) devas
-kalkuli kun tio.
+estus la kontraŭeco **Tracking**. Ekde PR #148 (2026-10-29) la defaŭlto
+dependas de la konstruo (`BuildConfig.SEN_NIA_SUBSKRIBO` en
+`androidApp/build.gradle.kts` — vera kiam la keystore mankis dum la konstruo):
+
+- **Konstruo sen nia subskribo** (tiel F-Droid konstruas): **opt-in** —
+  defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto. La apo ne
+  ricevas la kontraŭecon "Tracking".
+- **Konstruo kun nia subskribo** (Google Play, Aptoide): **defaŭlte ŝaltita**,
+  sen demando — la uzanto povas malŝalti en Agordoj → Privateco
+  ("Sendu erar-raportojn"). Ĉe malŝalto iras unu LASTA protokolo al Sentry
+  ("malŝaltita de la uzanto"), ĉe (re)ŝalto unu protokolo ("(re)ŝaltita").
+
+Ambaŭ reĝimoj: ŝanĝoj de la protokolo-fluo ekvalidas tuj, kraŝ-raportoj
+(nekapteblaj esceptoj) post restartigo. Kontrolite 2026-10-29 en ambaŭ
+konstruoj (pura worktree → SEN_NIA_SUBSKRIBO=true; loke kun keystore → false).
+Sekvo por la Sentry-esplorado (C48/C49/G44): la telemetrio el F-Droid-uzantoj
+malpliiĝas (nur konsentintoj raportas); Play-uzantoj plu raportas kaj iliaj
+malŝaltoj/reŝaltoj aperiĝos kiel logGrava-eventoj.
 
 ### Reprodukteblaj konstruoj (opcia, estonta)
 

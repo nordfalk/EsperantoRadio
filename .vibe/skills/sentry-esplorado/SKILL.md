@@ -64,6 +64,13 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
 - Negaciaj filtriloj (`!device.model:...`) ne funkcias en logs — prenu ĉiujn grupojn
   (`limit: 100`) kaj filtru loke.
 - `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
+- **La medio nomiĝas `produktado`, ne `production`** (2026-10-27): `search_errors`
+  kun `environment:production` redonas malplenan rezulton SEN averto — aŭ
+  uzu `produktado`, aŭ ellasu la medi-filtrilon tute (en la projekto ĉiuj
+  produktaj eventoj estas en ĝi kaj dubaj filtroj nur kaŝas datumojn).
+- **`issue.id:KMP-X` ne funkcias en `search_errors`** (2026-10-27): ĝi postulas
+  NUMERAN idon (400 "Invalid number"). Por krei dist-bildon de specifa problemo,
+  filtu laŭ `error.type:` aŭ `message:"…"` kaj grupigu per `dist` anstataŭe.
 
 ## Interpreto-avertoj pri uzant-nombroj
 

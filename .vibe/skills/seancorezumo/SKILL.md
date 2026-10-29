@@ -61,3 +61,21 @@ Kiam la uzanto petas ion kiel:
 - Ne necesas retkonekto
 - La protokoloj troviĝas en `~/.vibe/logs/session/` (aŭ `$VIBE_HOME/logs/session/`)
 - Se `VIBE_HOME` estas agordita, uzu ĝin anstataŭ `~/.vibe`
+
+## Eligo-loko (2026-10-29, PR #143)
+
+Skribu la eligon al `docs/historio.html` (ne al la repo-radiko):
+
+```bash
+python3 .vibe/skills/seancorezumo/krei_html.py "$(pwd)" "$(pwd)/docs/historio.html"
+```
+
+Kialoj:
+- GitHub **montras `.html`-dosierojn kiel fontokodon** en la deponejo (intenca) —
+  la stiligita vidpunkto ekzistas nur per **GitHub Pages**, kiu servas la
+  dosierujon `docs/` el `master` ĉe
+  `https://nordfalk.github.io/EsperantoRadio/historio.html`
+  (aktiviĝis 2026-10-29; rekonstruas aŭtomate je ĉiu puŝo al master)
+- La README ligas al tiu Pages-URL — tenu la dosiernomon `historio.html` fiksita
+- Ne commitu la generitan HTML kunona kun aliaj ŝanĝoj se la uzanto volas
+  nur legi ĝin — demandu aŭ raportu la dosierindikon

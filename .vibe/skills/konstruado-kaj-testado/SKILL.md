@@ -30,7 +30,10 @@ Konstruu post ĉiu kunfando de master kiu alportas kod-ŝanĝojn:
 `:shared:desktopTest` + `:androidApp:assembleDebug` post ĉiu merge. Por PR-oj
 nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
 tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
-(2026-10-17, regulo de la uzanto).
+(2026-10-17, regulo de la uzanto). Tio validas ankaŭ por kod-dosieroj, kiam la
+ŝanĝoj tuŝas NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas
+ion ajn en la konduto, do ankaŭ tiam nek konstruu nek atendu la CI; merĝu tuj
+(2026-10-25, regulo de la uzanto).
 
 Versioj ne estas listigitaj ĉi tie — unu fonto de vero:
 `gradle/libs.versions.toml` (Gradle: `gradle/wrapper/gradle-wrapper.properties`;

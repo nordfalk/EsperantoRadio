@@ -1,6 +1,6 @@
 ---
 name: eldonado
-description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version al Google Play, promocii eldonon, ĝisdatigi release-notojn, baskuli versionCode, aŭ kiam ajn temas pri la eldona procezo (signado, GPP-taskoj, Play Console, F-Droid, Aptoide).
+description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version al Google Play, promocii eldonon, ĝisdatigi eldon-notojn, baskuli versionCode, aŭ kiam ajn temas pri la eldona procezo (signado, GPP-taskoj, Play Console, F-Droid, Aptoide).
 ---
 
 # Eldonado de EsperantoRadio
@@ -38,13 +38,13 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    do la eldonita APK devus kongrui kun etikedita komito (ne eldonu el nekompromita
    laborarbo kiam eviteble; se tamen necesis, komitu la ĝustan fonton tuj poste —
    kiel farite por 249 per PR #109).
-5. **Release-notoj** (intence en Esperanto, maks. 500 signoj):
+5. **Eldon-notoj** (intence en Esperanto, maks. 500 signoj):
    `androidApp/src/main/play/release-notes/en-US/internal.txt`.
    **GPP elektas la dosieron laŭ la TRAKO-nomo** — `internal.txt` (aŭ `default.txt`
    kiel retroiro) — NENIAM laŭ versionName. Versio-nomitaj dosieroj (`3.0.3.txt` ktp.)
    estas ignoritaj de GPP (tiel ĉiuj eldonoj 3.0.2…249 eldoniĝis kun la malnovaj
    3.0.1-notoj; la 249-notoj korektiĝis permane). La historiaj `X.Y.Z.txt`-dosieroj
-   estas arkivigitaj en `androidApp/release-notes-arkivo/`. NENIAM interne de
+   estas arkivigitaj en `androidApp/eldon-notoj-arkivo/`. NENIAM interne de
    `src/main/play/`: GPP 4.x validigas ĈIUJN dosierojn tie kaj rifuzas la taskon
    per „Unknown Play resource file“ (2026-10-24, la unua GPP-4-eldono).
    **La notoj resumu la delton ekde la lasta PRODUKTADA versio** — ne ekde la
@@ -72,7 +72,7 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 | Tasko | Kion ĝi faras |
 |---|---|
-| `publishReleaseApk` | APK + release-notoj (`internal.txt`) — **kion ni uzas** |
+| `publishReleaseApk` | APK + eldon-notoj (`internal.txt`) — **kion ni uzas** |
 | `publishReleaseListing` | **aparte** alŝutas metadatumojn (priskribo, ekranfotoj el `play/listings/`) — `publishReleaseApk` NE inkluzivas ilin! |
 | `publishReleaseApps` | APK + metadatumoj kune |
 | `promoteReleaseArtifact` | promocias eldonon inter trakoj (`play { fromTrack/promoteTrack }`) |
@@ -84,6 +84,18 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## Jam konataj limoj kaj problemoj
 
+- **Subskriba eraro „Keystore was tampered with, or password was incorrect“**
+  (2026-10-25, 3.1.0): la subskribo legas `KEYSTORE_*` el `secrets.properties`
+  (la build-defaŭltoj estas malplena pasvorto + la vojo `/home/j/android/A_signaturer/`
+  — agentaj sesioj ne havas la mediovariablojn). Se la eraro aperas, la pasvorto
+  en `secrets.properties` estas malĝusta aŭ malaktuala — la POSEDANTO devas
+  korekti ĝin; agentoj ne rajtas legi la dosieron (regulo A12).
+- **Eldonitan versionCode oni NE povas re-alŝuti**: reprovo de `publishReleaseApk`
+  por jam alŝutita versionCode fiaskas per „Version code is too low or has
+  already been used“ — sed tio mem estas KONFIRMO ke la unua alŝuto sukcesis
+  (2026-10-25, 252). Ne uzu `--rerun` por kontroli eldonon; kaptu la eligilon de
+  la unua rulo (`Updating [completed] release (...:[N]) in track 'internal'`)
+  — reprovo montras nur `UP-TO-DATE` sen la konfirman linion.
 - **Notoj de jam eldonita versionCode NE korekteblas per GPP** (la API rifuzas
   versionCode-reuzon) — korektu ilin permane en Play Console (kiel farite por 249).
 - **AAB ne eblas** ĝis la apo enskribiĝos en Play App Signing (403 "must be enrolled").

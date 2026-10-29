@@ -66,7 +66,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 - **A5 — Konservu la kanalkonfiguron** (`esperantoradio_konfiguro.json`). Ĝi estas
   daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
   en agordo, ne en logiko.
-- **A6 — GPL-licenco.** Ĉiu derivaĵo devas resti GPL.
+- **A6 — GPL-permesilo.** Ĉiu derivaĵo devas resti GPL.
 - **A7 — Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
   faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
@@ -168,8 +168,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
   post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
   nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
-  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
-  (2026-10-17, regulo de la uzanto).
+  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI
+  (2026-10-17, regulo de la uzanto). **Tamen NE kunfandu sen aparta, eksplikita
+  peto de la uzanto** — eĉ ne por tekstaj/agentaj PR-oj; «ne atendu CI» rajtigas
+  nur la ŝparon de la atendo, ne la kunfandon. Same por kod-dosieroj, kiam la ŝanĝoj tuŝas
+  NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas ion ajn
+  (2026-10-25, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
   (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.
@@ -183,6 +187,9 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
   teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
   per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
+  Legu ankaŭ la erarmesaĝon mem — ĝi montras la plej proksiman kongruon kaj
+  malkaŝas tiel ĵus enŝtelintajn tiperojn (2026-10-29: «sourpuce» anstataŭ
+  «source» en la dana README-linio, forkonsumita de PR #143).
 - **Esperanto-ortografio: nur veraj supersignoj** (renomo 2026-10-24): ĉiuj identigiloj,
   klasoj kaj dosier-nomoj uzas `ŝ ĝ ĉ ĵ ŭ` (`ŝargiElsendojnPorKanal`, `ElŝutStato.kt`,
   `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
@@ -213,6 +220,19 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   ĉiu karto).
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **Recenzo-komentoj de la posedanto povas esti nudpunktaj** (2026-10-29, PR #143):
+  «forigu» aŭ nura citita linio signifas forig-peton (ekz. redundan,
+  mem-referencan linion). Agu, respondu en la fadeno per la komita-ŝlosilo
+  (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
+  forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
+  etikedon `preterlasu-changelog` (REST: `gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **GitHub ne vidigas `.html`-dosierojn en la deponejo** (2026-10-29): ili montriĝas
+  kiel fontokodo — tio estas intenca. Solvo: **GitHub Pages** el `master:/docs`
+  (aktivigita 2026-10-29; la Pages-API postulas la vojon kun klino:
+  `source[path]=/docs`, nura `docs` donas 422). Ligiloj al `.html`-dosieroj en
+  README/dokumentoj iru al la Pages-URL (`https://nordfalk.github.io/EsperantoRadio/…`);
+  Pages rekonstruas aŭtomate je ĉiu puŝo al master. MD-dosieroj en `docs/`
+  estas Jekyll-transformataj; la deponeja fonto restas la vero.
 - **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
   `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 ("non-pending") —
   korektu per GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId`
@@ -278,7 +298,7 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `com.android.kotlin.multiplatform.library` — vidu https://kotl.in/gradle/agp-new-kmp);
   GPP devas esti la 4.x-linio (3.x ne subtenas AGP 9); platformon la novan
   compileSdk AGP mem elŝutas se la permesiloj akceptitaj. La material3-versio
-  devas kongrui kun CMP (parigo el la CMP-release-notoj, ne la sama versinombro).
+  devas kongrui kun CMP (parigo el la CMP-eldon-notoj, ne la sama versinombro).
   La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
   konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
 
@@ -327,7 +347,7 @@ Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sci
 ## Protokolado kaj Sentry — konvencio
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
-projekto `KMP`). **Nur release-konstruoj sur realaj aparatoj raportas** —
+projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109).
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.

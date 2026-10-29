@@ -10,14 +10,16 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
 > devas esti konservitaj. La konfiguro estas daten-movita (regulo A5):
 > per-kanalaj apartaĵoj en agordo, ne en logiko.
 
-## La du kopioj kaj la du aroj
+## La kopio (unu) kaj la du aroj
 
-- La konfiguro ekzistas **dufoje kaj devas resti identa**:
-  - `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
-  - `androidApp/src/androidMain/assets/esperantoradio_konfiguro.json`
-- Sur wasmJs/iOS ĝi estas enigita kiel Kotlin-ĉeno dum la konstruo
-  (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`) — la fonto restas
-  la JSONC-dosiero.
+- La konfiguro ekzistas **nur unufoje**: `shared/src/commonMain/resources/esperantoradio_konfiguro.json`.
+  Ĝi estas la fonto por ĉiuj kvar platformoj: desktop kaj testoj legas ĝin de la
+  classpath, Android ricevas ĝin kiel asset (per `assets.srcDir` en
+  `androidApp/build.gradle.kts` — ekde 2026-10-29 neniu duobla kopio en
+  `androidMain/assets`), kaj sur wasmJs/iOS ĝi estas enigita kiel Kotlin-ĉeno
+  dum la konstruo (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`).
+- Atentu: ĉio en `shared/src/commonMain/resources/` aŭtomate iĝas ankaŭ Android-asset —
+  metu tien nur la agordon.
 - La JSONC havas **du arojn**: `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ`
   (referencataj, de la kodo NE legataj). Novaj kanaloj devas iri en `kanaloj`;
   la dosiero FINIĜAS per la forprenitaj — "aldonu ĉe la fino" surteriĝas en la

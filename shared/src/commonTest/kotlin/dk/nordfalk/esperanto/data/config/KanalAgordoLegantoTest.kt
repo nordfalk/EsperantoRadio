@@ -108,8 +108,7 @@ class KanalAgordoLegantoTest {
         assertEquals(1, agordo.kanaloj.size)
         assertEquals("test", agordo.kanaloj[0].kodo)
         assertNull(agordo.kanaloj[0].elsendojRssUrl) // XXX-prefikso estas nekonata kampo
-        assertNotNull(agordo.android)
-        assertEquals("https://ekzemplo.com", agordo.android!!.kontakt_url)
+        assertNotNull(agordo.android) // kontakt_url estas nekonata kampo kaj estas ignorata
     }
 
     @Test
@@ -130,10 +129,9 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
-    fun legasIntervalsKajKomencaKanalo() {
+    fun legasKomencaKanalon() {
         val jsonc = """
             {
-                "intervals": { "playlist": 60, "settings": 3600 },
                 "komenca_kanalo": "muzaiko",
                 "kanaloj": []
             }
@@ -141,8 +139,6 @@ class KanalAgordoLegantoTest {
 
         val agordo = leganto.legu(jsonc)
 
-        assertEquals(60, agordo.intervals?.playlist)
-        assertEquals(3600, agordo.intervals?.settings)
         assertEquals("muzaiko", agordo.komenca_kanalo)
     }
 

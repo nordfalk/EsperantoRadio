@@ -79,7 +79,6 @@ class KanalAgordoLeganto {
 @Serializable
 data class KanalAgordo(
     val android: AndroidSekcio? = null,
-    val intervals: Intervals? = null,
     val komenca_kanalo: String? = null,
     val elsendojUrl: String? = null,
     val hejmpaĝo: String? = null,
@@ -88,16 +87,7 @@ data class KanalAgordo(
 ) {
     @Serializable
     data class AndroidSekcio(
-        val kontakt_url: String? = null,
-        val kontakt_modtagere: List<String>? = null,
-        val kontakt_titel: String? = null,
         @SerialName("apaj_novaĵoj") val apajNovaĵoj: String? = null,
-    )
-
-    @Serializable
-    data class Intervals(
-        val playlist: Int = 30,
-        val settings: Int = 1800,
     )
 }
 

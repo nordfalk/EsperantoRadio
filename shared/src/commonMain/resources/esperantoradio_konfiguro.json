@@ -1,16 +1,9 @@
 {
-	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
-	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
-	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v*.json  javabog.dk:javabog.dk/privat/",
-
 
 	"android" : {
-		"kontakt_url": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
-		"kontakt_modtagere": ["jacob.nordfalk@gmail.com" ],
-		"kontakt_titel": "Pri la Esperanto-radio",
-		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
+		"aktualaVersio": "3.1.0",
 		"apaj_novaĵoj": "<b>Versio 3.1.0</b> eldoniĝis la 25an de oktobro 2026: <br><br>⚡ Amaso da plibonigoj, ekzemple kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito<br>🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston, la mini-ludilbreto restas ĉiam videbla<br>- La malsupra naviga breto estas anstataŭigita per naviga tirkesto<br>🔔 Sciigoj pri novaj elsendoj - limigataj al maks. 7 samtempe, maks. 3 po kanalo<br>⏰ Vekhorloĝo: tempo per ciferplato, kanalo per kanal-elektilo<br>🗣️ Plibonigita esperanta lingvaĵo en la tuta apo<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
-		"drift_statusmeddelelse": ""
+		"funkciaAnonco": ""
 	},
 
 	"sugestoj_por_alarmoj":
@@ -21,11 +14,6 @@
 10003/0/21/0/8/0/=radiovatikana/=/\
 ",
 
-	"intervals": {
-		"playlist": 30,
-		"settings": 1800
-	},
-
 	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 	"elsendojUrl": "https://esperanto-radio.com/radio.txt",
 	"komenca_kanalo": "muzaiko",
@@ -34,7 +22,7 @@
 		{
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
-			"priskribo": "24-hora Esperanto-retradio: muziko kaj parolataj programeroj. Aŭskultu rete aŭ podkaste.",
+			"priskribo": "24-hora muzika retradio. Aŭskultu rekte.",
 			"rektaElsendaSonoUrl": "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
             "xxxrektaElsendoPriskbUrl": "https://fluo.muzaiko.info/api/nowplaying/1",
             "rektaElsendaPriskriboUrl": "https://muzaiko.info/data.json",

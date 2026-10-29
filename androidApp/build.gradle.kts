@@ -39,6 +39,14 @@ android {
     namespace = "dk.nordfalk.esperanto.android"
     compileSdk = 37
 
+    // EKSPERIMENTO (FAROTA - unuopa kanalkonfiguro): la agorda JSONC venas rekte el
+    // shared/commonMain/resources - neniu duobla kopio en androidMain/assets.
+    sourceSets {
+        getByName("main") {
+            assets.srcDir(rootProject.layout.projectDirectory.dir("shared/src/commonMain/resources"))
+        }
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")

@@ -57,6 +57,8 @@ fun NavigaTirkesto(
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     nunaVojo: NavKey?,
     onElektu: (Vojo) -> Unit,
+    /** Retpoŝtadreso de la prizorganto — ricevita de la „Proponu kanalon"-butono (datum-movita, A5). */
+    prizorgantaRetpoŝto: String = "jacob.nordfalk@gmail.com",
 ) {
     ModalDrawerSheet(
         tirkestStato,
@@ -81,14 +83,17 @@ fun NavigaTirkesto(
 
         // "Proponi kanalon" — retpoŝta butono al la prizorganto (FAROTA C57)
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        val tirkestScope = rememberCoroutineScope()
         NavigationDrawerItem(
             icon = { Icon(Icons.Filled.Email, contentDescription = null) },
             label = { Text("Proponi kanalon") },
             selected = false,
             onClick = {
                 logi("Klako", "tirkesto: proponi kanalon")
+                // Kiel la aliaj eroj: la tirkesto fermiĝas post la ago
+                tirkestScope.launch { tirkestStato.close() }
                 malfermuRetpoŝton(
-                    retpoŝto = "jacob.nordfalk@proton.me",
+                    retpoŝto = prizorgantaRetpoŝto,
                     temo = "Kanalo-propono por EsperantoRadio",
                     teksto = "Saluton!\n\nMi proponas la kanalon <nomo>:\n\nRSS-fluo: <url>\nPriskribo: <…>\n\nDankon!",
                 )

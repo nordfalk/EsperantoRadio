@@ -218,7 +218,12 @@ fun EsperantoRadioApp(
         // La tirkesto mem vivas interne de ĉiu ĉefekrano, sub la supra breto
         // (vidu HejmoEkrano ktp.); ĉi tie ni transdonas nur la staton kaj la enhavon.
         val tirkestEnhavo: @Composable () -> Unit = {
-            NavigaTirkesto(tirkestStato = tirkestStato, nunaVojo = nunaVojo, onElektu = ::elektuTirkeste)
+            NavigaTirkesto(
+                tirkestStato = tirkestStato,
+                nunaVojo = nunaVojo,
+                onElektu = ::elektuTirkeste,
+                prizorgantaRetpoŝto = AppStato.prizorgantaRetpoŝto,
+            )
         }
 
         Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {

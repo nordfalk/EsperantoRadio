@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Enkonduk-detekto (FAROTA C59b) - cxu kanalo havas ripetighantan enkondukon?
+"""Enkonduk-detekto (FAROTA C59b) - ĉu kanalo havas ripetiĝantan enkondukon?
 
-Legas la kanalkonfiguron, elsxutas la plej fresxajn N elsendojn de cxiu
+Legas la kanalkonfiguron, elŝutas la plej freŝajn N elsendojn de ĉiu
 kanalo (120 s, 8 kHz mono PCM), komparas iliajn komencojn per spekto-
-grama kosino-simileco kun sxovoserco kaj rekomendas valoron por
+grama kosino-simileco kun ŝovo-serĉo kaj rekomendas valoron por
 `transsaltuKomenceSekundojn` po kanalo.
 
 Rulu:  python3 .vibe/skills/enkonduk-detekto/detekto.py --n 5
@@ -24,22 +24,22 @@ LABOREJO = "/tmp/intro-detekto"
 SR = 8000
 NA = 512      # FFT-grandeco
 PASO = 256    # 32 ms
-MAKS_SEK = 120  # kiom da sekundoj elsxuti po elsendo
+MAKS_SEK = 120  # kiom da sekundoj elŝuti po elsendo
 
 
-# ---------------- lego kaj elsxuto ----------------
+# ---------------- lego kaj elŝuto ----------------
 
 def legu_agordon(vojo):
     s = open(vojo, encoding="utf-8").read()
     s = re.sub(r"^\s*//.*$", "", s, flags=re.M)   # // -komentoj
     s = re.sub(r",(\s*[}\]])", r"\1", s)           # vostaj komoj
-    # plurliniaj \-dauxrigoj: kunigu
+    # plurliniaj \-daŭrigoj: kunigu
     s = re.sub(r"\\\s*\n", "", s)
     return json.loads(s)["kanaloj"]
 
 
 def sonaj_url_oj(el):
-    """Elsxuteblaj sond URL-oj de RSS-ero: enclosure aux <audio>-mp3 (P6.2)."""
+    """Elŝuteblaj sond URL-oj de RSS-ero: enclosure aŭ <audio>-mp3 (P6.2)."""
     u = re.search(r'<enclosure[^>]*url="([^"]+)"', el)
     if u:
         return u.group(1)
@@ -47,7 +47,7 @@ def sonaj_url_oj(el):
     return m[0] if m else None
 
 
-def elsxutu(kanalo, indekso, url):
+def elŝutu(kanalo, indekso, url):
     """Elŝutu la unuajn MAKS_SEK s kiel PCM; redonas la dosier-vojon aŭ None."""
     celo = f"{LABOREJO}/pcm/{kanalo}_{indekso}.raw"
     if os.path.exists(celo) and os.path.getsize(celo) > 100_000:
@@ -86,7 +86,7 @@ def preparu_kanalon(kanalo, n):
         su = sonaj_url_oj(el)
         if not su:
             continue
-        p = elsxutu(kodo, i, su)
+        p = elŝutu(kodo, i, su)
         if p:
             vojoj.append(p)
         elif not eraro:
@@ -146,10 +146,10 @@ def glata_kurbo(A, B, lag):
 
 
 def analizu_paron(A, B):
-    """(maks_simileco, sxovo, komuna_fino_s) — la lasta dauxra >=0.85-segmento en la unuaj 30 s."""
-    sxovoj = [int(d * 0.5 * SR / PASO) for d in range(-30, 31)]
+    """(maks_simileco, ŝovo, komuna_fino_s) — la lasta daŭra >=0.85-segmento en la unuaj 30 s."""
+    ŝovoj = [int(d * 0.5 * SR / PASO) for d in range(-30, 31)]
     plej = (0.0, 0)
-    for lag in sxovoj:
+    for lag in ŝovoj:
         if lag >= 0:
             a, b = A, B[lag:]
         else:
@@ -161,7 +161,7 @@ def analizu_paron(A, B):
     if plej[0] < 0.5:
         return plej[0], plej[1], 0
     kurbo = glata_kurbo(A, B, plej[1])[:30]
-    # trovu cxiujn dauxrajn (>=3 s) segmentojn >= 0.85; prenu la FINON de la LASTA
+    # trovu ĉiujn daŭrajn (>=3 s) segmentojn >= 0.85; prenu la FINON de la LASTA
     segmentoj = []
     komenco = None
     for t, v in enumerate(kurbo + [0.0]):

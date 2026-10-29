@@ -88,6 +88,8 @@ data class KanalAgordo(
     @Serializable
     data class AndroidSekcio(
         @SerialName("apaj_novaĵoj") val apajNovaĵoj: String? = null,
+        /** Retpoŝto de la prizorganto — celo de „Proponi kanalon“ (datum-movita, A5). */
+        @SerialName("prizorgantaRetpoŝto") val prizorgantaRetpoŝto: String? = null,
     )
 }
 

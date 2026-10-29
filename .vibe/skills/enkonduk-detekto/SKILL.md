@@ -8,7 +8,7 @@ description: Ŝargu ĉi tiun skill-on kiam vi devas esplori/elkalkuli la valoron
 ## La tasko
 
 La agord-kampo `transsaltuKomenceSekundojn` (FAROTA C59a) transsaltas la
-komenc(ο)on de ĉiu elsendo de kanalo. Tiu ĉi skill-o trovas la valoron empirie:
+komenco de ĉiu elsendo de kanalo. Tiu ĉi skill-o trovas la valoron empirie:
 se la komenco de pluraj elsendoj sonas same, oni transsaltas ĝin ĝis la punkto
 kie ili ekmalas.
 

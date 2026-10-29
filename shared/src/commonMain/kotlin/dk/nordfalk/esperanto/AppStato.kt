@@ -81,6 +81,9 @@ object AppStato {
     var diagnozoRegilo: DiagnozoRegilo? = null
         private set
     var apajNovaĵojDeponejo: ApajNovaĵojDeponejo? = null
+
+    /** Retpoŝto de la prizorganto (el la agordo) — celo de „Proponi kanalon“. */
+    var prizorgantaRetpoŝto: String = "jacob.nordfalk@proton.me"   // restaŭvaloro, se la agordo mankas la kampon
         private set
 
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
@@ -165,6 +168,7 @@ object AppStato {
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
         apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj)
+        agordo.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 
@@ -222,6 +226,7 @@ object AppStato {
         ludvicoRegilo = null
         diagnozoRegilo = null
         apajNovaĵojDeponejo = null
+        prizorgantaRetpoŝto = "jacob.nordfalk@proton.me"
         kanaloViewModelj.clear()
     }
 }

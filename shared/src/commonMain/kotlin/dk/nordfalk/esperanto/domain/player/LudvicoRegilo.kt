@@ -641,7 +641,8 @@ class LudvicoRegilo(
      * la enkonduk-identecon de la kanalo.
      */
     @OptIn(kotlin.time.ExperimentalTime::class)
-    private fun aŭskultisDumPasintaMonato(kanaloSlug: String): Boolean {        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_MONATO_MS
+    private fun aŭskultisDumPasintaMonato(kanaloSlug: String): Boolean {
+        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_MONATO_MS
         return ludatojDeponejo.observiLudatojn().value.values.any {
             it.kanaloSlug == kanaloSlug && it.lasteLudita >= limo
         }

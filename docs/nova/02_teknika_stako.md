@@ -81,7 +81,7 @@ val client = HttpClient(CIO) {
 
 `IfModifiedSince`-kapoj por kaŝena valideco (heredaĵo de `FilCache`).
 
-Kanalkonfiguro elŝutata de `https://javabog.dk/privat/esperantoradio_kanaloj_v9.json`
+Kanalkonfiguro elŝutata de `https://javabog.dk/privat/esperantoradio_konfiguro.json`
 kun ene-enigita rezervo en `commonMain/resources/`.
 
 ## Persisto
@@ -105,7 +105,7 @@ uzas **ksoup** por RSS/Atom + HTML-purigado/iframe-skrapado. Per-kanalaj
 apartaĵoj estas **dateno-movitaj** el la kanalagordo (JSON-kampoj
 `puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`).
 
-La kanalkonfiguro (`esperantoradio_kanaloj_v9.json`) estas **JSON kun komentoj** —
+La kanalkonfiguro (`esperantoradio_konfiguro.json`) estas **JSON kun komentoj** —
 stripi `//`-komentojn antaŭ `kotlinx.serialization`-parsado, aŭ uzi indulgentan
 JSONC-parsilon.
 

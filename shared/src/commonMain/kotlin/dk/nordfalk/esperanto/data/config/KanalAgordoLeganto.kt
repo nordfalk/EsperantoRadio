@@ -10,7 +10,7 @@ import dk.nordfalk.esperanto.logw
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
  *
- * La dosiero `esperantoradio_kanaloj_v9.json` enhavas `//`-komentojn kaj
+ * La dosiero `esperantoradio_konfiguro.json` enhavas `//`-komentojn kaj
  * kampojn kun `XXX`-prefikso por malaktivigi. Ni striptigas komentojn
  * antaŭ parsado, kaj ignoras nekonatajn kampojn.
  */

@@ -55,8 +55,8 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    kanalkonfiguro — la versio-anonco, kiu montriĝas kiel dialogo al ĉiuj
    uzantoj kiam ĝia haketaĵo ŝanĝiĝas (nova enhavo = nova dialogo). Ekzistas
    DU bit-identaj kopioj de la kanalkonfiguro —
-   `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json` kaj
-   `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json` —
+   `shared/src/commonMain/resources/esperantoradio_konfiguro.json` kaj
+   `androidApp/src/androidMain/assets/esperantoradio_konfiguro.json` —
    ŝanĝu AMBAŬ kaj tenu ilin identaj (JSONC-detalon vidu en la
    `kanalkonfiguro`-skill-o).
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —

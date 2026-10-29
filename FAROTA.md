@@ -43,7 +43,7 @@
 #### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-N](https://esperantoradio.sentry.io/issues/KMP-N) kaj parencaj; en la lasta semajno: spiritismavocxo, peranto, bitmono, radiovatikana, sano — ofte "uzas 0 kaŝenitajn elsendojn"; pli frue ankaŭ lamalfamuloj, babibejo, universeala-lindo, varsoviavento, kaliningrada, radioscienca, kernpunkto, vinilkosmo, movada-vidpunkto, polaretradio)
-- **Loko**: `esperantoradio_kanaloj_v9.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
+- **Loko**: `esperantoradio_konfiguro.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
 - **Priskribo**: Parto estas pasemaj ret-problemoj (timeout/DNS ĉe spreaker, anchor.fm, blogspot — KMP-12/14/15/M/Q), sed la ripetiĝo ĉe la samaj kanaloj sugestas mortajn aŭ ŝanĝitajn fluojn. `radiovatikana` aperas ankaŭ en lud-eraroj (`UnknownHostException` por `media.vaticannews.va`) — eble la tuta gastigo estas morta.
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
 
@@ -366,7 +366,7 @@
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas
   transsalti en la komenco. (b) Eble eĉ krei ilon kiu trovas tion: komparas la
   komencajn sekundojn de pluraj epizodoj kaj elkalkulas la ripetan longon.
-- **Sugesto**: (a) nova kampo en `esperantoradio_kanaloj_v9.json` (ekz.
+- **Sugesto**: (a) nova kampo en `esperantoradio_konfiguro.json` (ekz.
   `saltiKomenceSekundojn` — daten-movita, A5; kontroli la JSONC-kampanimadon kaj la
   parsajn regulojn P6.1+, ankaŭ la agord-kompateblecon kiam la kampo mankas);
   la ludilo jam subtenas komencan pozicion — `LudiloRegilo.fiksiFonton(fonto,

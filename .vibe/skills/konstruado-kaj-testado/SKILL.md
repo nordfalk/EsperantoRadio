@@ -42,6 +42,11 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 
 ## Kompilado-limigoj kaj iliaj erarmesaĝoj
 
+- **"Incremental compilation failed: The following FqNames can't be derived from
+  DirtyData.dirtyLookupSymbols"** (ekz. pri `Elsendo`, `Kanalo`, `LudataElsendo`) —
+  forlasita inkrementa kompilo-kaŝo post oftaj branĉo-ŝanĝoj/kunfandoj, NE koda
+  eraro (konfirmite 2026-10-24: post `./gradlew clean` ĉio verda). Unua ago:
+  `./gradlew clean` (aŭ `--rerun-tasks`) — ne kodo-esploro.
 - **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — en
   commonMain ĝi rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default`.
 - **`@Volatile` bezonas `import kotlin.concurrent.Volatile`** — sur JVM ĝi solvas

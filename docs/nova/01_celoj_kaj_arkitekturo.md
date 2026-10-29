@@ -108,7 +108,7 @@ EsperantoRadio/
 
 | Konservi (kono) | Reenrigardi (implementaĵo) |
 |---|---|
-| La kanallisto kaj agordo (`esperantoradio_kanaloj_v9.json`) | RssArkivServer Java-jar |
+| La kanallisto kaj agordo (`esperantoradio_konfiguro.json`) | RssArkivServer Java-jar |
 | La sep parsreguloj | Fragment-bazita UI |
 | La salto-listo de neeltireblaj gastigantoj | Singletona `App`-stato |
 | radio.txt-formato kaj antaŭeco | Volley |

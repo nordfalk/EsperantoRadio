@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * Kanalo-modelo. Pura Kotlin, @Serializable, komuna trans ĉiuj platformoj.
  *
- * La kampoj kongruas kun `esperantoradio_kanaloj_v9.json`.
+ * La kampoj kongruas kun `esperantoradio_konfiguro.json`.
  */
 @Serializable
 data class Kanalo(

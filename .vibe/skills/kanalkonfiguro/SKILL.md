@@ -1,6 +1,6 @@
 ---
 name: kanalkonfiguro
-description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (esperantoradio_kanaloj_v9.json / JSONC), aldonas aŭ forigas kanalon, ŝanĝas puriguModeloj-regexojn, aŭ prilaboras RSS-parsadon kaj podkastajn fluojn. Ankaŭ por radioTxtKomparilo kaj serĉado de novaj fluoj.
+description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (esperantoradio_konfiguro.json / JSONC), aldonas aŭ forigas kanalon, ŝanĝas puriguModeloj-regexojn, aŭ prilaboras RSS-parsadon kaj podkastajn fluojn. Ankaŭ por radioTxtKomparilo kaj serĉado de novaj fluoj.
 ---
 
 # Kanalkonfiguro (JSONC) kaj parsado
@@ -13,8 +13,8 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
 ## La du kopioj kaj la du aroj
 
 - La konfiguro ekzistas **dufoje kaj devas resti identa**:
-  - `shared/src/commonMain/resources/esperantoradio_kanaloj_v9.json`
-  - `androidApp/src/androidMain/assets/esperantoradio_kanaloj_v9.json`
+  - `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
+  - `androidApp/src/androidMain/assets/esperantoradio_konfiguro.json`
 - Sur wasmJs/iOS ĝi estas enigita kiel Kotlin-ĉeno dum la konstruo
   (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`) — la fonto restas
   la JSONC-dosiero.

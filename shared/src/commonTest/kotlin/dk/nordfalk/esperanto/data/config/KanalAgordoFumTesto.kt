@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
  * Fum-testo de la VERA kanalkonfiguro (PR #89).
  *
  * `KanalAgordoLegantoTest` testas nur sintezitan JSONC. Sed la vera
- * `esperantoradio_kanaloj_v9.json` estas la kerno de la apo (AGENTS.md regulo A5):
+ * `esperantoradio_konfiguro.json` estas la kerno de la apo (AGENTS.md regulo A5):
  * se iu enmetas eraron en ĝin (ekz. `/* */`-blokkomenton, kiun la striptigilo ne
  * subtenas, aŭ forgesitan komon), la apo kraŝus ĉe ekfunkciigo — kaj neniu alia
  * testo kaptus tion.

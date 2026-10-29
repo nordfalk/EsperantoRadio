@@ -4,7 +4,7 @@ import java.io.InputStream
 
 actual fun leguPakititanKanalkonfiguron(): String {
     val fluo: InputStream = Thread.currentThread().contextClassLoader
-        ?.getResourceAsStream("esperantoradio_kanaloj_v9.json")
+        ?.getResourceAsStream("esperantoradio_konfiguro.json")
         ?: error("Kanalkonfiguro ne trovita en resurcoj")
     return fluo.bufferedReader().use { it.readText() }
 }

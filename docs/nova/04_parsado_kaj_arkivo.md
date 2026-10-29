@@ -103,7 +103,7 @@ URL (`rss_nextLink`). Uzata de la arkiva servilo por marŝi malantaŭen.
 
 > **Ne implementita kiel aparta klaso.** La `RadioTxtParsilo` priskribita en la
 > originala plano ne ekzistas en la kodo. La radio.txt-datumoj estas difinitaj en
-> la kanalkonfiguro (`esperantoradio_kanaloj_v9.json`), ne parsataj dise.
+> la kanalkonfiguro (`esperantoradio_konfiguro.json`), ne parsataj dise.
 >
 > Ekzistas tamen `RadioTxtKomparilo` (en `desktopApp/`) kiu komparas la kanalkonfiguron
 > kun la reala `esperanto-radio.com/radio.txt` por identigi mankantajn kanalojn

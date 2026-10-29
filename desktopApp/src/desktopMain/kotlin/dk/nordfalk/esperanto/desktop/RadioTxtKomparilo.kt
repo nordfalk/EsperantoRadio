@@ -23,7 +23,7 @@ fun main() {
 
     // 1. Legu la kanalkonfiguron
     val configTeksto = object {}.javaClass.classLoader
-        .getResourceAsStream("esperantoradio_kanaloj_v9.json")!!
+        .getResourceAsStream("esperantoradio_konfiguro.json")!!
         .bufferedReader().readText()
     val agordo = KanalAgordoLeganto().legu(configTeksto)
     val kanaloj = agordo.kanaloj.map { it.alKanalo() }

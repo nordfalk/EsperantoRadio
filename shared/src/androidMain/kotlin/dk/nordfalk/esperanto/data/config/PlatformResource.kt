@@ -9,6 +9,6 @@ import android.content.Context
 lateinit var appContext: Context
 
 actual fun leguPakititanKanalkonfiguron(): String {
-    return appContext.assets.open("esperantoradio_kanaloj_v9.json")
+    return appContext.assets.open("esperantoradio_konfiguro.json")
         .bufferedReader().use { it.readText() }
 }

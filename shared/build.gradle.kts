@@ -31,7 +31,7 @@ val generuApoVersio by tasks.registering {
 // sinkrone (wasmJs: nur nesinkrona fetch; iOS: ankoraŭ neniu resurco-mekanismo).
 // La fonto restas la sama dosiero — neniu duobligita konfiguro.
 val generuEnigitanKanalkonfiguron by tasks.registering {
-    val fonto = layout.projectDirectory.file("src/commonMain/resources/esperantoradio_kanaloj_v9.json")
+    val fonto = layout.projectDirectory.file("src/commonMain/resources/esperantoradio_konfiguro.json")
     val celDosierujo = layout.buildDirectory.dir("generated/sources/kanalkonfiguro/kotlin")
     inputs.file(fonto)
     outputs.dir(celDosierujo)
@@ -51,7 +51,7 @@ val generuEnigitanKanalkonfiguron by tasks.registering {
         dosiero.parentFile.mkdirs()
         dosiero.writeText(
             "package dk.nordfalk.esperanto.data.config\n\n" +
-            "// GENERITA de la Gradle-tasko generuEnigitanKanalkonfiguron el esperantoradio_kanaloj_v9.json — NE REDAKTU\n" +
+            "// GENERITA de la Gradle-tasko generuEnigitanKanalkonfiguron el esperantoradio_konfiguro.json — NE REDAKTU\n" +
             "internal val ENIGITA_KANALKONFIGURO: String = \"" + eskapita + "\"\n"
         )
     }

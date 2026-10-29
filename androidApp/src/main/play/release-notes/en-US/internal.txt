@@ -1,6 +1,8 @@
-Nova en 3.1.1-beta29okt (interna testo):
+Nova en 3.1.0:
 
-🎙 Nova kanalo: HUMILOPINIE (ManchaPod) - pensaĵoj kaj enaj debatoj
-✉ Nova ero "Proponu kanalon" en la naviga tirkesto
-⏩ Kelkaj kanaloj transsaltas sian ripetan enkondukon (babibejo, iro, fremdulo, Le Monde, polar radio, Universala Lindo) - nur se vi jam aŭkultis la kanalon dum la lasta monato
-🔧 La kanalkonfiguro nun vivas en unu dosiero por ĉiuj platformoj
+⚡ Amaso da plibonigoj, ekzemple kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito
+🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston, la mini-ludilbreto restas ĉiam videbla
+- La malsupra naviga breto estas anstataŭigita per naviga tirkesto
+🔔 Sciigoj pri novaj elsendoj - limigataj al maks. 7 samtempe, maks. 3 po kanalo
+⏰ Vekhorloĝo: tempo per ciferplato, kanalo per kanal-elektilo
+🗣️ Plibonigita esperanta lingvaĵo en la tuta apo

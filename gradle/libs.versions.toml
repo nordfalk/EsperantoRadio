@@ -3,7 +3,7 @@
 # Vidu docs/nova/02_teknika_stako.md por la teknika stako.
 
 [versions]
-apoversio = "3.1.1-beta29okt"  # Interna testo de PR #144 (la sekvanta versio estos 3.1.1)
+apoversio = "3.1.0"  # La aktuala versio de la apo
 kotlin = "2.4.21"
 compose-multiplatform = "1.12.2"
 compose-material3 = "1.13.0-alpha01"

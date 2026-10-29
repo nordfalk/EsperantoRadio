@@ -396,6 +396,22 @@
   natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
   ĝi povus proponi la valoron por ĉiu kanalo.
 
+#### C60 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
+- **Statuso**: [ ]
+- **Fonto**: recenz-komento pri PR #144, punkto 6 (2026-10-29)
+- **Priskribo**: la ŝlosiloj en la `android`-sekcio de `esperantoradio_konfiguro.json`
+  (`aktualaVersio`, `funkciaAnonco`) estas nenie legataj — pure mortaj datumoj
+  (ĝis 2026-10-29). Ili estas verŝajne celitaj por estonta uzo (versio-montrilo;
+  `funkciaAnonco` = la malnova `drift_statusmeddelelse` = provizora mesaĝo pri
+  funkciaj problemoj), sed neniu kodo konsumas ilin. Krome la nom-tribuo miksiĝas
+  (ambaŭ camelCase, dum `apaj_novaĵoj` estas snake_case).
+- **Sugesto**: decidu ĉu (a) realigi la celatan uzon — `aktualaVersio` povus
+  averti la uzanton pri malnova versio (ekz. en Pri-ekrano, C51(g));
+  `funkciaAnonco` povus esti mesaĝo pri kanal-funkciado (Muzaiko mortas ktp.,
+  ligita al la diagnozo-sistemo) — aŭ (b) forigi ilin ĝis tiam. Unuigu la
+  nom-stilon kiam ili ekviviĝos (elektu snake_case kiel `apaj_novaĵoj` aŭ
+  konsekvence camelCase por la tuta android-sekcio).
+
 ---
 
 

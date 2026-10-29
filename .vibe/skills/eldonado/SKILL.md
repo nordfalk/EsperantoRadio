@@ -17,6 +17,14 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    `--head <branĉo>` (la loka fetch-refspec estas limigita al master). La
    paŝoj 4 (etikedo) kaj 6 (publish) okazas nur POST la squash-kunfando: la
    etikedo devas stari sur la SQUASH-komito sur master, ne sur la branĉa komito.
+   **Internaj eldonoj NENIAM restu en la PR** (2026-10-29, decido de la
+   posedanto): se vi faras internan teston-eldonon el PR-branĉo, NE komitu la
+   eldonan libraron (apoversio-beta-nomo, versionCode-baskulo, internal.txt)
+   al la PR — faru ilin en la laborarbo SEN commito (aŭ forigu/revertu la
+   komiton tuj post la publikigo). Nur la versionCode restas konsumita ĉe
+   Play (ne re-uzebla); la venonta vera eldono prenas la sekvan liberan
+   versionCode. La interna testo estas esplorilo por la PR, ne parto de ĝia
+   historio.
 1. **`apoversio`** en `gradle/libs.versions.toml` ricevas la novan nombron (unu fonto de
    vero por `versionName`/Sentry — `ApoVersio.kt` generiĝas el ĝi).
 2. **Baskulu `versionCode`** en `androidApp/build.gradle.kts` (`defaultConfig.versionCode`).

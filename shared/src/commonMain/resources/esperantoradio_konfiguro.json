@@ -79,6 +79,7 @@
 		}
 	,{
 			"kodo": "polaretradio",
+			"transsaltuKomenceSekundojn": 22.0,
 			"nomo": "Pola Retradio",
 			"priskribo": "Volontula daŭrigo de la historia pola radio-elsendo (1959-2011). Nova elsendo ĉiun kvinan tagon.",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
@@ -91,6 +92,7 @@
 		}
 	,{
 			"kodo": "babibejo",
+			"transsaltuKomenceSekundojn": 50.0,
 			"nomo": "BabiBEJO",
 			"priskribo": "Podkasto de la Brazila Esperantista Junularo pri junulara vivo, kulturo kaj agadoj en Brazilo.",
 			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
@@ -214,6 +216,7 @@
 		},
 		{
 			"kodo": "universeala-lindo",
+			"transsaltuKomenceSekundojn": 39.0,
 			"nomo": "Universeala Lindo, la argentina podkasto",
 			"priskribo": "Argentina podkasto pri Esperanto kaj la vivo en Sudameriko.",
 			"emblemoUrl": "",
@@ -223,6 +226,7 @@
 		}
 	,{
 			"kodo": "fremdulo",
+			"transsaltuKomenceSekundojn": 11.0,
 			"nomo": "Fremdulo 3",
 			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto — kun buntaj gastoj.",
 			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
@@ -276,6 +280,7 @@
 		}
 	,{
 			"kodo": "lemondediplomatique",
+			"transsaltuKomenceSekundojn": 11.0,
 			"nomo": "Le Monde diplomatique en Esperanto",
 			"priskribo": "Voĉlegitaj artikoloj el la mondfama revuo Le Monde diplomatique.",
 			"elsendojRssUrl": "https://feeds.acast.com/public/shows/65d51e18498c29001629f76a",
@@ -292,6 +297,7 @@
 		}
 	,{
 			"kodo": "iro",
+			"transsaltuKomenceSekundojn": 21.0,
 			"nomo": "Internacia Afrika Retradio",
 			"priskribo": "Novaĵbultenoj kaj kulturaj kaj mitologiaj elsendoj de la internacia ĵurnalista teamo (eks. Afrika Retradio).",
 			// AzuraCast-fluo sur la sama servilo kiel Muzaiko (fluo.muzaiko.info); la fluo listas la epizodojn plej malnovajn unue

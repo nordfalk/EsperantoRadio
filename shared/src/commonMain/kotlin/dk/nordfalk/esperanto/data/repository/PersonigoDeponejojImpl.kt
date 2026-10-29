@@ -59,6 +59,11 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
     private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(emptyMap())
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
+    /** Test-helpo: rekte enmetu ludaton (ekz. kun difinita lasteLudita — C59a-testoj). */
+    fun enmetuLudaton(ludata: LudataElsendo) {
+        _ludatoj.value = _ludatoj.value + (ludata.elsendoId to ludata)
+    }
+
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long) {
         val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]

@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
+import kotlin.time.Clock
 
 /**
  * LudvicoRegilo — kontrolas daŭran ludadon kun aŭtomata sekva-ludado.
@@ -567,10 +568,16 @@ class LudvicoRegilo(
         // Grava evento — ĉiam al Sentry: ekludo de elsendo kun la kanalo
         logGrava("Ludvico", "Ekludo: '${elsendo.titolo}' (kanalo: ${elsendo.kanaloNomo ?: elsendo.kanaloSlug})")
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
-        // C59a: transsaltu la ripetiĝantan enkondukon de la kanalo, se agordita
-        // (dato-movita el la kanalkonfiguro; 0 = konduto senŝanĝa)
-        val saltuMs = (kanaloDeponejo.observiKanalojn().value
-            .find { it.slug == elsendo.kanaloSlug }?.transsaltuKomenceSekundojn ?: 0) * 1000L
+        // C59a: transsaltu la ripetiĝantan enkondukon de la kanalo, se agordita —
+        // sed nur se la uzanto JAM aŭskultis ion de tiu kanalo dum la pasinta
+        // monato (novaj aŭskultantoj unue aŭdu la enkonduk-identecon).
+        // Dato-movita el la kanalkonfiguro; 0 = konduto senŝanĝa.
+        val saltuMs = if (aŭskultisDumPasintaMonato(elsendo.kanaloSlug)) {
+            ((kanaloDeponejo.observiKanalojn().value
+                .find { it.slug == elsendo.kanaloSlug }?.transsaltuKomenceSekundojn ?: 0.0f) * 1000.0f).toLong()
+        } else {
+            0L
+        }
         val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
             logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
             maxOf(ludato.pozicioMs, saltuMs)
@@ -628,6 +635,18 @@ class LudvicoRegilo(
         savuPozicion()
     }
 
+    /**
+     * Ĉu la uzanto aŭskultis iun elsendon de la kanalo dum la pasinta monato —
+     * kondiĉo de la enkonduk-transsalto (C59a): novaj aŭskultantoj unue aŭdu
+     * la enkonduk-identecon de la kanalo.
+     */
+    @OptIn(kotlin.time.ExperimentalTime::class)
+    private fun aŭskultisDumPasintaMonato(kanaloSlug: String): Boolean {        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_MONATO_MS
+        return ludatojDeponejo.observiLudatojn().value.values.any {
+            it.kanaloSlug == kanaloSlug && it.lasteLudita >= limo
+        }
+    }
+
     companion object {
         /** Kiom ofte savas pozicion dum ludado (ms). */
         const val POZICIO_SAV_INTERVALO_MS = 5000L
@@ -635,5 +654,7 @@ class LudvicoRegilo(
         const val MAKS_ERAROJ = 10
         /** Grandeco de la dedup-fenestro por finoj (PR #89). */
         const val TRAKTITAJ_FONTOJ_MAKS = 4
+        /** Kiom longe "ĵusa aŭskolto" validas por la enkonduk-transsalto (C59a). */
+        const val TRANSSALTA_MONATO_MS = 30L * 24 * 60 * 60 * 1000
     }
 }

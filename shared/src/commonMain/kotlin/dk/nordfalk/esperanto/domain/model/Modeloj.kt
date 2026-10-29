@@ -25,11 +25,13 @@ data class Kanalo(
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
     /**
-     * Kiom da sekundoj transsalti ĉe la komenco de ĉiu elsendo de tiu kanalo —
-     * por ripetiĝantaj enkondukoj (FAROTA C59a; datum-movita, el la JSONC).
-     * 0 = ne transsalti.
+     * Kiom da sekundoj (fra kleceble, ekz. 12.5) transsalti ĉe la komenco de ĉiu
+     * elsendo de tiu kanalo — por ripetiĝantaj enkondukoj (FAROTA C59a; datum-movita,
+     * el la JSONC). 0 = ne transsalti. La transsalto efikas nur por uzanto, kiu jam
+     * aŭskultis ion de tiu kanalo dum la pasinta monato (novaj aŭskultantoj aŭdu la
+     * enkonduk-identecon).
      */
-    val transsaltuKomenceSekundojn: Int = 0,
+    val transsaltuKomenceSekundojn: Float = 0.0f,
     @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null

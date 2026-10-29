@@ -117,8 +117,8 @@ data class KanaloDto(
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
-    /** Kiom da sekundoj transsalti ĉe la komenco de ĉiu elsendo (ripetiĝanta enkonduko — FAROTA C59a). */
-    val transsaltuKomenceSekundojn: Int = 0,
+    /** Kiom da sekundoj (frakcieble) transsalti ĉe la komenco de ĉiu elsendo (ripetiĝanta enkonduko — FAROTA C59a). */
+    val transsaltuKomenceSekundojn: Float = 0.0f,
     val defaŭltŜatata: Boolean = false,
 )
 

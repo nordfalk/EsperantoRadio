@@ -168,8 +168,10 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
   post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
   nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
-  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
-  (2026-10-17, regulo de la uzanto). Same por kod-dosieroj, kiam la ŝanĝoj tuŝas
+  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI
+  (2026-10-17, regulo de la uzanto). **Tamen NE kunfandu sen aparta, eksplikita
+  peto de la uzanto** — eĉ ne por tekstaj/agentaj PR-oj; «ne atendu CI» rajtigas
+  nur la ŝparon de la atendo, ne la kunfandon. Same por kod-dosieroj, kiam la ŝanĝoj tuŝas
   NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas ion ajn
   (2026-10-25, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —

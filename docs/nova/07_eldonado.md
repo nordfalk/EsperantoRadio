@@ -6,9 +6,9 @@
 
 | Vendejo | Aŭtomateco | Postuloj                           | Stato |
 |---|---|------------------------------------|---|
-| **Google Play** | Tute aŭtomata per Gradle Play Publisher (GPP) | Servila konto JSON, $25-konto      | Agordita — bezonas servilan konton |
-| **F-Droid** | Duon-aŭtomata (F-Droid konstruas mem el fonto) | GPL-permesilo, GitLab-konto        | Metadato pretigita — bezonas MR al fdroiddata |
-| **Aptoide** | Duon-aŭtomata (API havebla) | Aptoide Connect-konto, API-ŝlosilo | Bezonas konton kaj API-ŝlosilon |
+| **Google Play** | Tute aŭtomata per Gradle Play Publisher (GPP) | Servila konto JSON, $25-konto      | Aktiva (eldonado de la loka maŝino) |
+| **F-Droid** | Duon-aŭtomata (F-Droid konstruas mem el la git-etikedo) | GPL-permesilo, GitLab-konto | Metadateno + nesubskribita konstruo pretaj (2026-10-29) — restas: MR al fdroiddata |
+| **Aptoide** | Duon-aŭtomata (retkonzolo, API havebla) | Aptoide Connect-konto | Restas: posedanto kreas konton kaj alŝutas la APK-on |
 
 ---
 
@@ -92,68 +92,109 @@ Agordita track: `internal` (interna testado — ŝanĝu al `alpha`, `beta` aŭ `
 ## 2. F-Droid
 
 F-Droid funkcias alie ol Google Play — **vi ne alŝutas APK-on**. F-Droid mem
-konstruas la apon el via fontkodo kaj subskribas ĝin.
+konstruas la apon el via fontkodo (el la git-etikedo) kaj subskribas ĝin per
+sia propra ŝlosilo.
 
-### Kio estas pretigita
+### Kio estas pretigita (2026-10-29, C50)
 
-- Metadatena ŝablono: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml`
-- GPL-3.0-or-later permesilo (kongrua kun F-Droid-postuloj)
+- **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — laŭ la
+  nuna fdroiddata-formato, kun `Builds`-ero por 3.1.0/252 (etikedo `v3.1.0`),
+  `AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags`, dulingva priskribo
+  (eo + en-US). Rekte submetebla kiel `metadata/dk.nordfalk.esperanto.radio.yml`.
+- **Nesubskribita konstruo**: la release-buildtype en `androidApp/build.gradle.kts`
+  subskribas nur kiam la keystore-dosiero ekzistas. Sen `secrets.properties` kaj
+  sen keystore `./gradlew :androidApp:assembleRelease` produktas
+  `androidApp-release-unsigned.apk` (kontrolita 2026-10-29 en pura worktree);
+  F-Droid subskribas ĝin mem per sia ŝlosilo.
+- **Permesilo**: GPL-3.0-or-later (`LICENSE` en la radiko) — kongrua.
+- **Neniuj binaroj en la deponejo** krom la norma
+  `gradle/wrapper/gradle-wrapper.jar`, kiun la F-Droid-skanilo konas.
+- **Gradle-versio**: F-Droid rulas `gradlew-fdroid` (propra reiaĵo de la
+  gradlew-rajto, kiu elŝutas la version de `gradle/wrapper/gradle-wrapper.properties`
+  kun SHA-256-kontrolo). Ĝi serĉas la dosieron ankaŭ en la gepatra dosierujo —
+  do `subdir: androidApp` trovas la radikan `gradle/wrapper/`. La tasko
+  `assembleRelease` lanĉita el `androidApp/` solviĝas kiel `:androidApp:assembleRelease`
+  (kontrolite 2026-10-29). Gradle 9.8.1 do ne dependas de la versio sur la
+  buildservilo.
+- **JDK**: la Android-konstruo funkcias sur JDK 17 (same kiel loke).
+
+### Kion FARAS F-Droid kun nia metadateno
+
+```yaml
+Builds:
+  - versionName: '3.1.0'
+    versionCode: 252
+    commit: v3.1.0
+    subdir: androidApp
+    gradle:
+      - yes
+```
+
+Tio signifas: elprenu `v3.1.0`, rulu `gradlew-fdroid assembleRelease` en
+`androidApp/`, trovu la APK-on, subskribu per la F-Droid-ŝlosilo.
+(ATENTU: la `gradle:`-kampo signifas GUSTUMOJN, ne taskojn — `yes` = sen
+gustumo, do `assembleRelease`. Pliaj taskoj iras en `preassemble:`.)
 
 ### Paŝoj por eldoni
 
-1. **Kreu GitLab-konton** ĉe https://gitlab.com (se vi ne jam havas)
-
-2. **Forku la fdroiddata-deponejon**:
-   - Iru al https://gitlab.com/fdroid/fdroiddata
-   - Klaku "Fork"
-
-3. **Kopiu la metadatumojn**:
+1. **Kreu GitLab-konton** ĉe https://gitlab.com (se vi ne jam havas).
+2. **Forku https://gitlab.com/fdroid/fdroiddata**.
+3. **Kopiu la metadatumojn** al fork-branĉo nomata laŭ la apo:
    ```bash
    git clone https://gitlab.com/VIA_UZANTNOMO/fdroiddata.git
-   cp fdroid/metadata/dk.nordfalk.esperanto.radio.yml \
-      fdroiddata/metadata/dk.nordfalk.esperanto.radio.yml
+   cd fdroiddata
+   git checkout -b dk.nordfalk.esperanto.radio
+   cp /vojo/al/EsperantoRadio/fdroid/metadata/dk.nordfalk.esperanto.radio.yml \
+      metadata/dk.nordfalk.esperanto.radio.yml
+   git add metadata/dk.nordfalk.esperanto.radio.yml
+   git commit -m "New App: dk.nordfalk.esperanto.radio"
+   git push origin dk.nordfalk.esperanto.radio
    ```
+4. **Kreu merge request** al `fdroid/fdroiddata`. La GitLab-CI de fdroiddata
+   aŭtomate provas konstrui — se ĝi malsukcesas, la eligilo montras kial.
+5. **Atendu la revizion** (tigoj ĝis semajnoj); respondu al demandoj de la
+   kontrolistoj en la MR-fadeno.
 
-4. **Kreu git-etikedon** en ĉi tiu deponejo:
-   ```bash
-   git tag v3.0.0
-   git push origin v3.0.0
-   ```
-   La etikedo devas kongrui kun `versionName` kaj `versionCode` en `build.gradle.kts`.
+### Estontaj ĝisdatigoj
 
-5. **Kreu merge request** al `fdroid/fdroiddata`:
-   - La F-Droid-teamo revizios vian MR
-   - Procezo povas daŭri tagojn ĝis semajnojn
-   - Post aprobo, F-Droid aŭtomate konstruas kaj eldonas la apon
+Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
+`AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags` igas F-Droid-on
+aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
-6. **Estontaj ĝisdatigoj**: kreu novan git-etikedon (`v3.0.1`, `v3.1.0`, ktp.)
-   kaj puŝu ĝin. F-Droid aŭtomate detektos kaj rekonstruos.
+### Sentry kaj la "Tracking"-kontraŭeco (DECIDO DE LA POSEDANTO)
 
-### Reprodukteblaj konstruoj (rekomendita)
+La apo aŭtomate raportas erarojn kaj protokolojn al sentry.io (ne-debug-
+konstruoj sur realaj aparatoj, sen konsento de la uzanto). Laŭ la
+F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio estas la
+kontraŭeco **Tracking**. Konsekvencoj:
 
-Por ke F-Droid povu kontroli ke ĝia konstruo kongruas kun via, la konstruo devas esti reproduktebla:
+- La apo **ne estas blokita** pro tio — ĝi ricevas la etikedon `Tracking` kaj
+  aperas en la defaŭlta listo nur al uzantoj, kiuj elektis montri tiajn apojn.
+- Sen la kontraŭeco eblas nur se la raportado iĝas **opt-in** (demando je la
+  unua starto, defaŭlte malŝaltita). Tio draste malpliigus la erar-raportojn,
+  sur kiuj la protokolita diagnoses dependas (C48/G44).
 
-- `isMinifyEnabled = false` (jam agordita)
-- Neniuj dependecoj kiuj varias inter konstruoj (ekz. tempor-markoj en dosiernomoj)
-- Konservu versionCode/versionName stabilaj inter etikedo kaj build.gradle
+### Reprodukteblaj konstruoj (opcia, estonta)
 
-Por reproduktebleco, oni povas specifi `AllowedAPKSigningKeys` en la metadatumoj
-kun la SHA-256 de via subskriba atestilo.
+Norma F-Droid-konstruo estas subskribita per la F-Droid-ŝlosilo. Se ni iam volas,
+ke F-Droid disdonu NIAN APK-on kun nia subskribo (sen re-instalo inter
+F-Droid- kaj Play-uzantoj), la konstruo devas esti bit-identa:
 
-### Propra F-Droid-nightly-repo (opcia)
+- `dependenciesInfo { includeInApk = false; includeInBundle = false }` en
+  `androidApp/build.gradle.kts` (vidu https://gitlab.com/fdroid/fdroiddata/-/issues/3330)
+- `AllowedAPKSigningKeys: aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16`
+  en la metadateno (SHA-256 de nia subskriba atestilo, 2026-10-29)
 
-Por evoluantoj kiuj volas tujajn ĝisdatigojn sendepende de la oficiala F-Droid-revizio:
+### Propra F-Droid-repo (opcia)
+
+Por tujaj ĝisdatigoj sendepende de la oficiala revizio ekzistas propra
+fdroid-repo (uzantoj aldonas ĝin per deponeja URL):
 
 ```bash
-# Instalu fdroidserver
 sudo apt install fdroidserver
-
-# Kreu novan deponejon
 mkdir ~/fdroid-repo && cd ~/fdroid-repo
 fdroid init
 fdroid update --create-metadata
-
-# Aldonu vian APK-on
 cp androidApp/build/outputs/apk/release/androidApp-release.apk ~/fdroid-repo/
 fdroid update
 ```
@@ -164,52 +205,49 @@ Dokumentaro: https://f-droid.org/docs/Publishing_Nightly_Builds/
 
 - Quick Start: https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/
 - Build Metadata Reference: https://f-droid.org/docs/Build_Metadata_Reference/
-- Reprodukteblaj konstruoj: https://f-droid.org/docs/Reproducible_Builds/
+- Anti-Features (Tracking): https://f-droid.org/en/docs/Anti-Features/
+- FAQ por ap-evoluigistoj: https://f-droid.org/gd/docs/FAQ_-_App_Developers/
 - fdroiddata-deponejo: https://gitlab.com/fdroid/fdroiddata
-- F-Droid-stilo: https://f-droid.org/docs/All_about_descriptions/
+- gradlew-fdroid: https://gitlab.com/fdroid/gradlew-fdroid
+- Priskribo-stilo: https://f-droid.org/docs/All_about_descriptions/
 
 ---
 
 ## 3. Aptoide
 
-Aptoide havas API por aŭtomata alŝuto de APK/AAB.
+Aptoide estas memstara vendejo (ne necese FOSS-ema — kontroli iliajn kondiĉojn).
+La praktika vojo (2026-10-29) iras tra **Aptoide Connect**:
+https://docs.connect.aptoide.com/
 
 ### Paŝoj por eldoni
 
-1. **Kreu konton ĉe Aptoide Connect**:
-   - Iru al https://connect.aptoide.com/
-   - Registriĝu kiel evoluanto
+1. **Kreu konton** ĉe https://connect.aptoide.com/ kaj ensalutu al la konzolo.
+2. **Aldonu la apon** (pako `dk.nordfalk.esperanto.radio`). Ĉar la apo jam
+   ekzistas en Google Play, Aptoide Connect prenas la metadatumojn de tie —
+   titolo, priskribo kaj ekranfotoj neniam redakteblas duoble.
+3. **Pruvu la posedon** de la pako-nomo (propra paŝo de Aptoide Connect;
+   sekvu la instrukciojn en la konzolo — ili postulas, ke la posedanto
+   respondu al la identigilo ligita al la Play-listing).
+4. **Alŝutu la APK-on** (`androidApp-release.apk`, subskribita per nia ŝlosilo —
+   sama APK kiel en Play; uzu per ilia retkonzolo). Aptoide disdonas la
+   **samsubskribajn** ĝisdatigojn, do la elŝutejo montras la saman version.
+5. **Revizio**: Aptoide kontrolas la politikon; post akcepto la apo publikiĝas.
 
-2. **Akiru API-ŝlosilon**:
-   - En la Aptoide Connect-konzolo, iru al **Settings** → **API Keys**
-   - Kreu novan API-ŝlosilon
+### Notoj
 
-3. **Alŝutu per API** (curl-ekzemplo):
-
-   ```bash
-   # Pliigu versionCode kaj versionName en androidApp/build.gradle.kts unue!
-   export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-   ./gradlew :androidApp:assembleRelease
-
-   # Alŝutu al Aptoide
-   curl -X POST \
-     "https://api.aptoide.com/v1/api/uploadApp/v3" \
-     -H "Authorization: Bearer VIA_API_SXLOSILON" \
-     -F "apk=@androidApp/build/outputs/apk/release/androidApp-release.apk" \
-     -F "package_name=dk.nordfalk.esperanto.radio" \
-     -F "version_code=244" \
-     -F "version_name=3.0.0"
-   ```
-
-   Noto: La preciza API-endpoint kaj parametroj povas varii — vidu la oficialan dokumentaron.
-
-4. **Permana alternative**: Uzu la Aptoide Connect-retinterfacon por alŝuti la APK-on.
+- Aptoide Connect mencias **kotizon/abonon** por iuj funkcioj — kontrolu la
+  nunajn kondiĉojn en la konzolo antaŭ ol subskribi ion.
+- API por aŭtomata alŝuto ekzistas (vidu https://docs.connect.aptoide.com/),
+  sed la unua eldono per la retkonzolo estas pli simpla; aŭtomatigebla poste.
+- La `eldonado.yml`-CI alŝutas la APK-on kiel GitHub-artefakton — ĝi estas
+  elŝutebla por permana alŝuto al Aptoide.
+- La servo estas **nedeviga**: neniuj partoj de la apo dependas de Aptoide
+  (neniuj Aptoide-SDK-oj estas integritaj).
 
 ### Ligiloj
 
 - Aptoide Connect: https://connect.aptoide.com/
-- Uploader API-dokumentaro: https://docs.connect.aptoide.com/reference/android-app-version-submission-api
-- API-plena dokumentaro: https://docs.connect.aptoide.com/
+- Dokumentaro: https://docs.connect.aptoide.com/
 
 ---
 
@@ -259,14 +297,14 @@ Agordu ilin ĉe: GitHub → Deponejo → Settings → Secrets and variables → 
    - `KEYSTORE_PASSWORD=xxxxxx ./gradlew :androidApp:publishReleaseApk`
 
 2. **F-Droid**:
-   - Forku `fdroiddata` ĉe GitLab
-   - Kopiu `fdroid/metadata/dk.nordfalk.esperanto.radio.yml`
-   - Kreu MR
+   - Kreu GitLab-konton, fork `fdroiddata`
+   - Kopiu `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` al `metadata/`
+   - Kreu MR kaj sekvu la fdroiddata-CI-konstruon
 
 3. **Aptoide**:
    - Kreu konton ĉe Aptoide Connect
-   - Akiru API-ŝlosilon
-   - Alŝutu APK per API aŭ retinterfaco
+   - Aldonu la apon, pruvu la posedon de la pako-nomo
+   - Alŝutu `androidApp-release.apk` per la retkonzolo
 
 4. **CI/CD**:
    - Agordu GitHub-sekretajn variablojn (keystore + Play JSON)

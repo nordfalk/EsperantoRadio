@@ -64,7 +64,13 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            // Subskribu nur kiam la keystore-dosiero reale ekzistas. Tio ebligas
+            // nesubskribitan release-konstruon en medioj SEN la sekretoj (F-Droid,
+            // senkolora CI) — ili subskribas la APK-on mem per sia propra ŝlosilo.
+            // Loke la keystore ekzistas, do la kutima subskribita konstruo ne ŝanĝiĝas.
+            if (signingConfigs.getByName("release").storeFile?.exists() == true) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             applicationIdSuffix = ".alfa"

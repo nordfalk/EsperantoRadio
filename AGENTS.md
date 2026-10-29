@@ -185,6 +185,9 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
   teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
   per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
+  Legu ankaŭ la erarmesaĝon mem — ĝi montras la plej proksiman kongruon kaj
+  malkaŝas tiel ĵus enŝtelintajn tiperojn (2026-10-29: «sourpuce» anstataŭ
+  «source» en la dana README-linio, forkonsumita de PR #143).
 - **Esperanto-ortografio: nur veraj supersignoj** (renomo 2026-10-24): ĉiuj identigiloj,
   klasoj kaj dosier-nomoj uzas `ŝ ĝ ĉ ĵ ŭ` (`ŝargiElsendojnPorKanal`, `ElŝutStato.kt`,
   `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
@@ -215,6 +218,19 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   ĉiu karto).
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **Recenzo-komentoj de la posedanto povas esti nudpunktaj** (2026-10-29, PR #143):
+  «forigu» aŭ nura citita linio signifas forig-peton (ekz. redundan,
+  mem-referencan linion). Agu, respondu en la fadeno per la komita-ŝlosilo
+  (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
+  forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
+  etikedon `preterlasu-changelog` (REST: `gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **GitHub ne vidigas `.html`-dosierojn en la deponejo** (2026-10-29): ili montriĝas
+  kiel fontokodo — tio estas intenca. Solvo: **GitHub Pages** el `master:/docs`
+  (aktivigita 2026-10-29; la Pages-API postulas la vojon kun klino:
+  `source[path]=/docs`, nura `docs` donas 422). Ligiloj al `.html`-dosieroj en
+  README/dokumentoj iru al la Pages-URL (`https://nordfalk.github.io/EsperantoRadio/…`);
+  Pages rekonstruas aŭtomate je ĉiu puŝo al master. MD-dosieroj en `docs/`
+  estas Jekyll-transformataj; la deponeja fonto restas la vero.
 - **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
   `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 ("non-pending") —
   korektu per GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId`

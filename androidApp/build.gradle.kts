@@ -39,8 +39,7 @@ android {
     namespace = "dk.nordfalk.esperanto.android"
     compileSdk = 37
 
-    // EKSPERIMENTO (FAROTA - unuopa kanalkonfiguro): la agorda JSONC venas rekte el
-    // shared/commonMain/resources - neniu duobla kopio en androidMain/assets.
+    // La agorda JSONC por androidMain/assets venas el shared/commonMain/resources
     sourceSets {
         getByName("main") {
             assets.srcDir(rootProject.layout.projectDirectory.dir("shared/src/commonMain/resources"))

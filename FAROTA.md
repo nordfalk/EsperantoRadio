@@ -362,7 +362,12 @@
   (frakcieblaj valoroj), efikas nur se la uzanto jam aŭkultis ion de la sama kanalo
   dum la pasinta monato (TRANSSALTA_MONATO_MS = 30 tagoj); komenco = max(savitaPozicio,
   transsalto); 6 testoj. Neniuj valoroj ankoraŭ agorditaj — ili atendas (b).
-  RESTAS: (b) la detekta-ilo kaj la valoroj po kanalo)
+  RESTAS: (b) aŭtomata detekta-ilo. Mana detekto farita 2026-10-29 por 6 kanaloj
+  (3 plej freŝaj elsendoj po kanalo; ffmpeg-elŝuto de 120 s; spektrograma
+  kosino-simileco kun ŝovo-serĉo): nur **kernpunkto** havas komunan enkondukon
+  (ripetaĵo – 8-25 s, ĉiuj 3 paroj kongruas) → agordita 24.0; varsoviavento,
+  lamalfamuloj, neparolupriesperanto, humilopinie, rakontatempo — neniu kohera
+  komuna komenco → 0)
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas

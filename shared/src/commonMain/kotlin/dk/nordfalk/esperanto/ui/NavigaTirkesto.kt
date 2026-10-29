@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MusicNote
@@ -77,6 +78,22 @@ fun NavigaTirkesto(
                 onClick = { logi("Klako", "tirkesto: $etikedo"); onElektu(vojo) },
             )
         }
+
+        // "Proponi kanalon" — retpoŝta butono al la prizorganto (FAROTA C57)
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Filled.Email, contentDescription = null) },
+            label = { Text("Proponi kanalon") },
+            selected = false,
+            onClick = {
+                logi("Klako", "tirkesto: proponi kanalon")
+                malfermuRetpoŝton(
+                    retpoŝto = "jacob.nordfalk@proton.me",
+                    temo = "Kanalo-propono por EsperantoRadio",
+                    teksto = "Saluton!\n\nMi proponas la kanalon <nomo>:\n\nRSS-fluo: <url>\nPriskribo: <…>\n\nDankon!",
+                )
+            },
+        )
     }
 }
 

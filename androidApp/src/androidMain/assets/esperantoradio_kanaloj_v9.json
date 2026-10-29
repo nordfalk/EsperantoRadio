@@ -256,7 +256,19 @@
 			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/70e4cc48a445832bdc21f89ac01c9fd5.jpg",
 			"retpoŝto": "manchapod@gmail.com",
 			"hejmpaĝoButono": "https://www.spreaker.com/show/neparolupriesperanto"
-		}
+		},
+        {
+            "kodo": "humilopinie",
+            "nomo": "HUMILOPINIE",
+            "priskribo": "Pensaĵoj kaj enaj debatoj, kiuj ne havas lokon en la aliaj podkastoj de ManchaPod — la rajtigo pensi kaj pensigi.",
+            "elsendojRssUrl": "https://www.spreaker.com/show/6684993/episodes/feed",
+            "emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/da5d5077f5c8b40601fef016043876f1.jpg",
+            "retpoŝto": "manchapod@gmail.com",
+            "hejmpaĝoButono": "https://www.spreaker.com/podcast/humilopinie-manchapod--6684993",
+            "puriguModeloj": [
+                "Enigu min en la debato:(?:(?!</ul>).)*?</ul>(<br />)?"
+            ]
+        }
 	,{
 			"kodo": "radikalatenero",
 			"nomo": "Radikala tenero",

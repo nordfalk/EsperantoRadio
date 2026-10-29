@@ -24,6 +24,12 @@ data class Kanalo(
     val uzuWebViewPorElsendo: Boolean = false,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
+    /**
+     * Kiom da sekundoj transsalti ĉe la komenco de ĉiu elsendo de tiu kanalo —
+     * por ripetiĝantaj enkondukoj (FAROTA C59a; datum-movita, el la JSONC).
+     * 0 = ne transsalti.
+     */
+    val transsaltuKomenceSekundojn: Int = 0,
     @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null

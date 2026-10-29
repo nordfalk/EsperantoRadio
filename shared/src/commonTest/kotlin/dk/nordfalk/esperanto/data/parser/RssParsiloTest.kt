@@ -208,6 +208,40 @@ class RssParsiloTest {
         assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
     }
 
+    // === Regulo P6.1/P6.6 — HUMILOPINIE (ManchaPod, spreaker; C53) ===
+
+    @Test
+    fun parsasHumilopinion() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("humilopinie_feed.xml")
+        val kanalo = Kanalo(
+            slug = "humilopinie",
+            nomo = "HUMILOPINIE",
+            podkastaRssUrl = "https://www.spreaker.com/show/6684993/episodes/feed",
+            puriguModeloj = listOf("Enigu min en la debato:(?:(?!</ul>).)*?</ul>(<br />)?"),
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertTrue(elsendoj.size >= 33, "HUMILOPINIE devas havi almenaŭ 33 elsendojn: ${elsendoj.size}")
+
+        // La plej nova ero: "Jaroj kaj Jaroj", 2026-06-25, daŭro 70 s, spreaker-gvidilo
+        val jaroj = elsendoj.first { it.titolo == "Jaroj kaj Jaroj" }
+        assertEquals("humilopinie:https://api.spreaker.com/episode/72602928", jaroj.id)
+        assertEquals("2026-06-25", jaroj.dato)
+        assertEquals(70L, jaroj.daŭro, "Daŭro devas esti 70 s")
+        assertTrue(jaroj.fluo.endsWith(".mp3"), "Fluo devas finii per .mp3: ${jaroj.fluo}")
+        assertTrue(jaroj.fluo.contains("api.spreaker.com/download/episode/"), "Fluo: ${jaroj.fluo}")
+
+        // P6.6: la purig-modelo forigas la ripetan "Enigu min en la debato"-blokon
+        // el ĉiuj priskriboj (la temperita formo ne transiras alineojn)
+        for (e in elsendoj) {
+            assertTrue(e.priskribo?.contains("Enigu min en la debato") != true, "Priskribo devas esti purigita: ${e.priskribo?.take(60)}")
+            assertTrue(e.id.startsWith("humilopinie:"), "ID devas komenciĝi per 'humilopinie:': ${e.id}")
+            assertTrue(e.fluo.startsWith("https://"), "Fluo devas esti https: ${e.fluo}")
+        }
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
+    }
+
     // === Regulo P6.2 — Varsovia Vento (pluraj <audio> po ero) ===
 
     @Test

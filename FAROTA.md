@@ -275,7 +275,9 @@
 - **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
 
 #### C53 — Nova kanalo: HUMILOPINIE (ManchaPod) — kaj kontrolo de la ceteraj ManchaPod-fluoj
-- **Statuso**: [ ]
+- **Statuso**: [ ] (parta — HUMILOPINIE aldonita 2026-10-24 kun purig-modelo kontraŭ la
+  ripeta "Enigu min en la debato"-boilerplate kaj ora testo sur fiksaĵo; RESTAS: kontroli
+  "Una Vaga Idea" kaj "Cuéntame, Hermosura" pri Esperanto-epizodoj)
 - **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
 - **Priskribo**:
   - **"Ne Parolu pri Esperanto"** (spreaker-show **5202159**,
@@ -331,8 +333,10 @@
   servataj de la servilo aŭ rekte `<img>`-ebligataj. Kvanto-specimenado: mezuru ĉu la
   servila datumvojo povas esti subflue (sen CORS-kapoj) por ĉiuj 26 kanaloj.
 
-#### C57 — "Proponu kanalon"-butono (retpoŝta)
-- **Statuso**: [ ]
+#### C57 — "Proponi kanalon"-butono (retpoŝta)
+- **Statuso**: [x] (2026-10-24: ero en la naviga tirkesto — `malfermuRetpoŝton` al la
+  prizorganto kun antaŭplenigita ŝablono; reago-retpoŝto ankoraŭfoje decidiĝu ĉe eventuala
+  reorganizo de la prizorganta adreso)
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: butono kiu simple kreas retpoŝtan mesaĝon por proponi novan kanalon
   (al la prizorganto; kun antaŭskribita temo/korpo: nomo, RSS-URL, priskribo).
@@ -354,7 +358,9 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ]
+- **Statuso**: [ ] (parta — (a) FARITA 2026-10-24: nova agord-kampo `transsaltuKomenceSekundojn`
+  (DTO+modelo+LudvicoRegilo, `max(savitaPozicio, transsalto)`, 3 testoj); neniuj valoroj
+  agorditaj ĝis (b) trovos ilin. RESTAS: (b) la detekta-ilo kaj la valoroj po kanalo)
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas

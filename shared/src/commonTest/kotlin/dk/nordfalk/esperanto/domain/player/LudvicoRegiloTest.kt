@@ -124,6 +124,55 @@ class LudvicoRegiloTest {
         assertEquals(0, ludilo.stato.value.pozicioMs, "Devus komenci de 0 se neniu savita pozicio")
     }
 
+    // =========================================================================
+    // Transsaltado de ripetiĝanta enkonduko (C59a) — transsaltuKomenceSekundojn
+    // =========================================================================
+
+    @Test
+    fun transsaltasEnkondukonKunNeniuSavitaPozicio() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(20_000, ludilo.stato.value.pozicioMs, "Devus komenci je 20 s (transsaltita enkonduko)")
+    }
+
+    @Test
+    fun transsaltasEnkondukonKiamSavitaPozicioEstasEneDeĜi() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20)
+        // La uzanto ĉesis je 10 s — ene de la 20-sekunda enkonduko
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 10_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(20_000, ludilo.stato.value.pozicioMs, "Savita pozicio ene de la enkonduko → transsaltu ĝin")
+    }
+
+    @Test
+    fun savitaPozicioPostLaEnkondukoVenkas() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20)
+        // La uzanto ĉesis je 60 s — jam post la enkonduko; resumu normale
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 60_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(60_000, ludilo.stato.value.pozicioMs, "Savita pozicio post la enkonduko → resumu ĝin")
+    }
+
     @Test
     fun resumiĝo_komencasDeNuloSeFinita() = runTest {
         val ludilo = NoOpLudiloRegilo()

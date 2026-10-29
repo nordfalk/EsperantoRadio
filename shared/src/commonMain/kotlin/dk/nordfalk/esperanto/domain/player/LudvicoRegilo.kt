@@ -567,11 +567,18 @@ class LudvicoRegilo(
         // Grava evento — ĉiam al Sentry: ekludo de elsendo kun la kanalo
         logGrava("Ludvico", "Ekludo: '${elsendo.titolo}' (kanalo: ${elsendo.kanaloNomo ?: elsendo.kanaloSlug})")
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
+        // C59a: transsaltu la ripetiĝantan enkondukon de la kanalo, se agordita
+        // (dato-movita el la kanalkonfiguro; 0 = konduto senŝanĝa)
+        val saltuMs = (kanaloDeponejo.observiKanalojn().value
+            .find { it.slug == elsendo.kanaloSlug }?.transsaltuKomenceSekundojn ?: 0) * 1000L
         val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
             logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
-            ludato.pozicioMs
+            maxOf(ludato.pozicioMs, saltuMs)
         } else {
-            0L
+            saltuMs
+        }
+        if (saltuMs > 0) {
+            logi("Ludvico", "Transsaltas enkondukon de ${elsendo.kanaloSlug}: komenco je ${komencoPozicio}ms")
         }
 
         val lokaVojo = getLokaDosieroVojo(elsendo.id)

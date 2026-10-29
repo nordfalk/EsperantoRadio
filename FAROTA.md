@@ -180,9 +180,9 @@
 - **Sugesto**: forigu aŭ dokumentu; direktu la poziciojn al `LudatojDeponejo`.
 
 #### C39 — `AppStato`: duobla ŝargo de la sama kanalo (neniu in-flight dedup)
-- **Statuso**: [ ]
-- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faras duoblan elŝuton)
-- **Sugesto**: Mutex/Deferred per kanalo.
+- **Statuso**: [x]
+- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faris duoblan elŝuton)
+- **Riparo** (2026-10-29): in-flight dedup per kanalo en `ŝargiElsendojn` — `Mutex` + `Map<slug, Deferred>`; dua samtempa voko aliĝas al la daŭranta `Deferred` (lanĉita en sendependa skopo `Dispatchers.Default + SupervisorJob`, do ĝi finiĝas eĉ se la unua vokanto estas nuligita). La ero estas forigata kiam la ŝargo finiĝas (`invokeOnCompletion`) resp. kiam finiĝas la vokanto (`finally` kun `isCompleted`-kontrolo). Testo: `samtempajVokojPorSamaKanaloDedupatas` (du vokoj → 1 HTTP-peto).
 
 #### C40 — `gradle.properties`: `org.gradle.jvmargs=-Xmx1536m` malalta por KMP
 - **Statuso**: [ ]

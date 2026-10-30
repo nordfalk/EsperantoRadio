@@ -367,6 +367,9 @@
   (frakcieblaj valoroj), efikas nur se la uzanto jam aŭkultis ion de la sama kanalo
   dum la pasinta monato (TRANSSALTA_MONATO_MS = 30 tagoj); komenco = max(savitaPozicio,
   transsalto); 6 testoj. Neniuj valoroj ankoraŭ agorditaj — ili atendas (b).
+  Aldone (PR #144): snackbar „Transsaltis la enkondukon" kun klariga dialogo;
+  agordoj „Transsalti enkondukon" (ĉefa ŝaltilo) kaj „Sciigo pri transsaltita
+  enkondukon" („Bone" en la dialogo malŝaltas ĝin).
   RESTAS: (b) plena aŭtomatiĕo (la skripto jam ekzistas kiel la skill-o
   `enkonduk-detekto` kun `detekto.py`). Plena detekto farita 2026-10-29 (21 kanaloj
   analizitaj, 5 plej freŝaj elsendoj po kanalo; 6 preterlasitaj: muzaiko rekta-kanalo,

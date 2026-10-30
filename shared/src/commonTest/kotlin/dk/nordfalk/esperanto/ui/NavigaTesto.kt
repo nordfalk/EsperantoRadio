@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
@@ -296,7 +297,8 @@ class NavigaTesto {
         waitForIdle()
         onNodeWithText("Agordoj").assertIsDisplayed()
         onNodeWithText("Ludado").assertIsDisplayed()
-        onNodeWithText("Temo").assertIsDisplayed()
+        // La sekcio „Temo” povas esti sub la faldebla rando — volu al ĝi
+        onNodeWithText("Temo").performScrollTo().assertIsDisplayed()
     }
 
     @Test

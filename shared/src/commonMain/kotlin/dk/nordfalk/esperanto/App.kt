@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -35,6 +36,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
+import dk.nordfalk.esperanto.domain.player.TranssaltaSciigo
 import dk.nordfalk.esperanto.domain.player.kreuDefaŭltanLudiloRegilon
 import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
@@ -145,6 +147,27 @@ fun EsperantoRadioApp(
             SekvantaEnhavoRegilo(semo = { lastatempeLudataj.firstOrNull() })
         }
         LaunchedEffect(ludantoStato.nunaFonto) { sekvantaRegilo.ludisFonton(ludantoStato.nunaFonto) }
+
+        // Enkonduk-transsalto (C59a): kiam la ludilo transsaltas la enkondukon
+        // de kanalo, montru mallongan snackbar-on; klako sur „Kial?“ malfermas
+        // klarigan dialogon (vidu transsaltaDialogo malsupre).
+        val transsaltaSnackbarStato = remember { SnackbarHostState() }
+        var transsaltaDialogo by remember { mutableStateOf<TranssaltaSciigo?>(null) }
+        LaunchedEffect(Unit) {
+            ludvicoRegilo.transsaltajSciigoj.collect { sciigo ->
+                if (agordojDeponejo.montruTranssaltanSciigon.value) {
+                    val rezulto = transsaltaSnackbarStato.showSnackbar(
+                        message = "Transsaltis la enkondukon",
+                        actionLabel = "Kial?",
+                        duration = SnackbarDuration.Short,
+                    )
+                    if (rezulto == SnackbarResult.ActionPerformed) {
+                        logi("Klako", "Transsalta snackbar → dialogo (${sciigo.kanaloSlug}, ${sciigo.sekundoj}s)")
+                        transsaltaDialogo = sciigo
+                    }
+                }
+            }
+        }
 
         // Observi ŝanĝojn de ŝatoj kaj sciigoj por ĝisdatigi la fonan skedon
         val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
@@ -469,6 +492,13 @@ fun EsperantoRadioApp(
                         elfaldita = false
                     },
                 )
+
+                // Snackbar pri transsaltita enkonduko — ĉe la malsupro de la
+                // enhav-areo, do super la mini-ludilbreto
+                SnackbarHost(
+                    transsaltaSnackbarStato,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
             }
 
             if (montruMiniLudilbreton) {
@@ -573,6 +603,37 @@ fun EsperantoRadioApp(
                     TextButton(onClick = {
                         logi("ApajNovaĵoj", "Uzanto konfirmis la apajn novaĵojn")
                         apajNovaĵojDeponejo.konfirmu()
+                    }) { Text("Bone") }
+                },
+            )
+        }
+
+        // Klara dialogo pri la enkonduk-transsalto — malfermiĝas per la ago
+        // „Kial?“ de la snackbar. „Agordoj“ navigas al la agordoj; „Bone“
+        // kaŝas la snackbar-on estonte (restarigebla en la agordoj).
+        transsaltaDialogo?.let { sciigo ->
+            AlertDialog(
+                onDismissRequest = { transsaltaDialogo = null },
+                title = { Text("Transsaltis la enkondukon") },
+                text = {
+                    Text(
+                        "Se vi jam aŭskultis la enkondukon (la unuaj ${sciigo.sekundoj} sekundoj " +
+                            "de ${sciigo.kanaloNomo}), la ludilo transsaltas ĝin dum la venonta monato. " +
+                            "Tio eblas ŝanĝi en la agordoj."
+                    )
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        logi("Klako", "Transsalta dialogo → Agordoj")
+                        transsaltaDialogo = null
+                        push(Vojo.Agordoj)
+                    }) { Text("Agordoj") }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        logi("Klako", "Transsalta dialogo → Bone (kaŝas la snackbar-on estonte)")
+                        agordojDeponejo.fiksiMontruTranssaltanSciigon(false)
+                        transsaltaDialogo = null
                     }) { Text("Bone") }
                 },
             )

@@ -54,6 +54,12 @@ interface AgordojDeponejo {
     val evoluo: StateFlow<Boolean>
     val detalaProtokolado: StateFlow<Boolean>
 
+    /** Ĉu la ludilo transsaltas la ripetiĝantan enkondukon de kanaloj (C59a). */
+    val transsaltuEnkondukojn: StateFlow<Boolean>
+
+    /** Ĉu montri la snackbar-on pri transsaltita enkonduko. */
+    val montruTranssaltanSciigon: StateFlow<Boolean>
+
     /**
      * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
      * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
@@ -65,6 +71,8 @@ interface AgordojDeponejo {
     fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
     fun fiksiEvoluon(ŝaltita: Boolean)
     fun fiksiDetalanProtokoladon(ŝaltita: Boolean)
+    fun fiksiTranssaltuEnkondukojn(ŝaltita: Boolean)
+    fun fiksiMontruTranssaltanSciigon(ŝaltita: Boolean)
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
     fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>)

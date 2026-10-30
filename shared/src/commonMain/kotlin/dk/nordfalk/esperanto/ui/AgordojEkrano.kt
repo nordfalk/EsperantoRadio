@@ -35,6 +35,8 @@ fun AgordojEkrano(
     val temoNomo by agordojDeponejo.temo.collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
     val aŭtomataDaŭrigo by agordojDeponejo.aŭtomataDaŭrigo.collectAsState()
+    val transsaltuEnkondukojn by agordojDeponejo.transsaltuEnkondukojn.collectAsState()
+    val montruTranssaltanSciigon by agordojDeponejo.montruTranssaltanSciigon.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
@@ -57,6 +59,16 @@ fun AgordojEkrano(
                     Switch(
                         checked = aŭtomataDaŭrigo,
                         onCheckedChange = { logi("Klako", "aŭtomataDaŭrigo → $it"); agordojDeponejo.fiksiAŭtomatanDaŭrigon(it) }
+                    )
+                }
+            )
+            ListItem(
+                headlineContent = { Text("Transsalti enkondukon") },
+                supportingContent = { Text("Kanaloj kun ripetiĝanta enkonduko transsaltas ĝin, se vi aŭskultis la kanalon dum la pasinta monato") },
+                trailingContent = {
+                    Switch(
+                        checked = transsaltuEnkondukojn,
+                        onCheckedChange = { logi("Klako", "transsaltuEnkondukojn → $it"); agordojDeponejo.fiksiTranssaltuEnkondukojn(it) }
                     )
                 }
             )

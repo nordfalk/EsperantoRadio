@@ -149,6 +149,12 @@ class AgordojDeponejoImpl(
     private val _aŭtomataDaŭrigo = MutableStateFlow(settings?.leguMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, true) ?: true)
     override val aŭtomataDaŭrigo: StateFlow<Boolean> = _aŭtomataDaŭrigo.asStateFlow()
 
+    private val _transsaltuEnkondukojn = MutableStateFlow(settings?.getBoolean(SettingsKeys.TRANSSALTU_ENKONDUKOJN, true) ?: true)
+    override val transsaltuEnkondukojn: StateFlow<Boolean> = _transsaltuEnkondukojn.asStateFlow()
+
+    private val _montruTranssaltanSciigon = MutableStateFlow(settings?.getBoolean(SettingsKeys.MONTRU_TRANSSALTAN_SCIIGON, true) ?: true)
+    override val montruTranssaltanSciigon: StateFlow<Boolean> = _montruTranssaltanSciigon.asStateFlow()
+
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
@@ -186,6 +192,16 @@ class AgordojDeponejoImpl(
         _aŭtomataDaŭrigo.value = ŝaltita
         settings?.skribuMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, ŝaltita)
         logi("Agordoj", "AŭtomataDaŭrigo → $ŝaltita")
+    }
+    override fun fiksiTranssaltuEnkondukojn(ŝaltita: Boolean) {
+        _transsaltuEnkondukojn.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.TRANSSALTU_ENKONDUKOJN, ŝaltita)
+        logi("Agordoj", "TranssaltuEnkondukojn → $ŝaltita")
+    }
+    override fun fiksiMontruTranssaltanSciigon(ŝaltita: Boolean) {
+        _montruTranssaltanSciigon.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.MONTRU_TRANSSALTAN_SCIIGON, ŝaltita)
+        logi("Agordoj", "MontruTranssaltanSciigon → $ŝaltita")
     }
     override fun fiksiEvoluon(ŝaltita: Boolean) {
         _evoluo.value = ŝaltita

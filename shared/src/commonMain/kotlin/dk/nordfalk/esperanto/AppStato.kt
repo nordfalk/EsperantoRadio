@@ -182,6 +182,7 @@ object AppStato {
             ludatojDeponejo = ludatojDeponejo!!,
             getLokaDosieroVojo = { id -> elŝutDeponejo!!.getLokaDosieroVojo(id) },
             aŭtomataDaŭrigo = agordojDeponejo.aŭtomataDaŭrigo,
+            transsaltuEnkondukojn = agordojDeponejo.transsaltuEnkondukojn,
         )
 
         diagnozoRegilo = kreuDiagnozoRegilon()

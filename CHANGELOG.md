@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Riparita
+
+- Samtempa ŝargo de la sama kanalo (ekz. malsupren-tiro dum aŭtomata ŝargo aŭ vekhorloĝo dum ekran-ŝargo) ne plu elŝutas la RSS-fluon duoble — malpli da reta trafiko kaj pli rapida ŝargo (https://github.com/nordfalk/EsperantoRadio/pull/147)
+
 ## [3.1.0] - 2026-10-25
 
 ### Aldonita

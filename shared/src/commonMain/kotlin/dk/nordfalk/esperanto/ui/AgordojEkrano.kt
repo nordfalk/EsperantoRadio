@@ -37,6 +37,7 @@ fun AgordojEkrano(
     val aŭtomataDaŭrigo by agordojDeponejo.aŭtomataDaŭrigo.collectAsState()
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
+    val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
 
     Scaffold(
@@ -139,8 +140,19 @@ fun AgordojEkrano(
             Text("Privateco", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             ListItem(
+                headlineContent = { Text("Sendu erar-raportojn") },
+                supportingContent = { Text("Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Ŝanĝoj de kraŝ-raportoj tute ekvalidas post restartigo de la apo") },
+                trailingContent = {
+                    Switch(
+                        checked = erarRaportado,
+                        onCheckedChange = { logi("Klako", "erarRaportado → $it"); agordojDeponejo.fiksiErarRaportadon(it) }
+                    )
+                }
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            ListItem(
                 headlineContent = { Text("Ŝaltu detalan protokoladon") },
-                supportingContent = { Text("Protokolas anonimajn detalojn pri via uzado (navigado, klakoj, ŝargado) al la erar-monitorado (Sentry). Malŝaltu por sendi nur erarojn kaj gravajn eventojn (malfermo, ekludo, vekiĝo)") },
+                supportingContent = { Text("(Nur se erar-raportado estas ŝaltita) Protokolas anonimajn detalojn pri via uzado (navigado, klakoj, ŝargado). Malŝaltu por sendi nur erarojn kaj gravajn eventojn (malfermo, ekludo, vekiĝo)") },
                 trailingContent = {
                     Switch(
                         checked = detalaProtokolado,

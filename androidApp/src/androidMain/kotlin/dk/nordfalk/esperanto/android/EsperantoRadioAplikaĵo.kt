@@ -4,8 +4,10 @@ import android.app.Application
 import android.os.Build
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.data.config.leguErarRaportadanKonsenton
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logi
+import dk.nordfalk.esperanto.raportadoAktiva
 
 /**
  * Procez-nivela inicialigo ((PR #89) + C7).
@@ -17,10 +19,13 @@ import dk.nordfalk.esperanto.logi
  * `MainActivity.onCreate` (duobla inicialigo ĉe Activity-rekreo).
  *
  * Sentry estas inicialigata NUR por ne-debug konstruoj sur realaj aparatoj
- * (2026-10-13, PR #109): debug-konstruoj (FLAG_DEBUGGABLE — la .alfa-APK) kaj
- * emuliloj tute ne raportas — la propra testado de la programisto ne poluu la
- * produktadajn datumojn nek la Sentry-kvoton (emulilaj OOM-kraŝoj aperis kiel
- * "produktado", vidu ŜANĜOJ.md). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
+ * KAJ nur kiam la erar-raportado estas ŝaltita (agordo "erar_raportado", PR
+ * #148/C50). La DEFAŬLTO dependas de la konstruo: kun nia subskribo (Google
+ * Play, Aptoide — la keystore ekzistis dum la konstruo) ĝi estas ŜALTITA
+ * (neniu demando; malŝaltebla en Agordoj → Privateco); sen nia subskribo
+ * (tiel F-Droid konstruas) MALŜALTITA kun unufoja konsento-demando — alie
+ * F-Droid atribuus la kontraŭecon "Tracking". Sen inicialigo ĉiuj
+ * Sentry-vokoj estas no-op.
  */
 class EsperantoRadioAplikaĵo : Application() {
     override fun onCreate() {
@@ -30,11 +35,18 @@ class EsperantoRadioAplikaĵo : Application() {
         // Evolua medio (debug-konstruo aŭ emulilo): ekz. la "Apaj novaĵoj"-
         // dialogo ne montriĝu — ĝi aperus ĉe ĉiu freŝa instalaĵo
         AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
+        // Konstruo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on)
+        AppStato.erarRaportadoDefaŭlta = !BuildConfig.SEN_NIA_SUBSKRIBO
         if (AppStato.estasEvoluaMedo) {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
         }
-        initialiguSentry("produktado")
+        if (leguErarRaportadanKonsenton()) {
+            initialiguSentry("produktado")
+            raportadoAktiva = true
+        } else {
+            logi("Sentry", "Erar-raportado malŝaltita — ne raportas")
+        }
     }
 
     /** La kutimaj Android-emulilaj bildoj: AVD (sdk_gphone, goldfish, ranchu), Genymotion k.a. */

@@ -59,4 +59,14 @@ class AgordojEkranoTest {
         waitForIdle()
         onNodeWithText("Ŝaltu detalan protokoladon").assertIsDisplayed()
     }
+
+    @Test
+    fun montrasŜaltilonPorErarRaportado() = runComposeUiTest {
+        setContent {
+            AgordojEkrano(agordojDeponejo = AgordojDeponejoImpl(), onReen = {})
+        }
+        waitForIdle()
+        // Opt-in-erar-raportado (C50/F-Droid): defaŭlte malŝaltita, ŝanĝebla ĉi tie
+        onNodeWithText("Sendu erar-raportojn").assertIsDisplayed()
+    }
 }

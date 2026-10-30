@@ -12,6 +12,13 @@ komenco de ĉiu elsendo de kanalo. Tiu ĉi skill-o trovas la valoron empirie:
 se la komenco de pluraj elsendoj sonas same, oni transsaltas ĝin ĝis la punkto
 kie ili ekmalas.
 
+Se la enkonduko ŝanĝiĝis dum la historio de la kanalo, uzu anstataŭe la
+laŭdato-kampon `transsaltuKomenceLaŭDato` — listo de
+`{ "sekundoj": X, "ĝis": "YYYY-MM-DD" }` (fina dato INKLUZIVA; la lasta ero
+sen `ĝis` validas por estontaj elsendoj; ne malplena listo venkas super la
+simpla `transsaltuKomenceSekundojn`). Tiam detektu la valoron aparte po
+epoko (ekz. nur elsendoj antaŭ/ post la ŝanĝo).
+
 ## Kiel ruli
 
 ```bash

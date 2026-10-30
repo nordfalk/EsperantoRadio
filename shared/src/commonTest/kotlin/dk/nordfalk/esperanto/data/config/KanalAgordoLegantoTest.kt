@@ -234,4 +234,46 @@ class KanalAgordoLegantoTest {
         // Kanalo sen la kampo ricevas malplenan liston (defaŭlto)
         assertTrue(agordo.kanaloj[1].alKanalo().puriguModeloj.isEmpty())
     }
+
+    @Test
+    fun legasLaŭdatajnTranssaltajnValorojn() {
+        // C59a: transsaltuKomenceLaŭDato — valoro laŭ la publikig-dato de la elsendo
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "ŝanĝiĝema",
+                        "nomo": "Ŝanĝiĝema",
+                        "transsaltuKomenceLaŭDato": [
+                            { "sekundoj": 50.0, "ĝis": "2025-06-10" },
+                            { "sekundoj": 30.0 }
+                        ]
+                    },
+                    {
+                        "kodo": "simpla",
+                        "nomo": "Simpla",
+                        "transsaltuKomenceSekundojn": 22.0
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        val ŝanĝiĝema = agordo.kanaloj[0].alKanalo()
+        assertEquals(2, ŝanĝiĝema.transsaltuKomenceLaŭDato.size)
+        assertEquals(50.0f, ŝanĝiĝema.transsaltuKomenceLaŭDato[0].sekundoj)
+        assertEquals("2025-06-10", ŝanĝiĝema.transsaltuKomenceLaŭDato[0].ĝis)
+        assertNull(ŝanĝiĝema.transsaltuKomenceLaŭDato[1].ĝis, "La lasta ero estas sen fina dato (estontaj elsendoj)")
+        // Elekto laŭ elsendo-dato
+        assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-10"), "La fina dato estas inkluziva")
+        assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-01-01"))
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-11"))
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2030-01-01"), "Estontaj elsendoj → la lasta valoro")
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor(""), "Nekonata dato → la lasta valoro")
+        // La simpla kampo restas senŝanĝa (retrokongruo)
+        val simpla = agordo.kanaloj[1].alKanalo()
+        assertEquals(22.0f, simpla.transsaltajSekundojPor("2030-01-01"))
+        assertTrue(simpla.transsaltuKomenceLaŭDato.isEmpty())
+    }
 }

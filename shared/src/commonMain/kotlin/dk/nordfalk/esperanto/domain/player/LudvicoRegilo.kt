@@ -596,12 +596,13 @@ class LudvicoRegilo(
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
         // C59a: transsaltu la ripetiĝantan enkondukon de la kanalo, se agordita —
         // sed nur se la uzanto JAM aŭskultis ion de tiu kanalo dum la pasinta
-        // monato (novaj aŭskultantoj unue aŭdu la enkonduk-identecon).
+        // semajno (novaj aŭskultantoj unue aŭdu la enkonduk-identecon).
         // Dato-movita el la kanalkonfiguro; 0 = konduto senŝanĝa.
         // Forŝaltebla per la agordo „Transsalti enkondukon".
-        val saltuMs = if (transsaltuEnkondukojn.value && aŭskultisDumPasintaMonato(elsendo.kanaloSlug)) {
+        val saltuMs = if (transsaltuEnkondukojn.value && aŭskultisDumPasintaSemajno(elsendo.kanaloSlug)) {
             ((kanaloDeponejo.observiKanalojn().value
-                .find { it.slug == elsendo.kanaloSlug }?.transsaltuKomenceSekundojn ?: 0.0f) * 1000.0f).toLong()
+                .find { it.slug == elsendo.kanaloSlug }
+                ?.transsaltajSekundojPor(elsendo.dato) ?: 0.0f) * 1000.0f).toLong()
         } else {
             0L
         }
@@ -673,13 +674,13 @@ class LudvicoRegilo(
     }
 
     /**
-     * Ĉu la uzanto aŭskultis iun elsendon de la kanalo dum la pasinta monato —
+     * Ĉu la uzanto aŭskultis iun elsendon de la kanalo dum la pasinta semajno —
      * kondiĉo de la enkonduk-transsalto (C59a): novaj aŭskultantoj unue aŭdu
      * la enkonduk-identecon de la kanalo.
      */
     @OptIn(kotlin.time.ExperimentalTime::class)
-    private fun aŭskultisDumPasintaMonato(kanaloSlug: String): Boolean {
-        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_MONATO_MS
+    private fun aŭskultisDumPasintaSemajno(kanaloSlug: String): Boolean {
+        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_SEMAJNO_MS
         return ludatojDeponejo.observiLudatojn().value.values.any {
             it.kanaloSlug == kanaloSlug && it.lasteLudita >= limo
         }
@@ -692,7 +693,7 @@ class LudvicoRegilo(
         const val MAKS_ERAROJ = 10
         /** Grandeco de la dedup-fenestro por finoj (PR #89). */
         const val TRAKTITAJ_FONTOJ_MAKS = 4
-        /** Kiom longe "ĵusa aŭskolto" validas por la enkonduk-transsalto (C59a). */
-        const val TRANSSALTA_MONATO_MS = 30L * 24 * 60 * 60 * 1000
+        /** Kiom longe „ĵusa aŭskolto" validas por la enkonduk-transsalto (C59a). */
+        const val TRANSSALTA_SEMAJNO_MS = 7L * 24 * 60 * 60 * 1000
     }
 }

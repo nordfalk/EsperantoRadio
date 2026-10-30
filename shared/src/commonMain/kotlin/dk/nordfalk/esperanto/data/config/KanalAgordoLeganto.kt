@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.SerialName
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
 import dk.nordfalk.esperanto.logw
 
 /**
@@ -111,8 +112,23 @@ data class KanaloDto(
     val puriguModeloj: List<String> = emptyList(),
     /** Kiom da sekundoj (frakcieble) transsalti ĉe la komenco de ĉiu elsendo (ripetiĝanta enkonduko — FAROTA C59a). */
     val transsaltuKomenceSekundojn: Float = 0.0f,
+    /**
+     * Laŭdato-varianto (C59a): valoro laŭ la publikig-dato de la elsendo — por
+     * kanaloj kies enkonduko ŝanĝiĝis. La lasta ero estu sen „ĝis" (validas por
+     * estontaj elsendoj). Ne malplena listo venkas super transsaltuKomenceSekundojn.
+     */
+    val transsaltuKomenceLaŭDato: List<TranssaltaValoroLaŭDatoDto> = emptyList(),
     val defaŭltŜatata: Boolean = false,
 )
+
+/** DTO-ero de transsaltuKomenceLaŭDato: valoro + nedeviga fina dato (inkluziva). */
+@Serializable
+data class TranssaltaValoroLaŭDatoDto(
+    val sekundoj: Float,
+    val ĝis: String? = null,
+)
+
+fun TranssaltaValoroLaŭDatoDto.alValoro() = TranssaltaValoroLaŭDato(sekundoj = sekundoj, ĝis = ĝis)
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     slug = kodo,
@@ -129,6 +145,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
     transsaltuKomenceSekundojn = transsaltuKomenceSekundojn,
+    transsaltuKomenceLaŭDato = transsaltuKomenceLaŭDato.map { it.alValoro() },
     defaŭltŜatata = defaŭltŜatata,
 )
 

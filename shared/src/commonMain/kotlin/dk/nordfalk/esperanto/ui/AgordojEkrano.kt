@@ -64,7 +64,7 @@ fun AgordojEkrano(
             )
             ListItem(
                 headlineContent = { Text("Transsalti enkondukon") },
-                supportingContent = { Text("Kanaloj kun ripetiĝanta enkonduko transsaltas ĝin, se vi aŭskultis la kanalon dum la pasinta monato") },
+                supportingContent = { Text("Kanaloj kun ripetiĝanta enkonduko transsaltas ĝin, se vi aŭskultis la kanalon dum la pasinta semajno") },
                 trailingContent = {
                     Switch(
                         checked = transsaltuEnkondukojn,

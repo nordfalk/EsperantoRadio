@@ -133,7 +133,7 @@ class LudvicoRegiloTest {
     // =========================================================================
     // Transsaltado de ripetiĝanta enkonduko (C59a) — transsaltuKomenceSekundojn
     // (efikas nur se la uzanto jam aŭskultis ion de la sama kanalo dum la
-    // pasinta monato — novaj aŭskultantoj aŭdu la enkonduk-identecon)
+    // pasinta semajno — novaj aŭskultantoj aŭdu la enkonduk-identecon)
     // =========================================================================
 
     @Test
@@ -199,21 +199,48 @@ class LudvicoRegiloTest {
     }
 
     @Test
-    fun neTranssaltasSeLaAŭskoltoEstasPliOlMonatoMalnova() = runTest {
+    fun neTranssaltasSeLaAŭskoltoEstasPliOlSemajnoMalnova() = runTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
         val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
-        val antaŭ70Tagoj = Clock.System.now().toEpochMilliseconds() - 70L * 24 * 60 * 60 * 1000
+        val antaŭ8Tagoj = Clock.System.now().toEpochMilliseconds() - 8L * 24 * 60 * 60 * 1000
         ludatoj.enmetuLudaton(
-            LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", pozicioMs = 5_000, daŭroMs = 300_000, lasteLudita = antaŭ70Tagoj)
+            LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", pozicioMs = 5_000, daŭroMs = 300_000, lasteLudita = antaŭ8Tagoj)
         )
 
         val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
 
         regilo.ludiElsendon(e)
 
-        assertEquals(0, ludilo.stato.value.pozicioMs, "Aŭskolto pli ol monato malnova → ne transsalti")
+        assertEquals(0, ludilo.stato.value.pozicioMs, "Aŭskolto pli ol semajno malnova → ne transsalti")
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun laŭdataTranssaltoUzasLaValoronDeLaElsendoDato() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val kanalo = Kanalo(
+            slug = "k1", nomo = "Kanalo 1",
+            transsaltuKomenceSekundojn = 99.0f, // devas esti IGNORATA kiam la listo ekzistas
+            transsaltuKomenceLaŭDato = listOf(
+                dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 50.0f, ĝis = "2025-06-10"),
+                dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 30.0f),
+            ),
+        )
+        // La uzanto ĵus aŭskultis alian elsendon de la sama kanalo
+        ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        // Malnova elsendo (publikigita ĝis 2025-06-10) → 50 s
+        regilo.ludiElsendon(elsendo("e1", kanalo = "k1", dato = "2025-01-01"))
+        assertEquals(50_000, ludilo.stato.value.pozicioMs, "Elsendo antaŭ la ŝanĝo → la malnova valoro")
+
+        // Nova elsendo → 30 s
+        regilo.ludiElsendon(elsendo("e2", kanalo = "k1", dato = "2025-08-01"))
+        assertEquals(30_000, ludilo.stato.value.pozicioMs, "Elsendo post la ŝanĝo → la nova valoro")
     }
 
     @Test

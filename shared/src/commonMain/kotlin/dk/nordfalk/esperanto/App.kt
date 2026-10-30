@@ -618,7 +618,7 @@ fun EsperantoRadioApp(
                 text = {
                     Text(
                         "Se vi jam aŭskultis la enkondukon (la unuaj ${sciigo.sekundoj} sekundoj " +
-                            "de ${sciigo.kanaloNomo}), la ludilo transsaltas ĝin dum la venonta monato. " +
+                            "de ${sciigo.kanaloNomo}), la ludilo transsaltas ĝin dum la venonta semajno. " +
                             "Tio eblas ŝanĝi en la agordoj."
                     )
                 },

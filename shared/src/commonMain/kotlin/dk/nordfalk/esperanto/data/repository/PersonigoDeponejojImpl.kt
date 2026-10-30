@@ -129,12 +129,11 @@ class SerĉoDeponejoImpl(
     private val kanaloDeponejo: KanaloDeponejo,
 ) : SerĉoDeponejo {
     /**
-     * C60: la rezulto estas grupigita laŭ graveco — kanaltitoloj, kanalpriskriboj,
-     * elsendtitoloj, elsendpriskriboj. Ĉiu ero aperas nur en sia unua grupo (dedup).
+     * C60: la rezulto estas ordigita laŭ graveco — en ĉiu listo titolo-trovoj unue,
+     * poste nur-priskribo-trovoj; kanaloj tute antaŭ elsendoj. Ĉiu ero aperas nur
+     * unufoje (dedup per partition).
      */
     override suspend fun serĉi(teksto: String, limo: Int): SerĉoRezulto {
-        // C60: ĉiu listo jam ordigita — titolo-trovoj unue, poste nur-priskribo-trovoj
-        // (partition faras la dedup en unu paŝo)
         val (kanTitolo, kanResto) = kanaloDeponejo.getKanalojn()
             .partition { it.nomo.contains(teksto, ignoreCase = true) }
         val kanaloj = kanTitolo.take(limo) + kanResto

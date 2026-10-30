@@ -74,6 +74,13 @@
 - **Priskribo**: Du samnomaj troŝarĝoj kondutas malsame pri malproksima protokolado, nevideble ĉe la vok-lokoj (22 vokoj 2-arg, 44 vokoj 3-arg — la silenta formo estas la pli ofta). Sekvoj: (a) la avertoj de la 3-arg formo (RSS-malsukcesa, lud-eraroj, Worker-eraroj) estas tute nevideblaj en Sentry ekde 247/249 — oni kredis, ke la eraro-taso "kolapsis", dum ĝi nur fariĝis nevidebla; (b) AGENTS.md kaj la kodo kontraŭdiras (por la 2-arg formo: `Sentry.logger.warn` ja sendas); (c) "sendata al Sentry" estas plursenca — Sentry Logs kontraŭ Sentry Errors (avertoj neniam aperas kiel issue), do laŭ la kontrolata UI oni konkludas aŭ "sendata" aŭ "ne sendata".
 - **Sugesto**: (1) 3-arg `logw` sendu `Sentry.logger.warn("[$tag] $msg: ${e::class.simpleName}: ${e.message}")` — unuforma regulo: "logw = averto en Sentry Logs, ĉiam; neniam error-evento; neniam eraro-kvoto"; (2) ĉio, krom logd iru al Sentry (kun la escepto ke la uzanto povas malŝalti ke logi iras al Sentry en la agordoj); (3) KDoc pri ĉiu troŝargo kun la celo-matriks (logcat / Sentry Logs nivelo / Sentry errors / kvoto), inkluzive de induko "ne sendata" aŭ "sendata al Sentry"; (4) korektu AGENTS.md kaj la Protokolo.kt-KDoc; (5) kontrakt-testo: malgranda interna Sentry-"sink" (anstataŭigebla per test-fako), kiu asertas en commonTest: logw 2-arg → warn, logw 3-arg → warn (post-riparo), loge 3-arg → captureException, logd → nenio malproksima.
 
+#### G47 — Ekludo el sciigo restartiĝas (de pozicio 0) dum ekranturno
+- **Statuso**: [x] (diagnozita kaj riparita 2026-10-30, PR #149)
+- **Fonto**: uzanto-raporto de la posedanto (2026-10-30 antaŭtagmeze kaj denove vespere, Samsung-telefono en Danio, Varsovia Vento: "La 199a elsendo 1a/2a parto"); konfirmita en Sentry (uzanto `5f08712e…`, release `3.1.1-beta29okt`): la 2026-10-30 "Ludado komencita de sciigo" aperis dufoje 1 s aparte (07:22:51/52, 07:38:19/07:39:25) kaj eĉ 5-foje ene de 9 s (19:15:44–53) — ĉiufoja rekreo de la Activity.
+- **Kaŭzo**: `MainActivity` havas nek `configChanges` nek `launchMode` → ĉe ekranturno `onCreate` refariĝas kun la SAMA malnova intent kaj vokis `traktuIntenton(intent)` senkondiĉe → `traktuMalfermiElsendon` → `fiksiFonton(fonto, komencoPozicioMs=0)` + `ludi()` → `setMediaItem(aĵo, 0)` → restarto de la komenco; krome `AtendantaElsendoNavigacio.setu` re-navigis.
+- **Riparo**: en `MainActivity.onCreate` la intent estas traktata nur ĉe freska kreo (`savedInstanceState == null`); `onNewIntent` restas por novaj intent. Regresa testo: `SciigoLudiTest.rekreoNeRestartigasLudonDeSciigo` (lanĉas la Activity kun MALFERMI_ELSENDON, `recreate()`, kontrolas ke la pozicio ne rekomenciĝas).
+- **Sugesto**: post eldono observi en Sentry ke "Ludado komencita de sciigo" ne plu aperas plurfoje ene de sekundoj.
+
 ## KONSILO
 
 #### C5 — Subskrib-konfiguro: defaŭlta absoluta keystore-vojo en publika deponejo
@@ -375,6 +382,13 @@
   ilo komparu la komencajn ~60 s (RMS/ampleks-envelopa korelacio aŭ audio-fingerprint);
   natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
   ĝi povus proponi la valoron por ĉiu kanalo.
+
+#### C60 — Serĉ-ordigo: unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj
+- **Statuso**: [ ]
+- **Fonto**: ideo de la posedanto (2026-10-30)
+- **Loko**: `SerĉoDeponejoImpl.serĉi` (`PersonigoDeponejojImpl.kt:125-133`) nun vokas nur `ElsendoDeponejo.serĉiElsendojn` (filtras nur `elsendo.titolo`/`priskribo` en la kaŝmemoro — neniam serĉas kanalojn, neniu ordigo de la rezultoj)
+- **Priskribo**: la serĉo montru trovojn grupigitaj laŭ graveco: (1) kanalo kies titolo kongruas, (2) kanalo kies priskribo kongruas, (3) elsendo kies titolo kongruas, (4) elsendo kies priskribo kongruas. Eventuale ene de grupo ankoraŭ ordigi (ekz. laŭ dato).
+- **Sugesto**: etendu `SerĉoDeponejo.serĉi` por redoni grupigitan rezulton (aŭ plurajn listojn: `List<Kanalo>` + `List<Elsendo>` kun la grupoj ene) — serĉu kanalojn en `KanaloDeponejo` (titolo, priskribo) kaj elsendojn kiel nun; la ekrano (`SerĉoEkrano.kt`) montru la grupojn kun titoloj ("Kanaloj", "Elsendoj").
 
 ---
 

@@ -22,6 +22,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Ŝanĝita
 
 - Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
+- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
 
 ## [3.1.0] - 2026-10-25
 

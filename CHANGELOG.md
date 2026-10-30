@@ -22,7 +22,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 - Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - Naviga tirkesto: nova ero „Proponi kanalon“ — malfermas retpoŝton al la prizorganto kun pretigita plano (https://github.com/nordfalk/EsperantoRadio/pull/144)
-- Sep kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo) transsaltas sian ripetan enkondukon por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Ok kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo, 3ZZZ en Esperanto) transsaltas sian ripetan enkondukon; ĉe 3ZZZ la valoro sekvas la historian ŝanĝiĝon de la enkonduko laŭ la elsendo-dato por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - La malsupra naviga breto estas anstataŭigita per naviga tirkesto (https://github.com/nordfalk/EsperantoRadio/pull/120)
 - Hejmo: klako sur la sekcio-titolo „Kanaloj“ kondukas al la kanala vido (https://github.com/nordfalk/EsperantoRadio/pull/131)
 - Vekhorloĝo: la tempo elekteblas per ciferplato en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)

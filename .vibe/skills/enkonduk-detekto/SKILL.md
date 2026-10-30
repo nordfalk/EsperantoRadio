@@ -1,13 +1,13 @@
 ---
 name: enkonduk-detekto
-description: Ŝargu ĉi tiun skill-on kiam vi devas esplori/elkalkuli la valoron de `transsaltuKomenceLaŭDato` por kanalo(j) — elŝuti la plej freŝajn elsendojn, kompari iliajn komencojn spektrograme kaj rekomendi valoron (FAROTA C59b). Ankaŭ por prilabori la rezultojn en la kanalkonfiguro.
+description: Ŝargu ĉi tiun skill-on kiam vi devas esplori/elkalkuli la valoron de `transsaltuKomenceSekundojn` por kanalo(j) — elŝuti la plej freŝajn elsendojn, kompari iliajn komencojn spektrograme kaj rekomendi valoron (FAROTA C59b). Ankaŭ por prilabori la rezultojn en la kanalkonfiguro.
 ---
 
 # Enkonduk-detekto — ĉu kanalo havas ripetiĝantan enkondukon? (C59b)
 
 ## La tasko
 
-La agord-kampo `transsaltuKomenceLaŭDato` (FAROTA C59a) transsaltas la
+La agord-kampo `transsaltuKomenceSekundojn` (FAROTA C59a) transsaltas la
 komenco de ĉiu elsendo de kanalo. Tiu ĉi skill-o trovas la valoron empirie:
 se la komenco de pluraj elsendoj sonas same, oni transsaltas ĝin ĝis la punkto
 kie ili ekmalas.
@@ -74,7 +74,7 @@ landas en `/tmp/intro-detekto/` (forigeblas libere).
 
 1. Kontrolu la superrigordon; enmetu la rekomendatajn valorojn en
    `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
-   (`"transsaltuKomenceLaŭDato": [{ "sekundoj": <valoro> }]` en la koncerna kanal-objekto;
+   (`"transsaltuKomenceSekundojn": [{ "sekundoj": <valoro> }]` en la koncerna kanal-objekto;
    kun ŝanĝita enkonduko: pluraj eroj kun `ĝis`).
 2. `./gradlew :shared:desktopTest` (la fum-testo validigas la agordon).
 3. Ĝisdatigu la C59-eron en `FAROTA.md` kun la rezultoj kaj dato.

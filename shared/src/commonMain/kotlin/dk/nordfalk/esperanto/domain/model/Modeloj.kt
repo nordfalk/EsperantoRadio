@@ -34,7 +34,7 @@ data class Kanalo(
      * aŭdu la enkonduk-identecon).
      */
     @Transient
-    val transsaltuKomenceLaŭDato: List<TranssaltaValoroLaŭDato> = emptyList(),
+    val transsaltuKomenceSekundojn: List<TranssaltaValoroLaŭDato> = emptyList(),
     @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
@@ -48,13 +48,13 @@ data class Kanalo(
      * Nekonata/malplena dato → la valoro de la lasta ero.
      */
     fun transsaltajSekundojPor(dato: String): Float {
-        if (transsaltuKomenceLaŭDato.isEmpty()) return 0.0f
-        if (dato.isBlank()) return transsaltuKomenceLaŭDato.last().sekundoj
-        return transsaltuKomenceLaŭDato
+        if (transsaltuKomenceSekundojn.isEmpty()) return 0.0f
+        if (dato.isBlank()) return transsaltuKomenceSekundojn.last().sekundoj
+        return transsaltuKomenceSekundojn
             .firstOrNull { ero -> ero.ĝis?.let { dato <= it } ?: true }
             ?.sekundoj
             // dato post ĉiuj finaj datoj — uzu la lastan eron (estonta enkonduko)
-            ?: transsaltuKomenceLaŭDato.last().sekundoj
+            ?: transsaltuKomenceSekundojn.last().sekundoj
     }
 }
 

@@ -116,11 +116,11 @@ data class KanaloDto(
      * pluraj eroj kun finaj datoj — la lasta ero estu sen „ĝis" (validas por
      * estontaj elsendoj). Malplena listo = ne transsalti.
      */
-    val transsaltuKomenceLaŭDato: List<TranssaltaValoroLaŭDatoDto> = emptyList(),
+    val transsaltuKomenceSekundojn: List<TranssaltaValoroLaŭDatoDto> = emptyList(),
     val defaŭltŜatata: Boolean = false,
 )
 
-/** DTO-ero de transsaltuKomenceLaŭDato: valoro + nedeviga fina dato (inkluziva). */
+/** DTO-ero de transsaltuKomenceSekundojn: valoro + nedeviga fina dato (inkluziva). */
 @Serializable
 data class TranssaltaValoroLaŭDatoDto(
     val sekundoj: Float,
@@ -143,7 +143,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
-    transsaltuKomenceLaŭDato = transsaltuKomenceLaŭDato.map { it.alValoro() },
+    transsaltuKomenceSekundojn = transsaltuKomenceSekundojn.map { it.alValoro() },
     defaŭltŜatata = defaŭltŜatata,
 )
 

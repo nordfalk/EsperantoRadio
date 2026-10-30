@@ -4,7 +4,7 @@
 Legas la kanalkonfiguron, elŝutas la plej freŝajn N elsendojn de ĉiu
 kanalo (120 s, 8 kHz mono PCM), komparas iliajn komencojn per spekto-
 grama kosino-simileco kun ŝovo-serĉo kaj rekomendas valoron por
-`transsaltuKomenceLaŭDato` po kanalo.
+`transsaltuKomenceSekundojn` po kanalo.
 
 Rulu:  python3 .vibe/skills/enkonduk-detekto/detekto.py --n 5
 """

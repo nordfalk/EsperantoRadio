@@ -52,5 +52,18 @@ class KanalAgordoFumTesto {
         assertTrue(varsoviavento.puriguModeloj.any { it.contains("audio") }, "varsoviavento purigas <audio>-ludilojn")
         val vinilkosmo = agordo.kanaloj.first { it.kodo == "vinilkosmo" }
         assertTrue(vinilkosmo.puriguModeloj.isNotEmpty(), "vinilkosmo havas puriguModelojn")
+
+        // C59a: laŭdato-transsalto de 3zzz — epokoj kaj sen-enkondukaj elsendoj
+        // (detektita 2026-10-30 el 95 elsendoj 2025-01…2026-10)
+        val triZzz = agordo.kanaloj.first { it.kodo == "3zzzenesperanto" }.alKanalo()
+        assertEquals(27.0f, triZzz.transsaltajSekundojPor("2025-06-02"), "2025 = malnova enkonduko ~27 s")
+        assertEquals(0.0f, triZzz.transsaltajSekundojPor("2025-06-09"), "2025-06-09 estas sen enkonduko")
+        assertEquals(26.0f, triZzz.transsaltajSekundojPor("2026-03-02"), "ekde 2026-01-05 = nova enkonduko ~26 s")
+        assertEquals(0.0f, triZzz.transsaltajSekundojPor("2026-05-11"), "2026-05-04…25 estas sen enkonduko")
+        assertEquals(26.0f, triZzz.transsaltajSekundojPor("2026-07-13"), "lasta elsendo sen antaŭrolo")
+        assertEquals(37.0f, triZzz.transsaltajSekundojPor("2026-07-20"), "ekde 2026-07-20 = antaŭrolo + nova ~37 s")
+        assertEquals(0.0f, triZzz.transsaltajSekundojPor("2026-10-12"), "2026-10-12 perdis la enkondukon")
+        assertEquals(37.0f, triZzz.transsaltajSekundojPor("2026-10-19"), "revenis je 2026-10-19")
+        assertEquals(37.0f, triZzz.transsaltajSekundojPor("2030-01-01"), "estontaj elsendoj = la lasta valoro")
     }
 }

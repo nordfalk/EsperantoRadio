@@ -237,14 +237,14 @@ class KanalAgordoLegantoTest {
 
     @Test
     fun legasLaŭdatajnTranssaltajnValorojn() {
-        // C59a: transsaltuKomenceLaŭDato — valoro laŭ la publikig-dato de la elsendo
+        // C59a: transsaltuKomenceSekundojn — valoro laŭ la publikig-dato de la elsendo
         val jsonc = """
             {
                 "kanaloj": [
                     {
                         "kodo": "ŝanĝiĝema",
                         "nomo": "Ŝanĝiĝema",
-                        "transsaltuKomenceLaŭDato": [
+                        "transsaltuKomenceSekundojn": [
                             { "sekundoj": 50.0, "ĝis": "2025-06-10" },
                             { "sekundoj": 30.0 }
                         ]
@@ -252,7 +252,7 @@ class KanalAgordoLegantoTest {
                     {
                         "kodo": "simpla",
                         "nomo": "Simpla",
-                        "transsaltuKomenceLaŭDato": [{ "sekundoj": 22.0 }]
+                        "transsaltuKomenceSekundojn": [{ "sekundoj": 22.0 }]
                     }
                 ]
             }
@@ -261,10 +261,10 @@ class KanalAgordoLegantoTest {
         val agordo = leganto.legu(jsonc)
 
         val ŝanĝiĝema = agordo.kanaloj[0].alKanalo()
-        assertEquals(2, ŝanĝiĝema.transsaltuKomenceLaŭDato.size)
-        assertEquals(50.0f, ŝanĝiĝema.transsaltuKomenceLaŭDato[0].sekundoj)
-        assertEquals("2025-06-10", ŝanĝiĝema.transsaltuKomenceLaŭDato[0].ĝis)
-        assertNull(ŝanĝiĝema.transsaltuKomenceLaŭDato[1].ĝis, "La lasta ero estas sen fina dato (estontaj elsendoj)")
+        assertEquals(2, ŝanĝiĝema.transsaltuKomenceSekundojn.size)
+        assertEquals(50.0f, ŝanĝiĝema.transsaltuKomenceSekundojn[0].sekundoj)
+        assertEquals("2025-06-10", ŝanĝiĝema.transsaltuKomenceSekundojn[0].ĝis)
+        assertNull(ŝanĝiĝema.transsaltuKomenceSekundojn[1].ĝis, "La lasta ero estas sen fina dato (estontaj elsendoj)")
         // Elekto laŭ elsendo-dato
         assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-10"), "La fina dato estas inkluziva")
         assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-01-01"))
@@ -273,7 +273,7 @@ class KanalAgordoLegantoTest {
         assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor(""), "Nekonata dato → la lasta valoro")
         // Unuopa valoro sen fina dato — valida por ĉiu elsendo-dato
         val simpla = agordo.kanaloj[1].alKanalo()
-        assertEquals(1, simpla.transsaltuKomenceLaŭDato.size)
+        assertEquals(1, simpla.transsaltuKomenceSekundojn.size)
         assertEquals(22.0f, simpla.transsaltajSekundojPor("2030-01-01"))
         assertEquals(22.0f, simpla.transsaltajSekundojPor("2020-01-01"))
     }

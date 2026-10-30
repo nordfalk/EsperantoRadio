@@ -363,7 +363,7 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceLaŭDato`
+- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceSekundojn`
   — listo de { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (frakcieblaj valoroj; fina dato
   inkluziva; la lasta ero sen „ĝis" validas ankaŭ por estontaj elsendoj; unuopa
   valoro = unu ero sen „ĝis"; malplena listo = ne transsalti), efikas nur se la
@@ -383,9 +383,15 @@
   babibejo 50.0 (0-50 s identaj en ĉiuj 10 paroj), fremdulo 11.0, iro 21.0,
   lemondediplomatique 11.0 (ĉiuj kun 10/10 koheraj paroj), universeala-lindo 39.0
   kaj polaretradio 22.0 (nur 2 elsendoj haveblaj — malforta pruvo, rekontrolota).
+  **3zzzenesperanto** (2026-10-30, epok-konscia detekto de 95 elsendoj 2025-01…2026-10;
+  la unua 5-plej-freŝaj-rulo malsukcesis ĉar ĝi transiris epok-limon):
+  2025 = 27.0; ekde 2026-01-05 = 26.0; ekde 2026-07-20 = 37.0 (antaŭrolo ~10-14 s +
+  nova enkonduko); sen-enkondukaj unuopaj elsendoj = 0.0 (2025-01-13, 2025-06-09,
+  2026-05-04…25, 2026-08-31, 2026-10-12 — perdo konfirmita, revenis je 10-19;
+  decidoj de la posedanto: plena formul-a komenco, kaj 37 s por la antaŭrola epoko).
   **Rifuzitaj**: movada-vidpunkto (dispersaj 19-35 s mini-segmentoj — nerekta
-  enkonduko), radiovatikana (bimodala 4/15 s), 3zzzenesperanto kaj tuluzo (4/10
-  kaj 4/6 paroj), sano (1/10), la ceteraj sen iu ajn komuna segmento
+  enkonduko), radiovatikana (bimodala 4/15 s), tuluzo (4/6 paroj), sano (1/10),
+  la ceteraj sen iu ajn komuna segmento
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas

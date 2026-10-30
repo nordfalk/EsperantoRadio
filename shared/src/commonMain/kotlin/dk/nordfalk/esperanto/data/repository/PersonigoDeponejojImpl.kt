@@ -133,21 +133,16 @@ class SerĉoDeponejoImpl(
      * elsendtitoloj, elsendpriskriboj. Ĉiu ero aperas nur en sia unua grupo (dedup).
      */
     override suspend fun serĉi(teksto: String, limo: Int): SerĉoRezulto {
-        // Kanaloj: unupaŝa disigo per partition — titolo-trovoj unue, el la resto priskribo-trovoj
-        val (kanalojLaŭTitolo, kanaloResto) = kanaloDeponejo.getKanalojn()
+        // C60: ĉiu listo jam ordigita — titolo-trovoj unue, poste nur-priskribo-trovoj
+        // (partition faras la dedup en unu paŝo)
+        val (kanTitolo, kanResto) = kanaloDeponejo.getKanalojn()
             .partition { it.nomo.contains(teksto, ignoreCase = true) }
-        val kanalojLaŭPriskribo = kanaloResto
+        val kanaloj = kanTitolo.take(limo) + kanResto
             .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
             .take(limo)
-        val (elsendojLaŭTitolo, elsendojLaŭPriskribo) = elsendoDeponejo.serĉiElsendojnGrupigite(teksto, limo)
-        val entute = kanalojLaŭTitolo.size + kanalojLaŭPriskribo.size + elsendojLaŭTitolo.size + elsendojLaŭPriskribo.size
-        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — $entute trovoj (kanaloj ${kanalojLaŭTitolo.size}+${kanalojLaŭPriskribo.size}, elsendoj ${elsendojLaŭTitolo.size}+${elsendojLaŭPriskribo.size})")
-        return SerĉoRezulto(
-            kanalojLaŭTitolo = kanalojLaŭTitolo.take(limo),
-            kanalojLaŭPriskribo = kanalojLaŭPriskribo,
-            elsendojLaŭTitolo = elsendojLaŭTitolo,
-            elsendojLaŭPriskribo = elsendojLaŭPriskribo,
-        )
+        val (eTitolo, ePriskribo) = elsendoDeponejo.serĉiElsendojnGrupigite(teksto, limo)
+        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — ${kanaloj.size} kanaloj + ${eTitolo.size + ePriskribo.size} elsendoj")
+        return SerĉoRezulto(kanaloj = kanaloj, elsendoj = eTitolo + ePriskribo)
     }
 }
 

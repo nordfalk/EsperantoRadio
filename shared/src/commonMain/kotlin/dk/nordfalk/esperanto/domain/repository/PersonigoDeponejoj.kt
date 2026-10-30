@@ -45,20 +45,16 @@ interface LudatojDeponejo {
 }
 
 /**
- * Rezulto de serĉo, grupigita laŭ graveco (C60): unue trovoj en kanaltitoloj,
- * poste en kanalpriskriboj, poste en elsendtitoloj, poste en elsendpriskriboj.
- * Ero aperas nur en sia unua grupo (dedup): titolo-trovo ne ripetiĝas en la
- * priskribo-grupo.
+ * Rezulto de serĉo (C60): `kanaloj` kaj `elsendoj`, ĉiu jam ordigita laŭ graveco
+ * — titolo-trovoj unue, poste nur-priskribo-trovoj (dedup: ero aperas nur unufoje).
+ * La tuta montra sinsekvo estas: ĉiuj kanaloj (titolo→priskribo), poste ĉiuj
+ * elsendoj (titolo→priskribo).
  */
 data class SerĉoRezulto(
-    val kanalojLaŭTitolo: List<Kanalo> = emptyList(),
-    val kanalojLaŭPriskribo: List<Kanalo> = emptyList(),
-    val elsendojLaŭTitolo: List<Elsendo> = emptyList(),
-    val elsendojLaŭPriskribo: List<Elsendo> = emptyList(),
+    val kanaloj: List<Kanalo> = emptyList(),
+    val elsendoj: List<Elsendo> = emptyList(),
 ) {
-    val estasVacia: Boolean
-        get() = kanalojLaŭTitolo.isEmpty() && kanalojLaŭPriskribo.isEmpty() &&
-            elsendojLaŭTitolo.isEmpty() && elsendojLaŭPriskribo.isEmpty()
+    val estasVacia: Boolean get() = kanaloj.isEmpty() && elsendoj.isEmpty()
 }
 
 interface SerĉoDeponejo {

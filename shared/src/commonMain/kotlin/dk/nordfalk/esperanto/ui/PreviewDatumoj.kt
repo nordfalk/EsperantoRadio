@@ -52,7 +52,7 @@ internal fun pKanaloDeponejo() = object : KanaloDeponejo {
 
 internal fun pSerĉoDeponejo() = object : SerĉoDeponejo {
     override suspend fun serĉi(teksto: String, limo: Int) =
-        if (teksto.length >= 2) SerĉoRezulto(elsendojLaŭTitolo = listOf(pElsendo)) else SerĉoRezulto()
+        if (teksto.length >= 2) SerĉoRezulto(elsendoj = listOf(pElsendo)) else SerĉoRezulto()
 }
 
 internal fun pPlejŝatatajDeponejo() = object : PlejŝatatajDeponejo {

@@ -68,10 +68,9 @@ class SerĉoDeponejoImplTest {
 
         val r = deponejo.serĉi("esperanto")
 
-        assertEquals(listOf("titola"), r.kanalojLaŭTitolo.map { it.slug }, "kanaltitoloj unue")
-        assertEquals(listOf("priskriba"), r.kanalojLaŭPriskribo.map { it.slug }, "kanalpriskriboj poste, sen dedup-eron")
-        assertEquals(listOf("e-titolo", "e-ambaŭ"), r.elsendojLaŭTitolo.map { it.id }, "elsendtitoloj poste")
-        assertEquals(listOf("e-priskribo"), r.elsendojLaŭPriskribo.map { it.id }, "elsendpriskriboj laste, sen dedup-eron")
+        // C60: en ĉiu listo titolo-trovoj unue, poste priskribo-trovoj; kanaloj tute antaŭ elsendoj
+        assertEquals(listOf("titola", "priskriba"), r.kanaloj.map { it.slug }, "kanaloj: titolo→priskribo, sen dedup-eron")
+        assertEquals(listOf("e-titolo", "e-ambaŭ", "e-priskribo"), r.elsendoj.map { it.id }, "elsendoj: titolo→priskribo, sen dedup-eron")
     }
 
     @Test
@@ -81,7 +80,7 @@ class SerĉoDeponejoImplTest {
 
         val r = deponejo.serĉi("ESPERANTO") // uskleco ne gravas
 
-        assertEquals(listOf("titola"), r.kanalojLaŭTitolo.map { it.slug })
+        assertEquals(listOf("titola"), r.kanaloj.map { it.slug })
         assertEquals(true, r.estasVacia == false)
     }
 

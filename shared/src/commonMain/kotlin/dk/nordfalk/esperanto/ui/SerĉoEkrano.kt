@@ -106,11 +106,11 @@ fun SerĉoEkrano(
                     CircularProgressIndicator()
                 }
             } else {
-                // C60: grupigita laŭ graveco — unue kanaloj (titolo-matĉoj antaŭ
-                // priskribo-matĉoj), poste elsendoj (same)
+                // C60: la listoj jam estas ordigitaj laŭ graveco — kanaloj unue
+                // (titolo-matĉoj antaŭ priskribo-matĉoj), poste elsendoj (same)
                 LazyColumn {
-                    val kanaloj = rezultoj.kanalojLaŭTitolo + rezultoj.kanalojLaŭPriskribo
-                    val elsendoj = rezultoj.elsendojLaŭTitolo + rezultoj.elsendojLaŭPriskribo
+                    val kanaloj = rezultoj.kanaloj
+                    val elsendoj = rezultoj.elsendoj
                     if (kanaloj.isNotEmpty()) {
                         item { SekcioTitolo("Kanaloj") }
                         items(kanaloj, key = { "kanalo:${it.slug}" }) { kanalo ->

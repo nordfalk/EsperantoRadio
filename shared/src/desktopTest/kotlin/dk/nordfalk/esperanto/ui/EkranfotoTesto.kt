@@ -138,7 +138,7 @@ class EkranfotoTesto {
     fun ekranfoto_serĉo() = runComposeUiTest {
         val serĉoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo {
             override suspend fun serĉi(teksto: String, limo: Int) =
-                if (teksto.length >= 2) dk.nordfalk.esperanto.domain.repository.SerĉoRezulto(elsendojLaŭTitolo = listOf(testElsendo)) else dk.nordfalk.esperanto.domain.repository.SerĉoRezulto()
+                if (teksto.length >= 2) dk.nordfalk.esperanto.domain.repository.SerĉoRezulto(elsendoj = listOf(testElsendo)) else dk.nordfalk.esperanto.domain.repository.SerĉoRezulto()
         }
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {

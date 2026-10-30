@@ -87,8 +87,8 @@ class SerĉoEkranoTest {
             petoj.add(teksto)
             return if (teksto == "esper") {
                 SerĉoRezulto(
-                    kanalojLaŭTitolo = listOf(Kanalo(slug = "test", nomo = "Esperanto Radio", podkastaRssUrl = "https://x.example/feed")),
-                    elsendojLaŭTitolo = listOf(Elsendo(id = "test:esper", kanaloSlug = "test", titolo = "Esperanto-podkasto", fluo = "https://x.com/e.mp3", dato = "2024-01-01"))
+                    kanaloj = listOf(Kanalo(slug = "test", nomo = "Esperanto Radio", podkastaRssUrl = "https://x.example/feed")),
+                    elsendoj = listOf(Elsendo(id = "test:esper", kanaloSlug = "test", titolo = "Esperanto-podkasto", fluo = "https://x.com/e.mp3", dato = "2024-01-01"))
                 )
             } else SerĉoRezulto()
         }

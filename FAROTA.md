@@ -386,7 +386,7 @@
 #### C60 — Serĉ-ordigo: unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj
 - **Statuso**: [x]
 - **Fonto**: ideo de la posedanto (2026-10-30)
-- **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto` (4 grupoj) redonata de `SerĉoDeponejo.serĉi`; `SerĉoDeponejoImpl` nun serĉas ankaŭ kanalojn per `KanaloDeponejo` (titolo, poste priskribo) kaj elsendojn per la novaj `ElsendoDeponejo.serĉiEnTitoloj`/`serĉiEnPriskriboj`; ĉiu ero aperas nur en sia unua grupo (dedup). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj" (titolo-matĉoj unue en ĉiu), klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
+- **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto(kanaloj, elsendoj)` — ambaŭ listoj jam ordigitaj laŭ graveco (titolo-trovoj unue, poste priskribo-trovoj; dedup per `partition`), redonata de `SerĉoDeponejo.serĉi`. `SerĉoDeponejoImpl` serĉas nun ankaŭ kanalojn per `KanaloDeponejo`; por elsendoj unu grupiga metodo `ElsendoDeponejo.serĉiElsendojnGrupigite` (Pair). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj", klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
 
 ---
 

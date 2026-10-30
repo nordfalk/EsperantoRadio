@@ -317,6 +317,7 @@ fun EsperantoRadioApp(
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                             )
                         }
                         entry<Vojo.Elŝutoj> {

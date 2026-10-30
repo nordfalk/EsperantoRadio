@@ -263,6 +263,14 @@ open class ElsendoDeponejoImpl(
         return rezulto
     }
 
+    /** C60: serĉo nur en la elsendtitoloj. */
+    override suspend fun serĉiEnTitoloj(teksto: String, limo: Int): List<Elsendo> =
+        kaŝmemoro.values.flatten().filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
+
+    /** C60: serĉo nur en la elsendpriskriboj. */
+    override suspend fun serĉiEnPriskriboj(teksto: String, limo: Int): List<Elsendo> =
+        kaŝmemoro.values.flatten().filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }.take(limo)
+
     /**
      * Kontrolas ke la respondo aspektas kiel RSS/Atom-fluo. Fiaskpaĝo kun HTTP 200
      * (prokura servilo, kaptiva portalo) ne devas anstataŭigi la kaŝon.

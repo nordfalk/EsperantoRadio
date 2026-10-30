@@ -384,11 +384,9 @@
   ĝi povus proponi la valoron por ĉiu kanalo.
 
 #### C60 — Serĉ-ordigo: unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj
-- **Statuso**: [ ]
+- **Statuso**: [x]
 - **Fonto**: ideo de la posedanto (2026-10-30)
-- **Loko**: `SerĉoDeponejoImpl.serĉi` (`PersonigoDeponejojImpl.kt:125-133`) nun vokas nur `ElsendoDeponejo.serĉiElsendojn` (filtras nur `elsendo.titolo`/`priskribo` en la kaŝmemoro — neniam serĉas kanalojn, neniu ordigo de la rezultoj)
-- **Priskribo**: la serĉo montru trovojn grupigitaj laŭ graveco: (1) kanalo kies titolo kongruas, (2) kanalo kies priskribo kongruas, (3) elsendo kies titolo kongruas, (4) elsendo kies priskribo kongruas. Eventuale ene de grupo ankoraŭ ordigi (ekz. laŭ dato).
-- **Sugesto**: etendu `SerĉoDeponejo.serĉi` por redoni grupigitan rezulton (aŭ plurajn listojn: `List<Kanalo>` + `List<Elsendo>` kun la grupoj ene) — serĉu kanalojn en `KanaloDeponejo` (titolo, priskribo) kaj elsendojn kiel nun; la ekrano (`SerĉoEkrano.kt`) montru la grupojn kun titoloj ("Kanaloj", "Elsendoj").
+- **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto` (4 grupoj) redonata de `SerĉoDeponejo.serĉi`; `SerĉoDeponejoImpl` nun serĉas ankaŭ kanalojn per `KanaloDeponejo` (titolo, poste priskribo) kaj elsendojn per la novaj `ElsendoDeponejo.serĉiEnTitoloj`/`serĉiEnPriskriboj`; ĉiu ero aperas nur en sia unua grupo (dedup). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj" (titolo-matĉoj unue en ĉiu), klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
 
 ---
 

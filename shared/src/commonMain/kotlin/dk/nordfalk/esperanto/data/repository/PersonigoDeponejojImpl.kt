@@ -7,6 +7,8 @@ import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LastAŭskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.logd
@@ -124,11 +126,27 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
 
 class SerĉoDeponejoImpl(
     private val elsendoDeponejo: ElsendoDeponejo,
+    private val kanaloDeponejo: KanaloDeponejo,
 ) : SerĉoDeponejo {
-    override suspend fun serĉi(teksto: String, limo: Int): List<Elsendo> {
-        val rezulto = elsendoDeponejo.serĉiElsendojn(teksto, limo)
-        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — ${rezulto.size} trovoj")
-        return rezulto
+    /**
+     * C60: la rezulto estas grupigita laŭ graveco — kanaltitoloj, kanalpriskriboj,
+     * elsendtitoloj, elsendpriskriboj. Ĉiu ero aperas nur en sia unua grupo (dedup).
+     */
+    override suspend fun serĉi(teksto: String, limo: Int): SerĉoRezulto {
+        val kanaloj = kanaloDeponejo.getKanalojn()
+        val kanalojLaŭTitolo = kanaloj.filter { it.nomo.contains(teksto, ignoreCase = true) }.take(limo)
+        val titoloSlugs = kanalojLaŭTitolo.map { it.slug }.toSet()
+        val kanalojLaŭPriskribo = kanaloj
+            .filter { it.slug !in titoloSlugs && it.priskribo?.contains(teksto, ignoreCase = true) == true }
+            .take(limo)
+        val elsendojLaŭTitolo = elsendoDeponejo.serĉiEnTitoloj(teksto, limo)
+        val titoloIds = elsendojLaŭTitolo.map { it.id }.toSet()
+        val elsendojLaŭPriskribo = elsendoDeponejo.serĉiEnPriskriboj(teksto, limo)
+            .filter { it.id !in titoloIds }
+            .take(limo)
+        val entute = kanalojLaŭTitolo.size + kanalojLaŭPriskribo.size + elsendojLaŭTitolo.size + elsendojLaŭPriskribo.size
+        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — $entute trovoj (kanaloj ${kanalojLaŭTitolo.size}+${kanalojLaŭPriskribo.size}, elsendoj ${elsendojLaŭTitolo.size}+${elsendojLaŭPriskribo.size})")
+        return SerĉoRezulto(kanalojLaŭTitolo, kanalojLaŭPriskribo, elsendojLaŭTitolo, elsendojLaŭPriskribo)
     }
 }
 

@@ -5,6 +5,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,8 +44,25 @@ interface LudatojDeponejo {
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
+/**
+ * Rezulto de serĉo, grupigita laŭ graveco (C60): unue trovoj en kanaltitoloj,
+ * poste en kanalpriskriboj, poste en elsendtitoloj, poste en elsendpriskriboj.
+ * Ero aperas nur en sia unua grupo (dedup): titolo-trovo ne ripetiĝas en la
+ * priskribo-grupo.
+ */
+data class SerĉoRezulto(
+    val kanalojLaŭTitolo: List<Kanalo> = emptyList(),
+    val kanalojLaŭPriskribo: List<Kanalo> = emptyList(),
+    val elsendojLaŭTitolo: List<Elsendo> = emptyList(),
+    val elsendojLaŭPriskribo: List<Elsendo> = emptyList(),
+) {
+    val estasVacia: Boolean
+        get() = kanalojLaŭTitolo.isEmpty() && kanalojLaŭPriskribo.isEmpty() &&
+            elsendojLaŭTitolo.isEmpty() && elsendojLaŭPriskribo.isEmpty()
+}
+
 interface SerĉoDeponejo {
-    suspend fun serĉi(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun serĉi(teksto: String, limo: Int = 50): SerĉoRezulto
 }
 
 interface AgordojDeponejo {

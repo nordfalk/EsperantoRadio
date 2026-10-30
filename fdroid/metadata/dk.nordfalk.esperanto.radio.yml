@@ -2,6 +2,7 @@
 #
 # Ĉi tiu dosiero estas laŭ la nuna fdroiddata-formato (Build Metadata Reference:
 # https://f-droid.org/docs/Build_Metadata_Reference/) kaj rekte submetebla.
+# Detala paŝon-post-paŝa gvidilo por la submeto: fdroid/GVIDILO.md
 # Procedo (2026-10-29, C50):
 # 1. Kreu GitLab-konton (aŭ uzu ekzistan) ĉe https://gitlab.com
 # 2. Forku https://gitlab.com/fdroid/fdroiddata
@@ -26,7 +27,7 @@ Categories:
 License: GPL-3.0-or-later
 
 AuthorName: Jacob Nordfalk
-AuthorEmail: jacob@nordfalk.dk
+AuthorEmail: jacob.nordfalk@proton.me
 WebSite: https://nordfalk.github.io/EsperantoRadio/
 SourceCode: https://github.com/nordfalk/EsperantoRadio
 IssueTracker: https://github.com/nordfalk/EsperantoRadio/issues
@@ -41,8 +42,8 @@ Description: |-
   unu apo: kanal-superrigardo, rektaj elsendoj, podkastoj, elŝutoj, plej
   ŝatataj, serĉo kaj vekhorloĝo.
 
-  La aplikaĵo estas konstruita per Compose Multiplatform kaj devenas de la
-  dana DR Radio-apo (GPL).
+  Inter la kanaloj: Muzaiko (24-hora Esperanto-retradio), Radio Vatikana
+  (ekde 1977), Varsovia Vento, Pola Retradio, Kernpunkto kaj La Malfamuloj.
 
 Summary:en-US: Radio with 27 Esperanto channels and podcasts, from around the world
 Description:en-US: |-
@@ -50,8 +51,9 @@ Description:en-US: |-
   world in one app: channel overview, live streams, podcasts, downloads,
   favourites, search and an alarm clock.
 
-  The app is built with Compose Multiplatform and is a fork of the Danish
-  DR Radio app (GPL).
+  Among the channels: Muzaiko (24-hour Esperanto web radio), Vatican
+  Radio in Esperanto (since 1977), Varsovia Vento, Polish Radio,
+  Kernpunkto and The Infamous Ones (La Malfamuloj).
 
 RepoType: git
 Repo: https://github.com/nordfalk/EsperantoRadio.git

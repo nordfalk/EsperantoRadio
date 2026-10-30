@@ -152,8 +152,10 @@ gustumo, do `assembleRelease`. Pliaj taskoj iras en `preassemble:`.)
    ```
 4. **Kreu merge request** al `fdroid/fdroiddata`. La GitLab-CI de fdroiddata
    aŭtomate provas konstrui — se ĝi malsukcesas, la eligilo montras kial.
-5. **Atendu la revizion** (tigoj ĝis semajnoj); respondu al demandoj de la
-   kontrolistoj en la MR-fadeno.
+5. **Atendu la revizion** (kelkaj tagoj ĝis semajnoj); respondu al demandoj
+   de la kontrolistoj en la MR-fadeno. Detala paŝon-post-paŝa trairado (ankaŭ
+   por la fork/MR en GitLab kaj pretaj respondoj al kontrolistoj):
+   [`fdroid/GVIDILO.md`](../fdroid/GVIDILO.md).
 
 ### Estontaj ĝisdatigoj
 

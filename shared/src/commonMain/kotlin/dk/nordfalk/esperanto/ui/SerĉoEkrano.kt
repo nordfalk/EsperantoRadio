@@ -105,6 +105,10 @@ fun SerĉoEkrano(
                 Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     CircularProgressIndicator()
                 }
+            } else if (teksto.length >= 2 && rezultoj.estasVacia) {
+                Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Text("Nenion trovitan")
+                }
             } else {
                 // C60: la listoj jam estas ordigitaj laŭ graveco — kanaloj unue
                 // (titolo-matĉoj antaŭ priskribo-matĉoj), poste elsendoj (same)

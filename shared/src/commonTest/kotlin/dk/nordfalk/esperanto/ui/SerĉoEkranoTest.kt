@@ -63,6 +63,20 @@ class SerĉoEkranoTest {
         onAllNodesWithText("Esperanto-podkasto").assertCountEquals(1)
     }
 
+    /** Malplena rezulto montras "Nenion trovitan" (nur post almenaŭ 2 signoj). */
+    @Test
+    fun montrasNenionTrovitanKiamVacia() = runComposeUiTest {
+        val deponejo = FalsaSerĉoDeponejo()
+        setContent { SerĉoEkrano(serĉoDeponejo = deponejo, onElsendo = {}) }
+        waitForIdle()
+
+        onNodeWithText("Trovu kanalon aŭ elsendon…").performTextInput("xyz")
+        mainClock.advanceTimeBy(1000)
+        waitForIdle()
+
+        onNodeWithText("Nenion trovitan").assertIsDisplayed()
+    }
+
     /** C60: la rezulto montras kaj la kanalon kaj la elsendon en siaj sekcioj. */
     @Test
     fun montrasGrupigitajnSekciojn() = runComposeUiTest {

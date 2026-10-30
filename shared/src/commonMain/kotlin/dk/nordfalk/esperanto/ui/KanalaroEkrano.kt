@@ -203,7 +203,7 @@ fun KanalaroEkrano(
 }
 
 @Composable
-private fun KanaloEro(
+internal fun KanaloEro(
     kanalo: Kanalo,
     onClick: () -> Unit,
     onLudi: (() -> Unit)? = null,

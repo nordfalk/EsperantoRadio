@@ -1,6 +1,5 @@
 package dk.nordfalk.esperanto.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -118,23 +117,21 @@ fun SerĉoEkrano(
                     if (kanaloj.isNotEmpty()) {
                         item { SekcioTitolo("Kanaloj") }
                         items(kanaloj, key = { "kanalo:${it.slug}" }) { kanalo ->
-                            ListItem(
-                                headlineContent = { Text(kanalo.nomo, maxLines = 2) },
-                                supportingContent = { kanalo.priskribo?.let { Text(it, maxLines = 2) } },
-                                modifier = Modifier.clickable { logi("Klako", "serĉrezulto kanalo ${kanalo.slug}"); onKanalo(kanalo) }
+                            // La sama listero kiel en la kanalary-paĝo
+                            KanaloEro(
+                                kanalo = kanalo,
+                                onClick = { logi("Klako", "serĉrezulto kanalo ${kanalo.slug}"); onKanalo(kanalo) }
                             )
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }
                     if (elsendoj.isNotEmpty()) {
                         item { SekcioTitolo("Elsendoj") }
                         items(elsendoj, key = { "elsendo:${it.id}" }) { elsendo ->
-                            ListItem(
-                                headlineContent = { Text(elsendo.titolo, maxLines = 2) },
-                                supportingContent = { Text(elsendo.kanaloSlug) },
-                                modifier = Modifier.clickable { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
+                            // La sama listero kiel en la kanalo-paĝo
+                            ElsendoEro(
+                                elsendo = elsendo,
+                                onClick = { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
                             )
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }
                 }

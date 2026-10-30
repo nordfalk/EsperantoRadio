@@ -260,7 +260,7 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
                                 },
                                 onAgordoj = { push(Vojo.Agordoj) },
-                                onElŝutoj = { push(Vojo.Elŝutoj) },
+                                onSerĉo = { push(Vojo.Serĉo) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
                                 onKaŝuHejmajnAvertojn = {
                                     // Kaŝu la NUNAJN problemo-tipojn; nova problemo poste reaperigos la karton

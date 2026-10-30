@@ -363,13 +363,13 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceSekundojn: Float`
-  (frakcieblaj valoroj), efikas nur se la uzanto jam aŭskultis ion de la sama kanalo
-  dum la pasinta semajno (TRANSSALTA_SEMAJNO_MS = 7 tagoj — 2026-10-30 decido de la
-  posedanto, antaŭe monato); komenco = max(savitaPozicio, transsalto).
-  La valoro povas dependi de la elsendo-dato: `transsaltuKomenceLaŭDato` — listo de
-  { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (fina dato inkluziva; la lasta ero sen „ĝis"
-  validas por estontaj elsendoj; ne malplena listo venkas super la simpla kampo).
+- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceLaŭDato`
+  — listo de { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (frakcieblaj valoroj; fina dato
+  inkluziva; la lasta ero sen „ĝis" validas ankaŭ por estontaj elsendoj; unuopa
+  valoro = unu ero sen „ĝis"; malplena listo = ne transsalti), efikas nur se la
+  uzanto jam aŭskultis ion de la sama kanalo dum la pasinta semajno
+  (TRANSSALTA_SEMAJNO_MS = 7 tagoj — 2026-10-30 decido de la posedanto, antaŭe
+  monato); komenco = max(savitaPozicio, transsalto).
   Aldone (PR #144): snackbar „Transsaltis la enkondukon" kun klariga dialogo;
   agordoj „Transsalti enkondukon" (ĉefa ŝaltilo) kaj „Sciigo pri transsaltita
   enkondukon" („Bone" en la dialogo malŝaltas ĝin).

@@ -110,12 +110,11 @@ data class KanaloDto(
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
-    /** Kiom da sekundoj (frakcieble) transsalti ĉe la komenco de ĉiu elsendo (ripetiĝanta enkonduko — FAROTA C59a). */
-    val transsaltuKomenceSekundojn: Float = 0.0f,
     /**
-     * Laŭdato-varianto (C59a): valoro laŭ la publikig-dato de la elsendo — por
-     * kanaloj kies enkonduko ŝanĝiĝis. La lasta ero estu sen „ĝis" (validas por
-     * estontaj elsendoj). Ne malplena listo venkas super transsaltuKomenceSekundojn.
+     * Transsaltendaj sekundoj de la komenco de ĉiu elsendo (ripetiĝanta enkonduko —
+     * FAROTA C59a). Unuopa valoro = unu ero sen „ĝis"; se la enkonduko ŝanĝiĝis,
+     * pluraj eroj kun finaj datoj — la lasta ero estu sen „ĝis" (validas por
+     * estontaj elsendoj). Malplena listo = ne transsalti.
      */
     val transsaltuKomenceLaŭDato: List<TranssaltaValoroLaŭDatoDto> = emptyList(),
     val defaŭltŜatata: Boolean = false,
@@ -144,7 +143,6 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
-    transsaltuKomenceSekundojn = transsaltuKomenceSekundojn,
     transsaltuKomenceLaŭDato = transsaltuKomenceLaŭDato.map { it.alValoro() },
     defaŭltŜatata = defaŭltŜatata,
 )

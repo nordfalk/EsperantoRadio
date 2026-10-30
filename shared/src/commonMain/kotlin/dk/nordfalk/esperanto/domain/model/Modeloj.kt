@@ -26,17 +26,12 @@ data class Kanalo(
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
     /**
-     * Kiom da sekundoj (fra kleceble, ekz. 12.5) transsalti ĉe la komenco de ĉiu
-     * elsendo de tiu kanalo — por ripetiĝantaj enkondukoj (FAROTA C59a; datum-movita,
-     * el la JSONC). 0 = ne transsalti. La transsalto efikas nur por uzanto, kiu jam
-     * aŭskultis ion de tiu kanalo dum la pasinta semajno (novaj aŭskultantoj aŭdu
-     * la enkonduk-identecon).
-     */
-    val transsaltuKomenceSekundojn: Float = 0.0f,
-    /**
-     * Datum-movita laŭdato-varianto de transsaltuKomenceSekundojn (C59a): se la
-     * enkonduko de la kanalo ŝanĝiĝis, la valoro povas dependi de la elsendo-dato.
-     * Ne malplena listo venkas super transsaltuKomenceSekundojn.
+     * Transsaltendaj sekundoj de la komenco de ĉiu elsendo — por ripetiĝantaj
+     * enkondukoj (FAROTA C59a; datum-movita, el la JSONC). Unuopa valoro = unu
+     * ero sen fina dato; se la enkonduko ŝanĝiĝis, pluraj eroj kun finaj datoj.
+     * Malplena listo = ne transsalti. La transsalto efikas nur por uzanto, kiu
+     * jam aŭskultis ion de tiu kanalo dum la pasinta semajno (novaj aŭskultantoj
+     * aŭdu la enkonduk-identecon).
      */
     @Transient
     val transsaltuKomenceLaŭDato: List<TranssaltaValoroLaŭDato> = emptyList(),
@@ -49,11 +44,11 @@ data class Kanalo(
      * Kiom da sekundoj transsalti por elsendo publikigita je [dato] (yyyy-MM-dd):
      * la unua laŭdato-ero kies fina dato („ĝis", inkluziva) ankoraŭ kovras la
      * elsendo-daton; la lasta ero sen fina dato kovras ĉion post ĝi kaj ankaŭ
-     * estontajn elsendojn. Sen listo validas la simpla transsaltuKomenceSekundojn.
+     * estontajn elsendojn. Malplena listo = 0 (ne transsalti).
      * Nekonata/malplena dato → la valoro de la lasta ero.
      */
     fun transsaltajSekundojPor(dato: String): Float {
-        if (transsaltuKomenceLaŭDato.isEmpty()) return transsaltuKomenceSekundojn
+        if (transsaltuKomenceLaŭDato.isEmpty()) return 0.0f
         if (dato.isBlank()) return transsaltuKomenceLaŭDato.last().sekundoj
         return transsaltuKomenceLaŭDato
             .firstOrNull { ero -> ero.ĝis?.let { dato <= it } ?: true }

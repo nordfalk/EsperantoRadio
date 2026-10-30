@@ -6,6 +6,7 @@ import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
@@ -45,6 +46,10 @@ class LudvicoRegiloTest {
         fluo = "https://x.com/$id.mp3",
         dato = dato,
     )
+
+    /** Unuopa aŭ pluraj transsaltaj valoroj sen dato-limo — la simpla kazo de transsaltuKomenceLaŭDato. */
+    private fun laŭdato(vararg sekundoj: Float) =
+        sekundoj.map { TranssaltaValoroLaŭDato(sekundoj = it) }
 
     /** Kreas la LudvicoRegilo kun memoraj deponejoj. */
     private fun kreuRegilon(
@@ -131,7 +136,7 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
-    // Transsaltado de ripetiĝanta enkonduko (C59a) — transsaltuKomenceSekundojn
+    // Transsaltado de ripetiĝanta enkonduko (C59a) — transsaltuKomenceLaŭDato
     // (efikas nur se la uzanto jam aŭskultis ion de la sama kanalo dum la
     // pasinta semajno — novaj aŭskultantoj aŭdu la enkonduk-identecon)
     // =========================================================================
@@ -142,7 +147,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo
         ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
 
@@ -158,7 +163,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĉesis je 10 s — ene de la 20-sekunda enkonduko (kaj ĵus aŭskoltis)
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 10_000, 300_000)
 
@@ -174,7 +179,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĉesis je 60 s — jam post la enkonduko; resumu normale
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 60_000, 300_000)
 
@@ -189,7 +194,7 @@ class LudvicoRegiloTest {
     fun neTranssaltasSeLaUzantoNeniamAŭskultisLaKanalon() = runTest {
         val ludilo = NoOpLudiloRegilo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
 
         val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), scope = this)
 
@@ -203,7 +208,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         val antaŭ8Tagoj = Clock.System.now().toEpochMilliseconds() - 8L * 24 * 60 * 60 * 1000
         ludatoj.enmetuLudaton(
             LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", pozicioMs = 5_000, daŭroMs = 300_000, lasteLudita = antaŭ8Tagoj)
@@ -223,7 +228,6 @@ class LudvicoRegiloTest {
         val ludatoj = LudatojDeponejoMaketo()
         val kanalo = Kanalo(
             slug = "k1", nomo = "Kanalo 1",
-            transsaltuKomenceSekundojn = 99.0f, // devas esti IGNORATA kiam la listo ekzistas
             transsaltuKomenceLaŭDato = listOf(
                 dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 50.0f, ĝis = "2025-06-10"),
                 dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 30.0f),
@@ -249,7 +253,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 12.5f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(12.5f))
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 5_000, 300_000)
 
         val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
@@ -285,7 +289,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo
         ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
 
@@ -307,7 +311,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĉesis je 60 s — jam post la enkonduko; nenio transsaltiĝas
         ludatoj.registriPozicion(e.id, e.kanaloSlug, 60_000, 300_000)
 
@@ -326,7 +330,7 @@ class LudvicoRegiloTest {
         val ludilo = NoOpLudiloRegilo()
         val ludatoj = LudatojDeponejoMaketo()
         val e = elsendo("e1", kanalo = "k1")
-        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = 20.0f)
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceLaŭDato = laŭdato(20.0f))
         // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo — sed la
         // agordo „Transsalti enkondukon" estas malŝaltita
         ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))

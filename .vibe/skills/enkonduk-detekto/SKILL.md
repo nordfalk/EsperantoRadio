@@ -1,23 +1,22 @@
 ---
 name: enkonduk-detekto
-description: Ŝargu ĉi tiun skill-on kiam vi devas esplori/elkalkuli la valoron de `transsaltuKomenceSekundojn` por kanalo(j) — elŝuti la plej freŝajn elsendojn, kompari iliajn komencojn spektrograme kaj rekomendi valoron (FAROTA C59b). Ankaŭ por prilabori la rezultojn en la kanalkonfiguro.
+description: Ŝargu ĉi tiun skill-on kiam vi devas esplori/elkalkuli la valoron de `transsaltuKomenceLaŭDato` por kanalo(j) — elŝuti la plej freŝajn elsendojn, kompari iliajn komencojn spektrograme kaj rekomendi valoron (FAROTA C59b). Ankaŭ por prilabori la rezultojn en la kanalkonfiguro.
 ---
 
 # Enkonduk-detekto — ĉu kanalo havas ripetiĝantan enkondukon? (C59b)
 
 ## La tasko
 
-La agord-kampo `transsaltuKomenceSekundojn` (FAROTA C59a) transsaltas la
+La agord-kampo `transsaltuKomenceLaŭDato` (FAROTA C59a) transsaltas la
 komenco de ĉiu elsendo de kanalo. Tiu ĉi skill-o trovas la valoron empirie:
 se la komenco de pluraj elsendoj sonas same, oni transsaltas ĝin ĝis la punkto
 kie ili ekmalas.
 
-Se la enkonduko ŝanĝiĝis dum la historio de la kanalo, uzu anstataŭe la
-laŭdato-kampon `transsaltuKomenceLaŭDato` — listo de
-`{ "sekundoj": X, "ĝis": "YYYY-MM-DD" }` (fina dato INKLUZIVA; la lasta ero
-sen `ĝis` validas por estontaj elsendoj; ne malplena listo venkas super la
-simpla `transsaltuKomenceSekundojn`). Tiam detektu la valoron aparte po
-epoko (ekz. nur elsendoj antaŭ/ post la ŝanĝo).
+Formato: listo de `{ "sekundoj": X, "ĝis": "YYYY-MM-DD" }` — unuopa valoro = unu
+ero sen `ĝis`; se la enkonduko ŝanĝiĝis dum la historio de la kanalo, pluraj
+eroj kun finaj datoj (INKLUZIVAJ; la lasta ero sen `ĝis` validas por estontaj
+elsendoj). Tiam detektu la valoron aparte po epoko (ekz. nur elsendoj antaŭ/
+post la ŝanĝo).
 
 ## Kiel ruli
 
@@ -75,6 +74,7 @@ landas en `/tmp/intro-detekto/` (forigeblas libere).
 
 1. Kontrolu la superrigordon; enmetu la rekomendatajn valorojn en
    `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
-   (`"transsaltuKomenceSekundojn": <valoro>` en la koncerna kanal-objekto).
+   (`"transsaltuKomenceLaŭDato": [{ "sekundoj": <valoro> }]` en la koncerna kanal-objekto;
+   kun ŝanĝita enkonduko: pluraj eroj kun `ĝis`).
 2. `./gradlew :shared:desktopTest` (la fum-testo validigas la agordon).
 3. Ĝisdatigu la C59-eron en `FAROTA.md` kun la rezultoj kaj dato.

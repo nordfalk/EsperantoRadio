@@ -252,7 +252,7 @@ class KanalAgordoLegantoTest {
                     {
                         "kodo": "simpla",
                         "nomo": "Simpla",
-                        "transsaltuKomenceSekundojn": 22.0
+                        "transsaltuKomenceLaŭDato": [{ "sekundoj": 22.0 }]
                     }
                 ]
             }
@@ -271,9 +271,10 @@ class KanalAgordoLegantoTest {
         assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-11"))
         assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2030-01-01"), "Estontaj elsendoj → la lasta valoro")
         assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor(""), "Nekonata dato → la lasta valoro")
-        // La simpla kampo restas senŝanĝa (retrokongruo)
+        // Unuopa valoro sen fina dato — valida por ĉiu elsendo-dato
         val simpla = agordo.kanaloj[1].alKanalo()
+        assertEquals(1, simpla.transsaltuKomenceLaŭDato.size)
         assertEquals(22.0f, simpla.transsaltajSekundojPor("2030-01-01"))
-        assertTrue(simpla.transsaltuKomenceLaŭDato.isEmpty())
+        assertEquals(22.0f, simpla.transsaltajSekundojPor("2020-01-01"))
     }
 }

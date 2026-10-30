@@ -30,8 +30,21 @@ python3 .vibe/skills/enkonduk-detekto/detekto.py --kanaloj kernpunkto,humilopini
 
 La skripto legas `shared/src/commonMain/resources/esperantoradio_konfiguro.json`,
 elŝutas la unuajn 120 s de ĉiu elsendo (8 kHz mono PCM per `ffmpeg`),
-kaj presas superrigardon kun rekomendata valoro po kanalo. La PCM-filmetoj
-landas en `/tmp/intro-detekto/` (forigeblas libere).
+kaj presas superrigordon kun rekomendata valoro po kanalo.
+
+**Kaŝo (persista, reuzu ĝin):** la PCM-filmetoj landas en
+`RssArkivServer-filcache/enkonduk-detekto/pcm/` (`.gitignore`-ita, do NE en la
+deponejo, sed postvivas restartojn — malsame ol `/tmp`). Jam-kaŝita elsendo ne
+re-elŝutiĝas (2026-10-30: 354 MB da elsendoj de 21 kanaloj + la tuta 3zzz-historio
+2025-01…2026-10). Forigu la dosierojn nur se vi vere bezonas diskospacon; la
+re-elŝuto estas nur malrapida, ne danĝera.
+
+**Malnovaj elsendoj ekster la fluo:** se la RSS-fluo portas nur la lastajn N
+erojn sed la sondosieroj havas antaŭdirekteblan URL-ŝablonon (ekz. 3zzz:
+`https://melburno.org.au/3ZZZradio/mp3/YYYY-MM-DD.3ZZZ.radio.mp3` — ĉiuj
+lundoj ekde 2025 ekzistas), vi povas elŝuti pli malnovajn epokojn rekte por
+epok-konscia detekto (tiel oni trovis la 3zzz-ŝanĝojn de 2026-01-05 kaj
+2026-07-20).
 
 ## La metodo (kaj kial ĝuste tiel)
 

@@ -20,7 +20,9 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 
 AGORDO = "shared/src/commonMain/resources/esperantoradio_konfiguro.json"
-LABOREJO = "/tmp/intro-detekto"
+# Persista kaŝo (RssArkivServer-filcache estas .gitignore-ita): la PCM-dosieroj
+# postvivas restartojn kaj estas reuzataj de venontaj ruloj — ne re-elŝutu ilin.
+LABOREJO = "RssArkivServer-filcache/enkonduk-detekto"
 SR = 8000
 NA = 512      # FFT-grandeco
 PASO = 256    # 32 ms

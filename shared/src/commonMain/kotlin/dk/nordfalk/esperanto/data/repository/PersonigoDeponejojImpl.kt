@@ -133,20 +133,21 @@ class SerĉoDeponejoImpl(
      * elsendtitoloj, elsendpriskriboj. Ĉiu ero aperas nur en sia unua grupo (dedup).
      */
     override suspend fun serĉi(teksto: String, limo: Int): SerĉoRezulto {
-        val kanaloj = kanaloDeponejo.getKanalojn()
-        val kanalojLaŭTitolo = kanaloj.filter { it.nomo.contains(teksto, ignoreCase = true) }.take(limo)
-        val titoloSlugs = kanalojLaŭTitolo.map { it.slug }.toSet()
-        val kanalojLaŭPriskribo = kanaloj
-            .filter { it.slug !in titoloSlugs && it.priskribo?.contains(teksto, ignoreCase = true) == true }
+        // Kanaloj: unupaŝa disigo per partition — titolo-trovoj unue, el la resto priskribo-trovoj
+        val (kanalojLaŭTitolo, kanaloResto) = kanaloDeponejo.getKanalojn()
+            .partition { it.nomo.contains(teksto, ignoreCase = true) }
+        val kanalojLaŭPriskribo = kanaloResto
+            .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
             .take(limo)
-        val elsendojLaŭTitolo = elsendoDeponejo.serĉiEnTitoloj(teksto, limo)
-        val titoloIds = elsendojLaŭTitolo.map { it.id }.toSet()
-        val elsendojLaŭPriskribo = elsendoDeponejo.serĉiEnPriskriboj(teksto, limo)
-            .filter { it.id !in titoloIds }
-            .take(limo)
+        val (elsendojLaŭTitolo, elsendojLaŭPriskribo) = elsendoDeponejo.serĉiElsendojnGrupigite(teksto, limo)
         val entute = kanalojLaŭTitolo.size + kanalojLaŭPriskribo.size + elsendojLaŭTitolo.size + elsendojLaŭPriskribo.size
         logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — $entute trovoj (kanaloj ${kanalojLaŭTitolo.size}+${kanalojLaŭPriskribo.size}, elsendoj ${elsendojLaŭTitolo.size}+${elsendojLaŭPriskribo.size})")
-        return SerĉoRezulto(kanalojLaŭTitolo, kanalojLaŭPriskribo, elsendojLaŭTitolo, elsendojLaŭPriskribo)
+        return SerĉoRezulto(
+            kanalojLaŭTitolo = kanalojLaŭTitolo.take(limo),
+            kanalojLaŭPriskribo = kanalojLaŭPriskribo,
+            elsendojLaŭTitolo = elsendojLaŭTitolo,
+            elsendojLaŭPriskribo = elsendojLaŭPriskribo,
+        )
     }
 }
 

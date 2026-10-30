@@ -263,13 +263,14 @@ open class ElsendoDeponejoImpl(
         return rezulto
     }
 
-    /** C60: serĉo nur en la elsendtitoloj. */
-    override suspend fun serĉiEnTitoloj(teksto: String, limo: Int): List<Elsendo> =
-        kaŝmemoro.values.flatten().filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
-
-    /** C60: serĉo nur en la elsendpriskriboj. */
-    override suspend fun serĉiEnPriskriboj(teksto: String, limo: Int): List<Elsendo> =
-        kaŝmemoro.values.flatten().filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }.take(limo)
+    /** C60: grupigita serĉo — titolo-trovoj kaj nur-priskribo-trovoj en unu paŝo (partition). */
+    override suspend fun serĉiElsendojnGrupigite(teksto: String, limo: Int): Pair<List<Elsendo>, List<Elsendo>> {
+        val (titolo, resto) = kaŝmemoro.values.flatten()
+            .partition { it.titolo.contains(teksto, ignoreCase = true) }
+        return titolo.take(limo) to resto
+            .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
+            .take(limo)
+    }
 
     /**
      * Kontrolas ke la respondo aspektas kiel RSS/Atom-fluo. Fiaskpaĝo kun HTTP 200

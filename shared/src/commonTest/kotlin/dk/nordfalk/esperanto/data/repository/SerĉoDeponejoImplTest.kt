@@ -43,10 +43,12 @@ class SerĉoDeponejoImplTest {
                 it.titolo.contains(teksto, ignoreCase = true) ||
                     (it.priskribo?.contains(teksto, ignoreCase = true) ?: false)
             }.take(limo)
-        override suspend fun serĉiEnTitoloj(teksto: String, limo: Int) =
-            elsendoj.filter { it.titolo.contains(teksto, ignoreCase = true) }.take(limo)
-        override suspend fun serĉiEnPriskriboj(teksto: String, limo: Int) =
-            elsendoj.filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }.take(limo)
+        override suspend fun serĉiElsendojnGrupigite(teksto: String, limo: Int): Pair<List<Elsendo>, List<Elsendo>> {
+            val (titolo, resto) = elsendoj.partition { it.titolo.contains(teksto, ignoreCase = true) }
+            return titolo.take(limo) to resto
+                .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
+                .take(limo)
+        }
         override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean) = emptyList<Elsendo>()
     }
 

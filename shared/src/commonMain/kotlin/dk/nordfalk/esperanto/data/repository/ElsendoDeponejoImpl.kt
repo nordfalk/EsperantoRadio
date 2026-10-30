@@ -14,6 +14,12 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,6 +45,23 @@ open class ElsendoDeponejoImpl(
     @Volatile protected var kaŝmemoro: Map<String, List<Elsendo>> = emptyMap()
     @Volatile protected var fluoj: Map<String, MutableStateFlow<List<Elsendo>>> = emptyMap()
     private val mapMutex = Mutex()
+
+    /**
+     * In-flight dedup (FAROTA C39): se ŝargo por kanalo jam daŭras (ekz.
+     * malsupren-tiro dum aŭtomata ŝargo, aŭ alarmo dum ekran-ŝargo), dua
+     * samtempa voko aliĝas al la sama [Deferred] anstataŭ elŝuti la saman
+     * fluon duoble. La ero foriĝas post la fino, do la sekva voko denove
+     * taksas la kaŝmemoron.
+     */
+    private val ŝargMutex = Mutex()
+    private val ŝargadoj = mutableMapOf<String, Deferred<List<Elsendo>>>()
+
+    /**
+     * Skopo por la daŭranta ŝargo — sendependa de la vokanto, ke la elŝuto
+     * finiĝu kaj plenigu la kaŝon eĉ se la unua vokanto (ekz. ekran-foriro)
+     * estas nuligita. Default, ne IO — IO ne ekzistas sur wasmJs.
+     */
+    private val ŝargSkopo = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     /**
      * Skribas la kanal-rezulton atome en la memoran kaŝon kaj la fluon.
@@ -87,6 +110,9 @@ open class ElsendoDeponejoImpl(
     /**
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
+     *
+     * Samtempaj vokoj por la sama kanalo estas dedupataj (C39): ili dividas
+     * unu in-flight [Deferred] kaj do unu HTTP-peton.
      */
     open suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
         val url = kanalo.podkastaRssUrl ?: run {
@@ -100,6 +126,41 @@ open class ElsendoDeponejoImpl(
             return kaŝenitaj
         }
 
+        val ŝargo = ŝargMutex.withLock {
+            ŝargadoj[kanalo.slug]?.also {
+                logd("ElsendoDeponejo", "${kanalo.slug}: aliĝas al daŭranta ŝargo anstataŭ duobla elŝuto")
+            } ?: ŝargSkopo.async { elŝutuKajParsu(kanalo, url, kaŝenitaj) }
+                .also { nova ->
+                    ŝargadoj[kanalo.slug] = nova
+                    // Forigu la eron kiam la ŝargo FINIĜAS (ne kiam vokanto finiĝas —
+                    // la unua vokanto povas esti nuligita dum la ŝargo daŭras).
+                    // Nur nian propran eron, intertempe povas aperi pli nova.
+                    nova.invokeOnCompletion {
+                        ŝargSkopo.launch {
+                            ŝargMutex.withLock {
+                                if (ŝargadoj[kanalo.slug] === nova) ŝargadoj.remove(kanalo.slug)
+                            }
+                        }
+                    }
+                }
+        }
+        return try {
+            ŝargo.await()
+        } finally {
+            // Forigu la eron se la ŝargo jam finiĝis (kutima vojo — la sekva voko
+            // denove taksas la kaŝmemoron). Se la vokanto estis nuligita meze de
+            // la ŝargo, la ero restas kaj invokeOnCompletion forigas ĝin ĉe la fino.
+            ŝargMutex.withLock {
+                if (ŝargo.isCompleted && ŝargadoj[kanalo.slug] === ŝargo) ŝargadoj.remove(kanalo.slug)
+            }
+        }
+    }
+
+    /**
+     * La reta parto de [ŝargiElsendojn]: elŝutas la RSS-fluon kaj parsas ĝin.
+     * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
+     */
+    private suspend fun elŝutuKajParsu(kanalo: Kanalo, url: String, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
         return try {
             logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
             if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))

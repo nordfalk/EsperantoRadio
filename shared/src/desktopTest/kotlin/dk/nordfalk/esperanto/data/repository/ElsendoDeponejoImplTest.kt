@@ -9,8 +9,13 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -129,6 +134,40 @@ class ElsendoDeponejoImplTest {
         val k = kanalo("test_malpura")
         assertNull(deponejo.leguKaŝitajnElsendojn(k), "Malpura kaŝo ne estas legebla kiel flue")
         assertNull(leguKaŝon(k.slug), "La malpura kaŝo devas esti forigita por ke la venonta ŝargado skribu puran")
+    }
+
+    // === C39 — in-flight dedup: samtempaj vokoj por la sama kanalo → unu HTTP-peto ===
+
+    @Test
+    fun samtempajVokojPorSamaKanaloDedupatas() = runTest {
+        val petoj = AtomicInteger(0)
+        val unuaPetoEnAgi = CompletableDeferred<Unit>()
+        val liberiguUnuanPeton = CompletableDeferred<Unit>()
+        val motoro = MockEngine {
+            petoj.incrementAndGet()
+            unuaPetoEnAgi.complete(Unit)
+            liberiguUnuanPeton.await() // tenas la unuan peton en flugo dum la dua voko alvenas
+            respond(fluoPlejMalnovajUnue, HttpStatusCode.OK)
+        }
+        val deponejo = ElsendoDeponejoImpl(HttpClient(motoro))
+        val k = kanalo("test_dedup")
+
+        val rezultoj = coroutineScope {
+            val unua = async { deponejo.ŝargiElsendojn(k, fortoRefresigi = true) }
+            unuaPetoEnAgi.await() // la unua ŝargo jam ekis kaj estas registrita en la deponejo
+            val dua = async { deponejo.ŝargiElsendojn(k, fortoRefresigi = true) }
+            repeat(10) { yield() } // la dua voko certe aliĝis al la daŭranta ŝargo
+            liberiguUnuanPeton.complete(Unit)
+            listOf(unua.await(), dua.await())
+        }
+
+        assertEquals(1, petoj.get(), "Du samtempaj vokoj devas fari nur unu HTTP-peton")
+        assertEquals(2, rezultoj[0].size)
+        assertEquals(rezultoj[0], rezultoj[1], "Ambaŭ vokantoj ricevas la saman rezulton")
+
+        // Post la fino la in-flight ero estas forigita: nova forta ŝargo denove elŝutas
+        deponejo.ŝargiElsendojn(k, fortoRefresigi = true)
+        assertEquals(2, petoj.get(), "Post la fino de la ŝargo nova voko devas denove elŝuti")
     }
 
     // === G45 (KMP-1H/1R) — limigita korpo-legado kontraŭ OutOfMemoryError ===

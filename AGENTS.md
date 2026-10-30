@@ -250,6 +250,20 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
   Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
   "you must first push the current branch" — aldonu `--head <branĉnomo>`.
+- **Eltrovu la venontan PR-numeron tuj antaŭ la unua puŝo kaj uzu ĝin en CHANGELOG**
+  per aparta commit (sen amendo): la numeroj de PR kaj issue estas komunaj, do
+  prenu la maksimuman el ambaŭ kaj aldonu 1, ekz.
+  `gh api "repos/nordfalk/EsperantoRadio/issues?state=all&per_page=100" -q '.[].number' | sort -n | tail -1`;
+  skribu la ligilon en CHANGELOG, commit, push, poste `gh pr create --head <branĉo>`.
+  Se intertempe iu alia malfermis PR kaj la numero ŝoviĝis, korektu poste per
+  aparta commit — ne per amendo. (2026-10-29, PR #147: divenis #140/#146, sed #146
+  estis intertempe okupita de alia PR, do la vera numero estis 147.)
+- **PR-revizio je peto de la posedanto**: kiam li petas "reviziu la PR", troreviziu
+  la tutan diff-on kaj aktive pripensu ĉu io mankas, misas aŭ povus esti problema
+  pri la ŝanĝoj — ne nur konfirmu. Kontrolu ĉu la ŝanĝoj obeas A7 (testo), A8
+  (neniu silenta catch), A10 (CHANGELOG), A11 (FAROTA/lecionoj), ĉu nur la propraj
+  dosieroj estas commititaj, ĉu doc-komitoj apartenas al la PR, kaj ĉu la titoo kaj
+  priskribo ĉe la PR kungruas kun la kodo kaj intenco. Se io ne kongruas, avertu.
 - **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
   (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
   `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese

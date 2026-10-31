@@ -8,12 +8,24 @@
 #
 # La instrumentitaj testoj (connectedDebugAndroidTest) restas neaŭtomataj —
 # ili bezonas emulilon kaj estas rulataj mane (vidu AGENTS.md).
+#
+# (2026-10-31, rapidigo de la CI): por ne devi atendi longe por ĉiu puŝo —
+#  1. UNU Gradle-voko anstataŭ kvar (unu konfigurado/daemon);
+#  2. la Gradle-build-kaŝo estas persistata (actions/cache + org.gradle.caching=true),
+#     do neŝanĝitaj taskoj ne rekompiliĝas (enhave hakitaj enigoj: fontoŝanĝo
+#     malvalidigas nur la tuŝitajn modulojn);
+#  3. `concurrency` kun cancel-in-progress: nova puŝo al la sama branĉo nuligas
+#     la kurantan runon — oni atendas nur la lastan.
 name: testoj-kaj-konstruo
 
 on:
   pull_request:
   push:
     branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -31,14 +43,16 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Unuopecaj testoj (Desktop)
-        run: ./gradlew :shared:desktopTest
+      # (2) Persisti la Gradle-build-kaŝon (task-eliroj), ne nur la dependencojn.
+      # La ŝlosilo dependas de la build-dosieroj; restore-keys permesas reuzi
+      # trans malgrandaj ŝanĝoj — la enhavo-hakoj interne prizorgas la reston.
+      - name: Kaŝo de la Gradle-build-kaŝo
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/build-cache-1
+          key: gradle-build-cache-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle.properties', '**/build.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: gradle-build-cache-
 
-      - name: Kompil-kontrolo Desktop
-        run: ./gradlew :desktopApp:compileKotlinDesktop
-
-      - name: Android-APK (debug)
-        run: ./gradlew :androidApp:assembleDebug
-
-      - name: Kompil-kontrolo wasmJs
-        run: ./gradlew :shared:compileKotlinWasmJs
+      # (1) Unu Gradle-voko: unu konfigurado kaj unu daemon por ĉiuj taskoj
+      - name: Testoj + kompil-kontroloj (unu Gradle-voko)
+        run: ./gradlew :shared:desktopTest :desktopApp:compileKotlinDesktop :androidApp:assembleDebug :shared:compileKotlinWasmJs

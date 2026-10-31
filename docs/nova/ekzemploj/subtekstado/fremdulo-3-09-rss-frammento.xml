@@ -1,0 +1,13 @@
+<!-- Ekzemplo: kiel la arkiv-servilo (docs/nova/06) povus aldoni la memfaritan
+     transskribon al la ero 3/09 de Fremdulo 3 (issue #142) per la Podcast-Namespace -->
+<item>
+  <title><![CDATA[3/09 Usona Radikala Fremdulo]]></title>
+  <guid isPermaLink="false">79aa6ace-82f0-40a7-aa7b-825ce048a260</guid>
+  <pubDate>Mon, 31 Aug 2026 11:01:32 GMT</pubDate>
+  <enclosure url="https://anchor.fm/s/379ccf70/podcast/play/124624214/....mp3" length="40746445" type="audio/mpeg"/>
+  <!-- NOVA: memfarita transskribo, servita de nia arkiv-servilo -->
+  <podcast:transcript url="https://arkivo.esperanto-radio.com/fremdulo/309.srt"
+                      type="application/srt" language="eo"/>
+  <podcast:transcript url="https://arkivo.esperanto-radio.com/fremdulo/309.vtt"
+                      type="text/vtt" language="eo" rel="captions"/>
+</item>

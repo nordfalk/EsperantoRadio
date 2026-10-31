@@ -101,10 +101,10 @@ sia propra ŝlosilo.
   KANONA formo de `fdroid rewritemeta` (neniu komento — alie la CI-tasko
   „fdroid rewritemeta" ruĝiĝas), kun `Builds`-ero por 3.1.1/253 (etikedo
   `v3.1.1`), `AutoUpdateMode: Version` + `UpdateCheckMode: Tags`,
-  `UpdateCheckName: Ignore` kaj `scanignore: build.gradle.kts` (klarigojn
-  vidu en `fdroid/GVIDILO.md` § 3.2). La resumoj vivas ekster la yml:
-  `fdroid/metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt` (angla —
-  la resta lingvo) kaj `…/eo/summary.txt` (esperanta). ĈIŬ SES CI-taskoj de
+  `UpdateCheckName: Ignore` kaj `scanignore: build.gradle.kts`; `commit` estas
+  la plena haketaĵo (la ŝablono malpermesas etikedojn). NENIU teksto rajtas en
+  fdroiddata — resumo, priskripo, ŝanĝoprotokolo (`default.txt`) kaj bildoj
+  venas el nia Play-listing (Triple-T). ĈIŬ SES CI-taskoj de
   la forko estis reproduktitaj verdaj loke per la samaj iloj (2026-10-31):
   `check-jsonschema` (skemo), `fdroid rewritemeta`/`lint`, la kvin
   `tools/`-kontrolskriptoj, `fdroid checkupdates --auto` („up to date") kaj

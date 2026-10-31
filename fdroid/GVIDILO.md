@@ -167,7 +167,12 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
    konstruo-ciklo; praktike 1–3 tagojn. Kontrol-ligilo:
    https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/
    (paĝo "not found" = ankoraŭ ne).
-2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid. Nia eldona
+2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid.
+   Noto pri 3.1.1: F-Droid konstruas versionCode **253** (la etikedo), dum
+   la Play-eldono havas **254** — 253 estis konsumita en Play de interna
+   testo (3.1.1-beta29okt, PR #144). Tio estas normala kaj senproblema:
+   la F-Droid-versionumejo estas sendependa, kaj la etikedo kongruas kun
+   la metadateno (253). Ekde la sekva versio (v3.1.2+) la kodoj re kongruas. Nia eldona
    procezo jam kreas la etikedon `vX.Y.Z` kaj puŝas ĝin; `AutoUpdateMode:
    Version` + `UpdateCheckMode: Tags` igas la fdroiddata-robotojn malfermi
    ĝisdatigo-MR-on mem. Reciprokaĵo: **ĉiu** eldonota versio bezonas etikedon

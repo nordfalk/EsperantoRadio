@@ -58,8 +58,12 @@ android {
     // erar-raportado: sen nia subskribo → opt-in (konsento-demando, F-Droid);
     // kun nia subskribo (Google Play, Aptoide) → defaŭlte ŝaltita (opt-out).
     // C50/PR #148. En debug-konstruoj la valoro estas senefika (ne raportas).
+    // findByName (ne getByName!): fdroidserver FORIGAS la signingConfigs-blokon
+    // el build.gradle(.kts) antaŭ ol konstrui (remove_signing_keys) — getByName
+    // tiam ĵetus "SigningConfig with name 'release' not found"; findByName
+    // redonas null kaj la konstruo sekure daŭras nesubskribita (2026-10-31).
     val senNiaSubskribo = !(
-        signingConfigs.getByName("release").storeFile?.exists() == true
+        signingConfigs.findByName("release")?.storeFile?.exists() == true
         )
 
     defaultConfig {

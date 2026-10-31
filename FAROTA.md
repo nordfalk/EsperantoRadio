@@ -261,8 +261,9 @@
     (la unua fork-CI-provo de la posedanto malkaŝis la skemo-erarojn, 2026-10-31);
   - ĉiuj ses forko-CI-taskoj reproduktitaj VERDAJ loke per la samaj iloj
     (fdroidserver + check-jsonschema + tools/-skriptoj, 2026-10-31): la yml
-    estas nun en la kanona rewritemeta-formo (neniu komento), `Summary` vivas
-    en `metadata/<appid>/{en-US,eo}/summary.txt`,
+    estas nun en la kanona rewritemeta-formo (neniu komento), NENIU teksto
+    en fdroiddata (resumo/priskribo/ŝanĝoprotokolo venas el nia Play-listing,
+    Triple-T + `release-notes/en-US/default.txt`), `commit` = plena haketaĵo,
     `UpdateCheckName: Ignore` (la nom-boto prenus la nomon de la malnova
     apo — KMP-manifesto ne troveblas), `scanignore: build.gradle.kts`
     (la skanilo rifuzas la jcenter-deklaron necesan por la malnova apo);

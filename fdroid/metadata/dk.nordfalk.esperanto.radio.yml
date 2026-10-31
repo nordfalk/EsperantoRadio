@@ -25,7 +25,7 @@ Repo: https://github.com/nordfalk/EsperantoRadio.git
 Builds:
   - versionName: 3.1.1
     versionCode: 253
-    commit: v3.1.1
+    commit: 10e3f13513ec00231e30148f4ee42cec6cb00c2a
     subdir: androidApp
     gradle:
       - yes

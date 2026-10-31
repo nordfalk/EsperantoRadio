@@ -52,28 +52,30 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
 3. Lasu la agordon kiel estas (lasi la kampojn kiel ili estas: "Project name" = fdroiddata, videbleco = Private) → klaku **Fork project**.
 4. Vi nun havas `https://gitlab.com/VIA_UZANTNOMO/fdroiddata`.
 
-### 3.2 Aldonu la metadatenon en via fork — 3 dosieroj
+### 3.2 Aldonu la metadatenon en via fork — UNU dosiero
+
+**Antaŭ ĉio**: via fork devas esti **PUBLIKA** (la oficiala ŝablono postulas
+ĝin; la MR-reviziantoj devas vidi la branĉon): via fork → Settings → General →
+Visibility → Project visibility: **Public**.
 
 **Grave**: la CI de fdroiddata validigas ĉiun taskon kontraŭ la kanona formo
 (`fdroid rewritemeta` devas esti no-op) — tial la yml enhavas NENIAJN
-komentojn, kaj `Summary` ne vivas en la yml sed en lokalizitaj dosieroj
-(`make-summary-translatable.py` forigas ĝin el la yml kaj fiaskigas la CI
-se ĝi devas tion fari mem). Kopiu ĉiujn tri dosierojn SEN ŝanĝoj:
+komentojn, kaj NENIU teksto (summary/priskribo/ŝanĝoprotokolo/bildoj) rajtas
+en fdroiddata — la oficiala MR-ŝablono diras „Don't add summary/description/
+changelog/images or anything that should be provided in upstream repo":
+ĉiuj tekstoj venas aŭtomate el nia Play-listing (Triple-T-strukturo en
+`androidApp/src/main/play/`). La MR do ŝanĝu **nur unu dosieron**:
 
 1. **`metadata/dk.nordfalk.esperanto.radio.yml`** —
    https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio.yml
-2. **`metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt`** (angla resumo —
-   `en-US` estas la resta lingvo de F-Droid) —
-   https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt
-3. **`metadata/dk.nordfalk.esperanto.radio/eo/summary.txt`** (esperanta resumo) —
-   https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio/eo/summary.txt
+   (kopiu SEN ŝanĝoj — `commit` jam estas la plena haketaĵo, ĉar la ŝablono
+   malpermesas etikedon/branon en la commit-kampo)
 
-En via fork (https://gitlab.com/nordfalk/fdroiddata): **`+` → New file**
-apud la dosieruja vojo, enigu la PLENAN vojon (subdosierujoj kreiĝas aŭtomate),
-po unu dosiero; la enhavon kopiu el la ligiloj supre. Post la unua dosiero
-elektu "Target Branch": `dk.nordfalk.esperanto.radio` (NE `master`) kaj
-u la saman branĉon por ĉiuj tri; Commit message ekz.
-`New App: dk.nordfalk.esperanto.radio`.
+En via fork (https://gitlab.com/nordfalk/fdroiddata): branĉo
+`dk.nordfalk.esperanto.radio` (NE `master`) → anstataŭigu la dosierenhavon;
+Commit message ekz. `New app: EsperantoRadio`. **Se lokaj dosierujoj
+(`metadata/dk.nordfalk.esperanto.radio/…`) restis de pli fruaj provoj, forigu
+ilin** — la ŝanĝoj-tabulo de la MR devas montri NUR la yml-on.
 
 #### Kial la yml aspektas kiel ĝi aspektas (sen komentoj en la dosiero)
 
@@ -90,9 +92,11 @@ u la saman branĉon por ĉiuj tri; Commit message ekz.
   la valoro devas esti la ĉeno „yes" (en YAML-1.1 la necitita formo estas
   legata kiel buleo de iuj iloj — la kanona formo de `rewritemeta` tamen
   precize tiel skribas ĝin kaj la CI-skemilo legas ĝin kiel ĉenon).
-- `Summary` for — `tools/make-summary-translatable.py` postulas, ke ĝi vivu
-  en `metadata/<appid>/en-US/summary.txt` (kaj `check-localized-metadata.py`
-  postulas, ke ĉiu apo kun lokalizitaj dosierujoj havu `en-US`).
+- Neniu `Summary` en la yml kaj neniu `summary.txt` en fdroiddata —
+  `tools/make-summary-translatable.py` mem migurus la Summary el la yml kaj
+  fiaskigus la CI; resumo, priskribo, ŝanĝoprotokolo (`default.txt`) kaj
+  bildoj venas el nia deponejo (Triple-T: `androidApp/src/main/play/
+  listings/en-US/`).
 
 ### 3.3 Kontrolu la CI-on de via fork
 
@@ -112,48 +116,86 @@ u la saman branĉon por ĉiuj tri; Commit message ekz.
 
 ### 3.4 Kreu la merge request-on
 
-1. Reen en via fork: supre aperas flavrubando "You have X new commits" →
-   klaku **Create merge request**. (Aŭ: malfermu
-   https://gitlab.com/fdroid/fdroiddata/-/merge_requests → "New merge request"
-   → elektu vian fork kaj la branĉon `dk.nordfalk.esperanto.radio`.)
-2. Fonto: `VIA_UZANTNOMO/fdroiddata:dk.nordfalk.esperanto.radio` → Celo: `fdroid/fdroiddata`.
-3. Titolo: `New App: dk.nordfalk.esperanto.radio`
-4. Priskribo (kopiu ĉi tion — ĝi plenumas ilian ŝablonon):
+1. Via fork devas esti **publika** (vidu 3.2) kaj la branĉo ne protektita.
+2. Flava rubando supre en via fork → **Create merge request** (aŭ
+   https://gitlab.com/fdroid/fdroiddata/-/merge_requests → New merge request
+   → via fork + `dk.nordfalk.esperanto.radio`).
+3. **Titolo (laŭ la ŝablona formo)**: `New app: EsperantoRadio`
+4. Priskribo: kopiu la PLENIGITAN ŜABLONON sube (ĝi jam respondas ĉiun
+   kontrolkeston) kaj **alkroĉu 2–3 ekranfotojn** (alkroĉu per ŝovmetado en la
+   priskribo-kampon; la bildoj kuŝas en
+   `androidApp/src/main/play/listings/en-US/graphics/phoneScreenshots/`):
 
+   ```markdown
+   ## Abstract for new app inclusion
+
+   EsperantoRadio unifies all scattered Esperanto radio stations and podcasts
+   (27 sources: 24-hour web radio Muzaiko, Vatican Radio in Esperanto since
+   1977, Varsovia Vento, Polish Radio, Kernpunkto and many more) into a single
+   app: channel overview, live streams, podcasts, downloads, favourites,
+   search and an alarm clock. Written in Kotlin with Compose Multiplatform
+   (Android, Desktop, Web targets), GPL-3.0-or-later; a maintained fork of the
+   Danish "DR Radio" app, rewritten from scratch for the Esperanto audience.
+
+   Why: Esperanto radio content is spread over many small, half-abandoned
+   feeds; this is the only app that aggregates them all in one place. There is
+   no other Esperanto-focused radio/podcast app in F-Droid, so it provides
+   unique value (Quality point 5/6: actively developed, established user base
+   on Google Play).
+
+   ### Policy
+   * [x] The app complies with the inclusion policy (GPL-3.0-or-later, source
+     on GitHub, no binaries, no proprietary dependencies, unique app id).
+   * [x] I am the author of the app.
+   * [x] The upstream repo contains the metadata in the Triple-T structure
+     (`androidApp/src/main/play/`): en-US summary + description + images +
+     icon + changelog (`release-notes/en-US/default.txt`).
+
+   ### Docs
+   * [x] Read the guide; metadata follows the templates and the Build
+     Metadata Reference; validated locally with fdroidserver 2.4.2
+     (rewritemeta is a no-op, check-jsonschema passes).
+
+   ### Merge Request Setup
+   * [x] Title follows "New app: app name"; fork is public; branch is not
+     protected; no rebase needed (no conflict); no related fdroiddata/RFP
+     issues exist; only one app in this MR.
+
+   ### Metadata
+   * [x] `metadata/dk.nordfalk.esperanto.radio.yml`, valid YAML, LF endings.
+   * [x] No summary/description/changelog/images in fdroiddata — all texts
+     come from the upstream Triple-T structure; the Changes tab shows only
+     the yml.
+   * [x] Releases are tagged (`v3.1.1`) and auto-update is enabled
+     (`AutoUpdateMode: Version` + `UpdateCheckMode: Tags`).
+   * [x] IssueTracker and AuthorEmail/AuthorName are set.
+   * [x] No srclibs/external repos.
+   * [ ] Reproducible Builds: **not enabled** — the build is not currently
+     bit-identical; we accept the F-Droid signing key for this app (note: we
+     understand this cannot be changed later without a reinstall for users).
+   * [x] No disabled versions; only the latest build is kept.
+   * [x] `commit` is the full hash (10e3f13513ec00231e30148f4ee42cec6cb00c2a).
+
+   ### Pipeline
+   * [x] All pipelines pass (including fdroid build — the APK builds unsigned
+     from the tag and is signed by F-Droid).
+   * [x] Reports tab: no unexplained errors.
    ```
-   The app complies with the inclusion criteria (https://f-droid.org/docs/Inclusion_Policy/):
-   GPL-3.0-or-later, source code and issue tracker on GitHub, no binaries in the repo,
-   no proprietary dependencies.
 
-   The original app author has been notified — I am the author of the app.
+   Rimarkoj pri la fakoj, se la reviziantoj demandas:
+   - la `scanignore: build.gradle.kts` kial — la radika konstrudosiero
+     deklaras la mortintan `jcenter.bintray.com` (necesa por la hereda
+     GPL-apo en la sama deponejo; la konstruata modulo neniam elŝutas de ĝi);
+   - la `UpdateCheckName: Ignore` kial — la aŭtonomo-parsilo ne trovas la
+     KMP-manifeston (`src/androidMain/`) kaj prenus la nomon de la hereda apo;
+   - Sentry (erar-raportado) estas **opt-in** en konstruoj sen nia subskribo
+     (ĉi tiuj, kiujn F-Droid konstruas): unufoja konsento-demando je la unua
+     starto + ŝaltilo en Agordoj → Privateco — do neniu Tracking-kontraŭeco.
 
-   No RFP issue exists for this app (checked https://gitlab.com/fdroid/rfp).
-
-   Notes for reviewers:
-   - The recipe builds version 3.1.1 (versionCode 253) from tag v3.1.1.
-   - It is a Kotlin Multiplatform project: the Gradle build lives in the repo
-     root, `subdir: androidApp` runs `assembleRelease` from the app module
-     (verified: resolves to :androidApp:assembleRelease).
-   - Gradle 9.8.1 comes from gradle/wrapper/gradle-wrapper.properties via
-     gradlew-fdroid, so the buildserver Gradle version does not matter.
-   - The release build signs only when our keystore exists; on the F-Droid
-     buildserver it is absent, so the APK is unsigned and F-Droid signs it.
-   - Error reporting (Sentry) is opt-in in builds without our signature
-     (BuildConfig.SEN_NIA_SUBSKRIBO); there is a one-time consent dialog on
-     first launch and a toggle in Settings → Privacy.
-   - The Esperanto Summary lives in metadata/<appid>/eo/summary.txt and the
-     English one in en-US/summary.txt (en-US is F-Droid's fallback); the
-     Esperanto Description is the yml default, the en-US description is read
-     automatically from the Play listing in the repo (Triple-T structure:
-     androidApp/src/main/play/listings/en-US).
-   - scanignore skips the root build.gradle.kts: it declares the dead
-     jcenter.bintray.com repo, which is only needed by the legacy app in
-     the same repo (GPL) — the built module never fetches from it.
-   - UpdateCheckName: Ignore — the autoname scanner cannot find the KMP
-     manifest (src/androidMain/) and would pick the legacy app's name.
-   ```
-
-5. Marku **"Squash commits when merge is accepted"** (defaŭlta) → **Create merge request**.
+5. Forigu la `Closes rfp#…`-linion kaj la `<!--…-->`-komentojn; tenu la
+   `/label ~"New App"`-linion (ĝi mem metas la etikedon).
+6. **Create merge request** → atentu la revizion (tigoj–semajnoj; respondu
+   rapide al komentoj).
 
 ## 4. Vojo B — per komandlinio (se vi preferas)
 

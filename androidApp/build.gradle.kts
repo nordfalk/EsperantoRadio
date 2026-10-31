@@ -66,7 +66,10 @@ android {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
         targetSdk = 36
-        versionCode = 253
+        // 253 estis konsumita de la interna testo "3.1.1-beta29okt" (PR #144, nekunfandita);
+        // la vera 3.1.1 eldoniĝas kiel 254. La etikedo v3.1.1 (253) restas por F-Droid —
+        // ilia versionumejo estas sendependa, la fdroid-yml (253) kongruas kun ĝi.
+        versionCode = 254
         // LAŬVORTE (ne el libs.versions.toml): la F-Droid-ĝisdatigilo parsas
         // versionName per regex, kiu bezonas cititan signoĉenon —
         // `libs.versions.apoversio.get()` estas por ĝi nelegebla.

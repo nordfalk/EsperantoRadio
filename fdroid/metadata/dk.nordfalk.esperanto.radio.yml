@@ -15,14 +15,16 @@
 #
 # Grave por ĉiu nova versio (Builds-ero + la 3 kampoj malsupre):
 # - git-etikedo `vX.Y.Z` sur master (F-Droid konstruas EL LA ETIKEDO)
-# - versionCode en androidApp/build.gradle.kts kongrua
+# - versionCode kaj versionName (laŭvorta!) en androidApp/build.gradle.kts kongruaj
 # - apoversio en gradle/libs.versions.toml kongrua
 # - ĉe ŝanĝo de build-ordo: kontroli ke `cd androidApp && gradlew assembleRelease`
 #   funkcias SEN secrets.properties (nesubskribita konstruo — F-Droid subskribas mem)
 
+# Nur nomoj el la difinita listo de fdroiddata (schemas/metadata.json) —
+# ekz. Audio ne ekzistas; Radio kaj Podcast ja.
 Categories:
-  - Audio
-  - Internet
+  - Radio
+  - Podcast
 
 License: GPL-3.0-or-later
 
@@ -36,6 +38,10 @@ Changelog: https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md
 Name: EsperantoRadio
 AutoName: EsperantoRadio
 
+# La esperanta teksto estas la ĝenerala priskribo (por ĉiuj lingvoj);
+# la anglan (en-US) versionon F-Droid legas aŭtomate el nia Play-listing
+# (androidApp/src/main/play/listings/en-US/ — la Triple-T-strukturo,
+# vidu https://f-droid.org/docs/All_About_Descriptions_Graphics_and_Screenshots/).
 Summary: Radio kun 27 Esperanto-kanaloj kaj podkastoj, el la tuta mondo
 Description: |-
   Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en
@@ -44,16 +50,6 @@ Description: |-
 
   Inter la kanaloj: Muzaiko (24-hora Esperanto-retradio), Radio Vatikana
   (ekde 1977), Varsovia Vento, Pola Retradio, Kernpunkto kaj La Malfamuloj.
-
-Summary:en-US: Radio with 27 Esperanto channels and podcasts, from around the world
-Description:en-US: |-
-  Listen to Esperanto — 27 radio channels and podcasts from around the
-  world in one app: channel overview, live streams, podcasts, downloads,
-  favourites, search and an alarm clock.
-
-  Among the channels: Muzaiko (24-hour Esperanto web radio), Vatican
-  Radio in Esperanto (since 1977), Varsovia Vento, Polish Radio,
-  Kernpunkto and The Infamous Ones (La Malfamuloj).
 
 RepoType: git
 Repo: https://github.com/nordfalk/EsperantoRadio.git
@@ -68,19 +64,22 @@ Repo: https://github.com/nordfalk/EsperantoRadio.git
 # sur la F-Droid-buildservilo ĝi mankas, do la APK eldoniĝas nesubskribita kaj
 # F-Droid subskribas ĝin per sia propra ŝlosilo.
 Builds:
-  - versionName: '3.1.0'
-    versionCode: 252
-    commit: v3.1.0
+  - versionName: '3.1.1'
+    versionCode: 253
+    commit: v3.1.1
     subdir: androidApp
     gradle:
-      - yes
+      - 'yes'  # citite: sen tio YAML-1.1-legiloj (ekz. PyYAML) legas buleon
 
-# Aŭtomata ĝisdatigo: nova git-etikedo `vX.Y.Z` → nova F-Droid-konstruo.
-# La ŝablono `v%v` generas la etikedo-nomon el la versio-nomo.
-AutoUpdateMode: Version v%v
+# Aŭtomata ĝisdatigo: la roboto legas versionCode/versionName el
+# androidApp/build.gradle.kts ĉe ĉiu nova etikedo (UpdateCheckMode: Tags)
+# kaj uzas la trovitan etikedon rekte kiel commit (AutoUpdateMode: Version —
+# la nuna skemo permesas nur None/Version/Version +sufikso-ŝablono).
+# versionName en build.gradle.kts devas esti LAŬVORTA ĉeno (F-Droid-parsilo).
+AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 3.1.0
-CurrentVersionCode: 252
+CurrentVersion: 3.1.1
+CurrentVersionCode: 253
 
 # Sentry-konsidero (C50, solvita en PR #148):
 # F-Droid konstruas SEN nia keystore (vidu la signadon en androidApp/

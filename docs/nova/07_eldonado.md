@@ -98,9 +98,14 @@ sia propra ŝlosilo.
 ### Kio estas pretigita (2026-10-29, C50)
 
 - **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — laŭ la
-  nuna fdroiddata-formato, kun `Builds`-ero por 3.1.0/252 (etikedo `v3.1.0`),
-  `AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags`, dulingva priskribo
-  (eo + en-US). Rekte submetebla kiel `metadata/dk.nordfalk.esperanto.radio.yml`.
+  nuna fdroiddata-formato, kun `Builds`-ero por 3.1.1/253 (etikedo `v3.1.1`),
+  `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` (la nuna skemo-sintakso).
+  Kontraŭvalidigita kontraŭ `schemas/metadata.json` de fdroiddata
+  (kategorioj `Radio`/`Podcast` el ties listo; neniu lokalizita kampo en la
+  yml — la en-US-tekstojn F-Droid legas aŭtomate el nia Play-listing,
+  `androidApp/src/main/play/listings/en-US/`, la Triple-T-strukturo;
+  la esperanta teksto estas la ĝenerala priskribo en la yml).
+  Rekte submetebla kiel `metadata/dk.nordfalk.esperanto.radio.yml`.
 - **Nesubskribita konstruo**: la release-buildtype en `androidApp/build.gradle.kts`
   subskribas nur kiam la keystore-dosiero ekzistas. Sen `secrets.properties` kaj
   sen keystore `./gradlew :androidApp:assembleRelease` produktas
@@ -122,15 +127,15 @@ sia propra ŝlosilo.
 
 ```yaml
 Builds:
-  - versionName: '3.1.0'
-    versionCode: 252
-    commit: v3.1.0
+  - versionName: '3.1.1'
+    versionCode: 253
+    commit: v3.1.1
     subdir: androidApp
     gradle:
       - yes
 ```
 
-Tio signifas: elprenu `v3.1.0`, rulu `gradlew-fdroid assembleRelease` en
+Tio signifas: elprenu `v3.1.1`, rulu `gradlew-fdroid assembleRelease` en
 `androidApp/`, trovu la APK-on, subskribu per la F-Droid-ŝlosilo.
 (ATENTU: la `gradle:`-kampo signifas GUSTUMOJN, ne taskojn — `yes` = sen
 gustumo, do `assembleRelease`. Pliaj taskoj iras en `preassemble:`.)
@@ -160,7 +165,7 @@ gustumo, do `assembleRelease`. Pliaj taskoj iras en `preassemble:`.)
 ### Estontaj ĝisdatigoj
 
 Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
-`AutoUpdateMode: Version v%v` + `UpdateCheckMode: Tags` igas F-Droid-on
+`AutoUpdateMode: Version` + `UpdateCheckMode: Tags` igas F-Droid-on
 aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
 ### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, dumoda)

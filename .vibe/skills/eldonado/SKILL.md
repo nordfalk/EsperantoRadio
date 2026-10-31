@@ -19,11 +19,17 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    etikedo devas stari sur la SQUASH-komito sur master, ne sur la branĉa komito.
 1. **`apoversio`** en `gradle/libs.versions.toml` ricevas la novan nombron (unu fonto de
    vero por `versionName`/Sentry — `ApoVersio.kt` generiĝas el ĝi).
-2. **Baskulu `versionCode`** en `androidApp/build.gradle.kts` (`defaultConfig.versionCode`).
-   GPP ne pliigas ĝin aŭtomate kaj la Play-API rifuzas re-uzi jam eldonitan
-   versionCode ("Version code is too low or has already been used").
+2. **Baskulu `versionCode` KAJ `versionName`** en `androidApp/build.gradle.kts`
+   (`defaultConfig.versionCode` + `versionName` — la versionName devas esti
+   LAŬVORTA citita ĉeno, ekz. `versionName = "3.1.1"`, kaj kongrui kun
+   `apoversio` en `gradle/libs.versions.toml`: la F-Droid-ĝisdatigilo parsas
+   versionName per regex, kiu bezonas cititan signoĉenon —
+   `libs.versions.apoversio.get()` estas por ĝi nelegebla (2026-10-31, C50)).
+   GPP ne pliigas versionCode aŭtomate kaj la Play-API rifuzas re-uzi jam
+   eldonitan versionCode ("Version code is too low or has already been used").
    Historio: 246=3.0.2, 247=3.0.3, 248=3.0.3-rekonstruo, 249=kvoto-protekto,
-   250=3.0.4-19okt, 251=3.0.4-beta24okt (2026-10-24), 252=3.1.0 (2026-10-25).
+   250=3.0.4-19okt, 251=3.0.4-beta24okt (2026-10-24), 252=3.1.0 (2026-10-25),
+   253=3.1.1 (2026-10-31).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).

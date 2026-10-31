@@ -66,8 +66,12 @@ android {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
         targetSdk = 36
-        versionCode = 252
-        versionName = libs.versions.apoversio.get()
+        versionCode = 253
+        // LAŬVORTE (ne el libs.versions.toml): la F-Droid-ĝisdatigilo parsas
+        // versionName per regex, kiu bezonas cititan signoĉenon —
+        // `libs.versions.apoversio.get()` estas por ĝi nelegebla.
+        // Ĝisdatigu KUN la apoversio en gradle/libs.versions.toml (eldonado-skill-o).
+        versionName = "3.1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "SEN_NIA_SUBSKRIBO", senNiaSubskribo.toString())
     }

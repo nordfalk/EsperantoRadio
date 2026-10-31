@@ -9,7 +9,7 @@
 		"kontakt_modtagere": ["jacob.nordfalk@proton.me" ],
 		"kontakt_titel": "Pri la Esperanto-radio",
 		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
-		"apaj_novaĵoj": "<b>Versio 3.1.0</b> eldoniĝis la 25an de oktobro 2026: <br><br>⚡ Amaso da plibonigoj, ekzemple kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito<br>🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston, la mini-ludilbreto restas ĉiam videbla<br>- La malsupra naviga breto estas anstataŭigita per naviga tirkesto<br>🔔 Sciigoj pri novaj elsendoj - limigataj al maks. 7 samtempe, maks. 3 po kanalo<br>⏰ Vekhorloĝo: tempo per ciferplato, kanalo per kanal-elektilo<br>🗣️ Plibonigita esperanta lingvaĵo en la tuta apo<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
+		"apaj_novaĵoj": "<b>Versio 3.1.1</b> eldoniĝis la 31an de oktobro 2026: <br><br>🔐 Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj (ekz. F-Droid) ĝi petas vian permeson unue<br>- Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble<br>- Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno<br>🔍 Serĉo: rezultoj grupigitaj laŭ graveco; serĉo-butono en la supra breto<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		"drift_statusmeddelelse": ""
 	},
 

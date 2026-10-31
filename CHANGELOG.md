@@ -14,19 +14,18 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+## [3.1.1] - 2026-10-31
+
 ### Ŝanĝita
 
 - Erar-raportado: en konstruoj el eksteraj vendejoj (F-Droid) ĝi petas vian permeson unue; en la Play-eldono ĝi restas ŝaltita kaj estas malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
+- Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
+- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
 
 ### Riparita
 
 - Samtempa ŝargo de la sama kanalo (ekz. malsupren-tiro dum aŭtomata ŝargo aŭ vekhorloĝo dum ekran-ŝargo) ne plu elŝutas la RSS-fluon duoble — malpli da reta trafiko kaj pli rapida ŝargo (https://github.com/nordfalk/EsperantoRadio/pull/147)
 - Ekludo komencita per klako sur sciigo ne plu restartas de la komenco dum ekranturno (https://github.com/nordfalk/EsperantoRadio/pull/149)
-
-### Ŝanĝita
-
-- Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
-- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
 
 ## [3.1.0] - 2026-10-25
 
@@ -174,6 +173,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.1.1]: https://github.com/nordfalk/EsperantoRadio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2

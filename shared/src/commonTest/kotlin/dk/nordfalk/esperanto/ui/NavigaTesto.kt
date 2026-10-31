@@ -115,7 +115,7 @@ class NavigaTesto {
     fun montrasSerĉon() = runComposeUiTest {
         val serĉoDeponejo = object : dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo {
             override suspend fun serĉi(teksto: String, limo: Int) =
-                if (teksto.length >= 2) listOf(testElsendo) else emptyList()
+                if (teksto.length >= 2) dk.nordfalk.esperanto.domain.repository.SerĉoRezulto(elsendoj = listOf(testElsendo)) else dk.nordfalk.esperanto.domain.repository.SerĉoRezulto()
         }
         setContent { SerĉoEkrano(serĉoDeponejo = serĉoDeponejo, onElsendo = {}) }
         waitForIdle()

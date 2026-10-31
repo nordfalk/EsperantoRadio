@@ -8,8 +8,15 @@ description: Ŝargu ĉi tiun skill-on kiam vi devas legi aŭ analizi Sentry-datu
 Organizo `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`.
 Agordo en la apo: `SentryAgordo.kt` — medio "produktado" por eldon-konstruoj,
 `release = "esperantoradio@<apoversio>"`, `dist` = versionCode (aŭtomate de la
-Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
-debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n.
+Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj KAJ nur kiam la erar-raportado
+estas ŝaltita** raportas — debug-konstruoj, Desktop kaj emuliloj ne
+inicialigas Sentry-n. Ekde PR #148 (2026-10-29, C50) la defaŭlto estas
+konstruo-specifa: konstruo sen nia subskribo (F-Droid) = opt-in (defaŭlte
+malŝaltita, konsento-demando); konstruo kun nia subskribo (Play/Aptoide) =
+defaŭlte ŝaltita, malŝaltebla (agordo `erar_raportado`; malŝalto/reŝalto
+sendas po unu logGrava-eventon). Konto ĉiuj datum-kvantaj analizoj: la
+malpliiĝo el F-Droid-uzantoj post la opt-in-ŝanĝo estas atendata, ne
+incidento.
 
 ## Konekto (MCP) kaj ĝiaj malsanoj
 

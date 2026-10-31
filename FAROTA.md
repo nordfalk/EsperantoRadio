@@ -74,6 +74,13 @@
 - **Priskribo**: Du samnomaj troŝarĝoj kondutas malsame pri malproksima protokolado, nevideble ĉe la vok-lokoj (22 vokoj 2-arg, 44 vokoj 3-arg — la silenta formo estas la pli ofta). Sekvoj: (a) la avertoj de la 3-arg formo (RSS-malsukcesa, lud-eraroj, Worker-eraroj) estas tute nevideblaj en Sentry ekde 247/249 — oni kredis, ke la eraro-taso "kolapsis", dum ĝi nur fariĝis nevidebla; (b) AGENTS.md kaj la kodo kontraŭdiras (por la 2-arg formo: `Sentry.logger.warn` ja sendas); (c) "sendata al Sentry" estas plursenca — Sentry Logs kontraŭ Sentry Errors (avertoj neniam aperas kiel issue), do laŭ la kontrolata UI oni konkludas aŭ "sendata" aŭ "ne sendata".
 - **Sugesto**: (1) 3-arg `logw` sendu `Sentry.logger.warn("[$tag] $msg: ${e::class.simpleName}: ${e.message}")` — unuforma regulo: "logw = averto en Sentry Logs, ĉiam; neniam error-evento; neniam eraro-kvoto"; (2) ĉio, krom logd iru al Sentry (kun la escepto ke la uzanto povas malŝalti ke logi iras al Sentry en la agordoj); (3) KDoc pri ĉiu troŝargo kun la celo-matriks (logcat / Sentry Logs nivelo / Sentry errors / kvoto), inkluzive de induko "ne sendata" aŭ "sendata al Sentry"; (4) korektu AGENTS.md kaj la Protokolo.kt-KDoc; (5) kontrakt-testo: malgranda interna Sentry-"sink" (anstataŭigebla per test-fako), kiu asertas en commonTest: logw 2-arg → warn, logw 3-arg → warn (post-riparo), loge 3-arg → captureException, logd → nenio malproksima.
 
+#### G47 — Ekludo el sciigo restartiĝas (de pozicio 0) dum ekranturno
+- **Statuso**: [x] (diagnozita kaj riparita 2026-10-30, PR #149)
+- **Fonto**: uzanto-raporto de la posedanto (2026-10-30 antaŭtagmeze kaj denove vespere, Samsung-telefono en Danio, Varsovia Vento: "La 199a elsendo 1a/2a parto"); konfirmita en Sentry (uzanto `5f08712e…`, release `3.1.1-beta29okt`): la 2026-10-30 "Ludado komencita de sciigo" aperis dufoje 1 s aparte (07:22:51/52, 07:38:19/07:39:25) kaj eĉ 5-foje ene de 9 s (19:15:44–53) — ĉiufoja rekreo de la Activity.
+- **Kaŭzo**: `MainActivity` havas nek `configChanges` nek `launchMode` → ĉe ekranturno `onCreate` refariĝas kun la SAMA malnova intent kaj vokis `traktuIntenton(intent)` senkondiĉe → `traktuMalfermiElsendon` → `fiksiFonton(fonto, komencoPozicioMs=0)` + `ludi()` → `setMediaItem(aĵo, 0)` → restarto de la komenco; krome `AtendantaElsendoNavigacio.setu` re-navigis.
+- **Riparo**: en `MainActivity.onCreate` la intent estas traktata nur ĉe freska kreo (`savedInstanceState == null`); `onNewIntent` restas por novaj intent. Regresa testo: `SciigoLudiTest.rekreoNeRestartigasLudonDeSciigo` (lanĉas la Activity kun MALFERMI_ELSENDON, `recreate()`, kontrolas ke la pozicio ne rekomenciĝas).
+- **Sugesto**: post eldono observi en Sentry ke "Ludado komencita de sciigo" ne plu aperas plurfoje ene de sekundoj.
+
 ## KONSILO
 
 #### C5 — Subskrib-konfiguro: defaŭlta absoluta keystore-vojo en publika deponejo
@@ -180,9 +187,9 @@
 - **Sugesto**: forigu aŭ dokumentu; direktu la poziciojn al `LudatojDeponejo`.
 
 #### C39 — `AppStato`: duobla ŝargo de la sama kanalo (neniu in-flight dedup)
-- **Statuso**: [ ]
-- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faras duoblan elŝuton)
-- **Sugesto**: Mutex/Deferred per kanalo.
+- **Statuso**: [x]
+- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faris duoblan elŝuton)
+- **Riparo** (2026-10-29): in-flight dedup per kanalo en `ŝargiElsendojn` — `Mutex` + `Map<slug, Deferred>`; dua samtempa voko aliĝas al la daŭranta `Deferred` (lanĉita en sendependa skopo `Dispatchers.Default + SupervisorJob`, do ĝi finiĝas eĉ se la unua vokanto estas nuligita). La ero estas forigata kiam la ŝargo finiĝas (`invokeOnCompletion`) resp. kiam finiĝas la vokanto (`finally` kun `isCompleted`-kontrolo). Testo: `samtempajVokojPorSamaKanaloDedupatas` (du vokoj → 1 HTTP-peto).
 
 #### C40 — `gradle.properties`: `org.gradle.jvmargs=-Xmx1536m` malalta por KMP
 - **Statuso**: [ ]
@@ -240,9 +247,27 @@
 - **Fonto**: README.md "Farota (notoj)" (2026-10-24, movita ĉi tien; prepara laboro en PR #66)
 - **Priskribo**: la apo eldoniĝas nur en Google Play; F-Droid kaj Aptoide estis planitaj
   sed neniam realigitaj.
-- **Sugesto**: sekvu la skemon en la skill-o `eldonado` (F-Droid/Aptoide bezonas facile
-  troveblan, signitan APK-fluon; atentu: la apo ne estas en Play App Signing, do APK —
-  ne AAB). Vidu ankaŭ https://github.com/nordfalk/EsperantoRadio/pull/66
+- **Progreso (2026-10-29)**: la teknika preparo estas farita — la paŝoj de la
+  posedanto staras en `docs/nova/07_eldonado.md` (sekcioj 2 kaj 3):
+  - nesubskribita release-konstruo ebligita (release subskribas nur kiam la
+    keystore ekzistas; pruvita en pura worktree — F-Droid kondiĉo);
+  - `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` estas pretigita laŭ la
+    nuna fdroiddata-formato (3.1.0/252, etikedo `v3.1.0`, aŭtomata ĝisdatigo
+    per etikedoj);
+  - fdroid-internaĵoj esploritaj kaj dokumentitaj: `gradlew-fdroid` trovas la
+    radikan `gradle/wrapper` ankaŭ el `subdir: androidApp`; la `gradle:`-kampo
+    signifas gustumojn (`yes` = `assembleRelease`), ne taskojn;
+  - Sentry-raportado iĝis **dumoda** (PR #148): konstruoj sen nia subskribo
+    (tiel F-Droid konstruas) = opt-in kun unufoja konsento-demando; konstruoj
+    kun nia subskribo (Play/Aptoide) = defaŭlte ŝaltita, malŝaltebla en
+    Agordoj → Privateco (kun fina protokolo ĉe malŝalto kaj protokolo ĉe
+    reŝalto) — la F-Droid-kontraŭeco `Tracking` ne aplikeblas al la
+    F-Droid-konstruo.
+- **Restas (posedanto)**: (1) GitLab-konto + fork de fdroiddata + MR kun la
+  metadateno; (2) Aptoide Connect-konto + pruvo de pako-posedo + alŝuto de la
+  subskribita APK; (3) atenti, ke la Sentry-telemetrio (C48/C49/G44) draste
+  malpliiĝas — nur konsentintaj uzantoj plu raportas. Vidu ankaŭ
+  https://github.com/nordfalk/EsperantoRadio/pull/66
 
 #### C51 — Funkcioj de la malnova apo ankoraŭ ne portitaj
 - **Statuso**: [ ]
@@ -408,7 +433,12 @@
   natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
   ĝi povus proponi la valoron por ĉiu kanalo.
 
-#### C60 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
+#### C60 — Serĉ-ordigo: unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj
+- **Statuso**: [x]
+- **Fonto**: ideo de la posedanto (2026-10-30)
+- **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto(kanaloj, elsendoj)` — ambaŭ listoj jam ordigitaj laŭ graveco (titolo-trovoj unue, poste priskribo-trovoj; dedup per `partition`), redonata de `SerĉoDeponejo.serĉi`. `SerĉoDeponejoImpl` serĉas nun ankaŭ kanalojn per `KanaloDeponejo`; por elsendoj unu grupiga metodo `ElsendoDeponejo.serĉiElsendojnGrupigite` (Pair). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj", klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
+
+#### C61 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
 - **Statuso**: [ ]
 - **Fonto**: recenz-komento pri PR #144, punkto 6 (2026-10-29)
 - **Priskribo**: la ŝlosiloj en la `android`-sekcio de `esperantoradio_konfiguro.json`

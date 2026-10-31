@@ -1,6 +1,5 @@
 package dk.nordfalk.esperanto.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
 import dk.nordfalk.compose.material3.DrawerState
 import dk.nordfalk.compose.material3.ModalNavigationDrawer
 import dk.nordfalk.compose.material3.rememberDrawerState
@@ -30,13 +31,14 @@ import kotlinx.coroutines.launch
 fun SerĉoEkrano(
     serĉoDeponejo: SerĉoDeponejo,
     onElsendo: (Elsendo) -> Unit,
+    onKanalo: (Kanalo) -> Unit = {},
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     tirkestEnhavo: @Composable () -> Unit = {},
 ) {
     // (PR #93) la serĉteksto pluvivas ekranturnon (rememberSaveable — la rezultoj
     // estas DERIVITAJ statoj: post restarigo la serĉo aŭtomate re-ruliĝas malsupre)
     var teksto by rememberSaveable { mutableStateOf("") }
-    var rezultoj by remember { mutableStateOf(emptyList<Elsendo>()) }
+    var rezultoj by remember { mutableStateOf(SerĉoRezulto()) }
     var ŝargas by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -47,7 +49,7 @@ fun SerĉoEkrano(
     LaunchedEffect(teksto) {
         serĉaJob?.cancel()
         if (teksto.length < 2) {
-            rezultoj = emptyList()
+            rezultoj = SerĉoRezulto()
             ŝargas = false
             return@LaunchedEffect
         }
@@ -66,7 +68,7 @@ fun SerĉoEkrano(
             } catch (e: Throwable) {
                 // Throwable, ne Exception: regulo A8 + la Js-motoro ĵetas kotlin.Error
                 logw("Serĉo", "Serĉado malsukcesis por '$teksto'", e)
-                rezultoj = emptyList()
+                rezultoj = SerĉoRezulto()
                 ŝargas = false
             }
         }
@@ -93,7 +95,7 @@ fun SerĉoEkrano(
             OutlinedTextField(
                 value = teksto,
                 onValueChange = { teksto = it },
-                label = { Text("Trovu elsendon…") },
+                label = { Text("Trovu kanalon aŭ elsendon…") },
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 singleLine = true
             )
@@ -102,15 +104,35 @@ fun SerĉoEkrano(
                 Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     CircularProgressIndicator()
                 }
+            } else if (teksto.length >= 2 && rezultoj.estasVacia) {
+                Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Text("Nenion trovitan")
+                }
             } else {
+                // C60: la listoj jam estas ordigitaj laŭ graveco — kanaloj unue
+                // (titolo-matĉoj antaŭ priskribo-matĉoj), poste elsendoj (same)
                 LazyColumn {
-                    items(rezultoj, key = { it.id }) { elsendo ->
-                        ListItem(
-                            headlineContent = { Text(elsendo.titolo, maxLines = 2) },
-                            supportingContent = { Text(elsendo.kanaloSlug) },
-                            modifier = Modifier.clickable { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    val kanaloj = rezultoj.kanaloj
+                    val elsendoj = rezultoj.elsendoj
+                    if (kanaloj.isNotEmpty()) {
+                        item { SekcioTitolo("Kanaloj") }
+                        items(kanaloj, key = { "kanalo:${it.slug}" }) { kanalo ->
+                            // La sama listero kiel en la kanalary-paĝo
+                            KanaloEro(
+                                kanalo = kanalo,
+                                onClick = { logi("Klako", "serĉrezulto kanalo ${kanalo.slug}"); onKanalo(kanalo) }
+                            )
+                        }
+                    }
+                    if (elsendoj.isNotEmpty()) {
+                        item { SekcioTitolo("Elsendoj") }
+                        items(elsendoj, key = { "elsendo:${it.id}" }) { elsendo ->
+                            // La sama listero kiel en la kanalo-paĝo
+                            ElsendoEro(
+                                elsendo = elsendo,
+                                onClick = { logi("Klako", "serĉrezulto ${elsendo.id}"); onElsendo(elsendo) }
+                            )
+                        }
                     }
                 }
             }
@@ -123,4 +145,15 @@ fun SerĉoEkrano(
 @Composable
 fun SerĉoEkranoPreview() {
     pTemo { SerĉoEkrano(serĉoDeponejo = pSerĉoDeponejo(), onElsendo = {}) }
+}
+
+/** Sekci-titolo en la rezult-listo (kiel en HejmoEkrano, sed sen klako). */
+@Composable
+private fun SekcioTitolo(titolo: String) {
+    Text(
+        titolo,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp)
+    )
 }

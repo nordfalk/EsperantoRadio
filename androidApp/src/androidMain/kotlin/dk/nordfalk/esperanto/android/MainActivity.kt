@@ -41,7 +41,13 @@ class MainActivity : ComponentActivity() {
             EsperantoRadioApp(ludilo = ludilo)
         }
         // La sciig-skedo estas mastrumata de App.kt per ĝisdatiguSciigSkedon()
-        traktuIntenton(intent)
+        // Traktu la intenton nur ĉe FRESKA kreo (savedInstanceState == null) — ne ĉe
+        // rekreo (ekz. ekranturno): sen tio la sama sciig-intento re-lanĉus la ludon
+        // de pozicio 0 kaj re-navigus al la elsendo (G47; Sentry 2026-10-30: "Ludado
+        // komencita de sciigo" aperis plurfoje ene de kelkaj sekundoj dum rotacio).
+        if (savedInstanceState == null) {
+            traktuIntenton(intent)
+        }
         // testuSentry()
     }
 

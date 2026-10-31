@@ -182,7 +182,7 @@ fun EsperantoRadioApp(
         fun switchTab(vojo: Vojo) {
             val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ tab: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
+            if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
             backStack.clear()
             backStack.add(Vojo.Hejmo)
             if (vojo !is Vojo.Hejmo) backStack.add(vojo)
@@ -197,7 +197,7 @@ fun EsperantoRadioApp(
             }
             val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ push: $vojo")
-            Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
+            if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
             backStack.add(vojo)
         }
 
@@ -288,7 +288,7 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
                                 },
                                 onAgordoj = { push(Vojo.Agordoj) },
-                                onElŝutoj = { push(Vojo.Elŝutoj) },
+                                onSerĉo = { push(Vojo.Serĉo) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
                                 onKaŝuHejmajnAvertojn = {
                                     // Kaŝu la NUNAJN problemo-tipojn; nova problemo poste reaperigos la karton
@@ -345,6 +345,7 @@ fun EsperantoRadioApp(
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                             )
                         }
                         entry<Vojo.Elŝutoj> {
@@ -635,6 +636,42 @@ fun EsperantoRadioApp(
                         agordojDeponejo.fiksiMontruTranssaltanSciigon(false)
                         transsaltaDialogo = null
                     }) { Text("Bone") }
+                },
+            )
+        }
+
+        // Konsento pri erar-raportado (C50/F-Droid). Nur en konstruoj SEN nia
+        // subskribo (tiel F-Droid konstruas) la defaŭlto estas malŝaltita kaj
+        // la uzanto ricevas unufojan demandon ĉe la unua starto; "Jes" ŝaltas,
+        // "Ne" nur memoras la respondon. Konstruoj KUN nia subskribo (Google
+        // Play, Aptoide) raportas defaŭlte kaj neniam montras la demandon.
+        // En evolua medio ĝi ne montriĝas (sama logiko kiel la Apaj novaĵoj).
+        val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
+        val erarRaportadoDemandita by agordojDeponejo.erarRaportadoDemandita.collectAsState()
+        if (!AppStato.estasEvoluaMedo && !erarRaportado && !erarRaportadoDemandita) {
+            AlertDialog(
+                // Kiel ĉe Apaj novaĵoj: nur la butonoj fermas la dialogon
+                onDismissRequest = { },
+                title = { Text("Helpu plibonigi la apon") },
+                text = {
+                    Text(
+                        "Ĉu la apo rajtas aŭtomate sendi sennomajn erar-raportojn kaj " +
+                            "protokolojn al la erar-monitorado (Sentry) de la evoluigisto? " +
+                            "Tio helpas trovi kaj ripari problemojn. Neniuj personaj datumoj " +
+                            "estas kolektataj. Vi povas ŝanĝi tion poste en Agordoj → Privateco."
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        logi("Konsento", "Uzanto konsentis al erar-raportado")
+                        agordojDeponejo.fiksiErarRaportadon(true)
+                    }) { Text("Jes, permesu") }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        logi("Konsento", "Uzanto rifuzis erar-raportadon")
+                        agordojDeponejo.konfirmuErarRaportadoDemandon()
+                    }) { Text("Ne, dankon") }
                 },
             )
         }

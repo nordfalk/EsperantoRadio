@@ -250,6 +250,20 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
   Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
   "you must first push the current branch" — aldonu `--head <branĉnomo>`.
+- **Eltrovu la venontan PR-numeron tuj antaŭ la unua puŝo kaj uzu ĝin en CHANGELOG**
+  per aparta commit (sen amendo): la numeroj de PR kaj issue estas komunaj, do
+  prenu la maksimuman el ambaŭ kaj aldonu 1, ekz.
+  `gh api "repos/nordfalk/EsperantoRadio/issues?state=all&per_page=100" -q '.[].number' | sort -n | tail -1`;
+  skribu la ligilon en CHANGELOG, commit, push, poste `gh pr create --head <branĉo>`.
+  Se intertempe iu alia malfermis PR kaj la numero ŝoviĝis, korektu poste per
+  aparta commit — ne per amendo. (2026-10-29, PR #147: divenis #140/#146, sed #146
+  estis intertempe okupita de alia PR, do la vera numero estis 147.)
+- **PR-revizio je peto de la posedanto**: kiam li petas "reviziu la PR", troreviziu
+  la tutan diff-on kaj aktive pripensu ĉu io mankas, misas aŭ povus esti problema
+  pri la ŝanĝoj — ne nur konfirmu. Kontrolu ĉu la ŝanĝoj obeas A7 (testo), A8
+  (neniu silenta catch), A10 (CHANGELOG), A11 (FAROTA/lecionoj), ĉu nur la propraj
+  dosieroj estas commititaj, ĉu doc-komitoj apartenas al la PR, kaj ĉu la titoo kaj
+  priskribo ĉe la PR kungruas kun la kodo kaj intenco. Se io ne kongruas, avertu.
 - **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
   (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
   `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese
@@ -348,21 +362,29 @@ Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sci
 
 La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio`,
 projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
-debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109).
+debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109)
+— **kaj nur kiam la erar-raportado estas ŝaltita** (agordo `erar_raportado`;
+dumoda defaŭlto laŭ `BuildConfig.SEN_NIA_SUBSKRIBO`, PR #148/C50: konstruo
+sen nia subskribo (F-Droid) = opt-in kun unufoja konsento-demando ĉe la unua
+starto; konstruo kun nia subskribo (Play/Aptoide) = defaŭlte ŝaltita,
+malŝaltebla en Agordoj → Privateco — sen la opt-in F-Droid atribuus la
+kontraŭecon "Tracking").
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.
 
-Niveloj (`ProtokoloUtil.kt`). Ĝenerala regulo (FAROTA G46): **ĉio krom `logd`
-iras al Sentry**; `logi` estas malŝaltebla per la agordo "Ŝaltu detalan
-protokoladon". Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
+Niveloj (`ProtokoloUtil.kt`). Ĉiuj Sentry-vojoj estas protektataj per la
+tutmonda flago `raportadoAktiva` (konsento, PR #148). Ĝenerala regulo (FAROTA
+G46): **ĉio krom `logd` iras al Sentry** (post konsento); `logi` estas
+malŝaltebla per la agordo "Ŝaltu detalan protokoladon".
+Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
   diska kaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
 - `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
   protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
   Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
-- `logGrava` — ĉiam al Sentry. NUR la gravaj eventoj: malfermo de la apo,
-  ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
+- `logGrava` — al Sentry (post konsento). NUR la gravaj eventoj: malfermo de la
+  apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
 - `logw` — avertoj. Ambaŭ formoj (kun kaj sen escepto) sendas `Sentry.logger.warn`
   al Sentry Logs — NENIAM error-evento, do ili ne konsumas la erarojn-kvoton;
   `logw(tag, msg, e)` sendas du liniojn: la escepto-resumon kaj la staktracon.

@@ -14,7 +14,23 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Aldonita
+
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
+
+### Ŝanĝita
+
+- Erar-raportado: en konstruoj el eksteraj vendejoj (F-Droid) ĝi petas vian permeson unue; en la Play-eldono ĝi restas ŝaltita kaj estas malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
+
+### Riparita
+
+- Samtempa ŝargo de la sama kanalo (ekz. malsupren-tiro dum aŭtomata ŝargo aŭ vekhorloĝo dum ekran-ŝargo) ne plu elŝutas la RSS-fluon duoble — malpli da reta trafiko kaj pli rapida ŝargo (https://github.com/nordfalk/EsperantoRadio/pull/147)
+- Ekludo komencita per klako sur sciigo ne plu restartas de la komenco dum ekranturno (https://github.com/nordfalk/EsperantoRadio/pull/149)
+
+### Ŝanĝita
+
+- Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
+- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
 
 ## [3.1.0] - 2026-10-25
 

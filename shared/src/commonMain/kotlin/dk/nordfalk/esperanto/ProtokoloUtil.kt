@@ -13,6 +13,15 @@ import kotlin.concurrent.Volatile
  * Konvencio: [Komponanto] mesaĝo
  * Niveloj: d = debug, i = info, g = grava informo, w = averto, e = eraro
  */
+/**
+ * Ĉu la uzanto konsentis al erar-raportado al Sentry (opt-in, defaŭlte MALŜALTITA —
+ * alie F-Droid atribuas la kontraŭecon "Tracking", C50/PR #148). Sinkronigata de
+ * AgordojDeponejoImpl kaj de la platforma enirpunkto (EsperantoRadioAplikaĵo).
+ * Ĉiuj Sentry-vokoj en ProtokoloUtil estas protektataj per ĉi tiu flago.
+ */
+@Volatile
+var raportadoAktiva: Boolean = false
+
 @Volatile
 var protokoloDetala: Boolean = false
 
@@ -22,27 +31,28 @@ fun logd(tag: String, msg: String) {
 
 fun logi(tag: String, msg: String) {
     platformLogi(tag, msg)
-    if (protokoloDetala) Sentry.logger.info("[$tag] $msg")
+    if (raportadoAktiva && protokoloDetala) Sentry.logger.info("[$tag] $msg")
 }
 
 /**
- * Grava evento — ĈIAM sendata al Sentry, sendepende de [protokoloDetala]:
- * malfermo de la apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo.
- * Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ la Sentry-kvoto.
+ * Grava evento — sendata al Sentry nur kiam la uzanto konsentis (alie ĝi
+ * ŝparus la kvoton al neniu): malfermo de la apo, ekludo de elsendo (kun
+ * kanalo), vekiĝo de alarmo. Uzu malmulte — ĉiu voko kalkuliĝas kontraŭ
+ * la Sentry-kvoto.
  */
 fun logGrava(tag: String, msg: String) {
     platformLogi(tag, msg)
-    Sentry.logger.info("[$tag] $msg")
+    if (raportadoAktiva) Sentry.logger.info("[$tag] $msg")
 }
 
 fun logw(tag: String, msg: String) {
     platformLogw(tag, msg)
-    Sentry.logger.warn("[$tag] $msg")
+    if (raportadoAktiva) Sentry.logger.warn("[$tag] $msg")
 }
 
 fun loge(tag: String, msg: String) {
     platformLoge(tag, msg)
-    Sentry.logger.error("[$tag] $msg")
+    if (raportadoAktiva) Sentry.logger.error("[$tag] $msg")
 }
 
 /**
@@ -58,7 +68,7 @@ fun loge(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLoge(tag, plenaMsg)
     platformLoge(tag, e.stackTraceToString())
-    Sentry.captureException(e)
+    if (raportadoAktiva) Sentry.captureException(e)
 }
 
 /**
@@ -71,6 +81,8 @@ fun logw(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLogw(tag, plenaMsg)
     platformLogw(tag, e.stackTraceToString())
-    Sentry.logger.warn("[$tag] $plenaMsg")
-    Sentry.logger.warn("[$tag] "+e.stackTraceToString())
+    if (raportadoAktiva) {
+        Sentry.logger.warn("[$tag] $plenaMsg")
+        Sentry.logger.warn("[$tag] "+e.stackTraceToString())
+    }
 }

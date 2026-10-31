@@ -92,6 +92,13 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## Jam konataj limoj kaj problemoj
 
+- **Release subskribas nur kiam la keystore-dosiero ekzistas** (2026-10-29, C50):
+  `assembleRelease` sen keystore produktas `androidApp-release-unsigned.apk` —
+  necesa por F-Droid (ĝi konstruas kaj subskribas mem); la loka subskribita
+  konstruo ne ŝanĝiĝas. F-Droid-faktoj: `gradlew-fdroid` legas la radikan
+  `gradle/wrapper/gradle-wrapper.properties` ankaŭ el `subdir: androidApp`;
+  la `gradle:`-kampo en la metadateno signifas GUSTUMOJN (`yes` = `assembleRelease`),
+  ne taskojn. Detaloj: `docs/nova/07_eldonado.md`, sekcio 2.
 - **Subskriba eraro „Keystore was tampered with, or password was incorrect“**
   (2026-10-25, 3.1.0): la subskribo legas `KEYSTORE_*` el `secrets.properties`
   (la build-defaŭltoj estas malplena pasvorto + la vojo `/home/j/android/A_signaturer/`

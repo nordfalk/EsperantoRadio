@@ -20,6 +20,13 @@ object SettingsKeys {
     const val EVOLO = "evoluo"
     /** Ĉu la uzanto ŝaltis "detalan protokoladon" (pliaj logi-vokoj al Sentry). */
     const val DETALA_PROTOKOLADO = "detala_protokolado"
+    /**
+     * Ĉu la uzanto konsentis al aŭtomata erar-raportado al Sentry (opt-in,
+     * defaŭlte malŝaltita — F-Droid-kontraŭeco "Tracking" alie; C50/PR #148).
+     */
+    const val ERAR_RAPORTADO = "erar_raportado"
+    /** Ĉu la konsento-demando pri erar-raportado jam estis respondita (dialogo unufoje). */
+    const val ERAR_RAPORTADO_DEMANDITA = "erar_raportado_demandita"
     const val KAŜITAJ_AVERTOJ = "kaŝitaj_avertoj"
     /** Po-instala hazarda valoro kiu protektas la intencojn al la eksportita Activity (PR #89). */
     const val INTENT_NONCE = "intent_nonce"

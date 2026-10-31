@@ -5,6 +5,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,8 +44,21 @@ interface LudatojDeponejo {
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
+/**
+ * Rezulto de serĉo (C60): `kanaloj` kaj `elsendoj`, ĉiu jam ordigita laŭ graveco
+ * — titolo-trovoj unue, poste nur-priskribo-trovoj (dedup: ero aperas nur unufoje).
+ * La tuta montra sinsekvo estas: ĉiuj kanaloj (titolo→priskribo), poste ĉiuj
+ * elsendoj (titolo→priskribo).
+ */
+data class SerĉoRezulto(
+    val kanaloj: List<Kanalo> = emptyList(),
+    val elsendoj: List<Elsendo> = emptyList(),
+) {
+    val estasVacia: Boolean get() = kanaloj.isEmpty() && elsendoj.isEmpty()
+}
+
 interface SerĉoDeponejo {
-    suspend fun serĉi(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun serĉi(teksto: String, limo: Int = 50): SerĉoRezulto
 }
 
 interface AgordojDeponejo {
@@ -61,6 +75,15 @@ interface AgordojDeponejo {
     val montruTranssaltanSciigon: StateFlow<Boolean>
 
     /**
+     * Ĉu la uzanto konsentis al aŭtomata erar-raportado al Sentry
+     * (opt-in, defaŭlte MALŜALTITA — F-Droid "Tracking"-kontraŭeco, C50).
+     */
+    val erarRaportado: StateFlow<Boolean>
+
+    /** Ĉu la konsento-demando jam estis respondita (dialogo unufoje, ĉe la unua starto). */
+    val erarRaportadoDemandita: StateFlow<Boolean>
+
+    /**
      * Problemoj kiujn la uzanto kaŝis per la 'x'-butono de la avertokarto sur
      * la ĉefekrano. La avertoj ĉiam restas videblaj en Agordoj → Diagnozo.
      */
@@ -73,6 +96,12 @@ interface AgordojDeponejo {
     fun fiksiDetalanProtokoladon(ŝaltita: Boolean)
     fun fiksiTranssaltuEnkondukojn(ŝaltita: Boolean)
     fun fiksiMontruTranssaltanSciigon(ŝaltita: Boolean)
+
+    /** Ŝaltas/malŝaltas la erar-raportadon kaj memorigas, ke la demando estas respondita. */
+    fun fiksiErarRaportadon(ŝaltita: Boolean)
+
+    /** Memorigas rifuzon de la konsento-demando (sen ŝalti la raportadon). */
+    fun konfirmuErarRaportadoDemandon()
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
     fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>)

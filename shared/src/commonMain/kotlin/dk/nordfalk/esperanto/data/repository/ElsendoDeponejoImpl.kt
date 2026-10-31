@@ -264,6 +264,15 @@ open class ElsendoDeponejoImpl(
         return rezulto
     }
 
+    /** C60: grupigita serĉo — titolo-trovoj kaj nur-priskribo-trovoj en unu paŝo (partition). */
+    override suspend fun serĉiElsendojnGrupigite(teksto: String, limo: Int): Pair<List<Elsendo>, List<Elsendo>> {
+        val (titolo, resto) = kaŝmemoro.values.flatten()
+            .partition { it.titolo.contains(teksto, ignoreCase = true) }
+        return titolo.take(limo) to resto
+            .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
+            .take(limo)
+    }
+
     /**
      * Kontrolas ke la respondo aspektas kiel RSS/Atom-fluo. Fiaskpaĝo kun HTTP 200
      * (prokura servilo, kaptiva portalo) ne devas anstataŭigi la kaŝon.

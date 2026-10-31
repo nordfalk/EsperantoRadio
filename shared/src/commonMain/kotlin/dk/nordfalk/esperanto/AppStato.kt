@@ -167,7 +167,7 @@ object AppStato {
             .toSet()
         plejŝatatajDeponejo = PersistaPlejŝatatajDeponejo(settings, defaŭltajŜatataj)
 
-        serĉoDeponejo = SerĉoDeponejoImpl(elsendoDeponejo!!)
+        serĉoDeponejo = SerĉoDeponejoImpl(elsendoDeponejo!!, kanaloDeponejo!!)
 
         elŝutDeponejo = kreuElŝutDeponejo(httpKliento!!)
 

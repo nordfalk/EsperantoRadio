@@ -8,6 +8,8 @@ import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LastAŭskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
+import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.initialiguSentry
@@ -128,11 +130,22 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
 
 class SerĉoDeponejoImpl(
     private val elsendoDeponejo: ElsendoDeponejo,
+    private val kanaloDeponejo: KanaloDeponejo,
 ) : SerĉoDeponejo {
-    override suspend fun serĉi(teksto: String, limo: Int): List<Elsendo> {
-        val rezulto = elsendoDeponejo.serĉiElsendojn(teksto, limo)
-        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — ${rezulto.size} trovoj")
-        return rezulto
+    /**
+     * C60: la rezulto estas ordigita laŭ graveco — en ĉiu listo titolo-trovoj unue,
+     * poste nur-priskribo-trovoj; kanaloj tute antaŭ elsendoj. Ĉiu ero aperas nur
+     * unufoje (dedup per partition).
+     */
+    override suspend fun serĉi(teksto: String, limo: Int): SerĉoRezulto {
+        val (kanTitolo, kanResto) = kanaloDeponejo.getKanalojn()
+            .partition { it.nomo.contains(teksto, ignoreCase = true) }
+        val kanaloj = kanTitolo.take(limo) + kanResto
+            .filter { it.priskribo?.contains(teksto, ignoreCase = true) == true }
+            .take(limo)
+        val (eTitolo, ePriskribo) = elsendoDeponejo.serĉiElsendojnGrupigite(teksto, limo)
+        logd("Serĉo", "Serĉas '$teksto' (limo=$limo) — ${kanaloj.size} kanaloj + ${eTitolo.size + ePriskribo.size} elsendoj")
+        return SerĉoRezulto(kanaloj = kanaloj, elsendoj = eTitolo + ePriskribo)
     }
 }
 

@@ -222,20 +222,9 @@ fun KanaloEkrano(
                     }
                 }
 
-                // Grupigi la elsendojn laŭ dato
-                val grupigitaj = elsendoj.groupBy { it.dato }
-                for ((dato, grupo) in grupigitaj) {
-                    item {
-                        Text(
-                            text = dato,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 4.dp)
-                        )
-                    }
-                    items(grupo, key = { it.id }) { elsendo ->
-                        ElsendoEro(elsendo = elsendo, onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) })
-                    }
+                // Plata listo — la dato nun aperas en la ero mem (maldekstre de la daŭro)
+                items(elsendoj, key = { it.id }) { elsendo ->
+                    ElsendoEro(elsendo = elsendo, onClick = { logi("Klako", "elsendo ${elsendo.id}"); onElsendo(elsendo) })
                 }
             }
         }
@@ -395,7 +384,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
 }
 
 @Composable
-private fun ElsendoEro(
+internal fun ElsendoEro(
     elsendo: Elsendo,
     onClick: () -> Unit,
 ) {
@@ -409,12 +398,18 @@ private fun ElsendoEro(
             )
         },
         supportingContent = {
+            // Dato maldekstre de la daŭro (anstataŭ aparta datum-titolo super la grupo)
+            val partoj = mutableListOf<String>()
+            if (elsendo.dato.isNotBlank()) partoj.add(elsendo.dato)
             val daŭro = elsendo.daŭro
             if (daŭro != null && daŭro > 0) {
                 val min = daŭro / 60
                 val sek = daŭro % 60
+                partoj.add("$min:${sek.toString().padStart(2, '0')}")
+            }
+            if (partoj.isNotEmpty()) {
                 Text(
-                    "$min:${sek.toString().padStart(2, '0')}",
+                    partoj.joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

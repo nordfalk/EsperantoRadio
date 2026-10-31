@@ -3,3 +3,4 @@ Nova en 3.1.1:
 - Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj ĝi petas vian permeson unue
 - Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble
 - Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno
+- Serĉo: rezultoj grupigitaj laŭ graveco; serĉo-butono en la supra breto de la hejmo-ekrano

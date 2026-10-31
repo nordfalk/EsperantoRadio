@@ -18,6 +18,15 @@ interface ElsendoDeponejo {
     suspend fun serĉiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>
 
     /**
+     * C60: serĉo grupigita — `first` = titolo-trovoj, `second` = nur-priskribo-trovoj
+     * (priskribo-trovo, kies titolo ALSO kongruas, aperas nur en `first`).
+     * Defaŭlte: titolo = serĉiElsendojn (trovos ambaŭ kampojn — sufiĉas por falsaj
+     * deponejoj en testoj), priskribo = malplena.
+     */
+    suspend fun serĉiElsendojnGrupigite(teksto: String, limo: Int = 50): Pair<List<Elsendo>, List<Elsendo>> =
+        serĉiElsendojn(teksto, limo) to emptyList()
+
+    /**
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */

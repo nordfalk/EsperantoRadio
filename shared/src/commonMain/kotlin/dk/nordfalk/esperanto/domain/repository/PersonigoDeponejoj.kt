@@ -5,6 +5,7 @@ import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,8 +44,21 @@ interface LudatojDeponejo {
     suspend fun getPozicio(elsendoId: String): Long?
 }
 
+/**
+ * Rezulto de serĉo (C60): `kanaloj` kaj `elsendoj`, ĉiu jam ordigita laŭ graveco
+ * — titolo-trovoj unue, poste nur-priskribo-trovoj (dedup: ero aperas nur unufoje).
+ * La tuta montra sinsekvo estas: ĉiuj kanaloj (titolo→priskribo), poste ĉiuj
+ * elsendoj (titolo→priskribo).
+ */
+data class SerĉoRezulto(
+    val kanaloj: List<Kanalo> = emptyList(),
+    val elsendoj: List<Elsendo> = emptyList(),
+) {
+    val estasVacia: Boolean get() = kanaloj.isEmpty() && elsendoj.isEmpty()
+}
+
 interface SerĉoDeponejo {
-    suspend fun serĉi(teksto: String, limo: Int = 50): List<Elsendo>
+    suspend fun serĉi(teksto: String, limo: Int = 50): SerĉoRezulto
 }
 
 interface AgordojDeponejo {

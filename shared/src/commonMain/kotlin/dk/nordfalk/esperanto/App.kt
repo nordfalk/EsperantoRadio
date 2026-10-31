@@ -260,7 +260,7 @@ fun EsperantoRadioApp(
                                     scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
                                 },
                                 onAgordoj = { push(Vojo.Agordoj) },
-                                onElŝutoj = { push(Vojo.Elŝutoj) },
+                                onSerĉo = { push(Vojo.Serĉo) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
                                 onKaŝuHejmajnAvertojn = {
                                     // Kaŝu la NUNAJN problemo-tipojn; nova problemo poste reaperigos la karton
@@ -317,6 +317,7 @@ fun EsperantoRadioApp(
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
                             )
                         }
                         entry<Vojo.Elŝutoj> {

@@ -15,6 +15,7 @@ import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
+import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
 import dk.nordfalk.esperanto.data.repository.MemorAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
@@ -51,7 +52,7 @@ internal fun pKanaloDeponejo() = object : KanaloDeponejo {
 
 internal fun pSerĉoDeponejo() = object : SerĉoDeponejo {
     override suspend fun serĉi(teksto: String, limo: Int) =
-        if (teksto.length >= 2) listOf(pElsendo) else emptyList()
+        if (teksto.length >= 2) SerĉoRezulto(elsendoj = listOf(pElsendo)) else SerĉoRezulto()
 }
 
 internal fun pPlejŝatatajDeponejo() = object : PlejŝatatajDeponejo {

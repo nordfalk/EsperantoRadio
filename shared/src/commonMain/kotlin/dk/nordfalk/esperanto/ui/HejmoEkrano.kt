@@ -12,13 +12,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -392,7 +392,7 @@ fun HejmoEkrano(
     onElsendo: (Elsendo) -> Unit = {},
     onLudi: (Elsendo) -> Unit = {},
     onAgordoj: () -> Unit = {},
-    onElŝutoj: () -> Unit = {},
+    onSerĉo: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
     onKaŝuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
@@ -480,7 +480,8 @@ fun HejmoEkrano(
                 navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
+                    // Serĉo-butono plej supre; elŝutoj restas atingeblaj per la naviga tirkesto
+                    IconButton(onClick = { logi("Klako", "serĉo-butono"); onSerĉo() }) { Icon(Icons.Filled.Search, contentDescription = "Serĉi") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }

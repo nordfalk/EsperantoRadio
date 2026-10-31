@@ -52,34 +52,59 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
 3. Lasu la agordon kiel estas (lasi la kampojn kiel ili estas: "Project name" = fdroiddata, videbleco = Private) → klaku **Fork project**.
 4. Vi nun havas `https://gitlab.com/VIA_UZANTNOMO/fdroiddata`.
 
-### 3.2 Aldonu la metadatenon en via fork
+### 3.2 Aldonu la metadatenon en via fork — 3 dosieroj
 
-1. En via fork malfermu la dosierujon **`metadata`**
-   (`https://gitlab.com/VIA_UZANTNOMO/fdroiddata/-/tree/master/metadata`).
-2. Klaku la **`+`** apud la dosieruja vojo (…/metadata/) → **New file**.
-3. Dosiernomo: `dk.nordfalk.esperanto.radio.yml`
-   (la tuta vojo do iĝas `metadata/dk.nordfalk.esperanto.radio.yml`).
-4. Enigu la enhavon: malfermu en dua langeto
+**Grave**: la CI de fdroiddata validigas ĉiun taskon kontraŭ la kanona formo
+(`fdroid rewritemeta` devas esti no-op) — tial la yml enhavas NENIAJN
+komentojn, kaj `Summary` ne vivas en la yml sed en lokalizitaj dosieroj
+(`make-summary-translatable.py` forigas ĝin el la yml kaj fiaskigas la CI
+se ĝi devas tion fari mem). Kopiu ĉiujn tri dosierojn SEN ŝanĝoj:
+
+1. **`metadata/dk.nordfalk.esperanto.radio.yml`** —
    https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio.yml
-   kaj kopiu la tutan tekston en la GitLab-redaktilon.
-   (La esperantaj komentaj linioj komenciĝantaj per `#` estas permesataj —
-   la F-Droid-iloj forigas ilin aŭtomate; ili helpas eventualajn reviziantojn.)
-5. Malsupre ĉe "Target Branch" **ŝanĝu** la nomon al nova branĉo:
-   `dk.nordfalk.esperanto.radio` (NE `master` — MR-oj el `master` estas
-   malpermesitaj).
-6. Commit message: `New App: dk.nordfalk.esperanto.radio` → **Commit changes**.
+2. **`metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt`** (angla resumo —
+   `en-US` estas la resta lingvo de F-Droid) —
+   https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt
+3. **`metadata/dk.nordfalk.esperanto.radio/eo/summary.txt`** (esperanta resumo) —
+   https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio/eo/summary.txt
+
+En via fork (https://gitlab.com/nordfalk/fdroiddata): **`+` → New file**
+apud la dosieruja vojo, enigu la PLENAN vojon (subdosierujoj kreiĝas aŭtomate),
+po unu dosiero; la enhavon kopiu el la ligiloj supre. Post la unua dosiero
+elektu "Target Branch": `dk.nordfalk.esperanto.radio` (NE `master`) kaj
+u la saman branĉon por ĉiuj tri; Commit message ekz.
+`New App: dk.nordfalk.esperanto.radio`.
+
+#### Kial la yml aspektas kiel ĝi aspektas (sen komentoj en la dosiero)
+
+- `scanignore: build.gradle.kts` — la radika konstrudosiero deklaras
+  `https://jcenter.bintray.com` (necesa por la MALNOVA apo, A1); la
+  F-Droid-skanilo rifuzas nekonatajn Maven-deponejojn. La nova apo neniam
+  efektive elŝutas de jcenter (ĉiuj ĝiaj dependejoj estas en
+  Maven Central/Google), do la skanilo sekure ignorigas tiun dosieron.
+- `UpdateCheckName: Ignore` — la aŭtomata nom-serĉanto ne trovas nian
+  manifeston (KMP-aranĝo: `src/androidMain/`) kaj prenus la nomon de la
+  malnova apo („Esperanto-radio Muzaiko"); sen „Ignore" la ĝisdatig-boto
+  ŝanĝus `AutoName` kaj la CI-diferkontrolo ruĝiĝus.
+- `gradle: - yes` — gustuma indiko (`yes` = sen gustumoj → `assembleRelease`);
+  la valoro devas esti la ĉeno „yes" (en YAML-1.1 la necitita formo estas
+  legata kiel buleo de iuj iloj — la kanona formo de `rewritemeta` tamen
+  precize tiel skribas ĝin kaj la CI-skemilo legas ĝin kiel ĉenon).
+- `Summary` for — `tools/make-summary-translatable.py` postulas, ke ĝi vivu
+  en `metadata/<appid>/en-US/summary.txt` (kaj `check-localized-metadata.py`
+  postulas, ke ĉiu apo kun lokalizitaj dosierujoj havu `en-US`).
 
 ### 3.3 Kontrolu la CI-on de via fork
 
 1. En via fork iru al **Build → Pipelines**
    (aŭ "CI/CD → Pipelines" en la malnova fasado).
 2. Atendu la pipeline (typical 10–40 minutoj — ĝi vere provas konstrui la apon).
-3. **Verda (passed)** → daŭrigu ĉe 3.4. La unua paŝo validigas la metadatenon
-   kontraŭ `schemas/metadata.json` (kategorioj nur el ties listo, neniu
-   lokalizita kampo en la yml, `AutoUpdateMode` laŭ la nova sintakso) — nia
-   dosiero estas jam kontraŭvalidigita loke kontraŭ la sama skemo.
-   **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
-   aldonu la eligilon al la sekva laborsesio kun mi.
+3. **Verda (passed)** → daŭrigu ĉe 3.4. La ses taskoj (schema validation,
+   fdroid lint, fdroid rewritemeta, tools check scripts, checkupdates,
+   fdroid build) estis ĉiuj reproduktitaj VERDAJ loke per la samaj iloj
+   (fdroidserver + check-jsonschema + la tools/-skriptoj de fdroiddata,
+   2026-10-31) — se tamen io ruĝiĝas, aldonu la taskan eligilon al la
+   sekva laborsesio kun mi.
    **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
    aldonu la eligilon al la sekva laborsesio kun mi — la plej oftaj kaŭzoj
    estas YAML-tajperaro aŭ retaj eraretoj; ni riparos la metadatenon kaj vi
@@ -116,9 +141,16 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
    - Error reporting (Sentry) is opt-in in builds without our signature
      (BuildConfig.SEN_NIA_SUBSKRIBO); there is a one-time consent dialog on
      first launch and a toggle in Settings → Privacy.
-   - Summary/Description (Esperanto) are in the yml as the default;
-     the en-US texts are read automatically from the Play listing in
-     the repo (Triple-T structure: androidApp/src/main/play/listings/en-US).
+   - The Esperanto Summary lives in metadata/<appid>/eo/summary.txt and the
+     English one in en-US/summary.txt (en-US is F-Droid's fallback); the
+     Esperanto Description is the yml default, the en-US description is read
+     automatically from the Play listing in the repo (Triple-T structure:
+     androidApp/src/main/play/listings/en-US).
+   - scanignore skips the root build.gradle.kts: it declares the dead
+     jcenter.bintray.com repo, which is only needed by the legacy app in
+     the same repo (GPL) — the built module never fetches from it.
+   - UpdateCheckName: Ignore — the autoname scanner cannot find the KMP
+     manifest (src/androidMain/) and would pick the legacy app's name.
    ```
 
 5. Marku **"Squash commits when merge is accepted"** (defaŭlta) → **Create merge request**.

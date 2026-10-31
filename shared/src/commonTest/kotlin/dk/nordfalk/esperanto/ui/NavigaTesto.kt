@@ -216,6 +216,53 @@ class NavigaTesto {
     }
 
     @Test
+    fun kanalEkranoMontrasKrudanAgordonEnEvoluaReĝimo() = runComposeUiTest {
+        val agordoj = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl()
+        agordoj.fiksiEvoluon(true)
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            override fun observiPlejŝatatajn() = MutableStateFlow(emptySet<String>()).asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = false
+        }
+        // Vera kodo el la pakita konfiguro — la kruda ero estas legata el ĝi
+        val kanalo = dk.nordfalk.esperanto.domain.model.Kanalo(slug = "polaretradio", nomo = "Pola Retradio")
+        setContent {
+            KanaloEkrano(
+                kanalo = kanalo,
+                elsendoDeponejo = PreviewElsendoDeponejo(emptyList()),
+                plejŝatatajDeponejo = plejDeponejo,
+                agordojDeponejo = agordoj,
+                onReen = {},
+            )
+        }
+        waitForIdle()
+        // La agord-datumoj de la kanalo (1-linia, elfaldebla)
+        onNodeWithText("Kanalo(slug=polaretradio", substring = true).assertIsDisplayed()
+        onNodeWithText("transsaltuKomenceSekundojn=[]", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun kanalEkranoNeMontrasKrudanAgordonSenEvoluaReĝimo() = runComposeUiTest {
+        val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
+            override fun observiPlejŝatatajn() = MutableStateFlow(emptySet<String>()).asStateFlow()
+            override suspend fun baskuliPlejŝaton(kanaloSlug: String) {}
+            override suspend fun estasPlejŝatata(kanaloSlug: String) = false
+        }
+        val kanalo = dk.nordfalk.esperanto.domain.model.Kanalo(slug = "polaretradio", nomo = "Pola Retradio")
+        setContent {
+            KanaloEkrano(
+                kanalo = kanalo,
+                elsendoDeponejo = PreviewElsendoDeponejo(emptyList()),
+                plejŝatatajDeponejo = plejDeponejo,
+                agordojDeponejo = dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl(),
+                onReen = {},
+            )
+        }
+        waitForIdle()
+        onAllNodesWithText("Kanalo(slug=polaretradio", substring = true).assertCountEquals(0)
+    }
+
+    @Test
     fun kanalEkranoSnackbarNavigasAlAgordoj() = runComposeUiTest {
         val plejDeponejo = object : dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo {
             private val _set = MutableStateFlow<Set<String>>(emptySet())

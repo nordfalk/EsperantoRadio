@@ -103,6 +103,11 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## Jam konataj limoj kaj problemoj
 
+- **fdroidserver forigas la signingConfigs-blokon antaŭ konstrui**
+  (`common.remove_signing_keys`, 2026-10-31): la keystore-kontrolo en
+  `androidApp/build.gradle.kts` devas uzi `findByName` (nenul-sekura) —
+  `getByName` ĵetus per „SigningConfig with name 'release' not found" sur la
+  F-Droid-buildservilo.
 - **Release subskribas nur kiam la keystore-dosiero ekzistas** (2026-10-29, C50):
   `assembleRelease` sen keystore produktas `androidApp-release-unsigned.apk` —
   necesa por F-Droid (ĝi konstruas kaj subskribas mem); la loka subskribita

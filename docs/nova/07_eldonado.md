@@ -97,20 +97,30 @@ sia propra ŝlosilo.
 
 ### Kio estas pretigita (2026-10-29, C50)
 
-- **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — laŭ la
-  nuna fdroiddata-formato, kun `Builds`-ero por 3.1.1/253 (etikedo `v3.1.1`),
-  `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` (la nuna skemo-sintakso).
-  Kontraŭvalidigita kontraŭ `schemas/metadata.json` de fdroiddata
-  (kategorioj `Radio`/`Podcast` el ties listo; neniu lokalizita kampo en la
-  yml — la en-US-tekstojn F-Droid legas aŭtomate el nia Play-listing,
-  `androidApp/src/main/play/listings/en-US/`, la Triple-T-strukturo;
-  la esperanta teksto estas la ĝenerala priskribo en la yml).
-  Rekte submetebla kiel `metadata/dk.nordfalk.esperanto.radio.yml`.
+- **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — en la
+  KANONA formo de `fdroid rewritemeta` (neniu komento — alie la CI-tasko
+  „fdroid rewritemeta" ruĝiĝas), kun `Builds`-ero por 3.1.1/253 (etikedo
+  `v3.1.1`), `AutoUpdateMode: Version` + `UpdateCheckMode: Tags`,
+  `UpdateCheckName: Ignore` kaj `scanignore: build.gradle.kts`; `commit` estas
+  la plena haketaĵo (la ŝablono malpermesas etikedojn). NENIU teksto rajtas en
+  fdroiddata — resumo, priskripo, ŝanĝoprotokolo (`default.txt`) kaj bildoj
+  venas el nia Play-listing (Triple-T). ĈIŬ SES CI-taskoj de
+  la forko estis reproduktitaj verdaj loke per la samaj iloj (2026-10-31):
+  `check-jsonschema` (skemo), `fdroid rewritemeta`/`lint`, la kvin
+  `tools/`-kontrolskriptoj, `fdroid checkupdates --auto` („up to date") kaj
+  la fonta skanilo („Ignoring unknown maven repo" per scanignore).
+  Submetebla kiel tri dosieroj sub `metadata/`.
 - **Nesubskribita konstruo**: la release-buildtype en `androidApp/build.gradle.kts`
   subskribas nur kiam la keystore-dosiero ekzistas. Sen `secrets.properties` kaj
   sen keystore `./gradlew :androidApp:assembleRelease` produktas
   `androidApp-release-unsigned.apk` (kontrolita 2026-10-29 en pura worktree);
   F-Droid subskribas ĝin mem per sia ŝlosilo.
+  **ATENTU**: fdroidserver antaŭ ĉiu konstruo FORIGAS la `signingConfigs`-blokon
+  el ĉiu `build.gradle(.kts)` (`common.remove_signing_keys`) — tial la keystore-
+  kontrolo devas uzi `signingConfigs.findByName("release")` (nenul-sekura), NE
+  `getByName` (ĵetus „SigningConfig with name 'release' not found", 2026-10-31).
+  Reprodukte loke: rulu `remove_signing_keys` sur kopio kaj konstruu — la
+  konstruo devas daŭri nesubskribita.
 - **Permesilo**: GPL-3.0-or-later (`LICENSE` en la radiko) — kongrua.
 - **Neniuj binaroj en la deponejo** krom la norma
   `gradle/wrapper/gradle-wrapper.jar`, kiun la F-Droid-skanilo konas.

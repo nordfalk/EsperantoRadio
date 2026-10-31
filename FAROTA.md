@@ -252,8 +252,13 @@
   - nesubskribita release-konstruo ebligita (release subskribas nur kiam la
     keystore ekzistas; pruvita en pura worktree — F-Droid kondiĉo);
   - `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` estas pretigita laŭ la
-    nuna fdroiddata-formato (3.1.0/252, etikedo `v3.1.0`, aŭtomata ĝisdatigo
-    per etikedoj);
+    nuna fdroiddata-formato kaj **kontraŭvalidigita kontraŭ la oficiala
+    `schemas/metadata.json`** (kategorioj `Radio`/`Podcast`; `AutoUpdateMode:
+    Version` — la malnova `v%v`-ŝablono ne plu rajtas; lokalizitaj kampoj
+    malpermesataj en la yml — la en-US-tekstojn F-Droid legas aŭtomate el
+    nia Play-listing `androidApp/src/main/play/` (Triple-T-strukturo));
+    3.1.1/253, etikedo `v3.1.1`, aŭtomata ĝisdatigo per etikedoj
+    (la unua fork-CI-provo de la posedanto malkaŝis la skemo-erarojn, 2026-10-31);
   - fdroid-internaĵoj esploritaj kaj dokumentitaj: `gradlew-fdroid` trovas la
     radikan `gradle/wrapper` ankaŭ el `subdir: androidApp`; la `gradle:`-kampo
     signifas gustumojn (`yes` = `assembleRelease`), ne taskojn;

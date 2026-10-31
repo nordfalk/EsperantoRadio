@@ -1,8 +1,5 @@
-Nova en 3.1.0:
+Nova en 3.1.1:
 
-⚡ Amaso da plibonigoj, ekzemple kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito
-🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston, la mini-ludilbreto restas ĉiam videbla
-- La malsupra naviga breto estas anstataŭigita per naviga tirkesto
-🔔 Sciigoj pri novaj elsendoj - limigataj al maks. 7 samtempe, maks. 3 po kanalo
-⏰ Vekhorloĝo: tempo per ciferplato, kanalo per kanal-elektilo
-🗣️ Plibonigita esperanta lingvaĵo en la tuta apo
+- Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj ĝi petas vian permeson unue
+- Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble
+- Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno

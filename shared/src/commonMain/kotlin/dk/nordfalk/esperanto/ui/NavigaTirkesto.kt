@@ -58,7 +58,7 @@ fun NavigaTirkesto(
     nunaVojo: NavKey?,
     onElektu: (Vojo) -> Unit,
     /** Retpoŝtadreso de la prizorganto — ricevita de la „Proponu kanalon"-butono (datum-movita, A5). */
-    prizorgantaRetpoŝto: String = "jacob.nordfalk@gmail.com",
+    prizorgantaRetpoŝto: String,
 ) {
     ModalDrawerSheet(
         tirkestStato,

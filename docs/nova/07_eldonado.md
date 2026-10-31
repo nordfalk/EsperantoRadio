@@ -97,15 +97,19 @@ sia propra ŝlosilo.
 
 ### Kio estas pretigita (2026-10-29, C50)
 
-- **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — laŭ la
-  nuna fdroiddata-formato, kun `Builds`-ero por 3.1.1/253 (etikedo `v3.1.1`),
-  `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` (la nuna skemo-sintakso).
-  Kontraŭvalidigita kontraŭ `schemas/metadata.json` de fdroiddata
-  (kategorioj `Radio`/`Podcast` el ties listo; neniu lokalizita kampo en la
-  yml — la en-US-tekstojn F-Droid legas aŭtomate el nia Play-listing,
-  `androidApp/src/main/play/listings/en-US/`, la Triple-T-strukturo;
-  la esperanta teksto estas la ĝenerala priskribo en la yml).
-  Rekte submetebla kiel `metadata/dk.nordfalk.esperanto.radio.yml`.
+- **Metadateno**: `fdroid/metadata/dk.nordfalk.esperanto.radio.yml` — en la
+  KANONA formo de `fdroid rewritemeta` (neniu komento — alie la CI-tasko
+  „fdroid rewritemeta" ruĝiĝas), kun `Builds`-ero por 3.1.1/253 (etikedo
+  `v3.1.1`), `AutoUpdateMode: Version` + `UpdateCheckMode: Tags`,
+  `UpdateCheckName: Ignore` kaj `scanignore: build.gradle.kts` (klarigojn
+  vidu en `fdroid/GVIDILO.md` § 3.2). La resumoj vivas ekster la yml:
+  `fdroid/metadata/dk.nordfalk.esperanto.radio/en-US/summary.txt` (angla —
+  la resta lingvo) kaj `…/eo/summary.txt` (esperanta). ĈIŬ SES CI-taskoj de
+  la forko estis reproduktitaj verdaj loke per la samaj iloj (2026-10-31):
+  `check-jsonschema` (skemo), `fdroid rewritemeta`/`lint`, la kvin
+  `tools/`-kontrolskriptoj, `fdroid checkupdates --auto` („up to date") kaj
+  la fonta skanilo („Ignoring unknown maven repo" per scanignore).
+  Submetebla kiel tri dosieroj sub `metadata/`.
 - **Nesubskribita konstruo**: la release-buildtype en `androidApp/build.gradle.kts`
   subskribas nur kiam la keystore-dosiero ekzistas. Sen `secrets.properties` kaj
   sen keystore `./gradlew :androidApp:assembleRelease` produktas

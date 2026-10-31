@@ -1,33 +1,7 @@
-# F-Droid-metadateno por EsperantoRadio
-#
-# Ĉi tiu dosiero estas laŭ la nuna fdroiddata-formato (Build Metadata Reference:
-# https://f-droid.org/docs/Build_Metadata_Reference/) kaj rekte submetebla.
-# Detala paŝon-post-paŝa gvidilo por la submeto: fdroid/GVIDILO.md
-# Procedo (2026-10-29, C50):
-# 1. Kreu GitLab-konton (aŭ uzu ekzistan) ĉe https://gitlab.com
-# 2. Forku https://gitlab.com/fdroid/fdroiddata
-# 3. Kopiu ĉi tiun dosieron al fdroiddata/metadata/dk.nordfalk.esperanto.radio.yml
-#    (branĉo nomata laŭ la apo-identigilo)
-# 4. Kreu merge request al fdroid/fdroiddata — la GitLab-CI de fdroiddata
-#    aŭtomate provas konstrui (rigardu ĝian eligilon!)
-# 5. La F-Droid-teamo revizias; la MR-kontrolistoj petas eventuale
-#    AntiFeatures-eraron aŭ priskribo-ĝustigojn
-#
-# Grave por ĉiu nova versio (Builds-ero + la 3 kampoj malsupre):
-# - git-etikedo `vX.Y.Z` sur master (F-Droid konstruas EL LA ETIKEDO)
-# - versionCode kaj versionName (laŭvorta!) en androidApp/build.gradle.kts kongruaj
-# - apoversio en gradle/libs.versions.toml kongrua
-# - ĉe ŝanĝo de build-ordo: kontroli ke `cd androidApp && gradlew assembleRelease`
-#   funkcias SEN secrets.properties (nesubskribita konstruo — F-Droid subskribas mem)
-
-# Nur nomoj el la difinita listo de fdroiddata (schemas/metadata.json) —
-# ekz. Audio ne ekzistas; Radio kaj Podcast ja.
 Categories:
-  - Radio
   - Podcast
-
+  - Radio
 License: GPL-3.0-or-later
-
 AuthorName: Jacob Nordfalk
 AuthorEmail: jacob.nordfalk@proton.me
 WebSite: https://nordfalk.github.io/EsperantoRadio/
@@ -37,12 +11,6 @@ Changelog: https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md
 
 Name: EsperantoRadio
 AutoName: EsperantoRadio
-
-# La esperanta teksto estas la ĝenerala priskribo (por ĉiuj lingvoj);
-# la anglan (en-US) versionon F-Droid legas aŭtomate el nia Play-listing
-# (androidApp/src/main/play/listings/en-US/ — la Triple-T-strukturo,
-# vidu https://f-droid.org/docs/All_About_Descriptions_Graphics_and_Screenshots/).
-Summary: Radio kun 27 Esperanto-kanaloj kaj podkastoj, el la tuta mondo
 Description: |-
   Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en
   unu apo: kanal-superrigardo, rektaj elsendoj, podkastoj, elŝutoj, plej
@@ -54,50 +22,18 @@ Description: |-
 RepoType: git
 Repo: https://github.com/nordfalk/EsperantoRadio.git
 
-# Konstru-instrukcioj — F-Droid konstruas la APOKON mem el la etikedita fonto:
-# fdroid rulas `gradlew-fdroid assembleRelease` en `androidApp/` (subdir).
-# gradlew-fdroid legas `gradle/wrapper/gradle-wrapper.properties` (serĉas ankaŭ
-# en la gepatra dosierujo — la radiko), elŝutas Gradle 9.8.1 kun SHA-256-kontrolo
-# kaj plenumas `assembleRelease`, kiu el `androidApp/` solviĝas kiel
-# `:androidApp:assembleRelease` (kontrolita 2026-10-29).
-# Signado: la release-buildtype subskribas NUR se la keystore-dosiero ekzistas —
-# sur la F-Droid-buildservilo ĝi mankas, do la APK eldoniĝas nesubskribita kaj
-# F-Droid subskribas ĝin per sia propra ŝlosilo.
 Builds:
-  - versionName: '3.1.1'
+  - versionName: 3.1.1
     versionCode: 253
     commit: v3.1.1
     subdir: androidApp
     gradle:
-      - 'yes'  # citite: sen tio YAML-1.1-legiloj (ekz. PyYAML) legas buleon
+      - yes
+    scanignore:
+      - build.gradle.kts
 
-# Aŭtomata ĝisdatigo: la roboto legas versionCode/versionName el
-# androidApp/build.gradle.kts ĉe ĉiu nova etikedo (UpdateCheckMode: Tags)
-# kaj uzas la trovitan etikedon rekte kiel commit (AutoUpdateMode: Version —
-# la nuna skemo permesas nur None/Version/Version +sufikso-ŝablono).
-# versionName en build.gradle.kts devas esti LAŬVORTA ĉeno (F-Droid-parsilo).
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
+UpdateCheckName: Ignore
 CurrentVersion: 3.1.1
 CurrentVersionCode: 253
-
-# Sentry-konsidero (C50, solvita en PR #148):
-# F-Droid konstruas SEN nia keystore (vidu la signadon en androidApp/
-# build.gradle.kts) — en tiaj konstruoj la erar-raportado al sentry.io estas
-# OPT-IN: defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto
-# (ŝanĝebla en Agordoj → Privateco). Laŭ la F-Droid-lingvaĵo ne temas pri la
-# kontraŭeco "Tracking" (https://f-droid.org/en/docs/Anti-Features/ — "opt-in
-# kaj defaŭlte malŝaltita" estas eksplicite la kondiĉo SEN la kontraŭeco).
-# Konstruoj KUN nia subskribo (kiujn ni mem disdonas: Google Play, Aptoide)
-# raportas defaŭlte — tio ne koncernas la F-Droid-konstruon, ĉar F-Droid ĉiam
-# subskribas per SIA propra ŝlosilo kaj la apo rekonas tion (BuildConfig.
-# SEN_NIA_SUBSKRIBO). Se la MR-kontrolisto demandas, referencu la
-# konsento-dialogon en shared/.../App.kt.
-#
-# Reprodukteblaj konstruoj (opcia, ne bezonata por enigo):
-# se `dependenciesInfo { includeInApk = false }` estos agordita kaj la konstruo
-# estos bit-identa, F-Droid povas validigi kaj disdoni NIAN subskribitan APK-on
-# (sen re-instalo inter F-Droid- kaj GitHub-uzantoj). Tiam aldonu ĉi tie:
-# AllowedAPKSigningKeys: aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16
-# (SHA-256 de la subskriba atestilo, eldonita per
-#  apksigner verify --print-certs androidApp-release.apk)

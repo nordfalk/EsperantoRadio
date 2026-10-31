@@ -18,10 +18,15 @@ kanal superrigardo, livestreno, podkastoj, elŝutoj, plej ŝatataj, serĉo, vekh
 La plej valora parto ne estas la ludilo aŭ UI, sed la **scio pri la fontoj** — kiuj
 kanaloj ekzistas, kiel iliaj fluoj aspektas, kaj kiel eltiri rektan MP3-URL el ĉiu.
 
-## Stato de la projekto (ĝisdatigita 2026-10-14)
+## Stato de la projekto (ĝisdatigita 2026-10-31)
 
 La nova KMP-apo (Android + Desktop + Web/wasmJs) estas eldonita kaj aktiva en
-Google Play (3.0.3/249, 2026-10-13). Ĉiuj fazoj de la plano estas faritaj krom:
+Google Play: produktado = 3.1.0 (252); **3.1.1 (254)** kuŝas en la interna
+trako kaj atendas promocion (2026-10-31; 253 bruliĝis pro la interna testo
+3.1.1-beta29okt el PR #144 — detaloj en la `eldonado`-skill-o). **F-Droid**:
+la metadatena MR !55129 estas submetita kaj atendas revizion (2026-10-31;
+paŝoj kaj stato en `fdroid/GVIDILO.md`, FAROTA C50). **Aptoide**: ankoraŭ
+ne komencita (docs/nova/07 § 3). Ĉiuj fazoj de la plano estas faritaj krom:
 iOS-ludado (bezonas AVPlayer + Xcode-projekton), eldono de Desktop + Web/wasmJs, hejmekrana widget, Chromecast,
 parolsintezo kaj la podkasta arkiv-servilo (`docs/nova/06_servilo_arkivo.md`).
 Web estas limigita de CORS (nur la anchor.fm-podkastoj ŝargeblas sen servilo).

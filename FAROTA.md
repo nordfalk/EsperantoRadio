@@ -277,10 +277,29 @@
     Agordoj → Privateco (kun fina protokolo ĉe malŝalto kaj protokolo ĉe
     reŝalto) — la F-Droid-kontraŭeco `Tracking` ne aplikeblas al la
     F-Droid-konstruo.
-- **Restas (posedanto)**: (1) GitLab-konto + fork de fdroiddata + MR kun la
-  metadateno; (2) Aptoide Connect-konto + pruvo de pako-posedo + alŝuto de la
-  subskribita APK; (3) atenti, ke la Sentry-telemetrio (C48/C49/G44) draste
-  malpliiĝas — nur konsentintaj uzantoj plu raportas. Vidu ankaŭ
+- **Stato (2026-10-31)**:
+  - **fdroiddata-MR !55129 estas SUBMETITA kaj atendas revizion**:
+    https://gitlab.com/fdroid/fdroiddata/-/merge_requests/55129 —
+    „New app: EsperantoRadio", 27/28 ŝablonaj kestoj (nur Reproducible
+    Builds malmarkita kun kialo), 4 ekranfotoj, ŝanĝoj-tabulo = nur la
+    yml, ĉiuj pipelinoj verdaj INKLUZIVE fdroid build (la APK eĉ
+    konstruiĝis kaj F-Droid-subskribiĝis sur ilia servilo). La
+    prizorgantoj etikedos (New App/review-requested — ekstera kontribuinto
+    ne povas mem) kaj revizios, tigoj–semajnoj; **respondu rapide al
+    komentoj** (tio decidas la rapidecon).
+  - **Play**: 3.1.1 (versionCode 254) kuŝas en la interna trako kun la
+    „Nova en 3.1.1"-notoj — restas nur la **promocio al produktado**
+    (https://play.google.com/console/u/0/developers/8294421063218887510/app/4973090730523647228/releases/overview).
+    Rimarko: F-Droid konstruas la etikedon v3.1.1 kiel **253** (253
+    bruliĝis en Play pro la interna testo 3.1.1-beta29okt el la
+    nekunfandita PR #144; ekde v3.1.2 la kodoj re kongruos).
+  - **Sentry-telemetrio** (C48/C49/G44): el F-Droid-uzantoj nur konsentintoj
+    plu raportos; la malpliiĝo estas atendata, ne incidento.
+- **Restas poste**: (1) post mergo de !55129 — 1–3 tagoj ĝis la paĝo
+  https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/ ekvivos, tiam
+  „Get it on F-Droid"-emblemo al la README (GVIDILO § 6); (2) Aptoide
+  Connect-konto + posedo-pruvo + alŝuto de la subskribita APK; (3) PR #144
+  (la beta-branĉo) revizii/fermi. Vidu ankaŭ
   https://github.com/nordfalk/EsperantoRadio/pull/66
 
 #### C51 — Funkcioj de la malnova apo ankoraŭ ne portitaj

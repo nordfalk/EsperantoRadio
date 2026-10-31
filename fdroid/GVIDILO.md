@@ -11,7 +11,7 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 
 - Vi **ne alŝutas APK-on**. Vi aldonas nur malgrandan "recepto-dosieron"
   (metadateno) al ilia deponejo `fdroiddata`.
-- F-Droid mem elŝutas nian fontkodon ĉe la git-**etikedo** (`v3.1.0`),
+- F-Droid mem elŝutas nian fontkodon ĉe la git-**etikedo** (`v3.1.1`),
   konstruas la APK-on en ilia konstruo-servilo kaj **subskribas ĝin per sia
   propra ŝlosilo**.
 - Konsekvenco: la F-Droid-APK havas alian subskribon ol la Play-APK. Uzanto ne
@@ -25,8 +25,8 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 
 | Kio | Stato |
 |---|---|
-| Metadateno (recepto) por 3.1.0/252, etikedo `v3.1.0` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`) |
-| Git-etikedo `v3.1.0` sur GitHub | ✅ (unu fonto de vero kun versionCode 252) |
+| Metadateno (recepto) por 3.1.1/253, etikedo `v3.1.1` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`); kontraŭvalidigita kontraŭ la oficiala fdroiddata-skemo (`schemas/metadata.json`) |
+| Git-etikedo `v3.1.1` sur GitHub | ✅ (unu fonto de vero kun versionCode 253) |
 | Nesubskribita konstruo ebla (F-Droid kondiĉo) | ✅ pruvita 2026-10-29 |
 | Permesilo GPL-3.0-or-later | ✅ `LICENSE` en la radiko |
 | Neniuj malliberaj dependejoj / binaroj en la deponejo | ✅ |
@@ -74,7 +74,12 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
 1. En via fork iru al **Build → Pipelines**
    (aŭ "CI/CD → Pipelines" en la malnova fasado).
 2. Atendu la pipeline (typical 10–40 minutoj — ĝi vere provas konstrui la apon).
-3. **Verda (passed)** → daŭrigu ĉe 3.4.
+3. **Verda (passed)** → daŭrigu ĉe 3.4. La unua paŝo validigas la metadatenon
+   kontraŭ `schemas/metadata.json` (kategorioj nur el ties listo, neniu
+   lokalizita kampo en la yml, `AutoUpdateMode` laŭ la nova sintakso) — nia
+   dosiero estas jam kontraŭvalidigita loke kontraŭ la sama skemo.
+   **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
+   aldonu la eligilon al la sekva laborsesio kun mi.
    **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
    aldonu la eligilon al la sekva laborsesio kun mi — la plej oftaj kaŭzoj
    estas YAML-tajperaro aŭ retaj eraretoj; ni riparos la metadatenon kaj vi
@@ -100,7 +105,7 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
    No RFP issue exists for this app (checked https://gitlab.com/fdroid/rfp).
 
    Notes for reviewers:
-   - The recipe builds version 3.1.0 (versionCode 252) from tag v3.1.0.
+   - The recipe builds version 3.1.1 (versionCode 253) from tag v3.1.1.
    - It is a Kotlin Multiplatform project: the Gradle build lives in the repo
      root, `subdir: androidApp` runs `assembleRelease` from the app module
      (verified: resolves to :androidApp:assembleRelease).
@@ -111,8 +116,9 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
    - Error reporting (Sentry) is opt-in in builds without our signature
      (BuildConfig.SEN_NIA_SUBSKRIBO); there is a one-time consent dialog on
      first launch and a toggle in Settings → Privacy.
-   - Summary/Description are in Esperanto (the app's audience), with an
-     en-US localization.
+   - Summary/Description (Esperanto) are in the yml as the default;
+     the en-US texts are read automatically from the Play listing in
+     the repo (Triple-T structure: androidApp/src/main/play/listings/en-US).
    ```
 
 5. Marku **"Squash commits when merge is accepted"** (defaŭlta) → **Create merge request**.
@@ -147,7 +153,7 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
 |---|---|
 | "Why is `subdir` not the repo root?" | The Gradle build needs the root (KMP: `settings.gradle.kts`, `gradle/wrapper`); running from `androidApp/` resolves `assembleRelease` to `:androidApp:assembleRelease` and gradlew-fdroid finds the root wrapper properties one level up. Verified locally and in fdroidserver's `common.py`. |
 | "Sentry = Tracking anti-feature?" | Reporting is opt-in in F-Droid builds: default off, one-time consent dialog on first launch, toggle in Settings → Privacy. See `BuildConfig.SEN_NIA_SUBSKRIBO` in `androidApp/build.gradle.kts`. |
-| "Description is not English" | Esperanto is the app's audience language; an en-US localization is included. |
+| "Description is not English" | Esperanto is the default text (the app's audience language); the en-US texts come from the Play listing in the repo (androidApp/src/main/play/listings/en-US). |
 | "Gradle 9/AGP 9 on the buildserver?" | gradlew-fdroid downloads Gradle 9.8.1 from our `gradle/wrapper` (SHA-256-verified via the gradle-transparency-log), independent of the buildserver's Gradle. |
 | "Why unsigned APK?" | The release signing config only applies when our keystore exists; F-Droid builds have no access to it — intended, F-Droid signs with its key. |
 
@@ -161,9 +167,14 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
    konstruo-ciklo; praktike 1–3 tagojn. Kontrol-ligilo:
    https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/
    (paĝo "not found" = ankoraŭ ne).
-2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid. Nia eldona
+2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid.
+   Noto pri 3.1.1: F-Droid konstruas versionCode **253** (la etikedo), dum
+   la Play-eldono havas **254** — 253 estis konsumita en Play de interna
+   testo (3.1.1-beta29okt, PR #144). Tio estas normala kaj senproblema:
+   la F-Droid-versionumejo estas sendependa, kaj la etikedo kongruas kun
+   la metadateno (253). Ekde la sekva versio (v3.1.2+) la kodoj re kongruas. Nia eldona
    procezo jam kreas la etikedon `vX.Y.Z` kaj puŝas ĝin; `AutoUpdateMode:
-   Version v%v` + `UpdateCheckMode: Tags` igas la fdroiddata-robotojn malfermi
+   Version` + `UpdateCheckMode: Tags` igas la fdroiddata-robotojn malfermi
    ĝisdatigo-MR-on mem. Reciprokaĵo: **ĉiu** eldonota versio bezonas etikedon
    sur GitHub kun kongrua versionCode — nia `eldonado`-procezo jam tion faras.
    Se post ~1 semajno la nova versio ne aperas en F-Droid, kontrolu ilian

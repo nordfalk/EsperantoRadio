@@ -16,29 +16,29 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Naviga tirkesto: nova ero „Proponi kanalon“ — malfermas retpoŝton al la prizorganto kun pretigita plano (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Ok kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo, 3ZZZ en Esperanto) transsaltas sian ripetan enkondukon; ĉe 3ZZZ la valoro sekvas la historian ŝanĝiĝon de la enkonduko laŭ la elsendo-dato por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
+
+## [3.1.1] - 2026-10-31
+
 
 ### Ŝanĝita
 
 - Erar-raportado: en konstruoj el eksteraj vendejoj (F-Droid) ĝi petas vian permeson unue; en la Play-eldono ĝi restas ŝaltita kaj estas malŝaltebla en Agordoj → Privateco (https://github.com/nordfalk/EsperantoRadio/pull/148)
+- Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
+- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
 
 ### Riparita
 
 - Samtempa ŝargo de la sama kanalo (ekz. malsupren-tiro dum aŭtomata ŝargo aŭ vekhorloĝo dum ekran-ŝargo) ne plu elŝutas la RSS-fluon duoble — malpli da reta trafiko kaj pli rapida ŝargo (https://github.com/nordfalk/EsperantoRadio/pull/147)
 - Ekludo komencita per klako sur sciigo ne plu restartas de la komenco dum ekranturno (https://github.com/nordfalk/EsperantoRadio/pull/149)
 
-### Ŝanĝita
-
-- Serĉo: trovoj estas grupigitaj laŭ graveco — unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj; klako sur trafita kanalo malfermas la kanalon (https://github.com/nordfalk/EsperantoRadio/pull/150)
-- Hejmo: la supra breto nun havas serĉo-butonon anstataŭ la elŝuto-butono (elŝutoj restas en la naviga tarkesto); en la elsend-listo la dato aperas maldekstre de la daŭro anstataŭ kiel aparta titolo (https://github.com/nordfalk/EsperantoRadio/pull/150)
-
 ## [3.1.0] - 2026-10-25
 
 ### Aldonita
 
-- Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
-- Naviga tirkesto: nova ero „Proponi kanalon“ — malfermas retpoŝton al la prizorganto kun pretigita plano (https://github.com/nordfalk/EsperantoRadio/pull/144)
-- Ok kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo, 3ZZZ en Esperanto) transsaltas sian ripetan enkondukon; ĉe 3ZZZ la valoro sekvas la historian ŝanĝiĝon de la enkonduko laŭ la elsendo-dato por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - La malsupra naviga breto estas anstataŭigita per naviga tirkesto (https://github.com/nordfalk/EsperantoRadio/pull/120)
 - Hejmo: klako sur la sekcio-titolo „Kanaloj“ kondukas al la kanala vido (https://github.com/nordfalk/EsperantoRadio/pull/131)
 - Vekhorloĝo: la tempo elekteblas per ciferplato en dialogo (kun eblo klavare enigi) kaj la kanalo per kanal-elektilo (https://github.com/nordfalk/EsperantoRadio/pull/114)
@@ -181,6 +181,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.1.1]: https://github.com/nordfalk/EsperantoRadio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.1...v3.0.2

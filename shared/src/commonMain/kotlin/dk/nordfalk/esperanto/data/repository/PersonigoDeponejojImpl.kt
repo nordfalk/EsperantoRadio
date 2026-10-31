@@ -65,6 +65,11 @@ class LudatojDeponejoMaketo : LudatojDeponejo {
     private val _ludatoj = MutableStateFlow<Map<String, LudataElsendo>>(emptyMap())
     override fun observiLudatojn(): StateFlow<Map<String, LudataElsendo>> = _ludatoj.asStateFlow()
 
+    /** Test-helpo: rekte enmetu ludaton (ekz. kun difinita lasteLudita — C59a-testoj). */
+    fun enmetuLudaton(ludata: LudataElsendo) {
+        _ludatoj.value = _ludatoj.value + (ludata.elsendoId to ludata)
+    }
+
     override suspend fun registriPozicion(elsendoId: String, kanaloSlug: String, pozicioMs: Long, daŭroMs: Long) {
         val nuna = _ludatoj.value.toMutableMap()
         val ekzista = nuna[elsendoId]
@@ -161,6 +166,12 @@ class AgordojDeponejoImpl(
     private val _aŭtomataDaŭrigo = MutableStateFlow(settings?.leguMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, true) ?: true)
     override val aŭtomataDaŭrigo: StateFlow<Boolean> = _aŭtomataDaŭrigo.asStateFlow()
 
+    private val _transsaltuEnkondukojn = MutableStateFlow(settings?.getBoolean(SettingsKeys.TRANSSALTU_ENKONDUKOJN, true) ?: true)
+    override val transsaltuEnkondukojn: StateFlow<Boolean> = _transsaltuEnkondukojn.asStateFlow()
+
+    private val _montruTranssaltanSciigon = MutableStateFlow(settings?.getBoolean(SettingsKeys.MONTRU_TRANSSALTAN_SCIIGON, true) ?: true)
+    override val montruTranssaltanSciigon: StateFlow<Boolean> = _montruTranssaltanSciigon.asStateFlow()
+
     private val _evoluo = MutableStateFlow(settings?.getBoolean(SettingsKeys.EVOLO, false) ?: false)
     override val evoluo: StateFlow<Boolean> = _evoluo.asStateFlow()
 
@@ -210,6 +221,16 @@ class AgordojDeponejoImpl(
         _aŭtomataDaŭrigo.value = ŝaltita
         settings?.skribuMigritanBuleon(SettingsKeys.AŬTOMATA_DAŬRIGO, SettingsKeys.AŬTOMATA_DAŬRIGO_MALNOVA, ŝaltita)
         logi("Agordoj", "AŭtomataDaŭrigo → $ŝaltita")
+    }
+    override fun fiksiTranssaltuEnkondukojn(ŝaltita: Boolean) {
+        _transsaltuEnkondukojn.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.TRANSSALTU_ENKONDUKOJN, ŝaltita)
+        logi("Agordoj", "TranssaltuEnkondukojn → $ŝaltita")
+    }
+    override fun fiksiMontruTranssaltanSciigon(ŝaltita: Boolean) {
+        _montruTranssaltanSciigon.value = ŝaltita
+        settings?.putBoolean(SettingsKeys.MONTRU_TRANSSALTAN_SCIIGON, ŝaltita)
+        logi("Agordoj", "MontruTranssaltanSciigon → $ŝaltita")
     }
     override fun fiksiEvoluon(ŝaltita: Boolean) {
         _evoluo.value = ŝaltita

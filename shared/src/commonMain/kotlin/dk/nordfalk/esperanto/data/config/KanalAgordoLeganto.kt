@@ -5,12 +5,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.SerialName
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
 import dk.nordfalk.esperanto.logw
 
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
  *
- * La dosiero `esperantoradio_kanaloj_v9.json` enhavas `//`-komentojn kaj
+ * La dosiero `esperantoradio_konfiguro.json` enhavas `//`-komentojn kaj
  * kampojn kun `XXX`-prefikso por malaktivigi. Ni striptigas komentojn
  * antaŭ parsado, kaj ignoras nekonatajn kampojn.
  */
@@ -79,7 +80,6 @@ class KanalAgordoLeganto {
 @Serializable
 data class KanalAgordo(
     val android: AndroidSekcio? = null,
-    val intervals: Intervals? = null,
     val komenca_kanalo: String? = null,
     val elsendojUrl: String? = null,
     val hejmpaĝo: String? = null,
@@ -88,16 +88,9 @@ data class KanalAgordo(
 ) {
     @Serializable
     data class AndroidSekcio(
-        val kontakt_url: String? = null,
-        val kontakt_modtagere: List<String>? = null,
-        val kontakt_titel: String? = null,
         @SerialName("apaj_novaĵoj") val apajNovaĵoj: String? = null,
-    )
-
-    @Serializable
-    data class Intervals(
-        val playlist: Int = 30,
-        val settings: Int = 1800,
+        /** Retpoŝto de la prizorganto — celo de „Proponi kanalon“ (datum-movita, A5). */
+        @SerialName("prizorgantaRetpoŝto") val prizorgantaRetpoŝto: String? = null,
     )
 }
 
@@ -117,8 +110,24 @@ data class KanaloDto(
     val uziWebViewPorElsendo: Boolean = true,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6). */
     val puriguModeloj: List<String> = emptyList(),
+    /**
+     * Transsaltendaj sekundoj de la komenco de ĉiu elsendo (ripetiĝanta enkonduko —
+     * FAROTA C59a). Unuopa valoro = unu ero sen „ĝis"; se la enkonduko ŝanĝiĝis,
+     * pluraj eroj kun finaj datoj — la lasta ero estu sen „ĝis" (validas por
+     * estontaj elsendoj). Malplena listo = ne transsalti.
+     */
+    val transsaltuKomenceSekundojn: List<TranssaltaValoroLaŭDatoDto> = emptyList(),
     val defaŭltŜatata: Boolean = false,
 )
+
+/** DTO-ero de transsaltuKomenceSekundojn: valoro + nedeviga fina dato (inkluziva). */
+@Serializable
+data class TranssaltaValoroLaŭDatoDto(
+    val sekundoj: Float,
+    val ĝis: String? = null,
+)
+
+fun TranssaltaValoroLaŭDatoDto.alValoro() = TranssaltaValoroLaŭDato(sekundoj = sekundoj, ĝis = ĝis)
 
 fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     slug = kodo,
@@ -134,6 +143,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     montruTitolojn = montruTitolojn,
     uzuWebViewPorElsendo = uziWebViewPorElsendo,
     puriguModeloj = puriguModeloj,
+    transsaltuKomenceSekundojn = transsaltuKomenceSekundojn.map { it.alValoro() },
     defaŭltŜatata = defaŭltŜatata,
 )
 

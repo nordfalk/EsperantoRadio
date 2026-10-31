@@ -45,7 +45,7 @@
 #### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-N](https://esperantoradio.sentry.io/issues/KMP-N) kaj parencaj; en la lasta semajno: spiritismavocxo, peranto, bitmono, radiovatikana, sano — ofte "uzas 0 kaŝenitajn elsendojn"; pli frue ankaŭ lamalfamuloj, babibejo, universeala-lindo, varsoviavento, kaliningrada, radioscienca, kernpunkto, vinilkosmo, movada-vidpunkto, polaretradio)
-- **Loko**: `esperantoradio_kanaloj_v9.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
+- **Loko**: `esperantoradio_konfiguro.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
 - **Priskribo**: Parto estas pasemaj ret-problemoj (timeout/DNS ĉe spreaker, anchor.fm, blogspot — KMP-12/14/15/M/Q), sed la ripetiĝo ĉe la samaj kanaloj sugestas mortajn aŭ ŝanĝitajn fluojn. `radiovatikana` aperas ankaŭ en lud-eraroj (`UnknownHostException` por `media.vaticannews.va`) — eble la tuta gastigo estas morta.
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
 - **Ĝisdatigo 2026-10-27** (Sentry 3.1.0/252, 14 tagoj + ekstera kontrolo): `radioscienca` fiaskas ankaŭ en la nuna eldono — ~15 eventoj ĉe ~5 uzantoj, ofte kun **0 kaŝenitaj elsendoj** (uzanto vidas malplenan kanalon). La fluo respondas HTTP 200 de ekstere (kontrolita per curl, ankaŭ kun Ktor/okhttp/apo-UA — do ne UA-blokado, sed intermita servila problemo de la gastiganto). Same aperas: `polaretradio`, `radiovatikana`, `spiritismavocxo` (0 kaŝenitaj), `lemondediplomatique`, `lamalfamuloj`, `vinilkosmo`. La DNS-avertoj (`UnresolvedAddressException`, 52 eventoj) venas de unu aparato sen reto kaj estas pritraktitaj ĝuste per kaŝmemoro.
@@ -319,7 +319,9 @@
 - **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
 
 #### C53 — Nova kanalo: HUMILOPINIE (ManchaPod) — kaj kontrolo de la ceteraj ManchaPod-fluoj
-- **Statuso**: [ ]
+- **Statuso**: [ ] (parta — HUMILOPINIE aldonita 2026-10-24 kun purig-modelo kontraŭ la
+  ripeta "Enigu min en la debato"-boilerplate kaj ora testo sur fiksaĵo; RESTAS: kontroli
+  "Una Vaga Idea" kaj "Cuéntame, Hermosura" pri Esperanto-epizodoj)
 - **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
 - **Priskribo**:
   - **"Ne Parolu pri Esperanto"** (spreaker-show **5202159**,
@@ -375,8 +377,10 @@
   servataj de la servilo aŭ rekte `<img>`-ebligataj. Kvanto-specimenado: mezuru ĉu la
   servila datumvojo povas esti subflue (sen CORS-kapoj) por ĉiuj 26 kanaloj.
 
-#### C57 — "Proponu kanalon"-butono (retpoŝta)
-- **Statuso**: [ ]
+#### C57 — "Proponi kanalon"-butono (retpoŝta)
+- **Statuso**: [x] (2026-10-24: ero en la naviga tirkesto — `malfermuRetpoŝton` al la
+  prizorganto kun antaŭplenigita ŝablono; reago-retpoŝto ankoraŭfoje decidiĝu ĉe eventuala
+  reorganizo de la prizorganta adreso)
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: butono kiu simple kreas retpoŝtan mesaĝon por proponi novan kanalon
   (al la prizorganto; kun antaŭskribita temo/korpo: nomo, RSS-URL, priskribo).
@@ -398,13 +402,41 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ]
+- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceSekundojn`
+  — listo de { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (frakcieblaj valoroj; fina dato
+  inkluziva; la lasta ero sen „ĝis" validas ankaŭ por estontaj elsendoj; unuopa
+  valoro = unu ero sen „ĝis"; malplena listo = ne transsalti), efikas nur se la
+  uzanto jam aŭskultis ion de la sama kanalo dum la pasinta semajno
+  (TRANSSALTA_SEMAJNO_MS = 7 tagoj — 2026-10-30 decido de la posedanto, antaŭe
+  monato); komenco = max(savitaPozicio, transsalto).
+  Aldone (PR #144): snackbar „Transsaltis la enkondukon" kun klariga dialogo;
+  agordoj „Transsalti enkondukon" (ĉefa ŝaltilo) kaj „Sciigo pri transsaltita
+  enkondukon" („Bone" en la dialogo malŝaltas ĝin).
+  RESTAS: (b) plena aŭtomatiĕo (la skripto jam ekzistas kiel la skill-o
+  `enkonduk-detekto` kun `detekto.py`). Plena detekto farita 2026-10-29 (21 kanaloj
+  analizitaj, 5 plej freŝaj elsendoj po kanalo; 6 preterlasitaj: muzaiko rekta-kanalo,
+  radioscienca/spiritismavocxo/vinilkosmo/peranto/kaliningrada mortaj fluoj — G44):
+  kernpunkto = 0 laŭ decido de la posedanto (la komunaĵo 8-25 s estas antaŭata de
+  varianta antaŝanonco, kiun oni ne transsaltu),
+  **agorditaj valoroj**:
+  babibejo 50.0 (0-50 s identaj en ĉiuj 10 paroj), fremdulo 11.0, iro 21.0,
+  lemondediplomatique 11.0 (ĉiuj kun 10/10 koheraj paroj), universeala-lindo 39.0
+  kaj polaretradio 22.0 (nur 2 elsendoj haveblaj — malforta pruvo, rekontrolota).
+  **3zzzenesperanto** (2026-10-30, epok-konscia detekto de 95 elsendoj 2025-01…2026-10;
+  la unua 5-plej-freŝaj-rulo malsukcesis ĉar ĝi transiris epok-limon):
+  2025 = 27.0; ekde 2026-01-05 = 26.0; ekde 2026-07-20 = 37.0 (antaŭrolo ~10-14 s +
+  nova enkonduko); sen-enkondukaj unuopaj elsendoj = 0.0 (2025-01-13, 2025-06-09,
+  2026-05-04…25, 2026-08-31, 2026-10-12 — perdo konfirmita, revenis je 10-19;
+  decidoj de la posedanto: plena formul-a komenco, kaj 37 s por la antaŭrola epoko).
+  **Rifuzitaj**: movada-vidpunkto (dispersaj 19-35 s mini-segmentoj — nerekta
+  enkonduko), radiovatikana (bimodala 4/15 s), tuluzo (4/6 paroj), sano (1/10),
+  la ceteraj sen iu ajn komuna segmento
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas
   transsalti en la komenco. (b) Eble eĉ krei ilon kiu trovas tion: komparas la
   komencajn sekundojn de pluraj epizodoj kaj elkalkulas la ripetan longon.
-- **Sugesto**: (a) nova kampo en `esperantoradio_kanaloj_v9.json` (ekz.
+- **Sugesto**: (a) nova kampo en `esperantoradio_konfiguro.json` (ekz.
   `saltiKomenceSekundojn` — daten-movita, A5; kontroli la JSONC-kampanimadon kaj la
   parsajn regulojn P6.1+, ankaŭ la agord-kompateblecon kiam la kampo mankas);
   la ludilo jam subtenas komencan pozicion — `LudiloRegilo.fiksiFonton(fonto,
@@ -419,6 +451,22 @@
 - **Statuso**: [x]
 - **Fonto**: ideo de la posedanto (2026-10-30)
 - **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto(kanaloj, elsendoj)` — ambaŭ listoj jam ordigitaj laŭ graveco (titolo-trovoj unue, poste priskribo-trovoj; dedup per `partition`), redonata de `SerĉoDeponejo.serĉi`. `SerĉoDeponejoImpl` serĉas nun ankaŭ kanalojn per `KanaloDeponejo`; por elsendoj unu grupiga metodo `ElsendoDeponejo.serĉiElsendojnGrupigite` (Pair). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj", klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
+
+#### C61 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
+- **Statuso**: [ ]
+- **Fonto**: recenz-komento pri PR #144, punkto 6 (2026-10-29)
+- **Priskribo**: la ŝlosiloj en la `android`-sekcio de `esperantoradio_konfiguro.json`
+  (`aktualaVersio`, `funkciaAnonco`) estas nenie legataj — pure mortaj datumoj
+  (ĝis 2026-10-29). Ili estas verŝajne celitaj por estonta uzo (versio-montrilo;
+  `funkciaAnonco` = la malnova `drift_statusmeddelelse` = provizora mesaĝo pri
+  funkciaj problemoj), sed neniu kodo konsumas ilin. Krome la nom-tribuo miksiĝas
+  (ambaŭ camelCase, dum `apaj_novaĵoj` estas snake_case).
+- **Sugesto**: decidu ĉu (a) realigi la celatan uzon — `aktualaVersio` povus
+  averti la uzanton pri malnova versio (ekz. en Pri-ekrano, C51(g));
+  `funkciaAnonco` povus esti mesaĝo pri kanal-funkciado (Muzaiko mortas ktp.,
+  ligita al la diagnozo-sistemo) — aŭ (b) forigi ilin ĝis tiam. Unuigu la
+  nom-stilon kiam ili ekviviĝos (elektu snake_case kiel `apaj_novaĵoj` aŭ
+  konsekvence camelCase por la tuta android-sekcio).
 
 ---
 

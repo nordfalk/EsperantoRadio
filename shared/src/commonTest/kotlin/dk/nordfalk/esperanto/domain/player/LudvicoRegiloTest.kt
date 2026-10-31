@@ -6,6 +6,7 @@ import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.model.LudantoInformo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
@@ -13,14 +14,18 @@ import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.LudatojDeponejoMaketo
 import dk.nordfalk.esperanto.data.repository.PlejŝatatajDeponejoImpl
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -42,6 +47,10 @@ class LudvicoRegiloTest {
         dato = dato,
     )
 
+    /** Unuopa aŭ pluraj transsaltaj valoroj sen dato-limo — la simpla kazo de transsaltuKomenceSekundojn. */
+    private fun laŭdato(vararg sekundoj: Float) =
+        sekundoj.map { TranssaltaValoroLaŭDato(sekundoj = it) }
+
     /** Kreas la LudvicoRegilo kun memoraj deponejoj. */
     private fun kreuRegilon(
         ludilo: LudiloRegilo = NoOpLudiloRegilo(),
@@ -51,6 +60,7 @@ class LudvicoRegiloTest {
         ludatojDeponejo: LudatojDeponejo = LudatojDeponejoMaketo(),
         lokaDosiero: Map<String, String> = emptyMap(),
         aŭtomataDaŭrigo: Boolean = true,
+        transsaltuEnkondukojn: Boolean = true,
         scope: TestScope,
         reprovoAtendo: (Int) -> Long? = { null },
     ): Triple<LudvicoRegilo, LudiloRegilo, LudatojDeponejo> {
@@ -85,6 +95,7 @@ class LudvicoRegiloTest {
             ludatojDeponejo = ludatojDeponejo,
             getLokaDosieroVojo = { id -> lokaDosiero[id] },
             aŭtomataDaŭrigo = MutableStateFlow(aŭtomataDaŭrigo),
+            transsaltuEnkondukojn = MutableStateFlow(transsaltuEnkondukojn),
             scope = regiloScope,
             reprovoAtendo = reprovoAtendo,
         )
@@ -122,6 +133,219 @@ class LudvicoRegiloTest {
         regilo.ludiElsendon(e)
 
         assertEquals(0, ludilo.stato.value.pozicioMs, "Devus komenci de 0 se neniu savita pozicio")
+    }
+
+    // =========================================================================
+    // Transsaltado de ripetiĝanta enkonduko (C59a) — transsaltuKomenceSekundojn
+    // (efikas nur se la uzanto jam aŭskultis ion de la sama kanalo dum la
+    // pasinta semajno — novaj aŭskultantoj aŭdu la enkonduk-identecon)
+    // =========================================================================
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun transsaltasEnkondukonKunNeniuSavitaPozicio() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo
+        ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(20_000, ludilo.stato.value.pozicioMs, "Devus komenci je 20 s (transsaltita enkonduko)")
+    }
+
+    @Test
+    fun transsaltasEnkondukonKiamSavitaPozicioEstasEneDeĜi() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĉesis je 10 s — ene de la 20-sekunda enkonduko (kaj ĵus aŭskoltis)
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 10_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(20_000, ludilo.stato.value.pozicioMs, "Savita pozicio ene de la enkonduko → transsaltu ĝin")
+    }
+
+    @Test
+    fun savitaPozicioPostLaEnkondukoVenkas() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĉesis je 60 s — jam post la enkonduko; resumu normale
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 60_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(60_000, ludilo.stato.value.pozicioMs, "Savita pozicio post la enkonduko → resumu ĝin")
+    }
+
+    @Test
+    fun neTranssaltasSeLaUzantoNeniamAŭskultisLaKanalon() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(0, ludilo.stato.value.pozicioMs, "Nova aŭskultanto devas aŭdi la enkonduk-identecon")
+    }
+
+    @Test
+    fun neTranssaltasSeLaAŭskoltoEstasPliOlSemajnoMalnova() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        val antaŭ8Tagoj = Clock.System.now().toEpochMilliseconds() - 8L * 24 * 60 * 60 * 1000
+        ludatoj.enmetuLudaton(
+            LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", pozicioMs = 5_000, daŭroMs = 300_000, lasteLudita = antaŭ8Tagoj)
+        )
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(0, ludilo.stato.value.pozicioMs, "Aŭskolto pli ol semajno malnova → ne transsalti")
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun laŭdataTranssaltoUzasLaValoronDeLaElsendoDato() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val kanalo = Kanalo(
+            slug = "k1", nomo = "Kanalo 1",
+            transsaltuKomenceSekundojn = listOf(
+                dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 50.0f, ĝis = "2025-06-10"),
+                dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato(sekundoj = 30.0f),
+            ),
+        )
+        // La uzanto ĵus aŭskultis alian elsendon de la sama kanalo
+        ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        // Malnova elsendo (publikigita ĝis 2025-06-10) → 50 s
+        regilo.ludiElsendon(elsendo("e1", kanalo = "k1", dato = "2025-01-01"))
+        assertEquals(50_000, ludilo.stato.value.pozicioMs, "Elsendo antaŭ la ŝanĝo → la malnova valoro")
+
+        // Nova elsendo → 30 s
+        regilo.ludiElsendon(elsendo("e2", kanalo = "k1", dato = "2025-08-01"))
+        assertEquals(30_000, ludilo.stato.value.pozicioMs, "Elsendo post la ŝanĝo → la nova valoro")
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun frakciaTranssaltoPrecizasAlMilisekundoj() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(12.5f))
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 5_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+
+        regilo.ludiElsendon(e)
+
+        assertEquals(12_500, ludilo.stato.value.pozicioMs, "12.5 s → 12 500 ms")
+    }
+
+    // =========================================================================
+    // Snackbar-sciigo pri transsaltita enkonduko (C59a) — transsaltajSciigoj
+    // =========================================================================
+
+    /**
+     * Abonas la transsaltajn sciigojn per UNDISPATCHED-kolektanto sur Unconfined
+     * (abonas tuj kaj prilaboras ĉiun emision sinkrone — alie la resumo
+     * restus en la testa dispecigilo post la aserto).
+     */
+    private fun kolektuTranssaltajnSciigojn(
+        regilo: LudvicoRegilo,
+        kolektaScope: CoroutineScope,
+    ): Pair<MutableList<TranssaltaSciigo>, kotlinx.coroutines.Job> {
+        val ricevitaj = mutableListOf<TranssaltaSciigo>()
+        val job = kolektaScope.launch(Dispatchers.Unconfined, start = CoroutineStart.UNDISPATCHED) {
+            regilo.transsaltajSciigoj.collect { ricevitaj.add(it) }
+        }
+        return ricevitaj to job
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun transsaltaSciigoElsendiĝasKiamEnkondukoTranssaltiĝas() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo
+        ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+        val (ricevitaj, kolekto) = kolektuTranssaltajnSciigojn(regilo, this)
+
+        regilo.ludiElsendon(e)
+        kolekto.cancel()
+
+        assertEquals(
+            listOf(TranssaltaSciigo(kanaloSlug = "k1", kanaloNomo = "k1", sekundoj = 20)),
+            ricevitaj,
+            "La UI devas ricevi sciigon kun kanalo kaj kvanto da sekundoj",
+        )
+    }
+
+    @Test
+    fun neElsendasSciigonKiamLaPozicioJamEstasPostLaEnkonduko() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĉesis je 60 s — jam post la enkonduko; nenio transsaltiĝas
+        ludatoj.registriPozicion(e.id, e.kanaloSlug, 60_000, 300_000)
+
+        val (regilo, _, _) = kreuRegilon(ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj, scope = this)
+        val (ricevitaj, kolekto) = kolektuTranssaltajnSciigojn(regilo, this)
+
+        regilo.ludiElsendon(e)
+        kolekto.cancel()
+
+        assertTrue(ricevitaj.isEmpty(), "Resumo post la enkonduko ne transsaltis ion ajn — neniu sciigo")
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun neTranssaltasKiamLaAgordoEstasMalŝaltita() = runTest {
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val e = elsendo("e1", kanalo = "k1")
+        val kanalo = Kanalo(slug = "k1", nomo = "Kanalo 1", transsaltuKomenceSekundojn = laŭdato(20.0f))
+        // La uzanto ĵus aŭskultis ALIAN elsendon de la sama kanalo — sed la
+        // agordo „Transsalti enkondukon" estas malŝaltita
+        ludatoj.enmetuLudaton(LudataElsendo(elsendoId = "e0", kanaloSlug = "k1", lasteLudita = Clock.System.now().toEpochMilliseconds()))
+
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, kanaloj = listOf(kanalo), ludatojDeponejo = ludatoj,
+            transsaltuEnkondukojn = false, scope = this,
+        )
+        val (ricevitaj, kolekto) = kolektuTranssaltajnSciigojn(regilo, this)
+
+        regilo.ludiElsendon(e)
+        kolekto.cancel()
+
+        assertEquals(0, ludilo.stato.value.pozicioMs, "Malŝaltita agordo → neniu transsalto")
+        assertTrue(ricevitaj.isEmpty(), "Malŝaltita agordo → neniu sciigo")
     }
 
     @Test

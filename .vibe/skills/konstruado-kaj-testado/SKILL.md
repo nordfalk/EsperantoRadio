@@ -45,6 +45,11 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 
 ## Kompilado-limigoj kaj iliaj erarmesaĝoj
 
+- **"Incremental compilation failed: The following FqNames can't be derived from
+  DirtyData.dirtyLookupSymbols"** (ekz. pri `Elsendo`, `Kanalo`, `LudataElsendo`) —
+  forlasita inkrementa kompilo-kaŝo post oftaj branĉo-ŝanĝoj/kunfandoj, NE koda
+  eraro (konfirmite 2026-10-24: post `./gradlew clean` ĉio verda). Unua ago:
+  `./gradlew clean` (aŭ `--rerun-tasks`) — ne kodo-esploro.
 - **`Dispatchers.IO` ne ekzistas sur wasmJs** (nur `Default` kaj `Main`) — en
   commonMain ĝi rompas la tutan wasmJs-kompiladon. Uzu `Dispatchers.Default`.
 - **`@Volatile` bezonas `import kotlin.concurrent.Volatile`** — sur JVM ĝi solvas
@@ -103,6 +108,7 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   ekster la Compose-skopo (ekz. la ViewModel-skopoj ekde PR #109) — uzu
   `waitUntil(timeoutMillis = 5_000) { <kondiĉo> }` (ATENTU: la unua parametro
   estas `conditionDescription: String?` — nomu `timeoutMillis`).
+- **uiautomator-dump povas montri malplenan tekstatributon por longa plur-linia Compose-teksto** (2026-10-31, la kruda-agorda linio en KanalInformoj): la nodo tamen ESTAS en la hierarkio — kontrolu la `bounds`, ne nur la tekstatributon, antaŭ ol konkludi ke komponanto ne bildigiĝas. Pli fidinda: la nodo-grandeco antaŭ/post klako.
 - **Logcat-legado**: `adb logcat -d | grep FATAL` (kraŝoj) aŭ
   `grep -E "dk.nordfalk"` (apo). La bufro ciklas rapide dum la 27-kanala ŝargado —
   por diagnozo kaptu la logcaton frue aŭ rulu `adb logcat -c` antaŭ la testo.

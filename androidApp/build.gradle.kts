@@ -39,6 +39,13 @@ android {
     namespace = "dk.nordfalk.esperanto.android"
     compileSdk = 37
 
+    // La agorda JSONC por androidMain/assets venas el shared/commonMain/resources
+    sourceSets {
+        getByName("main") {
+            assets.srcDir(rootProject.layout.projectDirectory.dir("shared/src/commonMain/resources"))
+        }
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")

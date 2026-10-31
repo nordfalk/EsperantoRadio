@@ -14,7 +14,15 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Aldonita
+
+- Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Naviga tirkesto: nova ero „Proponi kanalon“ — malfermas retpoŝton al la prizorganto kun pretigita plano (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Ok kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo, 3ZZZ en Esperanto) transsaltas sian ripetan enkondukon; ĉe 3ZZZ la valoro sekvas la historian ŝanĝiĝon de la enkonduko laŭ la elsendo-dato por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
+- Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
+
 ## [3.1.1] - 2026-10-31
+
 
 ### Ŝanĝita
 

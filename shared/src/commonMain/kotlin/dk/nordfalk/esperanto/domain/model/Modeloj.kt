@@ -2,11 +2,12 @@ package dk.nordfalk.esperanto.domain.model
 
 import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Kanalo-modelo. Pura Kotlin, @Serializable, komuna trans ĉiuj platformoj.
  *
- * La kampoj kongruas kun `esperantoradio_kanaloj_v9.json`.
+ * La kampoj kongruas kun `esperantoradio_konfiguro.json`.
  */
 @Serializable
 data class Kanalo(
@@ -24,11 +25,49 @@ data class Kanalo(
     val uzuWebViewPorElsendo: Boolean = false,
     /** Kanal-specifaj purigaj regex-modeloj por la priskribo (regulo P6.6) — datum-movita, el la JSONC. */
     val puriguModeloj: List<String> = emptyList(),
+    /**
+     * Transsaltendaj sekundoj de la komenco de ĉiu elsendo — por ripetiĝantaj
+     * enkondukoj (FAROTA C59a; datum-movita, el la JSONC). Unuopa valoro = unu
+     * ero sen fina dato; se la enkonduko ŝanĝiĝis, pluraj eroj kun finaj datoj.
+     * Malplena listo = ne transsalti. La transsalto efikas nur por uzanto, kiu
+     * jam aŭskultis ion de tiu kanalo dum la pasinta semajno (novaj aŭskultantoj
+     * aŭdu la enkonduk-identecon).
+     */
+    @Transient
+    val transsaltuKomenceSekundojn: List<TranssaltaValoroLaŭDato> = emptyList(),
     @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
     val havasPodkastojn: Boolean get() = podkastaRssUrl != null
+
+    /**
+     * Kiom da sekundoj transsalti por elsendo publikigita je [dato] (yyyy-MM-dd):
+     * la unua laŭdato-ero kies fina dato („ĝis", inkluziva) ankoraŭ kovras la
+     * elsendo-daton; la lasta ero sen fina dato kovras ĉion post ĝi kaj ankaŭ
+     * estontajn elsendojn. Malplena listo = 0 (ne transsalti).
+     * Nekonata/malplena dato → la valoro de la lasta ero.
+     */
+    fun transsaltajSekundojPor(dato: String): Float {
+        if (transsaltuKomenceSekundojn.isEmpty()) return 0.0f
+        if (dato.isBlank()) return transsaltuKomenceSekundojn.last().sekundoj
+        return transsaltuKomenceSekundojn
+            .firstOrNull { ero -> ero.ĝis?.let { dato <= it } ?: true }
+            ?.sekundoj
+            // dato post ĉiuj finaj datoj — uzu la lastan eron (estonta enkonduko)
+            ?: transsaltuKomenceSekundojn.last().sekundoj
+    }
 }
+
+/**
+ * Unu ero de la laŭdato-transsaltaj valoroj de kanalo (C59a): [sekundoj] por
+ * transsalti kaj nedeviga fina dato [ĝis] (inkluziva, yyyy-MM-dd) — la valoro
+ * validas por elsendoj publikigitaj ĝis tiu dato. Null = sen fina dato (la
+ * lasta ero; kovras ankaŭ estontajn elsendojn).
+ */
+data class TranssaltaValoroLaŭDato(
+    val sekundoj: Float,
+    val ĝis: String? = null,
+)
 
 /**
  * Elsendo-modelo. La kontrakto kiun la parsilo devas plenigi.

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * KanaloDeponejo-implentaĵo. Legas la kanalkonfiguron el pakita risurco.
  *
- * Estonte: ankaŭ elŝutas defore de https://javabog.dk/privat/esperantoradio_kanaloj_v9.json
+ * Estonte: ankaŭ elŝutas defore de https://javabog.dk/privat/esperantoradio_konfiguro.json
  * kaj kaŝenas, kun rezervo al la pakita versio.
  */
 class KanaloDeponejoImpl(

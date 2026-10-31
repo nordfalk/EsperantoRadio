@@ -20,7 +20,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,6 +34,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
+import kotlin.time.Clock
+
+/**
+ * Sciigo ke la ludilo transsaltis la ripetiĝantan enkondukon de kanalo (C59a).
+ * La UI montras snackbar-on kun klariga dialogo (kanalo + kiom da sekundoj).
+ */
+data class TranssaltaSciigo(
+    val kanaloSlug: String,
+    val kanaloNomo: String,
+    /** Kiom da sekundoj estis transsaltitaj (rondigita malsupren). */
+    val sekundoj: Int,
+)
 
 /**
  * LudvicoRegilo — kontrolas daŭran ludadon kun aŭtomata sekva-ludado.
@@ -62,6 +77,8 @@ class LudvicoRegilo(
     private val ludatojDeponejo: LudatojDeponejo,
     private val getLokaDosieroVojo: suspend (String) -> String? = { null },
     private val aŭtomataDaŭrigo: StateFlow<Boolean> = MutableStateFlow(true),
+    /** Ĉu transsalti la ripetiĝantan enkondukon de kanaloj (agordo, C59a). */
+    private val transsaltuEnkondukojn: StateFlow<Boolean> = MutableStateFlow(true),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
     /** Atendo antaŭ reprovo n (null = rezignu). Anstataŭigebla en testoj. */
     private val reprovoAtendo: (Int) -> Long? = ReprovoLogiko::atendoMs,
@@ -72,6 +89,16 @@ class LudvicoRegilo(
     /** La eksplicita ludvico — elsendoj aldonitaj de la uzanto. */
     private val _vico = MutableStateFlow<List<Elsendo>>(emptyList())
     val vico: StateFlow<List<Elsendo>> = _vico.asStateFlow()
+
+    /**
+     * Unufojaj sciigoj ke la enkonduko de kanalo estis transsaltita (C59a).
+     * La UI kolektas ilin por montri snackbar-on; neniu abonanto = neniom
+     * bufritaj perdoj (DROP_OLDEST, ringo de 4).
+     */
+    private val _transsaltajSciigoj = MutableSharedFlow<TranssaltaSciigo>(
+        extraBufferCapacity = 4, onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val transsaltajSciigoj: SharedFlow<TranssaltaSciigo> = _transsaltajSciigoj
 
     private var observanto: Job? = null
     private var pozicioSavanto: Job? = null
@@ -567,11 +594,36 @@ class LudvicoRegilo(
         // Grava evento — ĉiam al Sentry: ekludo de elsendo kun la kanalo
         logGrava("Ludvico", "Ekludo: '${elsendo.titolo}' (kanalo: ${elsendo.kanaloNomo ?: elsendo.kanaloSlug})")
         val ludato = ludatojDeponejo.getLudato(elsendo.id)
-        val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
-            logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
-            ludato.pozicioMs
+        // C59a: transsaltu la ripetiĝantan enkondukon de la kanalo, se agordita —
+        // sed nur se la uzanto JAM aŭskultis ion de tiu kanalo dum la pasinta
+        // semajno (novaj aŭskultantoj unue aŭdu la enkonduk-identecon).
+        // Dato-movita el la kanalkonfiguro; 0 = konduto senŝanĝa.
+        // Forŝaltebla per la agordo „Transsalti enkondukon".
+        val saltuMs = if (transsaltuEnkondukojn.value && aŭskultisDumPasintaSemajno(elsendo.kanaloSlug)) {
+            ((kanaloDeponejo.observiKanalojn().value
+                .find { it.slug == elsendo.kanaloSlug }
+                ?.transsaltajSekundojPor(elsendo.dato) ?: 0.0f) * 1000.0f).toLong()
         } else {
             0L
+        }
+        val savitaPozicioMs = ludato?.takeIf { !it.finita }?.pozicioMs ?: 0L
+        val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
+            logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
+            maxOf(ludato.pozicioMs, saltuMs)
+        } else {
+            saltuMs
+        }
+        // Sciigu la UI-on nur se la transsalto EFektive movis la komencan pozicion
+        // (rekomenco de pozicio post la enkonduko ne transsaltis ion ajn).
+        if (saltuMs > 0 && komencoPozicio > savitaPozicioMs) {
+            logi("Ludvico", "Transsaltas enkondukon de ${elsendo.kanaloSlug}: komenco je ${komencoPozicio}ms")
+            _transsaltajSciigoj.tryEmit(
+                TranssaltaSciigo(
+                    kanaloSlug = elsendo.kanaloSlug,
+                    kanaloNomo = elsendo.kanaloNomo ?: elsendo.kanaloSlug,
+                    sekundoj = (saltuMs / 1000.0f).toInt(),
+                )
+            )
         }
 
         val lokaVojo = getLokaDosieroVojo(elsendo.id)
@@ -621,6 +673,19 @@ class LudvicoRegilo(
         savuPozicion()
     }
 
+    /**
+     * Ĉu la uzanto aŭskultis iun elsendon de la kanalo dum la pasinta semajno —
+     * kondiĉo de la enkonduk-transsalto (C59a): novaj aŭskultantoj unue aŭdu
+     * la enkonduk-identecon de la kanalo.
+     */
+    @OptIn(kotlin.time.ExperimentalTime::class)
+    private fun aŭskultisDumPasintaSemajno(kanaloSlug: String): Boolean {
+        val limo = Clock.System.now().toEpochMilliseconds() - TRANSSALTA_SEMAJNO_MS
+        return ludatojDeponejo.observiLudatojn().value.values.any {
+            it.kanaloSlug == kanaloSlug && it.lasteLudita >= limo
+        }
+    }
+
     companion object {
         /** Kiom ofte savas pozicion dum ludado (ms). */
         const val POZICIO_SAV_INTERVALO_MS = 5000L
@@ -628,5 +693,7 @@ class LudvicoRegilo(
         const val MAKS_ERAROJ = 10
         /** Grandeco de la dedup-fenestro por finoj (PR #89). */
         const val TRAKTITAJ_FONTOJ_MAKS = 4
+        /** Kiom longe „ĵusa aŭskolto" validas por la enkonduk-transsalto (C59a). */
+        const val TRANSSALTA_SEMAJNO_MS = 7L * 24 * 60 * 60 * 1000
     }
 }

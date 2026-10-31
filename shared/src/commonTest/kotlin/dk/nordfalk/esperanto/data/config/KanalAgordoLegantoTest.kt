@@ -108,8 +108,7 @@ class KanalAgordoLegantoTest {
         assertEquals(1, agordo.kanaloj.size)
         assertEquals("test", agordo.kanaloj[0].kodo)
         assertNull(agordo.kanaloj[0].elsendojRssUrl) // XXX-prefikso estas nekonata kampo
-        assertNotNull(agordo.android)
-        assertEquals("https://ekzemplo.com", agordo.android!!.kontakt_url)
+        assertNotNull(agordo.android) // kontakt_url estas nekonata kampo kaj estas ignorata
     }
 
     @Test
@@ -130,10 +129,9 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
-    fun legasIntervalsKajKomencaKanalo() {
+    fun legasKomencaKanalon() {
         val jsonc = """
             {
-                "intervals": { "playlist": 60, "settings": 3600 },
                 "komenca_kanalo": "muzaiko",
                 "kanaloj": []
             }
@@ -141,8 +139,6 @@ class KanalAgordoLegantoTest {
 
         val agordo = leganto.legu(jsonc)
 
-        assertEquals(60, agordo.intervals?.playlist)
-        assertEquals(3600, agordo.intervals?.settings)
         assertEquals("muzaiko", agordo.komenca_kanalo)
     }
 
@@ -237,5 +233,48 @@ class KanalAgordoLegantoTest {
         assertTrue(vv.puriguModeloj[0].contains("Elŝutu podkaston"))
         // Kanalo sen la kampo ricevas malplenan liston (defaŭlto)
         assertTrue(agordo.kanaloj[1].alKanalo().puriguModeloj.isEmpty())
+    }
+
+    @Test
+    fun legasLaŭdatajnTranssaltajnValorojn() {
+        // C59a: transsaltuKomenceSekundojn — valoro laŭ la publikig-dato de la elsendo
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "ŝanĝiĝema",
+                        "nomo": "Ŝanĝiĝema",
+                        "transsaltuKomenceSekundojn": [
+                            { "sekundoj": 50.0, "ĝis": "2025-06-10" },
+                            { "sekundoj": 30.0 }
+                        ]
+                    },
+                    {
+                        "kodo": "simpla",
+                        "nomo": "Simpla",
+                        "transsaltuKomenceSekundojn": [{ "sekundoj": 22.0 }]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        val ŝanĝiĝema = agordo.kanaloj[0].alKanalo()
+        assertEquals(2, ŝanĝiĝema.transsaltuKomenceSekundojn.size)
+        assertEquals(50.0f, ŝanĝiĝema.transsaltuKomenceSekundojn[0].sekundoj)
+        assertEquals("2025-06-10", ŝanĝiĝema.transsaltuKomenceSekundojn[0].ĝis)
+        assertNull(ŝanĝiĝema.transsaltuKomenceSekundojn[1].ĝis, "La lasta ero estas sen fina dato (estontaj elsendoj)")
+        // Elekto laŭ elsendo-dato
+        assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-10"), "La fina dato estas inkluziva")
+        assertEquals(50.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-01-01"))
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2025-06-11"))
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor("2030-01-01"), "Estontaj elsendoj → la lasta valoro")
+        assertEquals(30.0f, ŝanĝiĝema.transsaltajSekundojPor(""), "Nekonata dato → la lasta valoro")
+        // Unuopa valoro sen fina dato — valida por ĉiu elsendo-dato
+        val simpla = agordo.kanaloj[1].alKanalo()
+        assertEquals(1, simpla.transsaltuKomenceSekundojn.size)
+        assertEquals(22.0f, simpla.transsaltajSekundojPor("2030-01-01"))
+        assertEquals(22.0f, simpla.transsaltajSekundojPor("2020-01-01"))
     }
 }

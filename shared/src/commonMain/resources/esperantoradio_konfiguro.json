@@ -1,16 +1,10 @@
 {
-	"rim1" : "ĈIAM post redaktado kontrolu ĉu la dosiero estas valida. Oni faras tion per",
-	"rim2" : "http://www.freeformatter.com/json-validator.html    kiu devas respondi 'The JSON input is valid in JavaScript.'",
-	"rim3" : "scp app/src/main/res/raw/esperantoradio_kanaloj_v*.json  javabog.dk:javabog.dk/privat/",
-
 
 	"android" : {
-		"kontakt_url": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
-		"kontakt_modtagere": ["jacob.nordfalk@proton.me" ],
-		"kontakt_titel": "Pri la Esperanto-radio",
-		"kontakt_brugerspørgsmål": "\nDankon pro via helpemo!\nSkribu viajn proponojn aŭ ideojn ĉi-sube. (mi eble kontaktos vin por pliaj informoj)\n---\nv8.json\n",
+		"aktualaVersio": "3.1.0",
 		"apaj_novaĵoj": "<b>Versio 3.1.1</b> eldoniĝis la 31an de oktobro 2026: <br><br>🔐 Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj (ekz. F-Droid) ĝi petas vian permeson unue<br>- Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble<br>- Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno<br>🔍 Serĉo: rezultoj grupigitaj laŭ graveco; serĉo-butono en la supra breto<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
-		"drift_statusmeddelelse": ""
+		"funkciaAnonco": "",
+		"prizorgantaRetpoŝto": "jacob.nordfalk@proton.me"
 	},
 
 	"sugestoj_por_alarmoj":
@@ -21,11 +15,6 @@
 10003/0/21/0/8/0/=radiovatikana/=/\
 ",
 
-	"intervals": {
-		"playlist": 30,
-		"settings": 1800
-	},
-
 	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 	"elsendojUrl": "https://esperanto-radio.com/radio.txt",
 	"komenca_kanalo": "muzaiko",
@@ -34,7 +23,7 @@
 		{
 			"kodo": "muzaiko",
 			"nomo": "Muzaiko",
-			"priskribo": "24-hora Esperanto-retradio: muziko kaj parolataj programeroj. Aŭskultu rete aŭ podkaste.",
+			"priskribo": "24-hora muzika retradio. Aŭskultu rekte.",
 			"rektaElsendaSonoUrl": "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8",
             "xxxrektaElsendoPriskbUrl": "https://fluo.muzaiko.info/api/nowplaying/1",
             "rektaElsendaPriskriboUrl": "https://muzaiko.info/data.json",
@@ -80,6 +69,25 @@
 		}
 	,{
 			"kodo": "3zzzenesperanto",
+			// Enkonduko laŭ epoko (detektita 2026-10-30 el 95 elsendoj 2025-01…2026-10):
+			// 2025 = malnova ~27s; ekde 2026-01-05 = nova ~26s; ekde 2026-07-20 = antaŭrolo
+			// ~10-14s + nova = 37s. Sen enkonduko: 2025-01-13, 2025-06-09, 2026-05-04…25,
+			// 2026-08-31, 2026-10-12 (revenis je 10-19).
+			"transsaltuKomenceSekundojn": [
+				{ "sekundoj": 27.0, "ĝis": "2025-01-12" },
+				{ "sekundoj": 0.0, "ĝis": "2025-01-13" },
+				{ "sekundoj": 27.0, "ĝis": "2025-06-08" },
+				{ "sekundoj": 0.0, "ĝis": "2025-06-09" },
+				{ "sekundoj": 27.0, "ĝis": "2025-12-29" },
+				{ "sekundoj": 26.0, "ĝis": "2026-05-03" },
+				{ "sekundoj": 0.0, "ĝis": "2026-05-25" },
+				{ "sekundoj": 26.0, "ĝis": "2026-07-13" },
+				{ "sekundoj": 37.0, "ĝis": "2026-08-30" },
+				{ "sekundoj": 0.0, "ĝis": "2026-08-31" },
+				{ "sekundoj": 37.0, "ĝis": "2026-10-11" },
+				{ "sekundoj": 0.0, "ĝis": "2026-10-12" },
+				{ "sekundoj": 37.0 }
+			],
 			"nomo": "3ZZZ en Esperanto",
 			"priskribo": "Semajnja unuhora programo de la Melburna Esperanto-komunumo ĉe la komunuma radio 3ZZZ.",
 			"emblemoUrl": "https://javabog.dk/privat/esperantoradio/3zz_emblemo.jpg",
@@ -91,6 +99,7 @@
 		}
 	,{
 			"kodo": "polaretradio",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 22.0 }],
 			"nomo": "Pola Retradio",
 			"priskribo": "Volontula daŭrigo de la historia pola radio-elsendo (1959-2011). Nova elsendo ĉiun kvinan tagon.",
 			"XXemblemoUrl": "http://javabog.dk/privat/esperantoradio_Pola75.png",
@@ -103,6 +112,7 @@
 		}
 	,{
 			"kodo": "babibejo",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 50.0 }],
 			"nomo": "BabiBEJO",
 			"priskribo": "Podkasto de la Brazila Esperantista Junularo pri junulara vivo, kulturo kaj agadoj en Brazilo.",
 			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
@@ -225,6 +235,7 @@
 		},
 		{
 			"kodo": "universeala-lindo",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 39.0 }],
 			"nomo": "Universeala Lindo, la argentina podkasto",
 			"priskribo": "Argentina podkasto pri Esperanto kaj la vivo en Sudameriko.",
 			"emblemoUrl": "",
@@ -234,6 +245,7 @@
 		}
 	,{
 			"kodo": "fremdulo",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 11.0 }],
 			"nomo": "Fremdulo 3",
 			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto — kun buntaj gastoj.",
 			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
@@ -256,7 +268,19 @@
 			"emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/70e4cc48a445832bdc21f89ac01c9fd5.jpg",
 			"retpoŝto": "manchapod@gmail.com",
 			"hejmpaĝoButono": "https://www.spreaker.com/show/neparolupriesperanto"
-		}
+		},
+        {
+            "kodo": "humilopinie",
+            "nomo": "HUMILOPINIE",
+            "priskribo": "Pensaĵoj kaj enaj debatoj, kiuj ne havas lokon en la aliaj podkastoj de ManchaPod — la rajtigo pensi kaj pensigi.",
+            "elsendojRssUrl": "https://www.spreaker.com/show/6684993/episodes/feed",
+            "emblemoUrl": "https://d3wo5wojvuv7l.cloudfront.net/images.spreaker.com/original/da5d5077f5c8b40601fef016043876f1.jpg",
+            "retpoŝto": "manchapod@gmail.com",
+            "hejmpaĝoButono": "https://www.spreaker.com/podcast/humilopinie-manchapod--6684993",
+            "puriguModeloj": [
+                "Enigu min en la debato:(?:(?!</ul>).)*?</ul>(<br />)?"
+            ]
+        }
 	,{
 			"kodo": "radikalatenero",
 			"nomo": "Radikala tenero",
@@ -275,6 +299,7 @@
 		}
 	,{
 			"kodo": "lemondediplomatique",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 11.0 }],
 			"nomo": "Le Monde diplomatique en Esperanto",
 			"priskribo": "Voĉlegitaj artikoloj el la mondfama revuo Le Monde diplomatique.",
 			"elsendojRssUrl": "https://feeds.acast.com/public/shows/65d51e18498c29001629f76a",
@@ -291,6 +316,7 @@
 		}
 	,{
 			"kodo": "iro",
+			"transsaltuKomenceSekundojn": [{ "sekundoj": 21.0 }],
 			"nomo": "Internacia Afrika Retradio",
 			"priskribo": "Novaĵbultenoj kaj kulturaj kaj mitologiaj elsendoj de la internacia ĵurnalista teamo (eks. Afrika Retradio).",
 			// AzuraCast-fluo sur la sama servilo kiel Muzaiko (fluo.muzaiko.info); la fluo listas la epizodojn plej malnovajn unue

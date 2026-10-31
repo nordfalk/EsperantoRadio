@@ -63,7 +63,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
   La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
 - **A4 — Unu fonto-eraro ne devas panei la apon.** Se unu kanal-fluo mortas, la aliaj
   devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
-- **A5 — Konservu la kanalkonfiguron** (`esperantoradio_kanaloj_v9.json`). Ĝi estas
+- **A5 — Konservu la kanalkonfiguron** (`esperantoradio_konfiguro.json`). Ĝi estas
   daten-movita konfiguro, ne malmola kodo. Per-kanalaj apartaĵoj devas esti
   en agordo, ne en logiko.
 - **A6 — GPL-permesilo.** Ĉiu derivaĵo devas resti GPL.
@@ -439,7 +439,7 @@ staras en la skill-o `konstruado-kaj-testado`:
 ## Datumfluo (nova apo)
 
 ```
-esperantoradio_kanaloj_v9.json (paktita risurco)
+esperantoradio_konfiguro.json (paktita risurco)
         ↓ KanalAgordoLeganto (striptigas // komentojn, traktas JSONC)
    List<Kanal>
         ↓ KanalDeponejoImpl (StateFlow)

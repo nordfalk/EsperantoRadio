@@ -13,6 +13,10 @@ object SettingsKeys {
     /** Rezervo de la kruda alarmo-JSON kiam la ĉefa valoro ne plu estas parsebla (PR #95). */
     const val ALARMOJ_REZERVO = "alarmoj_rezervo"
     const val AŬTOMATA_DAŬRIGO = "aŭtomata_daŭrigo"
+    /** Ĉu la ludilo transsaltas la ripetiĝantan enkondukon de kanaloj (C59a). */
+    const val TRANSSALTU_ENKONDUKOJN = "transsaltu_enkondukojn"
+    /** Ĉu montri la snackbar-on „transsaltis la enkondukon" (forŝaltebla per „Bone"). */
+    const val MONTRU_TRANSSALTAN_SCIIGON = "montru_transsaltan_sciigon"
     const val EVOLO = "evoluo"
     /** Ĉu la uzanto ŝaltis "detalan protokoladon" (pliaj logi-vokoj al Sentry). */
     const val DETALA_PROTOKOLADO = "detala_protokolado"

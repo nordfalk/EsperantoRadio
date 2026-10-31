@@ -39,6 +39,7 @@ import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
+import dk.nordfalk.esperanto.logw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -112,6 +113,7 @@ fun KanaloEkrano(
     val scope = rememberCoroutineScope()
     val plejŝatataj by plejŝatatajDeponejo.observiPlejŝatatajn().collectAsState()
     val sciigoj by agordojDeponejo.sciigoj.collectAsState()
+    val evoluo by agordojDeponejo.evoluo.collectAsState()
     val estasPlejŝatata = kanalo.slug in plejŝatataj
     val snackbarStato = remember { SnackbarHostState() }
 
@@ -168,7 +170,7 @@ fun KanaloEkrano(
             contentPadding = PaddingValues(8.dp)
         ) {
             // Kanalinformoj: emblemo, nomo, retejo, retpoŝto
-            item { KanalInformoj(kanalo, ludilo) }
+            item { KanalInformoj(kanalo, ludilo, evoluo = evoluo) }
 
             // Ŝargado
             if (ŝargas && elsendoj.isEmpty()) {
@@ -293,7 +295,7 @@ fun KanalEkranoKunSvipo(
 }
 
 @Composable
-private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
+private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean = false) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -376,6 +378,27 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?) {
                     )
                 }
             }
+        }
+
+        // Programista reĝimo: la agord-datumoj de tiu kanalo (1 linio, klakeble elfaldebla)
+        if (evoluo) {
+            var elfaldita by remember(kanalo.slug) { mutableStateOf(false) }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                kanalo.toString(),
+                maxLines = if (elfaldita) Int.MAX_VALUE else 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        logi("Klako", "kanalo-datumoj de ${kanalo.slug}: ${if (elfaldita) "enfoldigu" else "elfaldu"}")
+                        elfaldita = !elfaldita
+                    }
+                    .padding(horizontal = 16.dp),
+            )
         }
 
         Spacer(Modifier.height(4.dp))

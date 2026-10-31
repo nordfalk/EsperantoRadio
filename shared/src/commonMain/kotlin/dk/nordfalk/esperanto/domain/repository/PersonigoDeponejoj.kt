@@ -68,6 +68,12 @@ interface AgordojDeponejo {
     val evoluo: StateFlow<Boolean>
     val detalaProtokolado: StateFlow<Boolean>
 
+    /** Ĉu la ludilo transsaltas la ripetiĝantan enkondukon de kanaloj (C59a). */
+    val transsaltuEnkondukojn: StateFlow<Boolean>
+
+    /** Ĉu montri la snackbar-on pri transsaltita enkonduko. */
+    val montruTranssaltanSciigon: StateFlow<Boolean>
+
     /**
      * Ĉu la uzanto konsentis al aŭtomata erar-raportado al Sentry
      * (opt-in, defaŭlte MALŜALTITA — F-Droid "Tracking"-kontraŭeco, C50).
@@ -88,6 +94,8 @@ interface AgordojDeponejo {
     fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
     fun fiksiEvoluon(ŝaltita: Boolean)
     fun fiksiDetalanProtokoladon(ŝaltita: Boolean)
+    fun fiksiTranssaltuEnkondukojn(ŝaltita: Boolean)
+    fun fiksiMontruTranssaltanSciigon(ŝaltita: Boolean)
 
     /** Ŝaltas/malŝaltas la erar-raportadon kaj memorigas, ke la demando estas respondita. */
     fun fiksiErarRaportadon(ŝaltita: Boolean)

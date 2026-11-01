@@ -334,6 +334,18 @@
 			"emblemoUrl": "",
 			"hejmpaĝoButono": "https://toulouse.occeo.net/eo/radio/"
 		}
+	,{
+			"kodo": "radiofmesperanto",
+			"nomo": "Radio FM Esperanto",
+			"priskribo": "Kuba kulturradio el Camagüey: 24-hora livemitado kaj podkasto (kurso „Aprenda Esperanto”, Radio-Havano-Kubo-programoj, muziko) — parte hispanlingva.",
+			// Zeno.FM-fluo: la enira URL redirektas (302) al provizora subskribita URL (vivas ~5 min) — uzu ĉiam la stabilan enir-URL-on, neniam kaŝmemorigu la alidirektitan
+			"rektaElsendaSonoUrl": "https://stream.zeno.fm/p2k2q6t1fzwvv",
+			// iVoox-RSS: la MP3-enclosure-oj same redirektas (302) al subskribita audio.ivoox.com-URL
+			"elsendojRssUrl": "https://feeds.ivoox.com/feed_fg_f11930887_filtro_1.xml",
+			"emblemoUrl": "https://static-1.ivoox.com/canales/e/0/0/0/e000d0d845f5edd61e2a10d706eb4261_XXL.jpg",
+			"retpoŝto": "canalesperantocuba@gmail.com",
+			"hejmpaĝoButono": "https://radioambitooficial.blogspot.com/"
+		}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [

@@ -94,6 +94,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             if (fonto != null && fonto != nunaFonto) {
                 logi("Ludilo", "Ludata aĵo ŝanĝiĝis ekstere — nun: ${fonto::class.simpleName}")
                 nunaFonto = fonto
+                IcyTitoloRegistro.titolo = null
             }
             updateState()
         }
@@ -189,11 +190,16 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             pozicioMs = c.currentPosition,
             daŭroMs = if (c.duration > 0) c.duration else 0,
             estasRekta = nunaFonto is Sonfonto.RektaKanalo,
+            // La ICY StreamTitle de rekta elsendo venas de la servo per la procez-nivela
+            // registro (la MediaSession ne plusendas onMetadata al la MediaController);
+            // la ĉiusekunda enketado vokas updateState(), do la titolo aperas ene de ~1 s.
+            nunLudataTitolo = if (nunaFonto is Sonfonto.RektaKanalo) IcyTitoloRegistro.titolo else null,
         )
     }
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) = withContext(Dispatchers.Main) {
         nunaFonto = fonto
+        IcyTitoloRegistro.titolo = null
         konektita.await()
         val url = getStreamUrl(fonto)
         logi("Ludilo", "Fiksas fonton al url: $url")
@@ -220,6 +226,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
             controller?.clearMediaItems()
         }
         nunaFonto = null
+        IcyTitoloRegistro.titolo = null
         // Ankaŭ haltigu rezervan alarm-sonon — en la pura-rezerva-kazo la
         // ExoPlayer neniam startis, do nur ĉi tiu hoko povas haltigi la sonon.
         haltuAlarmVokosonon()
@@ -303,4 +310,18 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         }
         _laŭteco.value = frakcio
     }
+}
+
+/**
+ * Procez-nivela registro de la ICY `StreamTitle` de la ludata rekta elsendo.
+ *
+ * La servo (EsperantoLudadoServo) ricevas la ICY-metadatumojn rekte de la ExoPlayer
+ * (`Player.Listener.onMetadata` → [androidx.media3.extractor.metadata.icy.IcyInfo]),
+ * sed la MediaSession ne plusendas la krudan `onMetadata`-eventon al la MediaController.
+ * Tial la servo skribas la titolon ĉi tien, kaj [ExoPlayerLudiloRegilo] legas ĝin
+ * en sia ĉiusekunda `updateState()`.
+ */
+object IcyTitoloRegistro {
+    @Volatile
+    var titolo: String? = null
 }

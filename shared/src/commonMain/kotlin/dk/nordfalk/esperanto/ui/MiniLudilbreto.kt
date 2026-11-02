@@ -104,7 +104,7 @@ fun MiniLudilbreto(
     }
 
     val subtitolo = when (fonto) {
-        is Sonfonto.RektaKanalo -> null
+        is Sonfonto.RektaKanalo -> info.nunLudataTitolo
         is Sonfonto.ElsendoFonto -> fonto.elsendo.kanaloNomo
         is Sonfonto.LokaElsendo -> fonto.elsendo.kanaloNomo
     }

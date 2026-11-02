@@ -76,6 +76,30 @@ class MiniLudilbretoTest {
     }
 
     @Test
+    fun montrasNunLudatanTitolonDeRektaElsendo() = runComposeUiTest {
+        val kanalo = dk.nordfalk.esperanto.domain.model.Kanalo(
+            slug = "radiofmesperanto",
+            nomo = "Radio FM Esperanto",
+            rektaElsendaSonoUrl = "https://stream.zeno.fm/p2k2q6t1fzwvv"
+        )
+        val ludilo = TestLudiloRegilo(LudantoInformo(
+            stato = LudantoStato.Ludas,
+            nunaFonto = Sonfonto.RektaKanalo(kanalo),
+            pozicioMs = 0,
+            daŭroMs = 0,
+            estasRekta = true,
+            nunLudataTitolo = "20 - RadioStacio FM - Koncerto de Manno Montanna el Brazilo"
+        ))
+
+        setContent { MiniLudilbreto(ludilo = ludilo) }
+        waitForIdle()
+
+        // La ICY-titolo estas la titolo, la kanala nomo la subtitolo
+        onNodeWithText("20 - RadioStacio FM - Koncerto de Manno Montanna el Brazilo").assertIsDisplayed()
+        onNodeWithText("Radio FM Esperanto · Rekta elsendo").assertIsDisplayed()
+    }
+
+    @Test
     fun montrasLokaElsendonTitolon() = runComposeUiTest {
         val elsendo = Elsendo(
             id = "test:2024-01-01",

@@ -23,7 +23,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Mini-ludilo: enfoldigite ĝi montras nur la informojn kaj la paŭzan butonon, kaj klako sur la titolo elfaldas ĝin; en la elfaldita stato aperas la halt-butono kaj enfoldiga sago, kaj klako sur la titolo navigas al la detaloj; la ludvico-butono translokiĝis al la supra menua linio, kie ĝi videblas nur se la ludvico enhavas elementojn (https://github.com/nordfalk/EsperantoRadio/pull/167)
+- Mini-ludilo: enfoldigite ĝi montras nur la informojn kaj la paŭzan butonon, kaj klako sur la titolo elfaldas ĝin; en la elfaldita stato aperas la enfoldiga sago, kaj inter la reen-/antaŭen-butonoj nun troviĝas la paŭzo- kaj halt-butonoj, kaj klako sur la titolo navigas al la detaloj; la ludvico-butono translokiĝis al la supra menua linio, kie ĝi videblas nur se la ludvico enhavas elementojn (https://github.com/nordfalk/EsperantoRadio/pull/168)
 
 ## [3.1.1] - 2026-10-31
 

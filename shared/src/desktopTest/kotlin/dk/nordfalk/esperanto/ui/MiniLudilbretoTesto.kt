@@ -7,6 +7,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -359,16 +361,35 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         // Enfoldigite: nur informoj kaj la paŭzan/ludi-butono — neniu halti, sago nek ludvico
-        onNodeWithContentDescription("Halti").assertDoesNotExist()
+        onAllNodesWithContentDescription("Halti").assertCountEquals(0)
         onNodeWithContentDescription("Ludvico").assertDoesNotExist()
         onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
 
         // Elfaldite: halt-butono kaj sago aperas; la ludvico-butono restas en la supra menua linio
         onNodeWithText(testElsendo.titolo).performClick()
         waitForIdle()
-        onNodeWithContentDescription("Halti").assertExists()
+        assertTrue(onAllNodesWithContentDescription("Halti").fetchSemanticsNodes().isNotEmpty())
         onNodeWithContentDescription("Ludvico").assertDoesNotExist()
         onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
+    }
+
+    @Test
+    fun paŭzo_kaj_halti_inter_saltbutonoj_en_elfaldita_stato() = runComposeUiTest {
+        val ludilo = ludilo(pozicioMs = 600_000)
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
+            }
+        }
+        waitForIdle()
+
+        val reenX = onNodeWithContentDescription("Reen 5%").fetchSemanticsNode().positionInRoot.x
+        val antaŭenX = onNodeWithContentDescription("Antaŭen 5%").fetchSemanticsNode().positionInRoot.x
+        val paŭzojX = onAllNodesWithContentDescription("Paŭzigi").fetchSemanticsNodes().map { it.positionInRoot.x }
+        val haltiX = onAllNodesWithContentDescription("Halti").fetchSemanticsNodes().map { it.positionInRoot.x }
+
+        assertTrue(paŭzojX.any { it > reenX && it < antaŭenX }, "paŭzo devas kuŝi inter reen kaj antaŭen: $paŭzojX inter $reenX kaj $antaŭenX")
+        assertTrue(haltiX.any { it > reenX && it < antaŭenX }, "halti devas kuŝi inter reen kaj antaŭen: $haltiX inter $reenX kaj $antaŭenX")
     }
 
     @Test

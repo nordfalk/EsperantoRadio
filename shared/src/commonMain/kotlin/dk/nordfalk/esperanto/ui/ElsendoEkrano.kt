@@ -44,6 +44,7 @@ import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.logi
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -69,6 +70,9 @@ fun ElsendoEkrano(
      */
     onPaŭzigi: () -> Unit = { ludilo?.paŭzigi() },
     onDaŭrigi: () -> Unit = { ludilo?.ludi() },
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val snackbarStato = remember { SnackbarHostState() }
@@ -101,6 +105,9 @@ fun ElsendoEkrano(
                 title = { Text(elsendo.titolo, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = { logi("Klako", "reen (ElsendoEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
+                },
+                actions = {
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
                 }
             )
         },
@@ -452,6 +459,9 @@ fun ElsendoEkranoKunSvipo(
     agordojDeponejo: AgordojDeponejo? = null,
     onPaŭzigi: () -> Unit = { ludilo?.paŭzigi() },
     onDaŭrigi: () -> Unit = { ludilo?.ludi() },
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
 ) {
     if (elsendoj.size <= 1) {
         // Ne eblas svipi — montru nur la unuan elsendon
@@ -473,6 +483,8 @@ fun ElsendoEkranoKunSvipo(
             agordojDeponejo = agordojDeponejo,
             onPaŭzigi = onPaŭzigi,
             onDaŭrigi = onDaŭrigi,
+            ludvicoVico = ludvicoVico,
+            onLudvico = onLudvico,
         )
         LaunchedEffect(e) { onVidataElsendo(e) }
         return
@@ -505,6 +517,8 @@ fun ElsendoEkranoKunSvipo(
             agordojDeponejo = agordojDeponejo,
             onPaŭzigi = onPaŭzigi,
             onDaŭrigi = onDaŭrigi,
+            ludvicoVico = ludvicoVico,
+            onLudvico = onLudvico,
         )
     }
 }

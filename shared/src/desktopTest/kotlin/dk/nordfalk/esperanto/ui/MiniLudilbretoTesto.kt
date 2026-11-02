@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -95,7 +96,9 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         onNodeWithTag("ŝovilo").assertDoesNotExist()
-        onNodeWithContentDescription("Elfaldigi la ludilon").assertExists()
+        // Enfoldigite la sago ne montriĝas — klako sur la titolo elfaldas
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+        onNodeWithContentDescription("Elfaldigi la ludilon").assertDoesNotExist()
     }
 
     @Test
@@ -203,7 +206,7 @@ class MiniLudilbretoTesto {
     }
 
     @Test
-    fun sago_elfaldas_kaj_enfoldigas() = runComposeUiTest {
+    fun titolo_elfaldas_kaj_sago_enfoldigas() = runComposeUiTest {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
@@ -214,13 +217,38 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         onNodeWithTag("ŝovilo").assertDoesNotExist()
-        onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
+        // Enfoldigite: klako sur la titolo elfaldas (la sago mem ne estas videbla)
+        onNodeWithText(testElsendo.titolo).performClick()
         waitForIdle()
         onNodeWithTag("ŝovilo").assertExists()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
 
+        // Elfaldite: la sago enfoldigas
         onNodeWithContentDescription("Enfoldigi la ludilon").performClick()
         waitForIdle()
         onNodeWithTag("ŝovilo").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+    }
+
+    @Test
+    fun titolo_klako_navigas_al_detaloj_se_elfaldita() = runComposeUiTest {
+        val ludilo = ludilo()
+        var detaloVokita = false
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(
+                    ludilo = ludilo,
+                    elfaldita = true,
+                    onElfalditaŜanĝo = {},
+                    onClick = { detaloVokita = true },
+                )
+            }
+        }
+        waitForIdle()
+
+        onNodeWithText(testElsendo.titolo).performClick()
+        waitForIdle()
+        assertTrue(detaloVokita, "klako sur la titolo en elfaldita stato devas navigi al la detaloj (onClick)")
     }
 
     @Test
@@ -260,7 +288,7 @@ class MiniLudilbretoTesto {
         mainClock.autoAdvance = false
 
         val yEnfoldigita = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
-        onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
+        onNodeWithText(testElsendo.titolo).performClick()
         mainClock.advanceTimeBy(100) // mezo de la 250-ms tween
         val yMeza = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
         mainClock.advanceTimeBy(400) // preter la fino de la animacio
@@ -317,6 +345,30 @@ class MiniLudilbretoTesto {
             0.3f,
             onNodeWithTag("laŭteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
+    }
+
+    @Test
+    fun haltbutono_kaj_ludvico_nur_en_elfaldita_stato() = runComposeUiTest {
+        val ludilo = ludilo()
+        setContent {
+            MaterialTheme {
+                var elfaldita by remember { mutableStateOf(false) }
+                MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaŜanĝo = { elfaldita = it })
+            }
+        }
+        waitForIdle()
+
+        // Enfoldigite: nur informoj kaj la paŭzan/ludi-butono — neniu halti, sago nek ludvico
+        onNodeWithContentDescription("Halti").assertDoesNotExist()
+        onNodeWithContentDescription("Ludvico").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+
+        // Elfaldite: halt-butono kaj sago aperas; la ludvico-butono restas en la supra menua linio
+        onNodeWithText(testElsendo.titolo).performClick()
+        waitForIdle()
+        onNodeWithContentDescription("Halti").assertExists()
+        onNodeWithContentDescription("Ludvico").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
     }
 
     @Test

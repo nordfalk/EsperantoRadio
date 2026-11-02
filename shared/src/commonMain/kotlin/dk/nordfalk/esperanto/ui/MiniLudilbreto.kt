@@ -1,7 +1,6 @@
 package dk.nordfalk.esperanto.ui
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
@@ -43,17 +41,18 @@ const val SALTA_KVOCOTO = 0.05f
 /**
  * Mini-ludilbreto — malsupera breto kiu montras la nunan elsendon kaj lud-regilojn.
  *
- * Kiel en la malnova apo ĝi havas du statojn, ŝalteblajn per sago dekstre:
- * - **Enfoldigita**: bildeto, titolo, ludi/paŭzi, halti, ludvico + maldika pozicio-linio.
- * - **Elfaldigita**: aldone progresoŝovilo, reen-/antaŭen-5%-butonoj kaj laŭteco-regilo.
+ * Kiel en la malnova apo ĝi havas du statojn:
+ * - **Enfoldigita**: nur informoj (bildeto, titolo) kaj ludi/paŭzi. Klako sur la titolo elfaldas.
+ * - **Elfaldigita**: aldone halt-butono, la enfoldiga sago, progresoŝovilo, reen-/antaŭen-5%-butonoj
+ *   kaj laŭteco-regilo. Klako sur la titolo navigas al la detaloj.
  *   Progresoŝovilo kaj saltbutonoj aperas nur por podkastoj, ne por rekta elsendo.
+ *   La ludvico-butono troviĝas en la supra menua linio ([LudvicoButono]), ne ĉi tie.
  */
 @Composable
 fun MiniLudilbreto(
     ludilo: LudiloRegilo,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onLudvico: () -> Unit = {},
     /** Nuna reprovo-numero el [dk.nordfalk.esperanto.domain.player.LudvicoRegilo.reprovo] (0 = neniu). */
     reprovo: Int = 0,
     /** Ĉu la ludilbreto estas elfaldigita (levita ŝtato — regata de App.kt). */
@@ -132,7 +131,16 @@ fun MiniLudilbreto(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { logi("Klako", "mini-ludilbreto → detalo"); onClick() }
+                    // Klako sur la titolo/breto: enfoldigite → elfaldigi; elfaldite → detaloj
+                    .clickable {
+                        if (elfaldita) {
+                            logi("Klako", "mini-ludilbreto → detalo")
+                            onClick()
+                        } else {
+                            logi("Klako", "mini-ludilbreto → elfaldigi")
+                            onElfalditaŜanĝo(true)
+                        }
+                    }
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -214,30 +222,25 @@ fun MiniLudilbreto(
                     }
                 }
 
-                // Halti-butono
-                IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
-                    Icon(Icons.Filled.Stop, contentDescription = "Halti")
+                // Halti-butono — nur en la elfaldita stato; enfoldigite nur informoj kaj paŭzo
+                if (elfaldita) {
+                    IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
+                        Icon(Icons.Filled.Stop, contentDescription = "Halti")
+                    }
                 }
 
-                // Ludvico-butono
-                IconButton(onClick = { logi("Klako", "ludvico"); onLudvico() }) {
-                    Icon(Icons.Filled.QueueMusic, contentDescription = "Ludvico")
-                }
-
-                // Elfaldi/enfoldigi-sago (kiel en la malnova apo — turniĝas, ne ŝanĝas piktogramon)
-                val sagoRotacio by animateFloatAsState(
-                    targetValue = if (elfaldita) 180f else 0f,
-                    animationSpec = tween(durationMillis = 250),
-                )
-                IconButton(onClick = {
-                    logi("Klako", if (elfaldita) "enfoldigi la ludilon" else "elfaldi la ludilon")
-                    onElfalditaŜanĝo(!elfaldita)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowUp,
-                        contentDescription = if (elfaldita) "Enfoldigi la ludilon" else "Elfaldigi la ludilon",
-                        modifier = Modifier.rotate(sagoRotacio),
-                    )
+                // Enfoldigi-sago — nur en la elfaldita stato (enfoldigite klako sur la titolo elfaldas)
+                if (elfaldita) {
+                    IconButton(onClick = {
+                        logi("Klako", "enfoldigi la ludilon")
+                        onElfalditaŜanĝo(false)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = "Enfoldigi la ludilon",
+                            modifier = Modifier.rotate(180f),
+                        )
+                    }
                 }
             }
 

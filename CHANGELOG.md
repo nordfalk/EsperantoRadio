@@ -21,6 +21,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Ok kanaloj (babibejo, iro, fremdulo, Le Monde diplomatique, Pola Retradio, Universala Lindo, 3ZZZ en Esperanto) transsaltas sian ripetan enkondukon; ĉe 3ZZZ la valoro sekvas la historian ŝanĝiĝon de la enkonduko laŭ la elsendo-dato por aŭskultantoj, kiuj jam aŭskultis la kanalon dum la pasinta semajno — novaj aŭkultantoj aŭas la plenan enkondukon (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
 
+### Ŝanĝita
+
+- Mini-ludilo: enfoldigite ĝi montras nur la informojn kaj la paŭzan butonon, kaj klako sur la titolo elfaldas ĝin; en la elfaldita stato aperas la halt-butono kaj enfoldiga sago, kaj klako sur la titolo navigas al la detaloj; la ludvico-butono translokiĝis al la supra menua linio, kie ĝi videblas nur se la ludvico enhavas elementojn (https://github.com/nordfalk/EsperantoRadio/pull/167)
+
 ## [3.1.1] - 2026-10-31
 
 

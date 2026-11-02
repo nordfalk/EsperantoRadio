@@ -40,6 +40,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -136,6 +137,9 @@ fun KanalaroEkrano(
     onElŝutoj: () -> Unit = {},
     onAlarmoj: () -> Unit = {},
     onAgordoj: () -> Unit = {},
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
     val ŝargas by viewModel.ŝargas.collectAsState()
@@ -152,6 +156,7 @@ fun KanalaroEkrano(
                 navigationIcon = { TirkestButono(tirkestStato) },
                 title = { Text("Kanaloj") },
                 actions = {
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
                     IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }

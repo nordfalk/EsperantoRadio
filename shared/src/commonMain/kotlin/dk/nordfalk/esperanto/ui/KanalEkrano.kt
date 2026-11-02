@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -104,6 +105,9 @@ fun KanaloEkrano(
     onLudi: (Sonfonto) -> Unit = {},
     onAgordoj: () -> Unit = {},
     ludilo: LudiloRegilo? = null,
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
 ) {
     val viewModel = remember(kanalo.slug) {
         AppStato.kanaloViewModelj.getOrPut(kanalo.slug) { KanaloViewModel(kanalo, elsendoDeponejo) }
@@ -129,6 +133,7 @@ fun KanaloEkrano(
                     IconButton(onClick = { logi("Klako", "reen (KanaloEkrano)"); onReen() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Reen") }
                 },
                 actions = {
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
                     IconButton(onClick = {
                         logi("Klako", "baskulas plejŝaton: ${kanalo.slug}")
                         val antaŭa = estasPlejŝatata
@@ -253,6 +258,9 @@ fun KanalEkranoKunSvipo(
     onLudi: (Sonfonto) -> Unit = {},
     onAgordoj: () -> Unit = {},
     ludilo: LudiloRegilo? = null,
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
 ) {
     if (kanaloj.size <= 1) {
         val k = kanaloj.firstOrNull() ?: komencaKanalo
@@ -266,6 +274,8 @@ fun KanalEkranoKunSvipo(
             onLudi = onLudi,
             onAgordoj = onAgordoj,
             ludilo = ludilo,
+            ludvicoVico = ludvicoVico,
+            onLudvico = onLudvico,
         )
         LaunchedEffect(k) { onVidataKanalo(k) }
         return
@@ -290,6 +300,8 @@ fun KanalEkranoKunSvipo(
             onLudi = onLudi,
             onAgordoj = onAgordoj,
             ludilo = ludilo,
+            ludvicoVico = ludvicoVico,
+            onLudvico = onLudvico,
         )
     }
 }

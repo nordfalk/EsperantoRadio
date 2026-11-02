@@ -94,9 +94,10 @@ class MiniLudilbretoTest {
         setContent { MiniLudilbreto(ludilo = ludilo) }
         waitForIdle()
 
-        // La ICY-titolo estas la titolo, la kanala nomo la subtitolo
-        onNodeWithText("20 - RadioStacio FM - Koncerto de Manno Montanna el Brazilo").assertIsDisplayed()
-        onNodeWithText("Radio FM Esperanto · Rekta elsendo").assertIsDisplayed()
+        // La kanala nomo estas la titolo, la ICY-titolo aperas en la subtitolo
+        // (subtitolo · stat-teksto)
+        onNodeWithText("Radio FM Esperanto").assertIsDisplayed()
+        onNodeWithText("20 - RadioStacio FM - Koncerto de Manno Montanna el Brazilo · Rekta elsendo").assertIsDisplayed()
     }
 
     @Test

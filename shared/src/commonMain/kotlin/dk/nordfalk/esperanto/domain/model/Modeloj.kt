@@ -120,6 +120,13 @@ data class LudantoInformo(
     val pozicioMs: Long = 0,
     val daŭroMs: Long = 0,
     val estasRekta: Boolean = false,
+    /**
+     * La nun-ludata titolo de rekta elsendo (ICY `StreamTitle`), liverita de la
+     * ludilo mem — ekz. "20 - RadioStacio FM - Koncerto de Manno Montanna".
+     * null se la fluo ne liveras ICY-metadatumojn (aŭ ĉe podkastoj). Desktop
+     * (javax.sound) kaj wasmJs (HTMLAudioElement) ne eligas ICY — tie restas null.
+     */
+    val nunLudataTitolo: String? = null,
 )
 
 /**

@@ -12,8 +12,10 @@ import android.os.Bundle
 import androidx.core.app.ServiceCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.Metadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.extractor.metadata.icy.IcyInfo
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -24,6 +26,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.LudantoStato
+import dk.nordfalk.esperanto.domain.player.IcyTitoloRegistro
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.domain.player.SonfontoKodilo
 import dk.nordfalk.esperanto.logd
@@ -79,6 +82,15 @@ class EsperantoLudadoServo : MediaSessionService() {
         // procezo estas en kaŝmemoro aŭ la MediaController estas malrapida.
         // La protekto en LudvicoRegilo (dedup-fenestro) evitas duoblan traktadon.
         player.addListener(object : Player.Listener {
+            override fun onMetadata(metadata: Metadata) {
+                val icy = metadata.getFirstEntryOfType(IcyInfo::class.java)
+                if (icy != null) {
+                    logi("LudadoServo", "ICY ricevitaj: title=${icy.title}")
+                    // La MediaSession ne plusendas onMetadata al MediaController —
+                    // transdonu la titolon per la procez-nivela registro
+                    IcyTitoloRegistro.titolo = icy.title
+                }
+            }
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
                     logi("LudadoServo", "STATE_ENDED — vokas aŭtoludon en servo")

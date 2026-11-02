@@ -16,6 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Vivaj kanaloj montras la nun-ludatan programon (ICY-titolo, ekz. „22 - Programo 24-3-24 RadioStacio FM Esperanto“) en la mini-ludilbreto (https://github.com/nordfalk/EsperantoRadio/pull/166)
 - Nova kanalo: Radio FM Esperanto (Kubo) — 24-hora livemitado kaj podkasto el Camagüey (https://github.com/nordfalk/EsperantoRadio/pull/165)
 - Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
 - Naviga tirkesto: nova ero „Proponi kanalon“ — malfermas retpoŝton al la prizorganto kun pretigita plano (https://github.com/nordfalk/EsperantoRadio/pull/144)

@@ -57,6 +57,13 @@ object AppStato {
     var estasEvoluaMedo: Boolean = false
 
     /**
+     * Ĉu temas pri debug-konstruo (alfaversio). La Android-enirpunkto ŝaltas
+     * ĝin laŭ FLAG_DEBUGGABLE; Desktop kaj Web lasas `false`. Debug-konstruo
+     * montras la titolon «EsperαntoRαdio alfa» en la hejmoekrano.
+     */
+    var estasAlfaKonstruo: Boolean = false
+
+    /**
      * Konstruo-specifa defaŭlto de la erar-raportado (PR #148/C50):
      * - konstruo KUN nia subskribo (Google Play, Aptoide): `true` — la apo
      *   raportas defaŭlte (sen demando; malŝaltebla en Agordoj → Privateco);

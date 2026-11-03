@@ -318,6 +318,30 @@ class RssParsiloTest {
             "La enkonduko devas pluvivi: ${vv185.first().priskribo?.take(80)}",
         )
 
+        // Bildeto: la unua bildo supre de la enhavo iĝas la bildeto de ĉiuj partoj.
+        // Ĝi RESTAS en la priskribo-HTML — la bildo de Varsovia Vento apartenas al
+        // sia priskriba teksto (bildo-kun-priskribo en la sama alineo)
+        for (e in vv185) {
+            assertEquals(
+                "https://www.podkasto.net/wp-content/uploads/2025/04/matt_.jpg",
+                e.bildoUrl,
+                "La bildeto de la 185a devas esti la unua bildo de la enhavo",
+            )
+            assertTrue(
+                (e.priskriboHtml ?: "").contains("matt_.jpg"),
+                "La bildo devas resti en la priskribo-HTML: ${e.priskriboHtml?.take(120)}",
+            )
+        }
+        // Ĉiuj eroj de la fiksaĵo havas almenaŭ unu bildon → ĉiu elsendo havas bildeton
+        assertTrue(elsendoj.all { it.bildoUrl != null }, "Ĉiu Varsovia-Vento-elsendo devas havi bildeton")
+        // Kaj la bildo restas en la priskribo-HTML de ĉiu elsendo
+        for (e in elsendoj) {
+            assertTrue(
+                (e.priskriboHtml ?: "").contains(e.bildoUrl ?: "⟨neniu⟩"),
+                "La bildo (${e.bildoUrl}) devas resti en la priskribo-HTML: ${e.priskriboHtml?.take(120)}",
+            )
+        }
+
         // Regulo P6.6 (PR #91): la priskribo estas purigata — neniu parto-listilo,
         // neniu reklamo, neniu enkonstruita <audio>-ludilo
         for (e in elsendoj) {
@@ -334,6 +358,73 @@ class RssParsiloTest {
             assertTrue(e.id.startsWith("varsoviavento:"), "ID: ${e.id}")
             assertTrue(e.kanaloSlug == "varsoviavento")
         }
+    }
+
+    // === Bildeto-elekto el la priskribo-HTML ===
+
+    @Test
+    fun ĝeneralaParsiloElektasBildetonElPriskriboHTML() = kotlinx.coroutines.test.runTest {
+        val fluo = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+              <channel>
+                <item>
+                  <title>Epizodo kun bildo en la priskribo</title>
+                  <pubDate>Mon, 15 Jan 2024 12:00:00 +0000</pubDate>
+                  <enclosure url="https://ekzemplo.com/ep1.mp3" type="audio/mpeg"/>
+                  <description><![CDATA[<p><a href="https://ekzemplo.com/bildo.jpg"><img src="https://ekzemplo.com/bildo.jpg" width="500" height="300" /></a></p><p>Teksto pri la elsendo.</p>]]></description>
+                </item>
+                <item>
+                  <title>Epizodo kun iTunes-bildo kaj emoji</title>
+                  <itunes:image href="https://ekzemplo.com/emblemo.jpg"/>
+                  <pubDate>Tue, 16 Jan 2024 12:00:00 +0000</pubDate>
+                  <enclosure url="https://ekzemplo.com/ep2.mp3" type="audio/mpeg"/>
+                  <description><![CDATA[<p>Bonan <img src="https://s.w.org/images/core/emoji/72x72/1f600.png" class="wp-smiley" width="72" height="72" /> tagon 🎵<img src="https://ekzemplo.com/emblemo.jpg" width="600" /></p>]]></description>
+                </item>
+              </channel>
+            </rss>
+        """.trimIndent()
+
+        val kanalo = Kanalo(slug = "ekzemplo", nomo = "Ekzemplo", podkastaRssUrl = "https://ekzemplo.com/fluo.xml")
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertEquals(2, elsendoj.size, "Ambaŭ eroj devas esti parsataj")
+
+        // Ero 1: neniuj <itunes:image> → la unua <img> de la priskribo iĝas la bildeto.
+        // La HTML RESTAS NETUŜITA — la bildo ankaŭ plu aperas en la priskribo-HTML
+        // (la detala ekrano deduobligas per montrado de la kanal-emblemo)
+        val unua = elsendoj[0]
+        assertEquals("https://ekzemplo.com/bildo.jpg", unua.bildoUrl)
+        assertTrue((unua.priskriboHtml ?: "").contains("bildo.jpg"), "La bildo devas resti en la HTML")
+        assertEquals("Teksto pri la elsendo.", unua.priskribo, "Priskribo: ${unua.priskribo}")
+
+        // Ero 2: <itunes:image> restas la bildeto (la emoji ne taŭgas); la HTML
+        // (kaj la emoji, kaj la bildeto) restas netuŝita
+        val dua = elsendoj[1]
+        assertEquals("https://ekzemplo.com/emblemo.jpg", dua.bildoUrl)
+        assertTrue((dua.priskriboHtml ?: "").contains("emblemo.jpg"), "La bildo devas resti en la HTML")
+        assertTrue((dua.priskriboHtml ?: "").contains("wp-smiley"), "La emoji devas resti en la enhavo: ${dua.priskriboHtml}")
+    }
+
+    @Test
+    fun elektuBildetonSaltasOrnamajnBildetojn() {
+        val html = """
+            <p>Bonan <img src="https://s.w.org/images/core/emoji/72x72/1f600.png" class="wp-smiley" width="72" height="72" /> tagon</p>
+            <p><img src="https://ekzemplo.com/eta.png" width="50" /> malgranda bildo</p>
+            <p><img src="https://ekzemplo.com/bildo.png" width="500" height="300" /> la vera bildeto</p>
+        """.trimIndent()
+
+        // Smileyo (klaso) kaj eta bildo (width) estas preterpasataj; nur la vera bildo elektiĝas
+        assertEquals("https://ekzemplo.com/bildo.png", parsilo.elektuBildeton(html))
+
+        // Sen taŭga bildo: null
+        assertNull(parsilo.elektuBildeton("<p>Nur teksto, neniu bildo.</p>"))
+
+        // Jam donita bildeto (ekz. el <itunes:image>) havas prioritaton
+        assertEquals(
+            "https://ekzemplo.com/emblemo.jpg",
+            parsilo.elektuBildeton(html, jamBildetoUrl = "https://ekzemplo.com/emblemo.jpg"),
+        )
     }
 
     // === Regulo P6.4 — Vinilkosmo (ipernity-Atom) ===

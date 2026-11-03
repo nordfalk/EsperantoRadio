@@ -53,7 +53,11 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 2. Legu iTunes-modulon: `summary`, `duration`, `image`.
 3. `priskribo` = `<description>` aŭ iTunes-`summary`; se `<content:encoded>` ĉeestas, uzu ĝin.
 4. `fluo` = `<enclosure type="audio/*" url>`. Se neniu: parsu priskribo-HTML, prenu `<audio><source src>`. Se ankoraŭ neniu → **forĵetu**.
-5. `daŭro` el iTunes; `bildoUrl` el iTunes-bildo.
+5. `daŭro` el iTunes; `bildoUrl` el iTunes-bildo. Se mankas: la unua taŭga
+   `<img>` el la priskribo-HTML (preterpasante emoji/smileyojn kaj bildetojn
+   < 100 px; `elektuBildeton`). La HTML mem restas netuŝita — la detala
+   ekrano deduobligas per montrado de la kanal-emblemo (`supraBildoUrl` en
+   `ui/ElsendoEkrano.kt`).
 6. Se `fluo` komenciĝas per `http://` → `https://` (**nur por `kernpunkto`** — historia korekto,
    ĉar la malnova Rome-biblioteko reskribis https→http; aliaj kanaloj ricevas la URL-on el la fluo
    sen ŝanĝo kaj la cleartext-esceptoj staras en `network_security_config.xml`).
@@ -64,11 +68,16 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 1. Purigu enhavo-HTML per `kanal.puriguModeloj` (regulo P6.6).
 2. Por **ĉiu** `<audio>`-elemento: prenu `<source src>`, faru po unu elsendo.
 3. `titolo = entry.titolo + " " + partnum + "a parto"`, `id = <slug>:<dato>:<partnum>`.
+4. `bildoUrl` = la unua bildo supre de la enhavo (la fluo ne havas `<itunes:image>`-ajn
+   erojn) — por ĉiuj partoj de la sama ero (`elektuBildeton`). La bildo restas en
+   la priskribo-HTML; la detala ekrano deduobligas (`supraBildoUrl`).
 
 ### Regulo P6.3 — Peranto (`parsuPeranto`)
 
 1. Saltu konatajn malplenajn datojn (konstanta aro: `2019-11-08`, `2019-09-29`).
-2. Eltiru `bildUrl` el unua `<img>`; forigu `<img>`, `<iframe>`, `<div class="separator">`.
+2. Eltiru `bildUrl` el unua taŭga `<img>` (`elektuBildeton`); forigu `<img>`,
+   `<iframe>`, `<div class="separator">` el la plata priskribo-teksto
+   (la HTML de `priskriboHtml` restas kun la bildo).
 3. Unua `<iframe src>`:
    - `drive.google.com/file/d/<ID>/...` → `https://drive.google.com/u/1/uc?id=<ID>&export=download`
    - `archive.org/embed/<nomo>` → elŝutu embed-paĝon, skrapu MP3-URL (teksto ĝis `.mp3"`, tondas ĉe lasta `http`, malkodi entitojn). Apliku konatan korekton `orkestro_sklavidojj` → `orkestro_sklavidoj`.
@@ -79,7 +88,8 @@ Pura RSS/Atom-parsado. Po `<item>`/`<entry>`:
 ### Regulo P6.4 — Vinilkosmo (`parsuVinilkosmo`)
 
 Pura Atom-parsado. `<link rel="enclosure" type="audio/mpeg">` → stream;
-`<link type="image/jpeg">` → bildo; `<link type="text/html">` → ligo;
+`<link type="image/jpeg">` → bildo (aŭ la unua `<img>` de la enhavo,
+`elektuBildeton`); `<link type="text/html">` → ligo;
 `<published>` → dato (teksto antaŭ `T`); `id = vk:<publikigita-sen-tempzono>`.
 Purigu priskribon per `kanal.puriguModeloj` (forigu `<p class="who">…</p>`).
 

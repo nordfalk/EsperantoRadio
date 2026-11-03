@@ -478,7 +478,8 @@ fun HejmoEkrano(
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
-                title = { Text("EsperantoRadio", fontWeight = FontWeight.Bold) },
+                // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»
+                title = { Text(if (AppStato.estasAlfaKonstruo) "EsperαntoRαdio alfa" else "EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
                     // Serĉo-butono plej supre; elŝutoj restas atingeblaj per la naviga tirkesto
                     IconButton(onClick = { logi("Klako", "serĉo-butono"); onSerĉo() }) { Icon(Icons.Filled.Search, contentDescription = "Serĉi") }

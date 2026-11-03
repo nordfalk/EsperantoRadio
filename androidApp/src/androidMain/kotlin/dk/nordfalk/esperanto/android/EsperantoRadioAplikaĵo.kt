@@ -35,6 +35,8 @@ class EsperantoRadioAplikaĵo : Application() {
         // Evolua medio (debug-konstruo aŭ emulilo): ekz. la "Apaj novaĵoj"-
         // dialogo ne montriĝu — ĝi aperus ĉe ĉiu freŝa instalaĵo
         AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
+        // Debug-konstruo = alfaversio: titolo «EsperαntoRαdio alfa» en la hejmoekrano
+        AppStato.estasAlfaKonstruo = estasDebug
         // Konstruo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on)
         AppStato.erarRaportadoDefaŭlta = !BuildConfig.SEN_NIA_SUBSKRIBO
         if (AppStato.estasEvoluaMedo) {

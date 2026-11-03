@@ -401,6 +401,9 @@ fun HejmoEkrano(
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
     ludilo: LudiloRegilo? = null,
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
     viewModel: HejmoViewModel? = null,
 ) {
     val vm = viewModel ?: AppStato.hejmoViewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
@@ -481,6 +484,8 @@ fun HejmoEkrano(
                 // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»
                 title = { Text(if (AppStato.estasAlfaKonstruo) "EsperαntoRαdio alfa" else "EsperantoRadio", fontWeight = FontWeight.Bold) },
                 actions = {
+                    // Ludvico-butono unue — nur videbla se la vico enhavas elementojn
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
                     // Serĉo-butono plej supre; elŝutoj restas atingeblaj per la naviga tirkesto
                     IconButton(onClick = { logi("Klako", "serĉo-butono"); onSerĉo() }) { Icon(Icons.Filled.Search, contentDescription = "Serĉi") }
                     IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }

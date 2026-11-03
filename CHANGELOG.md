@@ -26,6 +26,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 
+### Ŝanĝita
+
+- Mini-ludilo: enfoldigite ĝi montras nur la informojn kaj la paŭzan butonon, kaj klako sur la titolo elfaldas ĝin; en la elfaldita stato aperas la enfoldiga sago, kaj la paŭzo- kaj halt-butonoj translokiĝis inter la reen-/antaŭen-butonojn (kaj nur tien), kaj klako sur la titolo navigas al la detaloj; la ludvico-butono translokiĝis al la supra menua linio, kie ĝi videblas nur se la ludvico enhavas elementojn (https://github.com/nordfalk/EsperantoRadio/pull/168)
+
 ## [3.1.1] - 2026-10-31
 
 

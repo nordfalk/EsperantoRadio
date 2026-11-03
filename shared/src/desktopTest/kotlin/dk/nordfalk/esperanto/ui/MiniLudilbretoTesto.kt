@@ -7,7 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -95,7 +98,9 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         onNodeWithTag("ŝovilo").assertDoesNotExist()
-        onNodeWithContentDescription("Elfaldigi la ludilon").assertExists()
+        // Enfoldigite la sago ne montriĝas — klako sur la titolo elfaldas
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+        onNodeWithContentDescription("Elfaldigi la ludilon").assertDoesNotExist()
     }
 
     @Test
@@ -198,12 +203,15 @@ class MiniLudilbretoTesto {
         onNodeWithTag("ŝovilo").assertDoesNotExist()
         onNodeWithContentDescription("Reen 5%").assertDoesNotExist()
         onNodeWithContentDescription("Antaŭen 5%").assertDoesNotExist()
+        // Ĉe rekta elsendo la paŭzo/halti-regiloj same aperas en la elfaldita stato (sen salt-butonoj)
+        onNodeWithContentDescription("Paŭzigi").assertExists()
+        onNodeWithContentDescription("Halti").assertExists()
         // La laŭteco-regilo funkcias ankaŭ ĉe rekta elsendo
         onNodeWithTag("laŭteco").assertExists()
     }
 
     @Test
-    fun sago_elfaldas_kaj_enfoldigas() = runComposeUiTest {
+    fun titolo_elfaldas_kaj_sago_enfoldigas() = runComposeUiTest {
         val ludilo = ludilo()
         setContent {
             MaterialTheme {
@@ -214,13 +222,38 @@ class MiniLudilbretoTesto {
         waitForIdle()
 
         onNodeWithTag("ŝovilo").assertDoesNotExist()
-        onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
+        // Enfoldigite: klako sur la titolo elfaldas (la sago mem ne estas videbla)
+        onNodeWithText(testElsendo.titolo).performClick()
         waitForIdle()
         onNodeWithTag("ŝovilo").assertExists()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
 
+        // Elfaldite: la sago enfoldigas
         onNodeWithContentDescription("Enfoldigi la ludilon").performClick()
         waitForIdle()
         onNodeWithTag("ŝovilo").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+    }
+
+    @Test
+    fun titolo_klako_navigas_al_detaloj_se_elfaldita() = runComposeUiTest {
+        val ludilo = ludilo()
+        var detaloVokita = false
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(
+                    ludilo = ludilo,
+                    elfaldita = true,
+                    onElfalditaŜanĝo = {},
+                    onClick = { detaloVokita = true },
+                )
+            }
+        }
+        waitForIdle()
+
+        onNodeWithText(testElsendo.titolo).performClick()
+        waitForIdle()
+        assertTrue(detaloVokita, "klako sur la titolo en elfaldita stato devas navigi al la detaloj (onClick)")
     }
 
     @Test
@@ -260,7 +293,7 @@ class MiniLudilbretoTesto {
         mainClock.autoAdvance = false
 
         val yEnfoldigita = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
-        onNodeWithContentDescription("Elfaldigi la ludilon").performClick()
+        onNodeWithText(testElsendo.titolo).performClick()
         mainClock.advanceTimeBy(100) // mezo de la 250-ms tween
         val yMeza = onNodeWithTag("ludilbreto").fetchSemanticsNode().positionInRoot.y
         mainClock.advanceTimeBy(400) // preter la fino de la animacio
@@ -317,6 +350,52 @@ class MiniLudilbretoTesto {
             0.3f,
             onNodeWithTag("laŭteco").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current,
         )
+    }
+
+    @Test
+    fun haltbutono_kaj_ludvico_nur_en_elfaldita_stato() = runComposeUiTest {
+        val ludilo = ludilo()
+        setContent {
+            MaterialTheme {
+                var elfaldita by remember { mutableStateOf(false) }
+                MiniLudilbreto(ludilo = ludilo, elfaldita = elfaldita, onElfalditaŜanĝo = { elfaldita = it })
+            }
+        }
+        waitForIdle()
+
+        // Enfoldigite: nur informoj kaj la paŭzan/ludi-butono — neniu halti, sago nek ludvico
+        onAllNodesWithContentDescription("Halti").assertCountEquals(0)
+        onAllNodesWithContentDescription("Paŭzigi").assertCountEquals(1)
+        onNodeWithContentDescription("Ludvico").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
+
+        // Elfaldite: paŭzo kaj halti translokiĝas inter la salt-butonoj (kaj nur tien — ne duoble
+        // en la supra vico); aperas la sago; la ludvico-butono restas en la supra menua linio
+        onNodeWithText(testElsendo.titolo).performClick()
+        waitForIdle()
+        onAllNodesWithContentDescription("Paŭzigi").assertCountEquals(1)
+        onAllNodesWithContentDescription("Halti").assertCountEquals(1)
+        onNodeWithContentDescription("Ludvico").assertDoesNotExist()
+        onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
+    }
+
+    @Test
+    fun paŭzo_kaj_halti_inter_saltbutonoj_en_elfaldita_stato() = runComposeUiTest {
+        val ludilo = ludilo(pozicioMs = 600_000)
+        setContent {
+            MaterialTheme {
+                MiniLudilbreto(ludilo = ludilo, elfaldita = true, onElfalditaŜanĝo = {})
+            }
+        }
+        waitForIdle()
+
+        val reenX = onNodeWithContentDescription("Reen 5%").fetchSemanticsNode().positionInRoot.x
+        val antaŭenX = onNodeWithContentDescription("Antaŭen 5%").fetchSemanticsNode().positionInRoot.x
+        val paŭzojX = onAllNodesWithContentDescription("Paŭzigi").fetchSemanticsNodes().map { it.positionInRoot.x }
+        val haltiX = onAllNodesWithContentDescription("Halti").fetchSemanticsNodes().map { it.positionInRoot.x }
+
+        assertTrue(paŭzojX.any { it > reenX && it < antaŭenX }, "paŭzo devas kuŝi inter reen kaj antaŭen: $paŭzojX inter $reenX kaj $antaŭenX")
+        assertTrue(haltiX.any { it > reenX && it < antaŭenX }, "halti devas kuŝi inter reen kaj antaŭen: $haltiX inter $reenX kaj $antaŭenX")
     }
 
     @Test

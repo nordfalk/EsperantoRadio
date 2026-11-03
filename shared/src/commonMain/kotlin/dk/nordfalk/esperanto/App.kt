@@ -306,6 +306,8 @@ fun EsperantoRadioApp(
                                 },
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                             )
                         }
                         entry<Vojo.Kanalaro> {
@@ -317,6 +319,8 @@ fun EsperantoRadioApp(
                                 onElŝutoj = { push(Vojo.Elŝutoj) },
                                 onAlarmoj = { push(Vojo.Alarmoj) },
                                 onAgordoj = { push(Vojo.Agordoj) },
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                                 onLudi = { fonto ->
                                     logi("Nav", "Ludas: $fonto")
                                     scope.launch {
@@ -335,6 +339,8 @@ fun EsperantoRadioApp(
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                                 kanaloDeponejo = kanaloDeponejo,
                                 onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                             )
@@ -342,6 +348,8 @@ fun EsperantoRadioApp(
                         entry<Vojo.Serĉo> {
                             SerĉoEkrano(
                                 serĉoDeponejo = serĉoDeponejo,
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
@@ -413,6 +421,8 @@ fun EsperantoRadioApp(
                                     scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                                 },
                                 ludilo = ludilo,
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
@@ -460,6 +470,8 @@ fun EsperantoRadioApp(
                                 elŝutDeponejo = elŝutDeponejo,
                                 ludatojDeponejo = ludatojDeponejo,
                                 ludilo = ludilo,
+                                ludvicoVico = ludvicoRegilo.vico,
+                                onLudvico = { push(Vojo.Ludvico) },
                                 agordojDeponejo = agordojDeponejo,
                                 // (PR #92) paŭzigi/daŭrigi tra LudvicoRegilo — rekta ludilo-voko
                                 // ne nuligas planitan reprovon
@@ -580,7 +592,6 @@ fun EsperantoRadioApp(
                             null -> sekvantaVojo?.let { push(it) } ?: onLudiSekvantan()
                         }
                     },
-                    onLudvico = { push(Vojo.Ludvico) },
                 )
             }
         }

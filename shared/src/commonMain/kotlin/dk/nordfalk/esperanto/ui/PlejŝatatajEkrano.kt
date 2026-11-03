@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
@@ -20,6 +21,7 @@ import dk.nordfalk.compose.material3.DrawerState
 import dk.nordfalk.compose.material3.ModalNavigationDrawer
 import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -34,6 +36,9 @@ fun PlejŝatatajEkrano(
     plejŝatatajDeponejo: PlejŝatatajDeponejo,
     kanaloDeponejo: KanaloDeponejo,
     onKanalo: (Kanalo) -> Unit,
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     tirkestEnhavo: @Composable () -> Unit = {},
 ) {
@@ -46,7 +51,10 @@ fun PlejŝatatajEkrano(
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
-                title = { Text("Plej ŝatataj") }
+                title = { Text("Plej ŝatataj") },
+                actions = {
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
+                }
             )
         }
     ) { padding ->

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import kotlinx.coroutines.flow.StateFlow
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
 import dk.nordfalk.compose.material3.DrawerState
@@ -32,6 +33,9 @@ fun SerĉoEkrano(
     serĉoDeponejo: SerĉoDeponejo,
     onElsendo: (Elsendo) -> Unit,
     onKanalo: (Kanalo) -> Unit = {},
+    /** La ludvico — por la ludvico-butono en la supra breto (montriĝas nur se ne malplena). */
+    ludvicoVico: StateFlow<List<Elsendo>>? = null,
+    onLudvico: () -> Unit = {},
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     tirkestEnhavo: @Composable () -> Unit = {},
 ) {
@@ -79,7 +83,10 @@ fun SerĉoEkrano(
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
-                title = { Text("Serĉi") }
+                title = { Text("Serĉi") },
+                actions = {
+                    ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
+                }
             )
         }
     ) { padding ->

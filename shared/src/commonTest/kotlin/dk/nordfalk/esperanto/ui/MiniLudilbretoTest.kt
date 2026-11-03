@@ -78,7 +78,7 @@ class MiniLudilbretoTest {
     @Test
     fun montrasNunLudatanTitolonDeRektaElsendo() = runComposeUiTest {
         val kanalo = dk.nordfalk.esperanto.domain.model.Kanalo(
-            slug = "radiofmesperanto",
+            slug = "radiofmkubo",
             nomo = "Radio FM Esperanto",
             rektaElsendaSonoUrl = "https://stream.zeno.fm/p2k2q6t1fzwvv"
         )

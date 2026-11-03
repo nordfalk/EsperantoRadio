@@ -336,8 +336,8 @@
 		}
 	,{
 			"kodo": "radiofmesperanto",
-			"nomo": "Radio FM Esperanto",
-			"priskribo": "Kuba kulturradio el Camagüey: 24-hora livemitado kaj podkasto — inkluzive de la programoj de Radio Havano Kubo (RHK). Parte hispanlingva.",
+			"nomo": "Radio FM Kubo",
+			"priskribo": "Kuba kulturradio el Camagüey: 24-hora rekta emitado kaj podkasto — inkluzive de la programoj de Radio Havano Kubo. Parte hispanlingva.",
 			// Zeno.FM-fluo: la enira URL redirektas (302) al provizora subskribita URL (vivas ~5 min) — uzu ĉiam la stabilan enir-URL-on, neniam kaŝmemorigu la alidirektitan
 			"rektaElsendaSonoUrl": "https://stream.zeno.fm/p2k2q6t1fzwvv",
 			// iVoox-RSS: la MP3-enclosure-oj same redirektas (302) al subskribita audio.ivoox.com-URL

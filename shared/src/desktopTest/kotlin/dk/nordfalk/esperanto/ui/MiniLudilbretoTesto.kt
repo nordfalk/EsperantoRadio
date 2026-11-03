@@ -203,6 +203,9 @@ class MiniLudilbretoTesto {
         onNodeWithTag("ŝovilo").assertDoesNotExist()
         onNodeWithContentDescription("Reen 5%").assertDoesNotExist()
         onNodeWithContentDescription("Antaŭen 5%").assertDoesNotExist()
+        // Ĉe rekta elsendo la paŭzo/halti-regiloj same aperas en la elfaldita stato (sen salt-butonoj)
+        onNodeWithContentDescription("Paŭzigi").assertExists()
+        onNodeWithContentDescription("Halti").assertExists()
         // La laŭteco-regilo funkcias ankaŭ ĉe rekta elsendo
         onNodeWithTag("laŭteco").assertExists()
     }
@@ -362,13 +365,16 @@ class MiniLudilbretoTesto {
 
         // Enfoldigite: nur informoj kaj la paŭzan/ludi-butono — neniu halti, sago nek ludvico
         onAllNodesWithContentDescription("Halti").assertCountEquals(0)
+        onAllNodesWithContentDescription("Paŭzigi").assertCountEquals(1)
         onNodeWithContentDescription("Ludvico").assertDoesNotExist()
         onNodeWithContentDescription("Enfoldigi la ludilon").assertDoesNotExist()
 
-        // Elfaldite: halt-butono kaj sago aperas; la ludvico-butono restas en la supra menua linio
+        // Elfaldite: paŭzo kaj halti translokiĝas inter la salt-butonoj (kaj nur tien — ne duoble
+        // en la supra vico); aperas la sago; la ludvico-butono restas en la supra menua linio
         onNodeWithText(testElsendo.titolo).performClick()
         waitForIdle()
-        assertTrue(onAllNodesWithContentDescription("Halti").fetchSemanticsNodes().isNotEmpty())
+        onAllNodesWithContentDescription("Paŭzigi").assertCountEquals(1)
+        onAllNodesWithContentDescription("Halti").assertCountEquals(1)
         onNodeWithContentDescription("Ludvico").assertDoesNotExist()
         onNodeWithContentDescription("Enfoldigi la ludilon").assertExists()
     }

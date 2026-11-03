@@ -43,8 +43,8 @@ const val SALTA_KVOCOTO = 0.05f
  *
  * Kiel en la malnova apo ĝi havas du statojn:
  * - **Enfoldigita**: nur informoj (bildeto, titolo) kaj ludi/paŭzi. Klako sur la titolo elfaldas.
- * - **Elfaldigita**: aldone halt-butono, la enfoldiga sago, progresoŝovilo, kaj inter la
- *   reen-/antaŭen-5%-butonoj paŭzo/ludi kaj halti; krome laŭteco-regilo.
+ * - **Elfaldigita**: aldone la enfoldiga sago, progresoŝovilo kaj laŭteco-regilo; la paŭzo/ludi-
+ *   kaj halt-butonoj translokiĝas inter la reen-/antaŭen-5%-butonoj (kaj nur tien).
  *   Klako sur la titolo navigas al la detaloj.
  *   Progresoŝovilo kaj saltbutonoj aperas nur por podkastoj, ne por rekta elsendo.
  *   La ludvico-butono troviĝas en la supra menua linio ([LudvicoButono]), ne ĉi tie.
@@ -82,7 +82,6 @@ fun MiniLudilbreto(
     if (fonto == null && sekvantaTitolo == null) return
 
     val ludas = info.stato is LudantoStato.Ludas
-    val scope = rememberCoroutineScope()
 
     // Se nenio ludas, montru la sekvantan enhavon (navigad-sekvado)
     if (fonto == null) {
@@ -201,33 +200,15 @@ fun MiniLudilbreto(
 
                 Spacer(Modifier.width(8.dp))
 
-                // Ludi/paŭzi-butono
-                IconButton(onClick = {
-                    logi("Klako", if (ludas) "paŭzigi" else "ludi")
-                    scope.launch {
-                        if (ludas) onPaŭzigi() else onDaŭrigi()
-                    }
-                }) {
-                    val konektas = info.stato is LudantoStato.Konektas ||
-                        (reprovo > 0 && info.stato is LudantoStato.Eraro)
-                    if (konektas) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp).semantics { contentDescription = "Konektas" },
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        Icon(
-                            imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (ludas) "Paŭzigi" else "Ludi"
-                        )
-                    }
-                }
-
-                // Halti-butono — nur en la elfaldita stato; enfoldigite nur informoj kaj paŭzo
-                if (elfaldita) {
-                    IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
-                        Icon(Icons.Filled.Stop, contentDescription = "Halti")
-                    }
+                // Ludi/paŭzi-butono — nur enfoldigite; elfaldite la regiloj estas inter la salt-butonoj
+                if (!elfaldita) {
+                    LudiPaŭziButono(
+                        ludas = ludas,
+                        konektas = info.stato is LudantoStato.Konektas ||
+                            (reprovo > 0 && info.stato is LudantoStato.Eraro),
+                        onPaŭzigi = onPaŭzigi,
+                        onDaŭrigi = onDaŭrigi,
+                    )
                 }
 
                 // Enfoldigi-sago — nur en la elfaldita stato (enfoldigite klako sur la titolo elfaldas)
@@ -294,35 +275,25 @@ fun MiniLudilbreto(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            Spacer(Modifier.weight(1f))
                             IconButton(onClick = { saltuDiference(ludilo, info, -1) }) {
                                 Icon(Icons.Filled.FastRewind, contentDescription = "Reen ${(SALTA_KVOCOTO * 100).toInt()}%")
                             }
-                            IconButton(onClick = {
-                                logi("Klako", if (ludas) "paŭzigi" else "ludi")
-                                scope.launch {
-                                    if (ludas) onPaŭzigi() else onDaŭrigi()
-                                }
-                            }) {
-                                val konektas = info.stato is LudantoStato.Konektas ||
-                                    (reprovo > 0 && info.stato is LudantoStato.Eraro)
-                                if (konektas) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(24.dp).semantics { contentDescription = "Konektas" },
-                                        strokeWidth = 2.dp,
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                        contentDescription = if (ludas) "Paŭzigi" else "Ludi"
-                                    )
-                                }
-                            }
-                            IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
-                                Icon(Icons.Filled.Stop, contentDescription = "Halti")
-                            }
+                            Spacer(Modifier.weight(1f))
+                            LudiPaŭziButono(
+                                ludas = ludas,
+                                konektas = info.stato is LudantoStato.Konektas ||
+                                    (reprovo > 0 && info.stato is LudantoStato.Eraro),
+                                onPaŭzigi = onPaŭzigi,
+                                onDaŭrigi = onDaŭrigi,
+                            )
+                            Spacer(Modifier.weight(1f))
+                            HaltButono(onHaltigi = onHaltigi)
+                            Spacer(Modifier.weight(1f))
                             IconButton(onClick = { saltuDiference(ludilo, info, +1) }) {
                                 Icon(Icons.Filled.FastForward, contentDescription = "Antaŭen ${(SALTA_KVOCOTO * 100).toInt()}%")
                             }
+                            Spacer(Modifier.weight(1f))
                         }
                     } else {
                         // La ludilo ne povas salti (ekz. Desktop/mp3spi) — nur pasiva indikilo
@@ -330,7 +301,11 @@ fun MiniLudilbreto(
                             progress = { valoro },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
                         )
+                        RegilojVico(ludas = ludas, info = info, reprovo = reprovo, onPaŭzigi = onPaŭzigi, onDaŭrigi = onDaŭrigi, onHaltigi = onHaltigi)
                     }
+                } else {
+                    // Rekta elsendo: neniuj salt-butonoj, sed la regiloj (paŭzo/halti) same videblas
+                    RegilojVico(ludas = ludas, info = info, reprovo = reprovo, onPaŭzigi = onPaŭzigi, onDaŭrigi = onDaŭrigi, onHaltigi = onHaltigi)
                 }
 
                 // Laŭteco-regilo (funkcias kaj por rekta kaj por podkasto).
@@ -375,6 +350,77 @@ fun MiniLudilbreto(
                 )
             }
         }
+    }
+}
+
+/**
+ * Ludi/paŭzi-butono de la mini-ludilbreto. Montras progres-indikilon dum konekto/reprovo.
+ */
+@Composable
+private fun LudiPaŭziButono(
+    ludas: Boolean,
+    konektas: Boolean,
+    onPaŭzigi: suspend () -> Unit,
+    onDaŭrigi: suspend () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    IconButton(onClick = {
+        logi("Klako", if (ludas) "paŭzigi" else "ludi")
+        scope.launch {
+            if (ludas) onPaŭzigi() else onDaŭrigi()
+        }
+    }) {
+        if (konektas) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp).semantics { contentDescription = "Konektas" },
+                strokeWidth = 2.dp,
+            )
+        } else {
+            Icon(
+                imageVector = if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                contentDescription = if (ludas) "Paŭzigi" else "Ludi"
+            )
+        }
+    }
+}
+
+/** Halt-butono de la mini-ludilbreto. */
+@Composable
+private fun HaltButono(
+    onHaltigi: suspend () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    IconButton(onClick = { logi("Klako", "halti"); scope.launch { onHaltigi() } }) {
+        Icon(Icons.Filled.Stop, contentDescription = "Halti")
+    }
+}
+
+/**
+ * Vico de la lud-regiloj (paŭzo/ludi kaj halti) — uzata en la elfaldita stato inter la
+ * salt-butonoj (aŭ sola, se estas rekta elsendo aŭ la ludilo ne subtenas saltadon).
+ */
+@Composable
+private fun RegilojVico(
+    ludas: Boolean,
+    info: LudantoInformo,
+    reprovo: Int,
+    onPaŭzigi: suspend () -> Unit,
+    onDaŭrigi: suspend () -> Unit,
+    onHaltigi: suspend () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LudiPaŭziButono(
+            ludas = ludas,
+            konektas = info.stato is LudantoStato.Konektas ||
+                (reprovo > 0 && info.stato is LudantoStato.Eraro),
+            onPaŭzigi = onPaŭzigi,
+            onDaŭrigi = onDaŭrigi,
+        )
+        HaltButono(onHaltigi = onHaltigi)
     }
 }
 

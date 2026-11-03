@@ -246,9 +246,9 @@ class RssParsiloTest {
 
     @Test
     fun parsasRadioFmEsperanton() = kotlinx.coroutines.test.runTest {
-        val fluo = leguFiksaĵon("radiofmesperanto_feed.xml")
+        val fluo = leguFiksaĵon("radiofmkubo_feed.xml")
         val kanalo = Kanalo(
-            slug = "radiofmesperanto",
+            slug = "radiofmkubo",
             nomo = "Radio FM Esperanto",
             podkastaRssUrl = "https://feeds.ivoox.com/feed_fg_f11930887_filtro_1.xml"
         )
@@ -258,7 +258,7 @@ class RssParsiloTest {
         assertTrue(elsendoj.size >= 30, "Radio FM Esperanto devas havi almenaŭ 30 elsendojn: ${elsendoj.size}")
 
         // La plej nova ero de la fiksaĵo: RHC-reludo de 2025-07-21, daŭro 26:59 = 1619 s
-        val rhk = elsendoj.first { it.id == "radiofmesperanto:https://www.ivoox.com/153431806" }
+        val rhk = elsendoj.first { it.id == "radiofmkubo:https://www.ivoox.com/153431806" }
         assertTrue(rhk.titolo.contains("Radio Havano Kubo"), "Titolo: ${rhk.titolo}")
         assertEquals("2025-07-21", rhk.dato)
         assertEquals(1619L, rhk.daŭro, "Daŭro devas esti 1619 s (26:59)")
@@ -268,7 +268,7 @@ class RssParsiloTest {
         // provizora subskribita audio.ivoox.com-URL — la ludilo devas sekvi alidirektojn
         for (e in elsendoj) {
             assertTrue(e.fluo.startsWith("https://www.ivoox.com/"), "Fluo devas esti https iVoox: ${e.fluo}")
-            assertTrue(e.id.startsWith("radiofmesperanto:"), "ID devas komenciĝi per 'radiofmesperanto:': ${e.id}")
+            assertTrue(e.id.startsWith("radiofmkubo:"), "ID devas komenciĝi per 'radiofmkubo:': ${e.id}")
             assertNotNull(e.dato, "Dato ne estu nul por ${e.titolo.take(40)}")
         }
         assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")

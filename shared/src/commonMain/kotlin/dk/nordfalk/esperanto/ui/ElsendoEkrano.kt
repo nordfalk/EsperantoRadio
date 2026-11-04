@@ -122,13 +122,17 @@ fun ElsendoEkrano(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // === Bildo kun ikonoj super ===
+            // Supra bildo: se la bildeto de la elsendo ankaŭ aperas en la priskribo-HTML,
+            // montru la kanal-emblemon anstataŭe (aliokaze la bildo aperus duoble —
+            // supre kaj en la priskribo)
+            val supraBildo = supraBildoUrl(elsendo, kanalo)
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                if (elsendo.bildoUrl != null) {
+                if (supraBildo != null) {
                     AsyncImage(
-                        model = elsendo.bildoUrl,
+                        model = supraBildo,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxWidth().height(200.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
@@ -428,6 +432,23 @@ fun ElsendoEkrano(
             }
         }
     }
+}
+
+/**
+ * La bildo por la supro de la detala elsendo-ekrano.
+ *
+ * Se la bildeto de la elsendo ankaŭ aperas en ĝia priskribo-HTML (bildetoj
+ * elektitaj el la HTML — ekz. Varsovia Vento, Pola Retradio, Tuluzo — aŭ
+ * bildeto samiĝanta kun bildo de la HTML), la bildo estus montrata duoble:
+ * supre kaj en la priskribo. La detala ekrano tial montras la emblemon de la
+ * kanalo anstataŭe; la epizoda bildeto mem restas por la listoj (hejmo,
+ * kanala listo, mini-ludilbreto).
+ */
+internal fun supraBildoUrl(elsendo: Elsendo, kanalo: Kanalo?): String? {
+    val bildoUrl = elsendo.bildoUrl ?: return null
+    return if ((elsendo.priskriboHtml ?: "").contains(bildoUrl)) {
+        kanalo?.emblemoUrl ?: bildoUrl
+    } else bildoUrl
 }
 
 /**

@@ -42,6 +42,13 @@ class RssParsilo(
         const val PARALELA_PETO_LIMIGO = 8
 
         /**
+         * Minimuma bild-grando (bilderoj laŭ la width/height-atributoj) por ke
+         * `<img>` el la priskribo-HTML taŭgu kiel elsendo-bildeto — preterpasas
+         * ornamajn smiley-/emoji-bildetojn (ekz. la wp-smiley-oj de Kernpunkto).
+         */
+        const val MINIMUMA_BILDETA_GRANDECO_PX = 100
+
+        /**
          * Regulo P6.1.4: eroj kies sola son-gastiganto estas nesubtenata (video-platformoj)
          * estas saltataj — tia "fluo" ne estis ludebla (PR #91). Devas esti konservita
          * el la malnova apo (AGENTS.md regulo A2).
@@ -74,6 +81,43 @@ class RssParsilo(
             }
         }
         return rezulto
+    }
+
+    /**
+     * Elektas la bildeto-URL-on de elsendo el ĝia priskribo-HTML — la HTML mem
+     * restas NETUŜITA (la bildo apartenas al sia priskriba teksto; la detala
+     * ekrano deduobligas per montrado de la kanal-emblemo anstataŭ la epizoda
+     * bildo, vidu `ElsendoEkrano`).
+     *
+     * Se [jamBildetoUrl] estas donita (ekz. el `<itunes:image>`), ĝi restas la
+     * bildeto; alie la unua taŭga `<img>` de la HTML iĝas la bildeto (multaj
+     * fluoj — ekz. Varsovia Vento — havas neniun apartan bildeto-kampon sed
+     * bildon supre de la enhavo).
+     *
+     * @return la bildeto-URL, aŭ null se neniu taŭga bildo trovita
+     */
+    internal fun elektuBildeton(html: String, jamBildetoUrl: String? = null): String? {
+        if (jamBildetoUrl != null) return jamBildetoUrl
+        return unuaTaŭgaBildo(Ksoup.parse(html))
+    }
+
+    /**
+     * La unua `<img>` de la enhavo, kiu taŭgas kiel bildeto: absoluta http(s)-URL,
+     * ne emoji/smileyo (laŭ la class-atributo) kaj ne deklarita malgranda
+     * (width/height-atributoj < [MINIMUMA_BILDETA_GRANDECO_PX]).
+     */
+    private fun unuaTaŭgaBildo(doc: Document): String? {
+        for (img in doc.select("img")) {
+            val klaso = img.attr("class").lowercase()
+            if (klaso.contains("emoji") || klaso.contains("smiley")) continue
+            val larĝo = img.attr("width").toIntOrNull()
+            val alto = img.attr("height").toIntOrNull()
+            if ((larĝo != null && larĝo < MINIMUMA_BILDETA_GRANDECO_PX) ||
+                (alto != null && alto < MINIMUMA_BILDETA_GRANDECO_PX)
+            ) continue
+            return saniguRetUrlon(img.attr("src")) ?: continue
+        }
+        return null
     }
 
     suspend fun parsuRss(
@@ -160,10 +204,12 @@ class RssParsilo(
         val daŭro = leguDaŭron(ero.selectFirst("itunes|duration")?.text())
         // Regulo P6.6: kanal-specifaj purigaj modeloj (reklamoj, enkonstruitaj ludiloj)
         val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
+        // Bildeto: el <itunes:image>, aŭ el la unua bildo de la priskribo-HTML
+        // (la HTML mem restas netuŝita — la detala ekrano deduobligas)
         val bildoUrl = saniguRetUrlon(
             ero.selectFirst("itunes|image")?.attr("href")
                 ?: ero.selectFirst("image url")?.text()
-        )
+        ) ?: elektuBildeton(priskriboPurigita)
         val retpaĝoUrl = saniguRetUrlon(
             ero.selectFirst("link")?.text()?.ifEmpty { null }
                 ?: ero.selectFirst("link")?.attr("href")
@@ -216,6 +262,10 @@ class RssParsilo(
             // Regulo P6.6: la <audio>-ludiloj kaj reklamaj alineoj estas purigataj el la
             // PRISKRIBO — sed la fluo-ekstraktado supre uzas la KRUDAN enhavon (PR #91)
             val purigitaEnhavo = puriguPerModeloj(htmlEnhavo, kanalo)
+            // Bildeto: la unua bildo supre de la enhavo (Varsovia Vento ne havas
+            // <itunes:image>-ajn erojn) — la bildo restas en la HTML (ĝi apartenas
+            // al sia priskriba teksto; la detala ekrano deduobligas)
+            val bildoUrl = elektuBildeton(purigitaEnhavo)
 
             for ((i, source) in audioj.withIndex()) {
                 val fluo = saniguRetUrlon(source.attr("src")) ?: continue
@@ -226,6 +276,7 @@ class RssParsilo(
                     titolo = "$titolo ${i + 1}a parto",
                     priskribo = puriguHtml(purigitaEnhavo),
                     priskriboHtml = puriguHtmlKunEtikedojn(purigitaEnhavo),
+                    bildoUrl = bildoUrl,
                     dato = dato,
                     fluo = fluo,
                 ))
@@ -268,8 +319,9 @@ class RssParsilo(
             // Malkodu HTML-entitojn
             val htmlDoc = Ksoup.parse(htmlEsprimite)
 
-            // Eltiru bildon el la unua <img>
-            val bildoUrl = saniguRetUrlon(htmlDoc.selectFirst("img")?.attr("src"))
+            // Bildeto: la unua taŭga <img> de la enhavo — la bildo restas en la
+            // priskribo-HTML (la detala ekrano deduobligas per kanal-emblemo)
+            val bildoUrl = elektuBildeton(htmlEsprimite)
 
             // Forigu <img>, <iframe>, <div class="separator"> el priskribo
             htmlDoc.select("img").remove()
@@ -418,11 +470,13 @@ class RssParsilo(
 
             val fluo = saniguRetUrlon(ero.selectFirst("link[rel=enclosure][type=audio/mpeg]")?.attr("href"))
                 ?: return@mapNotNull null
-            val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
             val retpaĝoUrl = saniguRetUrlon(ero.selectFirst("link[type=text/html]")?.attr("href"))
             val priskriboKruda = ero.selectFirst("content")?.text() ?: ""
             // Regulo P6.6: forigu la "<p class='who'>VINILKOSMO … has posted:</p>"-alineon (PR #91)
             val priskriboPurigita = puriguPerModeloj(priskriboKruda, kanalo)
+            // Bildeto el <link type="image/jpeg">; se neniu, el la enhavo-HTML
+            val bildoUrl = saniguRetUrlon(ero.selectFirst("link[type=image/jpeg]")?.attr("href"))
+                ?: elektuBildeton(priskriboPurigita)
             val id = "vk:${published.substringBefore("+").substringBefore("Z")}"
 
             Elsendo(

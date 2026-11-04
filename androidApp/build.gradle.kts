@@ -25,7 +25,8 @@ val gitBrancho = try {
 } catch (e: Exception) {
     "HEAD"
 }
-val branĉoPorAgordoj = if (gitBrancho == "master" || gitBrancho == "HEAD") "" else gitBrancho
+// Sanigu citilojn kaj deklivojn, por ke ili ne rompu la generitan BuildConfig-ĉenon
+val branĉoPorAgordoj = if (gitBrancho == "master" || gitBrancho == "HEAD") "" else gitBrancho.replace("\\", "").replace("\"", "")
 
 kotlin {
     androidTarget {

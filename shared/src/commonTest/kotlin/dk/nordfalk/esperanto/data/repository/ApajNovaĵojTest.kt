@@ -99,4 +99,15 @@ class ApajNovaĵojTest {
         val deponejo = ApajNovaĵojDeponejo(MapSettings(), null)
         assertNull(deponejo.observuMontratan().value)
     }
+
+    @Test
+    fun mesaĝoEstasEksponitaPorLaEkrano() {
+        // La ekrano „Apaj novaĵoj“ montras la mesaĝon sendepende de la konfirmo
+        val deponejo = ApajNovaĵojDeponejo(MapSettings(), "  Versio 3.2 eldoniĝis  ")
+        assertEquals("Versio 3.2 eldoniĝis", deponejo.mesaĝo)
+        deponejo.konfirmu()
+        assertEquals("Versio 3.2 eldoniĝis", deponejo.mesaĝo, "Ankaŭ post konfirmo la mesaĝo restas legebla en la ekrano")
+
+        assertEquals("", ApajNovaĵojDeponejo(MapSettings(), null).mesaĝo)
+    }
 }

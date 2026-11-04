@@ -20,7 +20,10 @@ class ApajNovaĵojDeponejo(
     private val settings: Settings,
     mesaĝo: String?,
 ) {
-    private val _montrata = MutableStateFlow(deciduMontratan(mesaĝo?.trim().orEmpty(), leguKonservitanHaketaĵon()))
+    /** La nuna novaĵ-mesaĝo el la kanalkonfiguro (sen spacetoj, malplena se mankas) — por la ekrano „Apaj novaĵoj“. */
+    val mesaĝo: String = mesaĝo?.trim().orEmpty()
+
+    private val _montrata = MutableStateFlow(deciduMontratan(this.mesaĝo, leguKonservitanHaketaĵon()))
 
     /** La mesaĝo montriĝu, aŭ `null` se nenio novas. */
     fun observuMontratan(): StateFlow<String?> = _montrata.asStateFlow()

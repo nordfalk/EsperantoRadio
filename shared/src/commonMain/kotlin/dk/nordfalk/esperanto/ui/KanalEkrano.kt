@@ -357,7 +357,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
                 if (kanalo.retejoUrl != null) {
                     AssistChip(
                         onClick = { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) },
-                        label = { Text("Retejo") },
+                        label = { Text(kanalo.retejoUrl) },
                         leadingIcon = { Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                     Spacer(Modifier.width(8.dp))
@@ -385,7 +385,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
                                 teksto = teksto,
                             )
                         },
-                        label = { Text("Retpoŝto") },
+                        label = { Text(kanalo.retpoŝto) },
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                 }

@@ -134,6 +134,9 @@ fun EsperantoRadioApp(
         // klako ekstere povu kolapsi ĝin
         var elfaldita by rememberSaveable { mutableStateOf(false) }
 
+        // Ĉu la novaĵ-dialogo estas montrata per la turkest-ero „Apaj novaĵoj“
+        var novaĵojMontratajPerMenua by remember { mutableStateOf(false) }
+
         // Gluiĝema sekvanta enhavo: kiam nenio ludas, la miniludilbreto montras la
         // LASTE MONSTRITAN enhavon — la lastan vidatan detalan celon (sekvante
         // svipojn) aŭ la lastan ludatan elsendon/kanalon. Nur vidado kaj ludado
@@ -245,6 +248,10 @@ fun EsperantoRadioApp(
                 tirkestStato = tirkestStato,
                 nunaVojo = nunaVojo,
                 onElektu = ::elektuTirkeste,
+                onApajNovaĵoj = {
+                    logi("Nav", "→ turkesto: montras la apajn novaĵojn")
+                    novaĵojMontratajPerMenua = true
+                },
                 prizorgantaRetpoŝto = AppStato.prizorgantaRetpoŝto,
             )
         }
@@ -596,25 +603,35 @@ fun EsperantoRadioApp(
             }
         }
 
-        // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo unufoje
-        // por ĉiu nova mesaĝo; "Bone" persistas la haketaĵon en la agordoj.
-        // En evolua medio ĝi ne montriĝas — ĉe freŝa instalaĵo la haketaĵo
-        // forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
+        // Apaj novaĵoj — novaĵo-mesaĝo el la kanalkonfiguro; dialogo aperas
+        // aŭtomate unufoje por ĉiu nova mesaĝo ("Bone" persistas la haketaĵon
+        // en la agordoj) kaj krome iam ajn per la turkest-ero „Apaj novaĵoj".
+        // En evolua medio la aŭtomata dialogo ne montriĝas — ĉe freŝa instalaĵo
+        // la haketaĵo forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
         val apajNovaĵoj by apajNovaĵojDeponejo.observuMontratan().collectAsState()
-        apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedo }?.let { mesaĝo ->
+        val montrataMesaĝo = apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedo }
+            ?: if (novaĵojMontratajPerMenua) apajNovaĵojDeponejo.mesaĝo else null
+        montrataMesaĝo?.let { mesaĝo ->
             LaunchedEffect(mesaĝo) {
-                logi("ApajNovaĵoj", "Montras novajn apajn novaĵojn (haketaĵo=${mesaĝo.hashCode()})")
+                logi("ApajNovaĵoj", "Montras la apajn novaĵojn (haketaĵo=${mesaĝo.hashCode()})")
             }
             AlertDialog(
                 // Kiel en la malnova apo: nur la "Bone"-butono fermas la dialogon
                 onDismissRequest = { },
                 title = { Text("Novaĵoj") },
-                // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
-                text = { HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth()) },
+                text = {
+                    if (mesaĝo.isEmpty()) {
+                        Text("Nun estas neniu novaĵo.")
+                    } else {
+                        // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
+                        HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth())
+                    }
+                },
                 confirmButton = {
                     TextButton(onClick = {
                         logi("ApajNovaĵoj", "Uzanto konfirmis la apajn novaĵojn")
                         apajNovaĵojDeponejo.konfirmu()
+                        novaĵojMontratajPerMenua = false
                     }) { Text("Bone") }
                 },
             )

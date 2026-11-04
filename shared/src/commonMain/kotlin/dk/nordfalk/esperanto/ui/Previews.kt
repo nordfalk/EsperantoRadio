@@ -151,7 +151,7 @@ fun PreviewHejmoNova() {
 @Composable
 fun PreviewNavigaTirkesto() {
     pTemo() {
-        NavigaTirkesto(nunaVojo = Vojo.Hejmo, onElektu = {}, prizorgantaRetpoŝto = "prizorganto@ekzemplo.org")
+        NavigaTirkesto(nunaVojo = Vojo.Hejmo, onElektu = {}, onApajNovaĵoj = {}, prizorgantaRetpoŝto = "prizorganto@ekzemplo.org")
     }
 }
 

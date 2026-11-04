@@ -16,6 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Naviga turkesto: nova ero „Apaj novaĵoj“ — remontras la novaĵ-dialogon de la apo iam ajn (https://github.com/nordfalk/EsperantoRadio/pull/173)
 - Vivaj kanaloj montras la nun-ludatan programon (ICY-titolo, ekz. „22 - Programo 24-3-24 RadioStacio FM Esperanto“) en la mini-ludilbreto (https://github.com/nordfalk/EsperantoRadio/pull/166)
 - Nova kanalo: Radio FM Esperanto (Kubo) — 24-hora livemitado kaj podkasto el Camagüey (https://github.com/nordfalk/EsperantoRadio/pull/165)
 - Nova kanalo: HUMILOPINIE (ManchaPod) — pensaĵoj kaj enaj debatoj; 33 novaj elsendoj (https://github.com/nordfalk/EsperantoRadio/pull/144)
@@ -24,6 +25,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
 ### Ŝanĝita
 
+- Kanala ekrano: la cip-butonoj montras la verajn retejon kaj retpoŝtadreson anstataŭ la fiksajn tekstojn „Retejo“ kaj „Retpoŝto“ (https://github.com/nordfalk/EsperantoRadio/pull/173)
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 - En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
 

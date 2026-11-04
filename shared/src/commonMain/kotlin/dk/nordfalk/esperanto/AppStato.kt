@@ -64,6 +64,13 @@ object AppStato {
     var estasAlfaKonstruo: Boolean = false
 
     /**
+     * Nomo de la git-branĉo, el kiu la apo estis konstruita (`null` ĉe master
+     * kaj ekster Android). Montriĝas en Agordoj post la versio, por ke oni
+     * vidas el kiu branĉo venas la konstruo.
+     */
+    var branĉoNomo: String? = null
+
+    /**
      * Konstruo-specifa defaŭlto de la erar-raportado (PR #148/C50):
      * - konstruo KUN nia subskribo (Google Play, Aptoide): `true` — la apo
      *   raportas defaŭlte (sen demando; malŝaltebla en Agordoj → Privateco);

@@ -37,6 +37,8 @@ class EsperantoRadioAplikaĵo : Application() {
         AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
         // Debug-konstruo = alfaversio: titolo «EsperαntoRαdio alfa» en la hejmoekrano
         AppStato.estasAlfaKonstruo = estasDebug
+        // Branĉnomo (malplena ĉe master) — montriĝas en Agordoj post la versio
+        AppStato.branĉoNomo = BuildConfig.GIT_BRANCHO.ifBlank { null }
         // Konstruo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on)
         AppStato.erarRaportadoDefaŭlta = !BuildConfig.SEN_NIA_SUBSKRIBO
         if (AppStato.estasEvoluaMedo) {

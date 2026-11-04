@@ -26,6 +26,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Ŝanĝita
 
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
+- En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
 
 ### Ŝanĝita
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.ApoVersio
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
 import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
@@ -192,7 +193,8 @@ fun AgordojEkrano(
             // Versio de la apo — el ApoVersio, generata el `apoversio` en libs.versions.toml
             Spacer(Modifier.height(32.dp))
             Text(
-                "Versio ${ApoVersio.VERSION}",
+                // Se konstruita el branĉo (ne master), la branĉnomo aperas post la versio
+                "Versio ${ApoVersio.VERSION}${AppStato.branĉoNomo?.let { " ($it)" } ?: ""}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.ApoVersio
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.domain.model.DiagnozoRezulto
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
@@ -26,6 +27,20 @@ class AgordojEkranoTest {
         waitForIdle()
         // La versio estas malsupre — skrolu al ĝi (la ekrano nun havas pli da sekcioj)
         onNodeWithText("Versio ${ApoVersio.VERSION}").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun montrasBranĉnomonPostLaVersio() = runComposeUiTest {
+        AppStato.branĉoNomo = "1103-testbranĉo"
+        try {
+            setContent {
+                AgordojEkrano(agordojDeponejo = AgordojDeponejoImpl(), onReen = {})
+            }
+            waitForIdle()
+            onNodeWithText("Versio ${ApoVersio.VERSION} (1103-testbranĉo)").performScrollTo().assertIsDisplayed()
+        } finally {
+            AppStato.branĉoNomo = null
+        }
     }
 
     @Test

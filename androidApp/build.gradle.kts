@@ -15,6 +15,19 @@ val keystoreProperties = Properties().apply {
     file("../secrets.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
+// Branĉnomo por BuildConfig.GIT_BRANCHO (montriĝas en Agordoj) — malplena
+// ĉe master kaj ĉe detached HEAD (F-Droid konstruas el etikedo; se .git
+// entute mankas, också malplena)
+val gitBrancho = try {
+    providers.exec {
+        commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
+    }.standardOutput.asText.get().trim()
+} catch (e: Exception) {
+    "HEAD"
+}
+// Sanigu citilojn kaj deklivojn, por ke ili ne rompu la generitan BuildConfig-ĉenon
+val branĉoPorAgordoj = if (gitBrancho == "master" || gitBrancho == "HEAD") "" else gitBrancho.replace("\\", "").replace("\"", "")
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -88,6 +101,7 @@ android {
         versionName = "3.1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "SEN_NIA_SUBSKRIBO", senNiaSubskribo.toString())
+        buildConfigField("String", "GIT_BRANCHO", "\"$branĉoPorAgordoj\"")
     }
 
     buildFeatures {

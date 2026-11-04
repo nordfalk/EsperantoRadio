@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
@@ -57,6 +58,8 @@ fun NavigaTirkesto(
     tirkestStato: DrawerState = rememberDrawerState(DrawerValue.Closed),
     nunaVojo: NavKey?,
     onElektu: (Vojo) -> Unit,
+    /** Malfermas la dialogon „Apaj novaĵoj“ (montras la nunan novaĵ-mesaĝon iam ajn). */
+    onApajNovaĵoj: () -> Unit,
     /** Retpoŝtadreso de la prizorganto — ricevita de la „Proponu kanalon"-butono (datum-movita, A5). */
     prizorgantaRetpoŝto: String,
 ) {
@@ -81,9 +84,21 @@ fun NavigaTirkesto(
             )
         }
 
+        // "Apaj novaĵoj" — remontras la novaĵ-dialogon (ne navigas, do ne aperas kiel elektita)
+        val tirkestScope = rememberCoroutineScope()
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Filled.Newspaper, contentDescription = null) },
+            label = { Text("Apaj novaĵoj") },
+            selected = false,
+            onClick = {
+                logi("Klako", "tirkesto: apaj novaĵoj")
+                tirkestScope.launch { tirkestStato.close() }
+                onApajNovaĵoj()
+            },
+        )
+
         // "Proponi kanalon" — retpoŝta butono al la prizorganto (FAROTA C57)
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        val tirkestScope = rememberCoroutineScope()
         NavigationDrawerItem(
             icon = { Icon(Icons.Filled.Email, contentDescription = null) },
             label = { Text("Proponi kanalon") },

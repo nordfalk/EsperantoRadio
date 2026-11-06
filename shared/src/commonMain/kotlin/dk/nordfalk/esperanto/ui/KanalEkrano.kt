@@ -355,15 +355,15 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (kanalo.retejoUrl != null) {
-                    AssistChip(
+                    AssistChip(modifier =  Modifier.weight(1f),
                         onClick = { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) },
-                        label = { Text(kanalo.retejoUrl) },
+                        label = { Text(kanalo.retejoUrl, maxLines = 3) },
                         leadingIcon = { Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                     Spacer(Modifier.width(8.dp))
                 }
                 if (kanalo.retpoŝto != null) {
-                    AssistChip(
+                    AssistChip( modifier =  Modifier.weight(1f),
                         onClick = {
                             logi("Klako", "retpoŝto ${kanalo.slug}")
                             val stato = ludilo?.stato?.value
@@ -385,7 +385,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
                                 teksto = teksto,
                             )
                         },
-                        label = { Text(kanalo.retpoŝto) },
+                        label = { Text(kanalo.retpoŝto, maxLines = 3) },
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.size(18.dp)) }
                     )
                 }

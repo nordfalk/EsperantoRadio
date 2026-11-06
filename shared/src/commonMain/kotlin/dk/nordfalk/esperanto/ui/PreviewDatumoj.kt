@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 internal val pKanaloj = listOf(
     Kanalo(slug = "muzaiko", nomo = "Muzaiko", rektaElsendaSonoUrl = "https://fluo.muzaiko.info/hls/muzaiko/live.m3u8"),
-    Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/"),
+    Kanalo(slug = "kernpunkto", nomo = "Kernpunkto", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/", retpoŝto = "xxuasasa@sdsdsd.sdsdsd.de", retejoUrl = "https://kern.punkto.info/longa_subadreso_bla_bla_bla"),
     Kanalo(slug = "varsoviavento", nomo = "Varsovia Vento", podkastaRssUrl = "https://www.podkasto.net/feed/"),
 )
 

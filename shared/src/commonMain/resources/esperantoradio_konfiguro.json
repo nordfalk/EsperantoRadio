@@ -115,7 +115,9 @@
 			"transsaltuKomenceSekundojn": [{ "sekundoj": 50.0 }],
 			"nomo": "BabiBEJO",
 			"priskribo": "Podkasto de la Brazila Esperantista Junularo pri junulara vivo, kulturo kaj agadoj en Brazilo.",
-			"emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2023/01/babibejo-16-1024x1024.png",
+			// bejo.esperanto.org.br redonas 403 (hotlink-protekto) — uzu la bildon el la anchor.fm-RSS
+			// "emblemoUrl": "https://bejo.esperanto.org.br/wp-content/uploads/2022/03/babibejo-400.png",
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/14019802/14019802-1616881327245-2587c04e9a963.jpg",
 			"elsendojRssUrl": "https://anchor.fm/s/54291ba8/podcast/rss",
 			"retpoŝto": "babibejopodcast@gmail.com",
 			"hejmpaĝoButono": "https://bejo.esperanto.org.br/babibejo"
@@ -331,7 +333,8 @@
 			"priskribo": "Semajnja unuhora magazino de Canal Sud (Tuluzo), parte en Esperanto, parte en la franca.",
 			// WordPress-blog-fluo; la ĝenerala parsilo preterlasas blogaĵojn sen MP3-enclosure (restas nur la magazenaj elsendoj)
 			"elsendojRssUrl": "https://toulouse.occeo.net/eo/feed/",
-			"emblemoUrl": "",
+			// Bildo el la kanala <image>-ero de la RSS-fluo
+			"emblemoUrl": "https://toulouse.occeo.net/wp-content/uploads/2018/08/1479357_569408243139872_1179630653_n-1-99x99.jpg",
 			"hejmpaĝoButono": "https://toulouse.occeo.net/eo/radio/"
 		}
 	,{

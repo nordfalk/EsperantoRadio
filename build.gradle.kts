@@ -5,7 +5,7 @@
 
 plugins {
     // Malnova apo
-    id("com.android.application") version "9.4.1" apply false
+    id("com.android.application") version "9.5.0" apply false
 
     // Nova KMP-apo
     id("org.jetbrains.kotlin.multiplatform") version "2.4.21" apply false
@@ -13,7 +13,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.21" apply false
     id("org.jetbrains.compose") version "1.12.2" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "2.4.21" apply false
-    id("com.android.library") version "9.4.1" apply false
+    id("com.android.library") version "9.5.0" apply false
     id("io.sentry.kotlin.multiplatform.gradle") version "0.28.0" apply false
     id("io.sentry.jvm.gradle") version "6.24.0" apply false
 }

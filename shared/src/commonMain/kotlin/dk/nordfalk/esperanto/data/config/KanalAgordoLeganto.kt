@@ -133,7 +133,9 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     slug = kodo,
     nomo = nomo,
     priskribo = priskribo,
-    emblemoUrl = emblemoUrl,
+    // Malplena emblemoUrl ("") signifas "neniu bildo" — normaligu al null, por ke
+    // la UI montru la rezervan komencliteran bildon anstataŭ provi ŝargi malplenan URL-on.
+    emblemoUrl = emblemoUrl?.ifBlank { null },
     rektaElsendaSonoUrl = rektaElsendaSonoUrl,
     podkastaRssUrl = elsendojRssUrl,
     rektaElsendaPriskriboUrl = rektaElsendaPriskriboUrl,

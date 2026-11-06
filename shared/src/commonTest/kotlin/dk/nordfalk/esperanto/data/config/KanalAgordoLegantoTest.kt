@@ -277,4 +277,36 @@ class KanalAgordoLegantoTest {
         assertEquals(22.0f, simpla.transsaltajSekundojPor("2030-01-01"))
         assertEquals(22.0f, simpla.transsaltajSekundojPor("2020-01-01"))
     }
+
+    @Test
+    fun malplenaEmblemoUrlIĝasNull() {
+        // Kanaloj kun "emblemoUrl": "" devas havi null, por ke la UI montru la
+        // rezervan komencliteran bildon anstataŭ provi ŝargi malplenan URL-on.
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "malplena",
+                        "nomo": "Malplena",
+                        "emblemoUrl": ""
+                    },
+                    {
+                        "kodo": "kunBildo",
+                        "nomo": "Kun bildo",
+                        "emblemoUrl": "https://ekzemplo.com/bildo.png"
+                    },
+                    {
+                        "kodo": "senKampo",
+                        "nomo": "Sen kampo"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertNull(agordo.kanaloj[0].alKanalo().emblemoUrl)
+        assertEquals("https://ekzemplo.com/bildo.png", agordo.kanaloj[1].alKanalo().emblemoUrl)
+        assertNull(agordo.kanaloj[2].alKanalo().emblemoUrl)
+    }
 }

@@ -47,7 +47,7 @@ jobs:
       # La ŝlosilo dependas de la build-dosieroj; restore-keys permesas reuzi
       # trans malgrandaj ŝanĝoj — la enhavo-hakoj interne prizorgas la reston.
       - name: Kaŝo de la Gradle-build-kaŝo
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.gradle/caches/build-cache-1
           key: gradle-build-cache-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle.properties', '**/build.gradle.kts', '**/libs.versions.toml') }}

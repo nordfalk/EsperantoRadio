@@ -40,7 +40,12 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    253=3.1.1-beta29okt (INTERNA TESTO, 2026-10-29, el la nekunfandita PR #144 —
    bruligis la versionumon; NE ĝisdatigu versionCode de ekzistanta etikedo!),
    254=3.1.1 (2026-10-31, la vera eldono; F-Droid konstruas la etikedon v3.1.1
-   kiel 253 — ilia versionumejo estas sendependa de Play).
+   kiel 253 — ilia versionumejo estas sendependa de Play),
+   255=nekonata (jam uzita ĉe Play antaŭ 2026-11-19 — eltrovis la elprovo
+   "Version code is too low"; fonto ne dokumentita en la repo),
+   256=3.1.2-beta19nov (BETA-TESTO, 2026-11-19, el la nekunfandita PR #175,
+   trako `beta`, eldonita el la PR-branĉo SEN komiti la eldon-libraron —
+   nur la versionCode restas konsumita).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).

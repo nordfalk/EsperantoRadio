@@ -3,6 +3,7 @@ package dk.nordfalk.esperanto.data.repository
 import kotlinx.coroutines.CancellationException
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.logd
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.raportadoAktiva
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -222,10 +223,11 @@ open class ElsendoDeponejoImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
-            // Fiaskpaĝo (kaptiva portalo) aŭ rompita parsado: forigu la malpuran
-            // kaŝon, alikaze tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S).
-            // logw (ne loge): tolerita, atendebla situacio — ne erar-evento.
-            logw("ElsendoDeponejo", "${kanalo.slug}: malsukcesis re-parsi diskan kaŝmemoron — forigas la kaŝon", e)
+            // Rompita parsado de la loka kaŝdosiero (Sentry montris IllegalArgumentException
+            // — do interna cimo, ne kaptiva portalo): forigu la malpuran kaŝon, alikaze
+            // tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S). loge: erar-evento, ĉar la
+            // kaŝmemoro estas loka kaj la eraro do indikas kod-cimon.
+            loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesa re-parsado de diska kaŝmemoro — forigas la kaŝon", e)
             foriguKaŝon(kanalo.slug)
             null
         }

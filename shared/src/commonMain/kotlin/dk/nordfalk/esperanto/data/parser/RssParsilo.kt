@@ -77,7 +77,7 @@ class RssParsilo(
             try {
                 rezulto = Regex(modelo, RegexOption.DOT_MATCHES_ALL).replace(rezulto, "")
             } catch (e: Exception) {
-                logw("RssParsilo", "Nevalida purig-modelo por ${kanalo.slug}: $modelo", e)
+                loge("RssParsilo", "Nevalida purig-modelo por ${kanalo.slug}: $modelo", e)
             }
         }
         return rezulto

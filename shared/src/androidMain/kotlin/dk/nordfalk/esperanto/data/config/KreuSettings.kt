@@ -2,7 +2,7 @@ package dk.nordfalk.esperanto.data.config
 
 import android.content.Context
 import com.russhwolf.settings.Settings
-import dk.nordfalk.esperanto.logw
+import dk.nordfalk.esperanto.loge
 
 /**
  * Android: uzas SharedPreferences rekte.
@@ -13,7 +13,7 @@ actual fun kreuSettings(): Settings {
         val prefs = appContext.getSharedPreferences("esperantoradio", Context.MODE_PRIVATE)
         SharedPreferencesSettings(prefs)
     } catch (e: UninitializedPropertyAccessException) {
-        logw("KreuSettings", "appContext ne inicialigita — uzas NoOpSettings", e)
+        loge("KreuSettings", "appContext ne inicialigita — uzas NoOpSettings (datumperdo!)", e)
         NoOpSettings()
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 
 /**
@@ -188,7 +189,7 @@ fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
                 etikedo = etikedo.ifBlank { null }
             ))
         } catch (e: Exception) {
-            logw("AlarmoSugestoj", "Ne eblis parsii alarmon ĉe indekso $i", e)
+            loge("AlarmoSugestoj", "Ne eblis parsii alarmon ĉe indekso $i (eraro en paktita agordo)", e)
         }
         i += 8
     }

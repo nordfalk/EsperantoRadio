@@ -39,6 +39,67 @@ class KanalAgordoLegantoTest {
         assertTrue(agordo.kanaloj[0].elsendojRssIgnoruTitolon)
     }
 
+    @Test // (FAROTA C8) blokkomentoj /* */ estas striptitaj kiel //-komentoj
+    fun legasBlokkomentojn() {
+        val jsonc = """
+            {
+                /* plura-linia
+                   blokkomento */
+                "kanaloj": [
+                    {
+                        "kodo": "muzaiko", /* komento post kampo */
+                        "nomo": "Muzaiko",
+                        "elsendojRssUrl": "https://ekzemplo.com/feed/" // lini-komento
+                    }
+                ] /* alia bloko
+                     inter elementoj */
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertEquals(1, agordo.kanaloj.size)
+        assertEquals("muzaiko", agordo.kanaloj[0].kodo)
+        assertEquals("Muzaiko", agordo.kanaloj[0].nomo)
+    }
+
+    @Test // (FAROTA C8) koment-simboloj ENE de teksta ĉeno ne estas striptitaj
+    fun komentSimbolojEnCenoNeEstasStriptitaj() {
+        val jsonc = """
+            {
+                "kanaloj": [
+                    {
+                        "kodo": "muzaiko",
+                        "nomo": "Muzaiko",
+                        "elsendojRssUrl": "https://ekzemplo.com/feed/*ne-komento*/",
+                        "priskribo": "Vidu // kaj /* kaj \" kaj \\ tie"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertEquals("https://ekzemplo.com/feed/*ne-komento*/", agordo.kanaloj[0].elsendojRssUrl)
+        assertEquals("Vidu // kaj /* kaj \" kaj \\ tie", agordo.kanaloj[0].priskribo)
+    }
+
+    @Test // (FAROTA C8) nefinita blokkomento estas striptita ĝis la fino (milda)
+    fun nefinitaBlokkomentoStrippitasGisFino() {
+        val jsonc = """
+            {
+                "komenca_kanalo": "muzaiko",
+                "kanaloj": []
+            }
+            /* neniam fermita — ĉio de ĉi tie estas komento
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertEquals("muzaiko", agordo.komenca_kanalo)
+        assertTrue(agordo.kanaloj.isEmpty())
+    }
+
     @Test
     fun legasPriskribonKajPlueAlKanalo() {
         val jsonc = """

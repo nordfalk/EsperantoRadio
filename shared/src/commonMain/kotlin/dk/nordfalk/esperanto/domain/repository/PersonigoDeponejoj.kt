@@ -16,12 +16,6 @@ interface PlejŝatatajDeponejo {
     suspend fun estasPlejŝatata(kanaloSlug: String): Boolean
 }
 
-interface LastAŭskultitajDeponejo {
-    fun observiLastAŭskultitajn(): StateFlow<List<Elsendo>>
-    suspend fun registri(elsendo: Elsendo)
-    suspend fun getPozicio(elsendoId: String): Long?
-}
-
 /**
  * Spuras ludstatuson de elsendoj — pozicio, ĉu finita, tempmarko.
  * Uzata de LudvicoRegilo por resumigo kaj aŭtomata sekva-ludado.

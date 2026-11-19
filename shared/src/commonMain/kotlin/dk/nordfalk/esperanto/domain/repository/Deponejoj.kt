@@ -13,6 +13,12 @@ interface KanaloDeponejo {
 
 interface ElsendoDeponejo {
     fun observiElsendojn(kanaloSlug: String): Flow<List<Elsendo>>
+
+    /**
+     * (FAROTA C38) Redonas nur la KAŜITajn (en-memorajn) elsendojn de la kanalo —
+     * neniam elŝutas el la reto, eĉ se `fortoRefresigi = true`. Por ŝargi/aktualigi
+     * el la reto uzu [ŝargiElsendojnPorKanal].
+     */
     suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean = false): List<Elsendo>
     suspend fun getElsendo(id: String): Elsendo?
     suspend fun serĉiElsendojn(teksto: String, limo: Int = 50): List<Elsendo>

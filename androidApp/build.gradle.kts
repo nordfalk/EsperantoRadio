@@ -111,7 +111,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8-kodminigo (FAROTA C6): la apo mem liveras la bezonatajn konsumajn
+            // regulojn (proguard-rules.pro — precipe kotlinx.serialization);
+            // Media3, Sentry, WorkManager kaj Compose liveras siajn proprajn.
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             // Subskribu nur kiam la keystore-dosiero reale ekzistas. Tio ebligas
             // nesubskribitan release-konstruon en medioj SEN la sekretoj (F-Droid,
             // senkolora CI) — ili subskribas la APK-on mem per sia propra ŝlosilo.
@@ -144,13 +151,17 @@ play {
     // Kiu track eldoni: "internal", "alpha", "beta", "production"
     track.set("internal")
     // Aŭtomate pliigi versionCode estas malaktiva — ni mastrumas versionCode permane
-    // Nur eldoni AAB (App Bundle), ne APK
-    defaultToAppBundles.set(true)
+    // Nur eldoni APK, ne AAB (App Bundle): la apo NE estas enskribita en Play App
+    // Signing, do AAB ne funkcius — la CI kaj la eldona gvidilo uzas publishReleaseApk
+    // (vidu .github/workflows/eldonado.yml kaj docs/nova/07_eldonado.md; FAROTA C24)
+    defaultToAppBundles.set(false)
 }
 
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")
+    // C23: ne hokita versio — la CMP-artefakto kun la sama versio kiel la cetero
+    // de Compose (la paketo ene restas androidx.compose.ui.test)
+    androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:rules:1.6.1") // GrantPermissionRule

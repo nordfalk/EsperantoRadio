@@ -26,6 +26,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
 ### Ŝanĝita
 
+- La eldona APK estas nun kod-minigita (R8) — signife pli malgranda elŝuto: ĉ. 7,5 MB anstataŭ ĉ. 21 MB (https://github.com/nordfalk/EsperantoRadio/pull/175)
 - Kanala ekrano: la cip-butonoj montras la verajn retejon kaj retpoŝtadreson anstataŭ la fiksajn tekstojn „Retejo“ kaj „Retpoŝto“ (https://github.com/nordfalk/EsperantoRadio/pull/173)
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 - En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
@@ -36,6 +37,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- Ludado komencita el sciigo aŭ vekhorloĝo ne plu riskas kraŝi la aplikon pro tro granda priskribo trans la sistemo (la ludata fonto en la media-sciigo nun portas nur la necesajn kampojn) (https://github.com/nordfalk/EsperantoRadio/pull/175)
 - Kanaloj BabiBEJO kaj Magazino Tuluzo denove montras sian emblemon en la kanala vido; kanaloj sen emblemo montras komencliterojn anstataŭ blankan kampon (https://github.com/nordfalk/EsperantoRadio/pull/174)
 
 ## [3.1.1] - 2026-10-31

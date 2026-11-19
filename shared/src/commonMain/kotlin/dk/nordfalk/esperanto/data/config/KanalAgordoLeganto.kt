@@ -11,15 +11,22 @@ import dk.nordfalk.esperanto.logw
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
  *
- * La dosiero `esperantoradio_konfiguro.json` enhavas `//`-komentojn kaj
- * kampojn kun `XXX`-prefikso por malaktivigi. Ni striptigas komentojn
- * antaŭ parsado, kaj ignoras nekonatajn kampojn.
+ * La dosiero `esperantoradio_konfiguro.json` enhavas `//`-liniajn kaj `/* */`-blokajn
+ * komentojn kaj kampojn kun `XXX`-prefikso por malaktivigi. Ni striptigas komentojn
+ * antaŭ parsado (vidu [striptiguKomentojn]), kaj ignoras nekonatajn kampojn.
  */
 class KanalAgordoLeganto {
 
     private val json = Json {
+        // Nekonataj kampoj (ekz. kun XXX-prefikso) estas ignorataj — tio ebligas
+        // malaktivigi kanalojn en la konfiguro sen ŝanĝi la kodon (A5).
         ignoreUnknownKeys = true
         isLenient = true
+        // coerceInputValues (FAROTA C8): kampo kun MALĜUSTA tipo ricevas sian
+        // defaŭlton anstataŭ ĵeti — elektita por toleremo (A4): unu fuŝita kampo
+        // ne rajtas mortigi la ŝargon de la TUTA konfiguro. Malavantaĝo: tajpo
+        // en valoro (ekz. "truee") estas kaŝe korektita al la defaŭlto — kontrolu
+        // per KanalAgordoFumTesto kaj radioTxtKomparilo.
         coerceInputValues = true
     }
 
@@ -29,11 +36,15 @@ class KanalAgordoLeganto {
     }
 
     /**
-     * Striptigas `//`-liniajn komentojn kaj normaligas plurliniajn ĉenojn.
+     * Striptigas `//`-liniajn kaj `/* */`-blokajn komentojn kaj normaligas
+     * plurliniajn ĉenojn. Komentoj ene de teksta ĉeno (ekz. en URL
+     * `"https://…"`) ne estas tuŝataj.
      *
-     * La JSONC-dosiero enhavas `//`-komentojn kaj plurliniajn ĉenojn kun `\`
-     * ĉe lini-fino (ekz. `sugestoj_por_alarmoj`). Ni striptigas komentojn
-     * kaj traktas `\` + linisalton kiel lin-daŭrigon (forigu ambaŭ).
+     * La JSONC-dosiero enhavas `//`- kaj `/* */`-komentojn kaj plurliniajn
+     * ĉenojn kun `\` ĉe lini-fino (ekz. `sugestoj_por_alarmoj`). Ni striptigas
+     * komentojn kaj traktas `\` + linisalton kiel lin-daŭrigon (forigu ambaŭ).
+     * Nefinita blokkomento (`/*` sen `*/`) estas striptita ĝis la fino (milda,
+     * kongrue kun `isLenient`).
      */
     private fun striptiguKomentojn(teksto: String): String {
         val sb = StringBuilder(teksto.length)
@@ -65,10 +76,21 @@ class KanalAgordoLeganto {
                 i++
                 continue
             }
-            if (!enĈeno && c == '/' && i + 1 < teksto.length && teksto[i + 1] == '/') {
-                // Saltu ĝis linifino
-                while (i < teksto.length && teksto[i] != '\n') i++
-                continue
+            if (!enĈeno && c == '/' && i + 1 < teksto.length) {
+                when (teksto[i + 1]) {
+                    '/' -> {
+                        // Linia komento — saltu ĝis linifino
+                        while (i < teksto.length && teksto[i] != '\n') i++
+                        continue
+                    }
+                    '*' -> {
+                        // Blokkomento — saltu ĝis la fina `*/` (aŭ ĝis la fino)
+                        i += 2
+                        while (i + 1 < teksto.length && !(teksto[i] == '*' && teksto[i + 1] == '/')) i++
+                        i = minOf(i + 2, teksto.length)
+                        continue
+                    }
+                }
             }
             sb.append(c)
             i++

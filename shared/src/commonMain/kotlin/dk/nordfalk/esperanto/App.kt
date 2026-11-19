@@ -433,7 +433,14 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
-                            val elsendo = vojo.elsendo
+                            // (FAROTA C11) La vojo povas porti MALDIKAN elsendon (el la
+                            // MediaMetadata.extras de la ludilo — sen priskriboj, por eviti
+                            // tro grandan binder-transakcion): reŝargu la plenan elsendon
+                            // el la deponejo, se ĝi estas kaŝita.
+                            var elsendo by remember(vojo.elsendo.id) { mutableStateOf(vojo.elsendo) }
+                            LaunchedEffect(vojo.elsendo.id) {
+                                elsendoDeponejo.getElsendo(vojo.elsendo.id)?.let { elsendo = it }
+                            }
                             val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
                             val elsendoj by elsendoDeponejo.observiElsendojn(elsendo.kanaloSlug).collectAsState()
                             LaunchedEffect(kanalo?.slug) {

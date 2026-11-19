@@ -49,6 +49,15 @@ Agordita track: `internal` (interna testado — ŝanĝu al `alpha`, `beta` aŭ `
    KEYSTORE_PASSWORD=xxxxxx ./gradlew :androidApp:publishReleaseApk
    ```
    Tio alŝutas la APK-on al la track agordita en `build.gradle.kts` (defaŭlte `internal`).
+   (Konvencio de la posedanto, 2026-11-19: «faru beta-eldonon» signifas internan test-eldonon al `internal`.)
+
+### Uzataj versionCode
+
+La kanona historio de uzitaj versionCode (Play rifuzas reuzon!) staras en
+[`.vibe/skills/eldonado/SKILL.md`](https://github.com/nordfalk/EsperantoRadio/blob/master/.vibe/skills/eldonado/SKILL.md)
+(paŝo 2 de la eldona laborfluo) — la dosiero estas en la deponejo, do rekte videbla sur GitHub.
+Ĉiu eldono, inkluzive de internaj testoj el PR-branĉoj (ekz. 253, 256, 257),
+aldonas sian linion tie; nur la versionCode restas konsumita ĉe Play.
 
 > **Kial APK, ne AAB?** AAB-alŝuto postulas enskribiĝon en **Play App Signing**
 > (eraro: "For uploading an AppBundle you must be enrolled in Play Signing").

@@ -10,6 +10,16 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## Resuma laborfluo (nova versio X.Y.Z)
 
+> **La kanona listo de uzitaj versionCode staras en paŝo 2 sube** (kaj tiel sur
+> GitHub: `.vibe/skills/eldonado/SKILL.md` en la deponejo). Ĉiu eldono — ankaŭ
+> internaj testoj — aldonas sian linion tie; Play rifuzas reuzon de versionCode.
+> (Montru al homoj: `docs/nova/07_eldonado.md` § «Uzataj versionCode».)
+
+> **Konvencio de la posedanto (2026-11-19)**: kiam li skribas «faru beta-eldonon»,
+> li **ĉiam celas internan test-eldonon** (trako `internal`) — li mem testas kaj
+> poste promocias al produktado. Uzu la trakton `beta` nur se li eksplicite diras
+> «al la beta-trakto» / «por beta-testantoj».
+
 0. **Eldonoj ĉiam tra PR** (2026-10-25, decido de la posedanto): kreu branĉon
    `MMdd-eldono-XY` de master, montru la ŝanĝojn al la posedanto ANTAŬ ol
    komiti, kaj kunfandu nur post aparta eksplicita aprobo („kunfandu“ — regulo
@@ -43,9 +53,11 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    kiel 253 — ilia versionumejo estas sendependa de Play),
    255=nekonata (jam uzita ĉe Play antaŭ 2026-11-19 — eltrovis la elprovo
    "Version code is too low"; fonto ne dokumentita en la repo),
-   256=3.1.2-beta19nov (BETA-TESTO, 2026-11-19, el la nekunfandita PR #175,
-   trako `beta`, eldonita el la PR-branĉo SEN komiti la eldon-libraron —
-   nur la versionCode restas konsumita).
+   256=3.1.2-beta19nov (2026-11-19, el PR #175, trako `beta` — antaŭ ol la
+   konvencio «beta-eldono = interna testo» estis klarigita; 255/256 eldonitaj
+   el la PR-branĉo SEN komiti la eldon-libraron, nur la versionCode restas konsumita),
+   257=3.1.2-alfa19nov (INTERNA TESTO, 2026-11-19, el PR #175, trako `internal` —
+   la kutima «faru beta-eldonon» de la posedanto).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).

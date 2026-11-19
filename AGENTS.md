@@ -170,6 +170,7 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 > arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
 > [`ŜANĜOJ.md`](ŜANĜOJ.md).
 
+- **«faru beta-eldonon» = interna testo (2026-11-19, decido de la posedanto):** kiam la posedanto skribas «faru beta-eldonon», li ĉiam celas eldonon al la trako `internal` de Google Play (li testas mem kaj poste promocias al produktado); la trako `beta` uziĝu nur se li eksplicite diras «beta-trakto». La uzitaj versionCode estas listigitaj en la `eldonado`-skill-o (`.vibe/skills/eldonado/SKILL.md`, do videbla sur GitHub), kun montrilo en `docs/nova/07_eldonado.md`.
 - **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
   post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
   nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)

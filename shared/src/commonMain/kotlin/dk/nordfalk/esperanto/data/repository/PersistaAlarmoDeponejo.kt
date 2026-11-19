@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.repository.AlarmoDeponejo
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import com.russhwolf.settings.Settings
@@ -61,14 +62,14 @@ class PersistaAlarmoDeponejo(
             logi("AlarmoDeponejo", "Sarĝis ${alarmoj.size} persistitajn alarmojn")
             alarmoj
         } catch (e: Exception) {
-            logw("AlarmoDeponejo", "Ne eblis legi persistitajn alarmojn", e)
+            loge("AlarmoDeponejo", "Ne eblis legi persistitajn alarmojn", e)
             // (PR #95) konservu la krudan valoron kiel rezervon — sen tio la sekvaj
             // persistu()-vokoj (ekigis/krei/ŝalti) anstataŭigas ĝin kaj la uzantaj
             // alarmoj estas definitive perditaj. Kun la rezervo ili estas reakireblaj.
             try {
                 settings.putString(SettingsKeys.ALARMOJ_REZERVO, str)
             } catch (e2: Exception) {
-                logw("AlarmoDeponejo", "Ne eblis skribi la alarman rezervon", e2)
+                loge("AlarmoDeponejo", "Ne eblis skribi la alarman rezervon", e2)
             }
             sugestoj
         }
@@ -125,7 +126,7 @@ class PersistaAlarmoDeponejo(
     fun ekigis(alarmoId: Int) {
         val alarmo = _alarmoj.value.find { it.id == alarmoId }
         when {
-            alarmo == null -> logw("AlarmoDeponejo", "Ekigis nekonatan alarmon $alarmoId")
+            alarmo == null -> loge("AlarmoDeponejo", "Ekigis nekonatan alarmon $alarmoId", IllegalStateException("nekonata alarmo-id: $alarmoId"))
             !alarmo.aktiva -> logi("AlarmoDeponejo", "Ekigis malaktivan alarmon $alarmoId — nenio farenda")
             alarmo.ripeto == 0 -> {
                 _alarmoj.value = _alarmoj.value.map { if (it.id == alarmoId) it.copy(aktiva = false) else it }

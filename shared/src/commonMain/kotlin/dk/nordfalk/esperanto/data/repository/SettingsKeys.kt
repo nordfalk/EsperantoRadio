@@ -36,6 +36,8 @@ object SettingsKeys {
     const val SCIIG_REGISTREJO = "sciig_registrejo"
     /** Haketaĵo de la lasta konfirmitaj apaj novaĵoj (nul = neniam montrita / malplena). */
     const val APAJ_NOVAĴOJ_HAKETAĴO = "apaj_novaĵoj_haketaĵo"
+    /** Tempo (ms) de la lasta intenca statistiko-"eraro" (geo el IP) — maks. 1× tage. */
+    const val LASTA_GEO_STATISTIKO = "lasta_geo_statistiko"
 
     /**
      * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —

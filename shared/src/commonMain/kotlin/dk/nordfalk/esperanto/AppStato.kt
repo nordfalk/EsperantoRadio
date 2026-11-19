@@ -13,6 +13,7 @@ import dk.nordfalk.esperanto.data.repository.PersistaAlarmoDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistaPlejŝatatajDeponejo
 import dk.nordfalk.esperanto.data.repository.PersistaLudatojDeponejo
 import dk.nordfalk.esperanto.data.repository.SerĉoDeponejoImpl
+import dk.nordfalk.esperanto.data.repository.SettingsKeys
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.data.repository.kreuElŝutDeponejo
 import dk.nordfalk.esperanto.domain.DiagnozoRegilo
@@ -139,6 +140,27 @@ object AppStato {
     }
 
     /**
+     * Intence raportas statistikan "eraron" (do erar-eventon kun geo el la IP
+     * ĉe Sentry) por landa statistiko — maks. unufoje tage po uzanto.
+     * NE vera eraro; konsumas la erar-kvoton (po ~1 evento/uzanto/tago).
+     */
+    private fun raportuGeoStatistikon(settings: Settings) {
+        try {
+            val nun = kotlin.time.Clock.System.now().toEpochMilliseconds()
+            val lasta = settings.getLong(SettingsKeys.LASTA_GEO_STATISTIKO, 0L)
+            if (lasta != 0L && nun - lasta < 24L * 60 * 60 * 1000) return
+            settings.putLong(SettingsKeys.LASTA_GEO_STATISTIKO, nun)
+            loge(
+                "Statistiko",
+                "Geo-statistiko (intence raportita por lando-statistiko, ne vera eraro)",
+                Exception("geo-statistiko")
+            )
+        } catch (e: Throwable) {
+            logw("Statistiko", "Geo-statistiko fiaskis", e)
+        }
+    }
+
+    /**
      * Kreas ĉiujn deponejojn kaj ViewModel-ojn. Idempotenta — se jam inicialigita, faras nenion.
      *
      * @param ludilo la ludilo-regilo (platform-specifa, transdonita de la enirpunkto)
@@ -153,6 +175,7 @@ object AppStato {
         if (httpKliento != null) return
 
         logGrava("AppStato", "Apo malfermita (versio ${ApoVersio.VERSION})")
+        raportuGeoStatistikon(settings)
         logi("AppStato", "Inicialigas deponejojn kaj ViewModel-ojn")
 
         httpKliento = HttpClient(httpMotoro) {

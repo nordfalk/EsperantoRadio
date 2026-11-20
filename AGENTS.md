@@ -28,7 +28,8 @@ la metadatena MR !55129 estas submetita kaj atendas revizion (2026-10-31;
 paŝoj kaj stato en `fdroid/GVIDILO.md`, FAROTA C50). **Aptoide**: ankoraŭ
 ne komencita (docs/nova/07 § 3). Ĉiuj fazoj de la plano estas faritaj krom:
 iOS-ludado (bezonas AVPlayer + Xcode-projekton), eldono de Desktop + Web/wasmJs, hejmekrana widget, Chromecast,
-parolsintezo kaj la podkasta arkiv-servilo (`docs/nova/06_servilo_arkivo.md`).
+parolsintezo kaj la plena HTTP-API de la arkiv-servilo (fazo 1 de `server/` — statikaj
+elŝuteblaj dosieroj — jam funkcias, vidu la skill-on `servilo-arkivo`; plano: `docs/nova/06_servilo_arkivo.md`).
 Web estas limigita de CORS (nur la anchor.fm-podkastoj ŝargeblas sen servilo).
 La historia fazo-tabelo kaj la detala listo "kio funkcias / kio ne funkcias"
 staras en [`NOTOJ.md`](NOTOJ.md) → "Projekta stato kaj fazoj".
@@ -39,7 +40,7 @@ Rekrei la apot en **Compose Multiplatform** (Android + iOS + Desktop + Web/Wasm)
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) kaj `server/` ankoraŭ ne estas kreitaj — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto kaj la podkasta arkiv-servilo restas estontaj.
+- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) ankoraŭ ne estas kreita — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto restas estonta. **`server/` jam ekzistas** (fazo 1: Kotlin-arkiv-konstruilo, publika elŝutejo ĉe `https://javabog.dk/esperanto-radio/publika/` — vidu la skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`).
 
 ## Dosierujo-structuro
 
@@ -48,7 +49,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 `webApp/` + `shared/` (la nova KMP-apo), `docs/malnova/` + `docs/nova/`
 (dokumentaro), `CHANGELOG.md` + `ŜANĜOJ.md` + `NOTOJ.md` + `FAROTA.md` +
 `AGENTS.md` (la protokolaro), `.vibe/skills/` (proceduraj skill-oj:
-`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`).
+`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`, `servilo-arkivo`).
 
 ## Plej gravaj reguloj por agentoj
 

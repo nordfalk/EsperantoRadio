@@ -21,4 +21,4 @@ include(":androidApp")
 include(":desktopApp")
 include(":webApp")
 // include(":iosApp")  — bezonas macOS/Xcode por konstrui; malkomentu sur Mac
-// include(":server")
+include(":server")

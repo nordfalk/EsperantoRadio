@@ -20,8 +20,8 @@ class RssParsiloTest {
     }
 
     // === Arkiva fluo de nia servilo (javabog.dk) — deArkivo=true konservas la id-on ===
-    // (La fiksaĵo intence havas GRANDLITERAJN datojn kiel "WED, 18 NOV 2026" — regression
-    // por la usklec-sensema monata analizo en normigiDaton; la servilo nun skribas normalajn.)
+    // (Pli fruaj arkivaj fluoj havis GRANDLITERAJN datojn kiel "WED, 18 NOV 2026" — tial
+    // normigiDaton estas usklec-sensema; vidu la teston normigiDatonUsklecSensiva sube.)
 
     @Test
     fun parsasArkivanFluonDeNiaServilo() = kotlinx.coroutines.test.runTest {
@@ -47,6 +47,14 @@ class RssParsiloTest {
         assertTrue(unua.priskriboHtml?.contains("<em>Rezumo farita de la sondosiero per AI") == true, unua.priskriboHtml)
         // la plata teksto (serĉo/listoj) ankoraŭ enhavas la averto-tekston
         assertTrue(elsendoj.any { it.priskribo?.contains("Rezumo farita de la sondosiero per AI") == true })
+    }
+
+    @Test
+    fun normigiDatonUsklecSensiva() {
+        // kelkaj fluoj (ankaŭ pli fruaj arkivaj fluoj de nia servilo) skribas la monaton grandlitere
+        assertEquals("2026-11-18", parsilo.normigiDaton("WED, 18 NOV 2026 12:00:00 +0000"))
+        assertEquals("2026-11-18", parsilo.normigiDaton("Wed, 18 Nov 2026 21:20:00 +0100"))
+        assertEquals("2026-04-06", parsilo.normigiDaton("2026-04-06"))
     }
 
     // === Regulo P6.1 — Ĝenerala parsado (Kernpunkto) ===

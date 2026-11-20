@@ -32,6 +32,9 @@ import kotlin.concurrent.Volatile
 /** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
 private const val ARKIVA_PETO_TEMROLIMITO_MS = 10_000L
 
+/** Unu elŝutota fonto: la URL kaj ĉu ĝi estas nia arkiva fluo (deArkivo). */
+private data class Fonto(val url: String, val deArkivo: Boolean)
+
 /**
  * ElsendoDeponejo-implentaĵo. Elŝutas RSS-fluojn per Ktor, parsas per RssParsilo,
  * kaŝenas en memoro (StateFlow). Tolerema: eraro → liveri kaŝenitan datumon.
@@ -121,11 +124,14 @@ open class ElsendoDeponejoImpl(
      */
     open suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
         // Arkivo unue (riĉigitaj fluoj kun AI-rezultoj), originala fluo kiel rezervo (FAROTA: arkivo-unue).
-        val urls = buildList {
-            arkivoBazoUrl?.let { add(it.trimEnd('/') + "/" + kanalo.slug + ".xml") }
-            kanalo.podkastaRssUrl?.let { add(it) }
-        }.distinct()
-        if (urls.isEmpty()) {
+        // Fonto portas la flagon deArkivo eksplicite — neniom da URL-ĉena komparo poste.
+        val fontoj = buildList {
+            if (!arkivoBazoUrl.isNullOrBlank()) {
+                add(Fonto(arkivoBazoUrl.trimEnd('/') + "/" + kanalo.slug + ".xml", deArkivo = true))
+            }
+            kanalo.podkastaRssUrl?.let { add(Fonto(it, deArkivo = false)) }
+        }.distinctBy { it.url }
+        if (fontoj.isEmpty()) {
             logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
             return kaŝmemoro[kanalo.slug] ?: emptyList()
         }
@@ -139,7 +145,7 @@ open class ElsendoDeponejoImpl(
         val ŝargo = ŝargMutex.withLock {
             ŝargadoj[kanalo.slug]?.also {
                 logd("ElsendoDeponejo", "${kanalo.slug}: aliĝas al daŭranta ŝargo anstataŭ duobla elŝuto")
-            } ?: ŝargSkopo.async { elŝutuKajParsu(kanalo, urls, kaŝenitaj) }
+            } ?: ŝargSkopo.async { elŝutuKajParsu(kanalo, fontoj, kaŝenitaj) }
                 .also { nova ->
                     ŝargadoj[kanalo.slug] = nova
                     // Forigu la eron kiam la ŝargo FINIĜAS (ne kiam vokanto finiĝas —
@@ -170,11 +176,11 @@ open class ElsendoDeponejoImpl(
      * La reta parto de [ŝargiElsendojn]: elŝutas la RSS-fluon kaj parsas ĝin.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    private suspend fun elŝutuKajParsu(kanalo: Kanalo, urls: List<String>, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
+    private suspend fun elŝutuKajParsu(kanalo: Kanalo, fontoj: List<Fonto>, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
         var lastaEraro: Throwable? = null
-        for (url in urls) {
+        for (fonto in fontoj) {
             try {
-                return elŝutuKajParsuUnu(kanalo, url)
+                return elŝutuKajParsuUnu(kanalo, fonto)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
@@ -183,7 +189,7 @@ open class ElsendoDeponejoImpl(
                 // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
                 // ili devas NE iĝi erar-nivelaj Sentry-eventoj (PR #93).
                 lastaEraro = e
-                logw("ElsendoDeponejo", "${kanalo.slug}: $url malsukcesis — provos sekvan fonton", e)
+                logw("ElsendoDeponejo", "${kanalo.slug}: ${fonto.url} malsukcesis — provos sekvan fonton", e)
             }
         }
         // Ĉiuj fontoj malsukcesaj (ekz. arkivo kaj originalo): tolerema rezervo —
@@ -196,9 +202,9 @@ open class ElsendoDeponejoImpl(
         return kaŝenitaj ?: emptyList()
     }
 
-    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, url: String): List<Elsendo> {
-        // Arkiva fluo de nia servilo = ne la originala RSS-URL de la kanalo
-        val deArkivo = url != kanalo.podkastaRssUrl
+    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, fonto: Fonto): List<Elsendo> {
+        val url = fonto.url
+        val deArkivo = fonto.deArkivo
         logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
         if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
         // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu provos la

@@ -54,25 +54,17 @@ fun AgordojEkrano(
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp).verticalScroll(rememberScrollState())) {
             Text("Ludado", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
-            ListItem(
-                headlineContent = { Text("Aŭtomate daŭrigu kun alia elsendo") },
-                supportingContent = { Text("Kiam elsendo finiĝas, aŭtomate ludu la sekvan") },
-                trailingContent = {
-                    Switch(
-                        checked = aŭtomataDaŭrigo,
-                        onCheckedChange = { logi("Klako", "aŭtomataDaŭrigo → $it"); agordojDeponejo.fiksiAŭtomatanDaŭrigon(it) }
-                    )
-                }
+            ŜaltilaLinio(
+                titolo = "Aŭtomate daŭrigu kun alia elsendo",
+                priskribo = "Kiam elsendo finiĝas, aŭtomate ludu la sekvan",
+                ŝaltita = aŭtomataDaŭrigo,
+                onŜanĝo = { logi("Klako", "aŭtomataDaŭrigo → $it"); agordojDeponejo.fiksiAŭtomatanDaŭrigon(it) }
             )
-            ListItem(
-                headlineContent = { Text("Transsalti enkondukon") },
-                supportingContent = { Text("Kanaloj kun ripetiĝanta enkonduko transsaltas ĝin, se vi aŭskultis la kanalon dum la pasinta semajno") },
-                trailingContent = {
-                    Switch(
-                        checked = transsaltuEnkondukojn,
-                        onCheckedChange = { logi("Klako", "transsaltuEnkondukojn → $it"); agordojDeponejo.fiksiTranssaltuEnkondukojn(it) }
-                    )
-                }
+            ŜaltilaLinio(
+                titolo = "Transsalti enkondukon",
+                priskribo = "Kanaloj kun ripetiĝanta enkonduko transsaltas ĝin, se vi aŭskultis la kanalon dum la pasinta semajno",
+                ŝaltita = transsaltuEnkondukojn,
+                onŜanĝo = { logi("Klako", "transsaltuEnkondukojn → $it"); agordojDeponejo.fiksiTranssaltuEnkondukojn(it) }
             )
             Spacer(Modifier.height(24.dp))
             Text("Sistemo", style = MaterialTheme.typography.titleMedium)
@@ -111,15 +103,11 @@ fun AgordojEkrano(
                 Spacer(Modifier.height(24.dp))
                 Text("Sciigoj", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
-                ListItem(
-                    headlineContent = { Text("Ricevi sciigojn") },
-                    supportingContent = { Text("Sciigo kiam aperas nova elsendo el ŝatata kanalo") },
-                    trailingContent = {
-                        Switch(
-                            checked = sciigoj,
-                            onCheckedChange = { logi("Klako", "sciigoj → $it"); agordojDeponejo.fiksiSciigojn(it) }
-                        )
-                    }
+                ŜaltilaLinio(
+                    titolo = "Ricevi sciigojn",
+                    priskribo = "Sciigo kiam aperas nova elsendo el ŝatata kanalo",
+                    ŝaltita = sciigoj,
+                    onŜanĝo = { logi("Klako", "sciigoj → $it"); agordojDeponejo.fiksiSciigojn(it) }
                 )
                 // Se la uzanto enŝaltis sciigojn sed la permeso mankas — montru ligilon
                 if (sciigoj && !sciigPermesoDonita()) {
@@ -137,41 +125,29 @@ fun AgordojEkrano(
             Spacer(Modifier.height(24.dp))
             Text("Programisto", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
-            ListItem(
-                headlineContent = { Text("Programista reĝimo") },
-                supportingContent = { Text("Montru elektilojn por priskribo-fonto kaj vidmaniero en elsendo-ekrano") },
-                trailingContent = {
-                    Switch(
-                        checked = evoluo,
-                        onCheckedChange = { logi("Klako", "programista reĝimo → $it"); agordojDeponejo.fiksiEvoluon(it) }
-                    )
-                }
+            ŜaltilaLinio(
+                titolo = "Programista reĝimo",
+                priskribo = "Montru elektilojn por priskribo-fonto kaj vidmaniero en elsendo-ekrano",
+                ŝaltita = evoluo,
+                onŜanĝo = { logi("Klako", "programista reĝimo → $it"); agordojDeponejo.fiksiEvoluon(it) }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Spacer(Modifier.height(24.dp))
             Text("Privateco", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
-            ListItem(
-                headlineContent = { Text("Sendu erar-raportojn") },
-                supportingContent = { Text("Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Ŝanĝoj de kraŝ-raportoj tute ekvalidas post restartigo de la apo") },
-                trailingContent = {
-                    Switch(
-                        checked = erarRaportado,
-                        onCheckedChange = { logi("Klako", "erarRaportado → $it"); agordojDeponejo.fiksiErarRaportadon(it) }
-                    )
-                }
+            ŜaltilaLinio(
+                titolo = "Sendu erar-raportojn",
+                priskribo = "Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Ŝanĝoj de kraŝ-raportoj tute ekvalidas post restartigo de la apo",
+                ŝaltita = erarRaportado,
+                onŜanĝo = { logi("Klako", "erarRaportado → $it"); agordojDeponejo.fiksiErarRaportadon(it) }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            ListItem(
-                headlineContent = { Text("Ŝaltu detalan protokoladon") },
-                supportingContent = { Text("(Nur se erar-raportado estas ŝaltita) Protokolas anonimajn detalojn pri via uzado (navigado, klakoj, ŝargado). Malŝaltu por sendi nur erarojn kaj gravajn eventojn (malfermo, ekludo, vekiĝo)") },
-                trailingContent = {
-                    Switch(
-                        checked = detalaProtokolado,
-                        onCheckedChange = { logi("Klako", "detalaProtokolado → $it"); agordojDeponejo.fiksiDetalanProtokoladon(it) }
-                    )
-                }
+            ŜaltilaLinio(
+                titolo = "Ŝaltu detalan protokoladon",
+                priskribo = "(Nur se erar-raportado estas ŝaltita) Protokolas anonimajn detalojn pri via uzado (navigado, klakoj, ŝargado). Malŝaltu por sendi nur erarojn kaj gravajn eventojn (malfermo, ekludo, vekiĝo)",
+                ŝaltita = detalaProtokolado,
+                onŜanĝo = { logi("Klako", "detalaProtokolado → $it"); agordojDeponejo.fiksiDetalanProtokoladon(it) }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -201,6 +177,25 @@ fun AgordojEkrano(
             )
         }
     }
+}
+
+/**
+ * Agorda linio kun ŝaltilo: la tuta linio estas klakebla kaj ŝaltas la agordon
+ * (ne nur la ŝaltilo mem — ĝi estas neinteraga, do `onCheckedChange = null`).
+ */
+@Composable
+private fun ŜaltilaLinio(
+    titolo: String,
+    priskribo: String,
+    ŝaltita: Boolean,
+    onŜanĝo: (Boolean) -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(titolo) },
+        supportingContent = { Text(priskribo) },
+        trailingContent = { Switch(checked = ŝaltita, onCheckedChange = null) },
+        modifier = Modifier.clickable { onŜanĝo(!ŝaltita) }
+    )
 }
 
 @Preview(name = "AgordojEkrano", showBackground = true, heightDp = 400)

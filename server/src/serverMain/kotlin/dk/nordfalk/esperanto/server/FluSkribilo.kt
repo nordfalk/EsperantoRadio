@@ -34,14 +34,14 @@ object FluSkribilo {
         }
         for (e in elsendoj) {
             val priskribo = priskriboj[e.id] ?: e.priskriboHtml ?: e.priskribo
-            val retpagxo = e.retpaĝoUrl
+            val retpaĝo = e.retpaĝoUrl
             val daŭro = e.daŭro
             sb.append("    <item>\n")
             xml(sb, "      ", "title", e.titolo)
             xml(sb, "      ", "guid", e.id)
             xml(sb, "      ", "pubDate", rfc822(e.dato))
             if (priskribo != null) xml(sb, "      ", "description", priskribo)
-            if (retpagxo != null) xml(sb, "      ", "link", retpagxo)
+            if (retpaĝo != null) xml(sb, "      ", "link", retpaĝo)
             sb.append("      <enclosure url=").append(citaĵo(e.fluo)).append(" type=\"audio/mpeg\"/>\n")
             if (daŭro != null && daŭro > 0) {
                 sb.append("      <itunes:duration>%02d:%02d:%02d</itunes:duration>\n".format(daŭro / 3600, (daŭro / 60) % 60, daŭro % 60))

@@ -1,12 +1,12 @@
 ---
 name: servilo-arkivo
-description: Ŝargu ĉi tiun skill-on kiam temas pri la arkiv-servilo de EsperantoRadio — la Kotlin-modulo server/ (arkiv-konstruilo), la publika elŝutejo ĉe javabog.dk, la dispozicio publika/privata, STT-transskriboj kaj AI-rezultoj, aŭ la rulu/publikigu-fluon (rsync).
+description: Ŝargu ĉi tiun skill-on kiam temas pri la arkiv-servilo de EsperantoRadio — la Kotlin-modulo server/ (arkiv-konstruilo), la publika elŝutejo ĉe javabog.dk, la dispozicio publika/privata, STT-transskriboj kaj AI-rezultoj, aŭ la fluon ruli kaj publikigi (rsync).
 ---
 
 # Servilo-arkivo (server/)
 
 Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la enhavo de
-`server/data/publika/` estas served per Apache kiel statikaj dosieroj.
+`server/data/publika/` estas servata de Apache kiel statikaj dosieroj.
 
 ## Publika baz-URL
 
@@ -22,7 +22,7 @@ https://javabog.dk/esperanto-radio/publika/
 server/data/
 ├── publika/     ← PUBLIKU: kanaloj/*.xml + esperantoradio_konfiguro.json
 └── privata/     ← NE publikigu: transkriptoj/, rezumoj/, audio/, modelo/, esr/,
-                   kasxo/, fluoj/, skriptoj/, stato.json, logoj
+                   kaŝo/, fluoj/, skriptoj/, stato.json, logoj
 ```
 
 - **Transskriboj kaj rezumoj estas PRIVATAJ** (ne pretaj / krudaj). La publikaj fluoj
@@ -37,7 +37,7 @@ server/data/
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ./gradlew :server:arkivKonstruilo                      # ĉiuj kanaloj (rete)
 ./gradlew :server:arkivKonstruilo --args="radiovatikana"   # nur unu kanalo
-./gradlew :server:arkivKonstruilo --args="--kasxo"     # el kaŝo, sen reto
+./gradlew :server:arkivKonstruilo --args="--kaŝo"     # el kaŝo, sen reto
 ```
 
 ## STT (provizore Python — modelo de PR #157)
@@ -47,14 +47,14 @@ N_POR_KANALO=10 MAKS_DAURO_MIN=30 WORKERS=4 \
   python3 server/data/privata/skriptoj/stt_chiujn.py   # → privata/transkriptoj/
 ```
 
-Modelos: `server/data/privata/modelo/` (NVIDIA Esperanto-Conformer INT8 ONNX,
+Modelo: `server/data/privata/modelo/` (NVIDIA Esperanto-Conformer INT8 ONNX,
 `OpenVoiceOS/nvidia-eo-conformer-transducer-large-onnx`, CC-BY-4.0), ilo:
 `server/data/privata/esr/` (BitsAndDopamine/Esperanto-SRT, CC0).
 Dosiernom-regulo (sama en Kotlin kaj Python): sanitarigita id (maks 60 signoj) + `_` + md5(id)[:8].
 
 ## Rezultoj (LLM-prilaboro)
 
-Pritaj rezultoj iras en `server/data/privata/rezumoj/<slug>/<dosiernomo>.txt`;
+Pretaj rezultoj iras en `server/data/privata/rezumoj/<slug>/<dosiernomo>.txt`;
 la konstruilo preferas ilin antaŭ la ekstrakta fallback. Se mankas ambaŭ, la ero
 restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
@@ -68,7 +68,7 @@ curl -s https://javabog.dk/esperanto-radio/publika/ | head
 ```
 
 **Prezentpaĝo**: `server/index.html` (+ `server/icon.png`) estas servata kiel
-`https://javabog.dk/esperanto-radio/` — nepremesu, ke la dosieroj havu permesojn 644
+`https://javabog.dk/esperanto-radio/` — ne forgesu, ke la dosieroj havu permesojn 644
 (Apache alie redonas 403).
 
 ## Regula rulado

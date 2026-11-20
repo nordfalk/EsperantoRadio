@@ -1,7 +1,7 @@
 package dk.nordfalk.esperanto.server
 
 /**
- * Generas mallongan rezultoon (4–9 linioj) el priskribo aŭ transskribo.
+ * Generas mallongan resumon (4–9 linioj) el priskribo aŭ transskribo.
  *
  * Fazo 1: ekstrakta rezumo (determinisma, testebla, sen ekstera LLM).
  * Fazo 2 (poste): eta LLM per HTTP — la interfaco jam permesas tion.

@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.server
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import io.ktor.client.HttpClient
@@ -21,7 +22,7 @@ import java.time.Instant
  * Uzo:
  *   ./gradlew :server:arkivKonstruilo                      — ĉiuj kanaloj
  *   ./gradlew :server:arkivKonstruilo --args="radiovatikana" — nur unu kanalo
- *   ./gradlew :server:arkivKonstruilo --args="--kasxo radiovatikana" — el kaŝo (sen reto)
+ *   ./gradlew :server:arkivKonstruilo --args="--kaŝo radiovatikana" — el kaŝo (sen reto)
  */
 object ArkivKonstruilo {
 
@@ -29,14 +30,14 @@ object ArkivKonstruilo {
     private val PUBLIKA = File(RADIKO, "publika")
     private val PRIVATA = File(RADIKO, "privata")
     private val KONFIGO = File("shared/src/commonMain/resources/esperantoradio_konfiguro.json")
-    private const val MAKS_PAGXOJ = 5
+    private const val MAKS_PAĜOJ = 5
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
     @JvmStatic
     fun main(args: Array<String>) {
         val nurTiuj = args.filter { !it.startsWith("--") }.toSet()
-        val uzuKasxon = "--kasxo" in args
+        val uzuKaŝon = "--kaŝo" in args
 
         val kanaloj = KanalAgordoLeganto().legu(KONFIGO.readText()).kanaloj
             .map { it.alKanalo() }
@@ -52,7 +53,7 @@ object ArkivKonstruilo {
 
         for (kanalo in kanaloj) {
             try {
-                val elsendoj = kolektuElsendojn(kanalo, parsilo, http, uzuKasxon)
+                val elsendoj = kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
                 val (priskriboj, transkriptoj) = riĉigu(kanalo, elsendoj)
                 FluSkribilo.skribu(
                     kanalo, elsendoj, priskriboj, transkriptoj,
@@ -66,6 +67,7 @@ object ArkivKonstruilo {
                 println("  ${kanalo.slug}: ${elsendoj.size} elsendoj, ${priskriboj.size} novaj rezultoj -> kanaloj/${kanalo.slug}.xml")
             } catch (e: Exception) {
                 // Regulo A4: unu kanalo ne haltigas la aliajn; regulo A8: neniam silente engluti
+                logw("ArkivKonstruilo", "kanalo ${kanalo.slug} fiaskis", e)
                 novajStatoj[kanalo.slug] = KanalStato(
                     lastaSukceso = stato.kanaloj[kanalo.slug]?.lastaSukceso ?: "",
                     nombroDaElsendoj = stato.kanaloj[kanalo.slug]?.nombroDaElsendoj ?: 0,
@@ -83,26 +85,26 @@ object ArkivKonstruilo {
         println(" preta. Stato: server/data/privata/stato.json")
     }
 
-    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAGXOJ. */
+    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ. */
     private fun kolektuElsendojn(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         parsilo: RssParsilo,
         http: HttpClient,
-        uzuKasxon: Boolean,
+        uzuKaŝon: Boolean,
     ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
-        val kasxo = File(PRIVATA, "kasxo/${kanalo.slug}.xml")
+        val kaŝo = File(PRIVATA, "kaŝo/${kanalo.slug}.xml")
         var fluoUrl = kanalo.podkastaRssUrl!!
-        val cxiuj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        val ĉiuj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
         val konataj = mutableSetOf<String>()
-        var pagxoj = 0
-        while (fluoUrl.isNotBlank() && pagxoj < MAKS_PAGXOJ) {
-            pagxoj++
-            val teksto = if (uzuKasxon && kasxo.isFile) {
-                kasxo.readText()
+        var paĝoj = 0
+        while (fluoUrl.isNotBlank() && paĝoj < MAKS_PAĜOJ) {
+            paĝoj++
+            val teksto = if (uzuKaŝon && kaŝo.isFile) {
+                kaŝo.readText()
             } else {
                 runBlocking {
                     val t = http.get(fluoUrl).bodyAsText()
-                    if (pagxoj == 1) { kasxo.parentFile.mkdirs(); kasxo.writeText(t) }
+                    if (paĝoj == 1) { kaŝo.parentFile.mkdirs(); kaŝo.writeText(t) }
                     t
                 }
             }
@@ -112,12 +114,12 @@ object ArkivKonstruilo {
                 }
             }
             val nekonataj = novaj.takeWhile { it.id !in konataj }
-            if (nekonataj.isEmpty() && pagxoj > 1) break
-            cxiuj.addAll(nekonataj)
+            if (nekonataj.isEmpty() && paĝoj > 1) break
+            ĉiuj.addAll(nekonataj)
             nekonataj.forEach { konataj.add(it.id) }
             fluoUrl = parsilo.leguNextLink(teksto) ?: ""
         }
-        return cxiuj.distinctBy { it.id }.sortedByDescending { it.dato }
+        return ĉiuj.distinctBy { it.id }.sortedByDescending { it.dato }
     }
 
     /**

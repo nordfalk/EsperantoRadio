@@ -65,6 +65,16 @@ data class Alarmo(
 }
 
 /**
+ * (PR #95, regulo A4) Koercas ekstervalorajn kampojn — korupta agordo (ekz. horo=99)
+ * ne rajtas kraŝi la skedadon. Uzata por la sugestoj el la kanalkonfiguro.
+ */
+fun Alarmo.koercita(): Alarmo = copy(
+    horo = horo.coerceIn(0, 23),
+    minuto = minuto.coerceIn(0, 59),
+    ripeto = ripeto and 0x7f,
+)
+
+/**
  * Kalkulas la sekvan lokan tempon (post [nun]) kiam la alarmo ekigu.
  * - ripeto == 0 (unufoje): hodiaŭ se la tempo ankoraŭ ne pasis, alie morgaŭ.
  * - ripeto != 0: la unua tago (hodiaŭ inkluzive) kies bito estas en la bitmasko

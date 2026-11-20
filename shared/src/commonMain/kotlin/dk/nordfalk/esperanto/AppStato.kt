@@ -20,6 +20,7 @@ import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import dk.nordfalk.esperanto.domain.model.koercita
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.LudvicoRegilo
 import dk.nordfalk.esperanto.domain.player.elektuAlarmElsendon
@@ -212,13 +213,7 @@ object AppStato {
 
         // (PR #95, A4) koercu ekstervalorajn horo/minuto/ripeto — malbona kampo en la agordo
         // ne rajtas kraŝi la skedadon
-        val sugestoj = (agordo.sugestoj_por_alarmoj ?: emptyList()).map {
-            it.copy(
-                horo = it.horo.coerceIn(0, 23),
-                minuto = it.minuto.coerceIn(0, 59),
-                ripeto = it.ripeto and 0x7f,
-            )
-        }
+        val sugestoj = (agordo.sugestoj_por_alarmoj ?: emptyList()).map { it.koercita() }
         alarmoDeponejo = PersistaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro

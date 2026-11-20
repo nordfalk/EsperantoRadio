@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.data.config
 
 import dk.nordfalk.esperanto.domain.model.Alarmo
+import dk.nordfalk.esperanto.domain.model.koercita
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
@@ -246,6 +247,16 @@ class KanalAgordoLegantoTest {
         // dua ero: ekstervaloraj kampoj (horo=99, minuto=-5) estas konservitaj krude ĉi tie;
         // la koerco okazas en AppStato (PR #95) — kontrolu nur, ke la valoroj parseblas
         assertEquals(99, agordo.sugestoj_por_alarmoj?.get(1)?.horo)
+    }
+
+    @Test // (PR #95) ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon (regulo A4)
+    fun koercasEkstervalorajnSugestojn() {
+        // horo=99, minuto=-5, ripeto=0x123 (ekster la 7 tago-bitoj)
+        val a = Alarmo(id = 10001, horo = 99, minuto = -5, ripeto = 0x123, kanaloSlug = "muzaiko").koercita()
+
+        assertEquals(23, a.horo)
+        assertEquals(0, a.minuto)
+        assertEquals(0x23, a.ripeto, "ripeto devas esti maskita al la 7 tago-bitoj (0x123 & 0x7f = 0x23 = Lu+Ma+Sa)")
     }
 
     @Test

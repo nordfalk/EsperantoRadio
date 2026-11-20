@@ -11,6 +11,7 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
 import io.ktor.client.*
 import io.ktor.client.plugins.expectSuccess
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.sentry.kotlin.multiplatform.Sentry
@@ -27,6 +28,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
+
+/** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
+private const val ARKIVA_PETO_TEMROLIMITO_MS = 10_000L
 
 /**
  * ElsendoDeponejo-implentaĵo. Elŝutas RSS-fluojn per Ktor, parsas per RssParsilo,
@@ -193,18 +197,31 @@ open class ElsendoDeponejoImpl(
     }
 
     private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, url: String): List<Elsendo> {
+        // Arkiva fluo de nia servilo = ne la originala RSS-URL de la kanalo
+        val deArkivo = url != kanalo.podkastaRssUrl
         logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
         if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
         // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu provos la
         // sekvan fonton. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
         // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
-        // leguKorponLimigite (G45): korpo pli granda ol 1 MB ne estas legata en la
+        // leguKorponLimigite (G45): korpo pli granda ol la limo ne estas legata en la
         // memoron — misdirektita respondo (MP3 anstataŭ fluo) kaŭzis OutOfMemoryError.
-        val respondo = httpKliento.get(url) { expectSuccess = true }.leguKorponLimigite()
+        // Niaj arkivaj fluoj povas esti pli grandaj ol 1 MB (profunda historio, ekz.
+        // peranto.xml ≈ 4,5 MB) — por ili ni permesas pli, ĉar ni regas la servilon.
+        val limo = if (deArkivo) 8L * 1024 * 1024 else MAKSIMUMA_FLUA_GRANDECO_BITOKOJ
+        val respondo = httpKliento.get(url) {
+            expectSuccess = true
+            if (deArkivo) {
+                // La arkivo estas nur optimumigo SUPER la originala fluo — ĝi neniam
+                // rajtas bloki horloĝon/alarman ŝargon: post 10 s ni falos al la
+                // originala fonto (la arkivo estos provita denove je la sekva ŝargo).
+                timeout { requestTimeoutMillis = ARKIVA_PETO_TEMROLIMITO_MS }
+            }
+        }.leguKorponLimigite(limo)
         kontroluFluecon(respondo)
         logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
         skribuKaŝon(kanalo.slug, respondo)
-        val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = (url != kanalo.podkastaRssUrl), httpKliento = arhivaPeto)
+        val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = deArkivo, httpKliento = arhivaPeto)
             .ordigitajPlejFreŝajUnue()
         logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
         konservu(kanalo.slug, elsendoj)

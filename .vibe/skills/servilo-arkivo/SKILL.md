@@ -61,8 +61,9 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 ## Publikigi (rsync)
 
 ```bash
-rsync -avz server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/publika/
-rsync -avz --chmod=644 server/index.html server/icon.png javabog.dk:javabog.dk/esperanto-radio/
+rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/publika/
+rsync -avz --chmod=D755,F644 server/index.html server/icon.png javabog.dk:javabog.dk/esperanto-radio/
+# ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:
 curl -s https://javabog.dk/esperanto-radio/publika/ | head
 ```

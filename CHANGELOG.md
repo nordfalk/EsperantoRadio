@@ -27,6 +27,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kiam la ludilo transsaltas la enkondukon de kanalo, aperas mallonga sciigo; klako klarigas ĝin kaj „Bone“ kaŝas ĝin estonte. Nova agordo „Transsalti enkondukon“ (https://github.com/nordfalk/EsperantoRadio/pull/144)
 ### Ŝanĝita
 
+- La arkiv-servilo nun publikiĝas rekte en la radiko https://javabog.dk/esperanto-radio/ (konfiguro kaj kanaloj/ sen „publika/“; prezentpaĝo index.html) (https://github.com/nordfalk/EsperantoRadio/pull/179)
 - La publikigita kanalkonfiguro ĉe javabog.dk/esperanto-radio estas nun strikta JSON (sen komentoj); la alarm-sugestoj estas en la sama JSON-formato kiel la alarmoj de la uzanto — po objekto kun id/horo/minuto/ripeto/kanaloSlug (https://github.com/nordfalk/EsperantoRadio/pull/178)
 - La eldona APK estas nun kod-minigita (R8) — signife pli malgranda elŝuto: ĉ. 7,5 MB anstataŭ ĉ. 21 MB (https://github.com/nordfalk/EsperantoRadio/pull/175)
 - Kanala ekrano: la cip-butonoj montras la verajn retejon kaj retpoŝtadreson anstataŭ la fiksajn tekstojn „Retejo“ kaj „Retpoŝto“ (https://github.com/nordfalk/EsperantoRadio/pull/173)

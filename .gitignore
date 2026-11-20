@@ -67,5 +67,10 @@ ekranfoto.svg
 
 __pycache__/
 
-# Generita arkivo de la servilo (RSS, kaŝo, transskriptoj, stato)
-server/data/
+# Generita arkivo de la servilo (RSS, kaŝo, transskriptoj, stato) — ignorata,
+# krom la prezentpaĝo kaj emblemo de la publika retejo (publika/ = radiko de javabog.dk/esperanto-radio)
+server/data/*
+!server/data/publika/
+server/data/publika/*
+!server/data/publika/index.html
+!server/data/publika/icon.png

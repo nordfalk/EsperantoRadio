@@ -11,9 +11,10 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 ## Publika baz-URL
 
 ```
-https://javabog.dk/esperanto-radio/publika/
-├── esperantoradio_konfiguro.json      (kopiita aŭtomate je ĉiu rulo)
-└── kanaloj/<slug>.xml                 (28 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
+https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
+├── index.html + icon.png                (prezentpaĝo, versioblaj en git)
+├── esperantoradio_konfiguro.json        (purigita, strikta JSON; kopiiĝas je ĉiu rulo)
+└── kanaloj/<slug>.xml                   (28 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
 ```
 
 ## Dispozicio
@@ -61,16 +62,16 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 ## Publikigi (rsync)
 
 ```bash
-rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/publika/
-rsync -avz --chmod=D755,F644 server/index.html server/icon.png javabog.dk:javabog.dk/esperanto-radio/
+# unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)
+rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
 # ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:
-curl -s https://javabog.dk/esperanto-radio/publika/ | head
+curl -s https://javabog.dk/esperanto-radio/kanaloj/ | head -3
 ```
 
-**Prezentpaĝo**: `server/index.html` (+ `server/icon.png`) estas servata kiel
-`https://javabog.dk/esperanto-radio/` — ne forgesu, ke la dosieroj havu permesojn 644
-(Apache alie redonas 403).
+**Prezentpaĝo**: `server/data/publika/index.html` (+ `icon.png`) estas servata kiel
+`https://javabog.dk/esperanto-radio/` — ili estas versioblaj en git (escepto en .gitignore);
+ne forgesu `--chmod=D755,F644` (alie Apache redonas 403).
 
 ## Regula rulado
 

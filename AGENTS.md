@@ -40,7 +40,7 @@ Rekrei la apot en **Compose Multiplatform** (Android + iOS + Desktop + Web/Wasm)
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) ankoraŭ ne estas kreita — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto restas estonta. **`server/` jam ekzistas** (fazo 1: Kotlin-arkiv-konstruilo, publika elŝutejo ĉe `https://javabog.dk/esperanto-radio/publika/` — vidu la skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`).
+- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) ankoraŭ ne estas kreita — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto restas estonta. **`server/` jam ekzistas** (fazo 1: Kotlin-arkiv-konstruilo, publika elŝutejo ĉe `https://javabog.dk/esperanto-radio/` — vidu la skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`).
 
 ## Dosierujo-structuro
 

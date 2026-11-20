@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
+import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import kotlinx.serialization.builtins.ListSerializer
@@ -58,7 +59,7 @@ internal fun leguPersistitajnAlarmojn(): List<Alarmo> {
     return try {
         Json { ignoreUnknownKeys = true }.decodeFromString(ListSerializer(Alarmo.serializer()), str)
     } catch (e: Exception) {
-        logw("BootReceivilo", "Korupta alarma JSON — komencas sen persistitaj alarmoj", e)
+        loge("BootReceivilo", "Korupta alarma JSON — komencas sen persistitaj alarmoj", e)
         emptyList()
     }
 }

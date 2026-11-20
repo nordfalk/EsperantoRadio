@@ -2,7 +2,7 @@ package dk.nordfalk.esperanto.domain.player
 
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
-import dk.nordfalk.esperanto.logw
+import dk.nordfalk.esperanto.loge
 import kotlinx.serialization.json.Json
 
 /**
@@ -47,7 +47,7 @@ object SonfontoKodilo {
         return try {
             json.decodeFromString(Sonfonto.serializer(), teksto)
         } catch (e: Exception) {
-            logw("SonfontoKodilo", "Ne povis malkodigi Sonfonton", e)
+            loge("SonfontoKodilo", "Ne povis malkodigi la paktitan Sonfonton", e)
             null
         }
     }

@@ -10,13 +10,13 @@ class RezumoHtmlTest {
     private val averto = "Rezumo farita de la sondosiero per AI. Eraroj povas okazi"
 
     @Test
-    fun platajLiniojIgxasParagrafoKunBr() {
+    fun platajLiniojIĝasParagrafoKunBr() {
         val html = rezumoAlHtml(listOf("Unua punkto.", "Dua punkto.", "", averto), averto)
         assertEquals("<p>Unua punkto.<br/>Dua punkto.</p>\n<p><em>${averto}</em></p>", html)
     }
 
     @Test
-    fun bulitajLiniojIgxasUlLi() {
+    fun bulitajLiniojIĝasUlLi() {
         val html = rezumoAlHtml(listOf("• unua", "- dua", "• tria"), averto)
         assertEquals("<ul>\n<li>unua</li>\n<li>dua</li>\n<li>tria</li>\n</ul>", html)
     }
@@ -70,9 +70,9 @@ class RezumoHtmlTest {
     @Test
     fun longaLinioTranĉiĝasĈeLimoKajFinaPunktuacioForiĝas() {
         val titolo = derivuTitolon(
-            "Post sia apostola vojaĝo al Urugvaj, Argentino kaj Peruo (6.–16.11.), papo Leono rakontis pri la tri landoj kaj iliaj eklezioj kaj multe pli da teksto sekvas ĉi tie",
+            "Post sia apostola vojaĝo al Urugvajo, Argentino kaj Peruo (6.–16.11.), papo Leono rakontis pri la tri landoj kaj iliaj eklezioj kaj multe pli da teksto sekvas ĉi tie",
             "Esperanto Programo 18.11.2026"
         )
-        assertEquals("Post sia apostola vojaĝo al Urugvaj, Argentino kaj Peruo (6.–16.11.)", titolo)
+        assertEquals("Post sia apostola vojaĝo al Urugvajo, Argentino kaj Peruo (6.–16.11.)", titolo)
     }
 }

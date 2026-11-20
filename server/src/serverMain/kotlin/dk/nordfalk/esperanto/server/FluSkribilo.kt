@@ -70,7 +70,7 @@ object FluSkribilo {
         return try {
             val p = dato.split("-")
             val loka = java.time.LocalDate.of(p[0].toInt(), p[1].toInt(), p[2].toInt())
-            // RFC-822 stilo: "Wed, 18 Nov 2026 …" (ne GRANDlitere — kelkaj parsiloj
+            // RFC-822 stilo: "Wed, 18 Nov 2026 …" (ne grandlitere — kelkaj parsiloj
             // distingas la monaton laŭ uskleco)
             val tago = loka.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH)
                 .replace(".", "")

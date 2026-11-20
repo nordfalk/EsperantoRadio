@@ -552,7 +552,7 @@ class RssParsilo(
         }
         val korektita = datStr.replace(Regex("(\\+\\d{2}):(\\d{2})$"), "$1$2")
         // Malgrandaj ŝlosiloj: kelkaj fluoj (ankaŭ nia arkiva servilo iam) skribas la
-        // monaton per GRANDaj literoj ("18 NOV 2026") — la serĉo do estas usklec-sensiva
+        // monaton per grandaj literoj ("18 NOV 2026") — la serĉo do estas usklec-sensiva
         val monatoj = mapOf(
             "jan" to "01", "feb" to "02", "mar" to "03", "apr" to "04",
             "may" to "05", "jun" to "06", "jul" to "07", "aug" to "08",

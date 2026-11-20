@@ -120,7 +120,7 @@ open class ElsendoDeponejoImpl(
      * unu in-flight [Deferred] kaj do unu HTTP-peton.
      */
     open suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
-        // Arkivo unue (riĉigitaj fluoj kun AI-rezultoj), originala fluo kiel rezervo (FAROTA: arkivo-first).
+        // Arkivo unue (riĉigitaj fluoj kun AI-rezultoj), originala fluo kiel rezervo (FAROTA: arkivo-unue).
         val urls = buildList {
             arkivoBazoUrl?.let { add(it.trimEnd('/') + "/" + kanalo.slug + ".xml") }
             kanalo.podkastaRssUrl?.let { add(it) }

@@ -6,7 +6,7 @@ package dk.nordfalk.esperanto.data.parser
  * (kiu montras `priskriboHtml`; plata teksto kun `\n` kolapsus al unu bloko).
  *
  * Enigo (la rezumo-kaŝo de la servilo, plata teksto):
- * - nedeviga unua linio `Titolo: …` — titolo por la elsendo (forigita el la priskribo);
+ * - nedeviga unua linio `Titolo: …` — titolo de la elsendo (forigita el la priskribo);
  * - linioj = punktoj; linioj komenciĝantaj per `•`/`-`/`*` iĝas `<li>`-oj;
  * - la lasta bloko estu la AI-averta frazo (iĝas `<em>`).
  *
@@ -30,8 +30,8 @@ private const val MAKS_TITOLO_LONGO = 70
 private const val MIN_TITOLO_LONGO = 8
 
 /**
- * Analizias platan rezumon: elprenas la titolon (`Titolo:`-linio aŭ derivita el
- * la unua punkto ĉe data originala titolo) kaj konvertas la korpon al HTML.
+ * Analizias platan rezumon: elprenas la titolon (`Titolo:`-linio, aŭ derivita el
+ * la unua punkto se la originala titolo enhavas daton) kaj konvertas la korpon al HTML.
  */
 fun analizuRezumon(rezumoKruda: String, originalaTitolo: String, avertaFrazo: String): RezumoAnalizita {
     val linioj = rezumoKruda.lines().map { it.trim() }
@@ -51,7 +51,7 @@ fun analizuRezumon(rezumoKruda: String, originalaTitolo: String, avertaFrazo: St
 
 /**
  * Plata rezumo (linioj, blokoj apartigitaj per malplenaj linioj) → HTML:
- * - bloko nur el bul-literoj → `<ul><li>…</li></ul>`;
+ * - bloko nur el bulmarkitaj linioj → `<ul><li>…</li></ul>`;
  * - la averta frazo sola → `<p><em>…</em></p>`;
  * - alie → `<p>` kun linioj kunigitaj per `<br/>`.
  * HTML-specialaj signoj estas eskapitaj.

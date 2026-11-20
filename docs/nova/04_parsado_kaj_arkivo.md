@@ -203,7 +203,7 @@ por ĉiu fiksaĵo, asertas:
 | Titol-derivado | Por `ignoruTitolon`-kanal: titolo = priskribo sen HTML, ≤ 200 signoj |
 | radio.txt | "Pola Retradio" → kanal `polaretradio`, id `polaretradio:<dato>`; nekonata nomo → nova kanal |
 | Dat-normigo | `pubDate "… +02:00"` → `yyyy-MM-dd` ĝuste |
-| Parsi `radiovatikana-arkivo.xml` (fluo de nia servilo, `deArkivo=true`) | 3 elsendoj; id komenciĝas per `radiovatikana:`; daŭro `00:07:59` → 479; priskribo enhavas la AI-averton; GRANDLITERA dato (`18 NOV 2026`) funkcias |
+| Parsi `radiovatikana-arkivo.xml` (fluo de nia servilo, `deArkivo=true`) | 3 elsendoj; id komenciĝas per `radiovatikana:`; daŭro `00:07:59` → 479; titolo estas la derivita temo (ne la dat-titolo); priskribo estas HTML (`<p>`, `<em>`-averto) |
 
 La datentavolo devas ruli en **pura `commonTest`** — neniom Android, neniom reto.
 

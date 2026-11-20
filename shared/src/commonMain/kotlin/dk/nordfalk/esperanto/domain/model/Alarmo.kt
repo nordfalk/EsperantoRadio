@@ -73,7 +73,7 @@ data class Alarmo(
 fun Alarmo.sekvaEkigo(nun: LocalDateTime): LocalDateTime {
     // (PR #95) koercu — korupta agordo (ekz. horo=99 el mana JSON-redakto) devas
     // ne kraŝi la skedadon (LocalTime ĵetas IllegalArgumentException). La validigo
-    // de NOVAJ alarmoj okazas en parsuSugestojnPorAlarmoj kaj AlarmoEkrano; tio ĉi
+    // de NOVAJ alarmoj okazas en AppStato kaj AlarmoEkrano; tio ĉi
     // estas la kraŝo-defendo por jam persistintaj valoroj.
     val tempo = LocalTime(horo.coerceIn(0, 23), minuto.coerceIn(0, 59))
     val sekuraRipeto = ripeto and 0x7f

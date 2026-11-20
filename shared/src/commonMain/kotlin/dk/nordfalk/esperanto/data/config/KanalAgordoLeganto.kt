@@ -6,8 +6,6 @@ import kotlinx.serialization.SerialName
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.Alarmo
 import dk.nordfalk.esperanto.domain.model.TranssaltaValoroLaŭDato
-import dk.nordfalk.esperanto.loge
-import dk.nordfalk.esperanto.logw
 
 /**
  * Legas la kanalkonfiguron (JSON kun komentoj — JSONC).
@@ -41,13 +39,13 @@ class KanalAgordoLeganto {
      * plurliniajn ĉenojn. Komentoj ene de teksta ĉeno (ekz. en URL
      * `"https://…"`) ne estas tuŝataj.
      *
-     * La JSONC-dosiero enhavas `//`- kaj `/* */`-komentojn kaj plurliniajn
-     * ĉenojn kun `\` ĉe lini-fino (ekz. `sugestoj_por_alarmoj`). Ni striptigas
-     * komentojn kaj traktas `\` + linisalton kiel lin-daŭrigon (forigu ambaŭ).
+     * La JSONC-dosiero enhavas `//`- kaj `/* */`-komentojn kaj povas enhavi
+     * plurliniajn ĉenojn kun `\` ĉe lini-fino. Ni striptigas komentojn kaj
+     * traktas `\` + linisalton kiel lin-daŭrigon (forigu ambaŭ).
      * Nefinita blokkomento (`/*` sen `*/`) estas striptita ĝis la fino (milda,
      * kongrue kun `isLenient`).
      */
-    private fun striptiguKomentojn(teksto: String): String {
+    fun striptiguKomentojn(teksto: String): String {
         val sb = StringBuilder(teksto.length)
         var i = 0
         var enĈeno = false
@@ -107,7 +105,7 @@ data class KanalAgordo(
     val elsendojUrl: String? = null,
     val hejmpaĝo: String? = null,
     val kanaloj: List<KanaloDto> = emptyList(),
-    val sugestoj_por_alarmoj: String? = null,
+    val sugestoj_por_alarmoj: List<Alarmo>? = null,
 ) {
     @Serializable
     data class AndroidSekcio(
@@ -171,124 +169,3 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     transsaltuKomenceSekundojn = transsaltuKomenceSekundojn.map { it.alValoro() },
     defaŭltŜatata = defaŭltŜatata,
 )
-
-/**
- * Parsas sugestoj_por_alarmoj el la JSONC-konfiguro.
- *
- * Formato: `ID/aktiva/horo/minuto/ripeto/tempo/=kanalo/=etikedo/`
- * kun `\` ĉe lini-fino por lin-daŭrigo (striptigita de KanalAgordoLeganto).
- * `+` = spaco, `%0A` = lini-rompo, `=` prefikso por kanalo kaj etikedo.
- *
- * Post JSONC-striptigo ĉiuj sugestoj estas sur unu linio, apartigitaj per `/`.
- * Ĉiu alarmo konsistas el 8 partoj + fina `/` (9 elementoj per disigo).
- */
-fun parsuSugestojnPorAlarmoj(teksto: String): List<Alarmo> {
-    val partoj = teksto.split("/")
-    val rezulto = mutableListOf<Alarmo>()
-    var i = 0
-    while (i + 7 < partoj.size) {
-        try {
-            val id = partoj[i].toInt()
-            val aktiva = partoj[i + 1] == "1"
-            // (PR #95) koercu — ekstervalora horo/minuto/ripeto el la agordo devas
-            // ne kraŝi la skedadon (LocalTime/sekvaEkigo); ni ne ĵetas la tutan sugeston
-            // pro unu malbona kampo (regulo A4 — toleremo al putrantaj fontoj)
-            val horo = partoj[i + 2].toInt().coerceIn(0, 23)
-            val minuto = partoj[i + 3].toInt().coerceIn(0, 59)
-            // ripeto: MASKU al la 7 tago-bitoj (ne limigu al 0x7f = ĉiutage) —
-            // tiel la semantiko kongruas kun sekvaEkigo kaj konservas la intencitajn tagojn
-            val ripeto = partoj[i + 4].toInt() and 0x7f
-            // partoj[i + 5] = tempo (malnova, ne uzata)
-            val kanaloSlug = partoj[i + 6].removePrefix("=")
-            val etikedo = malkoduUrlKoditaĵon(partoj[i + 7].removePrefix("="))
-            rezulto.add(Alarmo(
-                id = id,
-                horo = horo,
-                minuto = minuto,
-                ripeto = ripeto,
-                kanaloSlug = kanaloSlug,
-                aktiva = aktiva,
-                etikedo = etikedo.ifBlank { null }
-            ))
-        } catch (e: Exception) {
-            loge("AlarmoSugestoj", "Ne eblis parsii alarmon ĉe indekso $i (eraro en paktita agordo)", e)
-        }
-        i += 8
-    }
-    return rezulto
-}
-
-/**
- * Malkodas URL-koditan tekston: `+` → spaco, `%XX` → UTF-8-signo.
- *
- * Anstataŭas la antaŭan permanan supersignan tabelon, kiu estis erara:
- * `%C4%A5` estas **ĥ** (ne ĵ), `%C5%9C` estas **Ŝ** (ne ŝ), `%C5%AC` estas **Ŭ**
- * (ne Ŝ) — kaj `ĝ`, `ĵ`, `ŝ`, `Ĥ` tute mankis (PR #89).
- * Jam-malkoditaj signoj (kodo > 127) estas trairataj senŝanĝe.
- */
-internal fun malkoduUrlKoditaĵon(teksto: String): String {
-    val rezulto = StringBuilder()
-    val bitokoj = mutableListOf<Int>()
-    fun elfluigu() {
-        if (bitokoj.isNotEmpty()) {
-            rezulto.append(malkoduUtf8(bitokoj))
-            bitokoj.clear()
-        }
-    }
-    var i = 0
-    while (i < teksto.length) {
-        val c = teksto[i]
-        when {
-            c == '+' -> { elfluigu(); rezulto.append(' '); i++ }
-            c == '%' && i + 2 < teksto.length -> {
-                val alta = hexCifero(teksto[i + 1])
-                val malalta = hexCifero(teksto[i + 2])
-                if (alta != null && malalta != null) {
-                    bitokoj.add((alta shl 4) or malalta)
-                    i += 3
-                } else {
-                    elfluigu(); rezulto.append(c); i++
-                }
-            }
-            else -> { elfluigu(); rezulto.append(c); i++ }
-        }
-    }
-    elfluigu()
-    return rezulto.toString()
-}
-
-/** Heksa cifero → valoro 0-15, aŭ null se ne heksa. */
-private fun hexCifero(c: Char): Int? = when (c) {
-    in '0'..'9' -> c - '0'
-    in 'a'..'f' -> c - 'a' + 10
-    in 'A'..'F' -> c - 'A' + 10
-    else -> null
-}
-
-/** Malkodas UTF-8-bitokosekvencon al signoĉeno (subtenas 1-4-bitokajn signojn). */
-private fun malkoduUtf8(bitokoj: List<Int>): String {
-    val sb = StringBuilder()
-    var i = 0
-    while (i < bitokoj.size) {
-        val b = bitokoj[i]
-        when {
-            b < 0x80 -> { sb.append(b.toChar()); i += 1 }
-            b and 0xE0 == 0xC0 && i + 1 < bitokoj.size -> {
-                sb.append((((b and 0x1F) shl 6) or (bitokoj[i + 1] and 0x3F)).toChar()); i += 2
-            }
-            b and 0xF0 == 0xE0 && i + 2 < bitokoj.size -> {
-                sb.append((((b and 0x0F) shl 12) or ((bitokoj[i + 1] and 0x3F) shl 6) or (bitokoj[i + 2] and 0x3F)).toChar()); i += 3
-            }
-            b and 0xF8 == 0xF0 && i + 3 < bitokoj.size -> {
-                val kodo = ((b and 0x07) shl 18) or ((bitokoj[i + 1] and 0x3F) shl 12) or
-                    ((bitokoj[i + 2] and 0x3F) shl 6) or (bitokoj[i + 3] and 0x3F)
-                val m = kodo - 0x10000
-                sb.append((0xD800 + (m shr 10)).toChar())
-                sb.append((0xDC00 + (m and 0x3FF)).toChar())
-                i += 4
-            }
-            else -> { sb.append('\uFFFD'); i += 1 }
-        }
-    }
-    return sb.toString()
-}

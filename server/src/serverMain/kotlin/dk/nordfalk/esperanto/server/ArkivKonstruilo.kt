@@ -77,8 +77,11 @@ object ArkivKonstruilo {
             }
         }
 
-        // la kanalkonfiguro estas publika: la apo elŝutas ĝin de la sama servilo
-        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(KONFIGO.readText())
+        // la kanalkonfiguro estas publika: la apo elŝutas ĝin de la sama servilo.
+        // Publikiĝas PURIGITA versio (sen JSONC-komentoj) — tiel striktaj JSON-legiloj
+        // (ankaŭ eksteraj) povas legi ĝin rekte.
+        val leganto = KanalAgordoLeganto()
+        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(leganto.striptiguKomentojn(KONFIGO.readText()))
         stato = stato.copy(lastaRulo = Instant.now().toString(), kanaloj = novajStatoj)
         StatoLeganto.skribu(File(PRIVATA, "stato.json"), stato)
         http.close()

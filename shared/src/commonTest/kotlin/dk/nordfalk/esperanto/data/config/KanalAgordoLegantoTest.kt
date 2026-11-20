@@ -1,5 +1,8 @@
 package dk.nordfalk.esperanto.data.config
 
+import dk.nordfalk.esperanto.domain.model.Alarmo
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -23,10 +26,10 @@ class KanalAgordoLegantoTest {
                         "elsendojRssIgnoruTitolon": true
                     }
                 ],
-                "sugestoj_por_alarmoj":
-                "10000/0/6/45/31/0/=muzaiko/=Muzaiko+matene/\
-                10001/0/10/0/96/0/=muzaiko/=Semajnfine/\
-                "
+                "sugestoj_por_alarmoj": [
+                    { "id": 10000, "horo": 6, "minuto": 45, "ripeto": 31, "kanaloSlug": "muzaiko", "aktiva": false, "etikedo": "Muzaiko matene" },
+                    { "id": 10001, "horo": 10, "minuto": 0, "ripeto": 96, "kanaloSlug": "muzaiko", "aktiva": false }
+                ]
             }
         """.trimIndent()
 
@@ -37,6 +40,11 @@ class KanalAgordoLegantoTest {
         assertEquals("Muzaiko", agordo.kanaloj[0].nomo)
         assertEquals("https://ekzemplo.com/feed/", agordo.kanaloj[0].elsendojRssUrl)
         assertTrue(agordo.kanaloj[0].elsendojRssIgnoruTitolon)
+        // sugestoj estas nun List<Alarmo> — sama formato kiel la persistitaj alarmoj
+        assertEquals(2, agordo.sugestoj_por_alarmoj?.size)
+        assertEquals("Muzaiko matene", agordo.sugestoj_por_alarmoj?.get(0)?.etikedo)
+        assertEquals(31, agordo.sugestoj_por_alarmoj?.get(0)?.ripeto)
+        assertEquals(null, agordo.sugestoj_por_alarmoj?.get(1)?.etikedo)
     }
 
     @Test // (FAROTA C8) blokkomentoj /* */ estas striptitaj kiel //-komentoj
@@ -212,57 +220,32 @@ class KanalAgordoLegantoTest {
         assertTrue(agordo.kanaloj.isEmpty())
     }
 
-    // === (PR #89) — ĝusta percent-malkodado de supersignoj ===
+    // === sugestoj_por_alarmoj: nun List<Alarmo>, sama JSON-formato kiel la persistitaj alarmoj ===
 
     @Test
-    fun malkoduUrlKoditaĵonĈiujSupersignoj() {
-        // %C4%A5 = ĥ (la malnova tabelo erare mapis ĝin al ĵ),
-        // %C5%9C = Ŝ (ne ŝ), %C5%AC = Ŭ (ne Ŝ — kaj la linio aperis dufoje)
-        assertEquals(
-            "ĈĉĜĝĤĥĴĵŜŝŬŭ",
-            malkoduUrlKoditaĵon("%C4%88%C4%89%C4%9C%C4%9D%C4%A4%C4%A5%C4%B4%C4%B5%C5%9C%C5%9D%C5%AC%C5%AD")
+    fun sugestojRoundTripKielAlarmoJson() {
+        // La sama Json-agordo kiel en PersistaAlarmoDeponejo (defaults ne enkodataj)
+        val json = Json { ignoreUnknownKeys = true }
+        val originalaj = listOf(
+            Alarmo(
+                id = 10000, horo = 6, minuto = 45, ripeto = 31,
+                kanaloSlug = "muzaiko", aktiva = false, etikedo = "Matena ĥoro de Ŭato"
+            ),
+            Alarmo(
+                id = 10001, horo = 99, minuto = -5, ripeto = 0x123, kanaloSlug = "muzaiko", aktiva = true
+            ),
         )
-    }
+        val kodita = json.encodeToString(ListSerializer(Alarmo.serializer()), originalaj)
+        val jsonc = """{ "sugestoj_por_alarmoj": $kodita }"""
 
-    @Test
-    fun malkoduUrlKoditaĵonPlusKajLinisalto() {
-        assertEquals("Muzaiko matene\nlabortago", malkoduUrlKoditaĵon("Muzaiko+matene%0Alabortago"))
-        // Jam-malkoditaj signoj estas trairataj senŝanĝe
-        assertEquals("Ĥoro Ŭato", malkoduUrlKoditaĵon("Ĥoro Ŭato"))
-        // Ne-heksa %-sekvenco restas senŝanĝe
-        assertEquals("100% certa", malkoduUrlKoditaĵon("100%+certa"))
-        // %25 = %
-        assertEquals("100%", malkoduUrlKoditaĵon("100%25"))
-    }
+        val agordo = leganto.legu(jsonc)
 
-    @Test
-    fun malkoduUrlKoditaĵonKun4BitokaSigno() {
-        // U+1F600 (F0 9F 98 80) — la malkodilo subtenas 4-bitokajn UTF-8-signojn
-        assertEquals("😀", malkoduUrlKoditaĵon("%F0%9F%98%80"))
-    }
-
-    @Test
-    fun parsuSugestojnPorAlarmojKunSupersignoj() {
-        val sugestoj = "10000/0/6/45/31/0/=muzaiko/=Matena+%C4%A5oro+de+%C5%ACato/"
-
-        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
-
-        assertEquals(1, alarmoj.size)
-        assertEquals("Matena ĥoro de Ŭato", alarmoj[0].etikedo)
-        assertEquals("muzaiko", alarmoj[0].kanaloSlug)
-    }
-
-    @Test // (PR #95) ekstervalora horo/minuto/ripeto el la agordo ne rajtas kraŝi la skedadon
-    fun koercasEkstervalorajnSugestojn() {
-        // horo=99, minuto=-5, ripeto=0x123 (ekster la 7 tago-bitoj)
-        val sugestoj = "10001/1/99/-5/291/0/=muzaiko/=Testa/"
-
-        val alarmoj = parsuSugestojnPorAlarmoj(sugestoj)
-
-        assertEquals(1, alarmoj.size, "Unu malbona kampo ne devas forĵeti la sugeston (regulo A4)")
-        assertEquals(23, alarmoj[0].horo)
-        assertEquals(0, alarmoj[0].minuto)
-        assertEquals(0x23, alarmoj[0].ripeto, "ripeto devas esti maskita al la 7 tago-bitoj (0x123 & 0x7f = 0x23 = Lu+Ma+Sa)")
+        assertEquals(2, agordo.sugestoj_por_alarmoj?.size)
+        assertEquals("Matena ĥoro de Ŭato", agordo.sugestoj_por_alarmoj?.get(0)?.etikedo)
+        assertEquals(31, agordo.sugestoj_por_alarmoj?.get(0)?.ripeto)
+        // dua ero: ekstervaloraj kampoj (horo=99, minuto=-5) estas konservitaj krude ĉi tie;
+        // la koerco okazas en AppStato (PR #95) — kontrolu nur, ke la valoroj parseblas
+        assertEquals(99, agordo.sugestoj_por_alarmoj?.get(1)?.horo)
     }
 
     @Test

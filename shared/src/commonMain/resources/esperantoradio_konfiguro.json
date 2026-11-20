@@ -7,13 +7,13 @@
 		"prizorgantaRetpoŝto": "jacob.nordfalk@proton.me"
 	},
 
-	"sugestoj_por_alarmoj":
-"10000/0/6/45/31/0/=muzaiko/=/\
-10001/0/10/0/96/0/=muzaiko/=/\
-10002/0/17/0/127/0/=peranto/=/\
-10003/0/16/0/68/0/=polaretradio/=/\
-10003/0/21/0/8/0/=radiovatikana/=/\
-",
+	"sugestoj_por_alarmoj": [
+		{ "id": 10000, "horo": 6, "minuto": 45, "ripeto": 31, "kanaloSlug": "muzaiko" },
+		{ "id": 10001, "horo": 10, "minuto": 0, "ripeto": 96, "kanaloSlug": "muzaiko" },
+		{ "id": 10002, "horo": 17, "minuto": 0, "ripeto": 127, "kanaloSlug": "peranto" },
+		{ "id": 10003, "horo": 16, "minuto": 0, "ripeto": 68, "kanaloSlug": "polaretradio" },
+		{ "id": 10003, "horo": 21, "minuto": 0, "ripeto": 8, "kanaloSlug": "radiovatikana" }
+	],
 
 	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 	"elsendojUrl": "https://esperanto-radio.com/radio.txt",

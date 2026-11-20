@@ -2,7 +2,6 @@ package dk.nordfalk.esperanto
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
-import dk.nordfalk.esperanto.data.config.parsuSugestojnPorAlarmoj
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKaŝo
@@ -211,7 +210,15 @@ object AppStato {
 
         elŝutDeponejo = kreuElŝutDeponejo(httpKliento!!)
 
-        val sugestoj = agordo.sugestoj_por_alarmoj?.let { parsuSugestojnPorAlarmoj(it) } ?: emptyList()
+        // (PR #95, A4) koercu ekstervalorajn horo/minuto/ripeto — malbona kampo en la agordo
+        // ne rajtas kraŝi la skedadon
+        val sugestoj = (agordo.sugestoj_por_alarmoj ?: emptyList()).map {
+            it.copy(
+                horo = it.horo.coerceIn(0, 23),
+                minuto = it.minuto.coerceIn(0, 59),
+                ripeto = it.ripeto and 0x7f,
+            )
+        }
         alarmoDeponejo = PersistaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro

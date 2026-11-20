@@ -66,6 +66,16 @@ Pretaj rezultoj iras en `server/data/privata/rezumoj/<slug>/<dosiernomo>.txt`;
 la konstruilo preferas ilin antaŭ la ekstrakta fallback. Se mankas ambaŭ, la ero
 restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
+**Formato de la rezumo-dosiero** (plata teksto):
+- nedeviga unua linio `Titolo: …` — anstataŭas la titolon de la elsendo en la publika fluo;
+- poste unu punkto po linio (linioj kun `•`/`-`-bulmarkoj iĝas `<ul><li>`);
+- la konstruilo aldonas la AI-averton kaj konvertas ĉion al HTML (`<p>`, `<ul>`, `<em>`),
+  tiel la rezulto estas legebla en la detala ekrano same kiel la priskriboj de aliaj
+  elsendoj. Se mankas `Titolo:` kaj la originala titolo enhavas daton (ripetiĝanta
+  titolo, ekz. „Esperanto Programo 18.11.2026“), la titolo estas derivita el la unua
+  punkto de la rezumo — vidu `analizuRezumon`/`derivuTitolon` en
+  `shared/.../data/parser/RezumoHtml.kt` (kun testoj en `RezumoHtmlTest`).
+
 ## Publikigi (rsync)
 
 ```bash

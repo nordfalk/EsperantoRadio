@@ -38,10 +38,14 @@ class RssParsiloTest {
         val unua = elsendoj.first()
         // nia servilo skribas la finan id-on kiel guid kun prefikso "slug:" — deArkivo konservas ĝin
         assertTrue(unua.id.startsWith("radiovatikana:"), "id: ${unua.id}")
-        assertTrue(unua.titolo.startsWith("Esperanto Programo"), unua.titolo)
+        // la servilo anstataŭas la ripetiĝantan dat-titolon per temo el la rezumo
+        assertTrue(unua.titolo.startsWith("Post sia apostola vojaĝo"), unua.titolo)
         assertTrue(unua.fluo.endsWith(".mp3"), unua.fluo)
         assertEquals(479, unua.daŭro, "7:59 = 479 s")
-        // AI-rezulto kun averto en la priskribo
+        // AI-rezulto estas HTML (kiel la priskriboj de aliaj elsendoj) kun averto en <em>
+        assertTrue(unua.priskriboHtml?.contains("<p>") == true, unua.priskriboHtml)
+        assertTrue(unua.priskriboHtml?.contains("<em>Rezumo farita de la sondosiero per AI") == true, unua.priskriboHtml)
+        // la plata teksto (serĉo/listoj) ankoraŭ enhavas la averto-tekston
         assertTrue(elsendoj.any { it.priskribo?.contains("Rezumo farita de la sondosiero per AI") == true })
     }
 

@@ -5,17 +5,21 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import java.io.File
 
 /**
- * Skribas RSS 2.0-fluon kun iTunes- kaj podcast-namespace (podcast:transcript).
- * Fazo 1: simpla rekta XML-skribado (neniu ekstera biblioteko).
+ * Skribas RSS 2.0-fluon kun iTunes-namespace. La priskriboj povas esti HTML
+ * (AI-rezultoj). Fazo 1: simpla rekta XML-skribado (neniu ekstera biblioteko).
  */
 object FluSkribilo {
 
-    /** Skribas la riĉigitan fluon por unu kanalo. [priskriboj] kaj [transkriptoj] estas laŭbezone mapitaj laŭ elsendo-id. */
+    /**
+     * Skribas la riĉigitan fluon por unu kanalo.
+     * [priskriboj] estas HTML (la rezumoj estas konvertitaj per `analizuRezumon`)
+     * kaj [titoloj] povas anstataŭigi la titolon de unuopa elsendo (laŭ id).
+     */
     fun skribu(
         kanalo: Kanalo,
         elsendoj: List<Elsendo>,
         priskriboj: Map<String, String>,
-        transkriptoj: Map<String, String>,
+        titoloj: Map<String, String>,
         celo: File,
     ) {
         celo.parentFile.mkdirs()
@@ -37,7 +41,7 @@ object FluSkribilo {
             val retpaĝo = e.retpaĝoUrl
             val daŭro = e.daŭro
             sb.append("    <item>\n")
-            xml(sb, "      ", "title", e.titolo)
+            xml(sb, "      ", "title", titoloj[e.id] ?: e.titolo)
             xml(sb, "      ", "guid", e.id)
             xml(sb, "      ", "pubDate", rfc822(e.dato))
             if (priskribo != null) xml(sb, "      ", "description", priskribo)
@@ -45,10 +49,6 @@ object FluSkribilo {
             sb.append("      <enclosure url=").append(citaĵo(e.fluo)).append(" type=\"audio/mpeg\"/>\n")
             if (daŭro != null && daŭro > 0) {
                 sb.append("      <itunes:duration>%02d:%02d:%02d</itunes:duration>\n".format(daŭro / 3600, (daŭro / 60) % 60, daŭro % 60))
-            }
-            transkriptoj[e.id]?.let { url ->
-                sb.append("      <podcast:transcript url=").append(citaĵo(url))
-                    .append(" type=\"text/plain\" language=\"eo\"/>\n")
             }
             sb.append("    </item>\n")
         }

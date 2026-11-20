@@ -4,6 +4,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.parser.RssParsilo
+import dk.nordfalk.esperanto.data.parser.analizuRezumon
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -54,9 +55,9 @@ object ArkivKonstruilo {
         for (kanalo in kanaloj) {
             try {
                 val elsendoj = kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
-                val (priskriboj, transkriptoj) = riĉigu(kanalo, elsendoj)
+                val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
                 FluSkribilo.skribu(
-                    kanalo, elsendoj, priskriboj, transkriptoj,
+                    kanalo, elsendoj, priskriboj, titoloj,
                     File(PUBLIKA, "kanaloj/${kanalo.slug}.xml"),
                 )
                 novajStatoj[kanalo.slug] = KanalStato(
@@ -127,32 +128,39 @@ object ArkivKonstruilo {
 
     /**
      * Riĉigas erojn sen priskribo per AI-rezulto (4–9 linioj + averto).
-     * Prioritato: pret concepta rezumo el la rezumo-kaŝo (privata/rezumoj/ — LLM-prilaborita);
+     * Prioritato: preta rezumo el la rezumo-kaŝo (privata/rezumoj/ — LLM-prilaborita);
      * se mankas, ekstrakta rezumo el la kaŝita transskribo (privata/transkriptoj/).
-     * Transskriboj kaj rezumoj estas PRIVATAJ — la publika fluo ricevas nur la pretan resumon.
+     * Transskriboj kaj rezumoj estas PRIVATAJ — la publika fluo ricevas nur la pretan
+     * rezumon, konvertitan al HTML (legebla kiel la priskriboj de aliaj elsendoj).
+     * Redonas: priskriboj (HTML) kaj titoloj (anstataŭaĵoj laŭ id — ekz. se la
+     * originala titolo estas nur „<kanalo> <dato>“, oni uzas la temon el la rezumo).
      */
     private fun riĉigu(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
     ): Pair<Map<String, String>, Map<String, String>> {
         val priskriboj = mutableMapOf<String, String>()
-        val transkriptoj = mutableMapOf<String, String>()
+        val titoloj = mutableMapOf<String, String>()
         for (e in elsendoj) {
             if (!e.priskribo.isNullOrBlank()) continue
             val nomo = transkriptoDosieroNomo(e.id)
             val rezumoDosiero = File(PRIVATA, "rezumoj/${kanalo.slug}/$nomo.txt")
-            if (rezumoDosiero.isFile) {
-                priskriboj[e.id] = certiguAverton(rezumoDosiero.readText())
-                continue
-            }
             val transkriptoDosiero = File(PRIVATA, "transkriptoj/${kanalo.slug}/$nomo.txt")
-            if (transkriptoDosiero.isFile) {
-                priskriboj[e.id] = rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
-            } else {
-                println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
+            val kruda = when {
+                rezumoDosiero.isFile -> certiguAverton(rezumoDosiero.readText())
+                transkriptoDosiero.isFile -> rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
+                else -> {
+                    println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
+                    null
+                }
+            }
+            if (kruda != null) {
+                val analizita = analizuRezumon(kruda, e.titolo, AI_AVERTO)
+                priskriboj[e.id] = analizita.priskriboHtml
+                analizita.titolo?.let { titoloj[e.id] = it }
             }
         }
-        return priskriboj to transkriptoj
+        return priskriboj to titoloj
     }
 
     /** certigas, ke la rezulto finiĝas per la AI-averta frazo */

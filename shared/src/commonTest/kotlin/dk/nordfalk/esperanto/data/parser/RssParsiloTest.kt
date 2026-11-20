@@ -19,6 +19,32 @@ class RssParsiloTest {
         return fluo.bufferedReader().use { it.readText() }
     }
 
+    // === Arkiva fluo de nia servilo (javabog.dk) — deArkivo=true konservas la id-on ===
+    // (La fiksaĵo intence havas GRANDLITERAJN datojn kiel "WED, 18 NOV 2026" — regression
+    // por la usklec-sensema monata analizo en normigiDaton; la servilo nun skribas normalajn.)
+
+    @Test
+    fun parsasArkivanFluonDeNiaServilo() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("radiovatikana-arkivo.xml")
+        val kanalo = Kanalo(
+            slug = "radiovatikana",
+            nomo = "Radio Vatikana",
+            podkastaRssUrl = "https://www.vaticannews.va/eo/podcast/esperanto-programo.podcast.xml"
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo, deArkivo = true)
+
+        assertEquals(3, elsendoj.size)
+        val unua = elsendoj.first()
+        // nia servilo skribas la finan id-on kiel guid kun prefikso "slug:" — deArkivo konservas ĝin
+        assertTrue(unua.id.startsWith("radiovatikana:"), "id: ${unua.id}")
+        assertTrue(unua.titolo.startsWith("Esperanto Programo"), unua.titolo)
+        assertTrue(unua.fluo.endsWith(".mp3"), unua.fluo)
+        assertEquals(479, unua.daŭro, "7:59 = 479 s")
+        // AI-rezulto kun averto en la priskribo
+        assertTrue(elsendoj.any { it.priskribo?.contains("Rezumo farita de la sondosiero per AI") == true })
+    }
+
     // === Regulo P6.1 — Ĝenerala parsado (Kernpunkto) ===
 
     @Test

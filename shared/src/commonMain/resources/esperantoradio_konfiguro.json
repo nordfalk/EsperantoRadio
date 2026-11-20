@@ -17,6 +17,9 @@
 
 	"hejmpaĝo": "https://github.com/nordfalk/EsperantoRadio/wiki/Hejmpa%C4%9Do#bonvenon",
 	"elsendojUrl": "https://esperanto-radio.com/radio.txt",
+	// Bazo de nia arkiv-servilo: se difinita, la apo provas unue <arkivoBazoUrl><slug>.xml
+	// (riĉigitaj fluoj kun AI-rezultoj) kaj nur poste la originalan elsendojRssUrl.
+	"arkivoBazoUrl": "https://javabog.dk/esperanto-radio/kanaloj/",
 	"komenca_kanalo": "muzaiko",
 
 	"kanaloj": [

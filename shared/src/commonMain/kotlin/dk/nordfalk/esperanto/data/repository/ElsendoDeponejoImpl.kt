@@ -35,6 +35,8 @@ import kotlin.concurrent.Volatile
 open class ElsendoDeponejoImpl(
     private val httpKliento: HttpClient,
     private val parsilo: RssParsilo = RssParsilo(),
+    /** Bazo de nia arkiv-servilo (riĉigitaj fluoj). Se difinita: provi unue `<bazo><slug>.xml`, poste la originalan fluon. */
+    private val arkivoBazoUrl: String? = null,
 ) : ElsendoDeponejo {
 
     /**
@@ -114,7 +116,12 @@ open class ElsendoDeponejoImpl(
      * unu in-flight [Deferred] kaj do unu HTTP-peton.
      */
     open suspend fun ŝargiElsendojn(kanalo: Kanalo, fortoRefresigi: Boolean = false): List<Elsendo> {
-        val url = kanalo.podkastaRssUrl ?: run {
+        // Arkivo unue (riĉigitaj fluoj kun AI-rezultoj), originala fluo kiel rezervo (FAROTA: arkivo-first).
+        val urls = buildList {
+            arkivoBazoUrl?.let { add(it.trimEnd('/') + "/" + kanalo.slug + ".xml") }
+            kanalo.podkastaRssUrl?.let { add(it) }
+        }.distinct()
+        if (urls.isEmpty()) {
             logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")
             return kaŝmemoro[kanalo.slug] ?: emptyList()
         }
@@ -128,7 +135,7 @@ open class ElsendoDeponejoImpl(
         val ŝargo = ŝargMutex.withLock {
             ŝargadoj[kanalo.slug]?.also {
                 logd("ElsendoDeponejo", "${kanalo.slug}: aliĝas al daŭranta ŝargo anstataŭ duobla elŝuto")
-            } ?: ŝargSkopo.async { elŝutuKajParsu(kanalo, url, kaŝenitaj) }
+            } ?: ŝargSkopo.async { elŝutuKajParsu(kanalo, urls, kaŝenitaj) }
                 .also { nova ->
                     ŝargadoj[kanalo.slug] = nova
                     // Forigu la eron kiam la ŝargo FINIĜAS (ne kiam vokanto finiĝas —
@@ -159,40 +166,49 @@ open class ElsendoDeponejoImpl(
      * La reta parto de [ŝargiElsendojn]: elŝutas la RSS-fluon kaj parsas ĝin.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      */
-    private suspend fun elŝutuKajParsu(kanalo: Kanalo, url: String, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
-        return try {
-            logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
-            if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
-            // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch sube redonas la kaŝitan
-            // datumon. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
-            // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
-            // leguKorponLimigite (G45): korpo pli granda ol 1 MB ne estas legata en la
-            // memoron — misdirektita respondo (MP3 anstataŭ fluo) kaŭzis OutOfMemoryError.
-            val respondo = httpKliento.get(url) { expectSuccess = true }.leguKorponLimigite()
-            kontroluFluecon(respondo)
-            logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
-            skribuKaŝon(kanalo.slug, respondo)
-            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto)
-                .ordigitajPlejFreŝajUnue()
-            logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
-            konservu(kanalo.slug, elsendoj)
-            elsendoj
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
-            // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo A4).
-            // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
-            // ili devas NE iĝi erar-nivelaj Sentry-eventoj ((PR #93) antaŭe la sama fiasko
-            // estis kaptita dufoje — loge→captureException + captureMessage).
-            logw(
-                "ElsendoDeponejo",
-                "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
-                e
-            )
-            // Toleremeco: liveri kaŝenitan datumon se haveblan
-            kaŝenitaj ?: emptyList()
+    private suspend fun elŝutuKajParsu(kanalo: Kanalo, urls: List<String>, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
+        var lastaEraro: Throwable? = null
+        for (url in urls) {
+            try {
+                return elŝutuKajParsuUnu(kanalo, url)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
+                // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo A4).
+                // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
+                // ili devas NE iĝi erar-nivelaj Sentry-eventoj (PR #93).
+                lastaEraro = e
+                logw("ElsendoDeponejo", "${kanalo.slug}: $url malsukcesis — provos sekvan fonton", e)
+            }
         }
+        // Ĉiuj fontoj malsukcesaj (ekz. arkivo kaj originalo): tolerema rezervo —
+        // liveri la kaŝenitan datumon anstataŭ ĵeti (regulo A4)
+        logw(
+            "ElsendoDeponejo",
+            "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
+            lastaEraro ?: IllegalStateException("Neniu fonto difinita por ${kanalo.slug}")
+        )
+        return kaŝenitaj ?: emptyList()
+    }
+
+    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, url: String): List<Elsendo> {
+        logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
+        if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
+        // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu provos la
+        // sekvan fonton. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
+        // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
+        // leguKorponLimigite (G45): korpo pli granda ol 1 MB ne estas legata en la
+        // memoron — misdirektita respondo (MP3 anstataŭ fluo) kaŭzis OutOfMemoryError.
+        val respondo = httpKliento.get(url) { expectSuccess = true }.leguKorponLimigite()
+        kontroluFluecon(respondo)
+        logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
+        skribuKaŝon(kanalo.slug, respondo)
+        val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = (url != kanalo.podkastaRssUrl), httpKliento = arhivaPeto)
+            .ordigitajPlejFreŝajUnue()
+        logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
+        konservu(kanalo.slug, elsendoj)
+        return elsendoj
     }
 
     override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
@@ -214,7 +230,10 @@ open class ElsendoDeponejoImpl(
             // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
             // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
             kontroluFluecon(respondo)
-            val elsendoj = parsilo.parsuRss(respondo, kanalo, arhivaPeto).ordigitajPlejFreŝajUnue()
+            // Detekto: niaj arkivaj fluoj skribas la finan id-on kiel guid kun prefikso
+            // "<slug>:" (la servilo envolvas la guid en CDATA — tial la regexo)
+            val elArkivo = Regex("<guid>(?:<!\\[CDATA\\[)?${Regex.escape(kanalo.slug)}:").containsMatchIn(respondo)
+            val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = elArkivo, httpKliento = arhivaPeto).ordigitajPlejFreŝajUnue()
             konservu(kanalo.slug, elsendoj)
             logd("ElsendoDeponejo", "${kanalo.slug}: diska kaŝmemoro parsita — ${elsendoj.size} elsendoj")
             elsendoj

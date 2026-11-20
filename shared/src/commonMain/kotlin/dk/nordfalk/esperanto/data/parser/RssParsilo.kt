@@ -123,13 +123,15 @@ class RssParsilo(
     suspend fun parsuRss(
         fluoTeksto: String,
         kanalo: Kanalo,
-        httpKliento: suspend (String) -> String = { "" }
+        /** Se difinita: anstataŭas la `podkasta_arkivo`-detekton — la deponejo scias, kiun URL-on ĝi uzis. */
+        deArkivo: Boolean? = null,
+        httpKliento: suspend (String) -> String = { "" },
     ): List<Elsendo> {
         logd("RssParsilo", "Parsas RSS por ${kanalo.slug} — ${fluoTeksto.length} signoj")
         val doc = Ksoup.parseXml(fluoTeksto, "")
-        val deArkivo = kanalo.podkastaRssUrl?.contains("podkasta_arkivo") == true
+        val elArkivo = deArkivo ?: (kanalo.podkastaRssUrl?.contains("podkasta_arkivo") == true)
 
-        val rezulto = if (deArkivo) {
+        val rezulto = if (elArkivo) {
             logd("RssParsilo", "${kanalo.slug}: uzas arkiv-parsilon")
             parsuĜenerala(doc, kanalo, deArkivo = true)
         } else when (kanalo.slug) {
@@ -549,15 +551,17 @@ class RssParsilo(
             if (dato.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) return dato
         }
         val korektita = datStr.replace(Regex("(\\+\\d{2}):(\\d{2})$"), "$1$2")
+        // Malgrandaj ŝlosiloj: kelkaj fluoj (ankaŭ nia arkiva servilo iam) skribas la
+        // monaton per GRANDaj literoj ("18 NOV 2026") — la serĉo do estas usklec-sensiva
         val monatoj = mapOf(
-            "Jan" to "01", "Feb" to "02", "Mar" to "03", "Apr" to "04",
-            "May" to "05", "Jun" to "06", "Jul" to "07", "Aug" to "08",
-            "Sep" to "09", "Oct" to "10", "Nov" to "11", "Dec" to "12"
+            "jan" to "01", "feb" to "02", "mar" to "03", "apr" to "04",
+            "may" to "05", "jun" to "06", "jul" to "07", "aug" to "08",
+            "sep" to "09", "oct" to "10", "nov" to "11", "dec" to "12"
         )
         // \w{3,4}: ankaŭ 4-literaj monataj mallongigoj kiel "Sept" (PR #95)
         val m = Regex("(\\d{1,2})\\s+(\\w{3,4})\\s+(\\d{4})").find(korektita) ?: return null
         val tago = m.groupValues[1].padStart(2, '0')
-        val monato = monatoj[m.groupValues[2].take(3)] ?: return null
+        val monato = monatoj[m.groupValues[2].take(3).lowercase()] ?: return null
         return "${m.groupValues[3]}-$monato-$tago"
     }
 

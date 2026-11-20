@@ -48,18 +48,18 @@ class ArchiveOrgDosiernomoKaŝoTest {
         }
 
         // Unua parsado: demandas la metadatumojn
-        val unua = parsilo.parsuRss(perantoFluo, kanalo, falsaKliento)
+        val unua = parsilo.parsuRss(perantoFluo, kanalo, httpKliento = falsaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3", unua[0].fluo)
         assertEquals(1, petoj, "Peto pri metadatumoj devas okazi unufoje")
 
         // Dua parsado (alia fluo-kopio): la kesto jam konas la nomon
-        val dua = parsilo.parsuRss(perantoFluo, kanalo, falsaKliento)
+        val dua = parsilo.parsuRss(perantoFluo, kanalo, httpKliento = falsaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3", dua[0].fluo)
         assertEquals(1, petoj, "Ne devas denove demandi — la kesto havas la nomon")
 
         // Nova parsilo kun nova kesto (kiel post restarto): legas la nomon el Settings
         val novaParsilo = RssParsilo(ArchiveOrgDosiernomoKaŝo(settings))
-        val tria = novaParsilo.parsuRss(perantoFluo, kanalo, falsaKliento)
+        val tria = novaParsilo.parsuRss(perantoFluo, kanalo, httpKliento = falsaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3", tria[0].fluo)
         assertEquals(1, petoj, "Persisto devas teni — neniu nova peto post restarto")
     }
@@ -74,7 +74,7 @@ class ArchiveOrgDosiernomoKaŝoTest {
         }
 
         // Senrete: retrofalas al la divenita nomo
-        val unua = parsilo.parsuRss(perantoFluo, kanalo, fiaskantaKliento)
+        val unua = parsilo.parsuRss(perantoFluo, kanalo, httpKliento = fiaskantaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/malapero-benda-3.mp3", unua[0].fluo)
         assertEquals(1, petoj)
 
@@ -83,7 +83,7 @@ class ArchiveOrgDosiernomoKaŝoTest {
             petoj++
             """{"files":[{"name":"Malapero_Benda3.mp3","source":"original","format":"VBR MP3"}]}"""
         }
-        val dua = parsilo.parsuRss(perantoFluo, kanalo, sukcesaKliento)
+        val dua = parsilo.parsuRss(perantoFluo, kanalo, httpKliento = sukcesaKliento)
         assertEquals("https://archive.org/download/malapero-benda-3/Malapero_Benda3.mp3", dua[0].fluo)
         assertEquals(2, petoj, "Fiasko ne devas esti kaŝita — reprovi kiam la reto revenas")
     }

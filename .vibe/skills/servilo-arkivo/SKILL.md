@@ -17,6 +17,13 @@ https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
 └── kanaloj/<slug>.xml                   (28 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
 ```
 
+La **apo konsumas tiujn fluojn arkivo-unue**: `arkivoBazoUrl` en
+`esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` provas unue
+`<arkivoBazoUrl><slug>.xml`, poste la originalan `elsendojRssUrl` (rezervo).
+La arkivaj fluoj portas la finan ID-on kiel `guid` (`<slug>:…`) — tial `deArkivo=true`
+ĉe la parsado konservas ĝin (stabilaj ID-oj inter fontoj). Vidu
+`docs/nova/04_parsado_kaj_arkivo.md` → „Arkivo-unue“.
+
 ## Dispozicio
 
 ```

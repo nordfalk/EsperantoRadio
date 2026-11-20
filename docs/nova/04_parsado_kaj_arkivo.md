@@ -151,6 +151,26 @@ la sama fluo (inkluzive servila rondiro) redonas la saman id-on.
   pro malforta parsilo — ne necesa se la nova parsilo estas fortika.
 - Atom ISO-8601 (`2018-03-21T17:00:56+00:00`): dato = teksto antaŭ `T`.
 - Kanona elirejo: `yyyy-MM-dd`.
+- La monata mallongigo estas usklec-sensiva (`normigiDaton` akceptas kaj `Nov` kaj
+  `NOV`) — kelkaj fluoj (ankaŭ pli malnovaj arkivaj fluoj de nia servilo) skribas
+  la monaton per grandaj literoj.
+
+## Arkivo-unue: la apo legas niajn riĉigitajn fluojn unue (2026-11)
+
+La servilo publikigas riĉigitajn RSS-fluojn ĉe
+`https://javabog.dk/esperanto-radio/kanaloj/<slug>.xml` (AI-rezultoj en la priskribo,
+normigitaj kampoj). La apo agordas tion per `arkivoBazoUrl` en
+`esperantoradio_konfiguro.json`:
+
+- `ElsendoDeponejoImpl.ŝargiElsendojn` provas unue `<arkivoBazoUrl><slug>.xml`, poste la
+  originalan `elsendojRssUrl` kiel rezervo; se ambaŭ malsukcesas, liveras la kaŝenitan
+  datumon (regulo A4).
+- `parsuRss(…, deArkivo = true)` por arkivaj fluoj: la `guid` jam estas la fina ID
+  (`<slug>:…`), do `konstruuId` redonas ĝin senŝanĝa — la ID-oj restas stabilaj
+  inter la arkiva kaj la originala fonto (elsendoj jam luditaj/ŝatataj ne duobliĝas).
+- Diska kaŝo: `leguKaŝitajnElsendojn` rekonas arkivan kaŝon per la guid-prefikso
+  `<guid>(<![CDATA[)?<slug>:`.
+- La servilo skribas `pubDate` laŭ RFC-822 (`Wed, 18 Nov 2026 …`).
 
 ## Golden-testoj (la plej grava kvalito-averto)
 
@@ -173,6 +193,7 @@ por ĉiu fiksaĵo, asertas:
 | Titol-derivado | Por `ignoruTitolon`-kanal: titolo = priskribo sen HTML, ≤ 200 signoj |
 | radio.txt | "Pola Retradio" → kanal `polaretradio`, id `polaretradio:<dato>`; nekonata nomo → nova kanal |
 | Dat-normigo | `pubDate "… +02:00"` → `yyyy-MM-dd` ĝuste |
+| Parsi `radiovatikana-arkivo.xml` (fluo de nia servilo, `deArkivo=true`) | 3 elsendoj; id komenciĝas per `radiovatikana:`; daŭro `00:07:59` → 479; priskribo enhavas la AI-averton; GRANDLITERA dato (`18 NOV 2026`) funkcias |
 
 La datentavolo devas ruli en **pura `commonTest`** — neniom Android, neniom reto.
 

@@ -70,10 +70,12 @@ object FluSkribilo {
         return try {
             val p = dato.split("-")
             val loka = java.time.LocalDate.of(p[0].toInt(), p[1].toInt(), p[2].toInt())
+            // RFC-822 stilo: "Wed, 18 Nov 2026 …" (ne GRANDlitere — kelkaj parsiloj
+            // distingas la monaton laŭ uskleco)
             val tago = loka.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH)
-                .uppercase().replace(".", "")
+                .replace(".", "")
             val monato = loka.month.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH)
-                .uppercase().replace(".", "")
+                .replace(".", "")
             "$tago, ${loka.dayOfMonth} $monato ${loka.year} 12:00:00 +0000"
         } catch (e: Exception) {
             "Thu, 01 Jan 1970 12:00:00 +0000"

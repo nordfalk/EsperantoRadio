@@ -30,7 +30,7 @@ object ArkivKonstruilo {
     private val PUBLIKA = File(RADIKO, "publika")
     private val PRIVATA = File(RADIKO, "privata")
     private val KONFIGO = File("shared/src/commonMain/resources/esperantoradio_konfiguro.json")
-    private const val MAKS_PAĜOJ = 5
+    private const val MAKS_PAĜOJ = 30
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 

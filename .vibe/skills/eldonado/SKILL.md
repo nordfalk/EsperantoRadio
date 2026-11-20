@@ -51,8 +51,9 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    bruligis la versionumon; NE ĝisdatigu versionCode de ekzistanta etikedo!),
    254=3.1.1 (2026-10-31, la vera eldono; F-Droid konstruas la etikedon v3.1.1
    kiel 253 — ilia versionumejo estas sendependa de Play),
-   255=nekonata (jam uzita ĉe Play antaŭ 2026-11-19 — eltrovis la elprovo
-   "Version code is too low"; fonto ne dokumentita en la repo),
+   255=3.2.0-beta06nov (interna testo de la posedanto, ~2026-11-06 — poste
+   identigita en Sentry: release esperantoradio@3.2.0-beta06nov, 7 uzantoj;
+   tio klarigas la "Version code is too low" ĉe la elprovo de 2026-11-19),
    256=3.1.2-beta19nov (2026-11-19, el PR #175, trako `beta` — antaŭ ol la
    konvencio «beta-eldono = interna testo» estis klarigita; 255/256 eldonitaj
    el la PR-branĉo SEN komiti la eldon-libraron, nur la versionCode restas konsumita),

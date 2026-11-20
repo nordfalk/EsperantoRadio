@@ -14,8 +14,12 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class NoOpElŝutDeponejo : ElŝutDeponejo {
     private val _elŝutoj = MutableStateFlow<Map<String, ElŝutitaElsendo>>(emptyMap())
+    // Unu komuna fluo por ĉiuj elsendoj (FAROTA C38): antaŭe ĉiu voko de
+    // observiElŝutStaton kreis NOVAN MutableStateFlow — kolektantoj neniam
+    // vidis ĝisdatigon kaj ĉiu voko kreis senbezonan objekton.
+    private val _stato = MutableStateFlow(ElŝutStato.NeElŝutita)
     override fun observiElŝutojn(): StateFlow<Map<String, ElŝutitaElsendo>> = _elŝutoj.asStateFlow()
-    override fun observiElŝutStaton(elsendoId: String): StateFlow<ElŝutStato> = MutableStateFlow(ElŝutStato.NeElŝutita)
+    override fun observiElŝutStaton(elsendoId: String): StateFlow<ElŝutStato> = _stato.asStateFlow()
     override suspend fun elŝuti(elsendo: Elsendo) { logw("ElŝutDeponejo", "Elŝutoj ne haveblas sur ĉi tiu platformo") }
     override suspend fun haltigi(elsendoId: String) {}
     override suspend fun forigi(elsendoId: String) {}

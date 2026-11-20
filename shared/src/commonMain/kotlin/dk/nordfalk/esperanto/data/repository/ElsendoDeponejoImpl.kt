@@ -98,15 +98,13 @@ open class ElsendoDeponejoImpl(
         return nova.asStateFlow()
     }
 
-    override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> {
-        val kaŝenitaj = kaŝmemoro[kanaloSlug]
-        if (kaŝenitaj != null && !fortoRefresigi) {
-            return kaŝenitaj
-        }
-        // Ni bezonas la kanalo-URL por elŝuti. La kanalo estas provizita ekstere.
-        // Tiu metodon estos vokita kun la kanalo-URL jam konata.
-        return kaŝenitaj ?: emptyList()
-    }
+    /**
+     * (FAROTA C38) Kaŝo-nur: redonas la en-memorajn elsendojn de la kanalo,
+     * neniam elŝutas — por reta ŝargo/aktualigo uzu [ŝargiElsendojnPorKanal].
+     * `fortoRefresigi` estas konservita nur por interfaca kongruo; ĝi ne ŝargas.
+     */
+    override suspend fun getElsendojn(kanaloSlug: String, fortoRefresigi: Boolean): List<Elsendo> =
+        kaŝmemoro[kanaloSlug] ?: emptyList()
 
     /**
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.

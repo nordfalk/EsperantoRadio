@@ -2,10 +2,8 @@ package dk.nordfalk.esperanto.data.repository
 
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
-import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.LudataElsendo
 import dk.nordfalk.esperanto.domain.repository.PlejŝatatajDeponejo
-import dk.nordfalk.esperanto.domain.repository.LastAŭskultitajDeponejo
 import dk.nordfalk.esperanto.domain.repository.LudatojDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoDeponejo
 import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
@@ -37,23 +35,6 @@ class PlejŝatatajDeponejoImpl : PlejŝatatajDeponejo {
     }
 
     override suspend fun estasPlejŝatata(kanaloSlug: String): Boolean = kanaloSlug in _plejŝatataj.value
-}
-
-class LastAŭskultitajDeponejoImpl : LastAŭskultitajDeponejo {
-    private val _listo = MutableStateFlow<List<Elsendo>>(emptyList())
-    private val pozicioj = mutableMapOf<String, Long>()
-
-    override fun observiLastAŭskultitajn(): StateFlow<List<Elsendo>> = _listo.asStateFlow()
-
-    override suspend fun registri(elsendo: Elsendo) {
-        val nuna = _listo.value.toMutableList()
-        nuna.removeAll { it.id == elsendo.id }
-        nuna.add(0, elsendo)
-        _listo.value = nuna.take(50) // LRU-maks 50
-        logd("LastAŭskultitaj", "Registras: ${elsendo.id} — ${elsendo.titolo}")
-    }
-
-    override suspend fun getPozicio(elsendoId: String): Long? = pozicioj[elsendoId]
 }
 
 /**

@@ -5,6 +5,34 @@
 > enskribon; bagatelaj ŝanĝoj restas nur en la git-historio. Novaj enskriboj
 > supren, kun dato kaj ligilo al la PR.
 
+# Ŝanĝoj — 2026-11-19
+
+## FAROTA-batch C6/C8/C11/C23/C24/C28/C38 (PR: https://github.com/nordfalk/EsperantoRadio/pull/175)
+
+- **C6 — R8 ŝaltita por release**: `isMinifyEnabled = true` + `androidApp/proguard-rules.pro`
+  kun la normaj konsumaj reguloj por kotlinx.serialization (`dk.nordfalk.esperanto.**$$serializer`,
+  `Companion`, `KSerializer serializer(...)`). Media3/Sentry/WorkManager/Compose liveras siajn
+  proprajn consumer-regulojn — neniu manlibro bezonatas. Rezulto: release-APK **7,5 MB**
+  (de ~21 MB). Verda: desktopTest + assembleDebug + assembleRelease; fumtesto sur emulilo
+  (lanĉo + 300 monkey-okazaĵoj sen kraŝo); `SciigoLudiTest`/`AlarmoReceiviloTest` 6/6.
+  Atento por la estonteco: se iam aldoniĝas refleks-bazita biblioteko, unue kontroliĝu ties
+  consumer-reguloj; `connectedReleaseAndroidTest` ne ekzistas (nur debug havas konektitajn
+  testojn), do R8-releasaj instrumentitaj testoj bezonus `testBuildType "release"`.
+- **C11 — maldika SonfontoKodilo**: la JSON de `Sonfonto` en `MediaMetadata.extras` trairas
+  Binder (limo ~1 MB); `kodigu` nun forigas `priskribo`/`priskriboHtml` el la enmetita
+  `Elsendo` (60 KB da HTML → kodita < 2 KB). La detala ekrano reŝargas la plenan elsendon
+  per `ElsendoDeponejo.getElsendo(id)` (`entry<Vojo.ElsendoDetalo>` en `App.kt`) — tial la
+  priskribo montriĝas ankaŭ når oni venas el la mini-ludilbreto.
+- **C8 — JSONC-blokkomentoj**: `striptiguKomentojn` subtenas nun `/* */` (nur ekster ĉeno;
+  nefinita bloko striptita ĝis EOF). `coerceInputValues = true` restas intence (A4) kaj estas
+  dokumentita: tajpo en valoro estas kaŝe korektita al la defaŭlto — la gardilo estas
+  `KanalAgordoFumTesto` sur la vera konfiguro.
+- **C23/C24/C28/C38**: `ui-test-junit4` per la CMP-artefakto (sama versio, sama paka nomo
+  `androidx.compose.ui.test`); `defaultToAppBundles.set(false)` kun korektita komento
+  (APK, ĉar ne en Play App Signing); neuzataj katalog-eroj forigitaj; morta kodo forigita
+  (`LastAŭskultitajDeponejo` tute, `NoOpElŝutDeponejo` nun unu komuna fluo,
+  `getElsendojn` dokumentita kiel kaŝo-nur).
+
 # Ŝanĝoj — 2026-10-24
 
 ## Unuopa kanalkonfiguro + alinomo (PR: https://github.com/nordfalk/EsperantoRadio/pull/144)

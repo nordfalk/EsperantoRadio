@@ -89,13 +89,15 @@
 - **Sugesto**: forigu la hardkoditan vojon; ĵetu eraron se `KEYSTORE_*` mankas ĉe eldon-konstruo (fail-fast). (La CI `eldonado.yml` faras tion ĝuste: GitHub-secrets → env.)
 
 #### C6 — R8/ProGuard: nenio aktiva (neniu keep-regula risko hodiaŭ)
-- **Statuso**: [ ]
-- **Loko**: `androidApp/build.gradle.kts:55` (`isMinifyEnabled = false`; neniu `proguard-rules.pro`; neniu `consumerProguardFiles` en `shared/build.gradle.kts`; APK ~21 MB)
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): R8 ŝaltita por `release` (`isMinifyEnabled = true` + nova `androidApp/proguard-rules.pro` kun konsumaj reguloj por kotlinx.serialization — Media3, Sentry, WorkManager kaj Compose liveras siajn proprajn consumer-regulojn en la AAR-oj). Verda: `:shared:desktopTest`, `assembleDebug`, `assembleRelease`; release-APK nun **7,5 MB** (de ~21 MB); fumtesto sur emulilo (lanĉo + 300 monkey-okazaĵoj, 0 kraŝoj) kaj `SciigoLudiTest`/`AlarmoReceiviloTest` (6/6) pasis — do la sciiga/alarm-vojo kaj la serializiloj funkcias sub R8. R8-seeds konfirmas, ke `dk.nordfalk.esperanto.**$$serializer` estas konservitaj.
+- **Loko**: `androidApp/build.gradle.kts` (`isMinifyEnabled = false`; neniu `proguard-rules.pro`; neniu `consumerProguardFiles` en `shared/build.gradle.kts`; APK ~21 MB)
 - **Sugesto**: kiam vi ŝaltos R8: konsumaj reguloj por Media3 session/exoplayer kaj Sentry (memkonfiguriĝas), atentu `SonfontoKodilo`/MediaMetadata-klasojn; re-testu la sciigojn kaj la fonon.
 
 
 #### C8 — `striptiguKomentojn` ne subtenas `/* */`; `coerceInputValues` kaŝas agord-erarojn
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): `striptiguKomentojn` nun subtenas `/* */`-blokkomentojn (nur ekster teksta ĉeno; nefinita bloko estas striptita ĝis la fino, kongrue kun `isLenient`) — testoj en `KanalAgordoLegantoTest` (blokkomentoj, koment-simboloj ene de ĉeno, nefinita bloko). `coerceInputValues = true` restas (toleremo A4: unu fuŝita kampo ne mortigu la tutan konfiguron) kaj estas nun dokumentita kun sia malavantaĝo (tajpo kaŝe korektita al defaŭlto — kontrolu per `KanalAgordoFumTesto`/`radioTxtKomparilo`).
 - **Loko**: `KanalAgordoLeganto.kt:37-72` (nur `//` kaj `\`-daŭrigoj), `:22` (`coerceInputValues = true`)
 - **Sugesto**: dokumentu la limigon (aŭ subtenu blokkomentojn); pripensu forigi `coerceInputValues` por novaj kampoj.
 
@@ -105,9 +107,10 @@
 - **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu Dependabot kaj OWASP `dependencyCheck` en CI; limigu `jcenter()` al la malnova projekto aŭ forigu ĝin iam.
 
 #### C11 — `SonfontoKodilo` enhavas la tutan `Elsendo` en `MediaMetadata.extras`
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): `SonfontoKodilo.kodigu` nun forigas la pezajn kampojn `priskribo`/`priskriboHtml` el la enmetita `Elsendo` (ĉiuj konsumantoj de la malkodita fonto uzas nur id/kanaloSlug/titolo/kanaloNomo/dato/fluo/bildoUrl); la detala ekrano (`entry<Vojo.ElsendoDetalo>` en `App.kt`) reŝargas la plenan elsendon per `ElsendoDeponejo.getElsendo(id)`. Testoj: `SonfontoKodiloTest.kodiguForigasPezajnPriskribojn` (60 KB da HTML → kodita < 2 KB) kaj `kodiguLokaElsendoAnkaŭMaldikas`; `SciigoLudiTest`/`AlarmoReceiviloTest` (6/6 sur emulilo) konfirmas la vojon sciigo→servo→regilo.
 - **Loko**: `shared/src/commonMain/.../domain/player/SonfontoKodilo.kt:23`; uzata en `ExoPlayerLudiloRegilo.kt:113-135` kaj `LudiElsendoReceivilo.kt:56-58`
-- **Priskribo**: La JSON trairas Binder (regilo→servo) kaj loĝas en la sesio; riĉaj HTML-priskriboj (ekz. Varsovia Vento kun enkorpigitaj `<audio>`) povas esti dekoj da KB — risko de `TransactionTooLargeException` kaj malnecesa ŝarĝo.
+- **Priskribo**: La JSON trairis Binder (regilo→servo) kaj loĝis en la sesio; riĉaj HTML-priskriboj (ekz. Varsovia Vento kun enkorpigitaj `<audio>`) povis esti dekoj da KB — risko de `TransactionTooLargeException` kaj malnecesa ŝarĝo.
 - **Sugesto**: serializu nur `id, kanaloSlug, titolo, fluo, dato, bildoUrl` kaj rekonstruu la `Elsendo`-on per `ElsendoDeponejo.getElsendo(id)`.
 
 #### C15 — wasmJs: malnovaj evento-aŭskultantoj de anstataŭigita elemento
@@ -132,12 +135,14 @@
 - **Priskribo**: La alarm-korutino (`delay(10_000)` + reto) retenas la detruitan Activity ĝis ~10+ sekundojn post `onDestroy`. Por la alarmo tio estas intenca (la servo transprenas), sed konsilindas apliki `lifecycleScope` por mallongaj UI-korutinoj kaj teni la alarman laboron aparte (kun komento).
 
 #### C23 — `ui-test-junit4:1.7.3` hokita kaj multe pli malnova ol Compose 1.10
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): la hokita `androidx.compose.ui:ui-test-junit4:1.7.3` anstataŭigita per la CMP-artefakto `org.jetbrains.compose.ui:ui-test-junit4` kun la sama versio kiel la cetero de Compose (`compose-multiplatform` en `libs.versions.toml`, nova aliaso `compose-ui-test-junit4`); la paka nomo ene restas `androidx.compose.ui.test`, do la importoj ne ŝanĝiĝis. Verda: `:androidApp:compileDebugAndroidTestKotlin` + `connectedDebugAndroidTest`.
 - **Loko**: `androidApp/build.gradle.kts:83` (`androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")`)
 - **Sugesto**: vicigu al la konvena Jetpack Compose-versio (aŭ BOM / `compose.uiTestJUnit4` de CMP).
 
 #### C24 — `defaultToAppBundles` komento kontraŭdiras la CI
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): `defaultToAppBundles.set(false)` kun korektita komento — la apo ne estas en Play App Signing, do la defaŭlto estas APK kaj la CI uzas `publishReleaseApk` (ligilo al `eldonado.yml` kaj `docs/nova/07_eldonado.md` en la komento). Neniu kondutoŝanĝo por la CI (eksplicita `publishReleaseApk); nur la nuda `publishRelease` nun koheras.
 - **Loko**: `androidApp/build.gradle.kts:76` (komento "Nur eldoni AAB (App Bundle), ne APK" — sed `eldonado.yml` uzas `publishReleaseApk`, ĉar la app ne estas en Play App Signing)
 - **Sugesto**: korektu la komenton aŭ forigu `defaultToAppBundles.set(true)`.
 
@@ -157,7 +162,8 @@
 - **Sugesto**: eligu la puran decidon (ekz. `klasifikuHttpStatuson(status: Int)`) al commonMain + unuo-testo; aŭ aldonu androidTest al CI per emulilo.
 
 #### C28 — Neuzataj katalog-eroj
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): forigitaj el `gradle/libs.versions.toml` — `ktor-client-cache`, `multiplatform-settings-android`, `turbine` (kaj la versio-linio `turbine`); grep konfirmis neniun referencon en la build-dosieroj (ankaŭ `malnova/` ne uzas la katalogon). Konstruo verda.
 - **Loko**: `gradle/libs.versions.toml:45,62,78` (`ktor-client-cache`, `multiplatform-settings-android`, `turbine` — neniu referenco en la build-dosieroj)
 - **Sugesto**: forigu (aŭ uzu).
 
@@ -182,7 +188,8 @@
 - **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
 
 #### C38 — Morta kodo
-- **Statuso**: [ ]
+- **Statuso**: [x]
+- **Riparo** (2026-11-19, PR #175): (1) `LastAŭskultitajDeponejo` + `LastAŭskultitajDeponejoImpl` tute forigitaj — nenie vokataj (la pozicioj vivas en `LudatojDeponejo`, kaj "lastatempe ludata" venas el `LudatojDeponejo` en `HejmoEkrano`); (2) `NoOpElŝutDeponejo.observiElŝutStaton` nun redonas unu komunan fluon anstataŭ nova `MutableStateFlow` je voko; (3) `DiagnozoTipo.RETO`/`Severeco.INFO` jam estis forigitaj pli frue — neniu senefika filtrilo restis; (4) `ElsendoDeponejo.getElsendojn` dokumentita kiel kaŝo-nur (por ŝargi: `ŝargiElsendojnPorKanal`) en la interfaco kaj la impl.
 - **Loko**: `PersonigoDeponejojImpl.kt:36,48` (`LastAŭskultitajDeponejo.pozicioj` neniam plenigita — `getPozicio` ĉiam redonas `null`); `NoOpElŝutDeponejo.kt:18` (nova `MutableStateFlow` je ĉiu voko de `observiElŝutStaton`); `Diagnozo.kt:32` (`DiagnozoTipo.RETO` neniam konstruita; `Severeco.INFO` neniam produktata — la filtrilo en `HejmoEkrano.kt:332` estas senefika); `ElsendoDeponejoImpl.kt:38-46` (`getElsendojn` kaŝo-nur, sed la interfaco sugestas alie — dokumentu aŭ renomu)
 - **Sugesto**: forigu aŭ dokumentu; direktu la poziciojn al `LudatojDeponejo`.
 

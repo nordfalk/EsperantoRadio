@@ -68,12 +68,13 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
 **Formato de la rezumo-dosiero** (plata teksto):
 - nedeviga unua linio `Titolo: …` — anstataŭas la titolon de la elsendo en la publika fluo;
-- poste unu punkto po linio (linioj kun `•`/`-`-bulmarkoj iĝas `<ul><li>`);
-- la konstruilo aldonas la AI-averton kaj konvertas ĉion al HTML (`<p>`, `<ul>`, `<em>`),
+- poste **unua linio = la temo** (resumo de la sekvaj punktoj), poste **unu punkto po linio**;
+- la konstruilo aldonas la AI-averton kaj konvertas ĉion al HTML: la tem-linio iĝas
+  `<p><strong>…</strong></p>` (titolo-stila), la punktoj `<ul><li>`, la averto `<em>` —
   tiel la rezulto estas legebla en la detala ekrano same kiel la priskriboj de aliaj
   elsendoj. Se mankas `Titolo:` kaj la originala titolo enhavas daton (ripetiĝanta
   titolo, ekz. „Esperanto Programo 18.11.2026“), la titolo estas derivita el la unua
-  punkto de la rezumo — vidu `analizuRezumon`/`derivuTitolon` en
+  linio de la rezumo — vidu `analizuRezumon`/`derivuTitolon`/`rezumoAlHtml` en
   `shared/.../data/parser/RezumoHtml.kt` (kun testoj en `RezumoHtmlTest`).
 
 ## Publikigi (rsync)

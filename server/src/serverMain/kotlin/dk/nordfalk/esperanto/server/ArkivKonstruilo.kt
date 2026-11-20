@@ -146,8 +146,9 @@ object ArkivKonstruilo {
             val nomo = transkriptoDosieroNomo(e.id)
             val rezumoDosiero = File(PRIVATA, "rezumoj/${kanalo.slug}/$nomo.txt")
             val transkriptoDosiero = File(PRIVATA, "transkriptoj/${kanalo.slug}/$nomo.txt")
+            var elRezumoKaŝo = false
             val kruda = when {
-                rezumoDosiero.isFile -> certiguAverton(rezumoDosiero.readText())
+                rezumoDosiero.isFile -> { elRezumoKaŝo = true; certiguAverton(rezumoDosiero.readText()) }
                 transkriptoDosiero.isFile -> rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
                 else -> {
                     println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
@@ -155,7 +156,9 @@ object ArkivKonstruilo {
                 }
             }
             if (kruda != null) {
-                val analizita = analizuRezumon(kruda, e.titolo, AI_AVERTO)
+                // el la rezumo-kaŝo la unua linio estas la temo (titolo-stila), el la ekstrakta
+                // rezumo ĝi estas nur la unua frazo de fluanta teksto
+                val analizita = analizuRezumon(kruda, e.titolo, AI_AVERTO, unuaLinioTitolo = elRezumoKaŝo)
                 priskriboj[e.id] = analizita.priskriboHtml
                 analizita.titolo?.let { titoloj[e.id] = it }
             }

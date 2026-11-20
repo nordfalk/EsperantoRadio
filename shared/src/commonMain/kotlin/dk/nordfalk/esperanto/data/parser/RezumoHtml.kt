@@ -7,7 +7,9 @@ package dk.nordfalk.esperanto.data.parser
  *
  * Enigo (la rezumo-kaŝo de la servilo, plata teksto):
  * - nedeviga unua linio `Titolo: …` — titolo de la elsendo (forigita el la priskribo);
- * - linioj = punktoj; linioj komenciĝantaj per `•`/`-`/`*` iĝas `<li>`-oj;
+ * - poste unua linio = la temo (resumo de la sekvaj punktoj), sekvaj linioj = punktoj;
+ *   ĉe `unuaLinioTitolo=true` la unua linio iĝas `<p><strong>…</strong></p>` (titolo-stila)
+ *   kaj la punktoj `<ul><li>` (linioj kun `•`/`-`/`*`-markoj simple iĝas `<li>`);
  * - la lasta bloko estu la AI-averta frazo (iĝas `<em>`).
  *
  * Se mankas `Titolo:`-linio kaj la originala titolo enhavas daton (do estas
@@ -33,7 +35,13 @@ private const val MIN_TITOLO_LONGO = 8
  * Analizias platan rezumon: elprenas la titolon (`Titolo:`-linio, aŭ derivita el
  * la unua punkto se la originala titolo enhavas daton) kaj konvertas la korpon al HTML.
  */
-fun analizuRezumon(rezumoKruda: String, originalaTitolo: String, avertaFrazo: String): RezumoAnalizita {
+fun analizuRezumon(
+    rezumoKruda: String,
+    originalaTitolo: String,
+    avertaFrazo: String,
+    /** true por strukturitaj rezumoj el la rezumo-kaŝo (unua linio = temo, poste punktoj). */
+    unuaLinioTitolo: Boolean = false,
+): RezumoAnalizita {
     val linioj = rezumoKruda.lines().map { it.trim() }
     val unua = linioj.indexOfFirst { it.isNotEmpty() }
     var titolo: String? = null
@@ -46,17 +54,19 @@ fun analizuRezumon(rezumoKruda: String, originalaTitolo: String, avertaFrazo: St
     if (titolo == null && enhavo.isNotEmpty() && DATO_EN_TITOLO.containsMatchIn(originalaTitolo)) {
         titolo = derivuTitolon(enhavo.first(), originalaTitolo)
     }
-    return RezumoAnalizita(titolo, rezumoAlHtml(korpo, avertaFrazo))
+    return RezumoAnalizita(titolo, rezumoAlHtml(korpo, avertaFrazo, unuaLinioTitolo))
 }
 
 /**
  * Plata rezumo (linioj, blokoj apartigitaj per malplenaj linioj) → HTML:
- * - bloko nur el bulmarkitaj linioj → `<ul><li>…</li></ul>`;
  * - la averta frazo sola → `<p><em>…</em></p>`;
+ * - bloko nur el bulmarkitaj linioj → `<ul><li>…</li></ul>`;
+ * - se [unuaLinioTitolo] kaj la bloko havas almenaŭ 2 liniojn: unua linio →
+ *   `<p><strong>…</strong></p>` (titolo-stila), la ceteraj → `<ul><li>`;
  * - alie → `<p>` kun linioj kunigitaj per `<br/>`.
  * HTML-specialaj signoj estas eskapitaj.
  */
-fun rezumoAlHtml(linioj: List<String>, avertaFrazo: String): String {
+fun rezumoAlHtml(linioj: List<String>, avertaFrazo: String, unuaLinioTitolo: Boolean = false): String {
     val blokoj = mutableListOf<List<String>>()
     var nuna = mutableListOf<String>()
     for (l in linioj.map { it.trim() }) {
@@ -71,6 +81,9 @@ fun rezumoAlHtml(linioj: List<String>, avertaFrazo: String): String {
                 "<p><em>${esc(avertaFrazo)}</em></p>"
             blok.all { BULETA.containsMatchIn(it) } ->
                 "<ul>\n" + blok.joinToString("\n") { "<li>${esc(it.replace(BULETA, ""))}</li>" } + "\n</ul>"
+            unuaLinioTitolo && blok.size >= 2 ->
+                "<p><strong>${esc(blok.first())}</strong></p>\n<ul>\n" +
+                    blok.drop(1).joinToString("\n") { "<li>${esc(it.replace(BULETA, ""))}</li>" } + "\n</ul>"
             else ->
                 "<p>" + blok.joinToString("<br/>") { esc(it) } + "</p>"
         }

@@ -68,6 +68,29 @@ class RezumoHtmlTest {
     }
 
     @Test
+    fun unuaLinioKielTitoloGrasaKajPunktojKielListo() {
+        // strukturita rezumo el la rezumo-kaŝo: unua linio = temo, poste punktoj
+        val r = analizuRezumon(
+            "Komenco de la apostola vojaĝo al Sud-Ameriko.\nAlveno en Montevideo.\nLa papo parolis pri la digno de ĉiu homo.\n\n$averto",
+            "Esperanto Programo 08.11.2026", averto, unuaLinioTitolo = true
+        )
+        assertTrue(r.priskriboHtml.startsWith("<p><strong>Komenco de la apostola vojaĝo al Sud-Ameriko.</strong></p>"), r.priskriboHtml)
+        assertTrue("<ul>\n<li>Alveno en Montevideo.</li>\n<li>La papo parolis pri la digno de ĉiu homo.</li>\n</ul>" in r.priskriboHtml, r.priskriboHtml)
+        assertTrue("<em>$averto</em>" in r.priskriboHtml)
+    }
+
+    @Test
+    fun senFlagoUnuaLinioNeGrasas() {
+        // ekstrakta fallback (fluanta teksto): neniu titolo-stila unua linio
+        val r = analizuRezumon(
+            "Unua frazo de fluanta teksto.\nDua frazo.\n\n$averto",
+            "Esperanto Programo 08.11.2026", averto
+        )
+        assertTrue("<strong>" !in r.priskriboHtml, r.priskriboHtml)
+        assertTrue("<p>Unua frazo de fluanta teksto.<br/>Dua frazo.</p>" in r.priskriboHtml, r.priskriboHtml)
+    }
+
+    @Test
     fun longaLinioTranĉiĝasĈeLimoKajFinaPunktuacioForiĝas() {
         val titolo = derivuTitolon(
             "Post sia apostola vojaĝo al Urugvajo, Argentino kaj Peruo (6.–16.11.), papo Leono rakontis pri la tri landoj kaj iliaj eklezioj kaj multe pli da teksto sekvas ĉi tie",

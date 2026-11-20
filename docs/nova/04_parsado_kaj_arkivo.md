@@ -175,9 +175,10 @@ normigitaj kampoj). La apo agordas tion per `arkivoBazoUrl` en
   grandec-limon de 8 MB — la arkivo estas optimumigo super la originala fluo kaj neniam
   rajtas bloki horloĝon/alarman ŝargon (profundaj arkivaj fluoj, ekz. peranto.xml ≈ 4,5 MB,
   povas malrapidiĝi; tiam oni faligas al la originala fluo).
-- La AI-rezultoj en la arkivaj fluoj estas HTML (`<p>`/`<ul><li>`/`<em>` — konvertitaj
-  el la plataj rezumo-dosieroj per `analizuRezumon` en `RezumoHtml.kt`), do ili estas
-  legeblaj en la detala ekrano same kiel la priskriboj de aliaj elsendoj. Se la
+- La AI-rezultoj en la arkivaj fluoj estas HTML (konvertitaj el la plataj rezumo-dosieroj
+  per `analizuRezumon`/`rezumoAlHtml` en `RezumoHtml.kt`): la unua linio (la temo) iĝas
+  `<p><strong>…</strong></p>`, la sekvaj punktoj `<ul><li>`, la averto `<em>` — legebla
+  en la detala ekrano same kiel la priskriboj de aliaj elsendoj. Se la
   originala titolo enhavas daton (ripetiĝanta titolo kiel „Esperanto Programo
   18.11.2026“), la servilo aldonas pli informan titolon derivitan el la rezumo
   (aŭ el `Titolo:`-unua linio de la rezumo-dosiero).

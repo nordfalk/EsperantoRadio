@@ -78,8 +78,11 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
 ## Publikigi (rsync)
 
+**REGULO (2026-11-20): neniam lanĉu la rsync al la servilo sen eksplicita peto de la uzanto** („kopiu al la servilo“ k.s.). Loka konstruado kaj kontrolo de `server/data/publika/` estas en ordo; la publikigo ĉiam atendas aprobon.
+
 ```bash
 # unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)
+# nur post eksplicita peto de la uzanto!
 rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
 # ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:

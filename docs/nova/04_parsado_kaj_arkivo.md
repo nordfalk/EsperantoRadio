@@ -207,6 +207,10 @@ por ĉiu fiksaĵo, asertas:
 
 La datentavolo devas ruli en **pura `commonTest`** — neniom Android, neniom reto.
 
+La fiksaĵo `radiovatikana-arkivo.xml` estas elprenita el la VERA publika fluo
+(`server/data/publika/kanaloj/radiovatikana.xml`, unuaj 3 eroj) — post ĉiu ŝanĝo de la
+fluo-formato (ekz. HTML-rezultoj, novaj titoloj) regeneru ĝin el la aktuala publika dosiero.
+
 ## Parser-kontrakto
 
 Nova parsilo estas "ĝusta" kiam por ĉiu fiksaĵo ĝi produktas:

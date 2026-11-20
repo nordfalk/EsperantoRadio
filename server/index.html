@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="eo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EsperantoRadio — unu apo por ĉiuj Esperanto-radioj kaj podkastoj</title>
+<meta name="description" content="EsperantoRadio kunigas 27 Esperanto-radiokanalojn kaj podkastojn el la tuta mondo en unu apo: Android, komputilo kaj retumilo. GPL-3.0.">
+<style>
+  :root { --bg:#0f1b2d; --fg:#eef3f8; --akcento:#4caf7d; --karto:#16263c; --malforta:#9fb2c8; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--fg); line-height:1.55; }
+  .kovrilo { max-width: 880px; margin: 0 auto; padding: 48px 20px 24px; text-align:center; }
+  .kovrilo img.emblemo { width: 110px; border-radius: 22px; }
+  h1 { font-size: 2rem; margin: 14px 0 6px; }
+  .tagline { color: var(--malforta); font-size: 1.1rem; margin: 0 0 22px; }
+  .ligiloj { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom: 10px; }
+  .butono { background: var(--akcento); color:#06130c; font-weight:700; padding: 12px 22px; border-radius: 999px; text-decoration:none; }
+  .butono.second { background: transparent; color: var(--fg); border: 1px solid var(--malforta); }
+  .sekcio { max-width: 880px; margin: 0 auto; padding: 18px 20px; }
+  h2 { font-size: 1.25rem; margin: 26px 0 10px; }
+  .ktoj { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; margin: 12px 0; }
+  .karto { background: var(--karto); border-radius: 14px; padding: 14px 16px; }
+  .karto b { display:block; font-size: 1.4rem; color: var(--akcento); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  code { background: var(--karto); padding: 2px 6px; border-radius: 6px; font-size: .92em; }
+  a { color: var(--akcento); }
+  .piedo { max-width: 880px; margin: 0 auto; padding: 24px 20px 48px; color: var(--malforta); font-size: .9rem; border-top: 1px solid #24374f; }
+</style>
+</head>
+<body>
+
+<div class="kovrilo">
+  <img class="emblemo" src="icon.png" alt="EsperantoRadio-emblemo">
+  <h1>EsperantoRadio</h1>
+  <p class="tagline">Radio kun 27 Esperanto-kanaloj kaj podkastoj el la tuta mondo — en unu apo:<br>poŝtelefono (Android), komputilo kaj retumilo.</p>
+  <div class="ligiloj">
+    <a class="butono" href="https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio">Elŝuti ĉe Google Play</a>
+    <a class="butono second" href="https://github.com/nordfalk/EsperantoRadio">Fontkodo (GitHub)</a>
+    <a class="butono second" href="https://nordfalk.github.io/EsperantoRadio/">Dokumentaro</a>
+  </div>
+</div>
+
+<div class="sekcio">
+  <h2>Pri la projekto</h2>
+  <p>EsperantoRadio kunigas dudek sep radiokanalojn kaj podkastojn en Esperanto el la tuta mondo
+  en unu unuecan sperton: kanala superrigardo, rekta elsendo, podkastoj, elŝutoj, plej ŝatataj,
+  serĉo kaj vekhorloĝo. La projekto estas forko de la dana <i>DR Radio</i>-apo kaj estas
+  eldonita sub la malferma permesilo <b>GPL-3.0</b>.</p>
+  <div class="ktoj">
+    <div class="karto"><b>27</b>kanaloj kaj podkastoj</div>
+    <div class="karto"><b>3</b>platformoj: Android, Desktop, Web</div>
+    <div class="karto"><b>GPL-3.0</b>malferma fontkodo</div>
+    <div class="karto"><b>eo</b>plene en Esperanto</div>
+  </div>
+  <h2>Funkcioj de la apo</h2>
+  <ul>
+    <li><b>Kanalaro</b> — superrigardo de ĉiuj kanaloj kun tuja elsendfluo kaj arkivitaj elsendoj</li>
+    <li><b>Elŝutoj</b> — konservu elsendojn por eksterreta aŭskultado</li>
+    <li><b>Vekhorloĝo</b> — vekiĝu per via kanalo</li>
+    <li><b>Serĉo</b> kaj <b>plej ŝatataj</b> — tra ĉiuj kanaloj samtempe</li>
+    <li><b>Mini-ludilbreto</b> kaj daŭrigo de ludado inter sesioj</li>
+  </ul>
+</div>
+
+<div class="sekcio">
+  <h2>Servilo / arkivo (publikaj dosieroj)</h2>
+  <p>Ĉi tie troviĝas la publikaj dosieroj de nia arkiv-servilo — la riĉigitaj RSS-fluoj
+  (kun AI-rezultoj por elsendoj sen priskribo) kaj la kanalkonfiguro, kiujn la apo povas elŝuti:</p>
+  <ul>
+    <li><a href="publika/">publika/</a> — <a href="publika/esperantoradio_konfiguro.json">esperantoradio_konfiguro.json</a> kaj <a href="publika/kanaloj/">kanaloj/*.xml</a></li>
+    <li>Ekzemplo: <a href="publika/kanaloj/radiovatikana.xml">publika/kanaloj/radiovatikana.xml</a></li>
+  </ul>
+  <p>La fonto de la servilo estas en la deponejo: <code>server/</code>
+  (Kotlin-konstruilo <code>:server:arkivKonstruilo</code>; detaloj en la skill <code>servilo-arkivo</code>).</p>
+</div>
+
+<div class="piedo">
+  EsperantoRadio — <a href="https://github.com/nordfalk/EsperantoRadio">github.com/nordfalk/EsperantoRadio</a> ·
+  <a href="https://play.google.com/store/apps/details?id=dk.nordfalk.esperanto.radio">Google Play</a> ·
+  <a href="LICENSE">GPL-3.0</a> · prizorgata de Jacob Nordfalk
+</div>
+
+</body>
+</html>

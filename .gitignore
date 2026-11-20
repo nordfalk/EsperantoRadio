@@ -66,3 +66,6 @@ img.png
 ekranfoto.svg
 
 __pycache__/
+
+# Generita arkivo de la servilo (RSS, kaŝo, transskriptoj, stato)
+server/data/

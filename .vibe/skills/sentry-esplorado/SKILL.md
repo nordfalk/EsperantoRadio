@@ -100,3 +100,23 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
   — krudaj nombroj de 249 estas duone intence reduktitaj; atendataj fiaskoj
   (reto/ludado/elŝuto/serĉo) estas `logw` kaj tute ne aperas kiel erar-eventoj.
 - Malnovaj versioj (≤ 248) ankoraŭ generas la malnovajn erarojn — komparu laŭ `dist`.
+
+## Sesio-lecionoj (2026-11-20, semajna statistiko)
+
+- **Projekto-slug estas `kmp` (minuskla)** — `projectSlug: "KMP"` redonas 404
+  "Project does not exist". Ĉiam kontrolu per `find_projects` unue.
+- **Tagaj tempo-serioj per natura lingvo paneas ĉe la MCP**: «… as a time series»
+  redonis nulajn duoblajn sitelojn; `toDate(timestamp)` estas nekonata funkcio en
+  la logs-datumaro. Fidinda maniero por tago-statistikoj: po unu agregita demando
+  pri tago kun `timestamp:>=YYYY-MM-DD timestamp:<sekva-tago`.
+- En `search_logs` la atributo ne estas `level:` (nekonata) — uzu **`severity:warn`**
+  (`severity:warning` trovas nenion).
+- Mesaĝ-serĉo: `message:"Apo malfermita"` (ekzempla frazo) trovis nenion, sed
+  ĵokero `message:*ludad*` funkcias — uzu `message:*…*`.
+- **Eraroj ne havis la medion `produktado`**: kun `environment:produktado` la
+  semajno montris 0 erarojn, sen filtrilo 42 (ĉiuj en `evoluo`). Por eraroj
+  esploru ANCHE sen medi-filtrilo; `search_issues period:7d` malpleniĝis eĉ kiam
+  erar-eventoj ekzistis — fidu pli la agregaĵojn de `search_errors`.
+- Grandegaj rezult ulterioraj estas konservitaj ekster la laborareo
+  (`~/.vibe/logs/...`) kaj `bash` ne rajtas legi ilin (`outside_workdir=deny`) —
+  resumu la datumojn ENE de `run_typescript` kaj redonu kompaktajn rezultojn.

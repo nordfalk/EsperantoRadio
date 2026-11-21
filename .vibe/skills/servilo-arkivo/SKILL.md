@@ -17,6 +17,15 @@ https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
 └── kanaloj/<slug>.xml                   (28 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
 ```
 
+La **apo konsumas tiujn fluojn kunfandante kun la originalaj**: `arkivoBazoUrl` en
+`esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` elŝutas paralele
+`<arkivoBazoUrl><slug>.xml` kaj la originalan `elsendojRssUrl` kaj kunfandas la rezultojn
+per `kunfanduElsendojn` (laŭ ID: la arkivo venkas; la originalo aldonas la novajn
+elsendojn, do ili aperas tuj eĉ se la arkivo estas malfreŝa). Se ambaŭ fiaskas, la apo
+uzas la kaŝon (enmemora, poste diska). La arkivaj fluoj portas la finan ID-on kiel
+`guid` (`<slug>:…`) — tial `deArkivo=true` ĉe la parsado konservas ĝin (stabilaj ID-oj
+inter fontoj). Vidu `docs/nova/04_parsado_kaj_arkivo.md` → „Arkivo-unue“.
+
 ## Dispozicio
 
 ```
@@ -59,10 +68,24 @@ Pretaj rezultoj iras en `server/data/privata/rezumoj/<slug>/<dosiernomo>.txt`;
 la konstruilo preferas ilin antaŭ la ekstrakta fallback. Se mankas ambaŭ, la ero
 restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
+**Formato de la rezumo-dosiero** (plata teksto):
+- nedeviga unua linio `Titolo: …` — anstataŭas la titolon de la elsendo en la publika fluo;
+- poste **unua linio = la temo** (resumo de la sekvaj punktoj), poste **unu punkto po linio**;
+- la konstruilo aldonas la AI-averton kaj konvertas ĉion al HTML: la tem-linio iĝas
+  `<p><strong>…</strong></p>` (titolo-stila), la punktoj `<ul><li>`, la averto `<em>` —
+  tiel la rezulto estas legebla en la detala ekrano same kiel la priskriboj de aliaj
+  elsendoj. Se mankas `Titolo:` kaj la originala titolo enhavas daton (ripetiĝanta
+  titolo, ekz. „Esperanto Programo 18.11.2026“), la titolo estas derivita el la unua
+  linio de la rezumo — vidu `analizuRezumon`/`derivuTitolon`/`rezumoAlHtml` en
+  `shared/.../data/parser/RezumoHtml.kt` (kun testoj en `RezumoHtmlTest`).
+
 ## Publikigi (rsync)
+
+**REGULO (2026-11-20): neniam lanĉu la rsync al la servilo sen eksplicita peto de la uzanto** („kopiu al la servilo“ k.s.). Loka konstruado kaj kontrolo de `server/data/publika/` estas en ordo; la publikigo ĉiam atendas aprobon.
 
 ```bash
 # unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)
+# nur post eksplicita peto de la uzanto!
 rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
 # ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:

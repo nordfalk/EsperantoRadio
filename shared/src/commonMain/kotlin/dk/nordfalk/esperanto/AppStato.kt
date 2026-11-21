@@ -195,12 +195,12 @@ object AppStato {
             paktitaTeksto = ::leguPakititanKanalkonfiguron
         )
 
-        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)))
+        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
-        // Legu kanalkonfiguron unufoje — por defaŭltaj ŝatataj kaj alarm-sugestoj
-        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        // (agordo jam legita pli supre — por arkivoBazoUrl kaj jen: defaŭltaj ŝatataj kaj alarm-sugestoj)
         val defaŭltajŜatataj = agordo.kanaloj
             .filter { it.defaŭltŜatata }
             .map { it.kodo }

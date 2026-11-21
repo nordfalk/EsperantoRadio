@@ -4,6 +4,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.parser.RssParsilo
+import dk.nordfalk.esperanto.data.parser.analizuRezumon
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -30,7 +31,10 @@ object ArkivKonstruilo {
     private val PUBLIKA = File(RADIKO, "publika")
     private val PRIVATA = File(RADIKO, "privata")
     private val KONFIGO = File("shared/src/commonMain/resources/esperantoradio_konfiguro.json")
-    private const val MAKS_PAĜOJ = 5
+    // Sufiĉas por la arkivo: krome la konstruilo ĉesas frue kiam ĝi atingas la plej
+    // novan elsendon jam en la arkivo (vidu kolektuElsendojn) — pli grandaj fluoj nur
+    // ŝarĝus la dosierojn (kaj la app-klientojn) sen nova enhavo.
+    private const val MAKS_PAĜOJ = 10
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
@@ -54,9 +58,9 @@ object ArkivKonstruilo {
         for (kanalo in kanaloj) {
             try {
                 val elsendoj = kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
-                val (priskriboj, transkriptoj) = riĉigu(kanalo, elsendoj)
+                val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
                 FluSkribilo.skribu(
-                    kanalo, elsendoj, priskriboj, transkriptoj,
+                    kanalo, elsendoj, priskriboj, titoloj,
                     File(PUBLIKA, "kanaloj/${kanalo.slug}.xml"),
                 )
                 novajStatoj[kanalo.slug] = KanalStato(
@@ -88,7 +92,9 @@ object ArkivKonstruilo {
         println(" preta. Stato: server/data/privata/stato.json")
     }
 
-    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ. */
+    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas
+     *  frue kiam oni atingas la plej novan elsendon jam en la arkivo (pli profunde nenio
+     *  nova povas aperi, ĉar la fluoj estas ordigitaj plej-novaj-unue). */
     private fun kolektuElsendojn(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         parsilo: RssParsilo,
@@ -97,9 +103,17 @@ object ArkivKonstruilo {
     ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
         val kaŝo = File(PRIVATA, "kaŝo/${kanalo.slug}.xml")
         var fluoUrl = kanalo.podkastaRssUrl!!
-        val ĉiuj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
-        val konataj = mutableSetOf<String>()
+        val novaj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        // La malnova arkivo: ĝiaj eroj restas (kunfandataj sube), ĝiaj ID-oj markas la
+        // punkton, kie la paĝigo ĉesu (la guid en la arkiva fluo estas la fina ID).
+        val arkivaDosiero = File(PUBLIKA, "kanaloj/${kanalo.slug}.xml")
+        val arkivaTeksto = if (arkivaDosiero.isFile) arkivaDosiero.readText() else null
+        val arkivitaj = arkivaTeksto?.let { t ->
+            Regex("<guid>(?:<!\\[CDATA\\[)?([^<\\]]+)").findAll(t).map { it.groupValues[1].trim() }.toSet()
+        } ?: emptySet()
+        val konataj = arkivitaj.toMutableSet()
         var paĝoj = 0
+        var unuaPaĝoGrandeco = 0
         while (fluoUrl.isNotBlank() && paĝoj < MAKS_PAĜOJ) {
             paĝoj++
             val teksto = if (uzuKaŝon && kaŝo.isFile) {
@@ -111,48 +125,65 @@ object ArkivKonstruilo {
                     t
                 }
             }
-            val novaj = runBlocking {
+            val novajElPaĝo = runBlocking {
                 parsilo.parsuRss(teksto, kanalo) { url ->
                     runBlocking { http.get(url).bodyAsText() }
                 }
             }
-            val nekonataj = novaj.takeWhile { it.id !in konataj }
-            if (nekonataj.isEmpty() && paĝoj > 1) break
-            ĉiuj.addAll(nekonataj)
+            if (paĝoj == 1) unuaPaĝoGrandeco = novajElPaĝo.size
+            val nekonataj = novajElPaĝo.takeWhile { it.id !in konataj }
+            // Ĉesu kiam la paĝo komenciĝas per jam-arkivitaj elsendoj (aŭ tute mankas novaj)
+            if (nekonataj.isEmpty() && (paĝoj > 1 || arkivitaj.isNotEmpty())) break
+            novaj.addAll(nekonataj)
             nekonataj.forEach { konataj.add(it.id) }
             fluoUrl = parsilo.leguNextLink(teksto) ?: ""
         }
-        return ĉiuj.distinctBy { it.id }.sortedByDescending { it.dato }
+        // Kunfandu kun la malnova arkivo kaj limigu la grandecon: maks. ~MAKS_PAĜOJ paĝoj da eroj
+        val malnovaj = arkivaTeksto?.let { t ->
+            runBlocking { parsilo.parsuRss(t, kanalo, deArkivo = true) }
+        } ?: emptyList()
+        val maksErjoj = MAKS_PAĜOJ * (if (unuaPaĝoGrandeco > 0) unuaPaĝoGrandeco else 10)
+        return (novaj + malnovaj).distinctBy { it.id }.sortedByDescending { it.dato }.take(maksErjoj)
     }
 
     /**
      * Riĉigas erojn sen priskribo per AI-rezulto (4–9 linioj + averto).
-     * Prioritato: pret concepta rezumo el la rezumo-kaŝo (privata/rezumoj/ — LLM-prilaborita);
+     * Prioritato: preta rezumo el la rezumo-kaŝo (privata/rezumoj/ — LLM-prilaborita);
      * se mankas, ekstrakta rezumo el la kaŝita transskribo (privata/transkriptoj/).
-     * Transskriboj kaj rezumoj estas PRIVATAJ — la publika fluo ricevas nur la pretan resumon.
+     * Transskriboj kaj rezumoj estas PRIVATAJ — la publika fluo ricevas nur la pretan
+     * rezumon, konvertitan al HTML (legebla kiel la priskriboj de aliaj elsendoj).
+     * Redonas: priskriboj (HTML) kaj titoloj (anstataŭaĵoj laŭ id — ekz. se la
+     * originala titolo estas nur „<kanalo> <dato>“, oni uzas la temon el la rezumo).
      */
     private fun riĉigu(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
     ): Pair<Map<String, String>, Map<String, String>> {
         val priskriboj = mutableMapOf<String, String>()
-        val transkriptoj = mutableMapOf<String, String>()
+        val titoloj = mutableMapOf<String, String>()
         for (e in elsendoj) {
             if (!e.priskribo.isNullOrBlank()) continue
             val nomo = transkriptoDosieroNomo(e.id)
             val rezumoDosiero = File(PRIVATA, "rezumoj/${kanalo.slug}/$nomo.txt")
-            if (rezumoDosiero.isFile) {
-                priskriboj[e.id] = certiguAverton(rezumoDosiero.readText())
-                continue
-            }
             val transkriptoDosiero = File(PRIVATA, "transkriptoj/${kanalo.slug}/$nomo.txt")
-            if (transkriptoDosiero.isFile) {
-                priskriboj[e.id] = rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
-            } else {
-                println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
+            var elRezumoKaŝo = false
+            val kruda = when {
+                rezumoDosiero.isFile -> { elRezumoKaŝo = true; certiguAverton(rezumoDosiero.readText()) }
+                transkriptoDosiero.isFile -> rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
+                else -> {
+                    println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
+                    null
+                }
+            }
+            if (kruda != null) {
+                // el la rezumo-kaŝo la unua linio estas la temo (titolo-stila), el la ekstrakta
+                // rezumo ĝi estas nur la unua frazo de fluanta teksto
+                val analizita = analizuRezumon(kruda, e.titolo, AI_AVERTO, unuaLinioTitolo = elRezumoKaŝo)
+                priskriboj[e.id] = analizita.priskriboHtml
+                analizita.titolo?.let { titoloj[e.id] = it }
             }
         }
-        return priskriboj to transkriptoj
+        return priskriboj to titoloj
     }
 
     /** certigas, ke la rezulto finiĝas per la AI-averta frazo */

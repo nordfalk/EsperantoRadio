@@ -31,7 +31,10 @@ object ArkivKonstruilo {
     private val PUBLIKA = File(RADIKO, "publika")
     private val PRIVATA = File(RADIKO, "privata")
     private val KONFIGO = File("shared/src/commonMain/resources/esperantoradio_konfiguro.json")
-    private const val MAKS_PAĜOJ = 30
+    // Sufiĉas por la arkivo: krome la konstruilo ĉesas frue kiam ĝi atingas la plej
+    // novan elsendon jam en la arkivo (vidu kolektuElsendojn) — pli grandaj fluoj nur
+    // ŝarĝus la dosierojn (kaj la app-klientojn) sen nova enhavo.
+    private const val MAKS_PAĜOJ = 10
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
@@ -89,7 +92,9 @@ object ArkivKonstruilo {
         println(" preta. Stato: server/data/privata/stato.json")
     }
 
-    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ. */
+    /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas
+     *  frue kiam oni atingas la plej novan elsendon jam en la arkivo (pli profunde nenio
+     *  nova povas aperi, ĉar la fluoj estas ordigitaj plej-novaj-unue). */
     private fun kolektuElsendojn(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         parsilo: RssParsilo,
@@ -98,9 +103,17 @@ object ArkivKonstruilo {
     ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
         val kaŝo = File(PRIVATA, "kaŝo/${kanalo.slug}.xml")
         var fluoUrl = kanalo.podkastaRssUrl!!
-        val ĉiuj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
-        val konataj = mutableSetOf<String>()
+        val novaj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        // La malnova arkivo: ĝiaj eroj restas (kunfandataj sube), ĝiaj ID-oj markas la
+        // punkton, kie la paĝigo ĉesu (la guid en la arkiva fluo estas la fina ID).
+        val arkivaDosiero = File(PUBLIKA, "kanaloj/${kanalo.slug}.xml")
+        val arkivaTeksto = if (arkivaDosiero.isFile) arkivaDosiero.readText() else null
+        val arkivitaj = arkivaTeksto?.let { t ->
+            Regex("<guid>(?:<!\\[CDATA\\[)?([^<\\]]+)").findAll(t).map { it.groupValues[1].trim() }.toSet()
+        } ?: emptySet()
+        val konataj = arkivitaj.toMutableSet()
         var paĝoj = 0
+        var unuaPaĝoGrandeco = 0
         while (fluoUrl.isNotBlank() && paĝoj < MAKS_PAĜOJ) {
             paĝoj++
             val teksto = if (uzuKaŝon && kaŝo.isFile) {
@@ -112,18 +125,25 @@ object ArkivKonstruilo {
                     t
                 }
             }
-            val novaj = runBlocking {
+            val novajElPaĝo = runBlocking {
                 parsilo.parsuRss(teksto, kanalo) { url ->
                     runBlocking { http.get(url).bodyAsText() }
                 }
             }
-            val nekonataj = novaj.takeWhile { it.id !in konataj }
-            if (nekonataj.isEmpty() && paĝoj > 1) break
-            ĉiuj.addAll(nekonataj)
+            if (paĝoj == 1) unuaPaĝoGrandeco = novajElPaĝo.size
+            val nekonataj = novajElPaĝo.takeWhile { it.id !in konataj }
+            // Ĉesu kiam la paĝo komenciĝas per jam-arkivitaj elsendoj (aŭ tute mankas novaj)
+            if (nekonataj.isEmpty() && (paĝoj > 1 || arkivitaj.isNotEmpty())) break
+            novaj.addAll(nekonataj)
             nekonataj.forEach { konataj.add(it.id) }
             fluoUrl = parsilo.leguNextLink(teksto) ?: ""
         }
-        return ĉiuj.distinctBy { it.id }.sortedByDescending { it.dato }
+        // Kunfandu kun la malnova arkivo kaj limigu la grandecon: maks. ~MAKS_PAĜOJ paĝoj da eroj
+        val malnovaj = arkivaTeksto?.let { t ->
+            runBlocking { parsilo.parsuRss(t, kanalo, deArkivo = true) }
+        } ?: emptyList()
+        val maksErjoj = MAKS_PAĜOJ * (if (unuaPaĝoGrandeco > 0) unuaPaĝoGrandeco else 10)
+        return (novaj + malnovaj).distinctBy { it.id }.sortedByDescending { it.dato }.take(maksErjoj)
     }
 
     /**

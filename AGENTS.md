@@ -267,8 +267,8 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   estis intertempe okupita de alia PR, do la vera numero estis 147.)
 - **PR-revizio je peto de la posedanto**: kiam li petas "reviziu la PR", troreviziu
   la tutan diff-on kaj aktive pripensu ĉu io mankas, misas aŭ povus esti problema
-  pri la ŝanĝoj — ne nur konfirmu, sed pritaksu kiel VI pensas, ĉu estas bona kodo,
-  ĉu estas verŝajnaj problemoj? Ankaŭ kontrolu ĉu la ŝanĝoj obeas A7 (testo), A8
+  pri la ŝanĝoj — ne nur konfirmu, sed pritaksu kion VI pensas? Ĉu estas bona kodo?
+  Ĉu estas verŝajnaj problemoj? Ankaŭ kontrolu ĉu la ŝanĝoj obeas A7 (testo), A8
   (neniu silenta catch), A10 (CHANGELOG), A11 (FAROTA/lecionoj), ĉu nur la propraj
   dosieroj estas commititaj, ĉu doc-komitoj apartenas al la PR, kaj ĉu la titolo kaj
   priskribo ĉe la PR kungruas kun la kodo kaj intenco. Se io ne kongruas, avertu.

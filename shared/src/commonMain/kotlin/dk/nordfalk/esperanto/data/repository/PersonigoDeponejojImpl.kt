@@ -10,6 +10,7 @@ import dk.nordfalk.esperanto.domain.repository.SerĉoRezulto
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.domain.repository.AgordojDeponejo
 import dk.nordfalk.esperanto.domain.repository.ElsendoDeponejo
+import dk.nordfalk.esperanto.agorduSentryEtikedon
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logGrava
@@ -175,10 +176,19 @@ class AgordojDeponejoImpl(
     )
     override val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = _kaŝitajAvertoj.asStateFlow()
 
+    // Pseŭdonimo: ŝargita el la agordoj, alie unue generita kaj persistigita
+    private val _pseŭdonimo = MutableStateFlow(
+        settings?.getString(SettingsKeys.PSEŬDONIMO, "")?.takeIf { it.isNotBlank() }
+            ?: generuPseŭdonimon().also { settings?.putString(SettingsKeys.PSEŬDONIMO, it) }
+    )
+    override val pseŭdonimo: StateFlow<String> = _pseŭdonimo.asStateFlow()
+
     init {
         // Sinkronigu la tutmondajn protokol-flagojn (legataj de la log*-funkcioj en ProtokoloUtil)
         protokoloDetala = _detalaProtokolado.value
         raportadoAktiva = _erarRaportado.value
+        // La pseŭdonimo kiel Sentry-etikedo, por rekoni la uzanton en la protokoloj
+        if (raportadoAktiva) agorduSentryEtikedon("uzanto", _pseŭdonimo.value)
     }
 
     /** Persistas la aron kiel kom-separated nomoj (nekonataj nomoj estas ignorataj). */
@@ -254,6 +264,14 @@ class AgordojDeponejoImpl(
             settings?.putBoolean(SettingsKeys.ERAR_RAPORTADO_DEMANDITA, true)
             logi("Agordoj", "ErarRaportadoDemandita → true")
         }
+    }
+    override fun fiksiPseŭdonimon(nomo: String) {
+        val neta = nomo.trim()
+        if (neta.isEmpty() || neta == _pseŭdonimo.value) return
+        _pseŭdonimo.value = neta
+        settings?.putString(SettingsKeys.PSEŬDONIMO, neta)
+        if (raportadoAktiva) agorduSentryEtikedon("uzanto", neta)
+        logi("Agordoj", "Pseŭdonimo → $neta")
     }
     override fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>) {
         _kaŝitajAvertoj.value = tipoj

@@ -38,6 +38,8 @@ object SettingsKeys {
     const val APAJ_NOVAĴOJ_HAKETAĴO = "apaj_novaĵoj_haketaĵo"
     /** Tempo (ms) de la lasta intenca statistiko-"eraro" (geo el IP) — maks. 1× tage. */
     const val LASTA_GEO_STATISTIKO = "lasta_geo_statistiko"
+    /** Pseŭdonimo de la uzanto ("adjektivo substantivo", ekz. "blua suno") — aperas en la protokoloj. */
+    const val PSEŬDONIMO = "pseŭdonimo"
 
     /**
      * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —

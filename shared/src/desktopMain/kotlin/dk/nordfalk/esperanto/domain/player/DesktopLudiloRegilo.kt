@@ -159,7 +159,12 @@ class DesktopLudiloRegilo : LudiloRegilo {
         } catch (e: Exception) {
             log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace(System.err)
-            runCatching { rawStream?.close() } // (FAROTA C16) ne lasu la fluon malfermita
+            // (FAROTA C16) ne lasu la fluon malfermita — kaj protokolu eblan fermo-eraron (A8)
+            try {
+                rawStream?.close()
+            } catch (e2: Exception) {
+                log("fiksiFonton: ne povis fermi rawStream: ${e2.message}")
+            }
             // Portu la FONTON en la Eraro-staton (PR #92): halti() supre forigis nunaFonton,
             // kaj sen ĝi LudvicoRegilo reprovus/aŭtoludus la MALĜUSTAN (antaŭan) elsendon.
             _stato.value = LudantoInformo(

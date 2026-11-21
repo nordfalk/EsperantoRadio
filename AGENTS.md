@@ -187,6 +187,10 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
   dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
   skribis sen la intertempe postulita `mutex.withLock`).
+- **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam verifu per
+  `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente
+  forvori najbarajn sekciojn (2026-11-20: C5/C26/C27 perdiĝis; Statuso-linioj
+  forglutiĝis de `getline`).
 - **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
   ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
   ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`). Tio validas ankaŭ

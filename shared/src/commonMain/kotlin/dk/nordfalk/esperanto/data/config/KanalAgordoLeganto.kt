@@ -103,6 +103,8 @@ data class KanalAgordo(
     val android: AndroidSekcio? = null,
     val komenca_kanalo: String? = null,
     val elsendojUrl: String? = null,
+    /** Bazo de nia arkiv-servilo (riĉigitaj fluoj); la apo provas ĝin unue, poste la originalan fluon. */
+    val arkivoBazoUrl: String? = null,
     val hejmpaĝo: String? = null,
     val kanaloj: List<KanaloDto> = emptyList(),
     val sugestoj_por_alarmoj: List<Alarmo>? = null,

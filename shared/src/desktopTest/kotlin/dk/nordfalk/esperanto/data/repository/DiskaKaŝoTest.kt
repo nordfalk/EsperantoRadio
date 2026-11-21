@@ -93,6 +93,28 @@ class DiskaKaŝoTest {
     }
 
     @Test
+    fun leguKaŝitajnElsendojnElArkivoKonservasId() = kotlinx.coroutines.test.runTest {
+        // Nia arkiva fluo skribas la finan id-on kiel guid kun prefikso "<slug>:" (en CDATA).
+        // La diska kaŝo devas esti rekonata kiel arkiva — alie konstruuId aldonus duan prefikson.
+        val slug = "radiovatikana"
+        val rssTeksto = leguFiksaĵon("radiovatikana-arkivo.xml")
+        val kanalo = Kanalo(
+            slug = slug,
+            nomo = "Radio Vatikana",
+            podkastaRssUrl = "https://www.vaticannews.va/eo/podcast/esperanto-programo.podcast.xml",
+        )
+        skribuKaŝon(slug, rssTeksto)
+
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val kaŝitaj = deponejo.leguKaŝitajnElsendojn(kanalo)
+
+        assertNotNull(kaŝitaj)
+        assertEquals(3, kaŝitaj.size)
+        assertTrue(kaŝitaj.all { it.id.startsWith("radiovatikana:") && !it.id.startsWith("radiovatikana:radiovatikana:") },
+            "La id-oj devas konservi la finan arkivan formon sen duobla prefikso: ${kaŝitaj.first().id}")
+    }
+
+    @Test
     fun leguKaŝitajnElsendojnSenKaŝoRedonasNull() = kotlinx.coroutines.test.runTest {
         val kanalo = Kanalo(
             slug = "neniam_kasita_kanalo_$$",

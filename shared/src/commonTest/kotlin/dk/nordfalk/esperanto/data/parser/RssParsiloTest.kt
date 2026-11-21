@@ -19,6 +19,44 @@ class RssParsiloTest {
         return fluo.bufferedReader().use { it.readText() }
     }
 
+    // === Arkiva fluo de nia servilo (javabog.dk) — deArkivo=true konservas la id-on ===
+    // (Pli fruaj arkivaj fluoj havis GRANDLITERAJN datojn kiel "WED, 18 NOV 2026" — tial
+    // normigiDaton estas usklec-sensema; vidu la teston normigiDatonUsklecSensiva sube.)
+
+    @Test
+    fun parsasArkivanFluonDeNiaServilo() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("radiovatikana-arkivo.xml")
+        val kanalo = Kanalo(
+            slug = "radiovatikana",
+            nomo = "Radio Vatikana",
+            podkastaRssUrl = "https://www.vaticannews.va/eo/podcast/esperanto-programo.podcast.xml"
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo, deArkivo = true)
+
+        assertEquals(3, elsendoj.size)
+        val unua = elsendoj.first()
+        // nia servilo skribas la finan id-on kiel guid kun prefikso "slug:" — deArkivo konservas ĝin
+        assertTrue(unua.id.startsWith("radiovatikana:"), "id: ${unua.id}")
+        // la servilo anstataŭas la ripetiĝantan dat-titolon per temo el la rezumo
+        assertTrue(unua.titolo.startsWith("Post sia apostola vojaĝo"), unua.titolo)
+        assertTrue(unua.fluo.endsWith(".mp3"), unua.fluo)
+        assertEquals(479, unua.daŭro, "7:59 = 479 s")
+        // AI-rezulto estas HTML (kiel la priskriboj de aliaj elsendoj) kun averto en <em>
+        assertTrue(unua.priskriboHtml?.contains("<p>") == true, unua.priskriboHtml)
+        assertTrue(unua.priskriboHtml?.contains("<em>Rezumo farita de la sondosiero per AI") == true, unua.priskriboHtml)
+        // la plata teksto (serĉo/listoj) ankoraŭ enhavas la averto-tekston
+        assertTrue(elsendoj.any { it.priskribo?.contains("Rezumo farita de la sondosiero per AI") == true })
+    }
+
+    @Test
+    fun normigiDatonUsklecSensiva() {
+        // kelkaj fluoj (ankaŭ pli fruaj arkivaj fluoj de nia servilo) skribas la monaton grandlitere
+        assertEquals("2026-11-18", parsilo.normigiDaton("WED, 18 NOV 2026 12:00:00 +0000"))
+        assertEquals("2026-11-18", parsilo.normigiDaton("Wed, 18 Nov 2026 21:20:00 +0100"))
+        assertEquals("2026-04-06", parsilo.normigiDaton("2026-04-06"))
+    }
+
     // === Regulo P6.1 — Ĝenerala parsado (Kernpunkto) ===
 
     @Test

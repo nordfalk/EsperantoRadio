@@ -151,6 +151,41 @@ la sama fluo (inkluzive servila rondiro) redonas la saman id-on.
   pro malforta parsilo — ne necesa se la nova parsilo estas fortika.
 - Atom ISO-8601 (`2018-03-21T17:00:56+00:00`): dato = teksto antaŭ `T`.
 - Kanona elirejo: `yyyy-MM-dd`.
+- La monata mallongigo estas usklec-sensiva (`normigiDaton` akceptas kaj `Nov` kaj
+  `NOV`) — kelkaj fluoj (ankaŭ pli malnovaj arkivaj fluoj de nia servilo) skribas
+  la monaton per grandaj literoj.
+
+## Arkivo-unue: la apo legas niajn riĉigitajn fluojn unue (2026-11)
+
+La servilo publikigas riĉigitajn RSS-fluojn ĉe
+`https://javabog.dk/esperanto-radio/kanaloj/<slug>.xml` (AI-rezultoj en la priskribo,
+normigitaj kampoj). La apo agordas tion per `arkivoBazoUrl` en
+`esperantoradio_konfiguro.json`:
+
+- `ElsendoDeponejoImpl.ŝargiElsendojn` elŝutas nun **ambaŭ** fontojn paralele:
+  `<arkivoBazoUrl><slug>.xml` kaj la originalan `elsendojRssUrl`, kaj kunfandas la
+  rezultojn per `kunfanduElsendojn` (laŭ ID: la arkivo venkas ĉe konflikto — riĉa
+  priskribo/titolo; la originalo aldonas la novajn elsendojn, kiuj ankoraŭ ne estas en
+  la arkivo, do ili aperas tuj). Se ambaŭ fiaskas, liveras la kaŝon — unue enmemora,
+  poste diska (regulo A4).
+- `parsuRss(…, deArkivo = true)` por arkivaj fluoj: la `guid` jam estas la fina ID
+  (`<slug>:…`), do `konstruuId` redonas ĝin senŝanĝa — la ID-oj restas stabilaj
+  inter la arkiva kaj la originala fonto (elsendoj jam luditaj/ŝatataj ne duobliĝas).
+- Diska kaŝo: `leguKaŝitajnElsendojn` rekonas arkivan kaŝon per la guid-prefikso
+  `<guid>(<![CDATA[)?<slug>:`.
+- La servilo skribas `pubDate` laŭ RFC-822 (`Wed, 18 Nov 2026 …`).
+- Tempolimoj: la arkivo ricevas 10 s (`ARKIVA_PETO_TEMPOLIMITO_MS`), la originalo kiel
+  aldona fonto 15 s (sola originalo: la defaŭlta 30 s de la kliento); grandec-limoj:
+  arkivo 8 MB, originalo 1 MB — la arkivo neniam rajtas bloki horloĝon/alarman ŝargon
+  (profundaj arkivaj fluoj, ekz. peranto.xml ≈ 4,5 MB). Ĉar la fontoj estas elŝutataj
+  paralele, la mur-tempo estas la maksimumo, ne la sumo.
+- La AI-rezultoj en la arkivaj fluoj estas HTML (konvertitaj el la plataj rezumo-dosieroj
+  per `analizuRezumon`/`rezumoAlHtml` en `RezumoHtml.kt`): la unua linio (la temo) iĝas
+  `<p><strong>…</strong></p>`, la sekvaj punktoj `<ul><li>`, la averto `<em>` — legebla
+  en la detala ekrano same kiel la priskriboj de aliaj elsendoj. Se la
+  originala titolo enhavas daton (ripetiĝanta titolo kiel „Esperanto Programo
+  18.11.2026“), la servilo aldonas pli informan titolon derivitan el la rezumo
+  (aŭ el `Titolo:`-unua linio de la rezumo-dosiero).
 
 ## Golden-testoj (la plej grava kvalito-averto)
 
@@ -173,8 +208,13 @@ por ĉiu fiksaĵo, asertas:
 | Titol-derivado | Por `ignoruTitolon`-kanal: titolo = priskribo sen HTML, ≤ 200 signoj |
 | radio.txt | "Pola Retradio" → kanal `polaretradio`, id `polaretradio:<dato>`; nekonata nomo → nova kanal |
 | Dat-normigo | `pubDate "… +02:00"` → `yyyy-MM-dd` ĝuste |
+| Parsi `radiovatikana-arkivo.xml` (fluo de nia servilo, `deArkivo=true`) | 3 elsendoj; id komenciĝas per `radiovatikana:`; daŭro `00:07:59` → 479; titolo estas la derivita temo (ne la dat-titolo); priskribo estas HTML (`<p>`, `<em>`-averto) |
 
 La datentavolo devas ruli en **pura `commonTest`** — neniom Android, neniom reto.
+
+La fiksaĵo `radiovatikana-arkivo.xml` estas elprenita el la VERA publika fluo
+(`server/data/publika/kanaloj/radiovatikana.xml`, unuaj 3 eroj) — post ĉiu ŝanĝo de la
+fluo-formato (ekz. HTML-rezultoj, novaj titoloj) regeneru ĝin el la aktuala publika dosiero.
 
 ## Parser-kontrakto
 

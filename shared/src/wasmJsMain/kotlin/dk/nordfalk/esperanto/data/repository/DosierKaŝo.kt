@@ -5,4 +5,6 @@ package dk.nordfalk.esperanto.data.repository
  */
 actual fun leguKaŝon(nomo: String): String? = null
 actual fun skribuKaŝon(nomo: String, enhavo: String) {}
+actual fun leguKaŝonJson(nomo: String): String? = null
+actual fun skribuKaŝonJson(nomo: String, enhavo: String) {}
 actual fun foriguKaŝon(nomo: String) {}

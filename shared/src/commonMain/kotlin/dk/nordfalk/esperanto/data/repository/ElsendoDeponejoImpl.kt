@@ -33,10 +33,10 @@ import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
 
 /** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
-private const val ARKIVA_PETO_TEMROLIMITO_MS = 10_000L
+private const val ARKIVA_PETO_TEMPOLIMITO_MS = 10_000L
 
 /** Tempolimo por la originala fluo KIEL ALDONA fonto (apud la arkivo) — sola originalo uzas la defaŭltan de la kliento. */
-private const val ORIGINALA_PETO_TEMROLIMITO_MS = 15_000L
+private const val ORIGINALA_PETO_TEMPOLIMITO_MS = 15_000L
 
 /** Unu elŝutota fonto: la URL kaj ĉu ĝi estas nia arkiva fluo (deArkivo). */
 private data class Fonto(val url: String, val deArkivo: Boolean)
@@ -196,13 +196,13 @@ open class ElsendoDeponejoImpl(
             async {
                 // Tempolimoj: la arkivo neniam rajtas bloki horloĝon (10 s); la originalo
                 // kiel sola fonto uzas la defaŭltan de la kliento, kiel aldona fonto 15 s.
-                val temrolimoMs = when {
-                    fonto.deArkivo -> ARKIVA_PETO_TEMROLIMITO_MS
-                    fontoj.size > 1 -> ORIGINALA_PETO_TEMROLIMITO_MS
+                val tempolimoMs = when {
+                    fonto.deArkivo -> ARKIVA_PETO_TEMPOLIMITO_MS
+                    fontoj.size > 1 -> ORIGINALA_PETO_TEMPOLIMITO_MS
                     else -> null
                 }
                 try {
-                    val (elsendoj, kruda) = elŝutuKajParsuUnu(kanalo, fonto, temrolimoMs)
+                    val (elsendoj, kruda) = elŝutuKajParsuUnu(kanalo, fonto, tempolimoMs)
                     FontoRezulto.Sukceso(fonto, elsendoj, kruda)
                 } catch (e: CancellationException) {
                     throw e
@@ -243,7 +243,7 @@ open class ElsendoDeponejoImpl(
         leguKaŝitajnElsendojn(kanalo) ?: emptyList()
     }
 
-    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, fonto: Fonto, temrolimoMs: Long?): Pair<List<Elsendo>, String> {
+    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, fonto: Fonto, tempolimoMs: Long?): Pair<List<Elsendo>, String> {
         logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: ${fonto.url}")
         if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(fonto.url, "GET"))
         // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu. Sen tio,
@@ -255,7 +255,7 @@ open class ElsendoDeponejoImpl(
         val limo = if (fonto.deArkivo) 8L * 1024 * 1024 else MAKSIMUMA_FLUA_GRANDECO_BITOKOJ
         val respondo = httpKliento.get(fonto.url) {
             expectSuccess = true
-            if (temrolimoMs != null) timeout { requestTimeoutMillis = temrolimoMs }
+            if (tempolimoMs != null) timeout { requestTimeoutMillis = tempolimoMs }
         }.leguKorponLimigite(limo)
         kontroluFluecon(respondo)
         logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")

@@ -174,7 +174,7 @@ normigitaj kampoj). La apo agordas tion per `arkivoBazoUrl` en
 - Diska kaŝo: `leguKaŝitajnElsendojn` rekonas arkivan kaŝon per la guid-prefikso
   `<guid>(<![CDATA[)?<slug>:`.
 - La servilo skribas `pubDate` laŭ RFC-822 (`Wed, 18 Nov 2026 …`).
-- Tempolimoj: la arkivo ricevas 10 s (`ARKIVA_PETO_TEMROLIMITO_MS`), la originalo kiel
+- Tempolimoj: la arkivo ricevas 10 s (`ARKIVA_PETO_TEMPOLIMITO_MS`), la originalo kiel
   aldona fonto 15 s (sola originalo: la defaŭlta 30 s de la kliento); grandec-limoj:
   arkivo 8 MB, originalo 1 MB — la arkivo neniam rajtas bloki horloĝon/alarman ŝargon
   (profundaj arkivaj fluoj, ekz. peranto.xml ≈ 4,5 MB). Ĉar la fontoj estas elŝutataj

@@ -9,10 +9,12 @@ import io.ktor.client.plugins.expectSuccess
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.decodeFromString
 import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -108,6 +110,24 @@ Rezumo farita de la sondosiero per AI. Eraroj povas okazi]]></description>
         assertEquals("testa:https://fonto.example/a", rezulto[1].id)
         assertTrue(rezulto[1].priskribo!!.contains("Arkiva priskribo"), rezulto[1].priskribo)
         assertTrue(rezulto[1].priskribo!!.contains("Rezumo farita de la sondosiero per AI"))
+    }
+
+    @Test
+    fun sukcesaRetaŜargoSkribasAnkaŭJsonKaŝon() = runTest {
+        val deponejo = deponejo(kliento(mapOf(
+            arkivoUrl to (HttpStatusCode.OK to arkivaFluo),
+            originalaUrl to (HttpStatusCode.OK to originalaFluo),
+        )))
+
+        val rezulto = deponejo.ŝargiElsendojnPorKanal(kanalo, fortoRefresigi = true)
+        assertEquals(2, rezulto.size)
+
+        // La JSON-kaŝo de la PARSITAJ elsendoj estas skribita (rapida sekva starto, 2026-11-21)
+        val jsonTeksto = leguKaŝonJson("testa")
+        assertNotNull(jsonTeksto, "Post sukcesa reta ŝargo, leguKaŝonJson devas redoni la parsitajn elsendojn")
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        val reen = json.decodeFromString<List<Elsendo>>(jsonTeksto)
+        assertEquals(rezulto.map { it.id }.toSet(), reen.map { it.id }.toSet())
     }
 
     @Test

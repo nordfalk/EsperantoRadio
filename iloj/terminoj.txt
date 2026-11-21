@@ -2379,3 +2379,8 @@ zĝĉŝĵŭ
 ŝovnavigado
 ŝtanĝas
 ŭato
+parsitaj
+serializable
+decode
+encode
+reparsado

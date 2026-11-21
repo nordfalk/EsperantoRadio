@@ -246,15 +246,19 @@ class HejmoViewModel(
         val kanaloj = kanaloDeponejo.getKanalojn()
         logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
-        // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
-        val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
+        // Paŝo 1: Legu diskan kaŝmemoron — PROGRESIVE: ĉiu preta kanalo tuj montriĝas
+        _ŝargas.value = true
+        val kolektitaj = mutableListOf<Elsendo>()
+        val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) { ero ->
+            kolektitaj.addAll(ero)
+            plenigu(kanaloj, kolektitaj.toList())
+        } ?: emptyList()
         if (kaŝitaj.isNotEmpty()) {
             plenigu(kanaloj, kaŝitaj)
             logi("HejmoViewModel", "Diska kaŝmemoro: ${kaŝitaj.size} elsendoj — tuj montras")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
-        _ŝargas.value = true
         try {
             val ĉiujElsendoj = coroutineScope {
                 kanaloj

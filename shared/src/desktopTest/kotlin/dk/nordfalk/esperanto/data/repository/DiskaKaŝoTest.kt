@@ -170,4 +170,81 @@ class DiskaKaŝoTest {
         assertNotNull(trovita, "getElsendo devas trovi elsendon el kaŝmemoro post leguKaŝitajnElsendojn")
         assertEquals(unuaElsendo.titolo, trovita.titolo)
     }
+
+    // === JSON-kaŝo de parsitaj elsendoj (rapida starto, 2026-11-21) ===
+
+    @Test
+    fun jsonKaŝoMalkodiĝasSenKrudaRss() = kotlinx.coroutines.test.runTest {
+        val slug = "test_json_kaŝo"
+        val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
+        val kanalo = Kanalo(slug = slug, nomo = "Testo", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
+        val atendataj = parsilo.parsuRss(rssTeksto, kanalo)
+        assertTrue(atendataj.isNotEmpty())
+
+        // Skribu nur la JSON-kaŝon (kiel post reta freŝigo), NENIU krudan .rss
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        skribuKaŝonJson(slug, json.encodeToString(atendataj))
+        assertNull(leguKaŝon(slug), "La kruda .rss ne devas ekzisti en ĉi tiu testo")
+
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val kaŝitaj = deponejo.leguKaŝitajnElsendojn(kanalo)
+
+        assertNotNull(kaŝitaj, "JSON-kaŝo devas esti uzata sen kruda .rss")
+        assertEquals(atendataj.size, kaŝitaj.size)
+        assertEquals(atendataj.first().id, kaŝitaj.first().id)
+        assertEquals(atendataj.first().titolo, kaŝitaj.first().titolo)
+    }
+
+    @Test
+    fun rompitaJsonKaŝoRezervasAlKrudaRss() = kotlinx.coroutines.test.runTest {
+        val slug = "test_json_kaŝo_rompita"
+        val rssTeksto = leguFiksaĵon("kernpunkto_feed.xml")
+        val kanalo = Kanalo(slug = slug, nomo = "Testo", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
+        val atendataj = parsilo.parsuRss(rssTeksto, kanalo)
+
+        skribuKaŝonJson(slug, "{ tio ne estas valida JSON")
+        skribuKaŝon(slug, rssTeksto)
+
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val kaŝitaj = deponejo.leguKaŝitajnElsendojn(kanalo)
+
+        assertNotNull(kaŝitaj, "Ĉe rompita JSON devas uzi la krudan RSS")
+        assertEquals(atendataj.size, kaŝitaj.size)
+    }
+
+    @Test
+    fun foriguKaŝonForigasAnkaŭJson() = kotlinx.coroutines.test.runTest {
+        val slug = "test_forigi_ambaŭ"
+        skribuKaŝon(slug, "<rss/>")
+        skribuKaŝonJson(slug, "[]")
+        assertNotNull(leguKaŝon(slug))
+        assertNotNull(leguKaŝonJson(slug))
+
+        foriguKaŝon(slug)
+
+        assertNull(leguKaŝon(slug), "La kruda .rss devas esti forigita")
+        assertNull(leguKaŝonJson(slug), "La .json devas esti forigita ankaŭ")
+    }
+
+    @Test
+    fun leguĈiujnKaŝitajnElsendojnVokasProgresanCallback() = kotlinx.coroutines.test.runTest {
+        val slug1 = "test_progresa_1"
+        val slug2 = "test_progresa_2"
+        val rss = leguFiksaĵon("kernpunkto_feed.xml")
+        val kanalo1 = Kanalo(slug = slug1, nomo = "T1", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
+        val kanalo2 = Kanalo(slug = slug2, nomo = "T2", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
+        skribuKaŝon(slug1, rss)
+        skribuKaŝon(slug2, rss)
+        // kanalo sen kaŝo — ne aperas en la callback
+        val kanalo3 = Kanalo(slug = "test_progresa_3", nomo = "T3", podkastaRssUrl = "https://kern.punkto.info/feed/mp3/")
+
+        val deponejo = ElsendoDeponejoImpl(HttpClient(CIO))
+        val ricevitaj = mutableListOf<Int>()
+        val ĉiuj = deponejo.leguĈiujnKaŝitajnElsendojn(listOf(kanalo1, kanalo2, kanalo3)) { ero ->
+            ricevitaj.add(ero.size)
+        }
+
+        assertEquals(2, ricevitaj.size, "La callback devas esti vokata po preta kanalo (2×), ne por la kanalo sen kaŝo")
+        assertEquals(ĉiuj.size, ricevitaj.sum(), "La sumo de la progresaj eroj devas egali la finan liston")
+    }
 }

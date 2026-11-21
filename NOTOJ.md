@@ -1,6 +1,6 @@
 # NOTOJ.md — Permanentaj teknikaj notoj de la nova apo
 
-> Ĉi tie staras la daŭre validaj decidoj, kondiĉoj kaj ĝangaloj de la nova KMP-apo,
+> Ĉi tie estas la daŭre validaj decidoj, kondiĉoj kaj ĝangaloj de la nova KMP-apo,
 > kiuj estis lernitaj dum la kodrevizio (2026-10) kaj kiujn estonta programado devas
 > koni. La PR-referencoj montras al la PR kies priskribo kaj kommitaj mesaĝoj
 > entenas la plenan klarigon (pruvojn, kialojn, kaj la difinojn de la etikedoj

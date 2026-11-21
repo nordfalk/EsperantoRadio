@@ -38,6 +38,7 @@ import java.io.File
 import javax.imageio.ImageIO
 import org.jetbrains.skia.Image as SkiaImage
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 /**
  * Ekranfota testoj — kaptas ĉiun ekranon kiel PNG-dosieron.
@@ -78,13 +79,16 @@ class EkranfotoTesto {
         // (la dialogon se ĝi malfermitas, alikaze la solan ekrano-radikon).
         val radikoj = test.onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })
         val nombro = radikoj.fetchSemanticsNodes().size
+        // (FAROTA C25, 2026-11-20) minimuma aserto: almenaŭ unu radiko kaj ne-malplena bildo
+        assertTrue(nombro >= 1, "Neniu kompona radiko trovita por $nomo")
         val lastaRadiko = radikoj[nombro - 1]
         val bitmap = lastaRadiko.captureToImage().asSkiaBitmap()
         val pngBitokoj = SkiaImage.makeFromBitmap(bitmap).encodeToData(org.jetbrains.skia.EncodedImageFormat.PNG)?.bytes
-        if (pngBitokoj != null) {
-            dosiero.writeBytes(pngBitokoj)
-            println("[EkranfotoTesto] Savis: ${dosiero.absolutePath}")
-        }
+        assertTrue(pngBitokoj != null && pngBitokoj.size > 10_000,
+            "Ekranfoto '$nomo' estas malplena aŭ tro malgranda: ${pngBitokoj?.size ?: -1} bitokoj")
+        dosiero.writeBytes(pngBitokoj!!)
+        assertTrue(dosiero.length() > 10_000, "Ekranfoto-dosiero '$nomo' ne skribiĝis korekte")
+        println("[EkranfotoTesto] Savis: ${dosiero.absolutePath} (${dosiero.length()} bitokoj)")
     }
 
     @Test

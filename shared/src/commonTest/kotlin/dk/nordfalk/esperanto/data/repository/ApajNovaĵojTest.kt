@@ -101,6 +101,15 @@ class ApajNovaĵojTest {
     }
 
     @Test
+    fun pasintajNovaĵojEksponitajPorFaldeblaSekcio() {
+        val deponejo = ApajNovaĵojDeponejo(MapSettings(), "Nuna novaĵo", listOf("  Unua pasinta  ", "", "   ", "Dua pasinta"))
+        assertEquals(listOf("Unua pasinta", "Dua pasinta"), deponejo.pasintaj)
+
+        assertEquals(emptyList(), ApajNovaĵojDeponejo(MapSettings(), "Nuna", null).pasintaj)
+        assertEquals(emptyList(), ApajNovaĵojDeponejo(MapSettings(), "Nuna", emptyList()).pasintaj)
+    }
+
+    @Test
     fun mesaĝoEstasEksponitaPorLaEkrano() {
         // La ekrano „Apaj novaĵoj“ montras la mesaĝon sendepende de la konfirmo
         val deponejo = ApajNovaĵojDeponejo(MapSettings(), "  Versio 3.2 eldoniĝis  ")

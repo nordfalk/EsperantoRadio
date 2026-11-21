@@ -21,6 +21,7 @@ import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.subtenasSciigojn
 import dk.nordfalk.esperanto.data.repository.sciigPermesoDonita
 import dk.nordfalk.esperanto.data.repository.malfermuSciigAgordojn
+import dk.nordfalk.esperanto.data.repository.generuPseŭdonimon
 import dk.nordfalk.esperanto.logi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +42,9 @@ fun AgordojEkrano(
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val detalaProtokolado by agordojDeponejo.detalaProtokolado.collectAsState()
     val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
+    val pseŭdonimo by agordojDeponejo.pseŭdonimo.collectAsState()
     val problemoj by diagnozoProblemoj.collectAsState()
+    var montriPseŭdonimanDialogon by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -136,6 +139,13 @@ fun AgordojEkrano(
             Spacer(Modifier.height(24.dp))
             Text("Privateco", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text("Pseŭdonimo") },
+                supportingContent = { Text(pseŭdonimo) },
+                trailingContent = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                modifier = Modifier.clickable { logi("Klako", "Pseŭdonimo"); montriPseŭdonimanDialogon = true }
+            )
+            Spacer(Modifier.height(8.dp))
             ŜaltilaLinio(
                 titolo = "Sendu erar-raportojn",
                 priskribo = "Permesu al la apo sendi sennomajn erarojn kaj protokolojn al la erar-monitorado (Sentry) de la evoluigisto — tio helpas trovi kaj ripari problemojn. Ŝanĝoj de kraŝ-raportoj tute ekvalidas post restartigo de la apo",
@@ -176,6 +186,40 @@ fun AgordojEkrano(
                 modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)
             )
         }
+    }
+
+    if (montriPseŭdonimanDialogon) {
+        var kampo by remember { mutableStateOf(pseŭdonimo) }
+        AlertDialog(
+            onDismissRequest = { montriPseŭdonimanDialogon = false },
+            title = { Text("Pseŭdonimo") },
+            text = {
+                Column {
+                    Text("Via unika nomo en la protokoloj de la apo (ekz. „blua suno“).")
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = kampo,
+                        onValueChange = { kampo = it },
+                        label = { Text("Pseŭdonimo") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    TextButton(onClick = { kampo = generuPseŭdonimon() }) {
+                        Text("Generi novan hazardan nomon")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    agordojDeponejo.fiksiPseŭdonimon(kampo)
+                    montriPseŭdonimanDialogon = false
+                }) { Text("Bone") }
+            },
+            dismissButton = {
+                TextButton(onClick = { montriPseŭdonimanDialogon = false }) { Text("Nuligi") }
+            }
+        )
     }
 }
 

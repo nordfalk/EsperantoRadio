@@ -14,6 +14,7 @@ import dk.nordfalk.esperanto.domain.model.DiagnozoTipo
 import dk.nordfalk.esperanto.domain.model.Severeco
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * UI-testoj por AgordojEkrano — testas plurajn tavolojn (UI + generita ApoVersio).
@@ -74,9 +75,27 @@ class AgordojEkranoTest {
             AgordojEkrano(agordojDeponejo = AgordojDeponejoImpl(), onReen = {})
         }
         waitForIdle()
-        onNodeWithText("Ŝaltu detalan protokoladon").assertIsDisplayed()
+        onNodeWithText("Ŝaltu detalan protokoladon").performScrollTo().assertIsDisplayed()
     }
 
+
+    @Test
+    fun pseŭdonimoŜanĝeblasPerDialogo() = runComposeUiTest {
+        val deponejo = AgordojDeponejoImpl()
+        val komence = deponejo.pseŭdonimo.value
+        setContent {
+            AgordojEkrano(agordojDeponejo = deponejo, onReen = {})
+        }
+        waitForIdle()
+        // Malfermu la dialogon per klako sur la linio "Pseŭdonimo"
+        onNodeWithText("Pseŭdonimo").performClick()
+        waitForIdle()
+        onNodeWithText("Generi novan hazardan nomon").assertIsDisplayed()
+        onNodeWithText("Generi novan hazardan nomon").performClick()
+        onNodeWithText("Bone").performClick()
+        waitForIdle()
+        assertTrue(deponejo.pseŭdonimo.value != komence, "La pseŭdonimo devas ŝanĝiĝi")
+    }
 
     @Test
     fun montrasŜaltilonPorErarRaportado() = runComposeUiTest {
@@ -85,6 +104,6 @@ class AgordojEkranoTest {
         }
         waitForIdle()
         // Opt-in-erar-raportado (C50/F-Droid): defaŭlte malŝaltita, ŝanĝebla ĉi tie
-        onNodeWithText("Sendu erar-raportojn").assertIsDisplayed()
+        onNodeWithText("Sendu erar-raportojn").performScrollTo().assertIsDisplayed()
     }
 }

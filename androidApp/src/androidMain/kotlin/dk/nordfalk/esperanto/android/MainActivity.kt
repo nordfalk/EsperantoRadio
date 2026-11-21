@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import dk.nordfalk.esperanto.EsperantoRadioApp
 import dk.nordfalk.esperanto.data.config.IntentŜlosilo
 import dk.nordfalk.esperanto.data.repository.NovajElsendojKontroloWorker
@@ -20,14 +21,13 @@ import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.testuSentry
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var ludilo: ExoPlayerLudiloRegilo
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    // (FAROTA C22, 2026-11-20) neniu propra ne-nuligebla scope plu: la lanĉo de la
+    // ludado el sciigo uzas lifecycleScope (nuligita en onDestroy — la servo
+    // transprenas la ludadon sendepende de la Activity).
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,8 +110,8 @@ class MainActivity : ComponentActivity() {
             dato = dato,
         )
 
-        // Komencas ludi
-        scope.launch {
+        // Komencas ludi — lifecycleScope (FAROTA C22): mallonga laboro ligita al la Activity
+        lifecycleScope.launch {
             try {
                 ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo))
                 ludilo.ludi()

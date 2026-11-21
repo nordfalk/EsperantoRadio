@@ -14,9 +14,10 @@
 | C5 | Aktuala (`build.gradle.kts:64` hardkodita keystore-vojo). |
 | C9 | Parte: `jcenter()` forigita, sed la jcenter-URL ankoraŭ registrita kiel maven-repo; `verification-metadata.xml` mankas; dependabot.yml ekzistas. |
 | C15, C16, C21, C25, C30 | **SOLVITAJ 2026-11-20** (forigo de malnovaj aŭskultantoj en wasmJs; fermo de `rawStream` + KDoc de `saltiAl` sur Desktop; forigo de `LOCKED_BOOT_COMPLETED`; asertoj en `EkranfotoTesto`; KDoc en `LudvicoLogiko`) — punktoj forigitaj el ĉi tiu dosiero; verdaj: `:shared:desktopTest`, `:shared:compileKotlinWasmJs`, `:androidApp:assembleDebug`. |
-| C22, C26, C27, C32, C34 | Ankoraŭ aktualaj (kontrolita en la kodo). |
+| C22, C40 | **SOLVITAJ 2026-11-20** (`lifecycleScope` anstataŭ propra ne-nuligebla scope en `MainActivity`; `-Xmx3g` en `gradle.properties`) — punktoj forigitaj; verdaj: `:androidApp:assembleDebug`, `:shared:desktopTest`. |
+| C26, C27, C32, C34 | Ankoraŭ aktualaj (kontrolita en la kodo). |
 | C29 | **SOLVITA** — `resolutionStrategy.force` forigita; punkto forigita el ĉi tiu dosiero. |
-| C40 | Aktuala (`-Xmx1536m`). |
+| C40 | **SOLVITA 2026-11-20** (`-Xmx3g`); punkto forigita. |
 | C41 | Parte: AGENTS.md ankoraŭ ne mencias la diagnozan ekranon; `docs/nova/02–04` ankoraŭ priskribas `puriguModeloj` (kiu fakte ekzistas en la kodo). |
 | C43, C44, C50, C51, C52, C54, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte). |
 | C46 | Parte: neniuj novaj `ExoPlaybackException`-eraroj sur novaj buildoj (14 tagoj: nur 4 sur dist 246); sed lud-eraroj restas nevideblaj en Sentry (3-arg `logw` = loka). |
@@ -56,11 +57,6 @@
 - **Loko**: radika `build.gradle.kts` (`jcenter()` en `allprojects` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; neniu `dependabot.yml`
 - **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu Dependabot kaj OWASP `dependencyCheck` en CI; limigu `jcenter()` al la malnova projekto aŭ forigu ĝin iam.
 
-#### C22 — `MainActivity.scope` neniam nuligeblas kaj postvivas la Activity
-- **Statuso**: [ ]
-- **Loko**: `androidApp/.../MainActivity.kt:43`
-- **Priskribo**: La alarm-korutino (`delay(10_000)` + reto) retenas la detruitan Activity ĝis ~10+ sekundojn post `onDestroy`. Por la alarmo tio estas intenca (la servo transprenas), sed konsilindas apliki `lifecycleScope` por mallongaj UI-korutinoj kaj teni la alarman laboron aparte (kun komento).
-
 #### C26 — `HejmoEkranoTest` uzas realtempan daton
 - **Statuso**: [ ]
 - **Loko**: `shared/src/commonTest/.../ui/HejmoEkranoTest.kt:59` (`Clock.System.todayIn(TimeZone.UTC)`)
@@ -80,11 +76,6 @@
 - **Statuso**: [ ]
 - **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
 - **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
-
-#### C40 — `gradle.properties`: `org.gradle.jvmargs=-Xmx1536m` malalta por KMP
-- **Statuso**: [ ]
-- **Loko**: `gradle.properties:9` (la wasmJs-konstruo bezonas `-Pkotlin.daemon.jvmargs=-Xmx4g`, dokumentita en AGENTS.md)
-- **Sugesto**: pliigu la defaŭltan valoron.
 
 #### C41 — AGENTS.md kaj docs malfruas post la kodo
 - **Statuso**: [ ]

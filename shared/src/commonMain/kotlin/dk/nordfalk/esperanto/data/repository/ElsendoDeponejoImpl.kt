@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
 
 /** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
@@ -276,29 +277,35 @@ open class ElsendoDeponejoImpl(
         // re-legu kaj re-parsu la diskon senbezone (KMP-esplorado 2026-10-20:
         // la ekranoj vokas tion je ĉiu eniro).
         kaŝmemoro[kanalo.slug]?.let { return it }
-        val respondo = leguKaŝon(kanalo.slug) ?: return null
-        logd("ElsendoDeponejo", "${kanalo.slug}: legas diskan kaŝmemoron (${respondo.length} signoj)")
-        return try {
-            // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
-            // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
-            kontroluFluecon(respondo)
-            // Detekto: niaj arkivaj fluoj skribas la finan id-on kiel guid kun prefikso
-            // "<slug>:" (la servilo envolvas la guid en CDATA — tial la regexo)
-            val elArkivo = Regex("<guid>(?:<!\\[CDATA\\[)?${Regex.escape(kanalo.slug)}:").containsMatchIn(respondo)
-            val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = elArkivo, httpKliento = arhivaPeto).ordigitajPlejFreŝajUnue()
-            konservu(kanalo.slug, elsendoj)
-            logd("ElsendoDeponejo", "${kanalo.slug}: diska kaŝmemoro parsita — ${elsendoj.size} elsendoj")
-            elsendoj
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            // Rompita parsado de la loka kaŝdosiero (Sentry montris IllegalArgumentException
-            // — do interna cimo, ne kaptiva portalo): forigu la malpuran kaŝon, alikaze
-            // tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S). loge: erar-evento, ĉar la
-            // kaŝmemoro estas loka kaj la eraro do indikas kod-cimon.
-            loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesa re-parsado de diska kaŝmemoro — forigas la kaŝon", e)
-            foriguKaŝon(kanalo.slug)
-            null
+        // Legado (bloka dosier-I/O) kaj parsado okazas sur Dispatchers.Default — vokoj
+        // ofte venas de la ĉefa fadeno (HejmoViewModel), kaj granda arkiva kaŝo
+        // (ekz. peranto ≈ 1,6 MB) blokus la unuan kadron dum pluraj sekundoj
+        // (logcat 2026-11-21: "Skipped 213 frames", Davey 3779 ms).
+        return withContext(Dispatchers.Default) {
+            val respondo = leguKaŝon(kanalo.slug) ?: return@withContext null
+            logd("ElsendoDeponejo", "${kanalo.slug}: legas diskan kaŝmemoron (${respondo.length} signoj)")
+            try {
+                // Mem-sangigo: kaŝoj skribitaj de antaŭ-riparaj versioj povas enhavi fiaskpaĝon
+                // (HTTP 200 de kaptiva portalo) — ne re-parsu ĝin kiel fluon
+                kontroluFluecon(respondo)
+                // Detekto: niaj arkivaj fluoj skribas la finan id-on kiel guid kun prefikso
+                // "<slug>:" (la servilo envolvas la guid en CDATA — tial la regexo)
+                val elArkivo = Regex("<guid>(?:<!\\[CDATA\\[)?${Regex.escape(kanalo.slug)}:").containsMatchIn(respondo)
+                val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = elArkivo, httpKliento = arhivaPeto).ordigitajPlejFreŝajUnue()
+                konservu(kanalo.slug, elsendoj)
+                logd("ElsendoDeponejo", "${kanalo.slug}: diska kaŝmemoro parsita — ${elsendoj.size} elsendoj")
+                elsendoj
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                // Rompita parsado de la loka kaŝdosiero (Sentry montris IllegalArgumentException
+                // — do interna cimo, ne kaptiva portalo): forigu la malpuran kaŝon, alikaze
+                // tiu fiasko ripetiĝus je ĉiu apomfermo (KMP-1S). loge: erar-evento, ĉar la
+                // kaŝmemoro estas loka kaj la eraro do indikas kod-cimon.
+                loge("ElsendoDeponejo", "${kanalo.slug}: malsukcesa re-parsado de diska kaŝmemoro — forigas la kaŝon", e)
+                foriguKaŝon(kanalo.slug)
+                null
+            }
         }
     }
 
@@ -306,15 +313,21 @@ open class ElsendoDeponejoImpl(
      * Legas ĉiujn kaŝitajn RSS-dosierojn por la donitaj kanaloj kaj re-parsas ilin.
      * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
      * Redonas ĉiujn elsendojn kune (plata listo).
+     *
+     * La kanaloj estas legataj PARALELE (ĉiu sur Dispatchers.Default ene de
+     * [leguKaŝitajnElsendojn]) — sinsekva legado sur la vokanta fadeno (kutime la
+     * ĉefa) blokus la unuan kadron dum ~3,5 s ĉe grandaj arkivaj kaŝoj.
      */
-    suspend fun leguĈiujnKaŝitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> {
-        val ĉiuj = mutableListOf<Elsendo>()
-        for (kanalo in kanaloj) {
-            if (!kanalo.havasPodkastojn) continue
-            leguKaŝitajnElsendojn(kanalo)?.let { ĉiuj.addAll(it) }
-        }
-        logd("ElsendoDeponejo", "Diska kaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
-        return ĉiuj
+    suspend fun leguĈiujnKaŝitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> = coroutineScope {
+        kanaloj
+            .filter { it.havasPodkastojn }
+            .map { kanalo -> async { leguKaŝitajnElsendojn(kanalo) } }
+            .awaitAll()
+            .filterNotNull()
+            .flatten()
+            .also { ĉiuj ->
+                logd("ElsendoDeponejo", "Diska kaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+            }
     }
 
     override suspend fun getElsendo(id: String): Elsendo? {

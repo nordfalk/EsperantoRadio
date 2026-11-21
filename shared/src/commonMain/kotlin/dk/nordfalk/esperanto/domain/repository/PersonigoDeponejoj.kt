@@ -83,6 +83,13 @@ interface AgordojDeponejo {
      */
     val kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>>
 
+    /**
+     * Pseŭdonimo de la uzanto ("adjektivo substantivo", ekz. "blua suno") —
+     * aperas kiel etikedo "uzanto" en la protokoloj (Sentry), por ke la
+     * posedanto povu rekoni unuopajn uzantojn. Ŝanĝebla en Agordoj.
+     */
+    val pseŭdonimo: StateFlow<String>
+
     fun fiksiTemon(temo: String)
     fun fiksiSciigojn(ŝaltita: Boolean)
     fun fiksiAŭtomatanDaŭrigon(ŝaltita: Boolean)
@@ -96,6 +103,9 @@ interface AgordojDeponejo {
 
     /** Memorigas rifuzon de la konsento-demando (sen ŝalti la raportadon). */
     fun konfirmuErarRaportadoDemandon()
+
+    /** Ŝanĝas la pseŭdonimon de la uzanto (kaj la Sentry-etikedon "uzanto"). */
+    fun fiksiPseŭdonimon(nomo: String)
 
     /** Kaŝas la donitajn problemo-tipojn (anstataŭigas la tutan aron). */
     fun kaŝuAvertojn(tipoj: Set<DiagnozoTipo>)

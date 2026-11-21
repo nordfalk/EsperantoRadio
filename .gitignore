@@ -74,3 +74,4 @@ server/data/*
 server/data/publika/*
 !server/data/publika/index.html
 !server/data/publika/icon.png
+iloj/vortaro/

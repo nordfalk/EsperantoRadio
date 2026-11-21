@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/183)
+- Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/184)
 - Riĉigitaj fluoj de arkiv-servilo (javabog.dk/esperanto-radio/kanaloj) kun priskriboj faritaj de AI; la apo kunfandas ilin kun la originalaj fluoj (novaj elsendoj aperas tuj), kaj se ambaŭ malsukcesas, uzas la kaŝon (https://github.com/nordfalk/EsperantoRadio/pull/180)
 - Arkiv-servilo: publika elŝutejo ĉe javabog.dk/esperanto-radio kun riĉigitaj RSS-fluoj (AI-rezultoj por elsendoj sen priskribo) kaj prezentpaĝo de la projekto (https://github.com/nordfalk/EsperantoRadio/pull/177)
 - Elsendoj sen propra bildeto (ekz. Varsovia Vento, Pola Retradio, Magazino Tuluzo) ricevas bildeton el la unua bildo de sia priskribo; en la elsendopaĝo tiu bildo ne aperas duoble (https://github.com/nordfalk/EsperantoRadio/pull/171)

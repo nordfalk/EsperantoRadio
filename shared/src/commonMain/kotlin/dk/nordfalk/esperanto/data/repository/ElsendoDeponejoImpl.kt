@@ -21,6 +21,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +34,17 @@ import kotlin.concurrent.Volatile
 /** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
 private const val ARKIVA_PETO_TEMROLIMITO_MS = 10_000L
 
+/** Tempolimo por la originala fluo KIEL ALDONA fonto (apud la arkivo) — sola originalo uzas la defaŭltan de la kliento. */
+private const val ORIGINALA_PETO_TEMROLIMITO_MS = 15_000L
+
 /** Unu elŝutota fonto: la URL kaj ĉu ĝi estas nia arkiva fluo (deArkivo). */
 private data class Fonto(val url: String, val deArkivo: Boolean)
+
+/** Rezulto de unu fonto: sukceso (parsitaj elsendoj + kruda teksto por la kaŝo) aŭ fiasko. */
+private sealed interface FontoRezulto {
+    data class Sukceso(val fonto: Fonto, val elsendoj: List<Elsendo>, val kruda: String) : FontoRezulto
+    data class Fiasko(val fonto: Fonto, val eraro: Throwable) : FontoRezulto
+}
 
 /**
  * ElsendoDeponejo-implentaĵo. Elŝutas RSS-fluojn per Ktor, parsas per RssParsilo,
@@ -173,65 +184,83 @@ open class ElsendoDeponejoImpl(
     }
 
     /**
-     * La reta parto de [ŝargiElsendojn]: elŝutas la RSS-fluon kaj parsas ĝin.
-     * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
+     * La reta parto de [ŝargiElsendojn]: elŝutas ĈIUJN fontojn (arkivo + originalo) parolele
+     * kaj kunfandas la rezultojn — la arkivo venkas ĉe konflikto (riĉa priskribo/titolo),
+     * la originalo aldonas la novajn elsendojn, kiuj ankoraŭ ne estas en la arkivo.
+     * Tolerema: fiasko de unu fonto ne haltigas la aliajn (regulo A4); se ĈIUJ fiaskas,
+     * redonas la kaŝon — unue la enmemoran, poste la diskan.
      */
-    private suspend fun elŝutuKajParsu(kanalo: Kanalo, fontoj: List<Fonto>, kaŝenitaj: List<Elsendo>?): List<Elsendo> {
-        var lastaEraro: Throwable? = null
-        for (fonto in fontoj) {
-            try {
-                return elŝutuKajParsuUnu(kanalo, fonto)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
-                // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo A4).
-                // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
-                // ili devas NE iĝi erar-nivelaj Sentry-eventoj (PR #93).
-                lastaEraro = e
-                logw("ElsendoDeponejo", "${kanalo.slug}: ${fonto.url} malsukcesis — provos sekvan fonton", e)
+    private suspend fun elŝutuKajParsu(kanalo: Kanalo, fontoj: List<Fonto>, kaŝenitaj: List<Elsendo>?): List<Elsendo> = coroutineScope {
+        val rezultoj = fontoj.map { fonto ->
+            async {
+                // Tempolimoj: la arkivo neniam rajtas bloki horloĝon (10 s); la originalo
+                // kiel sola fonto uzas la defaŭltan de la kliento, kiel aldona fonto 15 s.
+                val temrolimoMs = when {
+                    fonto.deArkivo -> ARKIVA_PETO_TEMROLIMITO_MS
+                    fontoj.size > 1 -> ORIGINALA_PETO_TEMROLIMITO_MS
+                    else -> null
+                }
+                try {
+                    val (elsendoj, kruda) = elŝutuKajParsuUnu(kanalo, fonto, temrolimoMs)
+                    FontoRezulto.Sukceso(fonto, elsendoj, kruda)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    // Throwable, ne Exception: la retumila Ktor-motoro (Js) ĵetas kotlin.Error("Fail to fetch")
+                    // ekz. ĉe CORS-blokado. Se ĝi eskapus, ĝi nuligus la ŝargadon de ĈIUJ aliaj kanaloj (regulo A4).
+                    // logw (ne loge): retaj malsukcesoj estas ATENDATAJ (sen reto, kaptiva portalo) —
+                    // ili devas NE iĝi erar-nivelaj Sentry-eventoj (PR #93).
+                    logw("ElsendoDeponejo", "${kanalo.slug}: ${fonto.url} malsukcesa — uzos la aliajn fontojn / la kaŝon", e)
+                    FontoRezulto.Fiasko(fonto, e)
+                }
             }
+        }.awaitAll()
+
+        val sukcesoj = rezultoj.filterIsInstance<FontoRezulto.Sukceso>()
+        val arkiva = sukcesoj.firstOrNull { it.fonto.deArkivo }
+        val originala = sukcesoj.firstOrNull { !it.fonto.deArkivo }
+        val kunfanditaj = when {
+            arkiva != null && originala != null -> kunfanduElsendojn(arkiva.elsendoj, originala.elsendoj)
+            arkiva != null -> arkiva.elsendoj
+            else -> originala?.elsendoj
         }
-        // Ĉiuj fontoj malsukcesaj (ekz. arkivo kaj originalo): tolerema rezervo —
-        // liveri la kaŝenitan datumon anstataŭ ĵeti (regulo A4)
+        if (kunfanditaj != null) {
+            // Diska kaŝo: la arkiva kruda teksto se sukcesa, alie la originala (unu dosiero po kanalo)
+            skribuKaŝon(kanalo.slug, (arkiva ?: originala)!!.kruda)
+            konservu(kanalo.slug, kunfanditaj)
+            logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${kunfanditaj.size} elsendoj (fontoj: ${sukcesoj.size}/${fontoj.size})")
+            return@coroutineScope kunfanditaj
+        }
+        // Ĉiuj fontoj malsukcesaj: unue enmemora kaŝo, poste diska kaŝo (regulo A4)
+        val lastaEraro = rezultoj.filterIsInstance<FontoRezulto.Fiasko>().lastOrNull()?.eraro
         logw(
             "ElsendoDeponejo",
-            "RSS-malsukcesa por ${kanalo.slug} — uzas ${kaŝenitaj?.size ?: 0} kaŝenitajn elsendojn",
+            "RSS-malsukcesa por ${kanalo.slug} — uzas la kaŝon",
             lastaEraro ?: IllegalStateException("Neniu fonto difinita por ${kanalo.slug}")
         )
-        return kaŝenitaj ?: emptyList()
+        kaŝenitaj?.let { return@coroutineScope it }
+        leguKaŝitajnElsendojn(kanalo) ?: emptyList()
     }
 
-    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, fonto: Fonto): List<Elsendo> {
-        val url = fonto.url
-        val deArkivo = fonto.deArkivo
-        logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: $url")
-        if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(url, "GET"))
-        // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu provos la
-        // sekvan fonton. Sen tio, fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj
-        // anstataŭigus kaj la enmemoran kaj la diskan kaŝon per malplena enhavo.
+    private suspend fun elŝutuKajParsuUnu(kanalo: Kanalo, fonto: Fonto, temrolimoMs: Long?): Pair<List<Elsendo>, String> {
+        logd("ElsendoDeponejo", "${kanalo.slug}: elŝutas RSS-fluon: ${fonto.url}")
+        if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.http(fonto.url, "GET"))
+        // expectSuccess=true: 4xx/5xx ĵetas escepton → la catch en elŝutuKajParsu. Sen tio,
+        // fiaskpaĝo (HTML de 404/500) estus parsata kiel fluo kaj anstataŭigus la kaŝon.
         // leguKorponLimigite (G45): korpo pli granda ol la limo ne estas legata en la
         // memoron — misdirektita respondo (MP3 anstataŭ fluo) kaŭzis OutOfMemoryError.
         // Niaj arkivaj fluoj povas esti pli grandaj ol 1 MB (profunda historio, ekz.
         // peranto.xml ≈ 4,5 MB) — por ili ni permesas pli, ĉar ni regas la servilon.
-        val limo = if (deArkivo) 8L * 1024 * 1024 else MAKSIMUMA_FLUA_GRANDECO_BITOKOJ
-        val respondo = httpKliento.get(url) {
+        val limo = if (fonto.deArkivo) 8L * 1024 * 1024 else MAKSIMUMA_FLUA_GRANDECO_BITOKOJ
+        val respondo = httpKliento.get(fonto.url) {
             expectSuccess = true
-            if (deArkivo) {
-                // La arkivo estas nur optimumigo SUPER la originala fluo — ĝi neniam
-                // rajtas bloki horloĝon/alarman ŝargon: post 10 s ni falos al la
-                // originala fonto (la arkivo estos provita denove je la sekva ŝargo).
-                timeout { requestTimeoutMillis = ARKIVA_PETO_TEMROLIMITO_MS }
-            }
+            if (temrolimoMs != null) timeout { requestTimeoutMillis = temrolimoMs }
         }.leguKorponLimigite(limo)
         kontroluFluecon(respondo)
         logd("ElsendoDeponejo", "${kanalo.slug}: RSS-elŝuto kompleta — ${respondo.length} signoj")
-        skribuKaŝon(kanalo.slug, respondo)
-        val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = deArkivo, httpKliento = arhivaPeto)
+        val elsendoj = parsilo.parsuRss(respondo, kanalo, deArkivo = fonto.deArkivo, httpKliento = arhivaPeto)
             .ordigitajPlejFreŝajUnue()
-        logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${elsendoj.size} elsendoj")
-        konservu(kanalo.slug, elsendoj)
-        return elsendoj
+        return elsendoj to respondo
     }
 
     override suspend fun ŝargiElsendojnPorKanal(kanalo: Kanalo, fortoRefresigi: Boolean): List<Elsendo> =
@@ -331,9 +360,19 @@ open class ElsendoDeponejoImpl(
 /**
  * Ordigas elsendojn plej-freŝe-unue.
  *
- * La dato estas "yyyy-MM-dd"-ĉeno, do leksikografia ordo estas kronologia ordo.
+ * La dato estas "yyyy-MM-dd"-ĉeno, do leksikografia ordo estas kronologica ordo.
  * Ne ĉiuj fluoj estas plej-freŝe-unue (ekz. IRo listigas plej-malnovajn unue;
  * `LudvicoLogiko` kaj la kanal-vido supozas plej-freŝe-unue) — tial la deponejo
  * devigas la ordon ĉe unu loko.
  */
 internal fun List<Elsendo>.ordigitajPlejFreŝajUnue(): List<Elsendo> = sortedByDescending { it.dato }
+
+/**
+ * Kunfandas arkivajn kaj originalajn elsendojn laŭ ID: la arkivo venkas ĉe konflikto
+ * (riĉa HTML-priskribo, derivita titolo, solvitanaj URL-oj), la originalo aldonas nur
+ * la novajn ID-ojn (elsendoj, kiuj ankoraŭ ne estas en la arkivo). Rezulto: plej-freŝe-unue.
+ */
+internal fun kunfanduElsendojn(arkivaj: List<Elsendo>, originalaj: List<Elsendo>): List<Elsendo> {
+    val arkivajIdoj = arkivaj.map { it.id }.toSet()
+    return (arkivaj + originalaj.filter { it.id !in arkivajIdoj }).ordigitajPlejFreŝajUnue()
+}

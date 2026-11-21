@@ -162,19 +162,23 @@ La servilo publikigas riĉigitajn RSS-fluojn ĉe
 normigitaj kampoj). La apo agordas tion per `arkivoBazoUrl` en
 `esperantoradio_konfiguro.json`:
 
-- `ElsendoDeponejoImpl.ŝargiElsendojn` provas unue `<arkivoBazoUrl><slug>.xml`, poste la
-  originalan `elsendojRssUrl` kiel rezervo; se ambaŭ malsukcesas, liveras la kaŝenitan
-  datumon (regulo A4).
+- `ElsendoDeponejoImpl.ŝargiElsendojn` elŝutas nun **ambaŭ** fontojn paralele:
+  `<arkivoBazoUrl><slug>.xml` kaj la originalan `elsendojRssUrl`, kaj kunfandas la
+  rezultojn per `kunfanduElsendojn` (laŭ ID: la arkivo venkas ĉe konflikto — riĉa
+  priskribo/titolo; la originalo aldonas la novajn elsendojn, kiuj ankoraŭ ne estas en
+  la arkivo, do ili aperas tuj). Se ambaŭ fiaskas, liveras la kaŝon — unue enmemora,
+  poste diska (regulo A4).
 - `parsuRss(…, deArkivo = true)` por arkivaj fluoj: la `guid` jam estas la fina ID
   (`<slug>:…`), do `konstruuId` redonas ĝin senŝanĝa — la ID-oj restas stabilaj
   inter la arkiva kaj la originala fonto (elsendoj jam luditaj/ŝatataj ne duobliĝas).
 - Diska kaŝo: `leguKaŝitajnElsendojn` rekonas arkivan kaŝon per la guid-prefikso
   `<guid>(<![CDATA[)?<slug>:`.
 - La servilo skribas `pubDate` laŭ RFC-822 (`Wed, 18 Nov 2026 …`).
-- Arkivaj petoj ricevas propran tempolimon de 10 s (`ARKIVA_PETO_TEMROLIMITO_MS`) kaj
-  grandec-limon de 8 MB — la arkivo estas optimumigo super la originala fluo kaj neniam
-  rajtas bloki horloĝon/alarman ŝargon (profundaj arkivaj fluoj, ekz. peranto.xml ≈ 4,5 MB,
-  povas malrapidiĝi; tiam oni faligas al la originala fluo).
+- Tempolimoj: la arkivo ricevas 10 s (`ARKIVA_PETO_TEMROLIMITO_MS`), la originalo kiel
+  aldona fonto 15 s (sola originalo: la defaŭlta 30 s de la kliento); grandec-limoj:
+  arkivo 8 MB, originalo 1 MB — la arkivo neniam rajtas bloki horloĝon/alarman ŝargon
+  (profundaj arkivaj fluoj, ekz. peranto.xml ≈ 4,5 MB). Ĉar la fontoj estas elŝutataj
+  paralele, la mur-tempo estas la maksimumo, ne la sumo.
 - La AI-rezultoj en la arkivaj fluoj estas HTML (konvertitaj el la plataj rezumo-dosieroj
   per `analizuRezumon`/`rezumoAlHtml` en `RezumoHtml.kt`): la unua linio (la temo) iĝas
   `<p><strong>…</strong></p>`, la sekvaj punktoj `<ul><li>`, la averto `<em>` — legebla

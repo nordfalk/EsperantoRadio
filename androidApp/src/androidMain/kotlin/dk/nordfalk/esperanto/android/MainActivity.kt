@@ -25,8 +25,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var ludilo: ExoPlayerLudiloRegilo
-    // (FAROTA C22, 2026-11-20) neniu propra ne-nuligebla scope plu: la lanĉo de la
-    // ludado el sciigo uzas lifecycleScope (nuligita en onDestroy — la servo
+    // La ludado el sciigo uzas lifecycleScope (nuligita en onDestroy — la servo
     // transprenas la ludadon sendepende de la Activity).
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,7 +109,7 @@ class MainActivity : ComponentActivity() {
             dato = dato,
         )
 
-        // Komencas ludi — lifecycleScope (FAROTA C22): mallonga laboro ligita al la Activity
+        // Komencas ludi — mallonga laboro ligita al la Activity
         lifecycleScope.launch {
             try {
                 ludilo.fiksiFonton(Sonfonto.ElsendoFonto(elsendo))

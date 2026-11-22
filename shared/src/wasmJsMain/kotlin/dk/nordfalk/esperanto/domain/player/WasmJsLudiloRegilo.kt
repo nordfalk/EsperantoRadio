@@ -23,9 +23,8 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
     private var nunaFonto: Sonfonto? = null
 
-    // (FAROTA C15, 2026-11-20) Aŭskultantoj registritaj per aŭskultu(), por ke ili
-    // estu FORIGEBlaj de malnova elemento — iliaj eventoj alie alvenus nesinkrone
-    // kaj superskribus la staton de la nova.
+    // Aŭskultantoj registritaj per aŭskultu(), por ke ili estu forigeblaj de malnova
+    // elemento — iliaj eventoj alie alvenus nesinkrone kaj superskribus la novan staton.
     private val registritajAŭskultantoj = mutableListOf<Triple<HTMLAudioElement, String, (Event) -> Unit>>()
 
     private fun foriguAŭskultantojn(elemento: HTMLAudioElement?) {
@@ -49,7 +48,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         nunaFonto = fonto
-        foriguAŭskultantojn(audio) // (FAROTA C15) neniam lasu malnovajn reagojn aktivaj
+        foriguAŭskultantojn(audio) // neniam lasu malnovajn reagojn aktivaj
         audio?.pause()
         val elemento = document.createElement("audio") as HTMLAudioElement
         audio = elemento
@@ -110,7 +109,7 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     }
     override fun paŭzigi() { audio?.pause() }
     override fun halti() {
-        foriguAŭskultantojn(audio) // (FAROTA C15)
+        foriguAŭskultantojn(audio)
         audio?.pause()
         audio = null
         nunaFonto = null

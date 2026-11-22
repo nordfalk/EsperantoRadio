@@ -79,7 +79,6 @@ class EkranfotoTesto {
         // (la dialogon se ĝi malfermitas, alikaze la solan ekrano-radikon).
         val radikoj = test.onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })
         val nombro = radikoj.fetchSemanticsNodes().size
-        // (FAROTA C25, 2026-11-20) minimuma aserto: almenaŭ unu radiko kaj ne-malplena bildo
         assertTrue(nombro >= 1, "Neniu kompona radiko trovita por $nomo")
         val lastaRadiko = radikoj[nombro - 1]
         val bitmap = lastaRadiko.captureToImage().asSkiaBitmap()

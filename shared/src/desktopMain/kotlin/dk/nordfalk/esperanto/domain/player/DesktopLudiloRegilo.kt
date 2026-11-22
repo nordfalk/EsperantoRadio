@@ -85,8 +85,6 @@ class DesktopLudiloRegilo : LudiloRegilo {
 
         halti()
 
-        // (FAROTA C16, 2026-11-20) rawStream deklarita ekster la try, por ke la
-        // catch povu fermi ĝin — alie la fluo likus ĉe eraro.
         var rawStream: BufferedInputStream? = null
         try {
             log("fiksiFonton: malfermas HTTP-fluon")
@@ -159,7 +157,6 @@ class DesktopLudiloRegilo : LudiloRegilo {
         } catch (e: Exception) {
             log("fiksiFonton: ESCEPTO: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace(System.err)
-            // (FAROTA C16) ne lasu la fluon malfermita — kaj protokolu eblan fermo-eraron (A8)
             try {
                 rawStream?.close()
             } catch (e2: Exception) {
@@ -288,9 +285,9 @@ class DesktopLudiloRegilo : LudiloRegilo {
         _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
     }
 
-    /** ŜAJNIGO (FAROTA C16): nur metas la MONTROTAN pozicion — la sono mem daŭras
-     *  de la nuna loko, ĉar mp3spi ne subtenas veran saltadon. La UI evitas la vokon
-     *  per `subtenasSaltadon = false`. */
+    /** ŜAJNIGO: nur metas la montratan pozicion — la sono mem daŭras de la nuna
+     *  loko, ĉar mp3spi ne subtenas veran saltadon. La UI evitas la vokon per
+     *  `subtenasSaltadon = false`. */
     override fun saltiAl(pozicioMs: Long) {
         log("saltiAl($pozicioMs ms) — ne implementita por mp3spi (streaming)")
         _stato.value = _stato.value.copy(pozicioMs = pozicioMs)

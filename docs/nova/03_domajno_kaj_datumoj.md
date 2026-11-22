@@ -204,8 +204,15 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 
 ### Kanal-deponejo
 
-`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron (paktita risurco) per
-`KanalAgordoLeganto` kaj liveras `StateFlow<List<Kanalo>>`.
+`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron per `KanalAgordoLeganto` kaj
+liveras `StateFlow<List<Kanalo>>`. Kiel la malnova apo (`App.initData` /
+`hentEvtNyeGrunddata`): ĉe relanĉo oni unue uzas la konservitan (elŝutitan el la
+reto) konfiguron el Settings (`kanalkonfiguro_teksto`), kaj nur se mankas — la
+paktitan risurcon; poste en fono oni elŝutas la nunan konfiguron el
+`https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json` (TTL 30 min,
+kiel `intervals.settings` en la malnova apo) kaj konservas ĝin nur se la parsado
+sukcesis. `leguLokanKanalkonfiguron()` estas la komuna loka legado, uzata ankaŭ
+de la alarmo-ricevilo kaj la sciigo-worker.
 
 ### Elsendo-deponejo
 

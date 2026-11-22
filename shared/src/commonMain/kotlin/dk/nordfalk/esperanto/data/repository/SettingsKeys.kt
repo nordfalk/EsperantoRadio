@@ -40,6 +40,13 @@ object SettingsKeys {
     const val LASTA_GEO_STATISTIKO = "lasta_geo_statistiko"
     /** Pseŭdonimo de la uzanto ("adjektivo substantivo", ekz. "blua suno") — aperas en la protokoloj. */
     const val PSEŬDONIMO = "pseŭdonimo"
+    /**
+     * La kanalkonfiguro elŝutita el la reto (konservita kiel kruda teksto, ŝlosilo
+     * kontraŭ la pakita versio — kiel `grunddata_prefs` en la malnova apo).
+     */
+    const val KANALKONFIGURO_TEKSTO = "kanalkonfiguro_teksto"
+    /** Tempo (ms) de la lasta reta kontrolo de la kanalkonfiguro — TTL por la refreŝo. */
+    const val LASATA_KONFIGURO_KONTROLO = "lasta_konfiguro_kontrolo"
 
     /**
      * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —

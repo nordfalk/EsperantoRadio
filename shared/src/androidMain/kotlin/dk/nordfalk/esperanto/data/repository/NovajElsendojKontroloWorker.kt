@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dk.nordfalk.esperanto.data.config.IntentŜlosilo
-import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
@@ -87,7 +86,8 @@ class NovajElsendojKontroloWorker(
             val plejŝatataj = plejStr.split(",").toSet()
             logi("NovajElsendoj", "Kontrolas ${plejŝatataj.size} ŝatatajn kanalojn: $plejŝatataj")
 
-            val kanaloj = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron()).kanaloj
+            // Loka kanalkonfiguro: konservita el la reto (Settings), aliokaze la pakita
+            val kanaloj = leguLokanKanalkonfiguron(settings = settings, paktitaTeksto = ::leguPakititanKanalkonfiguron).kanaloj
                 .filter { it.kodo in plejŝatataj && it.elsendojRssUrl != null }
                 .map { it.alKanalo() }
             if (kanaloj.isEmpty()) {

@@ -192,10 +192,15 @@ object AppStato {
 
         kanaloDeponejo = KanaloDeponejoImpl(
             leganto = KanalAgordoLeganto(),
-            paktitaTeksto = ::leguPakititanKanalkonfiguron
+            paktitaTeksto = ::leguPakititanKanalkonfiguron,
+            httpKliento = httpKliento,
+            settings = settings,
         )
 
-        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        // La efektive uzata agordo: konservita el la reto (Settings), aliokaze la pakita —
+        // tiel arkivoBazoUrl, defaŭltaj ŝatataj, alarm-sugestoj kaj apaj novaĵoj
+        // sekvas la elŝutitan konfiguron, ne nur la enkonstruitan (kiel en la malnova apo).
+        val agordo = kanaloDeponejo!!.getAgordo()
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)

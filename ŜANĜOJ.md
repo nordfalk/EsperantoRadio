@@ -5,6 +5,24 @@
 > enskribon; bagatelaj ŝanĝoj restas nur en la git-historio. Novaj enskriboj
 > supren, kun dato kaj ligilo al la PR.
 
+# Ŝanĝoj — 2026-11-22
+
+## Reta kanalkonfiguro: elŝuto dum relanĉo, konservado, uzado anstataŭ la pakita (PR: https://github.com/nordfalk/EsperantoRadio/pull/NNN)
+
+Kiel en la malnova apo (`Backend.getGrunddataUrl` + `App.initData`/`hentEvtNyeGrunddata`):
+`KanaloDeponejoImpl` nun legas ĉe relanĉo unue la konservitan konfiguron el Settings
+(`kanalkonfiguro_teksto`), kun rezervo al la pakita risurco; poste en fono elŝutas
+`https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json` (TTL 30 min, kiel
+`intervals.settings` en la malnova apo; tempolimo 15 s) kaj konservas ĝin nur post
+sukcesa parsado kaj ne-malplena kanal-listo — rompita respondo ne anstataŭigas la sanan.
+`AppStato.inicialigu`, la alarmo-ricevilo kaj la sciigo-worker uzas la lokan (kaŝitan)
+konfiguron (`getAgordo()` / `leguLokanKanalkonfiguron()`), do ankaŭ `arkivoBazoUrl`,
+defaŭltaj ŝatataj, alarm-sugestoj kaj apaj novaĵoj sekvas la elŝutitan version.
+Malsupren-tiro en la kanalaro devige refreŝigas ankaŭ la konfiguron.
+Testoj: `KanaloDeponejoImplTest` (desktopTest, MockEngine + MapSettings).
+Kaptindaĵo: la parametro de `getKanalojn` en la impl nomiĝas `devige` (la interfaca
+nomo `forteRefresigi` — vidu la literumadan noton de 2026-10-17 en AGENTS.md).
+
 # Ŝanĝoj — 2026-11-19
 
 ## FAROTA-batch C6/C8/C11/C23/C24/C28/C38 (PR: https://github.com/nordfalk/EsperantoRadio/pull/175)

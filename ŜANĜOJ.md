@@ -7,7 +7,7 @@
 
 # Ŝanĝoj — 2026-11-22
 
-## Reta kanalkonfiguro: elŝuto dum relanĉo, konservado, uzado anstataŭ la pakita (PR: https://github.com/nordfalk/EsperantoRadio/pull/196)
+## Reta kanalkonfiguro: elŝuto dum relanĉo, konservado, uzado anstataŭ la pakita (PR: https://github.com/nordfalk/EsperantoRadio/pull/197)
 
 Kiel en la malnova apo (`Backend.getGrunddataUrl` + `App.initData`/`hentEvtNyeGrunddata`):
 `KanaloDeponejoImpl` nun legas ĉe relanĉo unue la konservitan konfiguron el Settings

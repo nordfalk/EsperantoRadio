@@ -17,9 +17,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +31,8 @@ import kotlin.time.Clock
 /** Tempolimo por la elŝuto de la fora kanalkonfiguro (malgranda dosiero, sed ne rajtas bloki). */
 private const val KONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
 
-/** Maksimuma grandeco de la elŝutita konfiguro — protekto kontraŭ erarpaĝoj/fiaskoj kun grandega korpo. */
-private const val KONFIGURO_MAKS_GRANDECO = 1_000_000
+/** Maksimuma grandeco de la elŝutita konfiguro (bitokoj) — la vera konfiguro estas ~21 KB; 256 KB estas malproksima supra limo kontraŭ erarpaĝoj. */
+private const val KONFIGURO_MAKSUMA_GRANDECO_BITOKOJ = 256L * 1024
 
 /**
  * KanaloDeponejo-implentaĵo. Kiel la malnova apo («grunddata» en `App.initData` /
@@ -151,7 +148,7 @@ class KanaloDeponejoImpl(
                 kliento.get(url) {
                     expectSuccess = true
                     timeout { requestTimeoutMillis = KONFIGURO_PETO_TEMPOLIMITO_MS }
-                }.leguKorponLimigite(KONFIGURO_MAKS_GRANDECO)
+                }.leguKorponLimigite(KONFIGURO_MAKSUMA_GRANDECO_BITOKOJ)
             }
         } ?: return
         refreŝMutex.withLock {
@@ -200,17 +197,4 @@ class KanaloDeponejoImpl(
             }
         }
     }
-}
-
-/** Legas la korpon de respondo, sed rifuzas tro grandan enhavon (kontraŭ erarpaĝoj kun grandega korpo). */
-private suspend fun HttpResponse.leguKorponLimigite(maks: Int): String {
-    val deklarita = headers[HttpHeaders.ContentLength]?.toLongOrNull()
-    if (deklarita != null && deklarita > maks) {
-        throw IllegalStateException("Respondo tro granda: $deklarita bitokoj (maks. $maks)")
-    }
-    val teksto = bodyAsText()
-    if (teksto.length > maks) {
-        throw IllegalStateException("Respondo tro granda: ${teksto.length} signoj (maks. $maks)")
-    }
-    return teksto
 }

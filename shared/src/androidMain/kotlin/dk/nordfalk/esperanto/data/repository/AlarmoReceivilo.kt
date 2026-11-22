@@ -13,6 +13,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
+import dk.nordfalk.esperanto.data.config.leguAgordonKunRezervo
 import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
@@ -236,7 +237,7 @@ class AlarmoReceivilo : BroadcastReceiver() {
             logw("AlarmoReceivilo", "Ne povis inicialigi AppStaton — provas daŭrigi", e)
         }
 
-        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        val agordo = leguAgordonKunRezervo(KanalAgordoLeganto(), ::leguPakititanKanalkonfiguron)
         val kanalo: Kanalo = agordo.kanaloj.find { it.kodo == kanaloSlug }?.alKanalo() ?: run {
             logw("AlarmoReceivilo", "Kanalo ne trovita: $kanaloSlug")
             luduRezervanVokosonon(context)

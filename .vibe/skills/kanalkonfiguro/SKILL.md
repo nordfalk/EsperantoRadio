@@ -20,6 +20,16 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
   dum la konstruo (`generuEnigitanKanalkonfiguron` en `shared/build.gradle.kts`).
 - Atentu: ĉio en `shared/src/commonMain/resources/` aŭtomate iĝas ankaŭ Android-asset —
   metu tien nur la agordon.
+- **Defora kopio (ekde 2026-11-22):** la arkiv-servilo publikigas purigitan strikta
+  JSON-kopion ĉe `https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`.
+  La apo elŝutas ĝin unufoje po starto (`KanaloDeponejoImpl.refreŝiguDefore`),
+  persistigas la krudan tekston kiel dosieron en la diska kaŝmemoro
+  (`defora_kanalkonfiguro.json`, vidu `KanalkonfiguroDefora.kt` — NE en Settings:
+  la java.util.prefs-realigo sur Desktop rifuzas valorojn super ~6 KB) kaj uzas
+  la konservitan version antaŭ la paktitan (`leguAgordonKunRezervo`) — kiel
+  «grunddata» en la malnova apo. Ŝanĝo de la konfiguro do efikas al uzantoj SEN
+  ĝisdatigo de la apo (kanallisto, apaj novaĵoj, fluo-URL-oj). La reverta ĝisdatigo
+  bezonas `rsync` (vidu `servilo-arkivo`) — nur post eksplicita peto.
 - La JSONC havas **du arojn**: `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ`
   (referencataj, de la kodo NE legataj). Novaj kanaloj devas iri en `kanaloj`;
   la dosiero FINIĜAS per la forprenitaj — "aldonu ĉe la fino" surteriĝas en la

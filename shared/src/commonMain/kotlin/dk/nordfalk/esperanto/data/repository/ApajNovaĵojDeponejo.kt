@@ -22,15 +22,28 @@ class ApajNovaĵojDeponejo(
     pasintajMesaĝoj: List<String>? = null,
 ) {
     /** La nuna novaĵ-mesaĝo el la kanalkonfiguro (sen spacetoj, malplena se mankas) — por la ekrano „Apaj novaĵoj“. */
-    val mesaĝo: String = mesaĝo?.trim().orEmpty()
+    var mesaĝo: String = mesaĝo?.trim().orEmpty()
+        private set
 
     /** Pasintaj novaĵoj el la kanalkonfiguro (sen spacetoj, malplenaj forigitaj) — por la faldebla sekcio sub la novaĵ-dialogo. */
-    val pasintaj: List<String> = pasintajMesaĝoj.orEmpty().map { it.trim() }.filter { it.isNotEmpty() }
+    var pasintaj: List<String> = pasintajMesaĝoj.orEmpty().map { it.trim() }.filter { it.isNotEmpty() }
+        private set
 
     private val _montrata = MutableStateFlow(deciduMontratan(this.mesaĝo, leguKonservitanHaketaĵon()))
 
     /** La mesaĝo montriĝu, aŭ `null` se nenio novas. */
     fun observuMontratan(): StateFlow<String?> = _montrata.asStateFlow()
+
+    /**
+     * Prenas novan mesaĝon kaj pasintajn novaĵojn (ekz. de freŝa defora
+     * kanalkonfiguro meze de la seanco) kaj relegas ĉu la dialogo montriĝu.
+     * Jam konfirmita enhavo ne remontriĝas (la konservita haketaĵo validas).
+     */
+    fun ĝisdatigu(novaMesaĝo: String?, novajPasintaj: List<String>?) {
+        mesaĝo = novaMesaĝo?.trim().orEmpty()
+        pasintaj = novajPasintaj.orEmpty().map { it.trim() }.filter { it.isNotEmpty() }
+        _montrata.value = deciduMontratan(mesaĝo, leguKonservitanHaketaĵon())
+    }
 
     /**
      * La uzanto konfirmis la mesaĝon — persistigu la haketaĵon kaj fermu.

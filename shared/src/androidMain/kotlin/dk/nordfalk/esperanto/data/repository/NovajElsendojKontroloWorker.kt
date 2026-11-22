@@ -14,6 +14,7 @@ import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
+import dk.nordfalk.esperanto.data.config.leguAgordonKunRezervo
 import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.domain.model.Elsendo
@@ -87,7 +88,7 @@ class NovajElsendojKontroloWorker(
             val plejŝatataj = plejStr.split(",").toSet()
             logi("NovajElsendoj", "Kontrolas ${plejŝatataj.size} ŝatatajn kanalojn: $plejŝatataj")
 
-            val kanaloj = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron()).kanaloj
+            val kanaloj = leguAgordonKunRezervo(KanalAgordoLeganto(), ::leguPakititanKanalkonfiguron).kanaloj
                 .filter { it.kodo in plejŝatataj && it.elsendojRssUrl != null }
                 .map { it.alKanalo() }
             if (kanaloj.isEmpty()) {

@@ -5,6 +5,42 @@
 > enskribon; bagatelaj ŝanĝoj restas nur en la git-historio. Novaj enskriboj
 > supren, kun dato kaj ligilo al la PR.
 
+# Ŝanĝoj — 2026-11-22
+
+## Defora kanalkonfiguro kiel «grunddata» en la malnova apo (PR: https://github.com/nordfalk/EsperantoRadio/pull/195)
+
+La kanalkonfiguro nun havas duan tavolon krom la paktita risurco, modelita rekte laŭ
+la `App.initData`/`hentEvtNyeGrunddata`-fluo de la malnova apo:
+
+- **Starto**: `leguAgordonKunRezervo` (nova, `data/config/KanalkonfiguroDefora.kt`)
+  unue legas la krudan JSONC-tekston el la **diska kaŝmemoro**
+  (`defora_kanalkonfiguro.json` — `leguKaŝonJson`/`skribuKaŝonJson` de `DosierKaŝo`),
+  rezerve la paktitan risurcon. Putrita konservita teksto protokoliĝas kiel eraro
+  (loge), **forgesiĝas** kaj la paktita uziĝas (A4). `AlarmoReceivilo` kaj
+  `NovajElsendojKontroloWorker` (androidMain) uzas la saman helpilon — ankaŭ ili
+  vidas la novan konfiguron sen atendi ĝisdatigo de la apo.
+  **Leciono**: plurajn KB da teksto NE persistigu en `Settings` — sur Desktop la
+  java.util.prefs-realigo rifuzas valorojn super `MAX_VALUE_LENGTH` (~6 KB) per
+  `IllegalArgumentException: Value too long` (malkovrite 2026-11-22 ĉe reala rulado
+  de :desktopApp:run; la portempa Settings-realigo ĝuste tial anstataŭiĝis per
+  DosierKaŝo).
+- **Fona refreŝigo**: `KanaloDeponejoImpl.refreŝiguDefore()` — unufoje po starto,
+  lanĉita de `AppStato.inicialigu` sur `Dispatchers.Default`. Elŝuto per la
+  komuna `httpKliento` de `https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`
+  (la purigita strikta JSON-kopio, kiun `:server:arkivKonstruilo` kopias je ĉiu rulo).
+  Nur se la teksto **ŝanĝiĝis** kompare al la persistita kaj estas **parsigebla**:
+  persistigo, anstataŭigo de la kanallisto-StateFlow (la UI rekomponiĝas vive) kaj
+  reversevoko `alFreŝaAgordo`, kiu ĝisdatigas la apajn novaĵojn
+  (`ApajNovaĵojDeponejo.ĝisdatigu`, nova) kaj la prizorganto-retpoŝton.
+  Ĉiu fiasko (reto, **CORS sur wasmJs — la Js-motoro ĵetas kotlin.Error, do la
+  kaptado estas `Throwable` + re-ĵeto de CancellationException**, ne-parsigebla
+  respondo) nur protokoliĝas kaj lasas la nunan staton netuŝita — venena respondo
+  NENIAM persistiĝas.
+- **Konscia limigo**: `arkivoBazoUrl`, defaŭltaj ŝatataj kaj alarm-sugestoj restas de
+  la starto-valoro ĝis la sekva relanĉo — `ElsendoDeponejoImpl` kaj la
+  deponejoj de la derivaĵoj ne estas rekreieblaj vive (ili tenas kaŝmemorojn kaj
+  estas referenceblaj de la ViewModel-oj); tiuj kampoj ŝanĝiĝas praktike neniam.
+
 # Ŝanĝoj — 2026-11-19
 
 ## FAROTA-batch C6/C8/C11/C23/C24/C28/C38 (PR: https://github.com/nordfalk/EsperantoRadio/pull/175)

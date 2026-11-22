@@ -119,4 +119,44 @@ class ApajNovaĵojTest {
 
         assertEquals("", ApajNovaĵojDeponejo(MapSettings(), null).mesaĝo)
     }
+
+    @Test
+    fun ĝisdatigoMezeDeSeancoKunNovaMesaĝoMontriĝas() {
+        // Freŝa defora konfiguro alvenas meze de la seanco (KanaloDeponejoImpl.refreŝiguDefore)
+        val settings = MapSettings()
+        val deponejo = ApajNovaĵojDeponejo(settings, "Unua mesaĝo")
+        assertEquals("Unua mesaĝo", deponejo.observuMontratan().value)
+
+        deponejo.ĝisdatigu("Dua mesaĝo", listOf("Unua mesaĝo"))
+        assertEquals("Dua mesaĝo", deponejo.observuMontratan().value)
+        assertEquals("Dua mesaĝo", deponejo.mesaĝo)
+        assertEquals(listOf("Unua mesaĝo"), deponejo.pasintaj)
+    }
+
+    @Test
+    fun ĝisdatigoKunJamKonfirmitaMesaĝoNeRemontras() {
+        val settings = MapSettings()
+        val deponejo = ApajNovaĵojDeponejo(settings, "Unua mesaĝo")
+        deponejo.konfirmu()
+        assertNull(deponejo.observuMontratan().value)
+
+        // La sama mesaĝo re-alvenas (ekz. identa servila konfiguro) — ne remontriĝu
+        deponejo.ĝisdatigu("Unua mesaĝo", null)
+        assertNull(deponejo.observuMontratan().value)
+    }
+
+    @Test
+    fun ĝisdatigoKunMalplenaMesaĝoKaŝasDialogon() {
+        val settings = MapSettings()
+        val deponejo = ApajNovaĵojDeponejo(settings, null, null)
+        assertNull(deponejo.observuMontratan().value)
+
+        deponejo.ĝisdatigu("Grava novaĵo", null)
+        assertEquals("Grava novaĵo", deponejo.observuMontratan().value)
+
+        deponejo.ĝisdatigu(null, listOf("Grava novaĵo"))
+        assertNull(deponejo.observuMontratan().value, "Malplena mesaĝo neniam montriĝas")
+        assertEquals("", deponejo.mesaĝo)
+        assertEquals(listOf("Grava novaĵo"), deponejo.pasintaj)
+    }
 }

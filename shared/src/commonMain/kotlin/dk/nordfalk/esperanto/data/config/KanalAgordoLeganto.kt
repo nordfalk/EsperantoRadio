@@ -127,6 +127,8 @@ data class KanaloDto(
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
+    /** HTML-paĝo kun la elsendo-listo (por kanaloj sen RSS) — la arkiv-servilo el ĝi generas la arkivan fluon. */
+    val elsendojHtmlUrl: String? = null,
     val rektaElsendaPriskriboUrl: String? = null,
     val hejmpaĝoButono: String? = null,
     val retpoŝto: String? = null,
@@ -163,6 +165,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     emblemoUrl = emblemoUrl?.ifBlank { null },
     rektaElsendaSonoUrl = rektaElsendaSonoUrl,
     podkastaRssUrl = elsendojRssUrl,
+    htmlFontoUrl = elsendojHtmlUrl,
     rektaElsendaPriskriboUrl = rektaElsendaPriskriboUrl,
     retejoUrl = hejmpaĝoButono,
     retpoŝto = retpoŝto,

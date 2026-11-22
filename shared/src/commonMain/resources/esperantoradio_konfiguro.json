@@ -225,7 +225,9 @@
 			"nomo": "Radio Frei",
 			"priskribo": "Esperanto-podkastoj de la germana libertema radio «Radio Frei».",
 			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
-			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
+			// HTML-mediatheko kun serĉa filtrilo — la RSS-reĝimo de la CMS ignoras ssuchtext,
+			// do nia arkiv-servilo tiras la liston el ĉi tiu HTML-paĝo kaj generas radiofrei.xml.
+			"elsendojHtmlUrl": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto"
 		}

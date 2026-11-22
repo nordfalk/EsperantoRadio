@@ -3,11 +3,13 @@ package dk.nordfalk.esperanto.server
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.data.config.alKanalo
+import dk.nordfalk.esperanto.data.parser.HtmlFontoParsilo
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.parser.analizuRezumon
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -35,6 +37,9 @@ object ArkivKonstruilo {
     // novan elsendon jam en la arkivo (vidu kolektuElsendojn) — pli grandaj fluoj nur
     // ŝarĝus la dosierojn (kaj la app-klientojn) sen nova enhavo.
     private const val MAKS_PAĜOJ = 10
+    // HTML-fontoj (mediatheko sen RSS, ekz. radiofrei): pli da paĝoj kaj eroj ol RSS
+    private const val MAKS_HTML_PAĜOJ = 30
+    private const val MAKS_HTML_EROJ = 300
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
@@ -57,7 +62,11 @@ object ArkivKonstruilo {
 
         for (kanalo in kanaloj) {
             try {
-                val elsendoj = kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
+                val elsendoj = if (kanalo.podkastaRssUrl.isNullOrBlank() && !kanalo.htmlFontoUrl.isNullOrBlank()) {
+                    kolektuElHtmlFonto(kanalo, parsilo, http, uzuKaŝon)
+                } else {
+                    kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
+                }
                 val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
                 FluSkribilo.skribu(
                     kanalo, elsendoj, priskriboj, titoloj,
@@ -144,6 +153,81 @@ object ArkivKonstruilo {
         } ?: emptyList()
         val maksErjoj = MAKS_PAĜOJ * (if (unuaPaĝoGrandeco > 0) unuaPaĝoGrandeco else 10)
         return (novaj + malnovaj).distinctBy { it.id }.sortedByDescending { it.dato }.take(maksErjoj)
+    }
+
+    /**
+     * HTML-fonto (kanalo sen RSS, sed kun `elsendojHtmlUrl` — ekz. radiofrei ekde 2026-11-22):
+     * tiras la filtritan list-paĝon (pPAGE=1…), poste por ĉiu nova artikolo ĝian paĝon kaj
+     * el ĝi la unuan mp3-URL-on. Ĉesas frue ĉe jam arkivitaj id-oj (kiel kolektuElsendojn).
+     * La kruda HTML restas en la kaŝo (privata/kaŝo/) por `--kaŝo`-ruloj kaj testoj.
+     */
+    private fun kolektuElHtmlFonto(
+        kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
+        parsilo: RssParsilo,
+        http: HttpClient,
+        uzuKaŝon: Boolean,
+    ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
+        val htmlFonto = HtmlFontoParsilo()
+        val bazo = kanalo.htmlFontoUrl!!
+        val kaŝoDir = File(PRIVATA, "kaŝo").apply { mkdirs() }
+        val arkivaDosiero = File(PUBLIKA, "kanaloj/${kanalo.slug}.xml")
+        val arkivaTeksto = if (arkivaDosiero.isFile) arkivaDosiero.readText() else null
+        val konataj = arkivaTeksto?.let { t ->
+            Regex("<guid>(?:<!\\[CDATA\\[)?([^<\\]]+)").findAll(t).map { it.groupValues[1].trim() }.toSet()
+        }?.toMutableSet() ?: mutableSetOf()
+
+        fun elŝutu(url: String, kaŝNomo: String): String {
+            val kaŝo = File(kaŝoDir, kaŝNomo)
+            if (uzuKaŝon && kaŝo.isFile) return kaŝo.readText()
+            val bytes = runBlocking { http.get(url).bodyAsBytes() }
+            kaŝo.writeBytes(bytes)
+            return String(bytes, Charsets.UTF_8)
+        }
+
+        val novaj = mutableListOf<dk.nordfalk.esperanto.domain.model.Elsendo>()
+        var paĝo = 1
+        while (paĝo <= MAKS_HTML_PAĜOJ) {
+            val url = if (paĝo == 1) bazo else "$bazo&pPAGE=$paĝo"
+            val html = elŝutu(url, "${kanalo.slug}-listo-$paĝo.html")
+            val eroj = htmlFonto.parsuListon(html, kanalo.slug, bazo)
+            if (eroj.isEmpty()) break
+            val novajEroj = eroj.takeWhile { it.id !in konataj }
+            if (novajEroj.isEmpty()) break
+            for (ero in novajEroj) {
+                try {
+                    val artikolo = elŝutu(ero.retpaĝoUrl, "${kanalo.slug}-artikolo-${ero.id.substringAfter(':')}.html")
+                    val fluo = htmlFonto.eltiruFluon(artikolo)
+                    if (fluo == null) {
+                        // A8: neniam silente — la ero simple ne aperos en la fluo
+                        logw("ArkivKonstruilo", "${kanalo.slug}: ${ero.id} (“${ero.titolo}”) — neniu mp3 trovita, preterlasita")
+                        continue
+                    }
+                    novaj.add(
+                        dk.nordfalk.esperanto.domain.model.Elsendo(
+                            id = ero.id,
+                            kanaloSlug = kanalo.slug,
+                            kanaloNomo = kanalo.nomo,
+                            titolo = ero.titolo,
+                            priskribo = ero.priskribo,
+                            dato = ero.dato ?: "1970-01-01",
+                            fluo = fluo,
+                            retpaĝoUrl = ero.retpaĝoUrl,
+                        )
+                    )
+                    konataj.add(ero.id)
+                } catch (e: Exception) {
+                    // Regulo A4: unu artikolo ne haltigas la aliajn
+                    logw("ArkivKonstruilo", "${kanalo.slug}: artikolo ${ero.id} fiaskis — daŭrigas kun la sekva", e)
+                }
+            }
+            if (novajEroj.size < eroj.size) break // atingis jam arkivitajn erojn — pli frue nenio nova
+            paĝo++
+        }
+        // Kunfandu kun la malnova arkivo (kiel kolektuElsendojn)
+        val malnovaj = arkivaTeksto?.let { t ->
+            runBlocking { parsilo.parsuRss(t, kanalo, deArkivo = true) }
+        } ?: emptyList()
+        return (novaj + malnovaj).distinctBy { it.id }.sortedByDescending { it.dato }.take(MAKS_HTML_EROJ)
     }
 
     /**

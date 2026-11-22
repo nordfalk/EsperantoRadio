@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:podcast="https://podcastindex.org/namespace/1.0" xml:lang="eo">
+  <channel>
+    <title><![CDATA[Radio Frei]]></title>
+    <description><![CDATA[Esperanto-podkastoj de la germana libertema radio «Radio Frei».]]></description>
+    <link><![CDATA[https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto]]></link>
+    <itunes:image href="https://esperanto-radio.com/_radiofrei.png"/>
+    <item>
+      <title><![CDATA[TURINGIO INTERNACIA 122]]></title>
+      <guid><![CDATA[radiofrei:9062]]></guid>
+      <pubDate><![CDATA[Sun, 12 Dec 2021 12:00:00 +0000]]></pubDate>
+      <description><![CDATA[In unserem letzten Esperantomagazin hören wir Texte zum 3. Adventsonntag "Gaudete". Wir hören die Gruselgeschichte "Terura nokto" und Gedichte von Misu Beraru. In Eiseberg drehen wir dann einen schnellen Rundgang und denken an den ersten und einzigen dort residierenden Fürsten Christian. Auch der Vater der Sphragistik stammt von dort. Lev Tolstoj klärt uns am Schluß über die wichtige Rolle von Esperanto auf.]]></description>
+      <link><![CDATA[https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto&ksubmit_show=Artikel&kartikel_id=9062]]></link>
+      <enclosure url="https://audio.radio-frei.de/podcast/Esperanto/20211212%20turint%20klein.mp3" type="audio/mpeg"/>
+    </item>
+    <item>
+      <title><![CDATA[TURINGIO INTERNACIA 121]]></title>
+      <guid><![CDATA[radiofrei:9047]]></guid>
+      <pubDate><![CDATA[Mon, 15 Nov 2021 12:00:00 +0000]]></pubDate>
+      <description><![CDATA[In unserem Esperantomagazin feiern wir den Tag des Hl. Josaphat Kunzewitsch und hören Gedichte von Price sowie die Geschichte "Instruita mimikisto" von Devjatnin. Das Tempelherrenhaus, die Loge Anna Amalia zu den drei Rosen und das Grandhotel Russischer Hof in Weimar stehen in Zusammenhang. In welchem? Unsere Sendung klärt auf. Geistliche Musik (Laßt uns ein neues Lied dem Herrn Singen; Aaronssegen) kommt wieder von Christoph Dalitz.]]></description>
+      <link><![CDATA[https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto&ksubmit_show=Artikel&kartikel_id=9047]]></link>
+      <enclosure url="https://audio.radio-frei.de/podcast/Esperanto/20211114%20turint%20klein.mp3" type="audio/mpeg"/>
+    </item>
+  </channel>
+</rss>

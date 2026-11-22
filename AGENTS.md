@@ -437,7 +437,8 @@ ludata, Kio popularas) + "Ĉiuj kanaloj". Navigado per `ModalNavigationDrawer`-
 tirkesto (`ui/NavigaTirkesto.kt`, malfermiĝas per la hamburgero en la supra
 breto aŭ per tiro de la maldekstra rando); la supraj bretoj kun titoloj kaj
 agoj restas, la detalaj ekranoj havas reen-sagon. MiniLudilbreto kun ludi/paŭzi/halti + ludvico-butono.
-La Muzaiko-temo estas implementita en `Temo.kt`.
+Ekzistas ankaŭ diagnoza ekrano (`DiagnozoEkrano`/`DiagnozoRegilo`, modelo `Diagnozo.kt`)
+kaj la memstara fonto-aŭtomata daŭrigo. La Muzaiko-temo estas implementita en `Temo.kt`.
 
 ## Konstru-komandoj
 

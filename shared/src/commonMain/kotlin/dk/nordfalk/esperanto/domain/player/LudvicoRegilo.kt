@@ -606,7 +606,8 @@ class LudvicoRegilo(
         } else {
             0L
         }
-        val savitaPozicioMs = ludato?.takeIf { !it.finita }?.pozicioMs ?: 0L
+        val savitaPozicioMs = ludato?.takeIf { !it.finita }
+            ?.let { LudvicoLogiko.komencaPozicio(it.pozicioMs, it.daŭroMs) } ?: 0L
         val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
             logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
             maxOf(ludato.pozicioMs, saltuMs)

@@ -100,6 +100,13 @@ object LudvicoLogiko {
     }
 
     /**
+     * Komenca pozicio ĉe rekomenco de elsendo: se la savita pozicio estas pli ol
+     * 95 % de la daŭro, rekomencu de 0 (regulo el la malnova apo, C44c).
+     */
+    fun komencaPozicio(pozicioMs: Long, daŭroMs: Long): Long =
+        if (daŭroMs > 0 && pozicioMs > 0.95 * daŭroMs) 0L else pozicioMs
+
+    /**
      * Priority 3: Trovas la plej freŝan elsendon kiu neniam estis ludita
      * (neniu LudataElsendo ekzistas por ĝi).
      */

@@ -586,6 +586,63 @@ class LudvicoRegiloTest {
     }
 
     // =========================================================================
+    // «Venonta» — la uzanto transsaltas la nunan elsendon
+    // =========================================================================
+
+    @Test
+    fun venonta_markasLaNunannElsendonFinitaKajNeRevenasAlĜi() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this
+        )
+
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        ludilo.simuluPozicion(60_000, 300_000)
+
+        // La uzanto klikas «Venonta» dum e1 ludas
+        regilo.ludiSekvan(e1)
+
+        // e1 estas markita kiel plene finaŭskultita kaj la sekva samkanala (e2) ludas
+        assertTrue(ludatoj.estasFinita(e1.id), "Transsaltita elsendo devus esti markita finita")
+        val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
+        assertEquals(e2.id, fonto.elsendo.id)
+
+        // Post natura fino de e2 la aŭtoludo NE revenu al e1 (ĝi estas finita) — haltas
+        ludilo.simuluFinon()
+        assertEquals(LudantoStato.Haltita, ludilo.stato.value.stato)
+        assertFalse(ludilo.stato.value.nunaFonto is Sonfonto.ElsendoFonto &&
+            (ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto).elsendo.id == e1.id)
+    }
+
+    @Test
+    fun venonta_neMarkasDenoveSeJamFinitaKajNePerdastrerasFlagon() = runTest {
+        val e1 = elsendo("k1:2024-03-01", "k1", "2024-03-01")
+        val e2 = elsendo("k1:2024-02-01", "k1", "2024-02-01")
+        val elsendoj = mapOf("k1" to listOf(e1, e2))
+        val ludilo = NoOpLudiloRegilo()
+        val ludatoj = LudatojDeponejoMaketo()
+        val (regilo, _, _) = kreuRegilon(
+            ludilo, elsendoj = elsendoj, ludatojDeponejo = ludatoj, scope = this
+        )
+
+        regilo.komenci()
+        regilo.ludiElsendon(e1)
+        // Eraro dum e1 — markiErara metas finita=true KAJ erara=true
+        ludilo.simuluEraron(reprovebla = false)
+
+        // e1 devus esti markita erara (kaj finita), kaj la aŭtoludo ludas e2
+        val ludato = ludatoj.getLudato(e1.id)
+        assertTrue(ludato != null && ludato.finita && ludato.erara, "e1 devus esti markita erara")
+        val fonto = ludilo.stato.value.nunaFonto as Sonfonto.ElsendoFonto
+        assertEquals(e2.id, fonto.elsendo.id)
+    }
+
+    // =========================================================================
     // Servo-voko — traktiFinonPublika (kiel EsperantoLudadoServo vokas ĉe STATE_ENDED)
     // =========================================================================
 

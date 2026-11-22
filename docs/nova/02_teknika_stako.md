@@ -82,8 +82,9 @@ val client = HttpClient(CIO) {
 `IfModifiedSince`-kapoj por kaŝena valideco (heredaĵo de `FilCache`).
 
 Kanalkonfiguro elŝutata de `https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`
-(`KanalDeponejoImpl`, unufoje je relanĉo, konservita en la agordoj) kun ene-enigita
-rezervo en `commonMain/resources/`.
+(`KanalDeponejoImpl`, unufoje je relanĉo, konservita kiel dosiero en la diska kaŝmemoro
+— NE en Settings, kies java.util.prefs-realigo sur Desktop akceptas maks. 8192 signojn)
+kun ene-enigita rezervo en `commonMain/resources/`.
 
 ## Persisto
 

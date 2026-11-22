@@ -1,10 +1,12 @@
 package dk.nordfalk.esperanto.data.repository
 
 import com.russhwolf.settings.Settings
+import dk.nordfalk.esperanto.data.config.FORA_KONFIGURO_KAŜNOMO
 import dk.nordfalk.esperanto.data.config.FORA_KONFIGURO_URL
 import dk.nordfalk.esperanto.data.config.KanalAgordo
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
 import dk.nordfalk.esperanto.data.config.alKanalo
+import dk.nordfalk.esperanto.data.config.leguAgordonKunRezervo
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.repository.KanaloDeponejo
 import dk.nordfalk.esperanto.logd
@@ -13,8 +15,11 @@ import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.expectSuccess
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,24 +31,46 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
 
+/** Tempolimo por la elŝuto de la fora kanalkonfiguro (malgranda dosiero, sed ne rajtas bloki). */
+private const val KONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
+
+/** Maksimuma grandeco de la elŝutita konfiguro — protekto kontraŭ erarpaĝoj/fiaskoj kun grandega korpo. */
+private const val KONFIGURO_MAKS_GRANDECO = 1_000_000
+
 /**
- * KanaloDeponejo-implentaĵo. Kiel la malnova apo: la kanalkonfiguron oni elŝutas
- * de la servilo ([FORA_KONFIGURO_URL]) kaj konservas en la agordoj; ĉe relanĉo
- * oni uzas unue la kaŝitan foran version, kaj nur se mankas — la paktitan
- * enkonstruitan. En fono (unufoje je procezo, aŭ tuj ĉe `fortoRefresigi`)
- * oni elŝutas la nunan version kaj, nur se ĝi sukcese parseblas, konservas ĝin
- * kaj anstataŭigas la kanalojn (A4: fuŝita fora konfiguro neniam anstataŭas la
- * funkciantan).
+ * KanaloDeponejo-implentaĵo. Kiel la malnova apo («grunddata» en `App.initData` /
+ * `hentEvtNyeGrunddata`): la kanalkonfiguro havas du tavolojn —
+ *
+ * 1. **Komenca agordo** — jam parsita ĉe starto: unue la persistigita defora versio
+ *    el la diska kaŝmemoro, rezerve la paktita risurco ([leguAgordonKunRezervo]).
+ * 2. **Defora refreŝigo** — [refreŝiguElRete] elŝutas la konfiguron de la servilo
+ *    (unufoje je procezo en fono, kaj tuj ĉe `fortoRefresigi`); nur se la teksto
+ *    ŝanĝiĝis, estas parsigebla kaj havas kanalojn, ĝi anstataŭigas la kanalliston
+ *    (StateFlow) kaj persistiĝas por la sekva starto. Fiasko (reto, CORS sur
+ *    wasmJs — la Js-motoro ĵetas `kotlin.Error`, CORS-respondo, persist-fiasko)
+ *    neniam tuŝas la nunan staton (A4).
+ *
+ * La persistigo okazas per la diska kaŝmemoro (`DosierKaŝo`), NE per Settings — sur
+ * Desktop la java.util.prefs-realigo rifuzas valorojn super 8192 signoj.
  */
 class KanaloDeponejoImpl(
     private val leganto: KanalAgordoLeganto,
     private val paktitaTeksto: () -> String,
+    /** Settings estas uzata nur por la tempomastriko (Long) — neniam por la teksto mem. */
     private val settings: Settings? = null,
     private val httpKliento: HttpClient? = null,
     /** Fona amplekso por la refreŝigo — se null, la reta refreŝigo ne kuras (testoj, ekran-antaŭrigardoj). */
     private val fonaScope: CoroutineScope? = null,
     /** Test-hako: elŝutas tekston de URL. Se null, uzas [httpKliento]. */
     private val elŝutTeksto: (suspend (String) -> String)? = null,
+    /** Legas la persistigitan tekston (diska kaŝmemoro). Injektebla por testoj. */
+    private val leguKonservitan: () -> String? = { leguKaŝonJson(FORA_KONFIGURO_KAŜNOMO) },
+    /** Skribas la persistigitan tekston. Injektebla por testoj. */
+    private val skribuKonservitan: (String) -> Unit = { skribuKaŝonJson(FORA_KONFIGURO_KAŜNOMO, it) },
+    /** Forigas la persistigitan tekston (putrita kaŝo). Injektebla por testoj. */
+    private val foriguKonservitan: () -> Unit = { foriguKaŝon(FORA_KONFIGURO_KAŜNOMO) },
+    /** Vokata kiam freŝa, sukcese parsita fora agordo anstataŭigas la malnovan (kanallisto, apaj novaĵoj k.a.). */
+    private val alFreŝaAgordo: (KanalAgordo) -> Unit = {},
 ) : KanaloDeponejo {
 
     private val _kanaloj = MutableStateFlow<List<Kanalo>>(emptyList())
@@ -63,30 +90,16 @@ class KanaloDeponejoImpl(
         ŝarguLokale()
     }
 
-    /** Legas la efektivan konfiguron sen reto: kaŝita fora versio el la agordoj, aliokaz la pakita. */
+    /** Legas la efektivan konfiguron sen reto: kaŝita fora versio, aliokaz la pakita; putrita kaŝo estas forgesata (A4). */
     private fun ŝarguLokale() {
-        val fora = settings?.getStringOrNull(SettingsKeys.FORA_KANALKONFIGURO)
-        val teksto = if (!fora.isNullOrBlank()) fora else paktitaTeksto()
-        val fonto = if (!fora.isNullOrBlank()) "kaŝita fora" else "paktita"
-        val agordo = provuParse(teksto)
-            ?: provuParse(paktitaTeksto())  // (A4) fuŝita fora kaŝo → rezervo al la pakita
-            ?: KanalAgordo().also {
-                loge("KanaloDeponejo", "Nek la fora nek la pakita kanalkonfiguro parseblas — malplena listo")
-            }
+        val agordo = leguAgordonKunRezervo(leganto, paktitaTeksto, leguKonservitan, foriguKonservitan)
+        val fonto = if (!leguKonservitan().isNullOrBlank()) "kaŝita fora" else "paktita"
         _agordo.value = agordo
         _kanaloj.value = agordo.kanaloj.map { it.alKanalo() }
         logi("KanaloDeponejo", "Ŝargis ${_kanaloj.value.size} kanalojn el $fonto")
     }
 
-    /** Parsas kaj redonas null (kun averto) anstataŭ ĵeti — unu fuŝita konfiguro ne rajtas mortigi la apon (A4, A8). */
-    private fun provuParse(teksto: String): KanalAgordo? = try {
-        leganto.legu(teksto)
-    } catch (e: Exception) {
-        logw("KanaloDeponejo", "Kanalkonfiguro ne parseblas (${teksto.length} signoj)", e)
-        null
-    }
-
-    /** La ŝargita agordo; certigas ke zumindest la loka (kaŝo/pakita) versio estas legita. */
+    /** La ŝargita agordo; certigas ke almenaŭ la loka (kaŝo/pakita) versio estas legita. */
     fun getAgordon(): KanalAgordo {
         if (_kanaloj.value.isEmpty()) ŝarguLokale()
         return _agordo.value ?: KanalAgordo()
@@ -118,44 +131,86 @@ class KanaloDeponejoImpl(
                 refreŝiguElRete()
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                // Throwable, ne Exception: la Js-motoro ĵetas kotlin.Error (CORS) — atendata fiasko (A4, A8)
                 logw("KanaloDeponejo", "Fona refreŝigo de la kanalkonfiguro fiaskis", e)
             }
         }
     }
 
     /**
-     * Elŝutas la nunan foran konfiguron kaj — nur se ĝi malsamas kaj sukcese
-     * parseblas — konservas ĝin en la agordoj kaj anstataŭigas la kanalojn.
-     * Fiasko (reto, parsado) neniam tuŝas la nunan funkciantan konfiguron (A4).
+     * Elŝutas la nunan foran konfiguron kaj — nur se ĝi malsamas, parseblas kaj
+     * havas kanalojn — konservas ĝin kaj anstataŭigas la kanalojn (kaj vokas
+     * [alFreŝaAgordo]). Fiasko (reto, parsado, grandeco) neniam tuŝas la nunan
+     * funkciantan konfiguron (A4). Persist-fiasko nur protokoliĝas — la viva
+     * ĝisdatigo tamen okazas.
      */
     private suspend fun refreŝiguElRete() {
         val elŝutanto = elŝutTeksto ?: httpKliento?.let { kliento ->
-            suspend { url: String -> kliento.get(url) { expectSuccess = true }.bodyAsText() }
+            suspend { url: String ->
+                kliento.get(url) {
+                    expectSuccess = true
+                    timeout { requestTimeoutMillis = KONFIGURO_PETO_TEMPOLIMITO_MS }
+                }.leguKorponLimigite(KONFIGURO_MAKS_GRANDECO)
+            }
         } ?: return
         refreŝMutex.withLock {
             try {
                 val nova = elŝutanto(FORA_KONFIGURO_URL).trim()
-                val kaŝita = settings?.getStringOrNull(SettingsKeys.FORA_KANALKONFIGURO)
-                if (nova == kaŝita) {
+                if (nova.isBlank()) {
+                    logw("KanaloDeponejo", "Elŝutita fora kanalkonfiguro estas malplena — konservas la nunan")
+                    return@withLock
+                }
+                if (nova == leguKonservitan()?.trim()) {
                     logd("KanaloDeponejo", "Fora kanalkonfiguro ne ŝanĝiĝis — nenio farenda")
                     return@withLock
                 }
-                val agordo = provuParse(nova)
-                if (agordo == null) {
-                    logw("KanaloDeponejo", "Elŝutita fora kanalkonfiguro ne parseblas — ne konservita")
+                val agordo = try {
+                    leganto.legu(nova)
+                } catch (e: Throwable) {
+                    // Rompita respondo (ekz. HTML-fiaskpaĝo kun HTTP 200) — NENIAM konservu (A4)
+                    logw("KanaloDeponejo", "Elŝutita fora kanalkonfiguro ne parseblas — ne konservita", e)
                     return@withLock
                 }
-                settings?.putString(SettingsKeys.FORA_KANALKONFIGURO, nova)
+                if (agordo.kanaloj.isEmpty()) {
+                    logw("KanaloDeponejo", "Elŝutita fora kanalkonfiguro havas neniun kanalon — ne konservita")
+                    return@withLock
+                }
+                try {
+                    skribuKonservitan(nova)
+                } catch (e: Throwable) {
+                    // Persistigo fiaskis (ekz. plena disko) — la viva ĝisdatigo tamen okazas;
+                    // la sekva starto tiam refreŝiĝas denove.
+                    logw("KanaloDeponejo", "Ne povis persistigi la freŝan kanalkonfiguron", e)
+                }
                 settings?.putLong(SettingsKeys.FORA_KANALKONFIGURO_TEMPO, Clock.System.now().toEpochMilliseconds())
                 _agordo.value = agordo
                 _kanaloj.value = agordo.kanaloj.map { it.alKanalo() }
                 logi("KanaloDeponejo", "Ĝisdatigis kanalkonfiguron el la reto: ${_kanaloj.value.size} kanaloj")
+                try {
+                    alFreŝaAgordo(agordo)
+                } catch (e: Exception) {
+                    loge("KanaloDeponejo", "Eraro en la reagado al freŝa kanalkonfiguro", e)
+                }
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                // Throwable: sur wasmJs la Js-motoro ĵetas kotlin.Error (ekz. CORS-blokado)
                 logw("KanaloDeponejo", "Elŝuto de la fora kanalkonfiguro ($FORA_KONFIGURO_URL) fiaskis", e)
             }
         }
     }
+}
+
+/** Legas la korpon de respondo, sed rifuzas tro grandan enhavon (kontraŭ erarpaĝoj kun grandega korpo). */
+private suspend fun HttpResponse.leguKorponLimigite(maks: Int): String {
+    val deklarita = headers[HttpHeaders.ContentLength]?.toLongOrNull()
+    if (deklarita != null && deklarita > maks) {
+        throw IllegalStateException("Respondo tro granda: $deklarita bitokoj (maks. $maks)")
+    }
+    val teksto = bodyAsText()
+    if (teksto.length > maks) {
+        throw IllegalStateException("Respondo tro granda: ${teksto.length} signoj (maks. $maks)")
+    }
+    return teksto
 }

@@ -199,9 +199,16 @@ object AppStato {
             settings = settings,
             httpKliento = httpKliento,
             fonaScope = fonaScope,
+            alFreŝaAgordo = { freŝa ->
+                // Derivaĵoj de la konfiguro, ĝisdatigeblaj meze de la seanco.
+                // (arkivoBazoUrl kaj alarm-sugestoj restas de la starto-valoro —
+                // ili dependas de deponejoj, kiuj ne estas rekreieblaj vive.)
+                apajNovaĵojDeponejo?.ĝisdatigu(freŝa.android?.apajNovaĵoj, freŝa.android?.apajNovaĵojPasintaj)
+                freŝa.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
+            },
         )
 
-        // Efektiva agordo: kaŝita fora versio el la agordoj, aliokaz la pakita
+        // Efektiva agordo: kaŝita fora versio el la diska kaŝmemoro, aliokaz la pakita
         val agordo = kanaloDeponejo!!.getAgordon()
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 

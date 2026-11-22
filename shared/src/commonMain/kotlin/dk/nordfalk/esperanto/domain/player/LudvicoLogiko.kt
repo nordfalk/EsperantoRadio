@@ -59,7 +59,9 @@ object LudvicoLogiko {
      *
      * La listo estas ordigita plej-freŝe-unue (RSS-normo). La "sekva" elsendo
      * estas tiu ĉe indexo+1 post la nuna (do pli malnova).
-     * Saltas elsendojn kiuj estas jam finitaj.
+     * Saltas elsendojn kiuj estas jam finitaj — tio inkluzivas ERARAJN elsendojn,
+     * ĉar la deponejo markas ilin kiel finittaj (`markiErara` metas
+     * `finita = true, erara = true`).
      */
     fun trovSekvanSamkanalan(
         nunaElsendo: Elsendo?,

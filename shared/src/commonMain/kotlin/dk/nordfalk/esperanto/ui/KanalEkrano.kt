@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.RssFeed
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -121,6 +123,7 @@ fun KanaloEkrano(
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val estasPlejŝatata = kanalo.slug in plejŝatataj
     val snackbarStato = remember { SnackbarHostState() }
+    var montruRss by remember { mutableStateOf(false) }
 
     LaunchedEffect(kanalo.slug) {
         viewModel.ŝargi()
@@ -161,25 +164,39 @@ fun KanaloEkrano(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    // (C54) kopii la RSS-URL de la kanalo por aboni ĝin en alia podkasta apo
-                    kanalo.podkastaRssUrl?.let { rss ->
+                    // (C54) RSS-ikono: montras/malmontras la RSS-adreson sub la supra breto
+                    if (kanalo.podkastaRssUrl != null) {
                         IconButton(onClick = {
-                            logi("Klako", "kopii RSS-URL: ${kanalo.slug}")
-                            kopiuTekston(rss)
-                            scope.launch { snackbarStato.showSnackbar("RSS-URL kopiita en la poŝo.") }
+                            logi("Klako", "montri/malmontri RSS-adreson: ${kanalo.slug}")
+                            montruRss = !montruRss
                         }) {
-                            Icon(Icons.Filled.ContentCopy, contentDescription = "Kopii RSS-URL")
+                            Icon(Icons.Filled.RssFeed, contentDescription = "Montri RSS-adreson")
                         }
                     }
                 }
             )
         },
         snackbarHost = { SnackbarHost(snackbarStato) }
-    ) { padding -> PullToRefreshBox(
+    ) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            // (C54) diskreta vico sub la supra breto kun la RSS-adreso kaj klarigo
+            val rss = kanalo.podkastaRssUrl
+            if (montruRss && rss != null) {
+                RssAdresVico(
+                    rss = rss,
+                    kanaloNomo = kanalo.nomo,
+                    onKopii = {
+                        kopiuTekston(rss)
+                        scope.launch { snackbarStato.showSnackbar("RSS-URL kopiiita en la poŝo.") }
+                    },
+                    onPartigi = { partiguLigilon(rss, "RSS-fluo de ${kanalo.nomo}") },
+                )
+            }
+            PullToRefreshBox(
         // La granda spinilo en la listo montras la unuan ŝarĝon; ĉi tiu nur kiam jam estas elsendoj
         isRefreshing = ŝargas && elsendoj.isNotEmpty(),
         onRefresh = { logi("Klako", "malsupren-tiro (${kanalo.slug})"); viewModel.ŝargi(fortoRefresigi = true) },
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.weight(1f),
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -247,6 +264,53 @@ fun KanaloEkrano(
             }
         }
     }
+        }
+    }
+}
+
+/**
+ * Diskreta vico sub la supra breto: montras la RSS-adreson de la kanalo kun klarigo
+ * kaj butonoj por kopii kaj disdividi (C54).
+ */
+@Composable
+fun RssAdresVico(
+    rss: String,
+    kanaloNomo: String,
+    onKopii: () -> Unit,
+    onPartigi: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                "RSS-adreso de $kanaloNomo:",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(rss, style = MaterialTheme.typography.bodySmall)
+            Text(
+                "Uzu ĝin por aboni la kanalon en alia podkasto-ludilo, ekzemple AntennaPod, Pocket Casts aŭ Podcast Addict.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                OutlinedButton(onClick = onKopii) {
+                    Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Kopii")
+                }
+                OutlinedButton(onClick = onPartigi) {
+                    Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Disdividi")
+                }
+            }
+        }
     }
 }
 

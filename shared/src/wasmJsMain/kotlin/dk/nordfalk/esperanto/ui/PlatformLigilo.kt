@@ -36,3 +36,12 @@ actual fun kopiuTekston(teksto: String) {
         logw("Ligilo", "Ne povas kopii en la poŝo", e)
     }
 }
+
+actual fun partiguLigilon(url: String, teksto: String) {
+    // sur la web: malfermu novan fenestron kun la RSS
+    try {
+        kotlinx.browser.window.open(url, "_blank")
+    } catch (e: Throwable) {
+        logw("Ligilo", "Ne povas malfermi novan fenestron: $url", e)
+    }
+}

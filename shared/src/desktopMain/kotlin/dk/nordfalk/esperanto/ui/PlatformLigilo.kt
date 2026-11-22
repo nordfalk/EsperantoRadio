@@ -37,3 +37,8 @@ actual fun kopiuTekston(teksto: String) {
         logw("Ligilo", "Ne povas kopii en la poŝo", e)
     }
 }
+
+actual fun partiguLigilon(url: String, teksto: String) {
+    // sur desktop: malfermu novan fenestron (krozilon) kun la RSS
+    malfermuLigon(url)
+}

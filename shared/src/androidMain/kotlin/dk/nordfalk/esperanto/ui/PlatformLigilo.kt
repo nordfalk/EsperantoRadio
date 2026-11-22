@@ -49,3 +49,17 @@ actual fun kopiuTekston(teksto: String) {
         logw("Ligilo", "Ne povas kopii en la poŝo", e)
     }
 }
+
+actual fun partiguLigilon(url: String, teksto: String) {
+    try {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "$teksto\n$url")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        appContext.startActivity(Intent.createChooser(intent, teksto).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        logi("Ligilo", "Disdividas: $url")
+    } catch (e: Exception) {
+        logw("Ligilo", "Ne povas disdividi: $url", e)
+    }
+}

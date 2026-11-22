@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- La apo elŝutas la kanalkonfiguron el la servilo (javabog.dk/esperanto-radio) kaj uzas la konservitan version ĉe relanĉo — novaj kanaloj kaj ŝanĝoj aperas sen app-ĝisdatigo
+- La apo elŝutas la kanalkonfiguron el la servilo (javabog.dk/esperanto-radio) kaj uzas la konservitan version ĉe relanĉo — novaj kanaloj kaj ŝanĝoj aperas sen app-ĝisdatigo (https://github.com/nordfalk/EsperantoRadio/pull/196)
 - Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/184)
 - Riĉigitaj fluoj de arkiv-servilo (javabog.dk/esperanto-radio/kanaloj) kun priskriboj faritaj de AI; la apo kunfandas ilin kun la originalaj fluoj (novaj elsendoj aperas tuj), kaj se ambaŭ malsukcesas, uzas la kaŝon (https://github.com/nordfalk/EsperantoRadio/pull/180)
 - Arkiv-servilo: publika elŝutejo ĉe javabog.dk/esperanto-radio kun riĉigitaj RSS-fluoj (AI-rezultoj por elsendoj sen priskribo) kaj prezentpaĝo de la projekto (https://github.com/nordfalk/EsperantoRadio/pull/177)

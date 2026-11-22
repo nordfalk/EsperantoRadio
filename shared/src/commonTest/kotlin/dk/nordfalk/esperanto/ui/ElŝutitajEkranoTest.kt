@@ -2,8 +2,10 @@ package dk.nordfalk.esperanto.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
@@ -242,5 +244,40 @@ class ElŝutitajEkranoTest {
         }
         waitForIdle()
         onNodeWithContentDescription("Ludi").assertIsDisplayed()
+    }
+
+    @Test
+    fun forigoPostulasKonfirmon() = runComposeUiTest {
+        val deponejo = FalsaElŝutDeponejo(
+            mapOf(testElsendo.id to ElŝutitaElsendo(testElsendo, "/tmp/test.mp3", ElŝutStato.Preta))
+        )
+        setContent {
+            ElŝutitajEkrano(
+                elŝutDeponejo = deponejo,
+                ludilo = NoOpLudiloRegilo(),
+                onReen = {},
+                onLudi = {},
+                onElsendo = {}
+            )
+        }
+        waitForIdle()
+        // Klako sur "Forigi" (ikono) malfermas la konfirman dialogon — ankoraŭ nenio forigita
+        onNodeWithContentDescription("Forigi").performClick()
+        waitForIdle()
+        onNodeWithText("Forigi elŝuton?").assertIsDisplayed()
+        onNodeWithText("Mia podkasto").assertIsDisplayed()
+
+        // "Nuligi" fermas la dialogon sen forigi
+        onNodeWithText("Nuligi").performClick()
+        waitForIdle()
+        onNodeWithText("Forigi elŝuton?").assertDoesNotExist()
+        onNodeWithText("Mia podkasto").assertIsDisplayed()
+
+        // Denove malfermu kaj konfirmu — nun la elŝuto foririĝas
+        onNodeWithContentDescription("Forigi").performClick()
+        waitForIdle()
+        onNodeWithText("Jes, forigi").performClick()
+        waitForIdle()
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Mia podkasto").fetchSemanticsNodes().isEmpty() }
     }
 }

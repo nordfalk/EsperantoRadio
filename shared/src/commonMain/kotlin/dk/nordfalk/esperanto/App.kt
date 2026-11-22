@@ -56,6 +56,8 @@ import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
 import dk.nordfalk.esperanto.ui.temuKolorskemo
 import dk.nordfalk.esperanto.ui.TemoNomo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
@@ -125,10 +127,10 @@ fun EsperantoRadioApp(
             }
         }
 
-        // Savu pozicion kiam la komponanto detruiĝas (ekz. fermo de la apo)
+        // Savu pozicion kiam la komponanto detruiĝas (ekz. fermo de la apo).
         DisposableEffect(ludvicoRegilo) {
             onDispose {
-                scope.launch { ludvicoRegilo.savuPozicionNun() }
+                CoroutineScope(Dispatchers.Main).launch { ludvicoRegilo.savuPozicionNun() }
             }
         }
 

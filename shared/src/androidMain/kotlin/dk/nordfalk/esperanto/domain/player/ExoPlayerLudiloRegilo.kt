@@ -85,7 +85,7 @@ class ExoPlayerLudiloRegilo private constructor(context: Context) : LudiloRegilo
         override fun onPlaybackStateChanged(playbackState: Int) { updateState() }
         override fun onIsPlayingChanged(isPlaying: Boolean) { updateState() }
         override fun onPlayerErrorChanged(error: PlaybackException?) {
-            if (error != null) logw("Ludilo", "Ludanta eraro", error)
+            if (error != null) logw("Ludilo", "Ludanta eraro: ${error::class.simpleName}: ${error.message}")
             updateState()
         }
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {

@@ -9,7 +9,7 @@
 
 | Punkto | Verdikto 2026-11-20 |
 |---|---|
-| G42 | Neniu `ForgottenCoroutineScopeException` en Sentry (7 tagoj: 0; 14 tagoj: 0) — kodvojoj ankoraŭ ekzistas, sed nuntempe ne trafataj. Observu plu. |
+| G42 | **SOLVITA 2026-11-20**: la vera risko estis `scope.launch` en `onDispose` (App.kt) — nun nova scope; ceteraj uzoj jam uzas `LaunchedEffect`/nuligeblajn taskojn. Punkto forigita. |
 | G44 | ** Ankoraŭ aktuala, nova kaŭzo**: anchor.fm nun redonas 403 `geofence:blocked` (Spotify-geobloko); krome substack/vaticannews ConnectTimeout, ivoox 503, "Connection refused" (3zzzenesperanto, peranto). |
 | C5 | Aktuala (`build.gradle.kts:64` hardkodita keystore-vojo). |
 | C9 | Parte: `jcenter()` forigita, sed la jcenter-URL ankoraŭ registrita kiel maven-repo; `verification-metadata.xml` mankas; dependabot.yml ekzistas. |
@@ -22,8 +22,9 @@
 | C41 | **SOLVITA 2026-11-20** (AGENTS.md mencias nun la diagnozan ekranon; `docs/nova/02/03` korektitaj pri `puriguModeloj`); punkto forigita. |
 | C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
 | C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
-| C50, C51, C52, C54, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte). |
-| C46 | Parte: neniuj novaj `ExoPlaybackException`-eraroj sur novaj buildoj (14 tagoj: nur 4 sur dist 246); sed lud-eraroj restas nevideblaj en Sentry (3-arg `logw` = loka). |
+| C54 | **SOLVITA 2026-11-20**: butono „Kopii RSS-URL“ en KanalEkrano + `kopiuTekston` (expect/actual por android/desktop/wasmJs/ios). Punkto forigita. |
+| C50, C51, C52, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). |
+| C46 | **SOLVITA 2026-11-20**: lud-eraroj nun raportiĝas per 2-arg `logw` (videblaj en Sentry Logs); reprovo jam ekzistis (`ReprovoLogiko`). Punkto forigita. |
 | C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
 | C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
 | C53 | Parte farita: HUMILOPINIE aldonita; restas kontroli "Una Vaga Idea"/"Cuéntame, Hermosura". |
@@ -31,14 +32,6 @@
 | C61 | Aktuala: `aktualaVersio`/`funkciaAnonco` ankoraŭ nenie legataj. |
 
 ## GRAVA
-
-#### G42 — KMP-X: `ForgottenCoroutineScopeException: rememberCoroutineScope left the composition` (212 okazoj / 58 uzantoj ekde 2026-09-13)
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-X](https://esperantoradio.sentry.io/issues/KMP-X); 32 okazoj / 10 uzantoj en la lasta semajno, lasta 10-16)
-- **Loko**: `rememberCoroutineScope` en `App.kt:99`, `SerĉoEkrano.kt:34`, `PlejŝatatajEkrano.kt:37`, `HejmoEkrano.kt`, `ElŝutitajEkrano.kt:39`, `DiagnozoEkrano.kt:37`, `ElsendoEkrano.kt:73`, `KanalEkrano.kt:108`
-- **Priskribo**: Korutino lanĉita el `rememberCoroutineScope` postvivas la komponaĵon — tipa kaŭzo: lanĉo en klik-lambdo, kies rezulto estas uzata post navigado foren.
-- **Ĝisdatigo 2026-10-27** (Sentry, 14 tagoj): 23 eventoj / 4 uzantoj — 22× dist **248**, 1× 246; sur 3.1.0 (252; 6 uzantoj, 50 %-specimenado) nul. Restas malfermita: la pruvo sur la nova konstruo estas malforta (malmultaj uzantoj + specimenado), kaj la kodvojo probable ekzistas plu.
-- **Sugesto**: inspekti ĉiun uzon; laboro de la ekrano → `LaunchedEffect` aŭ nuligo en `DisposableEffect`; laboro transvivanta navigadon → `viewModelScope` (vidu la komenton en `HejmoEkrano.kt:224`); neniam teni la skopecon en longdaŭra objekto.
 
 #### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
@@ -65,13 +58,6 @@
 - **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
 - **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
 
-#### C46 — KMP-H: `ExoPlaybackException: Source error` (544 okazoj / 30 uzantoj ekde 2026-09-13; malpliiĝas)
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-H](https://esperantoradio.sentry.io/issues/KMP-H); 42 okazoj / 5 uzantoj en la lasta semajno, lasta evento sur dist 248, 10-14)
-- **Priskribo**: Plejparte ret-kulpaj kaŭzoj (`UnknownHostException`, `HttpDataSource$InvalidResponseCodeException`, timeout) — atendataj fiaskoj, sed ili nutras ankaŭ K1 (fiasko de la fonto prokrastas `startForeground()`). **Ĉar** ekde 249 (PR #109) `onPlayerErrorChanged` uzas `logw(tag, msg, e)` (3-arg = nur loka, la escepto ne plu atingas Sentry), la malpliiĝo de KMP-H post 10-14 estas grandparte **redukto de videbleco, ne pliboniĝo de stabileco** — sur 249-aparatoj lud-eraroj plu okazas, sed estas nevideblaj en Sentry.
-- **Sugesto**: unu aŭtomata reprovo ĉe fon-eraro en `LudvicoRegilo`; pli klara uzantmesaĝo; kontroli mortajn fluo-URL-ojn (ligu kun G44 — `media.vaticannews.va`). Se oni volas plu vidi lud-erarojn en Sentry, raportu ilin per 2-arg `logw` (Sentry-averto, videbla en Logs) aŭ kiel specimenata `loge` — intenca decido pro la kvoto.
-
-#### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
 - **Statuso**: [ ]
 - **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ = 1 MB` (la plej granda konata legitima fluo ~310 KB).
@@ -82,6 +68,15 @@
   Sentry la escepto-nomon `RespondoTroGrandaException` aŭ la protokolon "transpasas la
   limon": se ĝi aperas por reala fluo (ne por misdirektita MP3), levu
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ` aŭ serĉu la kaŭzon en la koncerna kanalo.
+
+#### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
+- **Statuso**: [ ]
+- **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
+  1 MB (la plej granda konata legitima fluo ~310 KB).
+- **Priskribo**: Se iam reala kanal-fluo transpasos 1 MB, la kanalo silente ne ŝargiĝos —
+  la escepto estas nur `logw`-averto, ne eraro. Tio estas intence (memor-protekto), sed necesas observo.
+- **Sugesto**: periode (ekz. ĉiusemajne, per la skill-o `sentry-esplorado`) serĉi en
+  Sentry `RespondoTroGrandaException` aŭ "transpasas la limon".
 
 #### C50 — Eldonaj kanaloj ekster Google Play: F-Droid, Aptoide
 - **Statuso**: [ ]
@@ -152,7 +147,7 @@
   `PlatformLigilo` malfermas nur ligilojn/retpoŝtojn);
   (b) elektebla loko de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera
   spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`);
-  (c) konfirmo antaŭ forigo de elŝuto (forigo mem jam ekzistas — tuj, sen dialogo);
+  (c) ~~konfirmo antaŭ forigo de elŝuto~~ — SOLVITA 2026-11-20 (dialogo en ElŝutitajEkrano + testo);
   (d) "Ĉu ĉesi ludi? / Daŭrigi fone" ĉe fermo de la apo;
   (e) nombro da novaj elsendoj ĉe Plej ŝatataj, kaj nombroj (elŝutoj) + sekva
   alarmtempo en la naviga tirkesto — la malnova tirkesto-skizo montris ilin;
@@ -201,13 +196,6 @@
   `https://www.spreaker.com/podcast/humilopinie-manchapod--6684993`. Post aldono:
   `radioTxtKomparilo` kaj fluo-kontrollo (G44-stilo: ĉu HTTP 200 + RSS?).
 
-#### C54 — Kanal-RSS-fluo kopiebla kaj kunhavigebla al alia podkasta apo
-- **Statuso**: [ ]
-- **Fonto**: ideo de la posedanto (2026-10-24)
-- **Priskribo**: butono en la kanal-ekrano, kiu kopiigas la `podkastaRssUrl` de la kanalo
-  (tondujo + partigo), por ke uzantoj abonu la kanalon en alia podkasta apo.
-- **Sugesto**: Android: `ClipboardManager` + partigo-intento (atentu: ĝi ankaŭ utilos por
-  C51(a) — kunhavigi ELSENDON; la partig-infrstrukturon kreu unufoje); la URL estas
   jam en la kanal-objekto (agordo, A5) — neniu nova datumvojo necesas.
 
 #### C55 — Eldoni la komputilan (desktop) version

@@ -17,6 +17,8 @@ data class Kanalo(
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,   // tuja elsendfluo (nur Muzaiko)
     val podkastaRssUrl: String? = null,        // elsendojRssUrl
+    /** HTML-paĝo kun la elsendo-listo — uzata nur de la arkiv-servilo, kiu el ĝi generas la arkivan fluon (ekz. radiofrei). */
+    val htmlFontoUrl: String? = null,          // elsendojHtmlUrl
     val rektaElsendaPriskriboUrl: String? = null,
     val retejoUrl: String? = null,             // hejmpaĝoButono
     @JsonNames("retposhto") val retpoŝto: String? = null,
@@ -38,7 +40,7 @@ data class Kanalo(
     @JsonNames("defaltSxatata") val defaŭltŜatata: Boolean = false,
 ) {
     val estasRekta: Boolean get() = rektaElsendaSonoUrl != null
-    val havasPodkastojn: Boolean get() = podkastaRssUrl != null
+    val havasPodkastojn: Boolean get() = podkastaRssUrl != null || htmlFontoUrl != null
 
     /**
      * Kiom da sekundoj transsalti por elsendo publikigita je [dato] (yyyy-MM-dd):

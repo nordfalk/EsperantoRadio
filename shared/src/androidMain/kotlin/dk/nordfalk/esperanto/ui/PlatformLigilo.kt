@@ -1,5 +1,8 @@
 package dk.nordfalk.esperanto.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import dk.nordfalk.esperanto.data.config.appContext
@@ -34,5 +37,29 @@ actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
         appContext.startActivity(intent)
     } catch (e: Exception) {
         logw("Ligilo", "Ne povas malfermi retpoŝto-programon", e)
+    }
+}
+
+actual fun kopiuTekston(teksto: String) {
+    try {
+        val poŝo = appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        poŝo.setPrimaryClip(ClipData.newPlainText("EsperantoRadio", teksto))
+        logi("Ligilo", "Teksto kopiita en la poŝo (${teksto.length} signoj)")
+    } catch (e: Exception) {
+        logw("Ligilo", "Ne povas kopii en la poŝo", e)
+    }
+}
+
+actual fun kunhaviguLigilon(url: String, teksto: String) {
+    try {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "$teksto\n$url")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        appContext.startActivity(Intent.createChooser(intent, teksto).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        logi("Ligilo", "Disdividas: $url")
+    } catch (e: Exception) {
+        logw("Ligilo", "Ne povas disdividi: $url", e)
     }
 }

@@ -17,6 +17,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - Kanalkonfiguro nun elŝutiĝas de la servilo (javabog.dk/esperanto-radio) kaj kaŝiĝas loke — novaj kanaloj kaj agordoj aperas sen app-ĝisdatigo (https://github.com/nordfalk/EsperantoRadio/pull/196)
+- Radio Frei: elsendoj (TURINGIO INTERNACIA) denove aperas en la apo — nia arkiv-servilo generas la fluon el la HTML-mediatheko de radio-frei.de (https://github.com/nordfalk/EsperantoRadio/pull/194)
+- Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/184)
 - Riĉigitaj fluoj de arkiv-servilo (javabog.dk/esperanto-radio/kanaloj) kun priskriboj faritaj de AI; la apo kunfandas ilin kun la originalaj fluoj (novaj elsendoj aperas tuj), kaj se ambaŭ malsukcesas, uzas la kaŝon (https://github.com/nordfalk/EsperantoRadio/pull/180)
 - Arkiv-servilo: publika elŝutejo ĉe javabog.dk/esperanto-radio kun riĉigitaj RSS-fluoj (AI-rezultoj por elsendoj sen priskribo) kaj prezentpaĝo de la projekto (https://github.com/nordfalk/EsperantoRadio/pull/177)
 - Elsendoj sen propra bildeto (ekz. Varsovia Vento, Pola Retradio, Magazino Tuluzo) ricevas bildeton el la unua bildo de sia priskribo; en la elsendopaĝo tiu bildo ne aperas duoble (https://github.com/nordfalk/EsperantoRadio/pull/171)
@@ -36,6 +38,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kanala ekrano: la cip-butonoj montras la verajn retejon kaj retpoŝtadreson anstataŭ la fiksajn tekstojn „Retejo“ kaj „Retpoŝto“ (https://github.com/nordfalk/EsperantoRadio/pull/173)
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 - En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
+- La butono «Venonta» en la ludada sciigo markas la nunan elsendon kiel plene aŭskultita — la apo ne plu revenas al ĝi per resumigo aŭ aŭtomata sekva ludado (https://github.com/nordfalk/EsperantoRadio/pull/193)
 
 ### Ŝanĝita
 
@@ -43,6 +46,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- La Hejmo-ekrano montras la kaŝitan enhavon signife pli rapide (progresive, kaj la kaŝo estas nun legata kiel jam-parsita JSON anstataŭ re-parsi la krudan RSS) (https://github.com/nordfalk/EsperantoRadio/pull/183)
 - Ludado komencita el sciigo aŭ vekhorloĝo ne plu riskas kraŝi la aplikon pro tro granda priskribo trans la sistemo (la ludata fonto en la media-sciigo nun portas nur la necesajn kampojn) (https://github.com/nordfalk/EsperantoRadio/pull/175)
 - Kanaloj BabiBEJO kaj Magazino Tuluzo denove montras sian emblemon en la kanala vido; kanaloj sen emblemo montras komencliterojn anstataŭ blankan kampon (https://github.com/nordfalk/EsperantoRadio/pull/174)
 

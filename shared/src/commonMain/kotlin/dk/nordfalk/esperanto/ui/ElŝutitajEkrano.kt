@@ -38,6 +38,7 @@ fun ElŝutitajEkrano(
     val listo = elŝutoj.values.toList()
     val scope = rememberCoroutineScope()
     val ludantoInformo by ludilo.stato.collectAsState()
+    var forigotaId by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -71,13 +72,32 @@ fun ElŝutitajEkrano(
                         onElsendo = { onElsendo(elŝutita.elsendo) },
                         onForigi = {
                             logi("Klako", "forigi elŝuton ${elŝutita.elsendo.id}")
-                            scope.launch { elŝutDeponejo.forigi(elŝutita.elsendo.id) }
+                            forigotaId = elŝutita.elsendo.id
                         }
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }
+    }
+
+    // Konfirma dialogo (C51c) — aparta kompona radiko, vidu la noton en AGENTS.md
+    val id = forigotaId
+    if (id != null) {
+        AlertDialog(
+            onDismissRequest = { forigotaId = null },
+            title = { Text("Forigi elŝuton?") },
+            text = { Text("La elŝutita dosiero estos definitive forigita de la aparato.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    forigotaId = null
+                    scope.launch { elŝutDeponejo.forigi(id) }
+                }) { Text("Jes, forigi") }
+            },
+            dismissButton = {
+                TextButton(onClick = { forigotaId = null }) { Text("Nuligi") }
+            }
+        )
     }
 }
 
@@ -132,12 +152,12 @@ private fun ElŝutitaEro(
                                     onLudi()
                                 }
                             },
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(48.dp)
                         ) {
                             Icon(if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (ludas) "Paŭzigi" else "Ludi")
                         }
                     }
-                    IconButton(onClick = onForigi, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onForigi, modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Delete, contentDescription = "Forigi")
                     }
                 }

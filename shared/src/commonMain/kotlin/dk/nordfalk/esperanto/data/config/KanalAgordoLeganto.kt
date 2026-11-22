@@ -112,6 +112,8 @@ data class KanalAgordo(
     @Serializable
     data class AndroidSekcio(
         @SerialName("apaj_novaĵoj") val apajNovaĵoj: String? = null,
+        /** Pasintaj novaĵoj — arkivo montrata faldeble sub la nuna novaĵo (datum-movita, A5). */
+        @SerialName("apaj_novaĵoj_pasintaj") val apajNovaĵojPasintaj: List<String>? = null,
         /** Retpoŝto de la prizorganto — celo de „Proponi kanalon“ (datum-movita, A5). */
         @SerialName("prizorgantaRetpoŝto") val prizorgantaRetpoŝto: String? = null,
     )
@@ -125,6 +127,8 @@ data class KanaloDto(
     val emblemoUrl: String? = null,
     val rektaElsendaSonoUrl: String? = null,
     val elsendojRssUrl: String? = null,
+    /** HTML-paĝo kun la elsendo-listo (por kanaloj sen RSS) — la arkiv-servilo el ĝi generas la arkivan fluon. */
+    val elsendojHtmlUrl: String? = null,
     val rektaElsendaPriskriboUrl: String? = null,
     val hejmpaĝoButono: String? = null,
     val retpoŝto: String? = null,
@@ -161,6 +165,7 @@ fun KanaloDto.alKanalo(): Kanalo = Kanalo(
     emblemoUrl = emblemoUrl?.ifBlank { null },
     rektaElsendaSonoUrl = rektaElsendaSonoUrl,
     podkastaRssUrl = elsendojRssUrl,
+    htmlFontoUrl = elsendojHtmlUrl,
     rektaElsendaPriskriboUrl = rektaElsendaPriskriboUrl,
     retejoUrl = hejmpaĝoButono,
     retpoŝto = retpoŝto,

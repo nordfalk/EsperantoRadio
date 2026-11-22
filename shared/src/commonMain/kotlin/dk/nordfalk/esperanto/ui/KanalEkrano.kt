@@ -1,5 +1,10 @@
 package dk.nordfalk.esperanto.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,8 +19,11 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.RssFeed
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -120,6 +128,7 @@ fun KanaloEkrano(
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val estasPlejŝatata = kanalo.slug in plejŝatataj
     val snackbarStato = remember { SnackbarHostState() }
+    var montruRss by remember { mutableStateOf(false) }
 
     LaunchedEffect(kanalo.slug) {
         viewModel.ŝargi()
@@ -160,6 +169,15 @@ fun KanaloEkrano(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                    // (C54) RSS-ikono: montras/malmontras la RSS-adreson sub la supra breto
+                    if (kanalo.podkastaRssUrl != null) {
+                        IconButton(onClick = {
+                            logi("Klako", "montri/malmontri RSS-adreson: ${kanalo.slug}")
+                            montruRss = !montruRss
+                        }) {
+                            Icon(Icons.Filled.RssFeed, contentDescription = "Montri RSS-adreson")
+                        }
+                    }
                 }
             )
         },
@@ -176,6 +194,28 @@ fun KanaloEkrano(
         ) {
             // Kanalinformoj: emblemo, nomo, retejo, retpoŝto
             item { KanalInformoj(kanalo, ludilo, evoluo = evoluo) }
+
+            val rss = kanalo.podkastaRssUrl
+            if (rss != null) {
+                item {
+                    AnimatedVisibility(
+                        visible = montruRss,
+                        // pure vertikala elfaldo (de supre malsupren), ne la defaŭlta svaga skalo
+                        enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+                    ) {
+                        RssAdresVico(
+                            rss = rss,
+                            kanaloNomo = kanalo.nomo,
+                            onKopii = {
+                                kopiuTekston(rss)
+                                scope.launch { snackbarStato.showSnackbar("RSS-URL kopiiita en la poŝo.") }
+                            },
+                            onPartigi = { kunhaviguLigilon(rss, "RSS-fluo de ${kanalo.nomo}") },
+                        )
+                    }
+                }
+            }
 
             // Ŝargado
             if (ŝargas && elsendoj.isEmpty()) {
@@ -236,6 +276,59 @@ fun KanaloEkrano(
             }
         }
     }
+    }
+}
+
+/**
+ * Diskreta vico sub la supra breto: montras la RSS-adreson de la kanalo kun klarigo
+ * kaj butonoj por kopii kaj disdividi (C54).
+ */
+@Composable
+fun RssAdresVico(
+    rss: String,
+    kanaloNomo: String,
+    onKopii: () -> Unit,
+    onPartigi: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                "RSS-adreso de $kanaloNomo:",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            // La ligilo mem estas klakebla — malfermas ĝin en nova fenestro/krozilo
+            Text(
+                rss,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                modifier = Modifier.clickable { malfermuLigon(rss) }
+            )
+            Text(
+                "Uzu ĝin por aboni la kanalon en alia podkasto-ludilo, ekzemple AntennaPod, Pocket Casts aŭ Podcast Addict.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                OutlinedButton(onClick = onKopii) {
+                    Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Kopii")
+                }
+                OutlinedButton(onClick = onPartigi) {
+                    Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Disdividi")
+                }
+            }
+        }
     }
 }
 
@@ -317,8 +410,8 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
             AsyncImage(
                 model = kanalo.emblemoUrl,
                 contentDescription = "Emblemo de ${kanalo.nomo}",
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxWidth().heightIn(max = 220.dp).clip(RoundedCornerShape(12.dp))
             )
         } else {
             Surface(
@@ -347,24 +440,40 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
             )
         }
 
-        // Retejo kaj retpoŝto butonoj
+        // Retejo kaj retpoŝto — kiel klakeblaj tekstoj (ne butonoj), por ŝpari vertikalan spacon
         if (kanalo.retejoUrl != null || kanalo.retpoŝto != null) {
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (kanalo.retejoUrl != null) {
-                    AssistChip(modifier =  Modifier.weight(1f),
-                        onClick = { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) },
-                        label = { Text(kanalo.retejoUrl, maxLines = 3) },
-                        leadingIcon = { Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                    Text(
+                        kanalo.retejoUrl.removePrefix("https://").removePrefix("http://").removeSuffix("/"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .clickable { logi("Klako", "retejo ${kanalo.slug}"); malfermuLigon(kanalo.retejoUrl) }
+                            .padding(4.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    if (kanalo.retpoŝto != null) Spacer(Modifier.width(12.dp))
                 }
                 if (kanalo.retpoŝto != null) {
-                    AssistChip( modifier =  Modifier.weight(1f),
-                        onClick = {
+                    Text(
+                        text = kanalo.retpoŝto,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .clickable(onClick = {
                             logi("Klako", "retpoŝto ${kanalo.slug}")
                             val stato = ludilo?.stato?.value
                             val nunaElsendo: Elsendo? = when (stato?.nunaFonto) {
@@ -384,9 +493,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
                                 temo = "Pri ${kanalo.nomo}",
                                 teksto = teksto,
                             )
-                        },
-                        label = { Text(kanalo.retpoŝto, maxLines = 3) },
-                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                        })
                     )
                 }
             }

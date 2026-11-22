@@ -19,3 +19,14 @@ expect fun malfermuLigon(url: String)
  * @param teksto korpa teksto de la mesaĝo
  */
 expect fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String)
+
+/**
+ * Kopias tekston en la sisteman poŝon (clipboard).
+ */
+expect fun kopiuTekston(teksto: String)
+
+/**
+ * Disdividas ligilon: sur Android per la sistemo (share-sheet); sur web kaj desktop
+ * malfermas novan fenestron kun la ligilo.
+ */
+expect fun kunhaviguLigilon(url: String, teksto: String)

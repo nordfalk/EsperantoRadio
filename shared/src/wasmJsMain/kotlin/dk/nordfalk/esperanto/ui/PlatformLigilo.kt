@@ -24,3 +24,24 @@ actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
         logw("Ligilo", "Ne povas malfermi retpoŝto-programon", e)
     }
 }
+
+actual fun kopiuTekston(teksto: String) {
+    try {
+        kotlinx.browser.window.navigator.clipboard.writeText(teksto).catch { e: JsAny? ->
+            logw("Ligilo", "Ne povas kopii en la poŝo: $e")
+            null
+        }
+        logi("Ligilo", "Teksto kopiita en la poŝo (${teksto.length} signoj)")
+    } catch (e: Throwable) {
+        logw("Ligilo", "Ne povas kopii en la poŝo", e)
+    }
+}
+
+actual fun kunhaviguLigilon(url: String, teksto: String) {
+    // sur la web: malfermu novan fenestron kun la RSS
+    try {
+        kotlinx.browser.window.open(url, "_blank")
+    } catch (e: Throwable) {
+        logw("Ligilo", "Ne povas malfermi novan fenestron: $url", e)
+    }
+}

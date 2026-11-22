@@ -23,6 +23,23 @@ class WasmJsLudiloRegilo : LudiloRegilo {
     override val stato: StateFlow<LudantoInformo> = _stato.asStateFlow()
     private var nunaFonto: Sonfonto? = null
 
+    // Aŭskultantoj registritaj per aŭskultu(), por ke ili estu forigeblaj de malnova
+    // elemento — iliaj eventoj alie alvenus nesinkrone kaj superskribus la novan staton.
+    private val registritajAŭskultantoj = mutableListOf<Triple<HTMLAudioElement, String, (Event) -> Unit>>()
+
+    private fun foriguAŭskultantojn(elemento: HTMLAudioElement?) {
+        if (elemento == null) return
+        for ((el, tipo, reago) in registritajAŭskultantoj) {
+            if (el === elemento) elemento.removeEventListener(tipo, reago)
+        }
+        registritajAŭskultantoj.removeAll { it.first === elemento }
+    }
+
+    private fun aŭskultu(elemento: HTMLAudioElement, tipo: String, reago: (Event) -> Unit) {
+        elemento.addEventListener(tipo, reago)
+        registritajAŭskultantoj.add(Triple(elemento, tipo, reago))
+    }
+
     private fun getStreamUrl(fonto: Sonfonto): String = when (fonto) {
         is Sonfonto.RektaKanalo -> fonto.kanalo.rektaElsendaSonoUrl ?: ""
         is Sonfonto.ElsendoFonto -> fonto.elsendo.fluo
@@ -31,39 +48,41 @@ class WasmJsLudiloRegilo : LudiloRegilo {
 
     override suspend fun fiksiFonton(fonto: Sonfonto, komencoPozicioMs: Long) {
         nunaFonto = fonto
+        foriguAŭskultantojn(audio) // neniam lasu malnovajn reagojn aktivaj
         audio?.pause()
-        val url = getStreamUrl(fonto)
-        audio = document.createElement("audio") as HTMLAudioElement
-        audio!!.src = url
-        audio!!.volume = nunaLaŭteco.toDouble() // reapliku la laŭtecon ankaŭ al nova fonto
-        audio!!.currentTime = (komencoPozicioMs / 1000.0)
-        audio!!.addEventListener("playing", { _ ->
+        val elemento = document.createElement("audio") as HTMLAudioElement
+        audio = elemento
+        elemento.src = getStreamUrl(fonto)
+        elemento.volume = nunaLaŭteco.toDouble() // reapliku la laŭtecon ankaŭ al nova fonto
+        elemento.currentTime = (komencoPozicioMs / 1000.0)
+        // La reagoj kaptas `elemento` (ne la kampon `audio`), do ili ĉiam validas
+        // nur por la elemento al kiu ili estas registritaj.
+        aŭskultu(elemento, "playing", { _ ->
             _stato.value = LudantoInformo(
                 stato = LudantoStato.Ludas,
                 nunaFonto = fonto,
-                pozicioMs = (audio!!.currentTime * 1000).toLong(),
-                daŭroMs = if (audio!!.duration.isNaN()) 0 else (audio!!.duration * 1000).toLong(),
+                pozicioMs = (elemento.currentTime * 1000).toLong(),
+                daŭroMs = if (elemento.duration.isNaN()) 0 else (elemento.duration * 1000).toLong(),
                 estasRekta = fonto is Sonfonto.RektaKanalo
             )
         })
-        audio!!.addEventListener("pause", { _ ->
+        aŭskultu(elemento, "pause", { _ ->
             _stato.value = _stato.value.copy(stato = LudantoStato.Haltita)
         })
-        audio!!.addEventListener("ended", { _ ->
+        aŭskultu(elemento, "ended", { _ ->
             _stato.value = _stato.value.copy(stato = LudantoStato.Finita)
         })
-        audio!!.addEventListener("error", { _ ->
+        aŭskultu(elemento, "error", { _ ->
             // MEDIA_ERR_NETWORK (2) estas pasema; aliaj (ekz. 4 = nesubtenata/404) estas daŭraj
-            val kodo = audio?.error?.code?.toInt()
+            val kodo = elemento.error?.code?.toInt()
             _stato.value = _stato.value.copy(stato = LudantoStato.Eraro("Retumila aŭda eraro ($kodo)", reprovebla = kodo == 2))
         })
         // (PR #92) sen timeupdate la pozicio frostas ĉe la valoro de "playing" —
         // la ŝovilo ne moviĝas kaj la pozicia savilo de LudvicoRegilo konservas malnovan valoron
-        audio!!.addEventListener("timeupdate", { _ ->
-            val a = audio ?: return@addEventListener
+        aŭskultu(elemento, "timeupdate", { _ ->
             _stato.value = _stato.value.copy(
-                pozicioMs = (a.currentTime * 1000).toLong(),
-                daŭroMs = if (a.duration.isNaN()) 0 else (a.duration * 1000).toLong(),
+                pozicioMs = (elemento.currentTime * 1000).toLong(),
+                daŭroMs = if (elemento.duration.isNaN()) 0 else (elemento.duration * 1000).toLong(),
             )
         })
         _stato.value = LudantoInformo(
@@ -89,7 +108,13 @@ class WasmJsLudiloRegilo : LudiloRegilo {
         }
     }
     override fun paŭzigi() { audio?.pause() }
-    override fun halti() { audio?.pause(); audio = null; nunaFonto = null; _stato.value = LudantoInformo(stato = LudantoStato.Haltita) }
+    override fun halti() {
+        foriguAŭskultantojn(audio)
+        audio?.pause()
+        audio = null
+        nunaFonto = null
+        _stato.value = LudantoInformo(stato = LudantoStato.Haltita)
+    }
     override fun saltiAl(pozicioMs: Long) { audio?.currentTime = pozicioMs / 1000.0 }
     override fun fiksiLaŭtecon(volumeno: Float) {
         nunaLaŭteco = volumeno.coerceIn(0f, 1f)

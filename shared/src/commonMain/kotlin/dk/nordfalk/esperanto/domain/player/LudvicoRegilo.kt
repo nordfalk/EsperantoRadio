@@ -532,13 +532,25 @@ class LudvicoRegilo(
     /**
      * Decidas kion ludi sekve kaj komencas ludi.
      *
+     * Se `nunaElsendo` estas donita kaj ankoraŭ ne estas finita (do la uzanto
+     * eksplicite premis «Venonta»), ĝi estas markita kiel plene finaŭskultita —
+     * nek la resumigo nek la aŭtoludo revenu al ĝi (sed eksplicita reludo ja
+     * eblas, [ludiElsendon] malmarkas la finiton).
+     *
      * Logiko:
      * 1. Se la eksplicita vico ne estas malplena → ludu la unuan
      * 2. Se la vico estas malplena → uzu LudvicoLogiko por aŭtomata decido
      * 3. Se nenio troviĝas → haltigu
      */
     suspend fun ludiSekvan(nunaElsendo: Elsendo?) {
-        ludMutex.withLock { ludiSekvanInterna(nunaElsendo) }
+        ludMutex.withLock {
+            if (nunaElsendo != null && !ludatojDeponejo.estasFinita(nunaElsendo.id)) {
+                logi("Ludvico", "Venonta: markas ${nunaElsendo.id} kiel finita (transsaltita de la uzanto)")
+                ludatojDeponejo.markiFinita(nunaElsendo.id, nunaElsendo.kanaloSlug)
+                _vico.value = _vico.value.filterNot { it.id == nunaElsendo.id }
+            }
+            ludiSekvanInterna(nunaElsendo)
+        }
     }
 
     private suspend fun ludiSekvanInterna(nunaElsendo: Elsendo?) {
@@ -606,7 +618,8 @@ class LudvicoRegilo(
         } else {
             0L
         }
-        val savitaPozicioMs = ludato?.takeIf { !it.finita }?.pozicioMs ?: 0L
+        val savitaPozicioMs = ludato?.takeIf { !it.finita }
+            ?.let { LudvicoLogiko.komencaPozicio(it.pozicioMs, it.daŭroMs) } ?: 0L
         val komencoPozicio = if (ludato != null && !ludato.finita && ludato.pozicioMs > 0) {
             logi("Ludvico", "Resumas sekvan: ${elsendo.id} @ ${ludato.pozicioMs}ms")
             maxOf(ludato.pozicioMs, saltuMs)

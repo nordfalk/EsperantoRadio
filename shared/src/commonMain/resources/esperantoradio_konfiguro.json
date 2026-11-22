@@ -3,6 +3,16 @@
 	"android" : {
 		"aktualaVersio": "3.1.0",
 		"apaj_novaĵoj": "<b>Versio 3.1.1</b> eldoniĝis la 31an de oktobro 2026: <br><br>🔐 Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj (ekz. F-Droid) ĝi petas vian permeson unue<br>- Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble<br>- Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno<br>🔍 Serĉo: rezultoj grupigitaj laŭ graveco; serĉo-butono en la supra breto<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
+		// Pasintaj novaĵoj: arkivo de malnovaj mesaĝoj, montrata faldeble sub la nuna novaĵo.
+		// Kiam "apaj_novaĵoj" ricevas novan enhavon, la antauan mesaĝon oni movu ĉi tien.
+		"apaj_novaĵoj_pasintaj": [
+			"<b>Versio 3.1.0</b> de la 25an de oktobro 2026<br><br>⚡ Amaso da plibonigoj, ekzemple kanal- kaj elsendolistoj ne plu reŝargiĝas je ĉiu ekranvizito<br>🏠 Hejmo: klakebla „Kanaloj”, tro-tiro dekstre malfermas la tirkeston, la mini-ludilbreto restas ĉiam videbla<br>- La malsupra naviga breto estas anstataŭigita per naviga tirkesto<br>🔔 Sciigoj pri novaj elsendoj - limigataj al maks. 7 samtempe, maks. 3 po kanalo<br>⏰ Vekhorloĝo: tempo per ciferplato, kanalo per kanal-elektilo<br>🗣️ Plibonigita esperanta lingvaĵo en la tuta apo.",
+			"<b>Versio 3.0.3</b> de la 12a de oktobro 2026<br><br>📻 27 radiokanaloj kaj podkastoj<br>⏰ La vekhorloĝo sonas ĝustatempe ankaŭ kiam la telefono dormas<br>🎛️ La ludilbreto kolapsas per la reen-butono kaj sekvas la navigadon<br>🧹 Pli puraj priskriboj ĉe Varsovia Vento kaj Vinilkosmo<br>✉️ Gravaj sciigoj denove aperas kiel dialogo — vi vidas ĝin nun :-)",
+			"<b>Versio 3.0.2</b> de la 8an de oktobro 2026<br><br>🎛️ Elfaldebla ludilbreto kun progresoŝovilo kaj reen-/antaŭen-butonoj<br>🩺 Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo)<br>⚠️ Avertosigno pri detektitaj problemoj sur la ĉefekrano.",
+			"<b>Versio 3.0.1</b> de la 26an de septembro 2026<br><br>🔁 Aŭtomata reprovo je ludo-eraroj<br>👇 Malsupren-tiro por refreŝigi<br>⏰ Vekhorloĝo ludas ankaŭ la plej freŝan podkaston de la kanalo<br>📱 La versio de la apo estas videbla en la agordoj.",
+			"<b>Versio 3.0.0</b> de la 21an de septembro 2026<br><br>✨ Kompleta reverko — nova plursistema apo kun 26 kanaloj, ludvico, elŝutoj, vekhorloĝo, sciigoj pri novaj elsendoj kaj serĉo",
+            "La kompleta listo de ŝanĝoj videblas ĉe <a href=\"https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md\">CHANGELOG.md</a>."
+		],
 		"funkciaAnonco": "",
 		"prizorgantaRetpoŝto": "jacob.nordfalk@proton.me"
 	},
@@ -215,7 +225,9 @@
 			"nomo": "Radio Frei",
 			"priskribo": "Esperanto-podkastoj de la germana libertema radio «Radio Frei».",
 			"emblemoUrl": "https://esperanto-radio.com/_radiofrei.png",
-			"elsendojRssUrl_malbona": "http://esperanto-tv.com/radiofrei.rss",
+			// HTML-mediatheko kun serĉa filtrilo — la RSS-reĝimo de la CMS ignoras ssuchtext,
+			// do nia arkiv-servilo tiras la liston el ĉi tiu HTML-paĝo kaj generas radiofrei.xml.
+			"elsendojHtmlUrl": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto",
 			"uziWebViewPorElsendo": false,
 			"hejmpaĝoButono": "https://www.radio-frei.de/index.php?iid=podcast&ssuchtext=esperanto"
 		}

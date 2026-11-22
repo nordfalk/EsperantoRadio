@@ -186,6 +186,8 @@ class HejmoViewModel(
     private val kanaloDeponejo: KanaloDeponejo,
     private val elsendoDeponejo: ElsendoDeponejo,
     private val ludatojDeponejo: LudatojDeponejo? = null,
+    /** Horloĝo por la "nuna dato" — injektebla en testoj (C26). */
+    private val hodiaŭ: () -> LocalDate = { Clock.System.todayIn(TimeZone.UTC) },
 ) {
     val kanaloj: StateFlow<List<Kanalo>> = kanaloDeponejo.observiKanalojn()
 
@@ -246,15 +248,19 @@ class HejmoViewModel(
         val kanaloj = kanaloDeponejo.getKanalojn()
         logi("HejmoViewModel", "Ŝargas elsendojn por ${kanaloj.size} kanaloj (fortoRefresigi=$fortoRefresigi)")
 
-        // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
-        val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) ?: emptyList()
+        // Paŝo 1: Legu diskan kaŝmemoron — PROGRESIVE: ĉiu preta kanalo tuj montriĝas
+        _ŝargas.value = true
+        val kolektitaj = mutableListOf<Elsendo>()
+        val kaŝitaj = (elsendoDeponejo as? ElsendoDeponejoImpl)?.leguĈiujnKaŝitajnElsendojn(kanaloj) { ero ->
+            kolektitaj.addAll(ero)
+            plenigu(kanaloj, kolektitaj.toList())
+        } ?: emptyList()
         if (kaŝitaj.isNotEmpty()) {
             plenigu(kanaloj, kaŝitaj)
             logi("HejmoViewModel", "Diska kaŝmemoro: ${kaŝitaj.size} elsendoj — tuj montras")
         }
 
         // Paŝo 2: Reto-elŝuto (malrapida)
-        _ŝargas.value = true
         try {
             val ĉiujElsendoj = coroutineScope {
                 kanaloj
@@ -281,7 +287,7 @@ class HejmoViewModel(
         // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
         // kun semo derivita de la enhavo — la ordo restas stabila inter rekomputadoj.
         aliajKandidatoj = elsendoj.shuffled(Random(elsendoj.hashCode().toLong()))
-        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+        val nunaDatumo = hodiaŭ()
 
         val ĉiujKanalojKartog = kanaloj
             .filter { it.havasPodkastojn }
@@ -314,7 +320,7 @@ class HejmoViewModel(
     private fun aktualigiuLudatajnInterna() {
         val elsendoj = ĉiujElsendoj
         if (elsendoj.isEmpty()) return
-        val nunaDatumo = Clock.System.todayIn(TimeZone.UTC)
+        val nunaDatumo = hodiaŭ()
 
         val ludatoj = ludatojDeponejo?.observiLudatojn()?.value ?: emptyMap()
         val luditajIdj = ludatoj.values
@@ -405,8 +411,10 @@ fun HejmoEkrano(
     ludvicoVico: StateFlow<List<Elsendo>>? = null,
     onLudvico: () -> Unit = {},
     viewModel: HejmoViewModel? = null,
+    /** Hodiaŭa dato por aĝ-kalkuloj — injektebla en testoj. */
+    nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
 ) {
-    val vm = viewModel ?: AppStato.hejmoViewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo) }
+    val vm = viewModel ?: AppStato.hejmoViewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo, hodiaŭ = { nunaDatumo }) }
     val kanaloj by vm.kanaloj.collectAsState()
     val novajElsendoj by vm.novajElsendoj.collectAsState()
     val popularajElsendoj by vm.popularajElsendoj.collectAsState()
@@ -452,7 +460,7 @@ fun HejmoEkrano(
 
     /** Ludata teksto (se ludita) aŭ aĝo de la elsendo (se ne ludita). */
     fun montruTekston(elsendo: Elsendo, ludata: LudataElsendo?): String? =
-        ludata?.let { ludataTeksto(it) } ?: kalkuliAĝon(elsendo.dato)
+        ludata?.let { ludataTeksto(it) } ?: kalkuliAĝon(elsendo.dato, nunaDatumo)
 
     /**
      * Karto de kanalo en la "Kanaloj"-vico. La flava markilo ĉiam montras la
@@ -464,7 +472,7 @@ fun HejmoEkrano(
         ElsendoKarto(
             elsendo = elsendo,
             kanalo = kanto.kanalo,
-            montruTekston = kalkuliAĝon(elsendo.dato),
+            montruTekston = kalkuliAĝon(elsendo.dato, nunaDatumo),
             ludilo = ludilo,
             onLudi = onLudi,
             onElŝuti = { onElŝuti(elsendo) },
@@ -808,7 +816,7 @@ private fun ElsendoKarto(
                     Box {
                         Box(
                             modifier = Modifier
-                                .size(28.dp)
+                                .size(48.dp)
                                 .clip(CircleShape)
                                 .background(Color.Black.copy(alpha = 0.55f))
                                 .clickable {
@@ -844,7 +852,7 @@ private fun ElsendoKarto(
                     // Ludo/paŭzo-butono
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
                             .background(Color.Black.copy(alpha = 0.55f))
                             .clickable {

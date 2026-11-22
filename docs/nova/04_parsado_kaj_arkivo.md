@@ -44,6 +44,15 @@ La enkursigo estas slug-bazita (`when (kanalo.slug)`), ne dateno-movita.
 La `httpKliento`-parametro (defaŭlta `{ "" }` = no-op) estas necesa nur por la
 Peranto-regulo (archive.org-embed-skrapado). La ĝenerala parsilo ne bezonas ĝin.
 
+## HTML-fontoj sen RSS (ekz. radiofrei, ekde 2026-11-22)
+
+Kelkaj retejoj (radio-frei.de) liveras RSS nur por la tuta stacio — la serĉa filtrilo
+(`ssuchtext`) estas ignorata en RSS-reĝimo. Por tiaj kanaloj la konfiguro havas
+`elsendojHtmlUrl` (model-kampo `htmlFontoUrl`); la **arkiv-servilo** tiras la filtritan
+HTML-liston per `HtmlFontoParsilo` (list-paĝo: ligiloj `kartikel_id=`, `p.subject`,
+`p.datecomments`; artikol-paĝo: unua `…​.mp3`-URL) kaj generas `kanaloj/<slug>.xml`.
+La apo mem legas nur la arkivan fluon — same kiel por ĉiu alia kanalo.
+
 ## La sep reguloj — kiel reprodukti
 
 ### Regulo P6.1 — Ĝenerala (`parsuĜenerala`)

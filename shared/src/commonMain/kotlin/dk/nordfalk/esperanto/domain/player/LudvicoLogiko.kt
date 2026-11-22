@@ -59,7 +59,9 @@ object LudvicoLogiko {
      *
      * La listo estas ordigita plej-freŝe-unue (RSS-normo). La "sekva" elsendo
      * estas tiu ĉe indexo+1 post la nuna (do pli malnova).
-     * Saltas elsendojn kiuj estas jam finitaj.
+     * Saltas elsendojn kiuj estas jam finitaj — tio inkluzivas ERARAJN elsendojn,
+     * ĉar la deponejo markas ilin kiel finittaj (`markiErara` metas
+     * `finita = true, erara = true`).
      */
     fun trovSekvanSamkanalan(
         nunaElsendo: Elsendo?,
@@ -96,6 +98,13 @@ object LudvicoLogiko {
             .filter { ludatoj[it.id]?.finita != true }
             .maxByOrNull { it.dato }
     }
+
+    /**
+     * Komenca pozicio ĉe rekomenco de elsendo: se la savita pozicio estas pli ol
+     * 95 % de la daŭro, rekomencu de 0 (regulo el la malnova apo, C44c).
+     */
+    fun komencaPozicio(pozicioMs: Long, daŭroMs: Long): Long =
+        if (daŭroMs > 0 && pozicioMs > 0.95 * daŭroMs) 0L else pozicioMs
 
     /**
      * Priority 3: Trovas la plej freŝan elsendon kiu neniam estis ludita

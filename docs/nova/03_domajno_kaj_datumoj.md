@@ -29,10 +29,10 @@ data class Kanalo(
 ```
 
 > La malnova apo havis `puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`
-> kiel kampojn sur la kanal-modelo. En la nova apo tiuj estas traktataj rekte en la
-> parsilo (`RssParsilo`) laŭ la kanal-slug, ne kiel dateno-movitaj kampoj. Tio estas
-> malpli pura sed pli simpla — la parsreguloj estas malmolaj sed bone dokumentitaj
-> (vidu `04_parsado_kaj_arkivo.md`).
+> kiel kampojn sur la kanal-modelo. En la nova apo `puriguModeloj` restas
+> **daten-movita kampo** (`Kanalo.puriguModeloj`, vidu `04_parsado_kaj_arkivo.md`);
+> `iframeReguloj`, `forceHttps` kaj `parsStrategio` ne plu ekzistas — la
+> iframe-/https-traktado nun estas en la parsilo mem (`RssParsilo`).
 
 ### `Elsendo` (`@Serializable`)
 
@@ -211,6 +211,14 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 
 `ElsendoDeponejoImpl` faras ĉion: Ktor-peto → RSS-parsado → diska kaŝmemoro.
 Ne ekzistas aparta reto-interfaco — la `HttpClient` estas enketigata rekte.
+
+Diska kaŝmemoro (2026-11-21, du dosieroj po kanalo en `elsendoj_kasho/`):
+`<slug>.rss` = kruda RSS-respondo (rezervo, re-parsata nur se necese) kaj
+`<slug>.json` = jam parsitaj elsendoj (`@Serializable`) — la starto malkodas la
+JSON unue, ĉar tio estas ~10× pli rapida ol re-parsi la krudan RSS per Ksoup
+(mezurite: peranto 250 eroj — parse 714 ms, JSON-decode 69 ms). Legado de ĉiuj
+kanaloj okazas paralele sur `Dispatchers.Default` kaj la rezultoj estas liverataj
+progresive (`poKanalRicevita`), por ke la Hejmo montru enhavon kiel eble plej frue.
 
 ```kotlin
 class ElsendoDeponejoImpl(

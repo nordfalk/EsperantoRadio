@@ -19,9 +19,13 @@ import kotlinx.coroutines.flow.asStateFlow
 class ApajNovaĵojDeponejo(
     private val settings: Settings,
     mesaĝo: String?,
+    pasintajMesaĝoj: List<String>? = null,
 ) {
     /** La nuna novaĵ-mesaĝo el la kanalkonfiguro (sen spacetoj, malplena se mankas) — por la ekrano „Apaj novaĵoj“. */
     val mesaĝo: String = mesaĝo?.trim().orEmpty()
+
+    /** Pasintaj novaĵoj el la kanalkonfiguro (sen spacetoj, malplenaj forigitaj) — por la faldebla sekcio sub la novaĵ-dialogo. */
+    val pasintaj: List<String> = pasintajMesaĝoj.orEmpty().map { it.trim() }.filter { it.isNotEmpty() }
 
     private val _montrata = MutableStateFlow(deciduMontratan(this.mesaĝo, leguKonservitanHaketaĵon()))
 

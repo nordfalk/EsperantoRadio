@@ -183,6 +183,17 @@ rekta font-fluo.
 | `FilCache` por kaŝeni fontfluojn | reuzo de Ktor-`HttpCache` + `RssArkivServer-filcache/` |
 | Malmolaj parsbranĉoj | komunaj parsreguloj el `shared/data/parser` (unu kodo, du uzoj) |
 
+Semantiko memorenda por la nova servilo (el la malnova `RssArkivServer`):
+
+- `FilCache` kun `ændrerSigIkke=true` signifas „kaŝita → neniam refreŝi“ — tial
+  `RssArkivServer-filcache/` estas la determinismaj golden-fixture-oj de la
+  parsado (A3), ne nura kaŝo.
+- La malnova `RomeFeedWriter` skribis `enclosure length` el la loka kaŝo kaj
+  **per-jarajn arkivdosierojn** `feed-<slug>-<yyyy>.xml` — same faru la nova.
+- La servilo devas transdoni `httpKliento` kaj persistentan
+  `ArchiveOrgDosiernomoKaŝo` al `parsRss`, alie Peranto ricevas divenitajn,
+  ofte malĝustajn archive.org-URL-ojn en la arkivo.
+
 La plej grava avantaĝo: **la servilo kaj la apo dividas la saman parsilon**.
 Kiam la fonto-kono estas ĝisdatigita (ekz. nova iframe-regulo), ĝi estas
 ĝisdatigita unuloke en `shared/` kaj kaj la apo kaj la servilo profitas.

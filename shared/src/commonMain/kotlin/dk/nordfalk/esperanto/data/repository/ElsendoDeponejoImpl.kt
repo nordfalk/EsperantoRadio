@@ -22,7 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +32,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.concurrent.Volatile
 
 /** Tempolimo por petoj al nia arkiva servilo (optimumigo, ne rajtas bloki horloĝon — vidu [ElsendoDeponejoImpl]). */
@@ -84,6 +89,9 @@ open class ElsendoDeponejoImpl(
      * estas nuligita. Default, ne IO — IO ne ekzistas sur wasmJs.
      */
     private val ŝargSkopo = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    /** JSON por la kaŝo de jam parsitaj elsendoj ([leguKaŝonJson]/[skribuKaŝonJson]). */
+    private val json = Json { ignoreUnknownKeys = true }
 
     /**
      * Skribas la kanal-rezulton atome en la memoran kaŝon kaj la fluon.
@@ -228,6 +236,14 @@ open class ElsendoDeponejoImpl(
         if (kunfanditaj != null) {
             // Diska kaŝo: la arkiva kruda teksto se sukcesa, alie la originala (unu dosiero po kanalo)
             skribuKaŝon(kanalo.slug, (arkiva ?: originala)!!.kruda)
+            // Krome JSON de la PARSITAJ elsendoj: la sekva starto malkodas ĝin rekte
+            // (~10× pli rapide ol re-parsi la krudan RSS — mezurite 2026-11-21: peranto
+            // 250 eroj, parse 714 ms, JSON-decode 69 ms). Ne fatala: nur malrapidigo.
+            try {
+                skribuKaŝonJson(kanalo.slug, json.encodeToString(kunfanditaj))
+            } catch (e: Exception) {
+                logw("ElsendoDeponejo", "${kanalo.slug}: ne povis skribi la JSON-kaŝon", e)
+            }
             konservu(kanalo.slug, kunfanditaj)
             logd("ElsendoDeponejo", "${kanalo.slug}: parsado kompleta — ${kunfanditaj.size} elsendoj (fontoj: ${sukcesoj.size}/${fontoj.size})")
             return@coroutineScope kunfanditaj
@@ -282,6 +298,20 @@ open class ElsendoDeponejoImpl(
         // (ekz. peranto ≈ 1,6 MB) blokus la unuan kadron dum pluraj sekundoj
         // (logcat 2026-11-21: "Skipped 213 frames", Davey 3779 ms).
         return withContext(Dispatchers.Default) {
+            // Unue la JSON-kaŝo de jam parsitaj elsendoj — multe pli rapida ol
+            // re-parsi la krudan RSS (Ksoup); la kruda .rss restas kiel rezervo.
+            leguKaŝonJson(kanalo.slug)?.let { jsonTeksto ->
+                try {
+                    val elsendoj = json.decodeFromString<List<Elsendo>>(jsonTeksto).ordigitajPlejFreŝajUnue()
+                    konservu(kanalo.slug, elsendoj)
+                    logd("ElsendoDeponejo", "${kanalo.slug}: JSON-kaŝo malkodita — ${elsendoj.size} elsendoj")
+                    return@withContext elsendoj
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    logw("ElsendoDeponejo", "${kanalo.slug}: rompita JSON-kaŝo — uzas la krudan RSS", e)
+                }
+            }
             val respondo = leguKaŝon(kanalo.slug) ?: return@withContext null
             logd("ElsendoDeponejo", "${kanalo.slug}: legas diskan kaŝmemoron (${respondo.length} signoj)")
             try {
@@ -310,24 +340,36 @@ open class ElsendoDeponejoImpl(
     }
 
     /**
-     * Legas ĉiujn kaŝitajn RSS-dosierojn por la donitaj kanaloj kaj re-parsas ilin.
-     * Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj [fluoj]-n.
-     * Redonas ĉiujn elsendojn kune (plata listo).
+     * Legas ĉiujn kaŝitajn dosierojn (JSON unue, aliokaze kruda RSS) por la donitaj
+     * kanaloj. Por ĉiu kanalo kun kaŝo, plenigas la en-memoran [kaŝmemoro]-n kaj
+     * [fluoj]-n. Redonas ĉiujn elsendojn kune (plata listo).
      *
      * La kanaloj estas legataj PARALELE (ĉiu sur Dispatchers.Default ene de
      * [leguKaŝitajnElsendojn]) — sinsekva legado sur la vokanta fadeno (kutime la
      * ĉefa) blokus la unuan kadron dum ~3,5 s ĉe grandaj arkivaj kaŝoj.
+     *
+     * [poKanalRicevita] estas vokata tuj kiam unu kanalo pretas (sur la fadeno de
+     * la vokanto — kutime la ĉefa), por ke la vokanto povu montri progresive
+     * anstataŭ atendi ĉiujn kanalojn (2026-11-21).
      */
-    suspend fun leguĈiujnKaŝitajnElsendojn(kanaloj: List<Kanalo>): List<Elsendo> = coroutineScope {
-        kanaloj
+    suspend fun leguĈiujnKaŝitajnElsendojn(
+        kanaloj: List<Kanalo>,
+        poKanalRicevita: (List<Elsendo>) -> Unit = {},
+    ): List<Elsendo> = coroutineScope {
+        val kanalo = Channel<Pair<Kanalo, List<Elsendo>?>>(Channel.UNLIMITED)
+        val infanoj = kanaloj
             .filter { it.havasPodkastojn }
-            .map { kanalo -> async { leguKaŝitajnElsendojn(kanalo) } }
-            .awaitAll()
-            .filterNotNull()
-            .flatten()
-            .also { ĉiuj ->
-                logd("ElsendoDeponejo", "Diska kaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+            .map { k -> launch { kanalo.send(k to leguKaŝitajnElsendojn(k)) } }
+        launch { infanoj.joinAll(); kanalo.close() }
+        val ĉiuj = mutableListOf<Elsendo>()
+        for ((_, rezulto) in kanalo) {
+            if (rezulto != null) {
+                ĉiuj.addAll(rezulto)
+                poKanalRicevita(rezulto)
             }
+        }
+        logd("ElsendoDeponejo", "Diska kaŝmemoro: ${ĉiuj.size} elsendoj el ${kanaloj.count { it.havasPodkastojn }} kanaloj")
+        return@coroutineScope ĉiuj
     }
 
     override suspend fun getElsendo(id: String): Elsendo? {

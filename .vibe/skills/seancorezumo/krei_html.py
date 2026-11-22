@@ -12,6 +12,7 @@ Se eligxdosiero mankas, defauxlto estas <repo_dosierujo>/seancorezumo.html
 import json
 import html
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -25,6 +26,34 @@ def get_text(content):
             for x in content
         )
     return str(content) if content else ""
+
+
+# Sekretoj, kiuj neniam aperu en la generita HTML (redaktataj).
+_SEKRETAJ_REGULES = [
+    r"sntrys_[A-Za-z0-9._+/-]+={0,2}",
+    r"figd_[A-Za-z0-9_-]+",
+    r"ghp_[A-Za-z0-9]{20,}",
+    r"github_pat_[A-Za-z0-9_]+",
+    r"gho_[A-Za-z0-9]{20,}",
+    r"sk-[A-Za-z0-9]{20,}",
+    r"AKIA[A-Z0-9]{16}",
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?-----END [A-Z ]*PRIVATE KEY-----",
+    # Asignoj kiel TOKEN=..., PASSWORD: ..., api_key = "..." — konservu la nomon, kaŝu la valoron
+    r"(?i)\b([A-Z0-9_]*(TOKEN|PASSWORD|PASVORTO|SECRET|API_?KEY|PRIVATE_?KEY)[A-Z0-9_]*)\b(\s*[=:]\s*|\s+as\s+)(\"[^\"]*\"|'[^']*'|[^\s,;\)\]}]+)",
+]
+_SEKRETAJ_REGULES_K = [re.compile(p, re.DOTALL) for p in _SEKRETAJ_REGULES]
+
+
+def redaktu(teksto):
+    """Kaŝu sekretojn (ĵetonojn, pasvortojn, ŝlosilojn) en la teksto."""
+    if not teksto:
+        return teksto
+    for reg in _SEKRETAJ_REGULES_K:
+        if reg.groups >= 3:
+            teksto = reg.sub(lambda m: m.group(1) + m.group(3) + "[KAŜITA]", teksto)
+        else:
+            teksto = reg.sub("[KAŜITA]", teksto)
+    return teksto
 
 
 def get_git_remote(cwd):
@@ -56,11 +85,24 @@ def find_sessions(vibe_home, repo_cwd):
     seen_cwds = {}
     for entry in sorted(os.listdir(session_dir)):
         full = os.path.join(session_dir, entry)
-        if not os.path.isdir(full) or not entry.startswith("session_"):
+        if not os.path.isdir(full):
             continue
         meta_path = os.path.join(full, "meta.json")
         msg_path = os.path.join(full, "messages.jsonl")
-        if not os.path.isfile(msg_path):
+        unified = False
+        if entry.startswith("session_"):
+            if not os.path.isfile(msg_path):
+                continue
+        elif entry == "unified":
+            # Nova protokola aranĝo: unified/<session-id>/{meta.json,chunks/*.json}
+            for sub in sorted(os.listdir(full)):
+                sub_full = os.path.join(full, sub)
+                sub_meta = os.path.join(sub_full, "meta.json")
+                if not os.path.isdir(sub_full) or not os.path.isfile(sub_meta):
+                    continue
+                all_sessions.append((sub, sub_full, None, "", "", True))
+            continue
+        else:
             continue
         cwd = ""
         start_time = ""
@@ -73,9 +115,27 @@ def find_sessions(vibe_home, repo_cwd):
             pass
         if not cwd:
             continue
-        all_sessions.append((entry, full, msg_path, cwd, start_time))
+        all_sessions.append((entry, full, msg_path, cwd, start_time, unified))
         if cwd not in seen_cwds:
             seen_cwds[cwd] = None
+
+    # Plenigu cwd/start_time por la unified-seancoj (post kolekto)
+    filled = []
+    for entry, full, msg_path, cwd, start_time, unified in all_sessions:
+        if unified and not cwd:
+            try:
+                with open(os.path.join(full, "meta.json")) as mf:
+                    m = json.load(mf)
+                cwd = m.get("environment", {}).get("working_directory", "")
+                start_time = m.get("start_time", "")
+            except (json.JSONDecodeError, FileNotFoundError, KeyError):
+                pass
+            if not cwd:
+                continue
+            if cwd not in seen_cwds:
+                seen_cwds[cwd] = None
+        filled.append((entry, full, msg_path, cwd, start_time, unified))
+    all_sessions = filled
 
     # Determinu git-remote-URL por cxiuj unikaj dosierujoj
     if target_remote:
@@ -91,19 +151,88 @@ def find_sessions(vibe_home, repo_cwd):
 
     repo_basename = os.path.basename(os.path.normpath(repo_cwd))
     sessions = []
-    for entry, full, msg_path, cwd, start_time in all_sessions:
+    for entry, full, msg_path, cwd, start_time, unified in all_sessions:
         remote = seen_cwds.get(cwd)
         if target_remote and remote and remote == target_remote:
-            sessions.append((entry, full, msg_path, cwd, start_time))
+            sessions.append((entry, full, msg_path, cwd, start_time, unified))
         elif not target_remote and (
             cwd == repo_cwd or os.path.realpath(cwd) == os.path.realpath(repo_cwd)
         ):
-            sessions.append((entry, full, msg_path, cwd, start_time))
+            sessions.append((entry, full, msg_path, cwd, start_time, unified))
         elif not remote and os.path.basename(os.path.normpath(cwd)) == repo_basename:
             # Dosierujo forigita/sen git — inkluzivu se samnoma
-            sessions.append((entry, full, msg_path, cwd, start_time))
+            sessions.append((entry, full, msg_path, cwd, start_time, unified))
 
     return sessions
+
+
+def extract_pairs_unified(session_dir):
+    """
+    Legu la novan unified-protokolon: chunks/*.json estas listoj de
+    {"source": ..., "message": {"role": ..., "content": [...]}}.
+    Harmess/injektajho-enskriboj estas pretersaltataj.
+    """
+    import hashlib
+    import glob
+
+    entries = []
+    seen = set()
+    for chunk_path in sorted(glob.glob(os.path.join(session_dir, "chunks", "*.json"))):
+        try:
+            with open(chunk_path) as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            continue
+        if not isinstance(data, list):
+            continue
+        for e in data:
+            if not isinstance(e, dict):
+                continue
+            m = e.get("message")
+            if not isinstance(m, dict):
+                continue
+            role = m.get("role")
+            if role not in ("user", "assistant"):
+                continue
+            source = e.get("source", "")
+            if source in ("injection", "harness"):
+                continue
+            key = hashlib.sha256(
+                json.dumps(m, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            ).hexdigest()
+            if key in seen:
+                continue
+            seen.add(key)
+            entries.append(m)
+
+    pairs = []
+    i = 0
+    while i < len(entries):
+        m = entries[i]
+        if m.get("role") == "user":
+            user_text = get_text(m.get("content", "")).strip()
+            if not user_text:
+                i += 1
+                continue
+            j = i + 1
+            last_asst_text = ""
+            while j < len(entries):
+                nm = entries[j]
+                if nm.get("role") == "user":
+                    break
+                if nm.get("role") == "assistant":
+                    content = get_text(nm.get("content", "")).strip()
+                    tc = nm.get("tool_calls")
+                    if content and not tc:
+                        last_asst_text = content
+                    elif content and tc and not last_asst_text:
+                        last_asst_text = content
+                j += 1
+            pairs.append((user_text, last_asst_text))
+            i = j
+        else:
+            i += 1
+    return pairs
 
 
 def extract_pairs(msg_path):
@@ -161,17 +290,17 @@ def build_html(all_data, max_len, repo_cwd, target_remote):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seancorezumo — """ + html.escape(os.path.basename(repo_cwd)) + """</title>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #222; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; margin: 0; padding: 20px; background: #f8f9fa; color: #222; box-sizing: border-box; }
 h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
 .session { margin-bottom: 28px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
 .session-header { background: #6750A4; color: white; padding: 8px 14px; font-size: 0.85em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .session-cwd { font-size: 0.85em; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 4px; font-weight: 400; }
 .session-cwd.changed { background: #ffeb3b; color: #333; font-weight: 600; }
-.exchange { padding: 12px 14px; border-bottom: 1px solid #eee; }
+.exchange { padding: 12px 14px; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
 .exchange:last-child { border-bottom: none; }
+@media (max-width: 720px) { .exchange { grid-template-columns: 1fr; } }
 .msg-time { font-size: 0.75em; color: #888; margin-bottom: 4px; }
 .user-msg { background: #e8f0fe; border-left: 3px solid #1967d2; padding: 8px 12px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5; }
-.asst-label { font-size: 0.75em; color: #6750A4; font-weight: 600; margin-top: 10px; margin-bottom: 4px; }
 .asst-msg { background: #f3e8ff; border-left: 3px solid #6750A4; padding: 8px 12px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5; }
 .truncated { color: #d32f2f; font-size: 0.8em; font-style: italic; margin-top: 4px; }
 .no-response { color: #999; font-size: 0.85em; font-style: italic; }
@@ -210,25 +339,26 @@ h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
         )
         for user_text, asst_text in pairs:
             user_trunc = False
-            u = user_text
+            u = redaktu(user_text)
             if len(u) > max_len:
                 u = u[:max_len]
                 user_trunc = True
 
             asst_trunc = False
-            a = asst_text
+            a = redaktu(asst_text)
             if len(a) > max_len:
                 a = a[:max_len]
                 asst_trunc = True
 
             out.append('<div class="exchange">')
+            out.append('<div>')
             out.append(f'<div class="user-msg">{html.escape(u)}')
             if user_trunc:
                 out.append(
                     f'<div class="truncated">[fortondita cxe {max_len} signoj]</div>'
                 )
-            out.append("</div>")
-            out.append('<div class="asst-label">Respondo:</div>')
+            out.append("</div></div>")
+            out.append('<div>')
             if a:
                 out.append(f'<div class="asst-msg">{html.escape(a)}')
                 if asst_trunc:
@@ -240,6 +370,7 @@ h1 { font-size: 1.5em; border-bottom: 2px solid #6750A4; padding-bottom: 8px; }
                 out.append(
                     '<div class="no-response">[neniu fina teksta respondo registrita]</div>'
                 )
+            out.append("</div>")
             out.append("</div>")
         out.append("</div>")
         prev_cwd = cwd
@@ -267,14 +398,14 @@ def main():
     target_remote = get_git_remote(repo_cwd)
 
     all_data = []
-    for entry, full, msg_path, cwd, start_time in sessions:
+    for entry, full, msg_path, cwd, start_time, unified in sessions:
         try:
             dt = datetime.fromisoformat(start_time.replace("Z", ""))
             dato = dt.strftime("%Y-%m-%d %H:%M")
         except (ValueError, TypeError):
             dato = entry
 
-        pairs = extract_pairs(msg_path)
+        pairs = extract_pairs_unified(full) if unified else extract_pairs(msg_path)
         if pairs:
             all_data.append((entry, dato, pairs, cwd))
 

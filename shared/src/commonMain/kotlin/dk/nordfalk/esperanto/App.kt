@@ -9,11 +9,18 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -21,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -48,6 +56,8 @@ import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
 import dk.nordfalk.esperanto.ui.temuKolorskemo
 import dk.nordfalk.esperanto.ui.TemoNomo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
@@ -117,10 +127,10 @@ fun EsperantoRadioApp(
             }
         }
 
-        // Savu pozicion kiam la komponanto detruiĝas (ekz. fermo de la apo)
+        // Savu pozicion kiam la komponanto detruiĝas (ekz. fermo de la apo).
         DisposableEffect(ludvicoRegilo) {
             onDispose {
-                scope.launch { ludvicoRegilo.savuPozicionNun() }
+                CoroutineScope(Dispatchers.Main).launch { ludvicoRegilo.savuPozicionNun() }
             }
         }
 
@@ -627,11 +637,48 @@ fun EsperantoRadioApp(
                 onDismissRequest = { },
                 title = { Text("Novaĵoj") },
                 text = {
-                    if (mesaĝo.isEmpty()) {
-                        Text("Nun estas neniu novaĵo.")
-                    } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
                         // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
                         HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth())
+
+                        // Faldebla sekcio kun la pasintaj novaĵoj, plej sube
+                        val pasintaj = apajNovaĵojDeponejo.pasintaj
+                        if (pasintaj.isNotEmpty()) {
+                            var pasintajFalditaj by remember { mutableStateOf(true) }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { pasintajFalditaj = !pasintajFalditaj }
+                                    .padding(top = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    "Pasintaj novaĵoj",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier.padding(end = 4.dp),
+                                )
+                                Icon(
+                                    if (pasintajFalditaj) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
+                                    contentDescription = if (pasintajFalditaj) "Malfaldi pasintajn novaĵojn" else "Faldi pasintajn novaĵojn",
+                                )
+                            }
+                            if (!pasintajFalditaj) {
+                                pasintaj.forEachIndexed { indekso, pasinta ->
+                                    if (indekso > 0) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            thickness = 1.5.dp,
+                                            color = MaterialTheme.colorScheme.outline,
+                                        )
+                                    }
+                                    HtmlVido(html = pasinta, uzuWebView = false, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+                                }
+                            }
+                        }
                     }
                 },
                 confirmButton = {

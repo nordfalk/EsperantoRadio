@@ -1,46 +1,37 @@
 # FAROTA.md — Malfermitaj trovoj por posta riparado
 
-> **Fonto**: tutplena kodrevizio de 2026-10-08, farita per 8 subagentoj (tavoloj: kerno, ludilo, UI/navigado, Android, testoj+build+CI, sekureco, historia `malnova/`, delta `b92f739..c92766a`).
-> **Pliigo 2026-10-19**: K1, G42–G45 kaj C46–C48 aldoniĝis el la Sentry-analizo (organizo `esperantoradio`, projekto `kmp` — uzoj, landoj, eraroj kaj kanaloj en la semajno 10-12 → 10-19; per la MCP-servilo `mcp.sentry.dev`, vidu la skill `sentry-esplorado`).
-> **Bazo**: `b92f739` + delto ĝis `c92766a` (la loka `master` estis ĝisdatigita per `git pull --ff-only` dum la revizio; liniaj referencoj estas al `c92766a`).
-> **Kiel uzi**: la punktoj estas ordigitaj laŭ graveco (KRITIKA → GRAVA → KONSILO). Marku la status-keston `[x]`, kiam finite. Ne forigu punkton sen riparo — anstataŭe movu ĝin al "Jam farita" sube.
-> **Rilato al la aliaj dosieroj** (ekde 2026-10-11): la DAŬRE VALIDA scio el la jam finitaj ([x]) trovindikoj staras en [`NOTOJ.md`](NOTOJ.md) (permanente notinde, laŭ temo); la historio de la riparoj (problemo→kaŭzo→testo) en [`ŜANĜOJ.md`](ŜANĜOJ.md) (enskribo 13). Ĉi tiu dosiero restas nur por la MALFERMAJ punktoj.
+> **Kiel uzi** (ĝisdatigita 2026-11-20): ĉi tiu dosiero enhavas NUR la MALFERMAJN punktojn, ordigitaj laŭ graveco (KRITIKA → GRAVA → KONSILO). Kiam punkto estas solvita, FORIGU ĝin tute — ĝia priskribo kaj la historio de la riparo estas arkivitaj en `git log` de ĉi tiu dosiero, en la PR/CHANGELOG kaj en [`ŜANĜOJ.md`](ŜANĜOJ.md); la daŭre valida scio el finitaj punktoj staras en [`NOTOJ.md`](NOTOJ.md).
+> **Rilato al la aliaj dosieroj** (ekde 2026-10-11): [`NOTOJ.md`](NOTOJ.md) = konstanta scio laŭ temo; [`ŜANĜOJ.md`](ŜANĜOJ.md) = historio de la riparoj (problemo→kaŭzo→testo); `CHANGELOG.md` = uzantvida resumo.
 
-## KRITIKA
+## Revizio 2026-11-20 (kontraŭ master + Sentry, 7–14 tagoj)
 
-#### K1 — KMP-1V: RemoteServiceException — `startForegroundService()` sen `startForeground()` en `EsperantoLudadoServo` (kraŝo sur dist 249)
-- **Statuso**: [x]
-- **Riparo** (2026-10-19, branĉo `1019-ludadoservo-defenda-startforeground`): defendam `startForeground()` en `EsperantoLudadoServo.onStartCommand` — post 4 s, se la ludilo restas malplena (restarto post procezo-morto, ekstera starto; esploro de la media3-1.11.1-fonto montris, ke `MediaController` nur BINDAS, do nur la restarta/ekstera vojo povas lasi la kontrakton malfermita), la servo mem plenumas la kontrakton per provizora `IMPORTANCE_MIN`-sciigo kaj tiam `stopForeground()` + `stopSelf()`. Ludilo kun media-eroj restas sub Media3 (kontrakto plenumita je ekbufrado). La instrumentita testo ne estas inkluzivita (la kraŝo estas tempo-bazita sistema konduto, ne reprenebla per emulilo; la empiria kontrolilo estas la observado de KMP-1V en Sentry post la venonta eldono — vidu C48).
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-1V](https://esperantoradio.sentry.io/issues/KMP-1V), unua fojo 2026-10-18 16:47 UTC; nivelo fatal, nepritraktita; Android 11, Redmi Note 9 Pro, IT; `FOREGROUND_SERVICE_MEDIA_PLAYBACK: not_granted`)
-- **Loko**: `androidApp/.../EsperantoLudadoServo.kt` (Media3 `MediaSessionService`); la start-vojoj per `SessionToken`/`MediaController`: `ExoPlayerLudiloRegilo.kt:77`, `LudiElsendoReceivilo.kt:78` (sciigo "ludi elsendon"), `AlarmoReceivilo.kt:161,313` (alarmo)
-- **Priskribo**: La servo startiĝas per `startForegroundService()` el fona vojo (sciigo/alarmo/aŭtoludo). Media3 vokas `startForeground()` nur kiam seanco kun ludanta legilo iĝas aktiva; se la fonto fiaskas (ĝuste la `ExoPlaybackException`-ersetego, KMP-H) aŭ la konekto malfruas, neniu `startForeground()` okazas kaj Android mortigas la apoton per `RemoteServiceException`. Unu uzanto, unu okazigo — sed sur la aktuala produktada build (249) kaj en la vojo, kiun la reverkata alarma PR (revertita `10e76e6`) tuŝos.
-- **Sugesto**: (a) en `EsperantoLudadoServo.onStartCommand`: se la servo startiĝis per `startForegroundService` kaj neniu seanco aktiviĝis ene de la limtempo, voku `startForeground()` per provizora sciigo — aŭ `stopSelf()` se neniu luda intenco restas; (b) en la regiloj (`ExoPlayerLudiloRegilo`, `LudiElsendoReceivilo`) traktu font-erarojn kaj ĉesu la kontrakton grace; (c) testu la sciigan kaj alarman vojon sur Android 11–16 (emulilo + vera aparato), precipe la alarman PR antaŭ ol merĝi; (d) post eldono observu Sentry: KMP-1V devas malaperi.
-- **Testo**: instrumentita testo: starti la servon el fono (sciigo-klako) kun rompita fonto-URL → neniu kraŝo, la servo haltiĝas mem.
-- **Konfirmo** (2026-10-27, Sentry): la sola evento de la lastaj 14 tagoj okazis sur dist **249** (la antaŭ-ripara konstruo); sur dist ≥ 250, inkluzive 3.1.0 (252), **nul** okazoj. KMP-1V solvita en Sentry.
+Ĉiuj punktoj sube kontrolitaj kontraŭ la nuna kodo; Sentry-datumoj de 2026-11-13 → 11-20.
+
+| Punkto | Verdikto 2026-11-20 |
+|---|---|
+| G42 | **SOLVITA 2026-11-20**: la vera risko estis `scope.launch` en `onDispose` (App.kt) — nun nova scope; ceteraj uzoj jam uzas `LaunchedEffect`/nuligeblajn taskojn. Punkto forigita. |
+| G44 | ** Ankoraŭ aktuala, nova kaŭzo**: anchor.fm nun redonas 403 `geofence:blocked` (Spotify-geobloko); krome substack/vaticannews ConnectTimeout, ivoox 503, "Connection refused" (3zzzenesperanto, peranto). |
+| C5 | Aktuala (`build.gradle.kts:64` hardkodita keystore-vojo). |
+| C9 | Parte: `jcenter()` forigita, sed la jcenter-URL ankoraŭ registrita kiel maven-repo; `verification-metadata.xml` mankas; dependabot.yml ekzistas. |
+| C15, C16, C21, C25, C30 | **SOLVITAJ 2026-11-20** (forigo de malnovaj aŭskultantoj en wasmJs; fermo de `rawStream` + KDoc de `saltiAl` sur Desktop; forigo de `LOCKED_BOOT_COMPLETED`; asertoj en `EkranfotoTesto`; KDoc en `LudvicoLogiko`) — punktoj forigitaj el ĉi tiu dosiero; verdaj: `:shared:desktopTest`, `:shared:compileKotlinWasmJs`, `:androidApp:assembleDebug`. |
+| C22, C40 | **SOLVITAJ 2026-11-20** (`lifecycleScope` anstataŭ propra ne-nuligebla scope en `MainActivity`; `-Xmx3g` en `gradle.properties`) — punktoj forigitaj; verdaj: `:androidApp:assembleDebug`, `:shared:desktopTest`. |
+| C26, C27, C32 | **SOLVITAJ 2026-11-20** (horloĝ-injekto en `HejmoViewModel`/`HejmoEkrano` + fiksa dato en la testo; pura `estasPasemaHttpStatuson` en commonMain + unuo-testo; tuŝ-celoj pligrandigitaj al 48 dp) — punktoj forigitaj; verda: `:shared:desktopTest`. |
+| C34 | Forigita 2026-11-20: la TODOj jam estas en la iOS-kodo (`PlatformLigilo.kt` + deep-link-noto); deep links restas parto de C58. |
+| C29 | **SOLVITA** — `resolutionStrategy.force` forigita; punkto forigita el ĉi tiu dosiero. |
+| C40 | **SOLVITA 2026-11-20** (`-Xmx3g`); punkto forigita. |
+| C41 | **SOLVITA 2026-11-20** (AGENTS.md mencias nun la diagnozan ekranon; `docs/nova/02/03` korektitaj pri `puriguModeloj`); punkto forigita. |
+| C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
+| C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
+| C54 | **SOLVITA 2026-11-20**: butono „Kopii RSS-URL“ en KanalEkrano + `kopiuTekston` (expect/actual por android/desktop/wasmJs/ios). Punkto forigita. |
+| C50, C51, C52, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). |
+| C46 | **SOLVITA 2026-11-20**: lud-eraroj nun raportiĝas per 2-arg `logw` (videblaj en Sentry Logs); reprovo jam ekzistis (`ReprovoLogiko`). Punkto forigita. |
+| C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
+| C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
+| C53 | Parte farita: HUMILOPINIE aldonita; restas kontroli "Una Vaga Idea"/"Cuéntame, Hermosura". |
+| C59 | Parte farita: `transsaltuKomenceSekundojn` ekzistas kun ĉiuj valoroj; restas (b) plena aŭtomatiĝo (`enkonduk-detekto`). |
+| C61 | Aktuala: `aktualaVersio`/`funkciaAnonco` ankoraŭ nenie legataj. |
 
 ## GRAVA
-
-#### G42 — KMP-X: `ForgottenCoroutineScopeException: rememberCoroutineScope left the composition` (212 okazoj / 58 uzantoj ekde 2026-09-13)
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-X](https://esperantoradio.sentry.io/issues/KMP-X); 32 okazoj / 10 uzantoj en la lasta semajno, lasta 10-16)
-- **Loko**: `rememberCoroutineScope` en `App.kt:99`, `SerĉoEkrano.kt:34`, `PlejŝatatajEkrano.kt:37`, `HejmoEkrano.kt`, `ElŝutitajEkrano.kt:39`, `DiagnozoEkrano.kt:37`, `ElsendoEkrano.kt:73`, `KanalEkrano.kt:108`
-- **Priskribo**: Korutino lanĉita el `rememberCoroutineScope` postvivas la komponaĵon — tipa kaŭzo: lanĉo en klik-lambdo, kies rezulto estas uzata post navigado foren.
-- **Ĝisdatigo 2026-10-27** (Sentry, 14 tagoj): 23 eventoj / 4 uzantoj — 22× dist **248**, 1× 246; sur 3.1.0 (252; 6 uzantoj, 50 %-specimenado) nul. Restas malfermita: la pruvo sur la nova konstruo estas malforta (malmultaj uzantoj + specimenado), kaj la kodvojo probable ekzistas plu.
-- **Sugesto**: inspekti ĉiun uzon; laboro de la ekrano → `LaunchedEffect` aŭ nuligo en `DisposableEffect`; laboro transvivanta navigadon → `viewModelScope` (vidu la komenton en `HejmoEkrano.kt:224`); neniam teni la skopecon en longdaŭra objekto.
-
-#### G43 — KMP-1S: `IllegalArgumentException: La respondo ne estas RSS/Atom-fluo` el kaŝita fluo (substatuso: escalating)
-- **Statuso**: [x]
-- **Solvo** (2026-10-19): jam plene riparita antaŭ la Sentry-analizo — `leguKaŝitajnElsendojn`
-  kaptas la ĵeton de `kontroluFluecon`, protokolas per `logw`, FORIGAS la koruptitan
-  kaŝon kaj redonas null (PR #89/#109); `kontroluFluecon` vokiĝas ankaŭ ANTAŬ
-  `skribuKaŝon` (fiaskpaĝo kun HTTP 200 ne estas kaŝata). La Sentry-okazoj (dist 249,
-  lasta 10-14) kongruas kun la 249-eldondato kaj ĉesis post ĝi. Testoj:
-  `malpuraKaŝoEstasForigata`, `http404NeAnstataŭigasKaŝon`,
-  `fiaskpaĝoKunHttp200NeAnstataŭigasKaŝon` (ElsendoDeponejoImplTest).
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-1S](https://esperantoradio.sentry.io/issues/KMP-1S); 15 okazoj / 4 uzantoj, 10-13 → 10-14; staktraco: `HejmoEkrano → HejmoViewModel.ŝargi → ElsendoDeponejoImpl.leguKaŝitajnElsendojn`)
-- **Loko**: `ElsendoDeponejoImpl.kt:204` (`kontroluFluecon`), vokita ĉe `:149` ( legado de la kaŝo) kaj `:109` (antaŭ kaŝado)
-- **Priskribo**: Kaŝita respondo (verŝajne HTML-erarpaĝo aŭ koruptita dosiero) estas re-validata kiel RSS kaj ĵetas — unu korupta kaŝero rompas la ŝaradon de la koncerna kanalo por la uzanto.
-- **Sugesto**: (a) dum legado de la kaŝo `kontroluFluecon` ne ĵetu — `logw` + traktu kiel malplenan kaj forigu la koruptitan kaŝeron; (b) validu la respondo (content-type / unuaj signoj `<`) **antaŭ** ol skribi en la kaŝon; (c) ampleksu la teston `ElsendoDeponejoImplTest.kt:95` per "korupta kaŝo ne rompas la legadon".
 
 #### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
 - **Statuso**: [ ]
@@ -50,192 +41,17 @@
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
 - **Ĝisdatigo 2026-10-27** (Sentry 3.1.0/252, 14 tagoj + ekstera kontrolo): `radioscienca` fiaskas ankaŭ en la nuna eldono — ~15 eventoj ĉe ~5 uzantoj, ofte kun **0 kaŝenitaj elsendoj** (uzanto vidas malplenan kanalon). La fluo respondas HTTP 200 de ekstere (kontrolita per curl, ankaŭ kun Ktor/okhttp/apo-UA — do ne UA-blokado, sed intermita servila problemo de la gastiganto). Same aperas: `polaretradio`, `radiovatikana`, `spiritismavocxo` (0 kaŝenitaj), `lemondediplomatique`, `lamalfamuloj`, `vinilkosmo`. La DNS-avertoj (`UnresolvedAddressException`, 52 eventoj) venas de unu aparato sen reto kaj estas pritraktitaj ĝuste per kaŝmemoro.
 
-#### G45 — KMP-1H/1R: `OutOfMemoryError` — tuta respondo legata en la memoron (`readByteArray`)
-- **Statuso**: [x]
-- **Riparo** (2026-10-20, branĉo `1019-g43-g45-kasxero-sanigado`): nova komuna helpilo
-  `KorpaLegilo.kt` — `HttpResponse.leguKorponLimigite()` (maks. 1 MB,
-  `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ`): (1) ContentLength-antaŭkontrolo ĵetas tuj sen
-  legi; (2) `bodyAsChannel()` + peceta legado devigas la limon ankaŭ sen/kun mensoganta
-  Content-Length. Anstataŭigis `bodyAsText()` en `ElsendoDeponejoImpl.ŝargiElsendojn`
-  kaj `NovajElsendojKontroloWorker`. La kaŝo-resta konduto kovrita per
-  `troGrandaRespondoNeAnstataŭigasKaŝon`; la helpilo mem per
-  `leguKorponLimigiteSekvasLaLimon` kaj `leguKorponLimigiteFlueTranslimasSenContentLength`.
-  La `arhivaPeto` (archive.org-metadatenoj, ~1-2 KB) restas kun `bodyAsText`.
-- **Fonto**: Sentry-analizo 2026-10-19 (issues [KMP-1H](https://esperantoradio.sentry.io/issues/KMP-1H), [KMP-1R](https://esperantoradio.sentry.io/issues/KMP-1R); 10-08 → 10-13; provoledo de 60 MB; malaltklasaj aparatoj, 2–3 uzantoj)
-- **Loko**: `ElsendoDeponejoImpl.kt:62,108` (`bodyAsText()` — ktor interne `SavedCallKt.save → kotlinx.io readByteArray`), `NovajElsendojKontroloWorker.kt:119-121`
-- **Priskribo**: La tuta korpo de respondo estas enmemorigata; ekstreme granda aŭ fuŝita respondo (misdirektita elŝuto anstataŭ fluo) mortigas la apoton sur malfortaj aparatoj.
-- **Sugesto**: limigi la legotan grandecon (maks. ~2–5 MB por fluoj — `bodyAsChannel` + limita legado anstataŭ `bodyAsText`), kaj kaŝi nur respondojn, kiuj aspektas kiel RSS (ligu kun G43(b)).
-
-#### G46 — `logw` estas nesimetria: 2-arg sendas averton al Sentry (Logs), 3-arg sendas NENION — memevidenta konfuzo-fonto
-- **Statuso**: [x]
-- **Riparo** (2026-10-19, branĉo `1019-protokolo-logw-al-sentry`): 3-arg `logw` sendas la escepto-resumon kaj la staktracon kiel `Sentry.logger.warn` (du linioj) + KDoc; AGENTS.md kaj `Protokolo.kt`-KDoc korektitaj. Minimala diferenca ŝanĝo, sen nova test-infrastrukturo (laŭ deziro de la uzanto).
-- **Fonto**: Sentry-analizo 2026-10-19 (post-raporta diskuto; la ŝajna "eraro-kolapso" post 10-14 parte kaŭzita de tio)
-- **Loko**: `ProtokoloUtil.kt:54-58` (`logw(tag, msg)` → `Sentry.logger.warn`; `logw(tag, msg, e)` → nur `platformLogw`, neniu Sentry-voko; `platformLogw` = nur `android.util.Log.w`); dokumentoj: AGENTS.md ("logw(tag, msg, e) — ĝi restas LOKA" — vera nur por la 3-arg formo, sed tro ĝeneraligebla), la KDoc super `loge(tag,msg,e)` ("Eraroj estas ankaŭ kaptitaj de Sentry…") staras rekte super `logw(tag,msg,e)` sen propra KDoc, kaj `Protokolo.kt` (commonMain) asertas "kun Sentry-breadcrumb-oj" — sed `platformLog*` aldonas neniun breadcrumb.
-- **Priskribo**: Du samnomaj troŝarĝoj kondutas malsame pri malproksima protokolado, nevideble ĉe la vok-lokoj (22 vokoj 2-arg, 44 vokoj 3-arg — la silenta formo estas la pli ofta). Sekvoj: (a) la avertoj de la 3-arg formo (RSS-malsukcesa, lud-eraroj, Worker-eraroj) estas tute nevideblaj en Sentry ekde 247/249 — oni kredis, ke la eraro-taso "kolapsis", dum ĝi nur fariĝis nevidebla; (b) AGENTS.md kaj la kodo kontraŭdiras (por la 2-arg formo: `Sentry.logger.warn` ja sendas); (c) "sendata al Sentry" estas plursenca — Sentry Logs kontraŭ Sentry Errors (avertoj neniam aperas kiel issue), do laŭ la kontrolata UI oni konkludas aŭ "sendata" aŭ "ne sendata".
-- **Sugesto**: (1) 3-arg `logw` sendu `Sentry.logger.warn("[$tag] $msg: ${e::class.simpleName}: ${e.message}")` — unuforma regulo: "logw = averto en Sentry Logs, ĉiam; neniam error-evento; neniam eraro-kvoto"; (2) ĉio, krom logd iru al Sentry (kun la escepto ke la uzanto povas malŝalti ke logi iras al Sentry en la agordoj); (3) KDoc pri ĉiu troŝargo kun la celo-matriks (logcat / Sentry Logs nivelo / Sentry errors / kvoto), inkluzive de induko "ne sendata" aŭ "sendata al Sentry"; (4) korektu AGENTS.md kaj la Protokolo.kt-KDoc; (5) kontrakt-testo: malgranda interna Sentry-"sink" (anstataŭigebla per test-fako), kiu asertas en commonTest: logw 2-arg → warn, logw 3-arg → warn (post-riparo), loge 3-arg → captureException, logd → nenio malproksima.
-
-#### G47 — Ekludo el sciigo restartiĝas (de pozicio 0) dum ekranturno
-- **Statuso**: [x] (diagnozita kaj riparita 2026-10-30, PR #149)
-- **Fonto**: uzanto-raporto de la posedanto (2026-10-30 antaŭtagmeze kaj denove vespere, Samsung-telefono en Danio, Varsovia Vento: "La 199a elsendo 1a/2a parto"); konfirmita en Sentry (uzanto `5f08712e…`, release `3.1.1-beta29okt`): la 2026-10-30 "Ludado komencita de sciigo" aperis dufoje 1 s aparte (07:22:51/52, 07:38:19/07:39:25) kaj eĉ 5-foje ene de 9 s (19:15:44–53) — ĉiufoja rekreo de la Activity.
-- **Kaŭzo**: `MainActivity` havas nek `configChanges` nek `launchMode` → ĉe ekranturno `onCreate` refariĝas kun la SAMA malnova intent kaj vokis `traktuIntenton(intent)` senkondiĉe → `traktuMalfermiElsendon` → `fiksiFonton(fonto, komencoPozicioMs=0)` + `ludi()` → `setMediaItem(aĵo, 0)` → restarto de la komenco; krome `AtendantaElsendoNavigacio.setu` re-navigis.
-- **Riparo**: en `MainActivity.onCreate` la intent estas traktata nur ĉe freska kreo (`savedInstanceState == null`); `onNewIntent` restas por novaj intent. Regresa testo: `SciigoLudiTest.rekreoNeRestartigasLudonDeSciigo` (lanĉas la Activity kun MALFERMI_ELSENDON, `recreate()`, kontrolas ke la pozicio ne rekomenciĝas).
-- **Sugesto**: post eldono observi en Sentry ke "Ludado komencita de sciigo" ne plu aperas plurfoje ene de sekundoj.
-
 ## KONSILO
 
 #### C5 — Subskrib-konfiguro: defaŭlta absoluta keystore-vojo en publika deponejo
 - **Statuso**: [ ]
-- **Loko**: `androidApp/build.gradle.kts:47` (`storeFile = file(System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")`, pasvortoj defaultas al `""`)
+- **Loko**: `androidApp/build.gradle.kts:64` (`storeFile = file(System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")`, pasvortoj defaultas al `""`)
 - **Sugesto**: forigu la hardkoditan vojon; ĵetu eraron se `KEYSTORE_*` mankas ĉe eldon-konstruo (fail-fast). (La CI `eldonado.yml` faras tion ĝuste: GitHub-secrets → env.)
-
-#### C6 — R8/ProGuard: nenio aktiva (neniu keep-regula risko hodiaŭ)
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): R8 ŝaltita por `release` (`isMinifyEnabled = true` + nova `androidApp/proguard-rules.pro` kun konsumaj reguloj por kotlinx.serialization — Media3, Sentry, WorkManager kaj Compose liveras siajn proprajn consumer-regulojn en la AAR-oj). Verda: `:shared:desktopTest`, `assembleDebug`, `assembleRelease`; release-APK nun **7,5 MB** (de ~21 MB); fumtesto sur emulilo (lanĉo + 300 monkey-okazaĵoj, 0 kraŝoj) kaj `SciigoLudiTest`/`AlarmoReceiviloTest` (6/6) pasis — do la sciiga/alarm-vojo kaj la serializiloj funkcias sub R8. R8-seeds konfirmas, ke `dk.nordfalk.esperanto.**$$serializer` estas konservitaj.
-- **Loko**: `androidApp/build.gradle.kts` (`isMinifyEnabled = false`; neniu `proguard-rules.pro`; neniu `consumerProguardFiles` en `shared/build.gradle.kts`; APK ~21 MB)
-- **Sugesto**: kiam vi ŝaltos R8: konsumaj reguloj por Media3 session/exoplayer kaj Sentry (memkonfiguriĝas), atentu `SonfontoKodilo`/MediaMetadata-klasojn; re-testu la sciigojn kaj la fonon.
-
-
-#### C8 — `striptiguKomentojn` ne subtenas `/* */`; `coerceInputValues` kaŝas agord-erarojn
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): `striptiguKomentojn` nun subtenas `/* */`-blokkomentojn (nur ekster teksta ĉeno; nefinita bloko estas striptita ĝis la fino, kongrue kun `isLenient`) — testoj en `KanalAgordoLegantoTest` (blokkomentoj, koment-simboloj ene de ĉeno, nefinita bloko). `coerceInputValues = true` restas (toleremo A4: unu fuŝita kampo ne mortigu la tutan konfiguron) kaj estas nun dokumentita kun sia malavantaĝo (tajpo kaŝe korektita al defaŭlto — kontrolu per `KanalAgordoFumTesto`/`radioTxtKomparilo`).
-- **Loko**: `KanalAgordoLeganto.kt:37-72` (nur `//` kaj `\`-daŭrigoj), `:22` (`coerceInputValues = true`)
-- **Sugesto**: dokumentu la limigon (aŭ subtenu blokkomentojn); pripensu forigi `coerceInputValues` por novaj kampoj.
 
 #### C9 — Gradle-higieno: dependency verification, Dependabot, jcenter
 - **Statuso**: [ ]
-- **Loko**: radika `build.gradle.kts` (`jcenter()` en `allprojects` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; neniu `dependabot.yml`
-- **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu Dependabot kaj OWASP `dependencyCheck` en CI; limigu `jcenter()` al la malnova projekto aŭ forigu ĝin iam.
-
-#### C11 — `SonfontoKodilo` enhavas la tutan `Elsendo` en `MediaMetadata.extras`
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): `SonfontoKodilo.kodigu` nun forigas la pezajn kampojn `priskribo`/`priskriboHtml` el la enmetita `Elsendo` (ĉiuj konsumantoj de la malkodita fonto uzas nur id/kanaloSlug/titolo/kanaloNomo/dato/fluo/bildoUrl); la detala ekrano (`entry<Vojo.ElsendoDetalo>` en `App.kt`) reŝargas la plenan elsendon per `ElsendoDeponejo.getElsendo(id)`. Testoj: `SonfontoKodiloTest.kodiguForigasPezajnPriskribojn` (60 KB da HTML → kodita < 2 KB) kaj `kodiguLokaElsendoAnkaŭMaldikas`; `SciigoLudiTest`/`AlarmoReceiviloTest` (6/6 sur emulilo) konfirmas la vojon sciigo→servo→regilo.
-- **Loko**: `shared/src/commonMain/.../domain/player/SonfontoKodilo.kt:23`; uzata en `ExoPlayerLudiloRegilo.kt:113-135` kaj `LudiElsendoReceivilo.kt:56-58`
-- **Priskribo**: La JSON trairis Binder (regilo→servo) kaj loĝis en la sesio; riĉaj HTML-priskriboj (ekz. Varsovia Vento kun enkorpigitaj `<audio>`) povis esti dekoj da KB — risko de `TransactionTooLargeException` kaj malnecesa ŝarĝo.
-- **Sugesto**: serializu nur `id, kanaloSlug, titolo, fluo, dato, bildoUrl` kaj rekonstruu la `Elsendo`-on per `ElsendoDeponejo.getElsendo(id)`.
-
-#### C15 — wasmJs: malnovaj evento-aŭskultantoj de anstataŭigita elemento
-- **Statuso**: [ ]
-- **Loko**: `WasmJsLudiloRegilo.kt:33-38`
-- **Priskribo**: `fiksiFonton` paŭzigas la malnovan elementon kaj kreas novan; la `pause`-evento de la malnova alvenas nesinkrone kaj ĝia aŭskultanto (`_stato.value.copy(stato = Haltita)`) povas superskribi la ĵus metitan `Konektas`.
-- **Sugesto**: forigu la aŭskultantojn (`removeEventListener`) aŭ uzu generacian kontrolon en ĉiu lambda.
-
-#### C16 — Desktop: `rawStream` likas ĉe eraro; `saltiAl` estas ŝajnigo
-- **Statuso**: [ ]
-- **Loko**: `DesktopLudiloRegilo.kt:90-93` (se `AudioSystem.getAudioInputStream(rawStream)` ĵetas, `rawStream` neniam fermiĝas); `:273-275` (`saltiAl` nur metas la montratan pozicion — la UI gardas per `subtenasSaltadon = false`, do nuntempe bone)
-- **Sugesto**: fermu `rawStream` en `catch`; klarigu en la KDoc de `saltiAl`, ke ĝi estas ŝajnigo.
-
-#### C21 — `BootReceivilo`: `LOCKED_BOOT_COMPLETED` estas morta kodo
-- **Statuso**: [ ]
-- **Loko**: `BootReceivilo.kt:33-35`
-- **Sugesto**: forigi la agon (la apo ne estas `directBootAware`) aŭ uzi `createDeviceProtectedStorageContext`.
-
-#### C22 — `MainActivity.scope` neniam nuligeblas kaj postvivas la Activity
-- **Statuso**: [ ]
-- **Loko**: `androidApp/.../MainActivity.kt:43`
-- **Priskribo**: La alarm-korutino (`delay(10_000)` + reto) retenas la detruitan Activity ĝis ~10+ sekundojn post `onDestroy`. Por la alarmo tio estas intenca (la servo transprenas), sed konsilindas apliki `lifecycleScope` por mallongaj UI-korutinoj kaj teni la alarman laboron aparte (kun komento).
-
-#### C23 — `ui-test-junit4:1.7.3` hokita kaj multe pli malnova ol Compose 1.10
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): la hokita `androidx.compose.ui:ui-test-junit4:1.7.3` anstataŭigita per la CMP-artefakto `org.jetbrains.compose.ui:ui-test-junit4` kun la sama versio kiel la cetero de Compose (`compose-multiplatform` en `libs.versions.toml`, nova aliaso `compose-ui-test-junit4`); la paka nomo ene restas `androidx.compose.ui.test`, do la importoj ne ŝanĝiĝis. Verda: `:androidApp:compileDebugAndroidTestKotlin` + `connectedDebugAndroidTest`.
-- **Loko**: `androidApp/build.gradle.kts:83` (`androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.3")`)
-- **Sugesto**: vicigu al la konvena Jetpack Compose-versio (aŭ BOM / `compose.uiTestJUnit4` de CMP).
-
-#### C24 — `defaultToAppBundles` komento kontraŭdiras la CI
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): `defaultToAppBundles.set(false)` kun korektita komento — la apo ne estas en Play App Signing, do la defaŭlto estas APK kaj la CI uzas `publishReleaseApk` (ligilo al `eldonado.yml` kaj `docs/nova/07_eldonado.md` en la komento). Neniu kondutoŝanĝo por la CI (eksplicita `publishReleaseApk); nur la nuda `publishRelease` nun koheras.
-- **Loko**: `androidApp/build.gradle.kts:76` (komento "Nur eldoni AAB (App Bundle), ne APK" — sed `eldonado.yml` uzas `publishReleaseApk`, ĉar la app ne estas en Play App Signing)
-- **Sugesto**: korektu la komenton aŭ forigu `defaultToAppBundles.set(true)`.
-
-#### C25 — `EkranfotoTesto`: 11 "testoj" sen asertoj
-- **Statuso**: [ ]
-- **Loko**: `shared/src/desktopTest/.../EkranfotoTesto.kt`
-- **Sugesto**: akceptebla kiel fumtestoj; konsideru almenaŭ minimuman kontrolon (dosier-grandeco > sojlo, aŭ ke la radiko havas infan-nodojn).
-
-#### C26 — `HejmoEkranoTest` uzas realtempan daton
-- **Statuso**: [ ]
-- **Loko**: `shared/src/commonTest/.../ui/HejmoEkranoTest.kt:40` (`Clock.System.todayIn(TimeZone.UTC)`)
-- **Sugesto**: puraj testoj kun fiksa dato estus pli determinismaj (la limoj estas precize testitaj en `HejmoLogikoTest` kun fiksa dato).
-
-#### C27 — Eraro-klasifiko: kerna decido al commonMain
-- **Statuso**: [ ]
-- **Loko**: `androidApp/.../EraroKlasifiko.kt:14-37` (bone testita, sed nur kiel instrumentita testo, kiu ne ruliĝas en CI)
-- **Sugesto**: eligu la puran decidon (ekz. `klasifikuHttpStatuson(status: Int)`) al commonMain + unuo-testo; aŭ aldonu androidTest al CI per emulilo.
-
-#### C28 — Neuzataj katalog-eroj
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): forigitaj el `gradle/libs.versions.toml` — `ktor-client-cache`, `multiplatform-settings-android`, `turbine` (kaj la versio-linio `turbine`); grep konfirmis neniun referencon en la build-dosieroj (ankaŭ `malnova/` ne uzas la katalogon). Konstruo verda.
-- **Loko**: `gradle/libs.versions.toml:45,62,78` (`ktor-client-cache`, `multiplatform-settings-android`, `turbine` — neniu referenco en la build-dosieroj)
-- **Sugesto**: forigu (aŭ uzu).
-
-#### C29 — `resolutionStrategy.force("androidx.savedstate:savedstate-ktx:1.3.1")` — observi
-- **Statuso**: [ ]
-- **Loko**: `shared/build.gradle.kts:165-168` (workaround bone dokumentita: navigation3 1.1.1 postulas savedstate 1.4.0, sed savedstate-ktx 1.4.0 ne ekzistas)
-- **Sugesto**: observu ĉe estontaj navigation3/CMP-ĝisdatigoj (kaj forigu kune kun la klib-ABI-limigo).
-
-#### C30 — `LudvicoLogiko`: dokumenti kaŝitan dependecon
-- **Statuso**: [ ]
-- **Loko**: `LudvicoLogiko.kt` (`trovSekvanSamkanalan` saltas nur finitajn; eraraj estas saltataj ĉar `markiErara` metas `finita = true, erara = true` — `PersonigoDeponejojImpl.kt:89-100`)
-- **Sugesto**: mencii en la KDoc de `trovSekvanSamkanalan` ke eraraj estas markitaj kiel finittaj de la deponejo.
-
-#### C32 — Tuŝ-celoj sub 48 dp; `contentDescription = null`
-- **Statuso**: [ ]
-- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElŝutitajEkrano.kt:140-148` (`IconButton` 36.dp); `App.kt` (Menuo-butono, `IconButton` sen `minimumTouchTargetSize`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
-- **Sugesto**: `Modifier.minimumTouchTargetSize()` aŭ pligrandigo; aldonu `contentDescription` al la ikonoj.
-
-#### C34 — iOS: `PlatformLigilo` estas TODO; neniuj deep links
-- **Statuso**: [ ]
-- **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
-- **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
-
-#### C38 — Morta kodo
-- **Statuso**: [x]
-- **Riparo** (2026-11-19, PR #175): (1) `LastAŭskultitajDeponejo` + `LastAŭskultitajDeponejoImpl` tute forigitaj — nenie vokataj (la pozicioj vivas en `LudatojDeponejo`, kaj "lastatempe ludata" venas el `LudatojDeponejo` en `HejmoEkrano`); (2) `NoOpElŝutDeponejo.observiElŝutStaton` nun redonas unu komunan fluon anstataŭ nova `MutableStateFlow` je voko; (3) `DiagnozoTipo.RETO`/`Severeco.INFO` jam estis forigitaj pli frue — neniu senefika filtrilo restis; (4) `ElsendoDeponejo.getElsendojn` dokumentita kiel kaŝo-nur (por ŝargi: `ŝargiElsendojnPorKanal`) en la interfaco kaj la impl.
-- **Loko**: `PersonigoDeponejojImpl.kt:36,48` (`LastAŭskultitajDeponejo.pozicioj` neniam plenigita — `getPozicio` ĉiam redonas `null`); `NoOpElŝutDeponejo.kt:18` (nova `MutableStateFlow` je ĉiu voko de `observiElŝutStaton`); `Diagnozo.kt:32` (`DiagnozoTipo.RETO` neniam konstruita; `Severeco.INFO` neniam produktata — la filtrilo en `HejmoEkrano.kt:332` estas senefika); `ElsendoDeponejoImpl.kt:38-46` (`getElsendojn` kaŝo-nur, sed la interfaco sugestas alie — dokumentu aŭ renomu)
-- **Sugesto**: forigu aŭ dokumentu; direktu la poziciojn al `LudatojDeponejo`.
-
-#### C39 — `AppStato`: duobla ŝargo de la sama kanalo (neniu in-flight dedup)
-- **Statuso**: [x]
-- **Loko**: `ElsendoDeponejoImpl.kt` (`ŝargiElsendojn` — du samtempaj vokoj, ekz. pull-to-refreŝ + aŭtomata ŝargo, faris duoblan elŝuton)
-- **Riparo** (2026-10-29): in-flight dedup per kanalo en `ŝargiElsendojn` — `Mutex` + `Map<slug, Deferred>`; dua samtempa voko aliĝas al la daŭranta `Deferred` (lanĉita en sendependa skopo `Dispatchers.Default + SupervisorJob`, do ĝi finiĝas eĉ se la unua vokanto estas nuligita). La ero estas forigata kiam la ŝargo finiĝas (`invokeOnCompletion`) resp. kiam finiĝas la vokanto (`finally` kun `isCompleted`-kontrolo). Testo: `samtempajVokojPorSamaKanaloDedupatas` (du vokoj → 1 HTTP-peto).
-
-#### C40 — `gradle.properties`: `org.gradle.jvmargs=-Xmx1536m` malalta por KMP
-- **Statuso**: [ ]
-- **Loko**: `gradle.properties:9` (la wasmJs-konstruo bezonas `-Pkotlin.daemon.jvmargs=-Xmx4g`, dokumentita en AGENTS.md)
-- **Sugesto**: pliigu la defaŭltan valoron.
-
-#### C41 — AGENTS.md kaj docs malfruas post la kodo
-- **Statuso**: [ ]
-- **Loko**: AGENTS.md "Kio funkcias nun" kaj la dosieruja arbo ne mencias la diagnozan ekranon, `DiagnozoRegilo`/`DiagnozoEkrano`/`Diagnozo.kt`, nek la fonan aŭtomatan daŭrigon; `docs/nova/03_domajno_kaj_datumoj.md` kaj `docs/nova/05_dizajno_kaj_ui.md` ricevis nur tajpo-riparojn; `docs/nova/04` priskribas neekzistantajn `puriguModeloj`/`iframeReguloj` kaj malprecizan id-konvencion (vidu G15, G16)
-- **Sugesto**: 2-3 linioj en "Kio funkcias nun" + 3 linioj en la arbo; mallonga alineo en `docs/nova/03` pri `DiagnozoRegilo` (expect/actual); vicigu `docs/nova/04` kaj la kodon (G15/G16).
-
-#### C43 — Semantiko de `FilCache` kaj scio de `RssArkivServer` por la estonta servilo
-- **Statuso**: [ ]
-- **Priskribo**: (a) `ændrerSigIkke=true` = "kaŝita → neniam refreŝi" — tio igas `RssArkivServer-filcache/` la determinismajn golden-fixture-ojn; la nova plano diras nur "reuzo de Ktor-HttpCache + RssArkivServer-filcache" sen precizigi tiun semantikon. (b) La malnova `RomeFeedWriter` skribis `enclosure length` el la loka kaŝo kaj **per-jarajn arkivdosierojn** `feed-<slug>-<yyyy>.xml` — la nova plano tion ne mencias. (c) La plan-snippet vokas `parsilo.parsRss(fluo, kanal)` **sen** `httpKliento` — por Peranto tio signifas divenitajn, ofte malĝustajn, archive.org-URL-ojn en la arkivo — la servilo devas transdoni klienton kaj persistentan `ArchiveOrgDosiernomoKaŝo` (vidu ankaŭ G16 kaj G34). (d) La id-rondira problemo (G16) rekte tuŝas la inkrementan kunfandon de la plano.
-- **Sugesto**: ĝisdatigu `docs/nova/06_servilo_arkivo.md` antaŭ ol konstrui la servilon.
-
-#### C44 — Perditaj kontraŭ la malnova apo (konsideroj, ne nepre riparoj)
-- **Statuso**: [ ]
-- **Priskribo**: (a) redirect-host-guard kontraŭ kaptivaj portaloj (`Diverse.tjekOmdirigering`); (b) `serverCurrentTimeMillis` (kontraŭ aparata horloĝ-eraro); (c) la regulo ">95% → rekomencu de 0" de la malnova ludilo (`Afspiller.onPrepared`) — nun nur la `finita`-flago; (d) "elŝuti nur per WiFi" (`hentKunOverWifi`); (e) perioda refreŝo (malnova: kanalo ĉiujn 30 s, grunddata ĉiujn 30 min — nova: nur tiral-aktualigo kaj eniro al ekrano); (f) fora elŝuto de la kanalkonfiguro kaj radio.txt dum rultempo (nun nur bundled; atentu: la `muzaiko`-RSS en la agordo estas ekstere gastigata); (g) ksoup `parseXml` kaj krudaj ne-XML-aj entitoj (`&nbsp;` rekte en la fluo) — rekomendas golden-teston kun kruda `&nbsp;`.
-- **Sugesto**: decidu intence, kiuj el ili estos reenkondukitaj; almenaŭ (c) kaj (g) estas malmultekostaj.
-
-#### C46 — KMP-H: `ExoPlaybackException: Source error` (544 okazoj / 30 uzantoj ekde 2026-09-13; malpliiĝas)
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-H](https://esperantoradio.sentry.io/issues/KMP-H); 42 okazoj / 5 uzantoj en la lasta semajno, lasta evento sur dist 248, 10-14)
-- **Priskribo**: Plejparte ret-kulpaj kaŭzoj (`UnknownHostException`, `HttpDataSource$InvalidResponseCodeException`, timeout) — atendataj fiaskoj, sed ili nutras ankaŭ K1 (fiasko de la fonto prokrastas `startForeground()`). **Ĉar** ekde 249 (PR #109) `onPlayerErrorChanged` uzas `logw(tag, msg, e)` (3-arg = nur loka, la escepto ne plu atingas Sentry), la malpliiĝo de KMP-H post 10-14 estas grandparte **redukto de videbleco, ne pliboniĝo de stabileco** — sur 249-aparatoj lud-eraroj plu okazas, sed estas nevideblaj en Sentry.
-- **Sugesto**: unu aŭtomata reprovo ĉe fon-eraro en `LudvicoRegilo`; pli klara uzantmesaĝo; kontroli mortajn fluo-URL-ojn (ligu kun G44 — `media.vaticannews.va`). Se oni volas plu vidi lud-erarojn en Sentry, raportu ilin per 2-arg `logw` (Sentry-averto, videbla en Logs) aŭ kiel specimenata `loge` — intenca decido pro la kvoto.
-
-#### C47 — Malnovaj buildoj (dist ≤ 248) daŭre raportas erarojn, kiujn novaj buildoj ne plu sendas
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (KMP-G "Aŭtoludo: …" 758 okazoj / 85 uzantoj — lasta evento sur dist 246/3.0.2; KMP-N "RSS-malsukcesa …" 1227 / 57 — lasta sur dist 245/3.0.1; ambaŭ vivas nur sur aparatoj kun dist ≤ 246)
-- **Priskribo**: **Ne solvita, nur malpliigite videbla**: "Aŭtoludo:"-mesaĝoj estis forigitaj (PR #107, en v3.0.3 ekde dist 247 — pro kvoto-plenigo per `captureMessage`); "RSS-malsukcesa" kaj lud-eraroj (KMP-H) estis malaltigitaj al `logw(tag, msg, e)` (PR #93 kaj #109), kio estas **nur loka** — la subaj problemoj (aŭtoludo fiaskas, fluoj neatingeblaj, fontoj mortaj) daŭre okazas, sed ekde 249 ili estas nevideblaj en Sentry krom kiel avertaj protokoloj (2-arg `logw` → `Sentry.logger.warn`). Ankaŭ la escepto-bazitaj retaj issues (KMP-12/14/15/M/Q — timeout/connect/DNS) venas nun nur de malnovaj buildoj: en la aktuala kodo ambaŭ ŝargo-vojoj (deponejo kaj `NovajElsendojKontroloWorker:140`) kaptas per 3-arg `logw` (loka). La eraro-taso kolapsis post 10-14 (225/tago → 1–3/tago) grandparte pro tio plus la 50 %-a specimenado (PR #109) — tio ne provas pliboniĝon de la stabileco.
-- **Sugesto**: versio-bazita `beforeSend`-forĵeto por eldonoj ≤ 3.0.2 (ligita al FAROTA C45 — la ĝisdatebla centra listo; AGENTS.md avertas ne malmoligi la liston en la apo); alternative: en Sentry ignori la eldonojn ≤ 3.0.2 aŭ marki la koncernajn problemojn "ne plu riparebla". Se la videbleco de aŭtoludo/RSS/ludado gravas, raportu ilin intence kiel avertojn (vidu C46).
-- **Ĝisdatigo 2026-10-27**: ankoraŭ aktuala — 55 erar-eventoj sur dist 248 kaj 30 sur 246 en 14 tagoj; ĉiuj erar-eventoj de la periodo venas de dist ≤ 249, dum 3.1.0 (252) produktis neniujn (nur `logw`-avertojn). La problemo malkreskos nature dum la uzantoj ĝisdatiĝas. KMP-1 ("Sentry-testo") montriĝis intenca provo-eraro (dist 1, release 0.1) — ignorita en Sentry.
-
-#### C48 — Post-ripara observo en Sentry
-- **Statuso**: [x]
-- **Riparo** (2026-10-27, observado de 3.1.0/252 dum 14 tagoj): KMP-1V **malaperis** sur ≥ 250 (sola evento sur dist 249, la antaŭ-ripara konstruo) kaj estas solvita en Sentry; KMP-1S: 1 evento nur sur dist 248 (laŭ atendado de G43); KMP-X (G42) daŭre malfermita, sed nur sur malnovaj konstruoj; la eraro-taso sur 3.1.0 mem estas **nul** — ĉiuj erar-eventoj de la periodo venas de dist ≤ 249. La 152 avertoj de 3.1.0 estas ĉiuj atendataj ret-fiaskoj (`logw`) — konduto laŭregola. Sentry-atentigoj por fatalaj kraŝoj ankoraŭ ne agorditaj; la ideo de averto pri "RSS-malsukcesa kun 0 kaŝenitaj elsendoj" transiras al G44 (la freŝaj datenoj tie).
-- **Fonto**: Sentry-analizo 2026-10-19 (bazlinio: 182 malfermoj / 336 ludadoj en 7 tagoj; eraro-taso 1–3/tago post 10-14, krom la nova KMP-1V)
-- **Sugesto**: post la sekva eldono kontroli: KMP-1V malaperis, la eraro-taso ne kreskas, KMP-X/KMP-1S fermiĝas; konsideri Sentry-atentigojn (alerts) por novaj fatalaj kraŝoj kaj por "RSS-malsukcesa kun 0 kaŝenitaj elsendoj" kiel frua averto pri mortaj kanaloj.
+- **Loko**: radika `build.gradle.kts:25-27` (la jcenter-URL ankoraŭ registrita kiel `maven { url = ... }` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; `.github/dependabot.yml` ekzistas
+- **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu OWASP `dependencyCheck` en CI; limigu la jcenter-repon al la malnova projekto aŭ forigu ĝin iam.
 
 #### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
 - **Statuso**: [ ]
@@ -318,7 +134,7 @@
   `PlatformLigilo` malfermas nur ligilojn/retpoŝtojn);
   (b) elektebla loko de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera
   spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`);
-  (c) konfirmo antaŭ forigo de elŝuto (forigo mem jam ekzistas — tuj, sen dialogo);
+  (c) ~~konfirmo antaŭ forigo de elŝuto~~ — SOLVITA 2026-11-20 (dialogo en ElŝutitajEkrano + testo);
   (d) "Ĉu ĉesi ludi? / Daŭrigi fone" ĉe fermo de la apo;
   (e) nombro da novaj elsendoj ĉe Plej ŝatataj, kaj nombroj (elŝutoj) + sekva
   alarmtempo en la naviga tirkesto — la malnova tirkesto-skizo montris ilin;
@@ -345,7 +161,7 @@
 - **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
 
 #### C53 — Nova kanalo: HUMILOPINIE (ManchaPod) — kaj kontrolo de la ceteraj ManchaPod-fluoj
-- **Statuso**: [ ] (parta — HUMILOPINIE aldonita 2026-10-24 kun purig-modelo kontraŭ la
+- **Statuso**: [ ]
   ripeta "Enigu min en la debato"-boilerplate kaj ora testo sur fiksaĵo; RESTAS: kontroli
   "Una Vaga Idea" kaj "Cuéntame, Hermosura" pri Esperanto-epizodoj)
 - **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
@@ -367,13 +183,6 @@
   `https://www.spreaker.com/podcast/humilopinie-manchapod--6684993`. Post aldono:
   `radioTxtKomparilo` kaj fluo-kontrollo (G44-stilo: ĉu HTTP 200 + RSS?).
 
-#### C54 — Kanal-RSS-fluo kopiebla kaj kunhavigebla al alia podkasta apo
-- **Statuso**: [ ]
-- **Fonto**: ideo de la posedanto (2026-10-24)
-- **Priskribo**: butono en la kanal-ekrano, kiu kopiigas la `podkastaRssUrl` de la kanalo
-  (tondujo + partigo), por ke uzantoj abonu la kanalon en alia podkasta apo.
-- **Sugesto**: Android: `ClipboardManager` + partigo-intento (atentu: ĝi ankaŭ utilos por
-  C51(a) — kunhavigi ELSENDON; la partig-infrstrukturon kreu unufoje); la URL estas
   jam en la kanal-objekto (agordo, A5) — neniu nova datumvojo necesas.
 
 #### C55 — Eldoni la komputilan (desktop) version
@@ -403,17 +212,6 @@
   servataj de la servilo aŭ rekte `<img>`-ebligataj. Kvanto-specimenado: mezuru ĉu la
   servila datumvojo povas esti subflue (sen CORS-kapoj) por ĉiuj 26 kanaloj.
 
-#### C57 — "Proponi kanalon"-butono (retpoŝta)
-- **Statuso**: [x] (2026-10-24: ero en la naviga tirkesto — `malfermuRetpoŝton` al la
-  prizorganto kun antaŭplenigita ŝablono; reago-retpoŝto ankoraŭfoje decidiĝu ĉe eventuala
-  reorganizo de la prizorganta adreso)
-- **Fonto**: ideo de la posedanto (2026-10-24)
-- **Priskribo**: butono kiu simple kreas retpoŝtan mesaĝon por proponi novan kanalon
-  (al la prizorganto; kun antaŭskribita temo/korpo: nomo, RSS-URL, priskribo).
-- **Sugesto**: `PlatformLigilo.malfermuRetpoŝton` jam ekzistas kaj funkcias (uzata sur
-  la kanal-ekrano por "Retpoŝto"); metu la butonon en la navigan tirkeston aŭ
-  Kanalaron (aŭ estontan Pri-ekranon, C51(g)); la retpoŝto-celo determinu la prizorganton.
-
 #### C58 — "White label"-ligilo por kanal-eldonantoj
 - **Statuso**: [ ]
 - **Fonto**: ideo de la posedanto (2026-10-24)
@@ -428,7 +226,7 @@
   ekzisti en la agordo (A5).
 
 #### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ] (parta — (a) FARITA (PR #144): agord-kampo `transsaltuKomenceSekundojn`
+- **Statuso**: [ ]
   — listo de { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (frakcieblaj valoroj; fina dato
   inkluziva; la lasta ero sen „ĝis" validas ankaŭ por estontaj elsendoj; unuopa
   valoro = unu ero sen „ĝis"; malplena listo = ne transsalti), efikas nur se la
@@ -473,11 +271,6 @@
   natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
   ĝi povus proponi la valoron por ĉiu kanalo.
 
-#### C60 — Serĉ-ordigo: unue kanaltitoloj, poste kanalpriskriboj, poste elsendtitoloj, poste elsendpriskriboj
-- **Statuso**: [x]
-- **Fonto**: ideo de la posedanto (2026-10-30)
-- **Riparo** (2026-10-30, PR #150): nova `SerĉoRezulto(kanaloj, elsendoj)` — ambaŭ listoj jam ordigitaj laŭ graveco (titolo-trovoj unue, poste priskribo-trovoj; dedup per `partition`), redonata de `SerĉoDeponejo.serĉi`. `SerĉoDeponejoImpl` serĉas nun ankaŭ kanalojn per `KanaloDeponejo`; por elsendoj unu grupiga metodo `ElsendoDeponejo.serĉiElsendojnGrupigite` (Pair). `SerĉoEkrano` montras la sekciojn "Kanaloj" kaj "Elsendoj", klako sur kanalo navigan al `Vojo.KanaloDetalo`. Testoj: `SerĉoDeponejoImplTest` (ordigo + dedup + uskleco), `SerĉoEkranoTest.montrasGrupigitajnSekciojn`.
-
 #### C61 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
 - **Statuso**: [ ]
 - **Fonto**: recenz-komento pri PR #144, punkto 6 (2026-10-29)
@@ -499,7 +292,6 @@
 
 ---
 
-> **Pri la finitaj trovindikoj** (62): ilia daŭre valida scio staras en
-> [`NOTOJ.md`](NOTOJ.md); la historio de la riparoj en [`ŜANĜOJ.md`](ŜANĜOJ.md)
-> (enskribo 13) kaj en la PR-oj #89–#95. La etikedoj (K…, G…, C…) restas
-> spureblaj per `git log` kaj per NOTOJ.md.
+> **Pri la finitaj trovindikoj**: ekde 2026-11-20 ili ne plu listiĝas ĉi tie — vidu
+> `git log` de FAROTA.md (la etikedoj K…, G…, C… restas spureblaj), la PR-ojn,
+> `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).

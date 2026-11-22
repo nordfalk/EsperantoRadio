@@ -43,6 +43,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- La Hejmo-ekrano montras la kaŝitan enhavon signife pli rapide (progresive, kaj la kaŝo estas nun legata kiel jam-parsita JSON anstataŭ re-parsi la krudan RSS) (https://github.com/nordfalk/EsperantoRadio/pull/183)
 - Ludado komencita el sciigo aŭ vekhorloĝo ne plu riskas kraŝi la aplikon pro tro granda priskribo trans la sistemo (la ludata fonto en la media-sciigo nun portas nur la necesajn kampojn) (https://github.com/nordfalk/EsperantoRadio/pull/175)
 - Kanaloj BabiBEJO kaj Magazino Tuluzo denove montras sian emblemon en la kanala vido; kanaloj sen emblemo montras komencliterojn anstataŭ blankan kampon (https://github.com/nordfalk/EsperantoRadio/pull/174)
 

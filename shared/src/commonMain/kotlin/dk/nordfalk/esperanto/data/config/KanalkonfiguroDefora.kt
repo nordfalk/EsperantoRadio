@@ -29,14 +29,8 @@ const val KANALKONFIGURO_URL = "https://javabog.dk/esperanto-radio/esperantoradi
 const val KANALKONFIGURO_KAŜNOMO = "defora_kanalkonfiguro"
 
 /**
- * Minimuma intervalo inter du NE-devigaj retaj kontroloj de la konfiguro (ENmemora —
- * kiel `sidstTjekket`/`opdaterGrunddataEfterMs` en la malnova apo: je ĉiu relanĉo
- * oni denove elŝutas freŝan version, sed ripetaj kontroloj ene de unu seanco
- * limiĝas al unu po 30 minutoj, por ne bombi la servilon).
+ * Tempolimo por la elŝutpeto de la konfiguro (malgranda dosiero, ne rajtas bloki).
  */
-const val KANALKONFIGURO_REFREŜA_INTERVALO_MS: Long = 30L * 60 * 1000
-
-/** Tempolimo por la elŝutpeto de la konfiguro (malgranda dosiero, ne rajtas bloki). */
 const val KANALKONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
 
 /**

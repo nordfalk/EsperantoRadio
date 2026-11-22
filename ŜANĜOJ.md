@@ -41,13 +41,13 @@ la `App.initData`/`hentEvtNyeGrunddata`-fluo de la malnova apo:
   deponejoj de la derivaĵoj ne estas rekreieblaj vive (ili tenas kaŝmemorojn kaj
   estas referenceblaj de la ViewModel-oj); tiuj kampoj ŝanĝiĝas praktike neniam.
 - **Plibonigoj laŭ la komparo kun la paralelaj PR-oj #196/#197 (2026-11-22, post
-  revizio)**: enmemora TTL 30 min (`sidstTjekket` de la malnova apo — po-proceza,
-  do ĉiu relanĉo denove elŝutas; kalkulas ankaŭ fiaskajn kontrolojn por ne bombi la
-  servilon); malsupren-tiro en la kanalaro devige refreŝigas la konfiguron
-  (asinkrone, ne blokante la tir-turnon); gardiloj kontraŭ malplena korpo kaj
-  konfiguro sen kanaloj; `expectSuccess` + 15-sa peto-tempolimo + grandec-limo
-  256 KB per `leguKorponLimigite` (produkta drato en `kreuDeforanElŝutilon`,
-  kovrita de MockEngine-testoj). Persistigo restas ĉe DosierKaŝo — la decida
+  revizio)**: gardiloj kontraŭ malplena korpo kaj konfiguro sen kanaloj;
+  `expectSuccess` + 15-sa peto-tempolimo + grandec-limo 256 KB per
+  `leguKorponLimigite` (produkta drato en `kreuDeforanElŝutilon`, kovrita de
+  MockEngine-testoj). La intertempe alprobigita TTL kaj la malsupren-tiro-devigo
+  estis FORIGITAJ laŭ decido de la posedanto (2026-11-22: la malsupren-tiro en la
+  kanalaro refreŝigu nur la elsendofluojn, ne la konfiguron; la refreŝigo de la
+  konfiguro okazas unufoje po starto). Persistigo restas ĉe DosierKaŝo — la decida
   diferenco kontraŭ #196/#197, kiuj persistigas per Settings kaj tial sur
   Desktop (java.util.prefs, ~6 KB-limo) silente ne refreŝigas.
 

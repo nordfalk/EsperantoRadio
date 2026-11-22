@@ -78,19 +78,14 @@ class KanalkonfiguroDeforaTest {
     /** Kiom da fojoj la reversevoko alFreŝaAgordo ruliĝis. */
     private var reversevokoj = 0
 
-    /** Kiom da fojoj la injektita elŝutilo efektive petis la reton. */
-    private var petoj = 0
-
     private fun deponejo(
         persisto: MemorPersisto,
         komenca: String,
-        refreŝaIntervaloMs: Long = KANALKONFIGURO_REFREŜA_INTERVALO_MS,
         elŝuto: (suspend (String) -> String)?,
     ) = KanaloDeponejoImpl(
         leganto = leganto,
         komencaAgordo = leganto.legu(komenca),
-        elŝutuDefore = elŝuto?.let { e -> { url: String -> petoj++; e(url) } },
-        refreŝaIntervaloMs = refreŝaIntervaloMs,
+        elŝutuDefore = elŝuto,
         leguKonservitan = persisto.legu,
         skribuKonservitan = persisto.skribu,
         alFreŝaAgordo = { reversevokoj++ },
@@ -185,51 +180,6 @@ class KanalkonfiguroDeforaTest {
         assertEquals(listOf("nuna"), deponejo.observiKanalojn().value.map { it.slug })
         assertEquals(null, persisto.teksto)
         assertTrue(reversevokoj == 0)
-    }
-
-    // ---------- TTL kaj deviga refreŝigo (kiel sidstTjekket en la malnova apo) ----------
-
-    @Test
-    fun eneDeTtl_neDevigaKontroloNePetasDufoje() = runTest {
-        val persisto = MemorPersisto()
-        val deponejo = deponejo(persisto, agordoTeksto("malnova")) { agordoTeksto("nova") }
-        deponejo.refreŝiguDefore()
-        assertEquals(1, petoj)
-        // Dua ne-deviga kontrolo ene de la TTL: neniu peto
-        deponejo.refreŝiguDefore()
-        assertEquals(1, petoj)
-    }
-
-    @Test
-    fun devigaKontroloPreterpasasTtl() = runTest {
-        val persisto = MemorPersisto()
-        val deponejo = deponejo(persisto, agordoTeksto("malnova")) { agordoTeksto("nova") }
-        deponejo.refreŝiguDefore()
-        assertEquals(1, petoj)
-        // Malsupren-tiro = devige: denove elŝutas
-        deponejo.refreŝiguDefore(devige = true)
-        assertEquals(2, petoj)
-    }
-
-    @Test
-    fun postEksvalidiĝoDeTtl_denoveEblasKontrolado() = runTest {
-        val persisto = MemorPersisto()
-        // TTL = 0: la intervalo tuj eksvalidiĝas
-        val deponejo = deponejo(persisto, agordoTeksto("malnova"), refreŝaIntervaloMs = 0) { agordoTeksto("nova") }
-        deponejo.refreŝiguDefore()
-        assertEquals(1, petoj)
-        deponejo.refreŝiguDefore()
-        assertEquals(2, petoj)
-    }
-
-    @Test
-    fun ttlKalkulasAnkaŭFiaskanKontrolon() = runTest {
-        val persisto = MemorPersisto()
-        val deponejo = deponejo(persisto, agordoTeksto("nuna")) { throw IllegalStateException("nenia reto") }
-        deponejo.refreŝiguDefore() // fiaskas — sed kalkuliĝas kiel kontrolo
-        assertEquals(1, petoj)
-        deponejo.refreŝiguDefore() // ene de la TTL: ne provas denove (ne bombi la servilon)
-        assertEquals(1, petoj)
     }
 
     // ---------- Gardiloj kontraŭ fuŝaj respondoj ----------

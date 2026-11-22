@@ -193,13 +193,20 @@ object AppStato {
         kanaloDeponejo = KanaloDeponejoImpl(
             leganto = KanalAgordoLeganto(),
             paktitaTeksto = ::leguPakititanKanalkonfiguron,
-            httpKliento = httpKliento,
+            elŝutuDefore = KanaloDeponejoImpl.kreuElŝutanton(httpKliento!!),
             settings = settings,
+            alFreŝaAgordo = { freŝa ->
+                // Derivaĵoj de la konfiguro, ĝisdatigeblaj vive meze de la seanco.
+                // (arkivoBazoUrl kaj alarm-sugestoj restas de la starto-valoro — ili
+                // dependas de deponejoj, kiuj ne estas rekreieblaj vive.)
+                apajNovaĵojDeponejo?.ĝisdatigu(freŝa.android?.apajNovaĵoj, freŝa.android?.apajNovaĵojPasintaj)
+                freŝa.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
+            },
         )
 
-        // La efektive uzata agordo: konservita el la reto (Settings), aliokaze la pakita —
-        // tiel arkivoBazoUrl, defaŭltaj ŝatataj, alarm-sugestoj kaj apaj novaĵoj
-        // sekvas la elŝutitan konfiguron, ne nur la enkonstruitan (kiel en la malnova apo).
+        // La efektive uzata agordo: konservita el la reto (diska kaŝmemoro), aliokaze
+        // la pakita — tiel arkivoBazoUrl, defaŭltaj ŝatataj, alarm-sugestoj kaj apaj
+        // novaĵoj sekvas la elŝutitan konfiguron, ne nur la enkonstruitan.
         val agordo = kanaloDeponejo!!.getAgordo()
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 

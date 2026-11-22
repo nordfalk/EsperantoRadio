@@ -2,27 +2,19 @@ package dk.nordfalk.esperanto.data.repository
 
 import com.russhwolf.settings.Settings
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Testoj por [KanaloDeponejoImpl] — elŝuto de la kanalkonfiguro el la reto,
- * konservado en Settings kaj uzado anstataŭ la pakita version (kiel la malnova
- * apo: `App.initData` legas la konservitan, `hentEvtNyeGrunddata` elŝutas la novan
- * kaj konservas nur post sukcesa parsado).
+ * konservado en la DISKA kaŝmemoro kaj uzado anstataŭ la pakita version (kiel la
+ * malnova apo: `App.initData` legas la konservitan, `hentEvtNyeGrunddata` elŝutas
+ * la novan kaj konservas nur post sukcesa parsado).
  *
- * Rulas en desktopTest ĉar ĝi bezonas `ktor-client-mock` (MockEngine).
+ * En commonTest (ĉiuj platformoj): la elŝuto kaj la persistigo estas injektataj
+ * per lambdoj — neniu reala dosiero nek reto tuŝiĝas.
  */
 class KanaloDeponejoImplTest {
 
@@ -54,21 +46,45 @@ class KanaloDeponejoImplTest {
         override fun getBooleanOrNull(key: String): Boolean? = map[key] as? Boolean
     }
 
-    /** La "pakita" konfiguro (en la testo: konstanta teksto anstataŭ resurco). */
+    /** Enmemora anstataŭaĵo de la diska kaŝmemoro. `n` = nombro da forigoj. */
+    private class MemorKaŝo {
+        var teksto: String? = null
+        var n = 0
+        var skriboj = 0
+        var skribEraro: Exception? = null
+        val legu: () -> String? = { teksto }
+        val skribu: (String) -> Unit = {
+            skribEraro?.let { e -> throw e }
+            teksto = it; skriboj++
+        }
+        val forigu: () -> Unit = { teksto = null; n++ }
+    }
+
+    /** La "paktita" konfiguro (en la testo: konstanta teksto anstataŭ resurco). */
     private val paktitaA = """{ "kanaloj": [ { "kodo": "aaa", "nomo": "Kanalo A" } ] }"""
     /** La "reta" konfiguro, kiun la servilo redonas (kun alia kampo por kontroli getAgordo). */
     private val retaB = """{ "arkivoBazoUrl": "https://ekzemplo.dk/arkivo/", "kanaloj": [ { "kodo": "bbb", "nomo": "Kanalo B" } ] }"""
 
-    private fun deponejo(settings: Settings, motoro: MockEngine? = null) = KanaloDeponejoImpl(
+    private var alFreŝajAgordoj = 0
+
+    private fun deponejo(
+        kaŝo: MemorKaŝo = MemorKaŝo(),
+        settings: Settings? = null,
+        elŝuto: (suspend (String) -> String)? = null,
+    ) = KanaloDeponejoImpl(
         leganto = KanalAgordoLeganto(),
         paktitaTeksto = { paktitaA },
-        httpKliento = motoro?.let { HttpClient(it) { install(HttpTimeout) } },
+        elŝutuDefore = elŝuto,
         settings = settings,
+        leguKonservitan = kaŝo.legu,
+        skribuKonservitan = kaŝo.skribu,
+        foriguKonservitan = kaŝo.forigu,
+        alFreŝaAgordo = { alFreŝajAgordoj++ },
     )
 
     @Test
     fun senKaŝo_uzasPakitan() = runTest {
-        val d = deponejo(MapSettings())
+        val d = deponejo()
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
         assertEquals("aaa", d.getKanalo("aaa")?.slug)
         assertNull(d.getKanalo("bbb"))
@@ -76,80 +92,119 @@ class KanaloDeponejoImplTest {
 
     @Test
     fun kaŝitaKonfiguro_venkas_super_pakita() = runTest {
-        val st = MapSettings()
-        st.putString(SettingsKeys.KANALKONFIGURO_TEKSTO, retaB)
-        val d = deponejo(st)
+        val kaŝo = MemorKaŝo().apply { teksto = retaB }
+        val d = deponejo(kaŝo = kaŝo)
         assertEquals(listOf("bbb"), d.getKanalojn(devige = false).map { it.slug })
         // getAgordo() liveras la kaŝitan agordon kun ĉiuj kampoj (ekz. arkivoBazoUrl)
         assertEquals("https://ekzemplo.dk/arkivo/", d.getAgordo().arkivoBazoUrl)
+        assertEquals(0, kaŝo.n)
     }
 
     @Test
-    fun rompitaKaŝo_rezervas_al_pakita() = runTest {
-        val st = MapSettings()
-        st.putString(SettingsKeys.KANALKONFIGURO_TEKSTO, "{ ne estas json")
-        val d = deponejo(st)
+    fun rompitaKaŝo_forgesiĝas_kaj_rezervo_al_pakita() = runTest {
+        val kaŝo = MemorKaŝo().apply { teksto = "{ ne estas json" }
+        val d = deponejo(kaŝo = kaŝo)
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
+        assertEquals(1, kaŝo.n, "La putrita kaŝo estu forigita por ne reprovi ĝin je ĉiu starto")
+        assertNull(kaŝo.teksto)
     }
 
     @Test
-    fun retaNovaKonfiguro_konserviĝas_kaj_uziĝas() = runTest {
-        val st = MapSettings()
-        val motoro = MockEngine { respond(retaB, HttpStatusCode.OK) }
-        val d = deponejo(st, motoro)
+    fun retaNovaKonfiguro_konserviĝas_uziĝas_kaj_callbackVokiĝas() = runTest {
+        val kaŝo = MemorKaŝo()
+        alFreŝajAgordoj = 0
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { url ->
+            assertEquals(KanaloDeponejoImpl.KONFIGURO_URL_DE_RETO, url)
+            retaB
+        })
 
         d.refreŝiguElRete(devige = true)
 
-        assertEquals(retaB, st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO))
+        assertEquals(retaB, kaŝo.teksto)
+        assertEquals(1, kaŝo.skriboj)
         assertEquals(listOf("bbb"), d.getKanalojn(devige = false).map { it.slug })
-        assertEquals("https://ekzemplo.dk/arkivo/", d.getAgordo().arkivoBazoUrl)
         assertEquals(listOf("bbb"), d.observiKanalojn().value.map { it.slug })
+        assertEquals("https://ekzemplo.dk/arkivo/", d.getAgordo().arkivoBazoUrl)
+        assertEquals(1, alFreŝajAgordoj)
     }
 
     @Test
-    fun retaEraro_ne_anstataŭas_la_lokan() = runTest {
-        val st = MapSettings()
-        st.putString(SettingsKeys.KANALKONFIGURO_TEKSTO, paktitaA) // konservita = A
-        val motoro = MockEngine { respond("Eraro", HttpStatusCode.InternalServerError) }
-        val d = deponejo(st, motoro)
+    fun retaEraro_ne_ŝanĝas_la_lokan() = runTest {
+        val kaŝo = MemorKaŝo().apply { teksto = paktitaA }
+        alFreŝajAgordoj = 0
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { throw IllegalStateException("nenia reto") })
 
-        d.refreŝiguElRete(devige = true)
+        d.refreŝiguElRete(devige = true) // ne devas ĵeti
 
-        assertEquals(paktitaA, st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO))
+        assertEquals(paktitaA, kaŝo.teksto)
+        assertEquals(0, kaŝo.skriboj)
+        assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
+        assertEquals(0, alFreŝajAgordoj)
+    }
+
+    @Test
+    fun jsMotorEraro_kaptiĝas_kiel_Throwable() = runTest {
+        // La retumila Ktor-motoro (Js) ĵetas kotlin.Error (ne Exception) ĉe CORS-blokado
+        val d = deponejo(elŝuto = { throw Error("Fail to fetch") })
+        d.refreŝiguElRete(devige = true) // ne devas ĵeti
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
     }
 
     @Test
     fun retaRompitaJson_ne_konserviĝas() = runTest {
-        val st = MapSettings()
+        val kaŝo = MemorKaŝo()
         // Fiaskpaĝo kun HTTP 200 (kaptiva portalo) — ne parseblas kiel JSON
-        val motoro = MockEngine { respond("<html><body>404</body></html>", HttpStatusCode.OK) }
-        val d = deponejo(st, motoro)
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { "<html><body>404</body></html>" })
 
         d.refreŝiguElRete(devige = true)
 
-        assertNull(st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO))
+        assertNull(kaŝo.teksto)
+        assertEquals(0, kaŝo.skriboj)
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
     }
 
     @Test
     fun retaMalplenaKanalolisto_ne_akceptiĝas() = runTest {
-        val st = MapSettings()
-        val motoro = MockEngine { respond("""{ "kanaloj": [] }""", HttpStatusCode.OK) }
-        val d = deponejo(st, motoro)
+        val kaŝo = MemorKaŝo()
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { """{ "kanaloj": [] }""" })
 
         d.refreŝiguElRete(devige = true)
 
-        assertNull(st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO))
+        assertNull(kaŝo.teksto)
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
     }
 
     @Test
+    fun samaTeksto_ne_rekonserviĝas_kaj_ne_callback() = runTest {
+        val kaŝo = MemorKaŝo().apply { teksto = retaB }
+        alFreŝajAgordoj = 0
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { retaB })
+
+        d.refreŝiguElRete(devige = true)
+
+        assertEquals(0, kaŝo.skriboj, "Ne re-skribu la saman tekston")
+        assertEquals(0, alFreŝajAgordoj, "Neniu freŝa agordo — neniu callback")
+        assertEquals(listOf("bbb"), d.getKanalojn(devige = false).map { it.slug })
+    }
+
+    @Test
+    fun persistFiasko_ne_blokas_la_vivan_ĝisdatigon() = runTest {
+        val kaŝo = MemorKaŝo().apply { skribEraro = IllegalStateException("plena disko") }
+        alFreŝajAgordoj = 0
+        val d = deponejo(kaŝo = kaŝo, elŝuto = { retaB })
+
+        d.refreŝiguElRete(devige = true)
+
+        assertEquals(listOf("bbb"), d.observiKanalojn().value.map { it.slug })
+        assertEquals(1, alFreŝajAgordoj)
+    }
+
+    @Test
     fun ttl_evitas_tro_oftajn_elŝutojn() = runTest {
-        val st = MapSettings()
+        val kaŝo = MemorKaŝo()
+        val settings = MapSettings()
         var petoj = 0
-        val motoro = MockEngine { petoj++; respond(retaB, HttpStatusCode.OK) }
-        val d = deponejo(st, motoro)
+        val d = deponejo(kaŝo = kaŝo, settings = settings, elŝuto = { petoj++; retaB })
 
         d.refreŝiguElRete(devige = true)   // unua: elŝutas
         assertEquals(1, petoj)
@@ -160,20 +215,9 @@ class KanaloDeponejoImplTest {
     }
 
     @Test
-    fun malvarmaStartigo_refreŝigas_el_rete_en_fono() = runBlocking {
-        val st = MapSettings()
-        var petoj = 0
-        val motoro = MockEngine { petoj++; respond(retaB, HttpStatusCode.OK) }
-        val d = deponejo(st, motoro)
-
-        // Malvarma ŝargo redonas tuj la lokan (pakitan) liston...
+    fun senElŝutanto_refreŝigo_nenion_faras() = runTest {
+        val d = deponejo(elŝuto = null)
+        d.refreŝiguElRete(devige = true)
         assertEquals(listOf("aaa"), d.getKanalojn(devige = false).map { it.slug })
-        // ...kaj en fono elŝutas la novan konfiguron kaj uzas ĝin
-        val atendu = withTimeoutOrNull(5000) {
-            while (petoj == 0 || d.observiKanalojn().value.map { it.slug } != listOf("bbb")) delay(20)
-        }
-        assertTrue(atendu != null, "La fona refreŝo ne alvenis ene de 5 s")
-        assertEquals(retaB, st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO))
-        assertEquals(listOf("bbb"), d.getKanalojn(devige = false).map { it.slug })
     }
 }

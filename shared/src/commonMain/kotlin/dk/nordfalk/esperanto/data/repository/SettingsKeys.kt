@@ -41,11 +41,10 @@ object SettingsKeys {
     /** Pseŭdonimo de la uzanto ("adjektivo substantivo", ekz. "blua suno") — aperas en la protokoloj. */
     const val PSEŬDONIMO = "pseŭdonimo"
     /**
-     * La kanalkonfiguro elŝutita el la reto (konservita kiel kruda teksto, ŝlosilo
-     * kontraŭ la pakita versio — kiel `grunddata_prefs` en la malnova apo).
+     * Tempo (ms) de la lasta reta kontrolo de la kanalkonfiguro — TTL por la refreŝo.
+     * (La konfiguro mem persistiĝas NE ĉi tie sed en la diska kaŝmemoro —
+     * Settings sur Desktop rifuzas valorojn super ~8 KB, la konfiguro estas ~21 KB.)
      */
-    const val KANALKONFIGURO_TEKSTO = "kanalkonfiguro_teksto"
-    /** Tempo (ms) de la lasta reta kontrolo de la kanalkonfiguro — TTL por la refreŝo. */
     const val LASATA_KONFIGURO_KONTROLO = "lasta_konfiguro_kontrolo"
 
     /**

@@ -30,29 +30,61 @@ import kotlin.time.Clock
  * `App.initData`/`hentEvtNyeGrunddata`):
  *
  * 1. Ĉe relanĉo oni unue legas la konservitan (elŝutitan el la reto) konfiguron
- *    el Settings, kaj nur se ĝi mankas — la pakitan version el la resurco
- *    (tiel la apo funkcias tuj kaj ankaŭ sen reto);
+ *    el la DISKA kaŝmemoro, kaj nur se ĝi mankas — la pakitan version el la
+ *    resurco (tiel la apo funkcias tuj kaj ankaŭ sen reto);
  * 2. poste en fono oni elŝutas la nunan konfiguron el [KONFIGURO_URL_DE_RETO]
  *    (kun TTL [KONFIGURO_REFREŜA_INTERVALO_MS], kiel `intervals.settings` en la
- *    malnova apo) kaj uzas ĝin — SED nur se la parsado sukcesis, por ke rompita
- *    respondo ne anstataŭigu la sanan konservitan version.
+ *    malnova apo) kaj uzas ĝin — SED nur se la parsado sukcesis kaj la kanal-listo
+ *    ne estas malplena, por ke rompita respondo ne anstataŭigu la sanan konservitan
+ *    version (A4). Sukcesa freŝa agordo anstataŭigas la kanalliston vive kaj
+ *    vokas [alFreŝaAgordo] (ĝisdatigo de apaj novaĵoj, prizorganto-retpoŝto k.a.).
+ *
+ * ATENTU pri la persistigo: la konfiguro (~21 KB) NE iru en `Settings` — sur
+ * Desktop la java.util.prefs-realigo rifuzas valorojn super ~8 KB per
+ * `IllegalArgumentException: Value too long` (malkovrite 2026-11-22). Tial la
+ * konservita teksto estas dosiero en la diska kaŝmemoro ([KANALKONFIGURO_KAŜNOMO],
+ * `leguKaŝonJson`/`skribuKaŝonJson` — la sama mekanismo kiel la RSS-kaŝoj).
  */
 class KanaloDeponejoImpl(
     private val leganto: KanalAgordoLeganto = KanalAgordoLeganto(),
     private val paktitaTeksto: () -> String,
-    private val httpKliento: HttpClient? = null,
+    /** Elŝutas la konfiguran tekston de URL; ĵetas ĉe ret-fiasko. Null = neniu reta refreŝo (testoj,antaŭrigardoj). */
+    private val elŝutuDefore: (suspend (url: String) -> String)? = null,
+    /** Settings — uzata nur por la TTL-tempo (malgranda valoro; la konfiguro mem NE iras tien). */
     private val settings: Settings? = null,
+    /** Legas la persistigitan konfiguran tekston (defaŭlte el la diska kaŝmemoro). */
+    private val leguKonservitan: () -> String? = { leguKaŝonJson(KANALKONFIGURO_KAŜNOMO) },
+    /** Skribas la persistigitan konfiguran tekston. */
+    private val skribuKonservitan: (String) -> Unit = { skribuKaŝonJson(KANALKONFIGURO_KAŜNOMO, it) },
+    /** Forigas putritan konservitan tekston. */
+    private val foriguKonservitan: () -> Unit = { foriguKaŝon(KANALKONFIGURO_KAŜNOMO) },
     private val konfiguroUrl: String = KONFIGURO_URL_DE_RETO,
     private val refreŝaIntervaloMs: Long = KONFIGURO_REFREŜA_INTERVALO_MS,
+    /** Vokata kiam freŝa, sukcese parsita defora agordo anstataŭigis la malnovan. */
+    private val alFreŝaAgordo: (KanalAgordo) -> Unit = {},
 ) : KanaloDeponejo {
 
     companion object {
         /** Nuna kanalkonfiguro sur nia servilo (publika, komentoj jam striptitaj — vidu la skill-on `servilo-arkivo`). */
         const val KONFIGURO_URL_DE_RETO = "https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json"
+        /** Kaŝnomo de la persistigita defora konfiguro en la diska kaŝmemoro (`defora_kanalkonfiguro.json`). */
+        const val KANALKONFIGURO_KAŜNOMO = "defora_kanalkonfiguro"
         /** TTL por la reta kontrolo de la konfiguro — same kiel `intervals.settings` (1800 s) en la malnova apo. */
         const val KONFIGURO_REFREŜA_INTERVALO_MS = 30L * 60 * 1000
         /** Tempolimo por la elŝuto de la konfiguro (malgranda dosiero, sed ne rajtas bloki). */
-        private const val KONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
+        const val KONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
+
+        /**
+         * Kreas la elŝutanton kun la necesa higieno: `expectSuccess` (4xx/5xx ĵetu,
+         * por ke fiaskpaĝo ne estu provata kiel konfiguro), tempolimo kaj
+         * grandec-limo (G45 — `leguKorponLimigite` kontraŭ misdirektitaj respondoj).
+         */
+        fun kreuElŝutanton(httpKliento: HttpClient): suspend (String) -> String = { url ->
+            httpKliento.get(url) {
+                expectSuccess = true
+                timeout { requestTimeoutMillis = KONFIGURO_PETO_TEMPOLIMITO_MS }
+            }.leguKorponLimigite()
+        }
     }
 
     @Volatile
@@ -81,7 +113,7 @@ class KanaloDeponejoImpl(
         ŝarguLokanAgordon()
         // Malvarma startigo aŭ eksplicita refreŝo (malsupren-tiro): kontrolu en
         // fono ĉu la servilo havas pli novan konfiguron (TTL ene de [refreŝiguElRete]).
-        if (httpKliento != null && (devige || estisMalvarma)) {
+        if (elŝutuDefore != null && (devige || estisMalvarma)) {
             refreŝSkopo.launch { refreŝiguElRete(devige = devige) }
         }
         return _kanaloj.value
@@ -90,12 +122,12 @@ class KanaloDeponejoImpl(
     override suspend fun getKanalo(slug: String): Kanalo? = getKanalojn(devige = false).find { it.slug == slug }
 
     /**
-     * Legas la lokan (konservitan en Settings, aliokaze pakitan) konfiguron kaj
-     * plenigas [agordo] kaj [_kanaloj]. Tolerema (A4): rompita kaŝo → rezervo al
-     * la pakita; ambaŭ rompita → malplena agordo (neniu kraŝo).
+     * Legas la lokan (konservitan en la diska kaŝmemoro, aliokaze pakitan) konfiguron
+     * kaj plenigas [agordo] kaj [_kanaloj]. Tolerema (A4): rompita kaŝo → forgeso +
+     * rezervo al la pakita; ambaŭ rompita → malplena agordo (neniu kraŝo).
      */
     private fun ŝarguLokanAgordon(): KanalAgordo {
-        val ŝargita = leguLokanKanalkonfiguron(leganto, settings, paktitaTeksto)
+        val ŝargita = leguLokanKanalkonfiguron(leganto, leguKonservitan, foriguKonservitan, paktitaTeksto)
         agordo = ŝargita
         _kanaloj.value = ŝargita.kanaloj.map { it.alKanalo() }
         logi("KanaloDeponejo", "Ŝargis ${ŝargita.kanaloj.size} kanalojn el la loka konfiguro")
@@ -104,33 +136,33 @@ class KanaloDeponejoImpl(
 
     /**
      * Elŝutas la nunan kanalkonfiguron el [konfiguroUrl] kaj — nur se ĝi parseblas
-     * kaj havas kanalojn — konservas ĝin en Settings kaj uzas ĝin (kiel la malnova
-     * apo: `hentEvtNyeGrunddata` konservis nur post sukcesa parsado).
+     * kaj havas kanalojn — konservas ĝin en la diska kaŝmemoro, anstataŭigas la
+     * kanalliston kaj vokas [alFreŝaAgordo] (kiel la malnova apo:
+     * `hentEvtNyeGrunddata` konservis nur post sukcesa parsado).
      *
-     * TTL: sen `devige` la elŝuto okazas maks. unufoje je [refreŝaIntervaloMs]
-     * (la tempo de la lasta kontrolo memoriĝas — ankaŭ ĉe fiasko, kiel en la
-     * malnova apo, por ne bombi la servilon).
+     * TTL: sen `devige` kaj kun [settings] la elŝuto okazas maks. unufoje je
+     * [refreŝaIntervaloMs] (la tempo de la lasta kontrolo memoriĝas — ankaŭ ĉe
+     * fiasko, kiel en la malnova apo, por ne bombi la servilon).
      */
     suspend fun refreŝiguElRete(devige: Boolean = false) {
-        val http = httpKliento ?: return
-        val st = settings ?: return
-        val nun = Clock.System.now().toEpochMilliseconds()
-        val lasta = st.getLong(SettingsKeys.LASATA_KONFIGURO_KONTROLO, 0L)
-        if (!devige && nun - lasta < refreŝaIntervaloMs) {
-            logd("KanaloDeponejo", "Reta konfiguro kontrolita antaŭ ${nun - lasta} ms — ene de la TTL, saltetas")
-            return
+        val elŝutanto = elŝutuDefore ?: return
+        val st = settings
+        if (st != null) {
+            val nun = Clock.System.now().toEpochMilliseconds()
+            val lasta = st.getLong(SettingsKeys.LASATA_KONFIGURO_KONTROLO, 0L)
+            if (!devige && nun - lasta < refreŝaIntervaloMs) {
+                logd("KanaloDeponejo", "Reta konfiguro kontrolita antaŭ ${nun - lasta} ms — ene de la TTL, saltetas")
+                return
+            }
+            st.putLong(SettingsKeys.LASATA_KONFIGURO_KONTROLO, nun)
         }
-        st.putLong(SettingsKeys.LASATA_KONFIGURO_KONTROLO, nun)
         try {
-            val teksto = http.get(konfiguroUrl) {
-                expectSuccess = true
-                timeout { requestTimeoutMillis = KONFIGURO_PETO_TEMPOLIMITO_MS }
-            }.leguKorponLimigite()
+            val teksto = elŝutanto(konfiguroUrl)
             if (teksto.isBlank()) {
                 logw("KanaloDeponejo", "La reta kanalkonfiguro estas malplena — konservas la lokan")
                 return
             }
-            if (teksto == st.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO)) {
+            if (teksto.trim() == leguKonservitan()?.trim()) {
                 logd("KanaloDeponejo", "La reta kanalkonfiguro estas sama kiel la konservita — nenio ŝanĝiĝis")
                 return
             }
@@ -146,11 +178,22 @@ class KanaloDeponejoImpl(
                 logw("KanaloDeponejo", "La reta kanalkonfiguro havas neniun kanalon — konservas la lokan")
                 return
             }
+            // Persistigo: fiasko (ekz. plena disko) ne rajtas bloki la vivan ĝisdatigon —
+            // nur la sekva starto restas ĉe la malnova versio.
+            try {
+                skribuKonservitan(teksto)
+            } catch (e: Exception) {
+                logw("KanaloDeponejo", "Ne povis persistigi la freŝan kanalkonfiguron — la vivan liston tamen uzas", e)
+            }
             val antaŭaNombro = _kanaloj.value.size
-            st.putString(SettingsKeys.KANALKONFIGURO_TEKSTO, teksto)
             agordo = novaAgordo
             _kanaloj.value = novaAgordo.kanaloj.map { it.alKanalo() }
             logi("KanaloDeponejo", "Nova kanalkonfiguro el la reto: ${novaAgordo.kanaloj.size} kanaloj (antaŭe $antaŭaNombro)")
+            try {
+                alFreŝaAgordo(novaAgordo)
+            } catch (e: Exception) {
+                loge("KanaloDeponejo", "Eraro en la reagado al freŝa kanalkonfiguro", e)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -163,21 +206,35 @@ class KanaloDeponejoImpl(
 
 /**
  * Legas la LOKAN kanalkonfiguron: unue la konservitan (elŝutitan el la reto) tekston
- * el [settings], kaj nur se ĝi mankas aŭ ne parseblas — la pakitan version
- * ([paktitaTeksto]). Ankaŭ uzata ekster [KanaloDeponejoImpl] (alarmo-ricevilo,
- * sciigo-worker), kiuj ne trairas AppStato-on.
+ * ([leguKonservitan], defaŭlte el la diska kaŝmemoro), kaj nur se ĝi mankas aŭ ne
+ * parseblas — la pakitan version ([paktitaTeksto]). Putrita konservita teksto
+ * forgesiĝas ([foriguKonservitan]), por ke la sekva starto ne reprovu ĝin (A4).
+ *
+ * Ankaŭ uzata ekster [KanaloDeponejoImpl] (alarmo-ricevilo, sciigo-worker), kiuj
+ * ne trairas AppStato-on.
  */
 fun leguLokanKanalkonfiguron(
     leganto: KanalAgordoLeganto = KanalAgordoLeganto(),
-    settings: Settings?,
+    leguKonservitan: () -> String? = { leguKaŝonJson(KanaloDeponejoImpl.KANALKONFIGURO_KAŜNOMO) },
+    foriguKonservitan: () -> Unit = { foriguKaŝon(KanaloDeponejoImpl.KANALKONFIGURO_KAŜNOMO) },
     paktitaTeksto: () -> String,
 ): KanalAgordo {
-    val kaŝita = settings?.getStringOrNull(SettingsKeys.KANALKONFIGURO_TEKSTO)
-    if (!kaŝita.isNullOrBlank()) {
+    val konservita = try {
+        leguKonservitan()
+    } catch (e: Exception) {
+        logw("KanaloDeponejo", "Ne povis legi la konservitan kanalkonfiguron", e)
+        null
+    }
+    if (!konservita.isNullOrBlank()) {
         try {
-            return leganto.legu(kaŝita)
+            return leganto.legu(konservita)
         } catch (e: Throwable) {
-            logw("KanaloDeponejo", "Rompita konservita kanalkonfiguro — uzas la pakitan", e)
+            loge("KanaloDeponejo", "Konservita kanalkonfiguro ne parseblas — forgesas ĝin kaj uzas la pakitan (A4)", e)
+            try {
+                foriguKonservitan()
+            } catch (e2: Exception) {
+                logw("KanaloDeponejo", "Ne povis forigi la putritan konservitan konfiguron", e2)
+            }
         }
     }
     return try {

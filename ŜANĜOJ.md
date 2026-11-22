@@ -10,16 +10,24 @@
 ## Reta kanalkonfiguro: elŝuto dum relanĉo, konservado, uzado anstataŭ la pakita (PR: https://github.com/nordfalk/EsperantoRadio/pull/197)
 
 Kiel en la malnova apo (`Backend.getGrunddataUrl` + `App.initData`/`hentEvtNyeGrunddata`):
-`KanaloDeponejoImpl` nun legas ĉe relanĉo unue la konservitan konfiguron el Settings
-(`kanalkonfiguro_teksto`), kun rezervo al la pakita risurco; poste en fono elŝutas
-`https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json` (TTL 30 min, kiel
-`intervals.settings` en la malnova apo; tempolimo 15 s) kaj konservas ĝin nur post
-sukcesa parsado kaj ne-malplena kanal-listo — rompita respondo ne anstataŭigas la sanan.
-`AppStato.inicialigu`, la alarmo-ricevilo kaj la sciigo-worker uzas la lokan (kaŝitan)
-konfiguron (`getAgordo()` / `leguLokanKanalkonfiguron()`), do ankaŭ `arkivoBazoUrl`,
-defaŭltaj ŝatataj, alarm-sugestoj kaj apaj novaĵoj sekvas la elŝutitan version.
-Malsupren-tiro en la kanalaro devige refreŝigas ankaŭ la konfiguron.
-Testoj: `KanaloDeponejoImplTest` (desktopTest, MockEngine + MapSettings).
+`KanaloDeponejoImpl` nun legas ĉe relanĉo unue la konservitan konfiguron el la
+**diska kaŝmemoro** (`defora_kanalkonfiguro.json`), kun rezervo al la pakita risurco;
+poste en fono elŝutas `https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`
+(TTL 30 min, kiel `intervals.settings` en la malnova apo; tempolimo 15 s; grandec-limo
+1 MB; `expectSuccess`) kaj konservas/uzas ĝin nur post sukcesa parsado kaj ne-malplena
+kanal-listo — rompita respondo ne anstataŭigas la sanan. Sukcesa freŝa agordo
+anstataŭigas la kanalliston vive kaj vokas `alFreŝaAgordo` (ĝisdatigo de apaj novaĵoj
+per `ApajNovaĵojDeponejo.ĝisdatigu` + prizorganto-retpoŝto). `AppStato.inicialigu`,
+la alarmo-ricevilo kaj la sciigo-worker uzas la lokan (kaŝitan) konfiguron
+(`getAgordo()` / `leguLokanKanalkonfiguron()`), do ankaŭ `arkivoBazoUrl`, defaŭltaj
+ŝatataj, alarm-sugestoj kaj apaj novaĵoj sekvas la elŝutitan version. Malsupren-tiro
+en la kanalaro devige refreŝigas ankaŭ la konfiguron.
+**Leciono (2026-11-22):** la konfiguro (~21 KB) NE persistiĝu en `Settings` — sur
+Desktop la java.util.prefs-realigo rifuzas valorojn super ~8 KB per
+`IllegalArgumentException: Value too long`; persistigu grandan tekston kiel dosieron
+en la diska kaŝmemoro (`leguKaŝonJson`/`skribuKaŝonJson`, kiel la RSS-kaŝoj).
+Testoj: `KanaloDeponejoImplTest` (commonTest, lambda-injekto) + `KanaloDeponejoElŝutantoTest`
+(desktopTest, MockEngine) + 3 novaj por `ApajNovaĵojDeponejo.ĝisdatigu`.
 Kaptindaĵo: la parametro de `getKanalojn` en la impl nomiĝas `devige` (la interfaca
 nomo `forteRefresigi` — vidu la literumadan noton de 2026-10-17 en AGENTS.md).
 

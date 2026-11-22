@@ -236,10 +236,10 @@ class AlarmoReceivilo : BroadcastReceiver() {
         }
 
         // Uzite la lokan kanalkonfiguron (event. elŝutitan el la reto kaj konservitan
-        // en Settings), ne nur la pakitan — tiel novaj kanaloj funkcias ankaŭ ĉe alarmo.
-        // Rezervo se AppStato ne estas inicialigita: legu la lokan konfiguron rekte.
+        // en la diska kaŝmemoro), ne nur la pakitan — tiel novaj kanaloj funkcias
+        // ankaŭ ĉe alarmo. Rezervo se AppStato ne estas inicialigita: legu rekte.
         val kanalo: Kanalo = AppStato.kanaloDeponejo?.getKanalo(kanaloSlug)
-            ?: leguLokanKanalkonfiguron(settings = kreuSettings(), paktitaTeksto = ::leguPakititanKanalkonfiguron)
+            ?: leguLokanKanalkonfiguron(paktitaTeksto = ::leguPakititanKanalkonfiguron)
                 .kanaloj.find { it.kodo == kanaloSlug }?.alKanalo()
             ?: run {
                 logw("AlarmoReceivilo", "Kanalo ne trovita: $kanaloSlug")

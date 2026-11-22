@@ -86,8 +86,8 @@ class NovajElsendojKontroloWorker(
             val plejŝatataj = plejStr.split(",").toSet()
             logi("NovajElsendoj", "Kontrolas ${plejŝatataj.size} ŝatatajn kanalojn: $plejŝatataj")
 
-            // Loka kanalkonfiguro: konservita el la reto (Settings), aliokaze la pakita
-            val kanaloj = leguLokanKanalkonfiguron(settings = settings, paktitaTeksto = ::leguPakititanKanalkonfiguron).kanaloj
+            // Loka kanalkonfiguro: konservita el la reto (diska kaŝmemoro), aliokaze la pakita
+            val kanaloj = leguLokanKanalkonfiguron(paktitaTeksto = ::leguPakititanKanalkonfiguron).kanaloj
                 .filter { it.kodo in plejŝatataj && it.elsendojRssUrl != null }
                 .map { it.alKanalo() }
             if (kanaloj.isEmpty()) {

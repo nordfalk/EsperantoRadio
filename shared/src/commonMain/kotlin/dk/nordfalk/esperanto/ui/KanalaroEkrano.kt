@@ -79,7 +79,9 @@ class KanalaroViewModel(
     }
 
     private suspend fun ŝargiInterna(fortoRefresigi: Boolean) {
-        val kanaloj = deponejo.getKanalojn()
+        // fortoRefresigi (malsupren-tiro) transdoniĝas: tiam la deponejo ankaŭ
+        // devige kontrolas en la reto ĉu la servilo havas pli novan kanalkonfiguron.
+        val kanaloj = deponejo.getKanalojn(fortoRefresigi)
 
         // Paŝo 1: Legu diskan kaŝmemoron (rapida — loka dosier-I/O + re-parsado)
         if (elsendoDeponejo != null) {

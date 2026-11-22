@@ -1,11 +1,10 @@
 package dk.nordfalk.esperanto
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.data.config.kreuDeforanElŝutilon
 import dk.nordfalk.esperanto.data.config.leguAgordonKunRezervo
 import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.data.parser.RssParsilo
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ArchiveOrgDosiernomoKaŝo
 import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
@@ -201,7 +200,7 @@ object AppStato {
         val deponejoDeKanaloj = KanaloDeponejoImpl(
             leganto = leganto,
             komencaAgordo = agordo,
-            elŝutuDefore = { url -> httpKliento!!.get(url).bodyAsText() },
+            elŝutuDefore = kreuDeforanElŝutilon(httpKliento!!),
             alFreŝaAgordo = { freŝa ->
                 // Derivaĵoj de la konfiguro, ĝisdatigeblaj meze de la seanco.
                 // (arkivoBazoUrl kaj alarm-sugestoj restas de la starto-valoro —

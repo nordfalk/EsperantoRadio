@@ -28,7 +28,7 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
   la java.util.prefs-realigo sur Desktop rifuzas valorojn super ~6 KB) kaj uzas
   la konservitan version antaŭ la paktitan (`leguAgordonKunRezervo`) — kiel
   «grunddata» en la malnova apo. Ŝanĝo de la konfiguro do efikas al uzantoj SEN
-  ĝisdatigo de la apo (kanallisto, apaj novaĵoj, fluo-URL-oj). La reverta ĝisdatigo
+  ĝisdatigo de la apo (kanallisto, apaj novaĵoj, fluo-URL-oj). La servila ĝisdatigo
   bezonas `rsync` (vidu `servilo-arkivo`) — nur post eksplicita peto.
 - La JSONC havas **du arojn**: `kanaloj` (aktivaj) kaj `FORPRENITAJ_KANALOJ`
   (referencataj, de la kodo NE legataj). Novaj kanaloj devas iri en `kanaloj`;

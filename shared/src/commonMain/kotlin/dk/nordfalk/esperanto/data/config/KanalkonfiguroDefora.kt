@@ -1,10 +1,15 @@
 package dk.nordfalk.esperanto.data.config
 
-import dk.nordfalk.esperanto.data.repository.foriguKaŝon
 import dk.nordfalk.esperanto.data.repository.leguKaŝonJson
+import dk.nordfalk.esperanto.data.repository.leguKorponLimigite
+import dk.nordfalk.esperanto.data.repository.foriguKaŝon
 import dk.nordfalk.esperanto.data.repository.skribuKaŝonJson
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.expectSuccess
+import io.ktor.client.plugins.timeout
+import io.ktor.client.request.get
 
 /**
  * URL de la defore elŝutebla kanalkonfiguro — la purigita strikta JSON-kopio, kiun
@@ -22,6 +27,38 @@ const val KANALKONFIGURO_URL = "https://javabog.dk/esperanto-radio/esperantoradi
  * ~6 KB («Value too long», malkovrite 2026-11-22 ĉe reala rulado).
  */
 const val KANALKONFIGURO_KAŜNOMO = "defora_kanalkonfiguro"
+
+/**
+ * Minimuma intervalo inter du NE-devigaj retaj kontroloj de la konfiguro (ENmemora —
+ * kiel `sidstTjekket`/`opdaterGrunddataEfterMs` en la malnova apo: je ĉiu relanĉo
+ * oni denove elŝutas freŝan version, sed ripetaj kontroloj ene de unu seanco
+ * limiĝas al unu po 30 minutoj, por ne bombi la servilon).
+ */
+const val KANALKONFIGURO_REFREŜA_INTERVALO_MS: Long = 30L * 60 * 1000
+
+/** Tempolimo por la elŝutpeto de la konfiguro (malgranda dosiero, ne rajtas bloki). */
+const val KANALKONFIGURO_PETO_TEMPOLIMITO_MS = 15_000L
+
+/**
+ * Maksimuma grandeco de la konfigur-respondo en bitokoj — la vera konfiguro estas
+ * ~21 KB; 256 KB estas malproksima supra limo. `leguKorponLimigite` readas
+ * pecete kaj ĵetas tuj ĉe transpaso (misdirektita respondo ne enmemorigiĝas).
+ */
+const val KANALKONFIGURO_MAKSUMA_GRANDECO_BITOKOJ: Long = 256L * 1024
+
+/**
+ * La produktada elŝutilo por la defora kanalkonfiguro: `expectSuccess` (erarpaĝo
+ * kun HTTP 200 ne plu povas trudi HTML-on kiel konfiguron sen kontrolado — kaj
+ * ĝi jam ne pasas la pars-provon), propra peto-tempolimo kaj grandec-limigita
+ * korpo-legado. Injektata kiel lambdo en `KanaloDeponejoImpl` (testoj povas
+ * anstataŭigi ĝin).
+ */
+fun kreuDeforanElŝutilon(httpKliento: HttpClient): suspend (url: String) -> String = { url ->
+    httpKliento.get(url) {
+        expectSuccess = true
+        timeout { requestTimeoutMillis = KANALKONFIGURO_PETO_TEMPOLIMITO_MS }
+    }.leguKorponLimigite(limo = KANALKONFIGURO_MAKSUMA_GRANDECO_BITOKOJ)
+}
 
 /**
  * Elektas kaj legas la kanalkonfiguron uzotan ĉe starto, kiel la «grunddata»-fluo

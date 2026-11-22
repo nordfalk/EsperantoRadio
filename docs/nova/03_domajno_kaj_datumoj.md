@@ -209,11 +209,15 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 unue la persistigita defora versio el la diska kaŝmemoro, rezerve la paktita
 risurco — `leguAgordonKunRezervo`.) Krome `refreŝiguDefore()` elŝutas la
 konfiguron de `https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`
-(unufoje po starto, kiel «grunddata» en la malnova apo): nur se la teksto
-ŝanĝis KAJ estas parsigebla, ĝi anstataŭigas la kanalliston vive, persistiĝas
-por la sekva starto kaj per la reversevoko `alFreŝaAgordo` ĝisdatigas la apajn
-novaĵojn kaj la prizorganto-retpoŝton. Fiasko (reto, CORS sur wasmJs,
-ne-parsigebla respondo) neniam tuŝas la nunan staton (A4).
+— lanĉita de `AppStato.inicialigu` (unufoje po starto, kiel «grunddata» en la
+malnova apo) kaj de la malsupren-tiro en la kanalaro (devige, preterpasante la
+TTL). Nur se la teksto ŝanĝis KAJ estas parsigebla kun ne-malplena kanalaro,
+ĝi anstataŭigas la kanalliston vive, persistiĝas por la sekva starto kaj per
+la reversevoko `alFreŝaAgordo` ĝisdatigas la apajn novaĵojn kaj la
+prizorganto-retpoŝton. Fiasko (reto, CORS sur wasmJs, ne-parsigebla/malplena
+respondo) neniam tuŝas la nunan staton (A4). Ne-devigaj kontroloj limiĝas
+enmemore al unu po 30 min (kiel `sidstTjekket` de la malnova apo) — sed ĉiu
+relanĉo denove elŝutas freŝan version.
 
 ### Elsendo-deponejo
 

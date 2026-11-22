@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- Kanalkonfiguro elŝutiĝas de la servilo je ĉiu starto kaj konserviĝas — ŝanĝoj de kanaloj kaj novaĵoj efikas sen ĝisdatigo de la apo (https://github.com/nordfalk/EsperantoRadio/pull/195)
+- Kanalkonfiguro elŝutiĝas de la servilo je ĉiu starto kaj konserviĝas — ŝanĝoj de kanaloj kaj novaĵoj efikas sen ĝisdatigo de la apo; malsupren-tiro en la kanalaro devige kontrolas tuj (https://github.com/nordfalk/EsperantoRadio/pull/195)
 - Radio Frei: elsendoj (TURINGIO INTERNACIA) denove aperas en la apo — nia arkiv-servilo generas la fluon el la HTML-mediatheko de radio-frei.de (https://github.com/nordfalk/EsperantoRadio/pull/194)
 - Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/184)
 - Riĉigitaj fluoj de arkiv-servilo (javabog.dk/esperanto-radio/kanaloj) kun priskriboj faritaj de AI; la apo kunfandas ilin kun la originalaj fluoj (novaj elsendoj aperas tuj), kaj se ambaŭ malsukcesas, uzas la kaŝon (https://github.com/nordfalk/EsperantoRadio/pull/180)

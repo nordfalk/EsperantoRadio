@@ -640,12 +640,9 @@ fun EsperantoRadioApp(
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        if (mesaĝo.isEmpty()) {
-                            Text("Nun estas neniuj novaĵoj.")
-                        } else {
-                            // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
-                            HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth())
-                        }
+                        // uzuWebView=false → AnnotatedString-vidigo (la elekto de la uzanto)
+                        HtmlVido(html = mesaĝo, uzuWebView = false, modifier = Modifier.fillMaxWidth())
+
                         // Faldebla sekcio kun la pasintaj novaĵoj, plej sube
                         val pasintaj = apajNovaĵojDeponejo.pasintaj
                         if (pasintaj.isNotEmpty()) {
@@ -660,7 +657,7 @@ fun EsperantoRadioApp(
                                 Text(
                                     "Pasintaj novaĵoj",
                                     style = MaterialTheme.typography.labelLarge,
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier.padding(end = 4.dp),
                                 )
                                 Icon(
                                     if (pasintajFalditaj) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,

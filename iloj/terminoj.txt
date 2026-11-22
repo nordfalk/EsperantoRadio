@@ -2384,3 +2384,27 @@ serializable
 decode
 encode
 reparsado
+
+# (2026-11-22, PR #195) terminoj de la defora kanalkonfiguro — legitimaj Esperanto-kunmetaĵoj kaj danaj historiaj identigiloj
+asinkrone
+enmemore
+eraropaĝo
+evt
+ĝisdatiĝos
+konfigur
+mediatheko
+nye
+parsigebla
+parsitan
+prefs
+putrita
+rekreiebla
+reversevoko
+sidst
+tjekket
+turingio
+erarpaĝon
+kanalliston
+parsigeblan
+putritan
+rekreieblaj

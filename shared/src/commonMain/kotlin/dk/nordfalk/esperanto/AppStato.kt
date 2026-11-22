@@ -1,6 +1,8 @@
 package dk.nordfalk.esperanto
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.data.config.kreuDeforanElŝutilon
+import dk.nordfalk.esperanto.data.config.leguAgordonKunRezervo
 import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
@@ -190,17 +192,29 @@ object AppStato {
             }
         }
 
-        kanaloDeponejo = KanaloDeponejoImpl(
-            leganto = KanalAgordoLeganto(),
-            paktitaTeksto = ::leguPakititanKanalkonfiguron
-        )
+        val leganto = KanalAgordoLeganto()
+        // Kiel «grunddata» en la malnova apo: unue la persistigita defora konfiguro
+        // el la diska kaŝmemoro, rezerve la paktita risurco (vidu leguAgordonKunRezervo).
+        val agordo = leguAgordonKunRezervo(leganto, ::leguPakititanKanalkonfiguron)
 
-        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        val deponejoDeKanaloj = KanaloDeponejoImpl(
+            leganto = leganto,
+            komencaAgordo = agordo,
+            elŝutuDefore = kreuDeforanElŝutilon(httpKliento!!),
+            alFreŝaAgordo = { freŝa ->
+                // Derivaĵoj de la konfiguro, ĝisdatigeblaj meze de la seanco.
+                // (arkivoBazoUrl kaj alarm-sugestoj restas de la starto-valoro —
+                // ili dependas de deponejoj, kiuj ne estas rekreieblaj vive.)
+                apajNovaĵojDeponejo?.ĝisdatigu(freŝa.android?.apajNovaĵoj, freŝa.android?.apajNovaĵojPasintaj)
+                freŝa.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
+            },
+        )
+        kanaloDeponejo = deponejoDeKanaloj
+
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 
-        // (agordo jam legita pli supre — por arkivoBazoUrl kaj jen: defaŭltaj ŝatataj kaj alarm-sugestoj)
         val defaŭltajŜatataj = agordo.kanaloj
             .filter { it.defaŭltŜatata }
             .map { it.kodo }
@@ -236,6 +250,19 @@ object AppStato {
         )
 
         diagnozoRegilo = kreuDiagnozoRegilon()
+
+        // Defora refreŝigo de la kanalkonfiguro — unufoje po starto, kiel
+        // «hentEvtNyeGrunddata» en la malnova apo. La UI jam funkcias per la
+        // konservita/paktita versio; se la servilo havas novan (kaj parsigeblan)
+        // konfiguron, la kanallisto, apaj novaĵoj kaj prizorganto-retpoŝto
+        // ĝisdatiĝas vive kaj la teksto persistiĝas por la sekva starto.
+        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
+            try {
+                deponejoDeKanaloj.refreŝiguDefore()
+            } catch (e: Exception) {
+                logw("AppStato", "Defora refreŝigo de la kanalkonfiguro fiaskis", e)
+            }
+        }
 
         // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la
         // ĉefekrano. Dispatchers.Default, ne IO: IO ne ekzistas sur wasmJs (la

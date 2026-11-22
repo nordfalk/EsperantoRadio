@@ -204,8 +204,18 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 
 ### Kanal-deponejo
 
-`KanaloDeponejoImpl` legas la JSONC-kanalkonfiguron (paktita risurco) per
-`KanalAgordoLeganto` kaj liveras `StateFlow<List<Kanalo>>`.
+`KanaloDeponejoImpl` ricevas la jam parsitan JSONC-kanalkonfiguron de
+`AppStato.inicialigu` kaj liveras `StateFlow<List<Kanalo>>`. (Komenca agordo =
+unue la persistigita defora versio el la diska kaŝmemoro, rezerve la paktita
+risurco — `leguAgordonKunRezervo`.) Krome `refreŝiguDefore()` — unufoje po
+starto, lanĉita de `AppStato.inicialigu` (kiel «grunddata» en la malnova apo) —
+elŝutas la konfiguron de
+`https://javabog.dk/esperanto-radio/esperantoradio_konfiguro.json`. Nur se la
+teksto ŝanĝis KAJ estas parsigebla kun ne-malplena kanalaro, ĝi anstataŭigas la
+kanalliston vive, persistiĝas por la sekva starto kaj per la reversevoko
+`alFreŝaAgordo` ĝisdatigas la apajn novaĵojn kaj la prizorganto-retpoŝton.
+Fiasko (reto, CORS sur wasmJs, ne-parsigebla/malplena respondo) neniam tuŝas
+la nunan staton (A4).
 
 ### Elsendo-deponejo
 

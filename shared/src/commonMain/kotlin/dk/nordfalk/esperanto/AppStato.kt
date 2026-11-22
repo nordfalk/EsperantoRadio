@@ -190,12 +190,19 @@ object AppStato {
             }
         }
 
+        // Fona amplekso por la refreŝigo de la fora kanalkonfiguro (unufoje je procezo)
+        val fonaScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
         kanaloDeponejo = KanaloDeponejoImpl(
             leganto = KanalAgordoLeganto(),
-            paktitaTeksto = ::leguPakititanKanalkonfiguron
+            paktitaTeksto = ::leguPakititanKanalkonfiguron,
+            settings = settings,
+            httpKliento = httpKliento,
+            fonaScope = fonaScope,
         )
 
-        val agordo = KanalAgordoLeganto().legu(leguPakititanKanalkonfiguron())
+        // Efektiva agordo: kaŝita fora versio el la agordoj, aliokaz la pakita
+        val agordo = kanaloDeponejo!!.getAgordon()
         elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)

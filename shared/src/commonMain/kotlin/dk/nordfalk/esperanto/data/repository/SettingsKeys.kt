@@ -40,6 +40,10 @@ object SettingsKeys {
     const val LASTA_GEO_STATISTIKO = "lasta_geo_statistiko"
     /** Pseŭdonimo de la uzanto ("adjektivo substantivo", ekz. "blua suno") — aperas en la protokoloj. */
     const val PSEŬDONIMO = "pseŭdonimo"
+    /** Kaŝita fora kanalkonfiguro (kruda JSONC-teksto el FORA_KONFIGURO_URL) — uzata ĉe relanĉo antaŭ ol la reto pretas. */
+    const val FORA_KANALKONFIGURO = "fora_kanalkonfiguro"
+    /** Tempo (ms) de la lasta sukcesa elŝuto de la fora kanalkonfiguro. */
+    const val FORA_KANALKONFIGURO_TEMPO = "fora_kanalkonfiguro_tempo"
 
     /**
      * Historiaj x-sistemaj ŝlosiloj (antaŭ la ortografia renomo, 2026-10-24) —

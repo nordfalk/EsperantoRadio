@@ -9,8 +9,10 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.config.IntentŜlosilo
+import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.data.config.kreuSettings
+import dk.nordfalk.esperanto.data.config.leguPakititanKanalkonfiguron
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import dk.nordfalk.esperanto.domain.model.LudantoStato
 import dk.nordfalk.esperanto.domain.player.ExoPlayerLudiloRegilo
@@ -235,11 +237,15 @@ class AlarmoReceivilo : BroadcastReceiver() {
 
         // Uzite la lokan kanalkonfiguron (event. elŝutitan el la reto kaj konservitan
         // en Settings), ne nur la pakitan — tiel novaj kanaloj funkcias ankaŭ ĉe alarmo.
-        val kanalo: Kanalo = AppStato.kanaloDeponejo?.getKanalo(kanaloSlug) ?: run {
-            logw("AlarmoReceivilo", "Kanalo ne trovita: $kanaloSlug")
-            luduRezervanVokosonon(context)
-            return
-        }
+        // Rezervo se AppStato ne estas inicialigita: legu la lokan konfiguron rekte.
+        val kanalo: Kanalo = AppStato.kanaloDeponejo?.getKanalo(kanaloSlug)
+            ?: leguLokanKanalkonfiguron(settings = kreuSettings(), paktitaTeksto = ::leguPakititanKanalkonfiguron)
+                .kanaloj.find { it.kodo == kanaloSlug }?.alKanalo()
+            ?: run {
+                logw("AlarmoReceivilo", "Kanalo ne trovita: $kanaloSlug")
+                luduRezervanVokosonon(context)
+                return
+            }
 
         val regilo = AppStato.ludvicoRegilo ?: run {
             logw("AlarmoReceivilo", "LudvicoRegilo ne havebla")

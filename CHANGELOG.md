@@ -36,6 +36,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Kanala ekrano: la cip-butonoj montras la verajn retejon kaj retpoŝtadreson anstataŭ la fiksajn tekstojn „Retejo“ kaj „Retpoŝto“ (https://github.com/nordfalk/EsperantoRadio/pull/173)
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 - En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
+- La butono «Venonta» en la ludada sciigo markas la nunan elsendon kiel plene aŭskultita — la apo ne plu revenas al ĝi per resumigo aŭ aŭtomata sekva ludado (https://github.com/nordfalk/EsperantoRadio/pull/193)
 
 ### Ŝanĝita
 

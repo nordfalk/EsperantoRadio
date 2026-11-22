@@ -50,7 +50,7 @@ actual fun kopiuTekston(teksto: String) {
     }
 }
 
-actual fun partiguLigilon(url: String, teksto: String) {
+actual fun kunhaviguLigilon(url: String, teksto: String) {
     try {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"

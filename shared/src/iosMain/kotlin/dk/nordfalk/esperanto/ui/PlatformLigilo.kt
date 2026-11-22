@@ -12,6 +12,6 @@ actual fun kopiuTekston(teksto: String) {
     platform.UIKit.UIPasteboard.generalPasteboard.setString(teksto)
 }
 
-actual fun partiguLigilon(url: String, teksto: String) {
+actual fun kunhaviguLigilon(url: String, teksto: String) {
     // TODO: UIActivityViewController kun la ligilo
 }

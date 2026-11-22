@@ -38,7 +38,7 @@ actual fun kopiuTekston(teksto: String) {
     }
 }
 
-actual fun partiguLigilon(url: String, teksto: String) {
+actual fun kunhaviguLigilon(url: String, teksto: String) {
     // sur desktop: malfermu novan fenestron (krozilon) kun la RSS
     malfermuLigon(url)
 }

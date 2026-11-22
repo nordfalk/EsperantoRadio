@@ -29,4 +29,4 @@ expect fun kopiuTekston(teksto: String)
  * Disdividas ligilon: sur Android per la sistemo (share-sheet); sur web kaj desktop
  * malfermas novan fenestron kun la ligilo.
  */
-expect fun partiguLigilon(url: String, teksto: String)
+expect fun kunhaviguLigilon(url: String, teksto: String)

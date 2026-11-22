@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -28,7 +29,7 @@ class RssAdresVicoTest {
             }
         }
         waitForIdle()
-        onNodeWithText("https://ekzemplo.test/feed.xml").assertIsDisplayed()
+        onNodeWithText("https://ekzemplo.test/feed.xml").assertIsDisplayed().assertHasClickAction()
         onNodeWithText("RSS-adreso de Testo:").assertIsDisplayed()
         onNodeWithText("Kopii").performClick()
         onNodeWithText("Disdividi").performClick()

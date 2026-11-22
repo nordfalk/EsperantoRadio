@@ -187,6 +187,10 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
   dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
   skribis sen la intertempe postulita `mutex.withLock`).
+- **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam verifu per
+  `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente
+  forvori najbarajn sekciojn (2026-11-20: C5/C26/C27 perdiĝis; Statuso-linioj
+  forglutiĝis de `getline`).
 - **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
   ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
   ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`). Tio validas ankaŭ
@@ -333,8 +337,9 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Ne publikigu al la servilo sen eksplicita peto (2026-11-20):** `rsync … javabog.dk:javabog.dk/esperanto-radio/` (aŭ ĉiu alia ekster-reta publikigo) okazas NUR post kiam la uzanto tion eksplicite petas („kopiu al la servilo“ k.s.). Loka konstruado (`./gradlew :server:arkivKonstruilo`) kaj loka rsync-simulado estas en ordo, sed la reala rsync ĉiam atendas la aprobon de la posedanto.
 - **Emulilo/medio (2026-11-20):** `git push --force` estas blokita de hoko (amendu nur nepuŝitajn komitojn); `/tmp` estas blokita — uzu la skraŭĉdosierujon, ĉi tie praktike `server/data/privata/` (gitignored); `connectedDebugAndroidTest` MALINSTALAS la `.alfa`-APK-on poste — reinstalu (`adb install`) antaŭ manaj kontroloj, kaj uzu `pm clear` por devigi freŝan elŝuton. Instrumentitaj testoj povas fiaski sub granda gastiganta ŝarĝo (load ~40+) — komparu kun master en aparta worktree antaŭ ol atribui fiaskon al PR.
 - **Atendu antaŭ `commit` (2026-11-20):** antaŭ ĉiu `git commit` atendu, ke la posedanto trarigardis la kodon kaj aprobis.
-- **Lingva kontrolo por fuŝitajn vortoj (2026-11-21):** la agento fojfoje (ekz. ĉe PR-revizio) rulas `python3 iloj/lingvokontrolo.py`, kiu skanas la prozon de la PR-diff per REVO-vortaro kaj markas nekonatajn vortojn (ekz. `temro` → `tempolimo`); trovitajn fuŝojn la agento korektas, legitimajn novajn terminojn aldonas al `iloj/terminoj.txt`. Regenero de la permeslisto: `python3 iloj/lingvokontrolo.py --generu-permesliston`. Detaloj: `iloj/README.md`. (Intence NENIU CI-kontrolo por tio — la posedanto preferas agentan kontrolon.)
+- **Lingva kontrolo por fuŝitajn vortoj (2026-11-21):** la agento fojfoje (ekz. ĉe PR-revizio) rulas `python3 iloj/lingvokontrolo.py`, kiu skanas la prozon de la PR-diff per REVO-vortaro kaj markas nekonatajn vortojn (ekz. `temro` → `tempolimo`); trovitajn fuŝojn la agento korektas, legitimajn novajn terminojn aldonas al `iloj/terminoj.txt`. **Ne blindigu la kontrolilon:** se la vorto estas fuŝita (ekz. `temro`, `nefatalas`), korektu la vorton en la teksto — ne aldonu ĝin al la permeslisto. Regenero de la permeslisto: `python3 iloj/lingvokontrolo.py --generu-permesliston`. Detaloj: `iloj/README.md`. (Intence NENIU CI-kontrolo por tio — la posedanto preferas agentan kontrolon.)
 - **Ne faru CPU-intensan laboron (parsado, dosier-I/O) sur la ĉefa fadeno.
+- **Kaŝu jam-parsitajn datumojn kiel JSON, ne nur krudan tekston (2026-11-21):** la diska kaŝo havas nun `<slug>.rss` (kruda, rezervo) kaj `<slug>.json` (parsitaj `Elsendo`, @Serializable) — la starto malkodas la JSON unue (~10× pli rapide ol Ksoup-reparsado: peranto 250 eroj = 714 ms parse vs 69 ms decode). Legado de la kaŝo okazas paralele sur `Dispatchers.Default` kaj liveras rezultojn progresive (`leguĈiujnKaŝitajnElsendojn(poKanalRicevita=…)`), por ke Hejmo montru enhavon tuj.
 
 ## Terminaro — kanonaj terminoj
 

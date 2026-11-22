@@ -212,6 +212,14 @@ La datentavolo estas pli simpla ol la originala plano. Ne ekzistas apartaj
 `ElsendoDeponejoImpl` faras ĉion: Ktor-peto → RSS-parsado → diska kaŝmemoro.
 Ne ekzistas aparta reto-interfaco — la `HttpClient` estas enketigata rekte.
 
+Diska kaŝmemoro (2026-11-21, du dosieroj po kanalo en `elsendoj_kasho/`):
+`<slug>.rss` = kruda RSS-respondo (rezervo, re-parsata nur se necese) kaj
+`<slug>.json` = jam parsitaj elsendoj (`@Serializable`) — la starto malkodas la
+JSON unue, ĉar tio estas ~10× pli rapida ol re-parsi la krudan RSS per Ksoup
+(mezurite: peranto 250 eroj — parse 714 ms, JSON-decode 69 ms). Legado de ĉiuj
+kanaloj okazas paralele sur `Dispatchers.Default` kaj la rezultoj estas liverataj
+progresive (`poKanalRicevita`), por ke la Hejmo montru enhavon kiel eble plej frue.
+
 ```kotlin
 class ElsendoDeponejoImpl(
     val httpKliento: HttpClient,

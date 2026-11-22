@@ -217,7 +217,7 @@ object AppStato {
         alarmoDeponejo = PersistaAlarmoDeponejo(settings, sugestoj, kreuAlarmoSkedilo())
 
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
-        apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj)
+        apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj, agordo.android?.apajNovaĵojPasintaj)
         agordo.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)

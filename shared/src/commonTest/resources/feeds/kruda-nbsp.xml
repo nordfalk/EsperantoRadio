@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>NBSP-Testo</title>
+    <link>https://ekzemplo.test/</link>
+    <description>Kanalo kun kruda &nbsp; en la fluo</description>
+    <item>
+      <title>Epizodo&nbsp;42</title>
+      <guid>nbsptesto:1</guid>
+      <pubDate>Wed, 18 Nov 2026 12:00:00 +0000</pubDate>
+      <enclosure url="https://ekzemplo.test/e42.mp3" type="audio/mpeg" length="12345"/>
+      <description>Priskribo kun kruda&nbsp;spaco</description>
+    </item>
+  </channel>
+</rss>

@@ -132,12 +132,12 @@ private fun ElŝutitaEro(
                                     onLudi()
                                 }
                             },
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(48.dp)
                         ) {
                             Icon(if (ludas) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (ludas) "Paŭzigi" else "Ludi")
                         }
                     }
-                    IconButton(onClick = onForigi, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onForigi, modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Delete, contentDescription = "Forigi")
                     }
                 }

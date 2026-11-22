@@ -349,4 +349,21 @@ class LudvicoLogikoTest {
 
         assertEquals(nova, rezulto)
     }
+
+    @Test
+    fun komencaPozicioSub95ProcentoRestas() {
+        assertEquals(500_000L, LudvicoLogiko.komencaPozicio(500_000L, 600_000L))
+    }
+
+    @Test
+    fun komencaPozicioSuper95ProcentoRekomencasDeNulo() {
+        // kiel en la malnova apo (C44c): >95 % de la daŭro → rekomencu de 0
+        assertEquals(0L, LudvicoLogiko.komencaPozicio(580_000L, 600_000L))
+        assertEquals(0L, LudvicoLogiko.komencaPozicio(600_000L, 600_000L))
+    }
+
+    @Test
+    fun komencaPozicioSenDaŭroRestas() {
+        assertEquals(123L, LudvicoLogiko.komencaPozicio(123L, 0L))
+    }
 }

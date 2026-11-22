@@ -102,8 +102,9 @@ datumbazon nur se la datumo vere kreskas.
 
 Parsreguloj kaj parser-kontrakto estas en `04_parsado_kaj_arkivo.md`. La parsilo
 uzas **ksoup** por RSS/Atom + HTML-purigado/iframe-skrapado. Per-kanalaj
-apartaĵoj estas **dateno-movitaj** el la kanalagordo (JSON-kampoj
-`puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`).
+apartaĵoj estas **dateno-movitaj** el la kanalagordo (JSON-kampo
+`puriguModeloj`; la malnovaj `iframeReguloj`, `forceHttps` kaj `parsStrategio`
+ne plu ekzistas kiel apartaj kampoj — vidu `04_parsado_kaj_arkivo.md`).
 
 La kanalkonfiguro (`esperantoradio_konfiguro.json`) estas **JSON kun komentoj** —
 stripi `//`-komentojn antaŭ `kotlinx.serialization`-parsado, aŭ uzi indulgentan

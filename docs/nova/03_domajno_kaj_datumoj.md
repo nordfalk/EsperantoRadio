@@ -29,10 +29,10 @@ data class Kanalo(
 ```
 
 > La malnova apo havis `puriguModeloj`, `iframeReguloj`, `forceHttps`, `parsStrategio`
-> kiel kampojn sur la kanal-modelo. En la nova apo tiuj estas traktataj rekte en la
-> parsilo (`RssParsilo`) laŭ la kanal-slug, ne kiel dateno-movitaj kampoj. Tio estas
-> malpli pura sed pli simpla — la parsreguloj estas malmolaj sed bone dokumentitaj
-> (vidu `04_parsado_kaj_arkivo.md`).
+> kiel kampojn sur la kanal-modelo. En la nova apo `puriguModeloj` restas
+> **daten-movita kampo** (`Kanalo.puriguModeloj`, vidu `04_parsado_kaj_arkivo.md`);
+> `iframeReguloj`, `forceHttps` kaj `parsStrategio` ne plu ekzistas — la
+> iframe-/https-traktado nun estas en la parsilo mem (`RssParsilo`).
 
 ### `Elsendo` (`@Serializable`)
 

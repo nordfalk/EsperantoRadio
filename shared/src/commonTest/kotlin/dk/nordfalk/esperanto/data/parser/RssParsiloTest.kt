@@ -1197,4 +1197,18 @@ class RssParsiloTest {
         assertEquals("https://x.example/sono.mp3", elsendoj[0].fluo,
             "La audio-enclosure devas esti preferata super la bildo")
     }
+
+    // === Kruda ne-XML-a entito (&nbsp;) rekte en la fluo (C44g) ===
+
+    @Test
+    fun krudaNbspEnFluoNeRompasParsadon() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("kruda-nbsp.xml")
+        val kanalo = Kanalo(slug = "nbsptesto", nomo = "NBSP-Testo", podkastaRssUrl = "https://ekzemplo.test/feed")
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertEquals(1, elsendoj.size)
+        assertTrue(elsendoj[0].titolo.contains("42"), "titolo: ${elsendoj[0].titolo}")
+        assertEquals("https://ekzemplo.test/e42.mp3", elsendoj[0].fluo)
+    }
 }

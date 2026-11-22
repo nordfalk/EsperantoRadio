@@ -15,13 +15,16 @@
 | C9 | Parte: `jcenter()` forigita, sed la jcenter-URL ankoraŭ registrita kiel maven-repo; `verification-metadata.xml` mankas; dependabot.yml ekzistas. |
 | C15, C16, C21, C25, C30 | **SOLVITAJ 2026-11-20** (forigo de malnovaj aŭskultantoj en wasmJs; fermo de `rawStream` + KDoc de `saltiAl` sur Desktop; forigo de `LOCKED_BOOT_COMPLETED`; asertoj en `EkranfotoTesto`; KDoc en `LudvicoLogiko`) — punktoj forigitaj el ĉi tiu dosiero; verdaj: `:shared:desktopTest`, `:shared:compileKotlinWasmJs`, `:androidApp:assembleDebug`. |
 | C22, C40 | **SOLVITAJ 2026-11-20** (`lifecycleScope` anstataŭ propra ne-nuligebla scope en `MainActivity`; `-Xmx3g` en `gradle.properties`) — punktoj forigitaj; verdaj: `:androidApp:assembleDebug`, `:shared:desktopTest`. |
-| C26, C27, C32, C34 | Ankoraŭ aktualaj (kontrolita en la kodo). |
+| C26, C27, C32 | **SOLVITAJ 2026-11-20** (horloĝ-injekto en `HejmoViewModel`/`HejmoEkrano` + fiksa dato en la testo; pura `estasPasemaHttpStatuson` en commonMain + unuo-testo; tuŝ-celoj pligrandigitaj al 48 dp) — punktoj forigitaj; verda: `:shared:desktopTest`. |
+| C34 | Ankoraŭ aktuala (kontrolita en la kodo). |
 | C29 | **SOLVITA** — `resolutionStrategy.force` forigita; punkto forigita el ĉi tiu dosiero. |
 | C40 | **SOLVITA 2026-11-20** (`-Xmx3g`); punkto forigita. |
-| C41 | Parte: AGENTS.md ankoraŭ ne mencias la diagnozan ekranon; `docs/nova/02–04` ankoraŭ priskribas `puriguModeloj` (kiu fakte ekzistas en la kodo). |
-| C43, C44, C50, C51, C52, C54, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte). |
+| C41 | **SOLVITA 2026-11-20** (AGENTS.md mencias nun la diagnozan ekranon; `docs/nova/02/03` korektitaj pri `puriguModeloj`); punkto forigita. |
+| C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
+| C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
+| C50, C51, C52, C54, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte). |
 | C46 | Parte: neniuj novaj `ExoPlaybackException`-eraroj sur novaj buildoj (14 tagoj: nur 4 sur dist 246); sed lud-eraroj restas nevideblaj en Sentry (3-arg `logw` = loka). |
-| C47 | Ankoraŭ aktuala, sed malpliiĝanta: en 7 tagoj erar-eventoj nur sur dist 245/246 (unu uzanto); novaj buildoj produktas neniujn. |
+| C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
 | C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
 | C53 | Parte farita: HUMILOPINIE aldonita; restas kontroli "Una Vaga Idea"/"Cuéntame, Hermosura". |
 | C59 | Parte farita: `transsaltuKomenceSekundojn` ekzistas kun ĉiuj valoroj; restas (b) plena aŭtomatiĝo (`enkonduk-detekto`). |
@@ -54,56 +57,19 @@
 
 #### C9 — Gradle-higieno: dependency verification, Dependabot, jcenter
 - **Statuso**: [ ]
-- **Loko**: radika `build.gradle.kts` (`jcenter()` en `allprojects` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; neniu `dependabot.yml`
-- **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu Dependabot kaj OWASP `dependencyCheck` en CI; limigu `jcenter()` al la malnova projekto aŭ forigu ĝin iam.
-
-#### C26 — `HejmoEkranoTest` uzas realtempan daton
-- **Statuso**: [ ]
-- **Loko**: `shared/src/commonTest/.../ui/HejmoEkranoTest.kt:59` (`Clock.System.todayIn(TimeZone.UTC)`)
-- **Sugesto**: puraj testoj kun fiksa dato estus pli determinismaj (la limoj estas precize testitaj en `HejmoLogikoTest` kun fiksa dato). Notu: la dinamika dato estas intenca kontraŭ maljuniĝo de la testoj — plibonigo postulas horloĝ-injekton en la UI.
-
-#### C27 — Eraro-klasifiko: kerna decido al commonMain
-- **Statuso**: [ ]
-- **Loko**: `shared/src/androidMain/.../player/EraroKlasifiko.kt` (bone testita, sed nur kiel instrumentita testo, kiu ne ruliĝas en CI)
-- **Sugesto**: eligu la puran decidon (ekz. `klasifikuHttpStatuson(status: Int)`) al commonMain + unuo-testo; aŭ aldonu androidTest al CI per emulilo.
-
-#### C32 — Tuŝ-celoj sub 48 dp; `contentDescription = null`
-- **Statuso**: [ ]
-- **Loko**: `HejmoEkrano.kt:618-658` (tripunkta menuo 28.dp, ludo-butono 32.dp); `ElŝutitajEkrano.kt:140-148` (`IconButton` 36.dp); `App.kt` (Menuo-butono, `IconButton` sen `minimumTouchTargetSize`); `ElsendoEkrano.kt:332-411` (buton-ikonoj kun `contentDescription = null`)
-- **Sugesto**: `Modifier.minimumTouchTargetSize()` aŭ pligrandigo; aldonu `contentDescription` al la ikonoj.
+- **Loko**: radika `build.gradle.kts:25-27` (la jcenter-URL ankoraŭ registrita kiel `maven { url = ... }` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; `.github/dependabot.yml` ekzistas
+- **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu OWASP `dependencyCheck` en CI; limigu la jcenter-repon al la malnova projekto aŭ forigu ĝin iam.
 
 #### C34 — iOS: `PlatformLigilo` estas TODO; neniuj deep links
 - **Statuso**: [ ]
 - **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
 - **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
 
-#### C41 — AGENTS.md kaj docs malfruas post la kodo
-- **Statuso**: [ ]
-- **Loko**: AGENTS.md "Kio funkcias nun" kaj la dosieruja arbo ne mencias la diagnozan ekranon, `DiagnozoRegilo`/`DiagnozoEkrano`/`Diagnozo.kt`, nek la fonan aŭtomatan daŭrigon; `docs/nova/03_domajno_kaj_datumoj.md` kaj `docs/nova/05_dizajno_kaj_ui.md` ricevis nur tajpo-riparojn; `docs/nova/04` priskribas neekzistantajn `puriguModeloj`/`iframeReguloj` kaj malprecizan id-konvencion (vidu G15, G16)
-- **Sugesto**: 2-3 linioj en "Kio funkcias nun" + 3 linioj en la arbo; mallonga alineo en `docs/nova/03` pri `DiagnozoRegilo` (expect/actual); vicigu `docs/nova/04` kaj la kodon (G15/G16).
-
-#### C43 — Semantiko de `FilCache` kaj scio de `RssArkivServer` por la estonta servilo
-- **Statuso**: [ ]
-- **Priskribo**: (a) `ændrerSigIkke=true` = "kaŝita → neniam refreŝi" — tio igas `RssArkivServer-filcache/` la determinismajn golden-fixture-ojn; la nova plano diras nur "reuzo de Ktor-HttpCache + RssArkivServer-filcache" sen precizigi tiun semantikon. (b) La malnova `RomeFeedWriter` skribis `enclosure length` el la loka kaŝo kaj **per-jarajn arkivdosierojn** `feed-<slug>-<yyyy>.xml` — la nova plano tion ne mencias. (c) La plan-snippet vokas `parsilo.parsRss(fluo, kanal)` **sen** `httpKliento` — por Peranto tio signifas divenitajn, ofte malĝustajn, archive.org-URL-ojn en la arkivo — la servilo devas transdoni klienton kaj persistentan `ArchiveOrgDosiernomoKaŝo` (vidu ankaŭ G16 kaj G34). (d) La id-rondira problemo (G16) rekte tuŝas la inkrementan kunfandon de la plano.
-- **Sugesto**: ĝisdatigu `docs/nova/06_servilo_arkivo.md` antaŭ ol konstrui la servilon.
-
-#### C44 — Perditaj kontraŭ la malnova apo (konsideroj, ne nepre riparoj)
-- **Statuso**: [ ]
-- **Priskribo**: (a) redirect-host-guard kontraŭ kaptivaj portaloj (`Diverse.tjekOmdirigering`); (b) `serverCurrentTimeMillis` (kontraŭ aparata horloĝ-eraro); (c) la regulo ">95% → rekomencu de 0" de la malnova ludilo (`Afspiller.onPrepared`) — nun nur la `finita`-flago; (d) "elŝuti nur per WiFi" (`hentKunOverWifi`); (e) perioda refreŝo (malnova: kanalo ĉiujn 30 s, grunddata ĉiujn 30 min — nova: nur tiral-aktualigo kaj eniro al ekrano); (f) fora elŝuto de la kanalkonfiguro kaj radio.txt dum rultempo (nun nur bundled; atentu: la `muzaiko`-RSS en la agordo estas ekstere gastigata); (g) ksoup `parseXml` kaj krudaj ne-XML-aj entitoj (`&nbsp;` rekte en la fluo) — rekomendas golden-teston kun kruda `&nbsp;`.
-- **Sugesto**: decidu intence, kiuj el ili estos reenkondukitaj; almenaŭ (c) kaj (g) estas malmultekostaj.
-
 #### C46 — KMP-H: `ExoPlaybackException: Source error` (544 okazoj / 30 uzantoj ekde 2026-09-13; malpliiĝas)
 - **Statuso**: [ ]
 - **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-H](https://esperantoradio.sentry.io/issues/KMP-H); 42 okazoj / 5 uzantoj en la lasta semajno, lasta evento sur dist 248, 10-14)
 - **Priskribo**: Plejparte ret-kulpaj kaŭzoj (`UnknownHostException`, `HttpDataSource$InvalidResponseCodeException`, timeout) — atendataj fiaskoj, sed ili nutras ankaŭ K1 (fiasko de la fonto prokrastas `startForeground()`). **Ĉar** ekde 249 (PR #109) `onPlayerErrorChanged` uzas `logw(tag, msg, e)` (3-arg = nur loka, la escepto ne plu atingas Sentry), la malpliiĝo de KMP-H post 10-14 estas grandparte **redukto de videbleco, ne pliboniĝo de stabileco** — sur 249-aparatoj lud-eraroj plu okazas, sed estas nevideblaj en Sentry.
 - **Sugesto**: unu aŭtomata reprovo ĉe fon-eraro en `LudvicoRegilo`; pli klara uzantmesaĝo; kontroli mortajn fluo-URL-ojn (ligu kun G44 — `media.vaticannews.va`). Se oni volas plu vidi lud-erarojn en Sentry, raportu ilin per 2-arg `logw` (Sentry-averto, videbla en Logs) aŭ kiel specimenata `loge` — intenca decido pro la kvoto.
-
-#### C47 — Malnovaj buildoj (dist ≤ 248) daŭre raportas erarojn, kiujn novaj buildoj ne plu sendas
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (KMP-G "Aŭtoludo: …" 758 okazoj / 85 uzantoj — lasta evento sur dist 246/3.0.2; KMP-N "RSS-malsukcesa …" 1227 / 57 — lasta sur dist 245/3.0.1; ambaŭ vivas nur sur aparatoj kun dist ≤ 246)
-- **Priskribo**: **Ne solvita, nur malpliigite videbla**: "Aŭtoludo:"-mesaĝoj estis forigitaj (PR #107, en v3.0.3 ekde dist 247 — pro kvoto-plenigo per `captureMessage`); "RSS-malsukcesa" kaj lud-eraroj (KMP-H) estis malaltigitaj al `logw(tag, msg, e)` (PR #93 kaj #109), kio estas **nur loka** — la subaj problemoj (aŭtoludo fiaskas, fluoj neatingeblaj, fontoj mortaj) daŭre okazas, sed ekde 249 ili estas nevideblaj en Sentry krom kiel avertaj protokoloj (2-arg `logw` → `Sentry.logger.warn`). Ankaŭ la escepto-bazitaj retaj issues (KMP-12/14/15/M/Q — timeout/connect/DNS) venas nun nur de malnovaj buildoj: en la aktuala kodo ambaŭ ŝargo-vojoj (deponejo kaj `NovajElsendojKontroloWorker:140`) kaptas per 3-arg `logw` (loka). La eraro-taso kolapsis post 10-14 (225/tago → 1–3/tago) grandparte pro tio plus la 50 %-a specimenado (PR #109) — tio ne provas pliboniĝon de la stabileco.
-- **Sugesto**: versio-bazita `beforeSend`-forĵeto por eldonoj ≤ 3.0.2 (ligita al FAROTA C45 — la ĝisdatebla centra listo; AGENTS.md avertas ne malmoligi la liston en la apo); alternative: en Sentry ignori la eldonojn ≤ 3.0.2 aŭ marki la koncernajn problemojn "ne plu riparebla". Se la videbleco de aŭtoludo/RSS/ludado gravas, raportu ilin intence kiel avertojn (vidu C46).
-- **Ĝisdatigo 2026-10-27**: ankoraŭ aktuala — 55 erar-eventoj sur dist 248 kaj 30 sur 246 en 14 tagoj; ĉiuj erar-eventoj de la periodo venas de dist ≤ 249, dum 3.1.0 (252) produktis neniujn (nur `logw`-avertojn). La problemo malkreskos nature dum la uzantoj ĝisdatiĝas. KMP-1 ("Sentry-testo") montriĝis intenca provo-eraro (dist 1, release 0.1) — ignorita en Sentry.
 
 #### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
 - **Statuso**: [ ]

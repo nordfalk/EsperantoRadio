@@ -37,9 +37,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.TimeZone
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
-import kotlinx.datetime.todayIn
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -50,13 +49,14 @@ import kotlin.test.assertTrue
  * Uzas falsan ElsendoDeponejo kiu liveras realajn testelsendojn
  * por "Kio novas" kaj "Kio popularas".
  *
- * Datoj estas kalkulitaj dinamike rilate al hodiaŭ por ke la testoj
- * ĉiiam validu (ne malnoviĝu post 6 monatoj).
+ * Datoj estas fiksaj (2026-11-20) — la horloĝo estas injektita en la
+ * ViewModel kaj la ekrano (C26), do la testoj estas plene determinismaj
+ * kaj ne malnoviĝas.
  */
 @OptIn(ExperimentalTestApi::class, ExperimentalTime::class)
 class HejmoEkranoTest {
 
-    private val hodiaŭ = Clock.System.todayIn(TimeZone.UTC)
+    private val hodiaŭ = LocalDate(2026, 11, 20)
 
     private fun datoAntaŭ(tagoloj: Int): String =
         (hodiaŭ.minus(DatePeriod(days = tagoloj))).toString()
@@ -109,6 +109,7 @@ class HejmoEkranoTest {
     fun malsuprenTiroRefreŝigasKunForto() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
@@ -131,6 +132,7 @@ class HejmoEkranoTest {
     fun montrasSekciojn() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
@@ -147,6 +149,7 @@ class HejmoEkranoTest {
     fun montrasKanalNomojnEnElsendoj() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
@@ -164,6 +167,7 @@ class HejmoEkranoTest {
     fun montrasElsendojnEnKioNovas() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
@@ -187,6 +191,7 @@ class HejmoEkranoTest {
     fun montrasAĝajnEmblemetojn() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
             )
@@ -224,6 +229,7 @@ class HejmoEkranoTest {
         )
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
                 elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
             )
@@ -262,6 +268,7 @@ class HejmoEkranoTest {
         runBlocking { ludatoj.registriPozicion("nova:1", "nova", pozicioMs = 252_000, daŭroMs = 600_000) }
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
                 elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
                 ludatojDeponejo = ludatoj,
@@ -294,6 +301,7 @@ class HejmoEkranoTest {
         runBlocking { ludatoj.registriPozicion("kp:1", "kernpunkto", pozicioMs = 252_000, daŭroMs = 600_000) }
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
                 elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
                 ludatojDeponejo = ludatoj,
@@ -323,6 +331,7 @@ class HejmoEkranoTest {
         }
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(kanaloj),
                 elsendoDeponejo = falsaElsendoDeponejo(elsendoj),
             )
@@ -350,7 +359,7 @@ class HejmoEkranoTest {
             Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Epizodo 2", fluo = "", dato = datoAntaŭ(2)),
         )
         val ludatoj = LudatojDeponejoMaketo()
-        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), ludatoj)
+        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), ludatoj, hodiaŭ = { hodiaŭ })
         vm.plenigu(kanaloj, elsendoj)
 
         // Ludado vere ekis por kp:1
@@ -373,7 +382,7 @@ class HejmoEkranoTest {
         val elsendoj = (1..12).map { i ->
             Elsendo(id = "kp:$i", kanaloSlug = "kernpunkto", titolo = "Epizodo $i", fluo = "", dato = datoAntaŭ(i))
         }
-        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), null)
+        val vm = HejmoViewModel(falsaKanaloDeponejo(kanaloj), falsaElsendoDeponejo(elsendoj), null, hodiaŭ = { hodiaŭ })
         vm.plenigu(kanaloj, elsendoj)
         val unua = vm.popularajElsendoj.value
         assertTrue(unua.isNotEmpty(), "Kio popularas devas havi kandidatojn")
@@ -398,6 +407,7 @@ class HejmoEkranoTest {
         var agordojKlakoj = 0
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 onAgordoj = { agordojKlakoj++ },
@@ -434,6 +444,7 @@ class HejmoEkranoTest {
         val kaŝitaj = MutableStateFlow(emptySet<DiagnozoTipo>())
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 onKaŝuHejmajnAvertojn = {
@@ -467,6 +478,7 @@ class HejmoEkranoTest {
     fun avertokartoNeAperasSeKaŝita() = runComposeUiTest {
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 diagnozoProblemoj = MutableStateFlow(listOf(avertaProblemo())),
@@ -484,6 +496,7 @@ class HejmoEkranoTest {
         var kanalaroVokita = false
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 onKanalaro = { kanalaroVokita = true },
@@ -511,6 +524,7 @@ class HejmoEkranoTest {
         val tirkestStato = DrawerState(DrawerValue.Closed)
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 tirkestStato = tirkestStato,
@@ -541,6 +555,7 @@ class HejmoEkranoTest {
         val tirkestStato = DrawerState(DrawerValue.Closed)
         setContent {
             HejmoEkrano(
+                nunaDatumo = hodiaŭ,
                 kanaloDeponejo = falsaKanaloDeponejo(),
                 elsendoDeponejo = falsaElsendoDeponejo(),
                 tirkestStato = tirkestStato,

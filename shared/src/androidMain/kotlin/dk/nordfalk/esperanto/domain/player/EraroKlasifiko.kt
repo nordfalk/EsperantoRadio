@@ -26,11 +26,12 @@ private fun estasPasemaErarKodo(kodo: Int): Boolean = when (kodo) {
     else -> false
 }
 
-/** Serĉas HTTP 5xx en la kaŭz-ĉeno (InvalidResponseCodeException.responseCode). */
+/** Serĉas HTTP 5xx en la kaŭz-ĉeno (InvalidResponseCodeException.responseCode);
+ *  la pura decido mem estas en commonMain: [EraroKlasifiko.estasPasemaHttpStatuson]. */
 private fun estasServilaEraro(error: PlaybackException): Boolean {
     var kaŭzo: Throwable? = error
     while (kaŭzo != null) {
-        if (kaŭzo is HttpDataSource.InvalidResponseCodeException && kaŭzo.responseCode in 500..599) return true
+        if (kaŭzo is HttpDataSource.InvalidResponseCodeException && EraroKlasifiko.estasPasemaHttpStatuson(kaŭzo.responseCode)) return true
         kaŭzo = kaŭzo.cause
     }
     return false

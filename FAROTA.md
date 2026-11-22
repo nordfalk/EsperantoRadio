@@ -16,7 +16,7 @@
 | C15, C16, C21, C25, C30 | **SOLVITAJ 2026-11-20** (forigo de malnovaj aŭskultantoj en wasmJs; fermo de `rawStream` + KDoc de `saltiAl` sur Desktop; forigo de `LOCKED_BOOT_COMPLETED`; asertoj en `EkranfotoTesto`; KDoc en `LudvicoLogiko`) — punktoj forigitaj el ĉi tiu dosiero; verdaj: `:shared:desktopTest`, `:shared:compileKotlinWasmJs`, `:androidApp:assembleDebug`. |
 | C22, C40 | **SOLVITAJ 2026-11-20** (`lifecycleScope` anstataŭ propra ne-nuligebla scope en `MainActivity`; `-Xmx3g` en `gradle.properties`) — punktoj forigitaj; verdaj: `:androidApp:assembleDebug`, `:shared:desktopTest`. |
 | C26, C27, C32 | **SOLVITAJ 2026-11-20** (horloĝ-injekto en `HejmoViewModel`/`HejmoEkrano` + fiksa dato en la testo; pura `estasPasemaHttpStatuson` en commonMain + unuo-testo; tuŝ-celoj pligrandigitaj al 48 dp) — punktoj forigitaj; verda: `:shared:desktopTest`. |
-| C34 | Ankoraŭ aktuala (kontrolita en la kodo). |
+| C34 | Forigita 2026-11-20: la TODOj jam estas en la iOS-kodo (`PlatformLigilo.kt` + deep-link-noto); deep links restas parto de C58. |
 | C29 | **SOLVITA** — `resolutionStrategy.force` forigita; punkto forigita el ĉi tiu dosiero. |
 | C40 | **SOLVITA 2026-11-20** (`-Xmx3g`); punkto forigita. |
 | C41 | **SOLVITA 2026-11-20** (AGENTS.md mencias nun la diagnozan ekranon; `docs/nova/02/03` korektitaj pri `puriguModeloj`); punkto forigita. |
@@ -53,11 +53,7 @@
 - **Loko**: radika `build.gradle.kts:25-27` (la jcenter-URL ankoraŭ registrita kiel `maven { url = ... }` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; `.github/dependabot.yml` ekzistas
 - **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu OWASP `dependencyCheck` en CI; limigu la jcenter-repon al la malnova projekto aŭ forigu ĝin iam.
 
-#### C34 — iOS: `PlatformLigilo` estas TODO; neniuj deep links
-- **Statuso**: [ ]
-- **Loko**: `shared/src/iosMain/.../ui/PlatformLigilo.ios.kt` (`malfermuLigon`/`malfermuRetpoŝton` malplenaj); neniu `ACTION_VIEW` intent-filter
-- **Sugesto**: konata limito (iOS venos); se iam bezonataj, aldonu deep links kaj traktu la URL-on en `MainActivity.traktuIntenton`.
-
+#### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
 - **Statuso**: [ ]
 - **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ = 1 MB` (la plej granda konata legitima fluo ~310 KB).
@@ -68,15 +64,6 @@
   Sentry la escepto-nomon `RespondoTroGrandaException` aŭ la protokolon "transpasas la
   limon": se ĝi aperas por reala fluo (ne por misdirektita MP3), levu
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ` aŭ serĉu la kaŭzon en la koncerna kanalo.
-
-#### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
-- **Statuso**: [ ]
-- **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
-  1 MB (la plej granda konata legitima fluo ~310 KB).
-- **Priskribo**: Se iam reala kanal-fluo transpasos 1 MB, la kanalo silente ne ŝargiĝos —
-  la escepto estas nur `logw`-averto, ne eraro. Tio estas intence (memor-protekto), sed necesas observo.
-- **Sugesto**: periode (ekz. ĉiusemajne, per la skill-o `sentry-esplorado`) serĉi en
-  Sentry `RespondoTroGrandaException` aŭ "transpasas la limon".
 
 #### C50 — Eldonaj kanaloj ekster Google Play: F-Droid, Aptoide
 - **Statuso**: [ ]

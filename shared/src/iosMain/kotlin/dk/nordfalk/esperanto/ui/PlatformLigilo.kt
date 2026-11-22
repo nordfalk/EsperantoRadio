@@ -1,5 +1,8 @@
 package dk.nordfalk.esperanto.ui
 
+// TODO (iOS ankoraŭ sen Xcode-projekto): deep links / universal links ankoraŭ ne estas
+// agorditaj — vidu FAROTA C58 ("white label"-ligilo) kaj C34 en la git-historio.
+
 actual fun malfermuLigon(url: String) {
     // TODO: UIKit UIApplication.shared.open(url)
 }

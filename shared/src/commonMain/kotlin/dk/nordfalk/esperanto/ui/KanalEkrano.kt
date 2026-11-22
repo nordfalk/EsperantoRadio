@@ -410,8 +410,7 @@ private fun KanalInformoj(kanalo: Kanalo, ludilo: LudiloRegilo?, evoluo: Boolean
             AsyncImage(
                 model = kanalo.emblemoUrl,
                 contentDescription = "Emblemo de ${kanalo.nomo}",
-                // kvadrataj emblemoj ne plenigu tro da vertikala spaco —uzu la altecon
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxWidth().heightIn(max = 220.dp).clip(RoundedCornerShape(12.dp))
             )
         } else {

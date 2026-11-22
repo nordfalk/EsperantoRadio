@@ -411,7 +411,7 @@ fun HejmoEkrano(
     ludvicoVico: StateFlow<List<Elsendo>>? = null,
     onLudvico: () -> Unit = {},
     viewModel: HejmoViewModel? = null,
-    /** Hodiaŭa dato por aĝ-kalkuloj — injektebla en testoj (C26). */
+    /** Hodiaŭa dato por aĝ-kalkuloj — injektebla en testoj. */
     nunaDatumo: LocalDate = Clock.System.todayIn(TimeZone.UTC),
 ) {
     val vm = viewModel ?: AppStato.hejmoViewModel ?: remember { HejmoViewModel(kanaloDeponejo, elsendoDeponejo, ludatojDeponejo, hodiaŭ = { nunaDatumo }) }

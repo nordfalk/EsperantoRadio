@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
@@ -159,6 +160,16 @@ fun KanaloEkrano(
                             contentDescription = if (estasPlejŝatata) "Forigi ŝaton" else "Aldoni ŝaton",
                             tint = MaterialTheme.colorScheme.primary
                         )
+                    }
+                    // (C54) kopii la RSS-URL de la kanalo por aboni ĝin en alia podkasta apo
+                    kanalo.podkastaRssUrl?.let { rss ->
+                        IconButton(onClick = {
+                            logi("Klako", "kopii RSS-URL: ${kanalo.slug}")
+                            kopiuTekston(rss)
+                            scope.launch { snackbarStato.showSnackbar("RSS-URL kopiita en la poŝo.") }
+                        }) {
+                            Icon(Icons.Filled.ContentCopy, contentDescription = "Kopii RSS-URL")
+                        }
                     }
                 }
             )

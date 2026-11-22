@@ -27,3 +27,13 @@ actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
         logw("Ligilo", "Ne povas malfermi retpoŝto-programon", e)
     }
 }
+
+actual fun kopiuTekston(teksto: String) {
+    try {
+        val poŝo = java.awt.Toolkit.getDefaultToolkit().systemClipboard
+        poŝo.setContents(java.awt.datatransfer.StringSelection(teksto), null)
+        logi("Ligilo", "Teksto kopiita en la poŝo (${teksto.length} signoj)")
+    } catch (e: Exception) {
+        logw("Ligilo", "Ne povas kopii en la poŝo", e)
+    }
+}

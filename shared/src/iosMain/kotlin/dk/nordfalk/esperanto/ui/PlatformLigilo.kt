@@ -7,3 +7,7 @@ actual fun malfermuLigon(url: String) {
 actual fun malfermuRetpoŝton(retpoŝto: String, temo: String, teksto: String) {
     // TODO: MFMailComposeViewController
 }
+
+actual fun kopiuTekston(teksto: String) {
+    platform.UIKit.UIPasteboard.generalPasteboard.setString(teksto)
+}

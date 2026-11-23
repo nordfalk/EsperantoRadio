@@ -389,11 +389,11 @@ La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio
 projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109)
 — **kaj nur kiam la erar-raportado estas ŝaltita** (agordo `erar_raportado`;
-dumoda defaŭlto laŭ `BuildConfig.SEN_NIA_SUBSKRIBO`, PR #148/C50: konstruo
-sen nia subskribo (F-Droid) = opt-in kun unufoja konsento-demando ĉe la unua
-starto; konstruo kun nia subskribo (Play/Aptoide) = defaŭlte ŝaltita,
-malŝaltebla en Agordoj → Privateco — sen la opt-in F-Droid atribuus la
-kontraŭecon "Tracking").
+defaŭlto RUTEMPA laŭ la subskriba atestilo de la APK, PR #148/C50 +
+MR !55129/2026-11-22: fremda subskribo (F-Droid) = opt-in kun unufoja
+konsento-demando ĉe la unua starto; nia subskribo (Play/Aptoide/GitHub) =
+defaŭlte ŝaltita, malŝaltebla en Agordoj → Privateco — sen la opt-in F-Droid
+atribuus la kontraŭecon "Tracking").
 Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
 skill-on **`sentry-esplorado`**.
 

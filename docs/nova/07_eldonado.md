@@ -187,39 +187,62 @@ Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
 `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` igas F-Droid-on
 aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
-### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, dumoda)
+### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, ĝisdatigita 2026-11-22)
 
 La apo sendis erarojn kaj protokolojn al sentry.io defaŭlte, sen konsento —
 laŭ la F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio
 estus la kontraŭeco **Tracking**. Ekde PR #148 (2026-10-29) la defaŭlto
-dependas de la konstruo (`BuildConfig.SEN_NIA_SUBSKRIBO` en
-`androidApp/build.gradle.kts` — vera kiam la keystore mankis dum la konstruo):
+dependas de la subskriba atestilo de la APK. Ekde 2026-11-22 tio estas
+kontrolata RUTEMPE ĉe starto (`estasSubskribitaPerNiaAtestilo()` en
+`EsperantoRadioAplikaĵo.kt`, per `PackageManager` + SHA-256), NE plu per
+`BuildConfig.SEN_NIA_SUBSKRIBO` — konstruo-dependa valoro en la APK
+malebligus bit-identan reprodukteblan konstruon (F-Droid RB, MR !55129):
 
-- **Konstruo sen nia subskribo** (tiel F-Droid konstruas): **opt-in** —
+- **APK kun fremda subskribo** (tiel F-Droid subskribas): **opt-in** —
   defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto. La apo ne
   ricevas la kontraŭecon "Tracking".
-- **Konstruo kun nia subskribo** (Google Play, Aptoide): **defaŭlte ŝaltita**,
-  sen demando — la uzanto povas malŝalti en Agordoj → Privateco
-  ("Sendu erar-raportojn"). Ĉe malŝalto iras unu LASTA protokolo al Sentry
-  ("malŝaltita de la uzanto"), ĉe (re)ŝalto unu protokolo ("(re)ŝaltita").
+- **APK kun nia subskribo** (Google Play, Aptoide, GitHub-releases):
+  **defaŭlte ŝaltita**, sen demando — la uzanto povas malŝalti en Agordoj →
+  Privateco ("Sendu erar-raportojn"). Ĉe malŝalto iras unu LASTA protokolo al
+  Sentry ("malŝaltita de la uzanto"), ĉe (re)ŝalto unu protokolo ("(re)ŝaltita").
 
+La konduto do ne ŝanĝiĝis por la uzanto; ŝanĝiĝis nur KIAM ĝi decidiĝas
+(rultempe, ne dum la konstruo). La eks-kontrolo baziĝis sur
+`BuildConfig.SEN_NIA_SUBSKRIBO` (vera kiam la keystore mankis dum la
+konstruo) — tio diferencigus la APK-bitokojn inter konstru-medioj kaj estas
+nun forigita.
 Ambaŭ reĝimoj: ŝanĝoj de la protokolo-fluo ekvalidas tuj, kraŝ-raportoj
-(nekapteblaj esceptoj) post restartigo. Kontrolite 2026-10-29 en ambaŭ
-konstruoj (pura worktree → SEN_NIA_SUBSKRIBO=true; loke kun keystore → false).
+(nekapteblaj esceptoj) post restartigo.
 Sekvo por la Sentry-esplorado (C48/C49/G44): la telemetrio el F-Droid-uzantoj
 malpliiĝas (nur konsentintoj raportas); Play-uzantoj plu raportas kaj iliaj
 malŝaltoj/reŝaltoj aperiĝos kiel logGrava-eventoj.
 
-### Reprodukteblaj konstruoj (opcia, estonta)
+### Reprodukteblaj konstruoj (RB) — FARBAS (MR !55129, 2026-11-22)
 
-Norma F-Droid-konstruo estas subskribita per la F-Droid-ŝlosilo. Se ni iam volas,
-ke F-Droid disdonu NIAN APK-on kun nia subskribo (sen re-instalo inter
-F-Droid- kaj Play-uzantoj), la konstruo devas esti bit-identa:
+Norma F-Droid-konstruo estas subskribita per la F-Droid-ŝlosilo. La
+F-Droid-revizianto demandis en MR !55129 („Why no RB?“) — ekde 2026-11-22 la
+konstruo estas pretigita bit-identa:
 
 - `dependenciesInfo { includeInApk = false; includeInBundle = false }` en
   `androidApp/build.gradle.kts` (vidu https://gitlab.com/fdroid/fdroiddata/-/issues/3330)
+- la telemetria defaŭlto ne plu bakeblas en la APK: rultempa kontrolo de la
+  subskriba atestilo (vidu la Sentry-sekcion supre)
+- Kontrolite 2026-11-22: du sendependaj konstruoj de la sama fontstato
+  produktas bit-identan APK-on (`9e6acc63…`; clean + assembleRelease
+  nesubskribita, kaj clean + `--rerun-tasks --no-build-cache`)
 - `AllowedAPKSigningKeys: aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16`
-  en la metadateno (SHA-256 de nia subskriba atestilo, 2026-10-29)
+  (SHA-256 de nia subskriba atestilo, 2026-10-29) — en la metadateno kiam ni
+  ankaŭ petos la `Binaries`-vojon
+
+POR FARI por vera RB-konfirmo de F-Droid:
+
+1. Venonta eldono (nova git-etikedo, ekz. `v3.1.2`) devas havi versionCode, kiu
+   kongruas inter Play kaj la etikedo (unu numero — la 253/254-dissplitiĝo de
+   3.1.1 ne ripetebla).
+2. Subskribita APK de la etikedo publikigita en GitHub-releases (F-Droid
+   konstruas el la etikedo kaj komparas malpostsubskribe).
+3. Ĝisdatigita yml (new versionName/versionCode/commit + `AllowedAPKSigningKeys`)
+   + respondo en la MR-fadeno.
 
 ### Propra F-Droid-repo (opcia)
 

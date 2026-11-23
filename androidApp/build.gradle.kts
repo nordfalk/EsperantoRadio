@@ -74,10 +74,11 @@ android {
 
     // Ĉu ĈI TIU konstruo okazas SEN nia subskriba keystore — tiel F-Droid kaj
     // senkolora CI konstruas (la release-konstruo subskribiĝas nur kiam la
-    // keystore ekzistas, vidu malsupre). Uzata por la defaŭlto de la
-    // erar-raportado: sen nia subskribo → opt-in (konsento-demando, F-Droid);
-    // kun nia subskribo (Google Play, Aptoide) → defaŭlte ŝaltita (opt-out).
-    // C50/PR #148. En debug-konstruoj la valoro estas senefika (ne raportas).
+    // keystore ekzistas, vidu malsupre). NUR por la SUBSKRIBO mem — NENIU alia
+    // parto de la APK rajtas dependi de ĝi, ĉar la konstruo devas esti
+    // bit-identa (reproduktebla konstruo, F-Droid RB, MR !55129, 2026-11-22).
+    // La eks-BuildConfig.SEN_NIA_SUBSKRIBO (telemetria defaŭlto) translokiĝis al
+    // RUTEMPA kontrolo de la subskriba atestilo (EsperantoRadioAplikaĵo.kt).
     // findByName (ne getByName!): fdroidserver FORIGAS la signingConfigs-blokon
     // el build.gradle(.kts) antaŭ ol konstrui (remove_signing_keys) — getByName
     // tiam ĵetus "SigningConfig with name 'release' not found"; findByName
@@ -101,13 +102,20 @@ android {
         // Ĝisdatigu KUN la apoversio en gradle/libs.versions.toml (eldonado-skill-o).
         versionName = "3.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("boolean", "SEN_NIA_SUBSKRIBO", senNiaSubskribo.toString())
         buildConfigField("String", "GIT_BRANCHO", "\"$branĉoPorAgordoj\"")
     }
 
     buildFeatures {
-        // BuildConfig.SEN_NIA_SUBSKRIBO (supre) bezonas BuildConfig-klason
+        // BuildConfig.GIT_BRANCHO (supre) bezonas BuildConfig-klason
         buildConfig = true
+    }
+
+    // Reproduktebla konstruo (F-Droid RB, MR !55129): la dependaĵoj-bloko en
+    // la APK malkasas la subskriban atestilon kaj rompas bit-identecon —
+    // vidu https://gitlab.com/fdroid/fdroiddata/-/issues/3330
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 
     buildTypes {

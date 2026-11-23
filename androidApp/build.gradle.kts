@@ -90,15 +90,16 @@ android {
         applicationId = "dk.nordfalk.esperanto.radio"
         minSdk = 26
         targetSdk = 36
-        // 253 estis konsumita de la interna testo "3.1.1-beta29okt" (PR #144, nekunfandita);
-        // la vera 3.1.1 eldoniĝas kiel 254. La etikedo v3.1.1 (253) restas por F-Droid —
-        // ilia versionumejo estas sendependa, la fdroid-yml (253) kongruas kun ĝi.
-        versionCode = 254
+        // Uzitaj versionCode (kanona listo: .vibe/skills/eldonado/SKILL.md paŝo 2):
+        // 246=3.0.2 … 252=3.1.0, 253=3.1.1-beta29okt (interna), 254=3.1.1,
+        // 255=3.2.0-beta06nov (interna), 256/257=3.1.2-beta/alfa19nov (interna),
+        // 258=3.2.0. versionCode NE reuzeblas (Play-API rifuzas).
+        versionCode = 258
         // LAŬVORTE (ne el libs.versions.toml): la F-Droid-ĝisdatigilo parsas
         // versionName per regex, kiu bezonas cititan signoĉenon —
         // `libs.versions.apoversio.get()` estas por ĝi nelegebla.
         // Ĝisdatigu KUN la apoversio en gradle/libs.versions.toml (eldonado-skill-o).
-        versionName = "3.1.1"
+        versionName = "3.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "SEN_NIA_SUBSKRIBO", senNiaSubskribo.toString())
         buildConfigField("String", "GIT_BRANCHO", "\"$branĉoPorAgordoj\"")

@@ -16,6 +16,12 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- (nenio ankoraŭ)
+
+## [3.2.0] - 2026-11-23
+
+### Aldonita
+
 - Kanalkonfiguro elŝutiĝas de la servilo je ĉiu starto kaj konserviĝas — ŝanĝoj de kanaloj kaj novaĵoj efikas sen ĝisdatigo de la apo (https://github.com/nordfalk/EsperantoRadio/pull/195)
 - Radio Frei: elsendoj (TURINGIO INTERNACIA) denove aperas en la apo — nia arkiv-servilo generas la fluon el la HTML-mediatheko de radio-frei.de (https://github.com/nordfalk/EsperantoRadio/pull/194)
 - Novaĵ-dialogo de la apo: faldebla sekcio «Pasintaj novaĵoj» plej sube (https://github.com/nordfalk/EsperantoRadio/pull/184)
@@ -39,9 +45,6 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Debug-konstruo (alfaversio) montras «EsperαntoRαdio alfa» kiel titolo en la hejmoekrano, por ke oni tuj vidas ke ne temas pri la eldona versio (https://github.com/nordfalk/EsperantoRadio/pull/169)
 - En Agordoj aperas la nomo de la git-branĉo post la versio, se la apo estas konstruita el branĉo (ne el master) (https://github.com/nordfalk/EsperantoRadio/pull/172)
 - La butono «Venonta» en la ludada sciigo markas la nunan elsendon kiel plene aŭskultita — la apo ne plu revenas al ĝi per resumigo aŭ aŭtomata sekva ludado (https://github.com/nordfalk/EsperantoRadio/pull/193)
-
-### Ŝanĝita
-
 - Mini-ludilo: enfoldigite ĝi montras nur la informojn kaj la paŭzan butonon, kaj klako sur la titolo elfaldas ĝin; en la elfaldita stato aperas la enfoldiga sago, kaj la paŭzo- kaj halt-butonoj translokiĝis inter la reen-/antaŭen-butonojn (kaj nur tien), kaj klako sur la titolo navigas al la detaloj; la ludvico-butono translokiĝis al la supra menua linio, kie ĝi videblas nur se la ludvico enhavas elementojn (https://github.com/nordfalk/EsperantoRadio/pull/168)
 
 ### Riparita
@@ -210,6 +213,7 @@ Kompar-ligoj por Keep a Changelog. kiam vi eldonas version, aldonu:
 Post kiam la etikedo v3.0.0 estos kreita sur la eldona komito 294834b,
 anstataŭigu la haketaĵon per la etikedo:
 -->
+[3.2.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/nordfalk/EsperantoRadio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/nordfalk/EsperantoRadio/compare/v3.0.2...v3.0.3

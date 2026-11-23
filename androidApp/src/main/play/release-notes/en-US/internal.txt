@@ -1,6 +1,8 @@
-Nova en 3.1.1:
+Versio 3.2.0 🎉 kun amaso da novaĵoj:
 
-- Nova agordo »Sendu erar-raportojn« (Agordoj → Privateco): en eldonoj el eksteraj vendejoj ĝi petas vian permeson unue
-- Riparo: samtempa ŝargo de la sama kanalo ne plu elŝutas la fluon duoble
-- Riparo: ludo komencita per klako sur sciigo ne plu restartas dum ekranturno
-- Serĉo: rezultoj grupigitaj laŭ graveco; serĉo-butono en la supra breto de la hejmo-ekrano
+📻 Novaj kanaloj: HUMILOPINIE kaj Radio FM Esperanto (Kubo) — Radio Frei revenis!
+🤖 Elsendoj sen priskribo ricevas AI-priskribojn el la sono mem
+📡 Kanalaro kaj novaĵoj venas de la servilo — novaj kanaloj aperos sen ap-ĝisdatigo
+🔊 Vivaj kanaloj montras la nunan programon en la mini-ludilo
+⏭️ Ripetaj enkondukoj de elsendoj transsaltiĝas (malŝaltebla en agordoj)
+⚡ Pli rapida ŝargado

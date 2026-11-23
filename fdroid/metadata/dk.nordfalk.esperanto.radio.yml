@@ -32,8 +32,17 @@ Builds:
     scanignore:
       - build.gradle.kts
 
+  - versionName: 3.2.0
+    versionCode: 258
+    commit: v3.2.0
+    subdir: androidApp
+    gradle:
+      - yes
+    scanignore:
+      - build.gradle.kts
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
 UpdateCheckName: Ignore
-CurrentVersion: 3.1.1
-CurrentVersionCode: 253
+CurrentVersion: 3.2.0
+CurrentVersionCode: 258

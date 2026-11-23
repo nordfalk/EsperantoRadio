@@ -58,7 +58,8 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    konvencio «beta-eldono = interna testo» estis klarigita; 255/256 eldonitaj
    el la PR-branĉo SEN komiti la eldon-libraron, nur la versionCode restas konsumita),
    257=3.1.2-alfa19nov (INTERNA TESTO, 2026-11-19, el PR #175, trako `internal` —
-   la kutima «faru beta-eldonon» de la posedanto).
+   la kutima «faru beta-eldonon» de la posedanto),
+   258=3.2.0 (2026-11-23).
 3. **Alinomu `## [Neeldonita]` al `## [X.Y.Z] - JJJJ-MM-TT`** en CHANGELOG.md kaj malfermu
    novan malplenan `## [Neeldonita]`-sekcion; aldonu kompar-ligon malsupre
    (`[X.Y.Z]: https://github.com/nordfalk/EsperantoRadio/compare/vANTAŬA...vX.Y.Z`).

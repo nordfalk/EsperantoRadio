@@ -118,6 +118,19 @@
     nekunfandita PR #144; ekde v3.1.2 la kodoj re kongruos).
   - **Sentry-telemetrio** (C48/C49/G44): el F-Droid-uzantoj nur konsentintoj
     plu raportos; la malpliiĝo estas atendata, ne incidento.
+- **Stato (2026-11-22)**: la revizianto demandis en la MR-fadeno
+  „Why no RB? Provide reason else put Binaries and AllowedAPKSigningKeys in
+  yaml and release signed apk in github releases". Ni elektis **plenajn RB**:
+  - `BuildConfig.SEN_NIA_SUBSKRIBO` forigita — la telemetria defaŭlto decidiĝas
+    RUTEMPE per la subskriba atestilo de la APK
+    (`estasSubskribitaPerNiaAtestilo()`, SHA-256-komparo);
+  - `dependenciesInfo { includeInApk = false; includeInBundle = false }`;
+  - kontrolite: du sendependaj konstruoj de la sama fontstato -> bit-identa
+    nesubskribita APK (haketo `9e6acc63…`);
+  - RESTAS: venonta eldono kun kongrua versionCode (ekde v3.1.2 re unu
+    numero), subskribita APK en GitHub-releases, ĝisdatigita yml
+    (+ `AllowedAPKSigningKeys`/`Binaries`), respondo en la MR-fadeno.
+    Detaloj: docs/nova/07_eldonado.md -> „Reprodukteblaj konstruoj (RB)".
 - **Restas poste**: (1) post mergo de !55129 — 1–3 tagoj ĝis la paĝo
   https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/ ekvivos, tiam
   „Get it on F-Droid"-emblemo al la README (GVIDILO § 6); (2) Aptoide

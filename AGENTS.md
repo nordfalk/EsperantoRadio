@@ -261,6 +261,18 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
   Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
   "you must first push the current branch" — aldonu `--head <branĉnomo>`.
+- **Kreu PR-branĉojn el `origin/master`, ne el la loka master (2026-11-24, PR #201→#202):**
+  la loka master povas antaŭeniĝi je nekunfandita laboro (tiam: la fermitaj
+  #196/#197 plus plibonigoj) — branĉo el ĝi portus tiun laboron en la PR
+  (17 dosieroj anstataŭ la celataj 6; la squash-mergo verŝus ĝin al master).
+  Do: `git fetch origin master` kaj branchigu per
+  `git switch -c MMdd-nomo origin/master`. Se la branĉo jam puŝiĝis malpure:
+  rekonstruu per nova branĉo el `origin/master` + `git cherry-pick <komito>`,
+  forigu la foran branĉon per `git push origin --delete <nomo>` (tio fermas la
+  PR-on; la numero ŝoviĝas — ĝustigu la ligilojn per aparta commit) kaj kreu
+  novan PR-on; `--force` estas blokita de hoko kaj normala mergo kun la loka
+  historio poluus la PR-on. (La loka master mem restu netuŝita — ĝia stato
+  estas laboro de la posedanto.)
 - **Eltrovu la venontan PR-numeron tuj antaŭ la unua puŝo kaj uzu ĝin en CHANGELOG**
   per aparta commit (sen amendo): la numeroj de PR kaj issue estas komunaj, do
   prenu la maksimuman el ambaŭ kaj aldonu 1, ekz.

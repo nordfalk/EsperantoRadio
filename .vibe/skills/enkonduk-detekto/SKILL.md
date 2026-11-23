@@ -79,6 +79,17 @@ epok-konscia detekto (tiel oni trovis la 3zzz-ŝanĝojn de 2026-01-05 kaj
   la skripto protokolas kaj daŭras.
 - **Malnovaj eroj en la fluo**: kelkaj fluoj havas ne-sonajn erojn
   (reklamaj pendantaĵoj) — komparu nur la plej freŝajn N.
+- **Kreskaj fluoj erarigas la specimenon (2026-11-24):** la skripto prenas
+  la UNUAJN N erojn de la fluo — plej multaj fluoj listigas la plej novajn
+  unue, sed ekz. `iro` (fluo.muzaiko.info) listigas ilin KRESKE, do
+  `--n 10` analizis la 10 plej MALNOVAJN epizodojn. Kontrolu la ordon
+  (unua vs lasta `pubDate`) antaŭ ol fidi la rezulton.
+- **`komuna_fino` estas maksimume 30 s** (`trajtoj(maksimume_sek=35)` kaj
+  `kurbo[:30]`): la norma skripto NE povas konfirmi valorojn super 30 s
+  (3zzz 37, babibejo 50). La kaŝo tamen enhavas 120 s da PCM — por tiaj
+  kanaloj rulu apartan analizon kun fenestro 70 s sur la jam-kaŝitaj
+  dosieroj (2026-11-24: tiel babibejo konfirmiĝis je precize 50 s kaj
+  universeala-lindo je 39 s, dum ambaŭ ŝajnis "ne" en la norma rulo).
 - La valoro efikas nur por uzantoj, kiuj **ĵus aŭskultis la kanalon**
   (monata kondiĉo, C59a) — novaj aŭskultantoj ĉiam aŭdas la plenan
   enkondukon; tial tro-malgranda valoro estas sendanĝera.

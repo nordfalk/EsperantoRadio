@@ -5,6 +5,42 @@
 > enskribon; bagatelaj ŝanĝoj restas nur en la git-historio. Novaj enskriboj
 > supren, kun dato kaj ligilo al la PR.
 
+# Ŝanĝoj — 2026-11-24
+
+## Ripetaj enkondukoj: reviziitaj transsaltaj valoroj el 30-specimena detekto (PR: https://github.com/nordfalk/EsperantoRadio/pull/201)
+
+- **Kial revizio**: la kontrolo de la 30 plej novaj elsendoj de ĉiuj kanaloj
+  montris, ke la norma `detekto.py` ne kapablas validigi valorojn super 30 s
+  (`trajtoj(maksimume_sek=35)` + `kurbo[:30]` tondas la analizon je 30 s) kaj ke
+  la IRO-fluo listigas kreske (la skripto do analizis la plej MALNOVAJN).
+  Por la kontrolo ni skribis apartan epok-analizilon
+  (`RssArkivServer-filcache/enkonduk-detekto/epokoj.py`, fenestro 70 s, dato po
+  epizodo el la kaŝita fluo) — la lecionoj estas en la skill-o `enkonduk-detekto`.
+- **3ZZZ 37→21**: kun 30 specimenoj la par-minimumo de la kongruantaj paroj
+  ekde 2026-05-26 estas 21 s; la septembraj elsendoj (ekz. 2026-09-07: ĉiuj paroj
+  finas ĉe 26–27 s) perdis ĝis ~11 s da enhavo per la malnova 37. La „sen-enkonduka“
+  epoko 2026-05-04…25 fakte estis kvar epizodoj kun inter si egala 62-s enkonduko
+  (ili ne kongruas kun la najbaraj epokoj, tial la 2026-10-30-a mezuro vidis nenion).
+- **BabiBEJO epokoj**: la fluo enhavas tri enkonduk-epokojn (0 ĝis 2021-05-30;
+  38 ĝis 2022-06-15; 6 por la transira epizodo 2022-10-17; 50 ekde 2022-10-25) —
+  simileco 1.000 ene de ĉiu epoko (identa sono).
+- **Fremdulo**: la enkonduko ekzistas nur ekde 2021-04-27; la pli malnovaj
+  epizodoj (ĝis 2021-04-20) ne kongruas inter si, do ili nun ricevas 0.
+- **IRO**: 21 s konfirmita por 26 el la 30 plej novaj; la epizodoj 2026-01-08,
+  2026-05-06 kaj la lasta 2026-06-18 kongruas kun neniu (0). Fina valoro 0 —
+  la kanalo dormas ekde 2026-06-18 kaj ties lasta epizodo ne plu havas la
+  enkondukon.
+- **Kernpunkto restas 0** (decido de la posedanto 2026-10-29): la komunaĵo (17–26 s
+  laŭ la nova mezurado) validas nur post varia antaŭanonco, kiun oni ne transsaltu.
+- Konfirmitaj sen ŝanĝo: polaretradio 22 (nur 3 elŝuteblaj sonoj — malforta
+  pruvo), universeala-lindo 39 (nur 2 epizodoj en la tuta fluo, sed precize 39),
+  lemondediplomatique 11 (konstanta en la tuta fluo, ankaŭ la pli fruaj „eksterordinaraj“
+  epizodoj de 2025-03/05/06 kongruas je 11–12 s).
+- **Rifuzitaj kandidatoj** (detaloj en FAROTA C59): radiovatikana (bimodala laŭ
+  epizodo, ne laŭ dato), lamalfamuloj/rakontatempo/bitmono/sano (nur 6–8-s
+  komunaĵo en malnovaj epokoj de dormantaj aŭ malregulaj kanaloj), radiofmkubo,
+  tuluzo, movada-vidpunkto (tre disaj valoroj).
+
 # Ŝanĝoj — 2026-11-22
 
 ## Defora kanalkonfiguro kiel «grunddata» en la malnova apo (PR: https://github.com/nordfalk/EsperantoRadio/pull/195)

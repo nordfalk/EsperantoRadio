@@ -38,6 +38,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 - Ĉiu uzanto ricevas unikan pseŭdonimon (ekz. „blua suno“) en la protokoloj de la apo, ŝanĝeblan en Agordoj (https://github.com/nordfalk/EsperantoRadio/pull/181)
 ### Ŝanĝita
 
+- Transsalto de ripetaj enkondukoj: reviziitaj valoroj por 3ZZZ, BabiBEJO, Fremdulo kaj Internacia Afrika Retradio laŭ nova mezurado (30 plej novaj elsendoj po kanalo) — 3ZZZ ne plu transsaltas tro multe ĉe iuj elsendoj, kaj BabiBEJO/Fremdulo nun ĝuste traktas siajn historiajn epokojn (https://github.com/nordfalk/EsperantoRadio/pull/201)
 - La arkiv-servilo nun publikiĝas rekte en la radiko https://javabog.dk/esperanto-radio/ (konfiguro kaj kanaloj/ sen „publika/“; prezentpaĝo index.html) (https://github.com/nordfalk/EsperantoRadio/pull/179)
 - La publikigita kanalkonfiguro ĉe javabog.dk/esperanto-radio estas nun strikta JSON (sen komentoj); la alarm-sugestoj estas en la sama JSON-formato kiel la alarmoj de la uzanto — po objekto kun id/horo/minuto/ripeto/kanaloSlug (https://github.com/nordfalk/EsperantoRadio/pull/178)
 - La eldona APK estas nun kod-minigita (R8) — signife pli malgranda elŝuto: ĉ. 7,5 MB anstataŭ ĉ. 21 MB (https://github.com/nordfalk/EsperantoRadio/pull/175)

@@ -83,10 +83,6 @@
 		}
 	,{
 			"kodo": "3zzzenesperanto",
-			// Enkonduko laŭ epoko (detektita 2026-10-30 el 95 elsendoj 2025-01…2026-10):
-			// 2025 = malnova ~27s; ekde 2026-01-05 = nova ~26s; ekde 2026-07-20 = antaŭrolo
-			// ~10-14s + nova = 37s. Sen enkonduko: 2025-01-13, 2025-06-09, 2026-05-04…25,
-			// 2026-08-31, 2026-10-12 (revenis je 10-19).
 			"transsaltuKomenceSekundojn": [
 				{ "sekundoj": 27.0, "ĝis": "2025-01-12" },
 				{ "sekundoj": 0.0, "ĝis": "2025-01-13" },
@@ -94,13 +90,12 @@
 				{ "sekundoj": 0.0, "ĝis": "2025-06-09" },
 				{ "sekundoj": 27.0, "ĝis": "2025-12-29" },
 				{ "sekundoj": 26.0, "ĝis": "2026-05-03" },
-				{ "sekundoj": 0.0, "ĝis": "2026-05-25" },
-				{ "sekundoj": 26.0, "ĝis": "2026-07-13" },
-				{ "sekundoj": 37.0, "ĝis": "2026-08-30" },
+				{ "sekundoj": 62.0, "ĝis": "2026-05-25" },
+				{ "sekundoj": 21.0, "ĝis": "2026-08-30" },
 				{ "sekundoj": 0.0, "ĝis": "2026-08-31" },
-				{ "sekundoj": 37.0, "ĝis": "2026-10-11" },
+				{ "sekundoj": 21.0, "ĝis": "2026-10-11" },
 				{ "sekundoj": 0.0, "ĝis": "2026-10-12" },
-				{ "sekundoj": 37.0 }
+				{ "sekundoj": 21.0 }
 			],
 			"nomo": "3ZZZ en Esperanto",
 			"priskribo": "Semajnja unuhora programo de la Melburna Esperanto-komunumo ĉe la komunuma radio 3ZZZ.",
@@ -126,7 +121,12 @@
 		}
 	,{
 			"kodo": "babibejo",
-			"transsaltuKomenceSekundojn": [{ "sekundoj": 50.0 }],
+			"transsaltuKomenceSekundojn": [
+				{ "sekundoj": 0.0, "ĝis": "2021-05-30" },
+				{ "sekundoj": 38.0, "ĝis": "2022-06-15" },
+				{ "sekundoj": 6.0, "ĝis": "2022-10-17" },
+				{ "sekundoj": 50.0 }
+			],
 			"nomo": "BabiBEJO",
 			"priskribo": "Podkasto de la Brazila Esperantista Junularo pri junulara vivo, kulturo kaj agadoj en Brazilo.",
 			// bejo.esperanto.org.br redonas 403 (hotlink-protekto) — uzu la bildon el la anchor.fm-RSS
@@ -263,7 +263,10 @@
 		}
 	,{
 			"kodo": "fremdulo",
-			"transsaltuKomenceSekundojn": [{ "sekundoj": 11.0 }],
+			"transsaltuKomenceSekundojn": [
+				{ "sekundoj": 0.0, "ĝis": "2021-04-20" },
+				{ "sekundoj": 11.0 }
+			],
 			"nomo": "Fremdulo 3",
 			"priskribo": "Persona podkasto pri la movado, lingvoj kaj publika transporto — kun buntaj gastoj.",
 			"elsendojRssUrl": "https://anchor.fm/s/379ccf70/podcast/rss",
@@ -334,7 +337,15 @@
 		}
 	,{
 			"kodo": "iro",
-			"transsaltuKomenceSekundojn": [{ "sekundoj": 21.0 }],
+			"transsaltuKomenceSekundojn": [
+				{ "sekundoj": 21.0, "ĝis": "2026-01-07" },
+				{ "sekundoj": 0.0, "ĝis": "2026-01-08" },
+				{ "sekundoj": 21.0, "ĝis": "2026-05-05" },
+				{ "sekundoj": 0.0, "ĝis": "2026-05-06" },
+				{ "sekundoj": 21.0, "ĝis": "2026-06-17" },
+				{ "sekundoj": 0.0, "ĝis": "2026-06-18" },
+				{ "sekundoj": 0.0 }
+			],
 			"nomo": "Internacia Afrika Retradio",
 			"priskribo": "Novaĵbultenoj kaj kulturaj kaj mitologiaj elsendoj de la internacia ĵurnalista teamo (eks. Afrika Retradio).",
 			// AzuraCast-fluo sur la sama servilo kiel Muzaiko (fluo.muzaiko.info); la fluo listas la epizodojn plej malnovajn unue

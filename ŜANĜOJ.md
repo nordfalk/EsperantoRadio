@@ -7,7 +7,7 @@
 
 # Ŝanĝoj — 2026-11-24
 
-## Ripetaj enkondukoj: reviziitaj transsaltaj valoroj el 30-specimena detekto (PR: https://github.com/nordfalk/EsperantoRadio/pull/201)
+## Ripetaj enkondukoj: reviziitaj transsaltaj valoroj el 30-specimena detekto (PR: https://github.com/nordfalk/EsperantoRadio/pull/202)
 
 - **Kial revizio**: la kontrolo de la 30 plej novaj elsendoj de ĉiuj kanaloj
   montris, ke la norma `detekto.py` ne kapablas validigi valorojn super 30 s

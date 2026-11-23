@@ -1,7 +1,8 @@
-Versio 3.2.0 havas la sekvajn novaĵojn
+Versio 3.2.0 🎉 kun amaso da novaĵoj:
 
-- Novaj kanaloj: HUMILOPINIE, Radio FM Esperanto (Kubo); Radio Frei revenis
-- Elsendoj sen priskriboj ricevas AI-priskribojn (ekzemple Radio Vatikano)
-- Vivaj kanaloj montras la nunan programon en la mini-ludilo
-- Ripetaj enkondukoj transsaltiĝas
-- Pli rapida ŝargado
+📻 Novaj kanaloj: HUMILOPINIE kaj Radio FM Esperanto (Kubo) — Radio Frei revenis!
+🤖 Elsendoj sen priskribo ricevas AI-priskribojn el la sono mem
+📡 Kanalaro kaj novaĵoj venas de la servilo — novaj kanaloj aperos sen ap-ĝisdatigo
+🔊 Vivaj kanaloj montras la nunan programon en la mini-ludilo
+⏭️ Ripetaj enkondukoj de elsendoj transsaltiĝas (malŝaltebla en agordoj)
+⚡ Pli rapida ŝargado

@@ -2,7 +2,7 @@
 
 	"android" : {
 		"aktualaVersio": "3.2.0",
-		"apaj_novaĵoj": "<b>Versio 3.2.0</b> eldoniĝis la 23an de novembro 2026: <br><br>📡 La kanalkonfiguro kaj tiuj ĉi novaĵoj venas de la servilo — ŝanĝoj efikas sen ĝisdatigo de la apo<br>📻 Novaj kanaloj: HUMILOPINIE kaj Radio FM Esperanto (Kubo); Radio Frei revenis<br>🤖 Elsendoj ricevas priskribojn faritajn de AI el la sondosiero (nia nova arkiv-servilo)<br>🔊 Vivaj kanaloj montras la nunan programon ankaŭ en la mini-ludilo<br>⏭️ Ripetaj enkondukoj transsaltiĝas (malŝaltebla per „Transsalti enkondukon”)<br>⬇️ Signife pli malgranda elŝuto: ĉ. 7,5 MB<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
+		"apaj_novaĵoj": "<b>Versio 3.2.0</b> eldoniĝis la 23an de novembro 2026 🎉<br><br>📻 Novaj kanaloj: HUMILOPINIE kaj Radio FM Esperanto (Kubo) — kaj Radio Frei revenis!<br>🤖 Elsendoj sen priskribo ricevas AI-priskribojn, skribitajn el la sono mem (nia nova arkiv-servilo)<br>🔊 Vivaj kanaloj montras la nunan programon ankaŭ en la mini-ludilo<br>⏭️ Ripetaj enkondukoj de elsendoj transsaltiĝas (malŝaltebla per „Transsalti enkondukon”)<br><br>Se vi havas proponojn bv. aliĝi al la telegrama grupo <a href=\"https://t.me/+AZriqUEuJHTcTFfO3psOHw\">muzaiko.telegramo.org</a>.",
 		// Pasintaj novaĵoj: arkivo de malnovaj mesaĝoj, montrata faldeble sub la nuna novaĵo.
 		// Kiam "apaj_novaĵoj" ricevas novan enhavon, la antauan mesaĝon oni movu ĉi tien.
 		"apaj_novaĵoj_pasintaj": [
@@ -12,7 +12,7 @@
 			"<b>Versio 3.0.2</b> de la 8an de oktobro 2026<br><br>🎛️ Elfaldebla ludilbreto kun progresoŝovilo kaj reen-/antaŭen-butonoj<br>🩺 Nova diagnoza ekrano (Agordoj → Sistemo → Diagnozo)<br>⚠️ Avertosigno pri detektitaj problemoj sur la ĉefekrano.",
 			"<b>Versio 3.0.1</b> de la 26an de septembro 2026<br><br>🔁 Aŭtomata reprovo je ludo-eraroj<br>👇 Malsupren-tiro por refreŝigi<br>⏰ Vekhorloĝo ludas ankaŭ la plej freŝan podkaston de la kanalo<br>📱 La versio de la apo estas videbla en la agordoj.",
 			"<b>Versio 3.0.0</b> de la 21an de septembro 2026<br><br>✨ Kompleta reverko — nova plursistema apo kun 26 kanaloj, ludvico, elŝutoj, vekhorloĝo, sciigoj pri novaj elsendoj kaj serĉo",
-            "La kompleta listo de ŝanĝoj videblas ĉe <a href=\"https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md\">CHANGELOG.md</a>."
+		"La kompleta listo de ŝanĝoj videblas ĉe <a href=\"https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md\">CHANGELOG.md</a>."
 		],
 		"funkciaAnonco": "",
 		"prizorgantaRetpoŝto": "jacob.nordfalk@proton.me"

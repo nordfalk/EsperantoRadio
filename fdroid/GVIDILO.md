@@ -52,6 +52,15 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
 3. Lasu la agordon kiel estas (lasi la kampojn kiel ili estas: "Project name" = fdroiddata, videbleco = Private) → klaku **Fork project**.
 4. Vi nun havas `https://gitlab.com/VIA_UZANTNOMO/fdroiddata`.
 
+> **Jam farita (2026-11-23)**: la fork de ĉi tiu projekto estas
+> **https://gitlab.com/nordfalk/fdroiddata** (uzanto: `nordfalk`).
+> La MR-branĉo de la enmet-peto !55129 nomiĝas `dk.nordfalk.esperanto.radio`.
+> Rekta redakto-URL por ĝisdatigi la metadatenon en la retumilo (por estontaj
+> versioj — kopiu la ĝisdatan yml el nia master unue):
+> https://gitlab.com/nordfalk/fdroiddata/-/edit/dk.nordfalk.esperanto.radio/metadata/dk.nordfalk.esperanto.radio.yml
+> (formo `…/-/edit/<branĉo>/metadata/<aplid>.yml` — nur-lega varianto: `…/-/blob/…`).
+> Komito sur tiu branĉo aŭtomate aperas en la malferman MR-on.
+
 ### 3.2 Aldonu la metadatenon en via fork — UNU dosiero
 
 **Antaŭ ĉio**: via fork devas esti **PUBLIKA** (la oficiala ŝablono postulas

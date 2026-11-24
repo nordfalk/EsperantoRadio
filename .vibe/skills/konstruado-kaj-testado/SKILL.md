@@ -140,8 +140,9 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   preskaŭ plenigas la ekranon) — `scrollBy` tiam konsumas 0 sen eraro. Ekzamenu
   en malalta fenestro (ekz. 420 px) antaŭ ol konkludi, ke io ne funkcias.
 - **Mezuru la retan UI-n per Playwright** (`playwright-core` instalita en
-  `server/data/privata/`, sistema Chrome): `page.on('console')` kaptas `logd`
-  de la apo; `chromium.launch({executablePath: '/usr/bin/google-chrome'})`;
+  `server/data/privata/tmp/` — kanona arbo, vidu servilo-arkivo; sistema Chrome):
+  `page.on('console')` kaptas `logd` de la apo;
+  `chromium.launch({executablePath: '/usr/bin/google-chrome'})`;
   tuŝgestoj per `CDPSession Input.dispatchTouchEvent`.
 - **`grep -c ĉeno *.wasm` kasas erarojn**: kompila fiasko pere de
   `… | tail -1 && alia` montras «BUILD»-sukceson kaj publikiĝas malnova fasko —

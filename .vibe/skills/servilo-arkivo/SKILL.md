@@ -8,6 +8,16 @@ description: Ŝargu ĉi tiun skill-on kiam temas pri la arkiv-servilo de Esperan
 Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la enhavo de
 `server/data/publika/` estas servata de Apache kiel statikaj dosieroj.
 
+## Kanona datum-loko (2026-11-24)
+
+**`/home/j/Code/EsperantoRadio/server/data/`** estas la ĉefloko de la servilaj datumoj
+(la operaciaumaj 3,2 GB: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
+Ĉiuj laborkopioj (ekz. `mobile-app4/`) portas **simbolan ligilon** `server/data` → la
+kanonan arbon, do konstruiloj kaj rsync ĉie vidas unu saman datumaron. NE kreu apartan
+`server/data`-arbon en nova laborkopio — demandedu/livligu kanonan.
+**Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
+`privata/tmp/`, ne al `privata/` mem.
+
 ## Publika baz-URL
 
 ```

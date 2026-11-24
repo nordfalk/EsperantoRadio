@@ -2416,3 +2416,6 @@ daŭrig
 idempova
 kontrolboto
 kontrolbotoj
+cdn
+dekso
+apksigcopier

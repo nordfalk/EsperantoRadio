@@ -128,7 +128,7 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
   fdroidserver 2.4.2 flankigus ankaŭ la identigilan kampon kaj do
   ne kongruas kun la CI-master — ne fidu ĝin blinde ĉe tiuj
   kampoj; la enmeta dosieroj sur nia master spegulas la CI-pasan formon,
-  do «kopiu sen ŝanĝoj» + eventuaj plibonigoj post la pipo estas la
+  do «kopiu sen ŝanĝoj» + eventualaj plibonigoj post la pipo estas la
   sekura vojo.
 - `AllowedAPKSigningKeys:` — SHA-256 de la subskriba atestilo de nia APK,
   minuskle skribita heksa kodo, sen dupunktoj. Ĝi kredindigas la `Binaries`-URL-ojn: la
@@ -305,7 +305,7 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - rewritemeta-dosiero → forigi ĉiujn `#`-komentojn; fina lini-salo ĉe EOF
 - rewritemeta-dosiero kun `Binaries` en unu linio → la kanona formo
   flankigas ĝin al daŭrig-linio («Binaries: \n  <url>»);
-  `AllowedAPKSigningKeys` restas unulini. La loka fdroidserver 2.4.2
+  `AllowedAPKSigningKeys` restas unulinie. La loka fdroidserver 2.4.2
   reflankigus ambaŭ — ne fidu ĝin detalnivelen; la CI-pasa formo staras
   sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu

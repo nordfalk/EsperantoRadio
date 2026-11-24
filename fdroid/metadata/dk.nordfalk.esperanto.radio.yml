@@ -19,7 +19,7 @@ Binaries:
 Builds:
   - versionName: 3.2.0
     versionCode: 258
-    commit: f9124b3639c51c88793e66a2284066d0209273c0
+    commit: 926dc4fafddc3eb8ac5ad61554aadb8ed9c32656
     subdir: androidApp
     gradle:
       - yes

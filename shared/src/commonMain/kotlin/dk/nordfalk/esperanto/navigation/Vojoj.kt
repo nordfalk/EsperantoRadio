@@ -1,8 +1,7 @@
 package dk.nordfalk.esperanto.navigation
 
 import androidx.navigation3.runtime.NavKey
-import dk.nordfalk.esperanto.domain.model.Elsendo
-import dk.nordfalk.esperanto.domain.model.Kanalo
+import kotlin.random.Random
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,6 +23,14 @@ sealed interface Vojo : NavKey {
     @Serializable data object Alarmoj : Vojo
     @Serializable data object Agordoj : Vojo
     @Serializable data object Diagnozo : Vojo
-    @Serializable data class KanaloDetalo(val kanalo: Kanalo) : Vojo
-    @Serializable data class ElsendoDetalo(val elsendo: Elsendo) : Vojo
+    // DETALAJ ŜLOSILOJ: ŝlosiloj portas identigilojn + vizito-kodon unikan po malfermo
+    @Serializable data class KanaloDetalo(
+        val slug: String,
+        val vizito: String = Random.nextLong().toString(36),
+    ) : Vojo
+    @Serializable data class ElsendoDetalo(
+        val id: String,
+        val kanaloSlug: String,
+        val vizito: String = Random.nextLong().toString(36),
+    ) : Vojo
 }

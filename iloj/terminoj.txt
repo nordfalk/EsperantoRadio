@@ -2419,3 +2419,4 @@ kontrolbotoj
 cdn
 dekso
 apksigcopier
+detalnivele

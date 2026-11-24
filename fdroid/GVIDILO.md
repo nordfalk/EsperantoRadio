@@ -306,7 +306,7 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - rewritemeta-dosiero kun `Binaries` en unu linio → la kanona formo
   flankigas ĝin al daŭrig-linio («Binaries: \n  <url>»);
   `AllowedAPKSigningKeys` restas unulinie. La loka fdroidserver 2.4.2
-  reflankigus ambaŭ — ne fidu ĝin detalnivelen; la CI-pasa formo staras
+  flankigus ambaŭ — ne fidu ĝin detalnivele; la CI-pasa formo staras
   sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)

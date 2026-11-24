@@ -461,10 +461,6 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.KanaloDetalo> { vojo ->
-                            // La vojo portas nur la slug (vidu Vojoj.kt): la Kanalo-objekton
-                            // prenu el la kanal-listo — ĝi estas tuj disponebla (la fluo estas
-                            // senborne semata el la konfiguro). Fine mankanta slug = kanalo
-                            // forigita el la konfiguro — tiam montru klarigon anstataŭ nenio.
                             val kanalo = kanaloj.find { it.slug == vojo.slug }
                             if (kanalo == null) {
                                 NetroveblasEkrano(
@@ -493,11 +489,6 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
-                            // La vojo portas nur la identigilojn (vidu Vojoj.kt): la plenan
-                            // elsendon prenu el la deponejo (LaunchedEffect sube iras tra
-                            // trovuElsendon — kutima ŝargo, unua forta refreŝigo) kaj la
-                            // fluo „observiElsendojn“ aŭtomate ĝisdatigas la vidon. Se ne
-                            // eblas trovi ĝin, montru klarigon — neniu eterna ŝarg-indikilo.
                             val kanalo = kanaloj.find { it.slug == vojo.kanaloSlug }
                             val elsendoj by elsendoDeponejo.observiElsendojn(vojo.kanaloSlug).collectAsState()
                             val elsendo = elsendoj.firstOrNull { it.id == vojo.id }

@@ -517,12 +517,6 @@ fun ElsendoEkranoKunSvipo(
     val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaId }.let { if (it < 0) 0 else it }
     val paĝoStato = rememberPagerState(initialPage = komencaPaĝo) { elsendoj.size }
 
-    // Neniu paĝo-korekto necesas: la nav3-ŝlosilo de eniro (Vojo.ElsendoDetalo)
-    // portas vizito-kodon unikan po malfermo, do nova vizito komenciĝas freŝe ĉe
-    // komencaPaĝo, dum rotacio/rekreado restaŭras la staton de ĝuste tiu vizito —
-    // la legita svipo-paĝo pluvivas; antaŭa vizito ne povas heredigi sian paĝon
-    // (2026-11-24: klako sur la 1-a elsendo malfermis la 3-an).
-
     // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam paĝo ekvidiĝas (settledPage)
     LaunchedEffect(paĝoStato.settledPage, elsendoj) {
         elsendoj.getOrNull(paĝoStato.settledPage)?.let(onVidataElsendo)

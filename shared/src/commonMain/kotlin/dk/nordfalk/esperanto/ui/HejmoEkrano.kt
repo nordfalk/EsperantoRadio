@@ -50,6 +50,7 @@ import dk.nordfalk.esperanto.data.repository.ElsendoDeponejoImpl
 import dk.nordfalk.compose.material3.DrawerState
 import dk.nordfalk.compose.material3.ModalNavigationDrawer
 import dk.nordfalk.compose.material3.rememberDrawerState
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.loge
 import kotlinx.coroutines.CoroutineScope
@@ -58,10 +59,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -194,6 +200,18 @@ class HejmoViewModel(
     private val _novajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val novajElsendoj = _novajElsendoj.asStateFlow()
 
+    /**
+     * Kreskas po ĉiu plenigu en kiu eniĝas almenaŭ unu elsendo ne iam ajd vidita
+     * (vera alveno). Re-vidiĝo de elsendo kaŝita en "Kio novas" (ludita, aĝo-limo,
+     * per-kanala take(5)) NE kreskigas la kalkulon. La hejmo rulumas al la unua
+     * karto kiam tiu ĉi kalkulo kreskas (vidu HejmoEkrano).
+     */
+    private val _novajAldonojKalkulo = MutableStateFlow(0)
+    val novajAldonojKalkulo = _novajAldonojKalkulo.asStateFlow()
+
+    /** ID-oj de ĉiuj iam ajd viditaj elsendoj — por rekoni verajn alvenojn en plenigu. */
+    private val viditajElsendojIdj = HashSet<String>()
+
     private val _popularajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val popularajElsendoj = _popularajElsendoj.asStateFlow()
 
@@ -283,6 +301,10 @@ class HejmoViewModel(
      */
     @OptIn(ExperimentalTime::class)
     fun plenigu(kanaloj: List<Kanalo>, elsendoj: List<Elsendo>) {
+        // Vera alveno: almenaŭ unu ID ne iam ajd vidita — este diferenca de ŝanĝo
+        // nur en la FILTRITA listo, ĉar elsendo kaŝita ekz. per take(5) povas
+        // revidiĝi sen ke io nova alvenis
+        if (elsendoj.count { viditajElsendojIdj.add(it.id) } > 0) _novajAldonojKalkulo.value++
         ĉiujElsendoj = elsendoj
         // Antaŭmiksu la kandidatojn por "Aliaj elsendoj" unufoje po ŝarĝado,
         // kun semo derivita de la enhavo — la ordo restas stabila inter rekomputadoj.
@@ -446,6 +468,25 @@ fun HejmoEkrano(
         vm.aktualigiuLudatajn(nunaElsendoId)
     }
 
+    // "Kio novas": kiam eniĝas novaj elsendoj (la VM kalkulas la alvenojn surbaze
+    // de la fonto-datumoj — la listo ŝanĝiĝas ankaŭ pro forlasoj kaj re-vidiĝoj,
+    // ekz. luditaj elsendoj aŭ la per-kanala limo), rulu la vicon trankvile al la
+    // unua karto. drop(1) preterlasas la kalkulon jam faritan antaŭ la komponado —
+    // restarigo de la ekrano aŭ re-eniro konservas la rulpozicion de la vico.
+    // Gestoj de la uzanto povas interrompi la animacion: tio NE mortigu la
+    // kolektanton (sia propra nuligo — ekz. forlaso de la ekrano — disvastiĝu).
+    val kioNovasVicoStato = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        vm.novajAldonojKalkulo.drop(1).collect {
+            try {
+                kioNovasVicoStato.animateScrollToItem(0)
+            } catch (e: CancellationException) {
+                coroutineContext.ensureActive()
+                logd("HejmoEkrano", "Aŭtomata rulumado interrompita de uzanta gesto: ${e.message}")
+            }
+        }
+    }
+
     // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
     val luditajVicoStato = rememberLazyListState()
     var antaŭaUnuaLudataId by remember { mutableStateOf<String?>(null) }
@@ -594,7 +635,6 @@ fun HejmoEkrano(
                 if (novajElsendoj.isNotEmpty()) {
                     item { SekcioTitolo("Kio novas") }
                     item {
-                        val kioNovasVicoStato = rememberLazyListState()
                         LazyRow(
                             state = kioNovasVicoStato,
                             modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kioNovasVicoStato),

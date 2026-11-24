@@ -553,6 +553,138 @@ class HejmoEkranoTest {
     }
 
     /**
+     * La "Kio novas"-vico ruliĝas trankvile al la unua karto nur kiam vere ENIĜAS
+     * novaj elsendoj — eĉ se la uzanto antaŭe rulis la vicon dekstren, kaj ankaŭ
+     * kiam la aldono samtempe forpelas la antaŭan unuan karton (per-kanala take(5)).
+     * Kiam la unua karto tamen nur FORLASAS la liston (ekz. ĝi iĝas ludita), la
+     * rulpozicio devas resti.
+     *
+     * La baza listo (9 elsendoj, maks 5 po kanalo en "Kio novas") certigas ke la vico
+     * necesas horizontalan ruladon ankaŭ en la plata testfenestro.
+     */
+    @Test
+    fun kioNovasRulumasAlLaUnuaKartoKiamVenasNovajElsendoj() = runComposeUiTest {
+        // La pli suba kopio de "Varsovia Vento epizodo 1" estas en la "Kio novas"-vico.
+        // Kernpunkto havas nur 4 epizodojn — sub la per-kanala limo — tiel ke aldono
+        // kaj forigo de kp:0 ne forpelu/revenigu pliajn kartojn per take(5).
+        val bazaElsendoj = listOf(
+            Elsendo(id = "kp:1", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 1", fluo = "", dato = datoAntaŭ(5)),
+            Elsendo(id = "kp:2", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 2", fluo = "", dato = datoAntaŭ(12)),
+            Elsendo(id = "kp:3", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 3", fluo = "", dato = datoAntaŭ(19)),
+            Elsendo(id = "kp:4", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 4", fluo = "", dato = datoAntaŭ(26)),
+            Elsendo(id = "vv:1", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 1", fluo = "", dato = datoAntaŭ(3)),
+            Elsendo(id = "vv:2", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 2", fluo = "", dato = datoAntaŭ(17)),
+            Elsendo(id = "vv:3", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 3", fluo = "", dato = datoAntaŭ(31)),
+            Elsendo(id = "vv:4", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 4", fluo = "", dato = datoAntaŭ(45)),
+            Elsendo(id = "vv:5", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento epizodo 5", fluo = "", dato = datoAntaŭ(59)),
+        )
+
+        val vm = HejmoViewModel(falsaKanaloDeponejo(), falsaElsendoDeponejo(), hodiaŭ = { hodiaŭ })
+        vm.plenigu(testKanaloj, bazaElsendoj)
+        setContent {
+            HejmoEkrano(
+                nunaDatumo = hodiaŭ,
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                viewModel = vm,
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        // Ambaŭ kopioj de la unua karto ("Kanaloj" + "Kio novas") estas videblaj
+        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
+        onNodeWithText("Kernpunkto epizodo 0").assertDoesNotExist()
+
+        // Rulu la "Kio novas"-vicon dekstren (maldekstren svingante) ĝis la unua karto
+        // eliras la vidkampon — la "Kanaloj"-kopio de vv:1 restas (ne ŝanĝita)
+        val y = onAllNodesWithText("Varsovia Vento epizodo 1").fetchSemanticsNodes()
+            .maxOf { it.positionInRoot.y + it.size.height / 2f }
+        repeat(3) {
+            onRoot().performTouchInput { swipe(Offset(width * 0.8f, y), Offset(width * 0.2f, y)) }
+            waitForIdle()
+        }
+        assertEquals(
+            1, onAllNodesWithText("Varsovia Vento epizodo 1").fetchSemanticsNodes().size,
+            "La svingo devas forruli la unuan karton el \"Kio novas\"",
+        )
+
+        // Nova elsendo venas — ĝi iĝas la unua karto de \"Kio novas\"
+        val freŝa = Elsendo(id = "kp:0", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo 0", fluo = "", dato = datoAntaŭ(1))
+        vm.plenigu(testKanaloj, bazaElsendoj + freŝa)
+
+        // La vico aŭtomate ruliĝis trankvile reen al la unua (plej nova) karto.
+        // "Kernpunkto epizodo 0" aperas nun 2-foje: en la "Kanaloj"-vico (plej nova
+        // elsendo de la kanalo, supre) kaj kiel la unua karto de "Kio novas" (sube) —
+        // la pli suba kopio devas esti ree en la vidkampon (la svingo rulis ĝin for)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kernpunkto epizodo 0").fetchSemanticsNodes().size == 2 }
+        val kp0Nodoj = onAllNodesWithText("Kernpunkto epizodo 0")
+        val kioNovasKopioIndekso = kp0Nodoj.fetchSemanticsNodes().indices.maxBy { kp0Nodoj.fetchSemanticsNodes()[it].positionInRoot.y }
+        kp0Nodoj.get(kioNovasKopioIndekso).assertIsDisplayed()
+        onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
+
+        // Kontraŭokazo: la nuna unua karto (kp:0) FORLASAS la liston (ekz. ĝi iĝas
+        // ludita) — tio ne estas nova elsendo, do la rulpozicio devas resti.
+        // Denove svingu la vicon dekstren, poste forigu kp:0 per re-plenigo de la baza listo
+        repeat(3) {
+            onRoot().performTouchInput { swipe(Offset(width * 0.8f, y), Offset(width * 0.2f, y)) }
+            waitForIdle()
+        }
+        assertEquals(1, onAllNodesWithText("Kernpunkto epizodo 0").fetchSemanticsNodes().size, "La svingo devas forruli la unuan karton el \"Kio novas\" (restas la \"Kanaloj\"-kopio)")
+        vm.plenigu(testKanaloj, bazaElsendoj)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kernpunkto epizodo 0").fetchSemanticsNodes().isEmpty() }
+        waitForIdle()
+        // La sekvanto (vv:1) iĝis la unua karto sen aldono — ĝia "Kio novas"-kopio
+        // ne revenu en la vidkampon, do nur la "Kanaloj"-kopio estas komponita
+        assertEquals(1, onAllNodesWithText("Varsovia Vento epizodo 1").fetchSemanticsNodes().size, "Forlaso de la unua karto ne devas rulumi la \"Kio novas\"-vicen")
+
+        // Aldono kiu ANKAŬ forpelas la antaŭan unuan karton: kvin pli freŝaj
+        // varsovia-vento-elsendoj — la per-kanala limo take(5) forigas vv:1 de la
+        // listo, sed vere venis novaj elsendoj, do la vico devas rulumi al la nova unua
+        val kvinFreŝaj = listOf(
+            Elsendo(id = "vv:a", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento freŝa 1", fluo = "", dato = datoAntaŭ(1)),
+            Elsendo(id = "vv:b", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento freŝa 2", fluo = "", dato = datoAntaŭ(1)),
+            Elsendo(id = "vv:c", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento freŝa 3", fluo = "", dato = datoAntaŭ(2)),
+            Elsendo(id = "vv:d", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento freŝa 4", fluo = "", dato = datoAntaŭ(2)),
+            Elsendo(id = "vv:e", kanaloSlug = "varsoviavento", titolo = "Varsovia Vento freŝa 5", fluo = "", dato = datoAntaŭ(2)),
+        )
+        vm.plenigu(testKanaloj, bazaElsendoj + kvinFreŝaj)
+        // La nova unua karto "Varsovia Vento freŝa 1" aperu en ambaŭ vicoj kaj la
+        // aŭtomata rulumado revenigu ĝian "Kio novas"-kopion en la vidkampon
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Varsovia Vento freŝa 1").fetchSemanticsNodes().size == 2 }
+        val freŝa1Nodoj = onAllNodesWithText("Varsovia Vento freŝa 1")
+        val freŝa1KioNovasIndekso = freŝa1Nodoj.fetchSemanticsNodes().indices.maxBy { freŝa1Nodoj.fetchSemanticsNodes()[it].positionInRoot.y }
+        freŝa1Nodoj.get(freŝa1KioNovasIndekso).assertIsDisplayed()
+        // Ne asertu la malaperon de vv:1: forpelita de "Kio novas" ĝi rajtas aperi
+        // en "Aliaj elsendoj", kiu kuŝas ekster la vidkampo de la testfenestro
+    }
+
+    /**
+     * La alveno-kalkulo (novajAldonojKalkulo) kreskas nur ĉe VERAJ alvenoj —
+     * ne kiam eks-kaŝita elsendo revidiĝas: kanalo kun 6 elsendoj montras nur 5
+     * en "Kio novas" (per-kanala limo take(5)); kiam forlaso (ekz. elsendo iĝas
+     * ludita) liberigas sloton, la sesa REVIDIĜAS sen ke io nova alvenis.
+     */
+    @Test
+    fun novajAldonojKalkuloRekonasNurVeranAlvenon() {
+        val vm = HejmoViewModel(falsaKanaloDeponejo(), falsaElsendoDeponejo(), hodiaŭ = { hodiaŭ })
+        val ses = (1..6).map {
+            Elsendo(id = "kp:$it", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo $it", fluo = "", dato = datoAntaŭ(it * 7))
+        }
+        vm.plenigu(testKanaloj, ses)
+        assertEquals(1, vm.novajAldonojKalkulo.value, "La komenca plenigu kalkulas kiel unu alveno")
+
+        // Forlaso de kp:2 (ekz. ĝi iĝis ludita) — la sesa revidiĝas en "Kio novas",
+        // sed neniu nova elsendo alvenis
+        vm.plenigu(testKanaloj, ses.filter { it.id != "kp:2" })
+        assertEquals(1, vm.novajAldonojKalkulo.value, "Re-vidiĝo de eks-kaŝita elsendo ne kalkuliĝu")
+
+        // Vera alveno kreskigas la kalkulon
+        vm.plenigu(testKanaloj, ses.filter { it.id != "kp:2" } + Elsendo(id = "kp:nova", kanaloSlug = "kernpunkto", titolo = "Kernpunkto freŝa", fluo = "", dato = datoAntaŭ(1)))
+        assertEquals(2, vm.novajAldonojKalkulo.value, "Vera alveno kreskigu la kalkulon")
+    }
+
+    /**
      * Falsa tirkest-enhavo kun reala larĝo — sen ĝi la ankroj degeneras al nul
      * kaj neniu tiro povas movi la tirkeston.
      */

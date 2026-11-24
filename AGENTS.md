@@ -305,7 +305,7 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (2026-11-25): en tujgenerita teksto supersignoj povas mangliĝi al eskapoj
   (`ambau~`, `g^isdatigo`, `kashig^as` — kvazaŭ x-sistemaj anstataŭaĵoj).
   Antaŭ ol uzi tian dosieron (ekz. per `--body-file` aŭ REST), kontrolu ĝin per
-  `grep -n '[@~^]c\|[@~^]g\|[@~^]s\|u~'` — ne nur per la okulo, kiu glitas
+  `grep -nE '[cghjs][@~^]|u~'` — ne nur per la okulo, kiu glitas
   preter la fuŝoj sur la ekrano.
 - **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam kontrolu per
   `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente

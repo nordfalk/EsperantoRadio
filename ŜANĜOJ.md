@@ -402,15 +402,6 @@ polaretradio havis ripeton 0x44 = merkredo+dimanĉo, dum la teksto diris
 - Nova testaro: `ripetoTekstoGeneratasElKonfiguro` (AlarmoTest);
   `ekranfoto_alarmo_redaktilo` kaptas redaktilon + ambaŭ dialogojn.
 
-### Lecioj pri testado (ankaŭ en AGENTS.md)
-
-- `AlertDialog` estas aparta kompona radiko → `onRoot()` fiaskas per "found 2
-  nodes"; la ekranfoto-helpilo kaptas la lastan radikon per
-  `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` — `isRoot` estas
-  eco, ne metodo.
-- `onNodeWithText` serĉas ĉiujn radikojn: "Nuligi" ekzistas kaj en dialogo kaj
-  en la ekrano malantaŭ ĝi — fermu per teksto unika en la dialogo.
-
 ## Post-revizio de PR #113: koda mapo ĝisdatigita + kompil-kaptindaĵoj en AGENTS.md
 
 Zorga revizio de PR #113 (mallongigo de AGENTS.md) konstatis, ke la "Deponeja

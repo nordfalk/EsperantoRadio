@@ -22,8 +22,5 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        // jcenter — malaktuala, sed ankoraŭ bezonata de iuj malnovaj dependencoj
-        // (la jcenter()-metodo foriĝis en Gradle 9; uzu la rektan URL-on)
-        maven { url = uri("https://jcenter.bintray.com") }
     }
 }

@@ -5,7 +5,9 @@ description: Ŝargu ĉi tiun skill-on kiam vi devas legi aŭ analizi Sentry-datu
 
 # Sentry-esplorado (esperantoradio / projekto KMP)
 
-Organizo `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`.
+Organizo `esperantoradio`, regiono `de.sentry.io`, projekto `KMP`
+(**API-slugo `kmp`, minuskla** — `projectSlug: "KMP"` redonas 404; kontrolu per
+`find_projects`).
 Agordo en la apo: `SentryAgordo.kt` — medio "produktado" por eldon-konstruoj,
 `release = "esperantoradio@<apoversio>"`, `dist` = versionCode (aŭtomate de la
 Android-SDK). **Nur eldon-konstruoj sur realaj aparatoj KAJ nur kiam la erar-raportado
@@ -14,7 +16,7 @@ inicialigas Sentry-n. Ekde PR #148 (2026-10-29, C50) la defaŭlto estas
 konstruo-specifa: konstruo sen nia subskribo (F-Droid) = opt-in (defaŭlte
 malŝaltita, konsento-demando); konstruo kun nia subskribo (Play/Aptoide) =
 defaŭlte ŝaltita, malŝaltebla (agordo `erar_raportado`; malŝalto/reŝalto
-sendas po unu logGrava-eventon). Konto ĉiuj datum-kvantaj analizoj: la
+sendas po unu logGrava-eventon). Kunteksto por ĉiuj datum-kvantaj analizoj: la
 malpliiĝo el F-Droid-uzantoj post la opt-in-ŝanĝo estas atendata, ne
 incidento.
 
@@ -54,7 +56,11 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
   - Uzantoj po eldono: `fields: ['release', 'count_unique(user.id)']` — proksimumo
     de aktivaj uzantoj.
   - Tempo-serio: petu naturlingve «... as a time series» kun
-    `fields: ['timestamp', 'count_unique(user.id)']` → tagaj/horaj siteloj.
+    `fields: ['timestamp', 'count_unique(user.id)']` — sed ATENTU: **tagaj
+    siteloj tiel paneas ĉe la MCP** (`toDate(timestamp)` estas nekonata funkcio
+    en la logs-datumaro; la rezulto estas nulaj siteloj). Por tago-statistikoj
+    faru po unu agregaĵon per tago:
+    `timestamp:>=YYYY-MM-DD timestamp:<sekva-tago`.
 - `search_errors` — erar-eventoj, nombroj, tendencoj (po tago/horo per time series).
 - `find_dropped_events` — ĉu protokoloj/eraroj estis forĵetitaj pro kvoto
   (rezulto `droppedEvents: []` = neniuj perdoj).
@@ -71,19 +77,29 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
 - Negaciaj filtriloj (`!device.model:...`) ne funkcias en logs — prenu ĉiujn grupojn
   (`limit: 100`) kaj filtru loke.
 - `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
-- **La medio nomiĝas `produktado`, ne `production`** (2026-10-27): `search_errors`
-  kun `environment:production` redonas malplenan rezulton SEN averto — aŭ
-  uzu `produktado`, aŭ ellasu la medi-filtrilon tute (en la projekto ĉiuj
-  produktaj eventoj estas en ĝi kaj dubaj filtroj nur kaŝas datumojn).
+- **La medioj nomiĝas `produktado`/`evoluo`, ne `production`** (2026-10-27):
+  `search_errors` kun `environment:production` redonas malplenan rezulton SEN
+  averto. Eldon-konstruoj raportas ĉion — protokoloj KAJ erar-eventoj — kun la
+  medio `produktado` (`initialiguSentry("produktado")`,
+  `options.environment` en `SentryAgordo.kt`; kontrolite kontraŭ la kodo
+  2026-11-24). Ĉe eraroj esploru do SEN medi-filtrilo, aŭ per
+  `environment:produktado`; dubaj filtriloj nur kaŝas datumojn. Eventoj kun
+  medio `evoluo` venas de evoluaj konstruoj — ne forgesu ilin ĉe tuta videbligo.
 - **`issue.id:KMP-X` ne funkcias en `search_errors`** (2026-10-27): ĝi postulas
   NUMERAN idon (400 "Invalid number"). Por krei dist-bildon de specifa problemo,
   filtu laŭ `error.type:` aŭ `message:"…"` kaj grupigu per `dist` anstataŭe.
+- **`search_issues period:7d` malpleniĝis eĉ kiam erar-eventoj ekzistis**
+  (2026-11-20) — fidu pli la agregaĵojn de `search_errors`.
+- En `search_logs` la sever-atributo ne estas `level:` (nekonata) — uzu
+  **`severity:warn`** (`severity:warning` trovas nenion).
+- Mesaĝ-serĉo per frazo (`message:"Apo malfermita"`) povas trovi nenion; ĵokero
+  `message:*ludad*` funkcias — uzu `message:*…*`.
 
 ## Interpreto-avertoj pri uzant-nombroj
 
 - `user.id` estas **anonima po instalaĵo** — reinstalo = nova uzanto-id.
 - Emulilaj testreinstaloj rekoneblas: `device.model:sdk_gphone*` (Google-emulilaj
-  bildoj); ekde la 249-gardo ili tute ne raportas.
+  bildoj); ekde la versio 249 ili tute ne raportas.
 - `count_unique(device.model)` nombras unikajn **modelajn ĉenojn**, ne aparatojn.
 - Landoj haveblas nur el erar-eventoj (do nur por uzantoj kun almenaŭ unu eraro) —
   la nombro subtaksas.
@@ -101,22 +117,8 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
   (reto/ludado/elŝuto/serĉo) estas `logw` kaj tute ne aperas kiel erar-eventoj.
 - Malnovaj versioj (≤ 248) ankoraŭ generas la malnovajn erarojn — komparu laŭ `dist`.
 
-## Sesio-lecionoj (2026-11-20, semajna statistiko)
+## Limo: grandaj rezultoj
 
-- **Projekto-slug estas `kmp` (minuskla)** — `projectSlug: "KMP"` redonas 404
-  "Project does not exist". Ĉiam kontrolu per `find_projects` unue.
-- **Tagaj tempo-serioj per natura lingvo paneas ĉe la MCP**: «… as a time series»
-  redonis nulajn duoblajn sitelojn; `toDate(timestamp)` estas nekonata funkcio en
-  la logs-datumaro. Fidinda maniero por tago-statistikoj: po unu agregita demando
-  pri tago kun `timestamp:>=YYYY-MM-DD timestamp:<sekva-tago`.
-- En `search_logs` la atributo ne estas `level:` (nekonata) — uzu **`severity:warn`**
-  (`severity:warning` trovas nenion).
-- Mesaĝ-serĉo: `message:"Apo malfermita"` (ekzempla frazo) trovis nenion, sed
-  ĵokero `message:*ludad*` funkcias — uzu `message:*…*`.
-- **Eraroj ne havis la medion `produktado`**: kun `environment:produktado` la
-  semajno montris 0 erarojn, sen filtrilo 42 (ĉiuj en `evoluo`). Por eraroj
-  esploru ANCHE sen medi-filtrilo; `search_issues period:7d` malpleniĝis eĉ kiam
-  erar-eventoj ekzistis — fidu pli la agregaĵojn de `search_errors`.
-- Grandegaj rezult ulterioraj estas konservitaj ekster la laborareo
-  (`~/.vibe/logs/...`) kaj `bash` ne rajtas legi ilin (`outside_workdir=deny`) —
-  resumu la datumojn ENE de `run_typescript` kaj redonu kompaktajn rezultojn.
+Grandegaj rezultoj estas konservitaj ekster la laborareo (`~/.vibe/logs/...`) kaj
+`bash` ne rajtas legi ilin (`outside_workdir=deny`) — resumu la datumojn ENE de
+`run_typescript` kaj redonu kompaktajn rezultojn.

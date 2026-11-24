@@ -161,6 +161,11 @@ object ArkivKonstruilo {
                     // ĵetas ĉe erarstatusoj (expectSuccess=false).
                     check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
                     val sufikso = Emblemoj.sufikso(respondo.headers[HttpHeaders.ContentType], url)
+                    // SVG-on ni NE spegulas (CWE-79/XSS): samdevene servata SVG-dosiero
+                    // povas enteni skripton kaj ruliĝi sub la origino de la retversio.
+                    // La emblemo restas ĉe la originala URL (A4) kaj estas purigata
+                    // el la arkivo (vidu puriguArkaikajnEmblemojn).
+                    check(sufikso != "svg") { "SVG-emblemo ne spegulebla (XSS-risko, PR #210)" }
                     val dosiero = File(bildujo, "${kanalo.slug}.$sufikso")
                     dosiero.writeBytes(respondo.bodyAsBytes())
                     "$bazo/bildoj/${dosiero.name}"
@@ -182,12 +187,16 @@ object ArkivKonstruilo {
      * – ekz. malnova .jpg post ŝanĝo al .png). Vokata NUR post sukcesa skribo de la
      * arkiva fluo de tiu kanalo, por ke neniu publika fluo/konfiguro plu referencas
      * la forigotan dosieron (partaj ruloj --args=slug lasas aliajn kanalojn netuŝitaj).
+     * novaNomo == null (emblemo fiaskis aŭ estis rifuzita, ekz. SVG) forigas ĈIUJN
+     * spegulojn de la slug.
      */
     private fun puriguArkaikajnEmblemojn(slug: String, novaNomo: String?) {
-        if (novaNomo == null) return
         val bildujo = File(PUBLIKA, "bildoj")
+        // novaNomo == null → la emblemo ne mapigis (fiasko aŭ rifuzita SVG):
+        // la eventuala spegulo de tiu slug ne plu estas referencata de la
+        // ĵus skribita fluo — forigu ĝin (malhelpas samdevenan SVG-reston).
         bildujo.listFiles()
-            ?.filter { it.isFile && it.nameWithoutExtension == slug && it.name != novaNomo }
+            ?.filter { it.isFile && it.nameWithoutExtension == slug && (novaNomo == null || it.name != novaNomo) }
             ?.forEach { it.delete() }
     }
 

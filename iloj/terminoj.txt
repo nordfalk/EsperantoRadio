@@ -2412,3 +2412,7 @@ ekranvizito
 enmet
 heksa
 enter
+daŭrig
+idempova
+kontrolboto
+kontrolbotoj

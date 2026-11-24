@@ -83,7 +83,8 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    En la eldon-priskribon algluu la eldonajn notojn (kopion de `internal.txt`) —
    ne deviga, sed utila.
    Poste ĝisdatigu la yml-on `fdroid/metadata/…yml` (novan konstruaĵon +
-   `CurrentVersion`) kaj la fork-branĉon en GitLab — detaloj en `fdroid/GVIDILO.md`.
+   `CurrentVersion`, kanonigita per `fdroid rewritemeta` — vidu `fdroid/GVIDILO.md`)
+   kaj la fork-branĉon en GitLab — detaloj en `fdroid/GVIDILO.md`.
 5. **Eldon-notoj** (intence en Esperanto, maks. 500 signoj):
    `androidApp/src/main/play/release-notes/en-US/internal.txt`.
    **GPP elektas la dosieron laŭ la TRAKO-nomo** — `internal.txt` (aŭ `default.txt`

@@ -120,6 +120,15 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
   (`v%v` anstataŭiĝas per `v3.2.0` ktp.; postulita de la reviziantoj,
   2026-11-23). Konsekvenco por la eldona procezo: **ĉiu eldono devas alŝuti
   la APK-on kiel averto al la GitHub-eldono `vX.Y.Z`** (vidu sekcion 6).
+- `Binaries:` kaj `AllowedAPKSigningKeys:` staras en la yml kiel
+  «ŝlosilo: \n  valoro» — la valoro en aparta daŭrig-linio, indeksita per
+  2 spacoj (2026-11-24: `fdroid rewritemeta` flankigas ĉiujn valorojn, kies
+  linio transpasas ~80 signojn; unulinia formo igas rewritemeta fiaski — tio
+  kaŭzis ruĝan pipon ankaŭ kiam la fina lini-salo jam estis en ordo).
+  **Sekura procedo post ĉiu yml-ŝanĝo**: rulu loke
+  `fdroid rewritemeta dk.nordfalk.esperanto.radio`
+  (ilo: `/home/j/.pyenv/shims/fdroid`, versio 2.4.2; kopiu la rezulton kiel
+  la novan yml-on — la rulo estas idempova: dua rulo ŝanĝas nenion).
 - `AllowedAPKSigningKeys:` — SHA-256 de la subskriba atestilo de nia APK,
   minuskle skribita heksa kodo, sen dupunktoj. Ĝi kredindigas la `Binaries`-URL-ojn: la
   reviziantoj tiel scias, ke la binaroj venas de ni. Kalkulo (el la APK, ne
@@ -293,6 +302,9 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - „AutoUpdateMode … does not match" → nuda `Version`
 - lokalizitaj kampoj en la yml → malpermesataj; tekstoj el la Triple-T
 - rewritemeta-dosiero → forigi ĉiujn `#`-komentojn; fina lini-salo ĉe EOF
+- rewritemeta-dosiero kun longaj valoroj (`Binaries`, `AllowedAPKSigningKeys`)
+  en unu linio → la kanona formo flankigas ilin al daŭrig-linio
+  («ŝlosilo: \n  valoro»); regeneru per `fdroid rewritemeta` (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
 - „Found unknown maven repo 'https://jcenter.bintray.com'" → `scanignore:

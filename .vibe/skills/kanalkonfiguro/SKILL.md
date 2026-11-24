@@ -35,6 +35,23 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
   la dosiero FINIĜAS per la forprenitaj — "aldonu ĉe la fino" surteriĝas en la
   malĝusta aro (2026-10-08: la 7 novaj podkastoj unue erare tie).
 
+## La `android`-sekcio (ŝlosiloj ekster `kanaloj`)
+
+La sekcio `android` supre de la dosiero portas apo-skalan agordon; la
+ŝlosil-nomoj estas camelCase (`prizorgantaRetpoŝto`, `aktualaVersio`) —
+`apaj_novaĵoj` kaj `apaj_novaĵoj_pasintaj` estas la snake_case-esceptoj:
+
+- `apaj_novaĵoj` (+ `apaj_novaĵoj_pasintaj`, faldeblaj) — novaĵo-mesaĝo de la
+  apo; dialogo unufoje po nova haketaĵo (`ApajNovaĵojDeponejo`). Kun la
+  eldon-fluo ĝi ĝisdatiĝas en la `eldonado`-skill-o.
+- `aktualaVersio` (C61a, PR #204) — versio-ĉeno „X.Y.Z“: se pli nova ol la
+  instalita apo (nur Android — `Platformo` en PlatformLigilo), la ĉefekrano
+  montras ĝisdatigo-karton → la novaĵ-dialogo kun butono „Ĝisdatigu al
+  versio X“ → Google Play (`PLAY_STORE_LIGILO`). La apo komparas nur la
+  numeran kernon („3.2.0-beta.1“ = „3.2.0“); fuŝita valoro ne kaŭzas averton.
+  Ĝisdatigu ĝin nur kiam la versio efektive haveblas en Play (vidu
+  `eldonado`, paŝo 5).
+
 ## JSONC-sintakso-minacoj
 
 - `//`-komentoj kaj plurliniaj ĉenoj kun `\` ĉe lini-fino — traktataj de
@@ -73,4 +90,22 @@ enkondukon de Varsovia Vento). Uzu la temperitan formon `(?:(?!</p>).)` anstata�
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en
   `<content:encoded>` — uzu `getElementsByTag("content:encoded").firstOrNull()?.text()`
   (ne `html()`), poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
+- **Kanaloj sen RSS-filtrilo (2026-11-22, radiofrei):** kelkaj retejoj (ekz.
+  radio-frei.de) liveras RSS nur por la tuta stacio kaj ignoras la serĉan
+  filtrilon en RSS-reĝimo — la filtrita listo estas akirebla nur kiel HTML.
+  Por tiaj kanaloj la konfiguro havas `elsendojHtmlUrl` (model-kampo
+  `htmlFontoUrl`; `havasPodkastojn` = vera ankaŭ tiam) KAJ MALPLENAN
+  RSS-URL-on: la arkiv-konstruilo elektas la HTML-kolektilon nur kiam
+  `podkastaRssUrl.isNullOrBlank()` (`ArkivKonstruilo.kt:65`) — ĉe plena
+  RSS-URL ĝi restas ĉe la RSS-kolektilo kaj NE kolektas la HTML-liston.
+  LA APOn mem ne tuŝas ĝin — la arkiv-servilo tiras la list-paĝojn
+  (`HtmlFontoParsilo` en shared, testita per fiksaĵoj), po artikolo la
+  mp3-URL-on, kaj generas `kanaloj/<slug>.xml`, kiun la apo legas kiel
+  kutiman arkivan fluon.
+  **Limo**: `HtmlFontoParsilo` estas verkita por la strukturo de radio-frei.de —
+  ĝi legas nur artikolajn ligilojn kun `kartikel_id=<n>`; alispecaj ligiloj
+  (ekz. `/episode/123`) estas ignorataj, kaj sen kongruaj ligiloj la listo
+  revenas malplena (la konstruilo tiam povas generi malplenan
+  `kanaloj/<slug>.xml`). Por alia retejo unue adaptu la parsilon (kun testo
+  per fiksaĵo, A3), antaŭ ol agordi `elsendojHtmlUrl`.
 - Aliajn regulojn (P6.1–P6.7, Peranto/archive.org) vidu en `docs/nova/04`.

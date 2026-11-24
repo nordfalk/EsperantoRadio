@@ -80,16 +80,23 @@ object AppStato {
     var branĉoNomo: String? = null
 
     /**
-     * Konstruo-specifa defaŭlto de la erar-raportado (PR #148/C50):
-     * - APK subskribita per NIA atestilo (Google Play, Aptoide, GitHub-releases):
-     *   `true` — la apo raportas defaŭlte (sen demando; malŝaltebla en
-     *   Agordoj → Privateco);
-     * - APK kun fremda subskribo (tia estas la F-Droid-pako): `false` — opt-in
-     *   per unufoja konsento-demando (F-Droid-kontraŭeco "Tracking" alie).
-     * La platforma enirpunkto ŝaltas ĝin ĉe starto rultempe surbaze de la
-     * subskriba atestilo de la APK (Android: `estasSubskribitaPerNiaAtestilo()`
-     * en `EsperantoRadioAplikaĵo` — ne BuildConfig, kiu malebligus reprodukteblan
-     * konstruon; Desktop/Web lasas `false`).
+     * Instalaĵo-specifa defaŭlto de la erar-raportado (PR #148/C50; la
+     * instal-fontan variaĵon vidu [erarRaportadaDefaŭltoLaŭInstalanto],
+     * 2026-11-24 — decido de la posedanto: **nur konataj ne-F-Droid-kanaloj
+     * estas opt-out; F-Droid kaj ĉio nekonata estas opt-in**):
+     * - instalaĵo el konata ne-F-Droid-kanalo (Google Play, la sistema
+     *   surŝutilo): `true` — la apo raportas defaŭlte (sen demando;
+     *   malŝaltebla en Agordoj → Privateco);
+     * - instalaĵo el la F-Droid-kliento (`org.fdroid.*`) aŭ NEKONATA
+     *   instala fonto: `false` — opt-in per unufoja konsento-demando
+     *   (F-Droid-kontraŭeco "Tracking" alie).
+     * ATENTU: la distingo NE plu okazas per la subskriba atestilo — per
+     * reprodukteblaj konstruoj F-Droid distribuas APK-on kun NIA atestilo
+     * (RB, `Binaries`/`AllowedAPKSigningKeys`, MR !55129). La platforma
+     * enirpunkto ŝaltas ĝin ĉe starto rultempe el la instal-fonto de la
+     * pako (Android: `leguInstalanto()` en `EsperantoRadioAplikaĵo` — ne
+     * BuildConfig, kiu malebligus reprodukteblan konstruon; Desktop/Web
+     * lasas `false`).
      */
     var erarRaportadoDefaŭlta: Boolean = false
 

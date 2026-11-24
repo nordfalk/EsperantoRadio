@@ -474,20 +474,11 @@ dk/nordfalk/esperanto/
 
 ## Git- kaj agent-lecionoj — historiaj (translokigitaj el AGENTS.md)
 
-- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL-eraro pri la
-  projectCards-malrekomendo) — uzu la REST API:
-  `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
-
 - **Stash-reakiro post perdo**: se `git stash list` estas malplena sed stash
   atendatas, serĉu nereatingeblajn komitojn per
   `git fsck --unreachable --no-reflogs | grep commit` (stash-komito = kunfando kun
   2–3 gepatroj, mesaĝo "On <branĉo>: ...") kaj reakiru per
   `git stash store -m "..." <hash>`. (2026-10-08: la stash "eldono 3.0.2" tiel reakiriĝis.)
-
-- **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
-  `git add -A`), kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la
-  uzanto; ne enmetu ilin sen aprobo. (2026-10-08: provizora "notu"-fragmento en
-  CHANGELOG.md — konservita en la stash, ne enmetita.)
 
 - **`git stash pop` post master-ĝisdatigo povas silente duobligi sekcionojn**:
   se via kaj la nova master-ŝanĝo tuŝas apudajn regionojn de la sama listo
@@ -497,21 +488,3 @@ dk/nordfalk/esperanto/
   importojn: viaj forigitaj/aldonitaj importoj povas resti/rediĉiĝi en dosieroj
   kiujn vi ne plu celas ŝanĝi. (2026-10-11: duoblaj sekcioj + restinta
   `fonaDispatcher`-importo en AppStato.kt.)
-
-## Sentry-kvoto — historia evoluo (translokigita el AGENTS.md)
-
-- **Sentry-kvoto: `logi` kondiĉa, `logGrava` ĉiam** (2026-10-12): `logi` sendas al
-  Sentry nur se la agordo "detala protokolado" estas ŝaltita (`protokoloDetala` en
-  `ProtokoloUtil.kt`, sinkronigita de `AgordojDeponejoImpl`); `logw`/`loge` kaj la nova
-  `logGrava` (malfermo de la apo, ekludo de elsendo kun kanalo, vekiĝo) ĉiam sendas.
-  Debug-konstruoj kaj emuliloj ne raportas al Sentry.
-
-- **Eraroj-kvoto: `loge(tag,msg,e)` = erar-evento** (2026-10-13): `loge(tag, msg, e)`
-  vokas `Sentry.captureException` kaj konsumas la MONATAN ERAROJ-KVOTON (5 000);
-  `loge(tag, msg)` sen escepto kaj `Sentry.logger.*` estas nur protokol-eventoj
-  (aparta kvoto). Atendataj fiaskoj (reto, ludad-, elŝut-, serĉ-fiaskoj) uzu
-  `logw(tag, msg, e)` (nur loka) — neniam loge. En produktado eraroj estas
-  50 %-specimenataj (`options.sampleRate` — rekte duonigas la kvot-konsumon;
-  `options.tracesSampleRate` specimenas nur SPUROJN, apartan kvoton, ne erarojn).
-  Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston
-  (FAROTA C45) — ne malmolu versio-listojn en la apo.

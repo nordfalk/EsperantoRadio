@@ -93,6 +93,13 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    vivas nur en `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
    (unu kopio por ĉiuj platformoj; JSONC-detalon vidu en la
    `kanalkonfiguro`-skill-o).
+   **Ĝisdatigu ankaŭ `aktualaVersio`** en la sama sekcio — sed nur kiam la nova
+   versio efektive haveblas en Play (PR #204, C61a): ĝi pelas la
+   ĝisdatigo-indikilon sur la ĉefekrano de ĉiuj instalaĵoj kun pli malnova
+   versio (butono al Google Play). Pli frua ŝanĝo montrus butonon por versio,
+   kiu ankoraŭ ne ekzistas. La apo komparas nur la numeran kernon
+   („3.2.0-beta.1“ = „3.2.0“) — la beta-nomoj de `apoversio` do ne konfliktas
+   kun la indikilo.
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
    la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
    ```bash
@@ -149,8 +156,6 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 - **Notoj de jam eldonita versionCode NE korekteblas per GPP** (la API rifuzas
   versionCode-reuzon) — korektu ilin permane en Play Console (kiel farite por 249).
 - **AAB ne eblas** ĝis la apo enskribiĝos en Play App Signing (403 "must be enrolled").
-- **Reproduktebleco**: versio-identaj rekonstruoj (247/248/249 ĉiuj = 3.0.3) malfaciligas
-  la diagnozon — `dist` (= versionCode) en Sentry estas la nura distingilo por eraroj.
 - **Keystore**: `jacobnordfalk.keystore` (2010) estas la kronjuvelo — sen Play App
   Signing, ĝia perdo signifas ke la apo neniam plu ĝisdateblas. Kontrolu rezervkopiojn.
 - **F-Droid** konstruas mem el la git-etikedo (duon-aŭtomata; vidu `docs/nova/07`).
@@ -158,18 +163,11 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
 
 ## GPP-versio kaj kongrueco
 
-- La GPP-versio estas fiksita en `androidApp/build.gradle.kts`. Ekde la
-  AGP-9-ĝisdatigo ni uzas la 4.x-linion (2026-10-17): GPP 4.0 subtenas nur
-  AGP 9 — kun malnova AGP ĝi ne funkcius (restu je 3.x).
-- Tasko-nomoj ne ŝanĝiĝis inter 3.x kaj 4.x (`publishReleaseApk` ktp. restas).
-- GPP 4.1.0 ŝanĝoj: ap-titolo en listing-metadatumoj maks. **30 signoj** (estis
-  50); nova agordo `retainInProgressRollout` (evitas haltigon de rulata
+- La GPP-versio estas fiksita en `androidApp/build.gradle.kts` — restu je la
+  4.x-linio: GPP 4 subtenas nur AGP 9 (3.x estus por malnova AGP).
+- GPP 4.1.0: ap-titolo en listing-metadatumoj maks. **30 signoj** (estis 50);
+  nova agordo `retainInProgressRollout` (evitas haltigon de rulata
   disvastigo dum promocio).
-- **GPP 4.x estas nun praktike testita** (2026-10-24, 251): la tasko-nomoj kaj la
-  atendata eligilo (`Updating [completed] release (...:[N]) in track 'internal'`)
-  funkcias; du provoj lernitaj: la versio-nomitaj dosieroj rompas la validigilon
-  (vidu supre) kaj la versionCode-historio ĉi tie devas resti ĝisdata — 250 estis
-  jam okupita de 3.0.4-19okt kiam ĝi ankoraŭ mankis en la listo.
 
 ## Kontrolu post la eldono
 

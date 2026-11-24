@@ -1,7 +1,7 @@
 # AGENTS.md — Gvidlinioj por agentoj en ĉi tiu deponejo
 
-> **Nuna jaro: 2026 (oktobro).** Ĉiuj referencoj al "aktuala" datas
-> rilatas al 2026 se ne alie specifite.
+> **Nuna jaro: 2026 (novembro).** Ĉiuj referencoj al "aktuala" datoj rilatas
+> al 2026 se ne alie specifite.
 
 > Lingvo: Preferu Esperanton por ĉiu dokumentado, komentoj, identigiloj kaj
 > komuniko kun la uzanto. La nova kodo uzas Esperanton anstataŭ la dana de la
@@ -18,21 +18,20 @@ kanal superrigardo, livestreno, podkastoj, elŝutoj, plej ŝatataj, serĉo, vekh
 La plej valora parto ne estas la ludilo aŭ UI, sed la **scio pri la fontoj** — kiuj
 kanaloj ekzistas, kiel iliaj fluoj aspektas, kaj kiel eltiri rektan MP3-URL el ĉiu.
 
-## Stato de la projekto (ĝisdatigita 2026-10-31)
+## Stato de la projekto
 
 La nova KMP-apo (Android + Desktop + Web/wasmJs) estas eldonita kaj aktiva en
-Google Play: produktado = 3.1.0 (252); **3.1.1 (254)** kuŝas en la interna
-trako kaj atendas promocion (2026-10-31; 253 bruliĝis pro la interna testo
-3.1.1-beta29okt el PR #144 — detaloj en la `eldonado`-skill-o). **F-Droid**:
-la metadatena MR !55129 estas submetita kaj atendas revizion (2026-10-31;
-paŝoj kaj stato en `fdroid/GVIDILO.md`, FAROTA C50). **Aptoide**: ankoraŭ
-ne komencita (docs/nova/07 § 3). Ĉiuj fazoj de la plano estas faritaj krom:
-iOS-ludado (bezonas AVPlayer + Xcode-projekton), eldono de Desktop + Web/wasmJs, hejmekrana widget, Chromecast,
-parolsintezo kaj la plena HTTP-API de la arkiv-servilo (fazo 1 de `server/` — statikaj
-elŝuteblaj dosieroj — jam funkcias, vidu la skill-on `servilo-arkivo`; plano: `docs/nova/06_servilo_arkivo.md`).
-Web estas limigita de CORS (nur la anchor.fm-podkastoj ŝargeblas sen servilo).
-La historia fazo-tabelo kaj la detala listo "kio funkcias / kio ne funkcias"
-staras en [`NOTOJ.md`](NOTOJ.md) → "Projekta stato kaj fazoj".
+Google Play; la kanona listo de versioj kaj uzitaj versionCode staras en la
+skill-o **`eldonado`**. **F-Droid**: la metadatena MR !55129 estas submetita kaj
+atendas revizion (paŝoj kaj stato: `fdroid/GVIDILO.md`, FAROTA C50). **Aptoide**:
+ankoraŭ ne komencita (docs/nova/07 § 3). Ĉiuj fazoj de la plano estas faritaj krom:
+iOS-ludado (bezonas AVPlayer + Xcode-projekton), eldono de Desktop + Web/wasmJs,
+hejmekrana widget, Chromecast, parolsintezo kaj la plena HTTP-API de la
+arkiv-servilo (fazo 1 — statikaj elŝuteblaj dosieroj — jam funkcias; vidu la
+skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`). Web estas
+limigita de CORS (nur la anchor.fm-podkastoj ŝargeblas sen servilo). La historia
+fazo-tabelo kaj la detala listo "kio funkcias / kio ne funkcias" staras en
+[`NOTOJ.md`](NOTOJ.md) → "Projekta stato kaj fazoj".
 
 ## Granda plano
 
@@ -40,16 +39,18 @@ Rekrei la apot en **Compose Multiplatform** (Android + iOS + Desktop + Web/Wasm)
 konstrui memstaran **servilon** kiu funkcias kiel arkivo de Esperanto-podkastoj.
 
 - **Malnova apo** (kodo en `malnova/app/`, `malnova/parse/`, `malnova/data/`): priskribita en `docs/malnova/`.
-- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposieraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) ankoraŭ ne estas kreita — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto restas estonta. **`server/` jam ekzistas** (fazo 1: Kotlin-arkiv-konstruilo, publika elŝutejo ĉe `https://javabog.dk/esperanto-radio/` — vidu la skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`).
+- **Nova apo** (en la radiko): priskribita en `docs/nova/` (komenco: [`docs/nova/INDEKSO.md`](docs/nova/INDEKSO.md)). La nova Compose Multiplatform-aposeraĵo (`androidApp/`, `desktopApp/`, `webApp/`, `shared/`) vivas en la radiko, apud `malnova/`, laŭ la oficiala KMP-ŝablono (https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html). `iosApp/` (Xcode-projekto) ankoraŭ ne estas kreita — la iOS-kodo jam ekzistas en `shared/src/iosMain/`, sed la Xcode-projekto restas estonta. **`server/` jam ekzistas** (fazo 1: Kotlin-arkiv-konstruilo, publika elŝutejo ĉe `https://javabog.dk/esperanto-radio/` — vidu la skill-on `servilo-arkivo` kaj `docs/nova/06_servilo_arkivo.md`).
 
-## Dosierujo-structuro
+## Dosierujo-strukturo
 
 La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esencoj:
 `malnova/` (la historia apo — ne tuŝebla), `androidApp/` + `desktopApp/` +
 `webApp/` + `shared/` (la nova KMP-apo), `docs/malnova/` + `docs/nova/`
 (dokumentaro), `CHANGELOG.md` + `ŜANĜOJ.md` + `NOTOJ.md` + `FAROTA.md` +
 `AGENTS.md` (la protokolaro), `.vibe/skills/` (proceduraj skill-oj:
-`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`, `servilo-arkivo`).
+`eldonado`, `sentry-esplorado`, `konstruado-kaj-testado`, `kanalkonfiguro`,
+`servilo-arkivo`, `enkonduk-detekto`, `seancorezumo`), `server/` (arkiv-servilo),
+`fdroid/` (F-Droid-metadatenoj), `iloj/` (agordaj skriptoj).
 
 ## Plej gravaj reguloj por agentoj
 
@@ -57,7 +58,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 > (**L1–L8**) kaj la sep parsreguloj (**P6.1–P6.7**, vidu `docs/malnova/03`). La FAROTA-eroj
 > uzas la literojn C/G/K/X. Referencu regulojn ĉiam per tiuj nomoj, ne per nura numero.
 
-- **A1 — Ne tuŝu la malnovan kodon** krom se eksplice petite. Ĝi estas historika.
+- **A1 — Ne tuŝu la malnovan kodon** krom se eksplicite petite. Ĝi estas historia.
   La celo estas rekreado, ne riparado.
 - **A2 — La parsado estas la kerno.** Antaŭ ol ŝanĝi ion pri datumoj, legu
   `docs/nova/04_parsado_kaj_arkivo.md` kaj `docs/malnova/03_parsado_kaj_fontoj.md`.
@@ -65,8 +66,7 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 - **A3 — Testu la daten tavolon kontraŭ golden fixtures**, sen reto. La dosierujo
   `RssArkivServer-filcache/` enhavas realajn kaŝenitajn fluojn (NE en la repo — .gitignore-ita).
   Uzu ilin kiel determinismajn test-enirojn kopiantaj la bezonatajn fiksaĵojn al
-  `shared/src/commonTest/resources/feeds/` (5 jam tie: kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
-  La testoj jam kopiis 3 fiksaĵojn al `shared/src/commonTest/resources/feeds/`.
+  `shared/src/commonTest/resources/feeds/` (kernpunkto, peranto, varsoviavento, vinilkosmo, lamalfamuloj). Vidu `docs/nova/04_parsado_kaj_arkivo.md`.
 - **A4 — Unu fonto-eraro ne devas panei la apon.** Se unu kanal-fluo mortas, la aliaj
   devas daŭre funkcii. Toleremeco al putrantaj fontoj estas deziro.
 - **A5 — Konservu la kanalkonfiguron** (`esperantoradio_konfiguro.json`). Ĝi estas
@@ -76,14 +76,14 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 - **A7 — Ĉiam pripensu ĉu indas fari teston.** Por ĉiu nova funkcio, modelo, aŭ
   regulo, demandu: ĉu tio estas testebla? Se jes, skribu teston. Tamen ne
   faru trivialajn testojn; preferu UI-testojn kiuj testas plurajn tavolojn.
-  Ne nur skribu kodon — ankaŭ validigu ĝin. Se estas UI-ŝanĝo, antaŭ ol fari 
+  Ne nur skribu kodon — ankaŭ validigu ĝin. Se estas UI-ŝanĝo, antaŭ ol fari
   commit, kontrolu ke navigado funkcias, kaj ke la enhavo estas videbla.
 - **A8 — Neniam engluti escepton silente.** Ĉiu `catch` bloko devas protokoli la
   eraron per `loge(tag, msg, e)` aŭ `logw(tag, msg, e)` (kun stacktrace).
   Eĉ se la eraro estas atendata aŭ negrava, protokolu ĝin per `logd`.
 - **A9 — Uzu `squash`-merge por ĉiuj PR-oj.** Kiam vi kunfandas PR-on al master,
-  uzigu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
-  La commit-mesaĝo estu la titolo de la PR + ligo al la PR
+  uzu `gh pr merge --squash`. Tiel master ricevas precize 1 commit po PR.
+  La commit-mesaĝo estu la titolo de la PR + ligo al la PR.
 - **A10 — Ĝisdatigu `CHANGELOG.md` en ĉiu PR kun uzantvidebla ŝanĝo.** Aldonu
   **unu linion** al la `## [Neeldonita]`-sekcio **ene de la sama PR**: konciza
   priskribo sen teknikaj detaloj + ligilo al la PR, ekz.:
@@ -100,14 +100,14 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
    NOTOJ.md aŭ ŜANĜOJ.md. Celo: ne ripeti la saman eraron.
 - **A12 — Neniam legu, modifu aŭ commit `secrets.properties` aŭ `*.keystore` aŭ `*.jks`.**
    Ĉi tiuj dosieroj enhavas sekretajn subskribajn informojn kaj neniam devas
-   esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmita
-   de `.gitignore`. Se vi trovas ili en la deponejo, tuj forigu ilin kun `git rm`
+   esti en la git-deponejo aŭ legataj de iu agento. Ilia ekzisto estas ŝirmata
+   de `.gitignore`. Se vi trovas ilin en la deponejo, tuj forigu ilin per `git rm`
    kaj informu la deponejan posedanton.
 
 ## Git-laborfluo
 
 - **L1 —** Kreu branĉon de `master` (aŭ de la plej nova feature-branĉo se temas pri
-  plia kommito en ekzistanta PR).
+  plia komito en ekzistanta PR).
   **Branĉnomo**: `MMdd-nomo` — ekz. `1009-hejmo-luditaj-kio-novas`.
   La `MMdd`-prefikso estas la nuna dato (ekz. 1009 = 9-a de oktobro).
   Uzu la saman nomon loke kaj sur GitHub.
@@ -115,24 +115,26 @@ La kompleta arbo estas en [`NOTOJ.md`](NOTOJ.md) → "Deponeja koda mapo". Esenc
 - **L3 —** Commit, push, kreu PR kun `gh pr create`.
 - **L4 —** Kiam la PR estas aprobita, kunfandu per `gh pr merge --squash --delete-branch`.
   Tio kreas 1 commit sur master kun la PR-titolo kaj ligilo al la PR.
-- **L5 —** Antaŭ commit kontrolu ĉu uzanto ŝanĝis aferojn rilate al via laboro, se jes
-  kaj ŝajnas esti en ordo, aldonu ankaŭ tion al la commit
+- **L5 —** Antaŭ commit kontrolu `git diff`: la posedanto povas labori paralele kaj
+  liaj ŝanĝoj povas miksiĝi kun viaj (2026-11-02, #166/#167). Rilatajn ŝanĝojn aldonu
+  (se en ordo), sed ne komutu senrilatajn; korektu eraretojn sed ne reskribu lian
+  varianton — avertu se li enkondukis eraron. Komparu la STAGING-diffon kun la
+  commit-mesaĝo (la dosieroj povas ŝanĝiĝi intertempe). Commitigu nur viajn proprajn
+  dosierojn: `git add <dosiero>`, neniam blinda `git add -A`.
 - **L6 — Ne commitu antaŭ ol la uzanto aprobis la ŝanĝojn.** La rajtigo por
   unu commit/push (ekz. "faru PR") validas nur por tiu unu fojo — ĝi ne
   ĝeneraligas al sekvaj ŝanĝoj sur la sama branĉo.
   **KUNFANDO (`gh pr merge`) BEZONAS APARTAN, EKPLICITAN aprobon** (ekz.
   "kunfandu"). Rajtigo por commiti/puŝi/krei PR-on NE inkluzivas la
-  kunfandon. (2026-10-19: PR #120 estis kunfandita post kiam la uzanto
-  aprobis nur "commitos, puŝos kaj kreos la PR-on" — tio estis eraro;
-  lasu la PR-on malfermita kaj atendu "kunfandu".)
+  kunfandon — eĉ ne por tekstaj/agentaj PR-oj; "ne atendu CI" rajtigas nur la
+  ŝparon de la atendo. (2026-10-19: PR #120 estis kunfandita post kiam la uzanto
+  aprobis nur "commitos, puŝos kaj kreos la PR-on" — tio estis eraro.)
 - **L7 — La kapa branĉo de PR ne nepre havas la nomon de via loka branĉo** — kontrolu
   `gh pr view N --json headRefName` antaŭ ol puŝi. Puŝi alinomitan lokan branĉon
   (ekz. `pr-85`) kreus NOVAN foran branĉon anstataŭ ĝisdatigi la PR-on.
-  (2026-10-11: PR #85 naskas el `hejmo-luditaj-kio-novas`, ne `pr-85`.)
 - **L8 — Por ĝisdatigi malfermitan PR-on de master, uzu merge, ne rebazo** — rebazo
-  reskribas la historion kaj postulas force-push; `git merge origin/master` en la
-  PR-branĉon ebligas normalan antaŭen-iran puŝon. (2026-10-11: tiel PR #85
-  ricevis master-ĝisdatigojn.)
+  reskribas la historion kaj postulas force-push (kiu estas blokita de hoko);
+  `git merge origin/master` en la PR-branĉon ebligas normalan antaŭen-iran puŝon.
 
 ## Ŝanĝoprotokolo (CHANGELOG.md)
 
@@ -155,55 +157,93 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
    ŝanĝas la ĉefan fontkodon (`*Main`-dosierujoj) sen ŝanĝo de `CHANGELOG.md`.
    Preterpaso: PR-etikedo `preterlasu-changelog` (puraj internaj ŝanĝoj).
 3. Eldono de nova versio: sekvu la skill-on **`eldonado`** (`.vibe/skills/eldonado/`)
-   — `apoversio` + versionCode-baskulo + CHANGELOG-sekcio + git-etikedo +
-   `internal.txt`-notoj + `publishReleaseApk` de la LOKA maŝino (la CI-eldonado
-   per GitHub-sekretoj ne uzeblas) + permana promocio al produktado. Kritikaj
-   faktoj: versionCode ne re-uzeblas (Play-API-rifuzo); GPP legas la notojn laŭ
-   la TRAKO (`internal.txt`), neniam laŭ versionName; APK, ne AAB (la apo ne
-   estas en Play App Signing); la signado legas `secrets.properties` (ne tuŝu).
+   — versionCode-baskulo + CHANGELOG-sekcio + git-etikedo + eldon-notoj +
+   `publishReleaseApk` de la LOKA maŝino (la CI-eldonado per GitHub-sekretoj
+   ne uzeblas) + permana promocio al produktado.
 
 ## Aktivaj reguloj kaj rimarkoj
 
-> La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan:
-> **`eldonado`** (versio-eldonado al Play), **`sentry-esplorado`** (legi/analizi
-> Sentry-n), **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, emulilo),
-> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj). Historiaj lecionoj kaj
+> La procedura scio vivas en la skill-oj de `.vibe/skills/` — ŝargu la koncernan
+> antaŭ ol labori pri la temo: **`eldonado`** (versioj/Play/F-Droid/Aptoide),
+> **`konstruado-kaj-testado`** (komandoj, JDK, platform-limigoj, testoj, emulilo,
+> Compose-testaj kaptindaĵoj), **`sentry-esplorado`** (legi/analizi Sentry-n),
+> **`kanalkonfiguro`** (JSONC, regex-minacoj, novaj kanaloj), **`servilo-arkivo`**
+> (servilo, STT, rsync), **`enkonduk-detekto`** (transsaltuKomenceSekundojn),
+> **`seancorezumo`** (HTML-resumo de seancoj). Historiaj lecionoj kaj
 > arkitekturaj resumoj staras en [`NOTOJ.md`](NOTOJ.md); la okazhistorio en
 > [`ŜANĜOJ.md`](ŜANĜOJ.md).
 
-- **«faru beta-eldonon» = interna testo (2026-11-19, decido de la posedanto):** kiam la posedanto skribas «faru beta-eldonon», li ĉiam celas eldonon al la trako `internal` de Google Play (li testas mem kaj poste promocias al produktado); la trako `beta` uziĝu nur se li eksplicite diras «beta-trakto». La uzitaj versionCode estas listigitaj en la `eldonado`-skill-o (`.vibe/skills/eldonado/SKILL.md`, do videbla sur GitHub), kun montrilo en `docs/nova/07_eldonado.md`.
-- **Konstruu post kunfando de kod-ŝanĝoj.** La CI nur kontrolas CHANGELOG-ŝanĝojn —
-  post ĉiu merge rulu `:shared:desktopTest` + `:androidApp:assembleDebug`. Por PR-oj
-  nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
-  tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI
-  (2026-10-17, regulo de la uzanto). **Tamen NE kunfandu sen aparta, eksplikita
-  peto de la uzanto** — eĉ ne por tekstaj/agentaj PR-oj; «ne atendu CI» rajtigas
-  nur la ŝparon de la atendo, ne la kunfandon. Same por kod-dosieroj, kiam la ŝanĝoj tuŝas
-  NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas ion ajn
-  (2026-10-25, regulo de la uzanto).
+### Git- kaj PR-laboro
+
+- **Kreu PR-branĉojn el `origin/master`, ne el la loka master (2026-11-24, PR #201→#202):**
+  la loka master povas antaŭeniĝi je nekunfandita laboro — branĉo el ĝi portus tiun
+  laboron en la PR (17 dosieroj anstataŭ la celataj 6). Do: `git fetch origin master`
+  kaj `git switch -c MMdd-nomo origin/master`. Se la branĉo jam puŝiĝis malpure:
+  rekonstruu per nova branĉo el `origin/master` + `git cherry-pick <komito>`,
+  forigu la foran branĉon per `git push origin --delete <nomo>` (tio fermas la
+  PR-on; la numero ŝoviĝas — ĝustigu la ligilojn per aparta commit) kaj kreu
+  novan PR-on; `--force` estas blokita de hoko. (La loka master mem restu netuŝita.)
+- **Loka `remote.origin.fetch` estas limigita al master** (2026-10-14): `git fetch origin`
+  (ankaŭ kun `--prune`) NE alportas PR-branĉojn. Por revizii PR-on, alportu la
+  kap-branĉon eksplicite:
+  `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
+  Flankefiko: `gh pr create` tiam ĉiam eraras per "you must first push the current
+  branch" — aldonu `--head <branĉnomo>`.
+- **Eltrovu la venontan PR-numeron tuj antaŭ la unua puŝo kaj uzu ĝin en CHANGELOG**
+  per aparta commit (sen amendo): la numeroj de PR kaj issue estas komunaj, do
+  prenu la maksimuman el ambaŭ kaj aldonu 1, ekz.
+  `gh api "repos/nordfalk/EsperantoRadio/issues?state=all&per_page=100" -q '.[].number' | sort -n | tail -1`;
+  skribu la ligilon en CHANGELOG, commit, push, poste `gh pr create --head <branĉo>`.
+  Se la numero intertempe ŝoviĝis, korektu per aparta commit — ne per amendo.
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
   (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj; ripetiĝis 2026-11-24,
   PR #207: la PR-korpo mangliĝis). Ankaŭ REST-vokoj (`gh api -f body="..."`) havas la
-  saman minacon. Liveru la korpon ĉiam el dosiero: `--body-file` aŭ `-f body="$(cat dosiero)"`
-  (la dosier-enhavo ne reanaliziĝas).
+  saman minacon. Liveru la korpon ĉiam el dosiero: `--body-file` aŭ `-f body="$(cat dosiero)"`.
+- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
+  uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
+- **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
+  `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 — korektu per
+  GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId` = `node_id`
+  de la recenzo). Kontrolu la AFIŜITAN tekston post la afiŝo.
+- **Recenzo-komentoj de la posedanto povas esti nudpunktaj** (2026-10-29, PR #143):
+  «forigu» aŭ nura citita linio signifas forig-peton. Agu, respondu en la fadeno
+  (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
+  forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
+  etikedon `preterlasu-changelog` (`gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **PR-revizio je peto de la posedanto**: troreviziu la tutan diff-on kaj aktive
+  pripensu kio mankas, misas aŭ povus esti problema — ne nur konfirmu. Ĉu estas
+  bona kodo? Ĉu estas verŝajnaj problemoj? Kontrolu A7 (testo), A8 (neniu silenta
+  catch), A10 (CHANGELOG), A11 (FAROTA/lecionoj), ĉu nur la propraj dosieroj estas
+  commititaj, kaj ĉu titolo kaj priskribo de la PR kongruas kun la kodo kaj
+  intenco. Se io ne kongruas, avertu.
+- **Dependabot-versi-PR-oj povas esti interdependaj kaj konfliktaj** (2026-10-13,
+  #99–#102): la Kotlin-bumpoj tuŝas apudajn liniojn de `build.gradle.kts` — solvu
+  per merge de master en la PR-branĉon, ĉiuj kromprogramoj je la sama versio.
+  Antaŭ ol kunfandi versi-bumpon kontrolu kaj la Kotlin-metadatumojn de transiraj
+  bibliotekoj (la kompililo havas maksimumon) kaj la compileSdk/AGP-postulojn
+  (`checkDebugAarMetadata`). Ĝenerale: `git fetch origin master` antaŭ la fina
+  puŝo — Dependabot povas esti enmetinta novajn komitojn al master dum la
+  revizio (2026-10-14, #109); konfliktoj en CHANGELOG/ŜANĜOJ/AGENTS estas kutimaj
+  — solvu ilin konservante ambaŭ flankojn.
+- **`mergeStateStatus: UNSTABLE`** = mergeable, sed la status-kontroloj ankoraŭ
+  kuras — gravas nur la fina konkludo de la kontroloj.
+- **«faru beta-eldonon» = interna testo (2026-11-19, decido de la posedanto):** la
+  posedanto ĉiam celas la trakon `internal` de Google Play (li testas mem kaj
+  poste promocias al produktado); la trako `beta` uziĝu nur se li eksplicite diras
+  «beta-trakto». La uzitaj versionCode estas listigitaj en la `eldonado`-skill-o.
+- **Konstruu post kunfando de kod-ŝanĝoj**: la CI nur kontrolas CHANGELOG-ŝanĝojn —
+  post ĉiu merge de kod-ŝanĝoj rulu `:shared:desktopTest` + `:androidApp:assembleDebug`.
+  Por PR-oj nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`,
+  NOTOJ ktp.) tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI;
+  same por kod-dosieroj kies ŝanĝoj tuŝas NUR komentojn aŭ dokumentadon
+  (2026-10-17/25, reguloj de la uzanto). La kunfando mem restas sub L6.
 - **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
-  dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
-  skribis sen la intertempe postulita `mutex.withLock`).
-- **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam verifu per
-  `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente
-  forvori najbarajn sekciojn (2026-11-20: C5/C26/C27 perdiĝis; Statuso-linioj
-  forglutiĝis de `getline`).
-- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
-  ĝustan literumadon de identigiloj per `grep`/`od` antaŭ ol reprovi — la okulo
-  ofte "korektas" similan nomon (`estasEneDe` ≠ `estaEneDe`). Tio validas ankaŭ
-  por ĉenoj: supersignaj literoj kaj SPACETOj glitas preter la okulo
-  (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis instrumentitan
-  teston atendi 5 s senfine). Komparu laŭbite (`od -c`, `python3`-asserto), ne
-  per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn, ne `\xc5\x9d`.
-  Legu ankaŭ la erarmesaĝon mem — ĝi montras la plej proksiman kongruon kaj
-  malkaŝas tiel ĵus enŝtelintajn tiperojn (2026-10-29: «sourpuce» anstataŭ
-  «source» en la dana README-linio, forkonsumita de PR #143).
+  dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11:
+  `markiLudita` skribis sen la intertempe postulita `mutex.withLock`).
+
+### Kodo, lingvo kaj stilo
+
 - **Esperanto-ortografio: nur veraj supersignoj** (renomo 2026-10-24): ĉiuj identigiloj,
   klasoj kaj dosier-nomoj uzas `ŝ ĝ ĉ ĵ ŭ` (`ŝargiElsendojnPorKanal`, `ElŝutStato.kt`,
   `SerĉoEkrano`, `ApajNovaĵojDeponejo`) — la x/h-sistemo estas forigita el la nova kodo.
@@ -220,149 +260,110 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   la historia `hesh` estas la angla „hash" — Esperante **haketo** (ago) / **haketaĵo**
   (rezulto; la konstanto nun: `APAJ_NOVAĴOJ_HAKETAĴO`). Nova kodo neniam enkonduku
   x/h-sistemajn vortojn.
-- **`LaunchedEffect(Unit) { vm.ŝargi() }` lanĉas la ŝargadon je ĈIU ekran-eniro** (2026-10-20):
-  navigado rekomponas la ekranon, do reveno al Hejmo/Kanalaro reŝargis ĉion — ĝis 7 plenaj
-  ŝarĝoj en 90 sekundoj ĉe unu uzanto (Sentry: 24 ŝarĝoj vs 6 apomfermoj). Ĉiu ŝargado,
-  kiun ekrano ekigas, devas iri tra `ŜargaKontrolilo` (dedupigo + TTL 5 min;
-  `ui/ŜargaKontrolilo.kt`) — kaj `leguKaŝitajnElsendojn` ne re-parsu kiam la en-memora
-  kaŝo jam havas la kanalon.
-- **Komponantoj de `ModalNavigationDrawer` restas en la semantika arbo ankaŭ
-  kiam la tirkesto estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")`
-  trovas 2 nodojn (ekrana titolo + tirkest-ero). Asertu laŭ enhava teksto
-  (ekz. agordo-ŝaltilo), ne laŭ ekrana titolo; por la tirkest-butono uzu
-  unikan `contentDescription` ("Naviga menuo" — ne "Menuo", kiu ekzistas sur
-  ĉiu karto).
-- **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
-  uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
-- **Recenzo-komentoj de la posedanto povas esti nudpunktaj** (2026-10-29, PR #143):
-  «forigu» aŭ nura citita linio signifas forig-peton (ekz. redundan,
-  mem-referencan linion). Agu, respondu en la fadeno per la komita-ŝlosilo
-  (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
-  forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
-  etikedon `preterlasu-changelog` (REST: `gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
-- **GitHub ne vidigas `.html`-dosierojn en la deponejo** (2026-10-29): ili montriĝas
-  kiel fontokodo — tio estas intenca. Solvo: **GitHub Pages** el `master:/docs`
-  (aktivigita 2026-10-29; la Pages-API postulas la vojon kun klino:
-  `source[path]=/docs`, nura `docs` donas 422). Ligiloj al `.html`-dosieroj en
-  README/dokumentoj iru al la Pages-URL (`https://nordfalk.github.io/EsperantoRadio/…`);
-  Pages rekonstruas aŭtomate je ĉiu puŝo al master. MD-dosieroj en `docs/`
-  estas Jekyll-transformataj; la deponeja fonto restas la vero.
-- **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
-  `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 ("non-pending") —
-  korektu per GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId`
-  = `node_id` de la recenzo). Aldone: kontrolu la AFIŜITAN tekston post la
-  afiŝo (en la unua recenzo de #126 glitis ne-esperanta artefakto en la teksto).
-- **Commitigu nur viajn proprajn dosierojn** (`git add <dosiero>`, ne blinda
-  `git add -A`) kiam la laborarbo povas enhavi nekomititajn ŝanĝojn de la uzanto.
+- **Terminaro kaj identigiloj (2026-10-24, kontraŭ Komputeko):** teknikajn terminojn
+  en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json. Renomante
+  publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu
+  ĉiujn tuŝitajn celojn — inkluzive
+  `:androidApp:compileDebugAndroidTestKotlin` (androidTest kompilas aparte kaj povas
+  referenci malnovajn kampojn). Post amasa anstataŭigo (find/replace) skanu la nove
+  verkitajn liniojn por fuŝitaj vortoj — ekz. `nenieu` anstataŭ `neniu` (2026-10-24,
+  PR #137). Kanonaj terminoj staras en la sekcio "Terminaro" sube.
+- **Lingva kontrolo por fuŝitaj vortoj (2026-11-21):** fojfoje (ekz. ĉe PR-revizio)
+  rulu `python3 iloj/lingvokontrolo.py`, kiu skanas la prozon de la PR-diff per
+  REVO-vortaro kaj markas nekonatajn vortojn (ekz. `temro` → `tempolimo`); trovitajn
+  fuŝojn korektu, legitimajn novajn terminojn aldonu al `iloj/terminoj.txt`.
+  **Ne blindigu la kontrolilon:** se la vorto estas fuŝita, korektu ĝin en la teksto
+  — ne aldonu ĝin al la permeslisto. Regenero: `python3 iloj/lingvokontrolo.py
+  --generu-permesliston`. Detaloj: `iloj/README.md`. (Intence NENIU CI-kontrolo.)
+- **Kiam `edit` fiaskas per "string not found" sen evidenta kialo**, kontrolu la
+  ĝustan literumadon per `grep`/`od` antaŭ ol reprovi — la okulo ofte "korektas"
+  similan nomon (`estasEneDe` ≠ `estaEneDe`). Spacetoj kaj supersignoj glitas preter
+  la okulo (2026-10-17: `"Plej ŝatataj"` ≠ `"Plejŝatataj"` — spaceto! — igis
+  instrumentitan teston atendi 5 s senfine). Komparu laŭbite (`od -c`,
+  `python3`-asserto), ne per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn,
+  ne `\xc5\x9d`. Legu ankaŭ la erarmesaĝon mem — ĝi montras la plej proksiman
+  kongruon kaj malkaŝas ĵus enŝtelintajn tiperojn.
+- **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam kontrolu per
+  `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente
+  forvori najbarajn sekciojn (2026-11-20: C5/C26/C27 perdiĝis; Statuso-linioj
+  forglutiĝis de `getline`).
+- **Ne faru CPU-intensan laboron (parsado, dosier-I/O) sur la ĉefa fadeno.**
+
+### Arĥitekturo kaj konduto de la apo
+
 - **Arkitekturaj bazlinioj**: neniu DI-framintervalo (permana injektado en
   konstruktiloj); neniu datumbazo (la kliento kaŝenas servil-respondojn kiel
   dosierojn).
-- **Loka `remote.origin.fetch` estas limigita al master** (2026-10-14, revizio de
-  PR #109): `git fetch origin` (ankaŭ kun `--prune`) NE alportas PR-branĉojn —
-  la refspec estas `+refs/heads/master:refs/remotes/origin/master`. Por revizii
-  PR-on, alportu la kap-branĉon eksplicite:
-  `git fetch origin <kap-branĉo> && git switch -c <loka-nomo> FETCH_HEAD`.
-  Flankefiko (2026-10-19, PR #122): `gh pr create` tiam ĉiam eraras per
-  "you must first push the current branch" — aldonu `--head <branĉnomo>`.
-- **Kreu PR-branĉojn el `origin/master`, ne el la loka master (2026-11-24, PR #201→#202):**
-  la loka master povas antaŭeniĝi je nekunfandita laboro (tiam: la fermitaj
-  #196/#197 plus plibonigoj) — branĉo el ĝi portus tiun laboron en la PR
-  (17 dosieroj anstataŭ la celataj 6; la squash-mergo verŝus ĝin al master).
-  Do: `git fetch origin master` kaj branchigu per
-  `git switch -c MMdd-nomo origin/master`. Se la branĉo jam puŝiĝis malpure:
-  rekonstruu per nova branĉo el `origin/master` + `git cherry-pick <komito>`,
-  forigu la foran branĉon per `git push origin --delete <nomo>` (tio fermas la
-  PR-on; la numero ŝoviĝas — ĝustigu la ligilojn per aparta commit) kaj kreu
-  novan PR-on; `--force` estas blokita de hoko kaj normala mergo kun la loka
-  historio poluus la PR-on. (La loka master mem restu netuŝita — ĝia stato
-  estas laboro de la posedanto.)
-- **Eltrovu la venontan PR-numeron tuj antaŭ la unua puŝo kaj uzu ĝin en CHANGELOG**
-  per aparta commit (sen amendo): la numeroj de PR kaj issue estas komunaj, do
-  prenu la maksimuman el ambaŭ kaj aldonu 1, ekz.
-  `gh api "repos/nordfalk/EsperantoRadio/issues?state=all&per_page=100" -q '.[].number' | sort -n | tail -1`;
-  skribu la ligilon en CHANGELOG, commit, push, poste `gh pr create --head <branĉo>`.
-  Se intertempe iu alia malfermis PR kaj la numero ŝoviĝis, korektu poste per
-  aparta commit — ne per amendo. (2026-10-29, PR #147: divenis #140/#146, sed #146
-  estis intertempe okupita de alia PR, do la vera numero estis 147.)
-- **PR-revizio je peto de la posedanto**: kiam li petas "reviziu la PR", troreviziu
-  la tutan diff-on kaj aktive pripensu ĉu io mankas, misas aŭ povus esti problema
-  pri la ŝanĝoj — ne nur konfirmu, sed pritaksu kion VI pensas? Ĉu estas bona kodo?
-  Ĉu estas verŝajnaj problemoj? Ankaŭ kontrolu ĉu la ŝanĝoj obeas A7 (testo), A8
-  (neniu silenta catch), A10 (CHANGELOG), A11 (FAROTA/lecionoj), ĉu nur la propraj
-  dosieroj estas commititaj, ĉu doc-komitoj apartenas al la PR, kaj ĉu la titolo kaj
-  priskribo ĉe la PR kungruas kun la kodo kaj intenco. Se io ne kongruas, avertu.
-- **Dependabot povas enmeti pliajn komitojn al master dum revizio de PR**
-  (2026-10-14, PR #109): dum la revizio envenis #99 kaj #101 — kontrolu
-  `git fetch origin master` antaŭ la fina puŝo kaj re-merge se necese
-  (`git merge --no-ff origin/master` en la PR-branĉo; konfliktoj en la
-  dokumentaj dosieroj (CHANGELOG/ŜANĜOJ/AGENTS) estas kutimaj — solvu ilin
-  konservante ambaŭ flankojn).
-- **`mergeStateStatus: UNSTABLE`** (2026-10-14, PR #109): signifas "mergeable,
-  sed la status-kontroloj ankoraŭ kuras" — gravas nur la fina konkludo de la
-  kontroloj (aŭ atendu `CLEAN` antaŭ ol merĝi).
-- **Dialogoj en Compose-testoj (EkranfotoTesto)** (2026-10-17): `AlertDialog`/`Dialog`
-  kreas APARTAN komponan radikon — `onRoot()` tiam fiaskas per "Expected exactly 1
-  node but found 2". Kaptu la lastan radikon per
-  `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` kaj
-  `.get(indekso)` sur `SemanticsNodeInteractionCollection`. ATENTU: `isRoot` estas
-  ECO (`val`), ne funkcio — `it.isRoot()` donas la konfuzan eraron "Cannot infer
-  type for T/R … DeepRecursiveFunction.invoke". Krome `onNodeWithText` serĉas en
-  ĈIUJ radikoj: buton-teksto kiu ekzistas kaj en la dialogo kaj en la ekrano
-  malantaŭ ĝi (ekz. "Nuligi") ne estas unika — fermu la dialogon per teksto kiu
-  aperas nur en ĝi (ekz. "Bone").
-- **Scaffold-enhavo DEVAS ricevi la `padding`-on el la content-lambda**
-  (2026-10-17, PR #114): forgeso ne fiaskas en testoj (la nodo restas
-  "displayed") — la TopAppBar simple kovras la unuajn liniojn de la enhavo
-  (en AlarmoRedaktilo la "Tempo"-etikedo malaperis malantaŭ la supra breto).
-  Sub-komponaĵoj de la enhavo bezonas `PaddingValues`-parametron; ĉiuj aliaj
-  ekranoj jam aplikas la padding-on en ĉiuj siaj branĉoj.
-- **Dependabot-versi-PR-oj povas esti interdependaj kaj konfliktaj** (2026-10-13,
-  revizio de #99/#101/#102): la du Kotlin-bumpoj tuŝas apudajn liniojn de
-  `build.gradle.kts` kaj konfliktas inter si — solvu per merge de master en la
-  PR-branĉon, ĉiuj kvar kromprogramoj je la sama versio. Coil 3.6.3 (#102) estis
-  blokita dufoje: (1) ĝia transira `kotlin-stdlib 2.4.10` havas metadatumojn 2.4.0,
-  nelegeblajn de kompililo 2.2.20 (maks 2.3.0); (2) eĉ sub Kotlin 2.4.21 ĝi postulas
-  `compileSdk 37` + AGP-nivelon kiu subenas ĝin (`checkDebugAarMetadata`; nuna AGP
-  8.9.1 maks rekomendatas 36). Kontrolu kaj Kotlin-metadatumajn kaj
-  compileSdk/AGP-postulojn antaŭ ol kunfandi versi-bumpon.
-- **Plena ĝisdatigo de la ilaro (Gradle 9 + AGP 9) eblas kaj estis provita**
-  (2026-10-17, PR #117; ĉiuj celoj verdaj: desktopTest, androidApp assembleDebug,
-  wasmJs-kompilo, :app:assembleDebug; versiojn vidu en `gradle/libs.versions.toml`).
-  Necesaj ŝanĝoj: `jcenter()` foriĝis en Gradle 9 (→ `maven { url = ... }`);
-  AGP 9 forigis la agord-flagojn `android.defaults.buildfeatures.buildconfig`,
-  `android.enableJetifier`, `android.enableR8.fullMode` el `gradle.properties`;
-  la malnova apo bezonas `buildFeatures { buildConfig true }` kaj
-  `proguard-android-optimize.txt` (ne `-android.txt`) kaj restas kun
-  `android.nonTransitiveRClass=false` (ĝi estos forigita en AGP 10);
-  KMP+`androidTarget()` bezonas `android.newDsl=false` kaj
-  `android.builtInKotlin=false` (pretervojoj ĝis migrado al
-  `com.android.kotlin.multiplatform.library` — vidu https://kotl.in/gradle/agp-new-kmp);
-  GPP devas esti la 4.x-linio (3.x ne subtenas AGP 9); platformon la novan
-  compileSdk AGP mem elŝutas se la permesiloj akceptitaj. La material3-versio
-  devas kongrui kun CMP (parigo el la CMP-eldon-notoj, ne la sama versinombro).
-  La nuna nav3-versio bone kompilas ankaŭ sur wasmJs (la klib-ABI-timo ne
-  konfirmiĝis), kaj la `savedstate-ktx`-devigo ne plu necesas (1.4.0 ekzistas).
+- **`LaunchedEffect(Unit) { vm.ŝargi() }` lanĉas la ŝargadon je ĈIU ekran-eniro**
+  (2026-10-20): navigado rekomponas la ekranon, do reveno al ekrano reŝargus ĉion.
+  Ĉiu ŝargado, kiun ekrano ekigas, devas iri tra `ŜargaKontrolilo` (dedupigo +
+  TTL 5 min; `ui/ŜargaKontrolilo.kt`) — kaj `leguKaŝitajnElsendojn` ne re-parsu
+  kiam la en-memora kaŝo jam havas la kanalon.
+- **La diska kaŝo havas `<slug>.rss` (kruda, rezervo) KAJ `<slug>.json`** (parsitaj
+  `Elsendo`, @Serializable; ~10× pli rapide ol re-parsado, 2026-11-21). Legado de la
+  kaŝo okazas paralele sur `Dispatchers.Default` kaj liveras rezultojn progresive
+  (`leguĈiujnKaŝitajnElsendojn(poKanalRicevita=…)`), por ke Hejmo montru enhavon tuj.
+- **La apo kunfandas la arkivan kaj la originalan fluon po kanalo (2026-11-20):**
+  `arkivoBazoUrl` → `<bazo><slug>.xml` + la originala `elsendojRssUrl`, paralele,
+  kunfandataj per `kunfanduElsendojn` (laŭ ID: la arkivo venkas; la originalo
+  aldonas novajn elsendojn tuj). Se ambaŭ fiaskas: kaŝo (unue enmemora, poste
+  diska). `deArkivo=true` konservas la finan ID-on el la guid. Tempolimoj: arkivo
+  10 s, originalo 15 s; grandec-limoj 8 MB/1 MB. `normigiDaton` akceptas la
+  monaton usklec-sensive (RFC-822).
+- **La persistigita navig-stato NE transvivas ĝisdatigon de la apo** (2026-10-27):
+  la pak-anstataŭigo forviŝas la task-rekordon — la Vojo-diskriminiloj el #134
+  ŝirmis okazintaĵon, kiu ne povas okazi, kaj estas forigitaj (ne reenkonduku).
+  La `@JsonNames`-kromnomoj en `Modeloj.kt` tamen RESTAS NECESAJ: ili ŝirmas
+  `Settings`/dosierojn, kiuj ja transvivas ĝisdatigojn.
+- **nav3-vojoj estas VALOR-bazitaj ŝlosiloj — ŝlosil-egalo signifas komunan
+  vizito-ŝtaton (2026-11-24):** nav3 konservas la staton de eniro per
+  `contentKey = "$key:${key::class}"` (la TUTA voja valoro). Solvo:
+  `Vojo.ElsendoDetalo(id, kanaloSlug, vizito)` / `KanaloDetalo(slug, vizito)` —
+  `vizito` estas hazarda kodo unika po malfermo. NE reenkonduku paĝ-korektojn en
+  `ElsendoEkranoKunSvipo` — ili rompas la rotacian pozicion. La cel-identeco
+  komparas nur la identigilojn per `estasSamaCelo` (App.kt); uzu `puŝuVojon`,
+  ne `backStack.add`. Mankanta kanalo/elsendo montras `NetroveblasEkrano`
+  (elsendo: post la ŝarg-kaskado `ElsendoDeponejoImpl.trovuElsendon`).
+- **ICY/StreamTitle ne atingas la MediaController-on** (2026-11-02, #166): la
+  MediaSession ne plusendas `onMetadata` — la servo skribas la titolon en
+  `IcyTitoloRegistro`, kiun `ExoPlayerLudiloRegilo.updateState()` legas
+  (ĉiusekunda enketado). Desktop kaj wasmJs ne eligas ICY.
+- **wasmJs: material3 devas resti parigita kun CMP (2026-11-22):**
+  `compose-material3 = "1.13.0-alpha01"` kun CMP 1.12.2 kompiliĝas sed mortas en
+  la retumilo per `LinkError` (skiko-malkongruo) — restu je la parigo el la
+  CMP-eldon-notoj (nun `1.12.0-alpha03`). Ne altgradigu ilin sendepende.
+- **CancellationException de animacio ne mortigu kolektanton en commonMain**
+  (2026-11-24, #205): `animateScrollToItem` ĵetas `CancellationException` kiam
+  uzanta gesto interrompas ĝin — en `LaunchedEffect(Unit)`-kolektanto tio finus
+  la kolekton porĉiame. Kaptu kaj voku `coroutineContext.ensureActive()`, por ke
+  nur la propra nuligo disvastiĝu; poste protokolu per `logd`. ATENTU:
+  `kotlin.coroutines.currentCoroutineContext` NE kompileblas en commonMain —
+  uzu `kotlin.coroutines.coroutineContext` + `kotlinx.coroutines.ensureActive`.
 
-- **Terminaro kaj identigiloj (2026-10-24, lingvaĵa korekto kontraŭ Komputeko):** teknikajn terminojn en nova kodo kontrolu unue kontraŭ https://komputeko.net/data.json (ekz. bitoko, diska kaŝmemoro, vokosono, ŝovilo, programisto). Renomante publikan identigilon, nepre grep-u ĉiujn `*Main`-fontojn kaj testojn kaj rekompilu ĉiujn tuŝitajn celojn — inkluzive `:androidApp:compileDebugAndroidTestKotlin`, ĉar androidTest kompilas aparte kaj povas referenci malnovajn kampojn. Post amasa anstataŭigo (find/replace) skanu la nove verkitajn liniojn por fuŝitaj vortoj — ekz. `nenieu` anstataŭ `neniu` (2026-10-24, PR #137). La kanonajn terminojn de la projekto listigas la sekcio "Terminaro — kanonaj terminoj" sube.
-- **La persistigita navig-stato ne transvivas ĝisdatigon de la apo (2026-10-27, emulila eksperimento):** la pak-anzataŭigo (`adb install -r`, same kiel Play) forviŝas la task-rekordon kun la konservita stato — sur API 26, 30 kaj 35 la apo post ĝisdatigo startas freŝe ĉe Hejmo, dum post pura procez-morto (`am kill`) la navig-stato ja restaŭriĝas. La historiaj Vojo-diskriminiloj (`…Vojo.Sercxo`/`…Vojo.Elshutoj`, `@SerialName`-pingloj el #134) ŝirmis do okazintaĵon, kiu ne povas okazi; ili estas forigitaj (2026-10-27) — ne reenkonduku ilin. La `@JsonNames`-kromnomoj en `Modeloj.kt` restas necesaj: ili ŝirmas `Settings`/dosierojn, kiuj ja transvivas ĝisdatigojn.
-- **ICY-metadatumoj (StreamTitle) de vivaj fluoj atingas nur la servon, ne la MediaController (2026-11-02, #166, kontrolite sur reala aparato kun Media3 1.11.1):** `Player.Listener.onMetadata` kun `IcyInfo` pafiĝas nur en la `EsperantoLudadoServo`; la `MediaSession` ne plusendas `onMetadata` al la `MediaController`, kaj `onMediaMetadataChanged` portas nur la statikan titolon de la `MediaItem` (MediaMetadata.title ne ŝanĝiĝas al la StreamTitle). Solvo: la servo skribas la titolon en procez-nivelan registron (`IcyTitoloRegistro`), la `ExoPlayerLudiloRegilo.updateState()` legas ĝin (ĉiusekunda enketado). Desktop (javax.sound) kaj wasmJs ne eligas ICY.
-- **Atentu pri lokaj ŝanĝoj de la uzanto en la laborkopio antaŭ `git add` (2026-11-02, #166/#167):** la posedanto povas dum nia laboro mem adapti la kodon (ekz. titolo/subtitolo en `MiniLudilbreto.kt`) — tia neatendita varianto eniris nian komiton kaj nur la post-merge testo malkaŝis ĝin. Antaŭ komiti, kontrolu `git diff` kaj ne komitu senrilatajn ŝanĝojn; nek reskribu la varianton de la posedanto, tamen korektu eraretojn kaj avertu se posedanto enkondukis erarojn.
-- **En Compose-testoj la subtitolo de MiniLudilbreto estas la kombinita teksto `"$subtitolo · $statTeksto"` (2026-11-02, #167):** aserti la tutan ĉenon (ekz. `"20 - RadioStacio FM - … · Rekta elsendo"`), ne la partan programtitolon.
-- **Rulumado de LazyRow en Compose-testoj (2026-11-24, #205):** la Desktop-testfenestro estas ~1024×768 px; kartoj (150 dp + 12 dp interspaco) → horizontala vico bezonas ~7+ erojn por esti rulebla. Svingu specifan vicon per `onRoot().performTouchInput { swipe(Offset(...y), Offset(...y)) }` kun y-koordinato prenita el karta nodo (`positionInRoot.y + size.height/2f`); unu plenlarĝa svingo flugos ĝis la fino. Du sama-tekstaj nodoj en malsamaj sekcioj (ekz. karto en "Kanaloj" kaj en "Kio novas") distingeblas per `fetchSemanticsNodes().maxBy { it.positionInRoot.y }` — la pli suba (pli granda y) estas la sekcio pli sube sur la ekrano. Notu: nombro-asertoj estas nedeterminismaj por kartoj apud la vidkampo-limo de la vico — prefere aserti videblecon per `assertIsDisplayed` sur la elektita kopio.
-- **CancellationException de animacio ne mortigu kolektanton en commonMain (2026-11-24, #205):** `animateScrollToItem` ĵetas `CancellationException` kiam uzanta gesto interrompas ĝin — en `LaunchedEffect(Unit)`-kolektanto tio finus la kolekton porĉiame. Kaptu kaj voku `coroutineContext.ensureActive()` tiel, ke nur la propra nuligo de la kolektanto (ekz. forlaso de la ekrano) disvastiĝu; poste protokolu per `logd`. ATENTU: `kotlin.coroutines.currentCoroutineContext` NE kompileblas en commonMain (Unresolved reference) — uzu `kotlin.coroutines.coroutineContext` + `kotlinx.coroutines.ensureActive`.
-- **Kiam fona konstruo fiaskas sed la eligon vi filtris per `tail`/`grep` (2026-11-24, #205):** la procez-reteno forĵetis la detalojn — kontrolu ĉu via `process.start`-komando filtras la eligon, kaj se jes, rerulu kun plena (aŭ `grep -E "FAILED|BUILD|e: "`) eligokapto antaŭ ol komenci diagnozon; alie vi vidas nur la senenhavan finan blokon.
-- **HTML-fonto por kanaloj sen RSS (2026-11-22, radiofrei):** kelkaj retejoj (ekz. radio-frei.de) liveras RSS nur por la tuta stacio kaj ignoras la serĉan filtrilon en RSS-reĝimo — la filtrita listo estas akirebla nur kiel HTML. Por tiaj kanaloj la konfiguro povas havi `elsendojHtmlUrl` (model-kampo `htmlFontoUrl`, `havasPodkastojn` = vera ankaŭ tiam); LA APON mem ne tuŝas ĝin — la arkiv-servilo tiras la list-paĝojn (`HtmlFontoParsilo` en shared, testita per fiksaĵoj) kaj po artikolo la mp3-URL-on, kaj generas `kanaloj/<slug>.xml`, kiun la apo legas kiel kutiman arkivan fluon.
-- **Arkivo + originalo kunfandataj (2026-11-20):** la apo elŝutas ambaŭ fontojn po kanalo (`arkivoBazoUrl` → `<bazo><slug>.xml` kaj la originala `elsendojRssUrl`) paralele kaj kunfandas per `kunfanduElsendojn` (laŭ ID: la arkivo venkas; la originalo aldonas novajn elsendojn — ili aperas tuj, eĉ se la arkivo estas malfreŝa). Se ambaŭ fiaskas: kaŝo (unue enmemora, poste diska). `deArkivo=true` konservas la finan ID-on el la guid. Tempolimoj: arkivo 10 s, originalo kiel aldona fonto 15 s; grandec-limoj 8 MB/1 MB. La servilo skribas `pubDate` laŭ RFC-822, kaj `normigiDaton` akceptas la monaton usklec-sensive (pli fruaj arkivaj fluoj havis grandlitere skribitajn datojn).
-- **Ne publikigu al la servilo sen eksplicita peto (2026-11-20):** `rsync … javabog.dk:javabog.dk/esperanto-radio/` (aŭ ĉiu alia ekster-reta publikigo) okazas NUR post kiam la uzanto tion eksplicite petas („kopiu al la servilo“ k.s.). Loka konstruado (`./gradlew :server:arkivKonstruilo`) kaj loka rsync-simulado estas en ordo, sed la reala rsync ĉiam atendas la aprobon de la posedanto.
-- **Emulilo/medio (2026-11-20):** `git push --force` estas blokita de hoko (amendu nur nepuŝitajn komitojn); `/tmp` estas blokita — uzu la skraŭĉdosierujon, ĉi tie praktike `server/data/privata/` (gitignored); `connectedDebugAndroidTest` MALINSTALAS la `.alfa`-APK-on poste — reinstalu (`adb install`) antaŭ manaj kontroloj, kaj uzu `pm clear` por devigi freŝan elŝuton. Instrumentitaj testoj povas fiaski sub granda gastiganta ŝarĝo (load ~40+) — komparu kun master en aparta worktree antaŭ ol atribui fiaskon al PR.
-- **Atendu antaŭ `commit` (2026-11-20):** antaŭ ĉiu `git commit` atendu, ke la posedanto trarigardis la kodon kaj aprobis.
-- **Lingva kontrolo por fuŝitajn vortoj (2026-11-21):** la agento fojfoje (ekz. ĉe PR-revizio) rulas `python3 iloj/lingvokontrolo.py`, kiu skanas la prozon de la PR-diff per REVO-vortaro kaj markas nekonatajn vortojn (ekz. `temro` → `tempolimo`); trovitajn fuŝojn la agento korektas, legitimajn novajn terminojn aldonas al `iloj/terminoj.txt`. **Ne blindigu la kontrolilon:** se la vorto estas fuŝita (ekz. `temro`, `nefatalas`), korektu la vorton en la teksto — ne aldonu ĝin al la permeslisto. Regenero de la permeslisto: `python3 iloj/lingvokontrolo.py --generu-permesliston`. Detaloj: `iloj/README.md`. (Intence NENIU CI-kontrolo por tio — la posedanto preferas agentan kontrolon.)
-- **Ne faru CPU-intensan laboron (parsado, dosier-I/O) sur la ĉefa fadeno.
-- **Kaŝu jam-parsitajn datumojn kiel JSON, ne nur krudan tekston (2026-11-21):** la diska kaŝo havas nun `<slug>.rss` (kruda, rezervo) kaj `<slug>.json` (parsitaj `Elsendo`, @Serializable) — la starto malkodas la JSON unue (~10× pli rapide ol Ksoup-reparsado: peranto 250 eroj = 714 ms parse vs 69 ms decode). Legado de la kaŝo okazas paralele sur `Dispatchers.Default` kaj liveras rezultojn progresive (`leguĈiujnKaŝitajnElsendojn(poKanalRicevita=…)`), por ke Hejmo montru enhavon tuj.
-- **Antaŭ commit komparu la staging-diff kun la commit-mesaĝo:** la posedanto povas intertempe forigi aferojn el la dosiero.
-- **wasmJs-webapo: material3 devas resti parigita kun CMP (2026-11-22):** `compose-material3 = "1.13.0-alpha01"` (PR #118) kun `compose-multiplatform = "1.12.2"` produktas skiko-malkongruon (0.150.1 vs 0.152.0-alpha02) — la apo kompiliĝas, sed en la retumilo mortas per `LinkError: WebAssembly.instantiate(): Import … "./skiko.mjs" … requires a callable`. Reiro al `1.12.0-alpha03` funkciigas la web-appon. Lanĉo: `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (sen -Xmx4g la ligilo mortas per OutOfMemoryError; laŭbezone unue `./gradlew kotlinWasmUpgradeYarnLock`).
+### Servilo kaj publikigo
 
-- **nav3-vojoj estas VALOR-bazitaj ŝlosiloj — ŝlosil-egalo signifas komunan vizito-ŝtaton (2026-11-24):** nav3 ŝargas kaj konservas la staton de eniro per `contentKey = "$key:${key::class}"` (la TUTA voja valoro, datumklasa toString). Du egalaj vojoj do dividas staton — klako sur la 1-a elsendo malfermis la 3-an (heredita svipo-paĝo de pli frua vizito). Solvo: `Vojo.ElsendoDetalo(id, kanaloSlug, vizito)` — `vizito` estas hazarda kodo unika po malfermo, do ĉiu vizito havas propran contentKey: remalfermo komenciĝas freŝe ĉe la klakita elsendo, rotacio/rekreado restaŭras la staton de ĝuste tiu vizito (la legita pozicio pluvivas). NE reenkonduku paĝ-korektojn en `ElsendoEkranoKunSvipo` — ili rompas la rotacian pozicion kaj ne estas necesaj. La cel-identecon por la navigado komparas nur la identigilojn (`id`+`kanaloSlug` ĉe ElsendoDetalo, `slug` ĉe KanaloDetalo) per `estasSamaCelo` (App.kt); uzu `puŝuVojon`, ne `backStack.add`. Fine, neniu detal-eniro restas ĉe ŝarg-indikilo eterne: mankanta kanalo aŭ elsendo montras `NetroveblasEkrano` (kanalo: tuj; elsendo: post la ŝarg-kaskado `ElsendoDeponejoImpl.trovuElsendon` = kaŝo → kutima ŝargo → unu forta refreŝigo). Same `KanaloDetalo(slug, vizito)` portas nur la identigilon.
+- **Ne publikigu al la servilo sen eksplicita peto (2026-11-20):** `rsync …
+  javabog.dk:javabog.dk/esperanto-radio/` (aŭ ĉiu alia ekster-retea publikigo)
+  okazas NUR post kiam la uzanto tion eksplicite petas („kopiu al la servilo“).
+  Loka konstruado kaj loka rsync-simulado estas en ordo; la reala rsync ĉiam
+  atendas la aprobon (detaloj: skill-o `servilo-arkivo`).
+- **GitHub ne vidigas `.html`-dosierojn en la deponejo** (2026-10-29): ili montriĝas
+  kiel fontokodo. Solvo: **GitHub Pages** el `master:/docs` (aktivigita; rekonstruas
+  je ĉiu puŝo al master). Ligiloj al `.html`-dosieroj en README/dokumentoj iru al la
+  Pages-URL (`https://nordfalk.github.io/EsperantoRadio/…`); la generita
+  seancorezumo iras al `docs/historio.html` (vidu la skill-on `seancorezumo`).
+
+### Testoj kaj medio
+
+- Kaptindaĵoj de Compose-testoj (apartaj radikoj de dialogoj,
+  `ModalNavigationDrawer` en la semantika arbo, Scaffold-padding,
+  LazyRow-svingo, subtitolo de MiniLudilbreto), la emulilo kaj la medio
+  (`/tmp` blokita, force-push-hoko, `connectedDebugAndroidTest` malinstalas
+  la APK-on, ŝarĝo-dependaj fiaskoj) staras en la skill-o
+  **`konstruado-kaj-testado`** — ŝargu ĝin antaŭ ol verki aŭ ruli testojn.
+- **Se fona konstruo fiaskas sed vi vidis nur filtritan eligon** (`tail`/`grep` en
+  `process.start`): la procez-reteno forĵetis la detalojn — rerulu kun plena
+  (aŭ `grep -E "FAILED|BUILD|e: "`) eligokapto antaŭ ol komenci diagnozon.
 
 ## Terminaro — kanonaj terminoj
 
@@ -401,7 +402,7 @@ sufiĉas grep-i kaj kopii el la kodo).
 
 Kunmetaĵoj skribiĝas kiel unu vorto: **sciigpermeso**, **sciigagordoj**, **sciiglimoj**
 (ne "sciig-permeso" ktp.). Esceptoj restas la persistitaj valoroj kaj API-nomoj
-(vidu la noton pri supersignoj en "Aktivaj reguloj kaj rimarkoj").
+(vidu la noton pri supersignoj en "Kodo, lingvo kaj stilo").
 
 ## Protokolado kaj Sentry — konvencio
 
@@ -409,13 +410,11 @@ La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio
 projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109)
 — **kaj nur kiam la erar-raportado estas ŝaltita** (agordo `erar_raportado`;
-defaŭlto RUTEMPA laŭ la subskriba atestilo de la APK, PR #148/C50 +
-MR !55129/2026-11-22: fremda subskribo (F-Droid) = opt-in kun unufoja
-konsento-demando ĉe la unua starto; nia subskribo (Play/Aptoide/GitHub) =
-defaŭlte ŝaltita, malŝaltebla en Agordoj → Privateco — sen la opt-in F-Droid
-atribuus la kontraŭecon "Tracking").
-Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj, kvoto-taksado) uzu la
-skill-on **`sentry-esplorado`**.
+defaŭlto RUTEMPA laŭ la subskriba atestilo de la APK, PR #148/C50: fremda
+subskribo (F-Droid) = opt-in kun unufoja konsento-demando ĉe la unua starto;
+nia subskribo (Play/Aptoide/GitHub) = defaŭlte ŝaltita, malŝaltebla en
+Agordoj → Privateco). Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj,
+kvoto-taksado) uzu la skill-on **`sentry-esplorado`**.
 
 Niveloj (`ProtokoloUtil.kt`). Ĉiuj Sentry-vojoj estas protektataj per la
 tutmonda flago `raportadoAktiva` (konsento, PR #148). Ĝenerala regulo (FAROTA
@@ -426,20 +425,19 @@ Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
 - `logd` — NUR loka logcat. Altfrekvencaj datum-tavolaj detaloj (parsado,
   diska kaŝmemoro, serĉo — po kanalo po ŝargo) uzu ĉi tion.
 - `logi` — loka + `Sentry.logger.info`. Defaŭlte ŜALTITA (agordo "Ŝaltu detalan
-  protokoladon", Agordoj → Privateco — la protokola kvoto montriĝis ne-problema).
-  Por uzantvidaj eventoj: navigado, klakoj, ŝargadoj.
+  protokoladon", Agordoj → Privateco). Por uzantvidaj eventoj: navigado, klakoj,
+  ŝargadoj.
 - `logGrava` — al Sentry (post konsento). NUR la gravaj eventoj: malfermo de la
   apo, ekludo de elsendo (kun kanalo), vekiĝo de alarmo. Uzu malmulte (kvoto).
-- `logw` — avertoj. Ambaŭ formoj (kun kaj sen escepto) sendas `Sentry.logger.warn`
-  al Sentry Logs — NENIAM error-evento, do ili ne konsumas la erarojn-kvoton;
-  `logw(tag, msg, e)` sendas du liniojn: la escepto-resumon kaj la staktracon.
-  Atendataj fiaskoj (reto, ludado, elŝuto, serĉo) uzu `logw(tag, msg, e)`.
-  (Ĝis 2026-10-19 la 3-arg formo sendis NENION al Sentry — FAROTA G46.)
+- `logw` — avertoj. Ambaŭ formoj sendas `Sentry.logger.warn` al Sentry Logs —
+  NENIAM error-evento, do ili ne konsumas la erarojn-kvoton; `logw(tag, msg, e)`
+  sendas la escepto-resumon kaj la staktracon. Atendataj fiaskoj (reto, ludado,
+  elŝuto, serĉo) uzu `logw(tag, msg, e)`.
 - `loge` — veraj eraroj. **`loge(tag, msg, e)` vokas `captureException` kaj
   konsumas la MONATAN ERAROJ-KVOTON** — neniam uzu por atendataj fiaskoj;
   `loge(tag, msg)` sen escepto estas nur protokol-evento (aparta kvoto).
 - `Sentry.captureMessage` rekte en la kodo — NE uzu (po-ŝanĝaj eventoj
-  plenigas la kvoton; la „Aŭtoludo“-mesaĝoj estis tial forigitaj).
+  plenigas la kvoton).
 - Ĉiu `catch` devas protokoli (regulo A8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
   kun stacktrace — neniam engluti escepton silente.
 - En produktado eraroj estas 50 %-specimenataj (`options.sampleRate`, PR #109).
@@ -471,7 +469,7 @@ mankas `jlink`); `./gradlew :shared:desktopTest` (ĉiuj testoj);
 
 ### Kaptindaĵoj en komuna kodo (commonMain)
 
-Tiuj kvin limigoj mordas jam dum la skribado de kodo — detaloj kaj erarmesaĝoj
+Tiuj limigoj mordas jam dum la skribado de kodo — detaloj kaj erarmesaĝoj
 staras en la skill-o `konstruado-kaj-testado`:
 
 - `Dispatchers.IO` ne ekzistas sur wasmJs — uzu `Dispatchers.Default` en komuna kodo.

@@ -21,15 +21,17 @@ Kiam la uzanto petas ion kiel:
 
 ## Procezo
 
-1. Rulu la Python-skripton `krei_html.py` kiu troviĝas apud tiu ĉi SKILL.md:
-   ```bash
-   python3 "$(dirname "$0")/krei_html.py" "$(pwd)" "$(pwd)/seancorezumo.html"
-   ```
-   (Anstataŭigu `$0` per la vojo al tiu dosiero.)
+1. Rulu la Python-skripton `krei_html.py` kiu troviĝas apud tiu ĉi SKILL.md.
+   Skribu la eligon al `docs/historio.html` — ne al la repo-radiko (PR #143):
+   - GitHub montras `.html`-dosierojn en la deponejo kiel fontokodon; la stiligita
+     vidpunkto ekzistas nur per **GitHub Pages** (aktiva por `docs/`):
+     `https://nordfalk.github.io/EsperantoRadio/historio.html` — la README ligas
+     al tiu URL, do tenu la dosiernomon `historio.html` fiksita.
+   - Ne commitu la generitan HTML kunona kun aliaj ŝanĝoj se la uzanto volas nur
+     legi ĝin — raportu la dosierindikon.
 
-   Pli precize, rulu:
    ```bash
-   python3 .vibe/skills/seancorezumo/krei_html.py "$(pwd)" "$(pwd)/seancorezumo.html"
+   python3 .vibe/skills/seancorezumo/krei_html.py "$(pwd)" "$(pwd)/docs/historio.html"
    ```
 
 2. La skripto:
@@ -61,21 +63,3 @@ Kiam la uzanto petas ion kiel:
 - Ne necesas retkonekto
 - La protokoloj troviĝas en `~/.vibe/logs/session/` (aŭ `$VIBE_HOME/logs/session/`)
 - Se `VIBE_HOME` estas agordita, uzu ĝin anstataŭ `~/.vibe`
-
-## Eligo-loko (2026-10-29, PR #143)
-
-Skribu la eligon al `docs/historio.html` (ne al la repo-radiko):
-
-```bash
-python3 .vibe/skills/seancorezumo/krei_html.py "$(pwd)" "$(pwd)/docs/historio.html"
-```
-
-Kialoj:
-- GitHub **montras `.html`-dosierojn kiel fontokodon** en la deponejo (intenca) —
-  la stiligita vidpunkto ekzistas nur per **GitHub Pages**, kiu servas la
-  dosierujon `docs/` el `master` ĉe
-  `https://nordfalk.github.io/EsperantoRadio/historio.html`
-  (aktiviĝis 2026-10-29; rekonstruas aŭtomate je ĉiu puŝo al master)
-- La README ligas al tiu Pages-URL — tenu la dosiernomon `historio.html` fiksita
-- Ne commitu la generitan HTML kunona kun aliaj ŝanĝoj se la uzanto volas
-  nur legi ĝin — demandu aŭ raportu la dosierindikon

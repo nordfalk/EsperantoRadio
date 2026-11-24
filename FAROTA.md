@@ -3,34 +3,6 @@
 > **Kiel uzi** (ĝisdatigita 2026-11-20): ĉi tiu dosiero enhavas NUR la MALFERMAJN punktojn, ordigitaj laŭ graveco (KRITIKA → GRAVA → KONSILO). Kiam punkto estas solvita, FORIGU ĝin tute — ĝia priskribo kaj la historio de la riparo estas arkivitaj en `git log` de ĉi tiu dosiero, en la PR/CHANGELOG kaj en [`ŜANĜOJ.md`](ŜANĜOJ.md); la daŭre valida scio el finitaj punktoj staras en [`NOTOJ.md`](NOTOJ.md).
 > **Rilato al la aliaj dosieroj** (ekde 2026-10-11): [`NOTOJ.md`](NOTOJ.md) = konstanta scio laŭ temo; [`ŜANĜOJ.md`](ŜANĜOJ.md) = historio de la riparoj (problemo→kaŭzo→testo); `CHANGELOG.md` = uzantvida resumo.
 
-## Revizio 2026-11-20 (kontraŭ master + Sentry, 7–14 tagoj)
-
-Ĉiuj punktoj sube kontrolitaj kontraŭ la nuna kodo; Sentry-datumoj de 2026-11-13 → 11-20.
-
-| Punkto | Verdikto 2026-11-20 |
-|---|---|
-| G42 | **SOLVITA 2026-11-20**: la vera risko estis `scope.launch` en `onDispose` (App.kt) — nun nova scope; ceteraj uzoj jam uzas `LaunchedEffect`/nuligeblajn taskojn. Punkto forigita. |
-| G44 | ** Ankoraŭ aktuala, nova kaŭzo**: anchor.fm nun redonas 403 `geofence:blocked` (Spotify-geobloko); krome substack/vaticannews ConnectTimeout, ivoox 503, "Connection refused" (3zzzenesperanto, peranto). |
-| C5 | Aktuala (`build.gradle.kts:64` hardkodita keystore-vojo). |
-| C9 | Parte: `jcenter()` forigita, sed la jcenter-URL ankoraŭ registrita kiel maven-repo; `verification-metadata.xml` mankas; dependabot.yml ekzistas. |
-| C15, C16, C21, C25, C30 | **SOLVITAJ 2026-11-20** (forigo de malnovaj aŭskultantoj en wasmJs; fermo de `rawStream` + KDoc de `saltiAl` sur Desktop; forigo de `LOCKED_BOOT_COMPLETED`; asertoj en `EkranfotoTesto`; KDoc en `LudvicoLogiko`) — punktoj forigitaj el ĉi tiu dosiero; verdaj: `:shared:desktopTest`, `:shared:compileKotlinWasmJs`, `:androidApp:assembleDebug`. |
-| C22, C40 | **SOLVITAJ 2026-11-20** (`lifecycleScope` anstataŭ propra ne-nuligebla scope en `MainActivity`; `-Xmx3g` en `gradle.properties`) — punktoj forigitaj; verdaj: `:androidApp:assembleDebug`, `:shared:desktopTest`. |
-| C26, C27, C32 | **SOLVITAJ 2026-11-20** (horloĝ-injekto en `HejmoViewModel`/`HejmoEkrano` + fiksa dato en la testo; pura `estasPasemaHttpStatuson` en commonMain + unuo-testo; tuŝ-celoj pligrandigitaj al 48 dp) — punktoj forigitaj; verda: `:shared:desktopTest`. |
-| C34 | Forigita 2026-11-20: la TODOj jam estas en la iOS-kodo (`PlatformLigilo.kt` + deep-link-noto); deep links restas parto de C58. |
-| C29 | **SOLVITA** — `resolutionStrategy.force` forigita; punkto forigita el ĉi tiu dosiero. |
-| C40 | **SOLVITA 2026-11-20** (`-Xmx3g`); punkto forigita. |
-| C41 | **SOLVITA 2026-11-20** (AGENTS.md mencias nun la diagnozan ekranon; `docs/nova/02/03` korektitaj pri `puriguModeloj`); punkto forigita. |
-| C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
-| C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
-| C54 | **SOLVITA 2026-11-20**: butono „Kopii RSS-URL“ en KanalEkrano + `kopiuTekston` (expect/actual por android/desktop/wasmJs/ios). Punkto forigita. |
-| C50, C51, C52, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). |
-| C46 | **SOLVITA 2026-11-20**: lud-eraroj nun raportiĝas per 2-arg `logw` (videblaj en Sentry Logs); reprovo jam ekzistis (`ReprovoLogiko`). Punkto forigita. |
-| C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
-| C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
-| C53 | Parte farita: HUMILOPINIE aldonita; restas kontroli "Una Vaga Idea"/"Cuéntame, Hermosura". |
-| C59 | Parte farita: `transsaltuKomenceSekundojn` ekzistas kun ĉiuj valoroj; restas (b) plena aŭtomatiĝo (`enkonduk-detekto`). |
-| C61 | **SOLVITA 2026-11-24** (`aktualaVersio` vivas kaj pelas la ĝisdatigo-indikilon — tipo `Platformo`, versiokarto, Play-butono; `funkciaAnonco` forigita el la konfiguro, PR #204) — punkto forigita el ĉi tiu dosiero. |
-
 ## GRAVA
 
 #### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
@@ -40,6 +12,9 @@
 - **Priskribo**: Parto estas pasemaj ret-problemoj (timeout/DNS ĉe spreaker, anchor.fm, blogspot — KMP-12/14/15/M/Q), sed la ripetiĝo ĉe la samaj kanaloj sugestas mortajn aŭ ŝanĝitajn fluojn. `radiovatikana` aperas ankaŭ en lud-eraroj (`UnknownHostException` por `media.vaticannews.va`) — eble la tuta gastigo estas morta.
 - **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
 - **Ĝisdatigo 2026-10-27** (Sentry 3.1.0/252, 14 tagoj + ekstera kontrolo): `radioscienca` fiaskas ankaŭ en la nuna eldono — ~15 eventoj ĉe ~5 uzantoj, ofte kun **0 kaŝenitaj elsendoj** (uzanto vidas malplenan kanalon). La fluo respondas HTTP 200 de ekstere (kontrolita per curl, ankaŭ kun Ktor/okhttp/apo-UA — do ne UA-blokado, sed intermita servila problemo de la gastiganto). Same aperas: `polaretradio`, `radiovatikana`, `spiritismavocxo` (0 kaŝenitaj), `lemondediplomatique`, `lamalfamuloj`, `vinilkosmo`. La DNS-avertoj (`UnresolvedAddressException`, 52 eventoj) venas de unu aparato sen reto kaj estas pritraktitaj ĝuste per kaŝmemoro.
+- **Ĝisdatigo 2026-11-20** (semajna Sentry-statistiko): ankoraŭ aktuala, kun novaj kaŭzoj:
+  anchor.fm redonas 403 `geofence:blocked` (Spotify-geobloko); krome substack/vaticannews
+  `ConnectTimeout`, ivoox 503, „Connection refused“ (3zzzenesperanto, peranto).
 
 ## KONSILO
 
@@ -54,7 +29,7 @@
 - **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu OWASP `dependencyCheck` en CI; limigu la jcenter-repon al la malnova projekto aŭ forigu ĝin iam.
 
 #### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
-- **Statuso**: [ ]
+- **Statuso**: [ ] (neniu okazinta en 30 tagoj, kontrolite 2026-11-13→11-20 — plu observu kun malalta prioritato)
 - **Fonto**: G45-riparo (2026-10-20): `KorpaLegilo.kt` limas la RSS-korpo-legadon al
   `MAKSIMUMA_FLUA_GRANDECO_BAJTOJ = 1 MB` (la plej granda konata legitima fluo ~310 KB).
 - **Priskribo**: Se iam reala kanal-fluo transpasos 1 MB (ekz. podkasto kun centoj da
@@ -110,12 +85,6 @@
     prizorgantoj etikedos (New App/review-requested — ekstera kontribuinto
     ne povas mem) kaj revizios, tigoj–semajnoj; **respondu rapide al
     komentoj** (tio decidas la rapidecon).
-  - **Play**: 3.1.1 (versionCode 254) kuŝas en la interna trako kun la
-    „Nova en 3.1.1"-notoj — restas nur la **promocio al produktado**
-    (https://play.google.com/console/u/0/developers/8294421063218887510/app/4973090730523647228/releases/overview).
-    Rimarko: F-Droid konstruas la etikedon v3.1.1 kiel **253** (253
-    bruliĝis en Play pro la interna testo 3.1.1-beta29okt el la
-    nekunfandita PR #144; ekde v3.1.2 la kodoj re kongruos).
   - **Sentry-telemetrio** (C48/C49/G44): el F-Droid-uzantoj nur konsentintoj
     plu raportos; la malpliiĝo estas atendata, ne incidento.
 - **Stato (2026-11-22)**: la revizianto demandis en la MR-fadeno
@@ -169,34 +138,26 @@
   (b) post aŭtomata ludado de kelkaj podkastaj elsendoj, aŭtomate transiri al la
   rektaj elsendoj (ideo);
   (c) transskribo de elsendoj kun tempokodoj, montrataj dum ludado — por lerni
-  Esperanton (ideo; nature kunligi kun la estonta arkiv-servilo,
-  `docs/nova/06_servilo_arkivo.md`).
+  Esperanton (ideo; la STT-flanko jam funkcias sur la arkiv-servilo — vidu la
+  skill-on `servilo-arkivo`; restas la montrado en la apo).
 - **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
 
-#### C53 — Nova kanalo: HUMILOPINIE (ManchaPod) — kaj kontrolo de la ceteraj ManchaPod-fluoj
-- **Statuso**: [ ]
-  ripeta "Enigu min en la debato"-boilerplate kaj ora testo sur fiksaĵo; RESTAS: kontroli
-  "Una Vaga Idea" kaj "Cuéntame, Hermosura" pri Esperanto-epizodoj)
+#### C53 — Kontrolo de la ceteraj ManchaPod-fluoj
+- **Statuso**: [ ] („Ne Parolu pri Esperanto“ kaj „HUMILOPINIE“ jam estas en la
+  agordo; RESTAS: kontroli „Una Vaga Idea“ kaj „Cuéntame, Hermosura“ pri
+  Esperanto-epizodoj)
 - **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
-- **Priskribo**:
-  - **"Ne Parolu pri Esperanto"** (spreaker-show **5202159**,
-    `https://www.spreaker.com/show/5202159/episodes/feed`) **jam estas en la agordo**
-    (kodo `neparolupriesperanto`) — kontrolita 2026-10-24.
-  - **"HUMILOPINIE"** (spreaker-show **6684993**) mankas:
-    `https://www.spreaker.com/show/6684993/episodes/feed`
-    (pod.ligilo: `https://pod.link/aHR0cHM6Ly93d3cuc3ByZWFrZXIuY29tL3Nob3cvNjY4NDk5My9lcGlzb2Rlcy9mZWVk`).
-  - La allmylinks-paĝo listigas pliajn ManchaPod-elsendojn ("Una Vaga Idea",
-    "Cuéntame, Hermosura" — parte nacilingvaj): kontroli ĉu ili havas sufiĉe da
-    Esperanto-epizodoj antaŭ ol aldoni.
-  - Spreaker-antaŭvido ekzistas en la agordo (almenaŭ 2 kanaloj); G44 notas
-    pasemajn spreaker-tempolimojn (KMP-12/14/15).
+- **Priskribo**: „Ne Parolu pri Esperanto“ (spreaker-show **5202159**, kodo
+  `neparolupriesperanto`) kaj „HUMILOPINIE“ (spreaker-show **6684993**, kodo
+  `humilopinie`) jam estas en la agordo — kontrolite 2026-11-24. La allmylinks-paĝo
+  listigas pliajn ManchaPod-elsendojn („Una Vaga Idea“, „Cuéntame, Hermosura“ —
+  parte nacilingvaj): kontrolu ĉu ili havas sufiĉe da Esperanto-epizodoj antaŭ ol
+  aldoni. Atentu G44 (pasemaj spreaker-tempolimoj, KMP-12/14/15).
 - **Sugesto**: sekvu la skill-on `kanalkonfiguro` (JSONC-kampoj, `puriguModeloj`-minacoj,
-  parsreguloj P6.1+, golden-testo laŭ A3). Datumoj: emblemo kaj retpoŝto
-  (`manchapod@gmail.com`) el la fluo/paĝo; `hejmpaĝoButono`
-  `https://www.spreaker.com/podcast/humilopinie-manchapod--6684993`. Post aldono:
-  `radioTxtKomparilo` kaj fluo-kontrollo (G44-stilo: ĉu HTTP 200 + RSS?).
-
-  jam en la kanal-objekto (agordo, A5) — neniu nova datumvojo necesas.
+  parsreguloj P6.1+, golden-testo laŭ A3); post aldono `radioTxtKomparilo` kaj
+  fluo-kontrolo (G44-stilo: ĉu HTTP 200 + RSS?). La kanalaj datumoj (emblemo,
+  retpoŝto, hejmpaĝo) jam vivas en la kanal-objekto (agordo, A5) — neniu nova
+  datumvojo necesas.
 
 #### C55 — Eldoni la komputilan (desktop) version
 - **Statuso**: [ ]
@@ -212,7 +173,8 @@
 - **Statuso**: [ ]
 - **Fonto**: ideo de la posedanto (2026-10-24); modelo: https://esperanto-radio.com/
 - **Priskribo**: esplori ĉu la reta versio povus funkcii tiel, ke la fluo- kaj
-  metadatumoj venas de la estonta arkiv-servilo (docs/nova/06, C43), sed la ludado mem
+  metadatumoj venas de la arkiv-servilo (fazo 1 funkcias; JSON-API = fazo 2 —
+  docs/nova/06), sed la ludado mem
   estas reta HTML-komponento kiu ludas rekte de la fonto. Ŝlosila fakto: CORS blokas
   `fetch`/XHR (pro tio plej multaj RSS-fluoj kaj ankaŭ la Coil-bildoj ne ŝargeblas en
   la nuna reta versio), sed **ne** `<audio src>` — la rekt-ludado do funkcias sen
@@ -249,7 +211,7 @@
   Aldone (PR #144): snackbar „Transsaltis la enkondukon" kun klariga dialogo;
   agordoj „Transsalti enkondukon" (ĉefa ŝaltilo) kaj „Sciigo pri transsaltita
   enkondukon" („Bone" en la dialogo malŝaltas ĝin).
-  RESTAS: (b) plena aŭtomatiĕo (la skripto jam ekzistas kiel la skill-o
+  RESTAS: (b) plena aŭtomatiĝo (la skripto jam ekzistas kiel la skill-o
   `enkonduk-detekto` kun `detekto.py`). Plena detekto farita 2026-10-29 (21 kanaloj
   analizitaj, 5 plej freŝaj elsendoj po kanalo; 6 preterlasitaj: muzaiko rekta-kanalo,
   radioscienca/spiritismavocxo/vinilkosmo/peranto/kaliningrada mortaj fluoj — G44):

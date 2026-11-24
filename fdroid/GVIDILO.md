@@ -291,6 +291,31 @@ neniu ago bezonata (konfirmita ĉe la najbaraj MR-oj, 2026-10-31).
   deponejo, kromprogramo neatingebla por ili) — tion mi kontrolu antaŭ ĉiu
   eldono (novaj kromprogramoj devas veni el Maven Central / Google Maven).
 
+## 8. Reproduktebleco de la konstruo (RB, Binaries-kontrolo)
+
+Kun `Binaries:` en la yml, `fdroid build` ne nur konstruas — ĝi ankaŭ
+**kontrolas** (per apksigcopier): ĝi kopias nian subskribo-blokon sur sian
+ propran konstruaĵon kaj postulas, ke ĉiuj bitokoj kongruas. Fiasko aspektas
+kiel „compared built binary to supplied reference binary but failed“ + difo
+(`diff -r`) de apartaj dosieroj. Ĉiuj kaŭzoj trovitaj ĝis nun:
+
+- **`rootProject.name` nefiksita** (2026-11-24, pruvita per puraj
+  rekonstruoj): Gradle implicite nomas la projekton laŭ la dosieruja nomo;
+  la nomo fluas en la sintezajn nomojn de Kotlin-inline-aliriloj
+  (`…$<vojo>_shared_release()`), el tie en `pg_map_hash`/`pg_map_id` —
+  kiun R8 enigas en la dekson kiel `r8-map-id-<64 hekso>` — do ĉiu
+  dosierujo produktas malsaman `classes.dex` (kaj `assets/dexopt/
+  baseline.prof`, kiu entenas la dekso-kontrolsumon). Riparo:
+  `rootProject.name = "EsperantoRadio"` en `settings.gradle.kts`
+  (PR #203) — NE FORIGU tiun linion kaj NE alinomu la kontrolan dosierujon.
+  La konstruo de F-Droid okazas en `/home/vagrant/build/
+  dk.nordfalk.esperanto.radio` — do sen la fiksa nomo ĝi neniam kongruus.
+- **`META-INF/version-control-info.textproto`**: la APK registras la
+  git-revizion de la konstrua komito. Konsekvenco: avero (GitHub-release
+  `EsperantoRadio-vX.Y.Z.apk`) kaj la `commit`-kampo de la yml devas
+  deveni el **la sama komito** — la averto konstruiĝu ĜUSTE el la komito,
+  pri kiu la yml parolas (paŝo en la `eldonado`-skill-o).
+
 ## Utilaj ligiloj
 
 - Inclusion Policy: https://f-droid.org/docs/Inclusion_Policy/

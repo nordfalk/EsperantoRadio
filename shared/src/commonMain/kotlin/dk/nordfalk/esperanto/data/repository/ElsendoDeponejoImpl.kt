@@ -66,7 +66,7 @@ open class ElsendoDeponejoImpl(
      * arkivo (la arkivo venkas, la originalo aldonas ĝis tiam ne-arkivitajn elsendojn).
      * Sur la retumilo (wasmJs) la originalaj fluoj estas CORS-blokitaj (FAROTA C56):
      * la retversio gastigas samdevene apud la arkivo (javabog.dk/esperanto-radio/apo/)
-     * kaj uzas nur la arkivan datumvojon — `AppStato` golfigas tion per la platformo.
+     * kaj uzas nur la arkivan datumvojon — `AppStato` ŝaltas tion laŭ la platformo.
      */
     private val uzuOriginajnFluojn: Boolean = true,
 ) : ElsendoDeponejo {

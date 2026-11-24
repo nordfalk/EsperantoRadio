@@ -315,6 +315,21 @@ class EkranfotoTesto {
     }
 
     @Test
+    fun ekranfoto_hejmo_versiokarto() = runComposeUiTest {
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                HejmoEkrano(
+                    kanaloDeponejo = falsaKanaloDeponejo(),
+                    elsendoDeponejo = falsaElsendoDeponejo(),
+                    novaVersio = MutableStateFlow("9.9.9"),
+                )
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "12_hejmo_versiokarto")
+    }
+
+    @Test
     fun ekranfoto_agordoj_avertosigno() = runComposeUiTest {
         setContent {
             MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {

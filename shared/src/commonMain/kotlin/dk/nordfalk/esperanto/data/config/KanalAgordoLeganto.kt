@@ -116,6 +116,13 @@ data class KanalAgordo(
         @SerialName("apaj_novaĵoj_pasintaj") val apajNovaĵojPasintaj: List<String>? = null,
         /** Retpoŝto de la prizorganto — celo de „Proponi kanalon“ (datum-movita, A5). */
         @SerialName("prizorgantaRetpoŝto") val prizorgantaRetpoŝto: String? = null,
+        /**
+         * La plej nova versio en la vendejo — se ĝi estas pli nova ol la instalita
+         * apo, la ĉefekrano montras ĝisdatigo-indikilon (FAROTA C61a). La valoro
+         * povas esti ĝisdatigita defore (en la refreŝigata kanalkonfiguro) sen
+         * eldoni novan apopaakon.
+         */
+        @SerialName("aktualaVersio") val aktualaVersio: String? = null,
     )
 }
 

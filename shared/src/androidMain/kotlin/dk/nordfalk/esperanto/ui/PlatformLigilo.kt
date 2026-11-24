@@ -9,6 +9,8 @@ import dk.nordfalk.esperanto.data.config.appContext
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 
+actual val platformo: Platformo = Platformo.ANDROIDO
+
 actual fun malfermuLigon(url: String) {
     logi("Ligilo", "Malfermas: $url")
     try {

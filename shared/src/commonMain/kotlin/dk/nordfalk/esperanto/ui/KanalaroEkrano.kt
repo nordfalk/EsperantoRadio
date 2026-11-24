@@ -157,8 +157,14 @@ fun KanalaroEkrano(
                 title = { Text("Kanaloj") },
                 actions = {
                     ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
-                    IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
-                    IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
+                    // Elŝutoj nur sur platformoj kiuj ilin subtenas (Android, Desktop)
+                    if (platformo == Platformo.ANDROIDO || platformo == Platformo.DESKTOPO) {
+                        IconButton(onClick = { logi("Klako", "elŝutoj-butono"); onElŝutoj() }) { Icon(Icons.Filled.Download, contentDescription = "Elŝutoj") }
+                    }
+                    // Vekhorloĝo nur sur Android (AlarmoSkedilo)
+                    if (platformo == Platformo.ANDROIDO) {
+                        IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
+                    }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }
             )

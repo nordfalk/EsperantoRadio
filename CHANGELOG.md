@@ -17,6 +17,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Ŝanĝita
 
 - „Kio novas“ aŭtomate rulumas al la unua (plej nova) karto kiam venas nova elsendo (https://github.com/nordfalk/EsperantoRadio/pull/205)
+- Nehaveblaj ebloj ne plu montriĝas: la vekhorloĝo nur sur Android, elŝutoj nur sur Android kaj Desktop (https://github.com/nordfalk/EsperantoRadio/pull/212)
 
 ### Aldonita
 

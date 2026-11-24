@@ -542,7 +542,10 @@ fun HejmoEkrano(
                     ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
                     // Serĉo-butono plej supre; elŝutoj restas atingeblaj per la naviga tirkesto
                     IconButton(onClick = { logi("Klako", "serĉo-butono"); onSerĉo() }) { Icon(Icons.Filled.Search, contentDescription = "Serĉi") }
-                    IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
+                    // Vekhorloĝo nur sur Android (AlarmoSkedilo)
+                    if (platformo == Platformo.ANDROIDO) {
+                        IconButton(onClick = { logi("Klako", "alarmoj-butono"); onAlarmoj() }) { Icon(Icons.Filled.Alarm, contentDescription = "Vekhorloĝo") }
+                    }
                     IconButton(onClick = { logi("Klako", "agordoj-butono"); onAgordoj() }) { Icon(Icons.Filled.Settings, contentDescription = "Agordoj") }
                 }
             )
@@ -884,14 +887,17 @@ private fun ElsendoKarto(
                             expanded = menuMontrata,
                             onDismissRequest = { menuMontrata = false }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Elŝuti") },
-                                onClick = {
-                                    menuMontrata = false
-                                    logi("Klako", "elŝuti — ${elsendo.id}")
-                                    onElŝuti()
-                                }
-                            )
+                            // Elŝuti nur sur platformoj kiuj subtenas elŝutojn (Android, Desktop)
+                            if (platformo == Platformo.ANDROIDO || platformo == Platformo.DESKTOPO) {
+                                DropdownMenuItem(
+                                    text = { Text("Elŝuti") },
+                                    onClick = {
+                                        menuMontrata = false
+                                        logi("Klako", "elŝuti — ${elsendo.id}")
+                                        onElŝuti()
+                                    }
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text("Aldoni al ludvico") },
                                 onClick = {

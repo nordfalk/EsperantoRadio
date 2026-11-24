@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -142,6 +143,8 @@ fun KanalaroEkrano(
     onLudvico: () -> Unit = {},
 ) {
     val kanaloj by viewModel.kanaloj.collectAsState()
+    // La lista kolumno (C56-beta): musa radeto/treno sur la retversio kaj Desktop
+    val kolumnStato = rememberLazyListState()
     val ŝargas by viewModel.ŝargas.collectAsState()
     val elsendoKontoj by viewModel.elsendoKontoj.collectAsState()
     val lastajElsendoj by viewModel.lastajElsendoj.collectAsState()
@@ -185,7 +188,8 @@ fun KanalaroEkrano(
             modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().rulumuKolumnonPerMuso(kolumnStato),
+                state = kolumnStato,
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(kanaloj, key = { it.slug }) { kanalo ->

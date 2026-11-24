@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -128,6 +129,8 @@ fun KanaloEkrano(
     val evoluo by agordojDeponejo.evoluo.collectAsState()
     val estasPlejŝatata = kanalo.slug in plejŝatataj
     val snackbarStato = remember { SnackbarHostState() }
+    // La lista kolumno (C56-beta): musa radeto/treno sur la retversio kaj Desktop
+    val kolumnStato = rememberLazyListState()
     var montruRss by remember { mutableStateOf(false) }
 
     LaunchedEffect(kanalo.slug) {
@@ -189,7 +192,8 @@ fun KanaloEkrano(
         modifier = Modifier.fillMaxSize().padding(padding),
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().rulumuKolumnonPerMuso(kolumnStato),
+            state = kolumnStato,
             contentPadding = PaddingValues(8.dp)
         ) {
             // Kanalinformoj: emblemo, nomo, retejo, retpoŝto

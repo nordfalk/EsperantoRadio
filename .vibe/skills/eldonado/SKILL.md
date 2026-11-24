@@ -93,6 +93,13 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    vivas nur en `shared/src/commonMain/resources/esperantoradio_konfiguro.json`
    (unu kopio por ĉiuj platformoj; JSONC-detalon vidu en la
    `kanalkonfiguro`-skill-o).
+   **Ĝisdatigu ankaŭ `aktualaVersio`** en la sama sekcio — sed nur kiam la nova
+   versio efektive haveblas en Play (PR #204, C61a): ĝi pelas la
+   ĝisdatigo-indikilon sur la ĉefekrano de ĉiuj instalaĵoj kun pli malnova
+   versio (butono al Google Play). Pli frua ŝanĝo montrus butonon por versio,
+   kiu ankoraŭ ne ekzistas. La apo komparas nur la numeran kernon
+   („3.2.0-beta.1“ = „3.2.0“) — la beta-nomoj de `apoversio` do ne konfliktas
+   kun la indikilo.
 6. **Eldonu al Google Play de la LOKA maŝino** (2026-10-13: nur la loka maŝino rajtas —
    la CI-`eldonado.yml` per GitHub-sekretoj ne uzeblas nuntempe):
    ```bash

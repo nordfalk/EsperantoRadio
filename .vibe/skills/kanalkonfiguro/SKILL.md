@@ -35,6 +35,23 @@ description: Ŝargu ĉi tiun skill-on kiam vi redaktas la kanal-konfiguron (espe
   la dosiero FINIĜAS per la forprenitaj — "aldonu ĉe la fino" surteriĝas en la
   malĝusta aro (2026-10-08: la 7 novaj podkastoj unue erare tie).
 
+## La `android`-sekcio (ŝlosiloj ekster `kanaloj`)
+
+La sekcio `android` supre de la dosiero portas apo-skalan agordon; la
+ŝlosil-nomoj estas camelCase (`prizorgantaRetpoŝto`, `aktualaVersio`) —
+`apaj_novaĵoj` kaj `apaj_novaĵoj_pasintaj` estas la snake_case-esceptoj:
+
+- `apaj_novaĵoj` (+ `apaj_novaĵoj_pasintaj`, faldeblaj) — novaĵo-mesaĝo de la
+  apo; dialogo unufoje po nova haketaĵo (`ApajNovaĵojDeponejo`). Kun la
+  eldon-fluo ĝi ĝisdatiĝas en la `eldonado`-skill-o.
+- `aktualaVersio` (C61a, PR #204) — versio-ĉeno „X.Y.Z“: se pli nova ol la
+  instalita apo (nur Android — `Platformo` en PlatformLigilo), la ĉefekrano
+  montras ĝisdatigo-karton → la novaĵ-dialogo kun butono „Ĝisdatigu al
+  versio X“ → Google Play (`PLAY_STORE_LIGILO`). La apo komparas nur la
+  numeran kernon („3.2.0-beta.1“ = „3.2.0“); fuŝita valoro ne kaŭzas averton.
+  Ĝisdatigu ĝin nur kiam la versio efektive haveblas en Play (vidu
+  `eldonado`, paŝo 5).
+
 ## JSONC-sintakso-minacoj
 
 - `//`-komentoj kaj plurliniaj ĉenoj kun `\` ĉe lini-fino — traktataj de

@@ -211,6 +211,14 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
   forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
   etikedon `preterlasu-changelog` (`gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **CodeRabbit recenzas ĉiun kod-PR-on (2026-11-24, PR #204)**: kontrolu ĝiajn
+  enliniajn komentojn kelkajn minutojn post ĉiu puŝo
+  (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments`), traktu la validajn
+  trovaĵojn kaj respondu en la fadeno — la vojo bezonas la PR-numeron
+  (`pulls/N/comments/{id}/replies`; sen N ĝi redonas 404). Lasu la posedanton
+  trarigardi antaŭ ol komiti. La bot-lego povas vidi malnovan revizion kaj
+  kontesti jam riparitan aferon — kontrolu la faktan kodon, respondu kun la
+  koncerna commit-SHA kaj ne amendu pro ĝi.
 - **PR-revizio je peto de la posedanto**: troreviziu la tutan diff-on kaj aktive
   pripensu kio mankas, misas aŭ povus esti problema — ne nur konfirmu. Ĉu estas
   bona kodo? Ĉu estas verŝajnaj problemoj? Kontrolu A7 (testo), A8 (neniu silenta

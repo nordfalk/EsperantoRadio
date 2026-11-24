@@ -96,11 +96,13 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
 
 #### Kial la yml aspektas kiel ĝi aspektas (sen komentoj en la dosiero)
 
-- `scanignore: build.gradle.kts` — la radika konstrudosiero deklaras
-  `https://jcenter.bintray.com` (necesa por la MALNOVA apo, A1); la
-  F-Droid-skanilo rifuzas nekonatajn Maven-deponejojn. La nova apo neniam
-  efektive elŝutas de jcenter (ĉiuj ĝiaj dependejoj estas en
-  Maven Central/Google), do la skanilo sekure ignorigas tiun dosieron.
+- ~~`scanignore: build.gradle.kts`~~ — **FORIGITA (2026-11-24)**: la iam
+  necesa flank-ignoro (la malnova apo deklaris `https://jcenter.bintray.com`,
+  kiun la F-Droid-skanilo rifuzas) perdis validecon post la jcenter-forigo
+  el la konstrukradikoj; la skanilo tiam raportas
+  **„Unused scanignore path: build.gradle.kts“ — eraro, kiu fiaskigas
+  `fdroid build`**. Regulo: kiam `scanignore` ne plu respondas al reala
+  trovo, forigu ĝin el la yml.
 - `UpdateCheckName: Ignore` — la aŭtomata nom-serĉanto ne trovas nian
   manifeston (KMP-aranĝo: `src/androidMain/`) kaj prenus la nomon de la
   malnova apo („Esperanto-radio Muzaiko"); sen „Ignore" la ĝisdatig-boto
@@ -316,8 +318,7 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
   sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
-- „Found unknown maven repo 'https://jcenter.bintray.com'" → `scanignore:
-  build.gradle.kts` (la malnova apo bezonas jcenter; la nova neniam ĝin uzas)
+- „Found unknown maven repo 'https://jcenter.bintray.com'“ → iam `scanignore: build.gradle.kts`; ekde la jcenter-forigo la scanignore devas esti FORIGITA tute — la mesaĝo „Unused scanignore path …“ estas eraro, kiu fiaskigas fdroid build (2026-11-24)
 - `AutoName` ŝanĝiĝas per si mem („Esperanto-radio Muzaiko") → `UpdateCheckName:
   Ignore` (la KMP-manifesto ne troveblas de la nom-serĉanto)
 - „SigningConfig with name 'release' not found" → `findByName` (fdroidserver

@@ -4,12 +4,12 @@ import android.app.Application
 import android.os.Build
 import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.config.appContext
+import dk.nordfalk.esperanto.data.config.erarRaportadaDefaŭltoLaŭInstalanto
 import dk.nordfalk.esperanto.data.config.leguErarRaportadanKonsenton
 import dk.nordfalk.esperanto.initialiguSentry
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.raportadoAktiva
-import java.security.MessageDigest
 
 /**
  * Procez-nivela inicialigo ((PR #89) + C7).
@@ -22,13 +22,17 @@ import java.security.MessageDigest
  *
  * Sentry estas inicialigata NUR por ne-debug konstruoj sur realaj aparatoj
  * KAJ nur kiam la erar-raportado estas ŝaltita (agordo "erar_raportado", PR
- * #148/C50). La DEFAŬLTO dependas de la subskriba atestilo de la APK, ne de
- * la konstruo: kun nia subskribo (Google Play, Aptoide, GitHub-releases) ĝi
- * estas ŜALTITA (neniu demando; malŝaltebla en Agordoj → Privateco); kun
- * fremda subskribo (tiel F-Droid subskribas) MALŜALTITA kun unufoja
- * konsento-demando — alie F-Droid atribuus la kontraŭecon "Tracking". Tio
- * estas RUTEMPE kontrolata ([estasSubskribitaPerNiaAtestilo]), ne bakita en
- * la konstruo (eks-`BuildConfig.SEN_NIA_SUBSKRIBO`): konstruo-dependa valoro
+ * #148/C50). La DEFAŬLTO dependas de la INSTAL-FONTO de la APK
+ * ([erarRaportadaDefaŭltoLaŭInstalanto], 2026-11-24; decido de la posedanto:
+ * nur KONATAJ ne-F-Droid-kanaloj raportas defaŭlte): instalaĵoj el la
+ * konataj kanaloj (Google Play, la sistema surŝutilo) raportas defaŭlte
+ * (malŝaltebla en Agordoj → Privateco); F-Droid (`org.fdroid.*`) kaj ĈIU
+ * NEKONATA instala fonto estas opt-in per unufoja konsento-demando. Nedependece de la SUBSKRIBO: per reprodukteblaj
+ * konstruoj F-Droid distribuas APK-on subskribitan per nia atestilo, do la
+ * subskribo ne plu distingas la kanalojn (sekureca trovo de PR #200; la
+ * malnova `BuildConfig.SEN_NIA_SUBSKRIBO` kaj la subskriba kontrolo de
+ * PR #148 estis konstruo/subskribo-bazitaj). La instala-distingo estas
+ * RUTEMPA kontrolo, ne bakita en la konstruo: konstruo-dependa valoro
  * en la APK malebligus bit-identan reprodukteblan konstruon (F-Droid RB,
  * MR !55129, 2026-11-22). Sen inicialigo ĉiuj Sentry-vokoj estas no-op.
  */
@@ -45,8 +49,9 @@ class EsperantoRadioAplikaĵo : Application() {
         AppStato.estasAlfaKonstruo = estasDebug
         // Branĉnomo (malplena ĉe master) — montriĝas en Agordoj post la versio
         AppStato.branĉoNomo = BuildConfig.GIT_BRANCHO.ifBlank { null }
-        // Konstruo-specifa defaŭlto de la erar-raportado (vidu la funkcian KDoc-on)
-        AppStato.erarRaportadoDefaŭlta = estasSubskribitaPerNiaAtestilo()
+        // Instalaĵo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on):
+        // konata ne-F-Droid-kanalo → defaŭlte ŝaltita; F-Droid/nekonata → opt-in demando.
+        AppStato.erarRaportadoDefaŭlta = erarRaportadaDefaŭltoLaŭInstalanto(leguInstalanton())
         if (AppStato.estasEvoluaMedo) {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
@@ -59,39 +64,27 @@ class EsperantoRadioAplikaĵo : Application() {
         }
     }
 
-    companion object {
-        /** SHA-256-haketo (bitoko-ĉeno) de nia subskriba atestilo (2026-10-29) */
-        private const val NIA_ATESTILO_SHA_256 =
-            "aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16"
-    }
-
     /**
-     * Ĉu la APK estas subskribita per NIA atestilo (jacobnordfalk.keystore —
-     * Google Play, Aptoide, GitHub-releases). RUTEMPA kontrolo per
-     * PackageManager, por ke la APK-bitokoj ne dependu de la konstruo-medio
-     * (reproduktebla konstruo, F-Droid RB): la sama APK condutas ĝustamaniere
-     * sendepende de kiu subskribis ĝin. Fremda subskribo (F-Droid, iu ajn
-     * rekonstruo) → opt-in per konsento-demando (kontraŭeco "Tracking").
+     * La pako, kiu instalis tiun ĉi aplikaĵon (rutempa kontrolo; vidu la
+     * klasan KDoc-on kial la instal-fonto, ne la subskribo). Play Store →
+     * `com.android.vending`; F-Droid → `org.fdroid.fdroid`
+     * (aŭ `org.fdroid.fdroid.privileged`); flanka ŝargo/adb →
+     * `com.android.packageinstaller` aŭ `null`. La valoron legas
+     * [erarRaportadaDefaŭltoLaŭInstalanto].
      */
-    private fun estasSubskribitaPerNiaAtestilo(): Boolean = try {
-        val subskriboj: Array<android.content.pm.Signature> =
-            if (Build.VERSION.SDK_INT >= 28) {
-                packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES)
-                    .signingInfo?.apkContentsSigners ?: emptyArray()
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNATURES)
-                    .signatures ?: emptyArray()
-            }
-        val sha256 = MessageDigest.getInstance("SHA-256")
-        subskriboj.any { subskribo ->
-            sha256.digest(subskribo.toByteArray())
-                .joinToString("") { "%02x".format(it) } == NIA_ATESTILO_SHA_256
+    private fun leguInstalanton(): String? = try {
+        if (Build.VERSION.SDK_INT >= 30) {
+            packageManager.getInstallSourceInfo(packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstallerPackageName(packageName)
         }
     } catch (e: Exception) {
-        // A8: protokolu. Fiu kiu fiasko → supozu fremdan subskribon (opt-in).
-        logw("Sentry", "Ne povis legi la subskriban atestilon — traktas kiel fremda subskribo", e)
-        false
+        // A8: protokolu. Fiasko → ne legebla instala fonto →
+        // `erarRaportadaDefaŭltoLaŭInstalanto` traktas ĝin kiel NEKONATA
+        // (laŭ decido de la posedanto: opt-in — la privatece konservema direkto).
+        logw("Sentry", "Ne povis legi la instal-fonton — traktas kiel nekonata instalaĵo (opt-in)", e)
+        null
     }
 
     /** La kutimaj Android-emulilaj bildoj: AVD (sdk_gphone, goldfish, ranchu), Genymotion k.a. */

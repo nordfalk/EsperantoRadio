@@ -187,30 +187,43 @@ Kreu novan git-etikedon (`v3.1.1`, `v3.2.0`, ktp.) kaj puŝu ĝin. La
 `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` igas F-Droid-on
 aŭtomate detekti la etikedon kaj pretigi ĝisdatigo-konstruon.
 
-### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, ĝisdatigita 2026-11-22)
+### Sentry kaj la "Tracking"-kontraŭeco — SOLVITA (PR #148, ĝisdatigita 2026-11-24)
 
 La apo sendis erarojn kaj protokolojn al sentry.io defaŭlte, sen konsento —
 laŭ la F-Droid-lingvaĵo (https://f-droid.org/en/docs/Anti-Features/) tio
-estus la kontraŭeco **Tracking**. Ekde PR #148 (2026-10-29) la defaŭlto
-dependas de la subskriba atestilo de la APK. Ekde 2026-11-22 tio estas
-kontrolata RUTEMPE ĉe starto (`estasSubskribitaPerNiaAtestilo()` en
-`EsperantoRadioAplikaĵo.kt`, per `PackageManager` + SHA-256), NE plu per
-`BuildConfig.SEN_NIA_SUBSKRIBO` — konstruo-dependa valoro en la APK
-malebligus bit-identan reprodukteblan konstruon (F-Droid RB, MR !55129):
+estus la kontraŭeco **Tracking**. Pr #148 (2026-10-29) enkondukis la
+dumodan defaŭlton; ekde 2026-11-22 ĝi decidiĝas RUTEMPE ĉe starto (ne dum
+la konstruo — konstruo-dependa valoro en la APK malebligus bit-identan
+reprodukteblan konstruon, F-Droid RB, MR !55129), kaj ekde 2026-11-24 la
+distingo okazas laŭ la INSTAL-FONTO de la pako, ne laŭ la subskribo
+(`erarRaportadaDefaŭltoLaŭInstalanto(leguInstalanto())` en
+`EsperantoRadioAplikaĵo.kt`; decido de la posedanto — **nur konataj
+ne-F-Droid-kanaloj estas opt-out**): per RB F-Droid distribuas APK-on subskribitan
+per NIA atestilo — la subskriba kontrolo de PR #148 do ne plu distingus la
+kanalojn (sekureca trovo de la aŭtomata revizio en PR #200; Sentry estus
+defaŭlte ŝaltita ĉe F-Droid-uzantoj sen konsento):
 
-- **APK kun fremda subskribo** (tiel F-Droid subskribas): **opt-in** —
-  defaŭlte malŝaltita, unufoja konsento-demando ĉe la unua starto. La apo ne
-  ricevas la kontraŭecon "Tracking".
-- **APK kun nia subskribo** (Google Play, Aptoide, GitHub-releases):
-  **defaŭlte ŝaltita**, sen demando — la uzanto povas malŝalti en Agordoj →
-  Privateco ("Sendu erar-raportojn"). Ĉe malŝalto iras unu LASTA protokolo al
-  Sentry ("malŝaltita de la uzanto"), ĉe (re)ŝalto unu protokolo ("(re)ŝaltita").
+- **Instalaĵo el KONATA ne-F-Droid-kanalo** — Google Play
+  (`com.android.vending`) kaj la sistema surŝutilo
+  (`com.android.packageinstaller`, t.e. adb/dosieradministrilo):
+  **defaŭlte ŝaltita** (opt-out), sen demando — la uzanto povas malŝalti
+  en Agordoj → Privateco ("Sendu erar-raportojn"). Ĉe malŝalto iras unu
+  LASTA protokolo al Sentry ("malŝaltita de la uzanto"), ĉe (re)ŝalto unu
+  protokolo ("(re)ŝaltita"). Estonte Aptoide k.t.p. aldoniĝu al la
+  blanklisto tiam, kiam la kanalo ekzistas.
+- **Ĉiu alia instala fonto** — la F-Droid-kliento (`org.fdroid.*`,
+  kliento kaj privilegiita kromaĵo) kaj ĈIU NEKONATA instalaĵo (aliulo,
+  anstataŭigita butika kliento, malkaptebla lego): **opt-in** — defaŭlte
+  malŝaltita, unufoja konsento-demando ĉe la unua starto (la privatece
+  konservema direkto). La apo ne ricevas la kontraŭecon "Tracking" ankaŭ
+  ĉe RB.
 
-La konduto do ne ŝanĝiĝis por la uzanto; ŝanĝiĝis nur KIAM ĝi decidiĝas
-(rultempe, ne dum la konstruo). La eks-kontrolo baziĝis sur
+La konduto do ne ŝanĝiĝis por la Play-uzanto; F-Droid-uzantoj denove ricevas
+la promesitan opt-in-fluon. La eks-kontrolo baziĝis sur
 `BuildConfig.SEN_NIA_SUBSKRIBO` (vera kiam la keystore mankis dum la
 konstruo) — tio diferencigus la APK-bitokojn inter konstru-medioj kaj estas
-nun forigita.
+nun forigita; same la intertempa subskriba kontrolo
+(`estasSubskribitaPerNiaAtestilo()`, 2026-11-22–2026-11-23).
 Ambaŭ reĝimoj: ŝanĝoj de la protokolo-fluo ekvalidas tuj, kraŝ-raportoj
 (nekapteblaj esceptoj) post restartigo.
 Sekvo por la Sentry-esplorado (C48/C49/G44): la telemetrio el F-Droid-uzantoj

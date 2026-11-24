@@ -20,7 +20,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
-- Remalfermo de elsendo aŭ kanalo montras ĝin mem anstataŭ la postlasitan svipan pozicion de la antaŭa vizito; rotacio kaj restartigo konservas la legitan pozicion; eltirita elsendo aŭ forigita kanalo montras klarigon anstataŭ senfina ŝargado (https://github.com/nordfalk/EsperantoRadio/pull/205)
+- Remalfermo de elsendo aŭ kanalo montras ĝin mem anstataŭ la postlasitan svipan pozicion de la antaŭa vizito; rotacio kaj restartigo konservas la legitan pozicion; eltirita elsendo aŭ forigita kanalo montras klarigon anstataŭ senfina ŝargado (https://github.com/nordfalk/EsperantoRadio/pull/206)
 
 ## [3.2.0] - 2026-11-23
 

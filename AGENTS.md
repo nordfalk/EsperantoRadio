@@ -246,6 +246,11 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   — solvu ilin konservante ambaŭ flankojn.
 - **`mergeStateStatus: UNSTABLE`** = mergeable, sed la status-kontroloj ankoraŭ
   kuras — gravas nur la fina konkludo de la kontroloj.
+- **`mergeStateStatus: DIRTY` = la CI-fluoj NE startas** (2026-11-24, PR #210):
+  `pull_request`-fluoji ruliĝas el la merga referenco de la PR; ĉe konflikto kun
+  master la merga komito ne ekzistas, do `testoj-kaj-konstruo` kaj
+  `changelog-kontrolo` silente ne ruliĝas. Mergeu `origin/master` en la PR-branĉon
+  (L8) kaj puŝu — nur tiam la kontroloj rekomencas.
 - **«faru beta-eldonon» = interna testo (2026-11-19, decido de la posedanto):** la
   posedanto ĉiam celas la trakon `internal` de Google Play (li testas mem kaj
   poste promocias al produktado); la trako `beta` uziĝu nur se li eksplicite diras

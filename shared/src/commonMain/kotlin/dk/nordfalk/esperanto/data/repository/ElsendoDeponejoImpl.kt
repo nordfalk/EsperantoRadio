@@ -136,6 +136,22 @@ open class ElsendoDeponejoImpl(
         kaŝmemoro[kanaloSlug] ?: emptyList()
 
     /**
+     * Trovas la elsendon laŭ [id] por la detala ekrano, kun ŝargo kiel rezervaj paŝoj:
+     * 1. serĉo en la kaŝo (nelimigite rapida);
+     * 2. se mankas — kutima kanal-ŝargo (kaŝo/disko, bezone rete);
+     * 3. se ankoraŭ mankas — unu forta refreŝigo preter la kaŝo (la kaŝo povas esti
+     *    pli malnova ol la elsendo — ekz. sciigo pri brandnova elsendo je malvarma starto).
+     *
+     * Redonas la elsendon aŭ null se ĝi ne troviĝas eĉ post la refreŝigo
+     * (forigita el la fluo, aŭ eksterrete sen iu ajn kaŝo). Ne ĵetas.
+     */
+    suspend fun trovuElsendon(kanalo: Kanalo, id: String): Elsendo? {
+        getElsendojn(kanalo.slug).find { it.id == id }?.let { return it }
+        ŝargiElsendojn(kanalo).find { it.id == id }?.let { return it }
+        return ŝargiElsendojn(kanalo, fortoRefresigi = true).find { it.id == id }
+    }
+
+    /**
      * Elŝutas kaj parsas la RSS-fluon por specifa kanalo.
      * Tolerema: eraro → liveri kaŝenitan datumon, ne ĵeti.
      *

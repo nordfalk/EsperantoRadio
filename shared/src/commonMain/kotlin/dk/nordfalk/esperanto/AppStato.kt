@@ -18,6 +18,7 @@ import dk.nordfalk.esperanto.data.repository.SettingsKeys
 import dk.nordfalk.esperanto.data.repository.kreuAlarmoSkedilo
 import dk.nordfalk.esperanto.data.repository.kreuElŝutDeponejo
 import dk.nordfalk.esperanto.domain.DiagnozoRegilo
+import dk.nordfalk.esperanto.domain.ĉuNovaVersio
 import dk.nordfalk.esperanto.domain.kreuDiagnozoRegilon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.ElŝutStato
@@ -30,12 +31,17 @@ import dk.nordfalk.esperanto.domain.repository.ElŝutDeponejo
 import dk.nordfalk.esperanto.ui.HejmoViewModel
 import dk.nordfalk.esperanto.ui.KanalaroViewModel
 import dk.nordfalk.esperanto.ui.KanaloViewModel
+import dk.nordfalk.esperanto.ui.Platformo
+import dk.nordfalk.esperanto.ui.platformo
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import dk.nordfalk.esperanto.data.repository.httpMotoro
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -117,10 +123,31 @@ object AppStato {
     var prizorgantaRetpoŝto: String = "jacob.nordfalk@proton.me"   // restaŭvaloro, se la agordo mankas la kampon
         private set
 
+    /**
+     * Versio havebla en la konfiguro (`aktualaVersio`), se ĝi estas pli nova ol
+     * la instalita apo (FAROTA C61a) — la ĉefekrano montras tiam
+     * ĝisdatigo-indikilon. Nur sur Android (la sola platformo kun Google Play);
+     * `null` alie.
+     */
+    private val _novaVersio = MutableStateFlow<String?>(null)
+    val novaVersio: StateFlow<String?> = _novaVersio.asStateFlow()
+
     /** KanaloViewModel-oj, ŝlositaj laŭ slug. */
     val kanaloViewModelj = mutableMapOf<String, KanaloViewModel>()
 
     fun inicialigita(): Boolean = httpKliento != null
+
+    /**
+     * Versio-kontrolo el la konfiguro (FAROTA C61a): se `aktualaVersio` estas pli
+     * nova ol la instalita apo, ludigas la ĝisdatigo-indikilon (nur Android —
+     * la sola platformo kun aldonaĵo-vendejo). La valoro malaperas mem kiam la
+     * uzanto ĝisdatigas la apopaakon.
+     */
+    private fun ĝisdatiguNovaVersion(aktualaVersio: String?) {
+        _novaVersio.value =
+            if (platformo == Platformo.ANDROIDO && aktualaVersio != null && ĉuNovaVersio(ApoVersio.VERSION, aktualaVersio)) aktualaVersio
+            else null
+    }
 
     /**
      * Trovas la elsendon kiun alarmo ludu por podkasta kanalo (komuna por la
@@ -210,6 +237,7 @@ object AppStato {
                 // ili dependas de deponejoj, kiuj ne estas rekreieblaj vive.)
                 apajNovaĵojDeponejo?.ĝisdatigu(freŝa.android?.apajNovaĵoj, freŝa.android?.apajNovaĵojPasintaj)
                 freŝa.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
+                ĝisdatiguNovaVersion(freŝa.android?.aktualaVersio)
             },
         )
         kanaloDeponejo = deponejoDeKanaloj
@@ -236,6 +264,7 @@ object AppStato {
         // Apaj novaĵoj (novaĵo-mesaĝo de la apo) el la android-sekcio de la konfiguro
         apajNovaĵojDeponejo = ApajNovaĵojDeponejo(settings, agordo.android?.apajNovaĵoj, agordo.android?.apajNovaĵojPasintaj)
         agordo.android?.prizorgantaRetpoŝto?.let { prizorgantaRetpoŝto = it }
+        ĝisdatiguNovaVersion(agordo.android?.aktualaVersio)
 
         ludatojDeponejo = PersistaLudatojDeponejo(settings)
 
@@ -308,6 +337,7 @@ object AppStato {
         diagnozoRegilo = null
         apajNovaĵojDeponejo = null
         prizorgantaRetpoŝto = "jacob.nordfalk@proton.me"
+        _novaVersio.value = null
         kanaloViewModelj.clear()
     }
 }

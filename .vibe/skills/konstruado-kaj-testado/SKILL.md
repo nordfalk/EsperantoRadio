@@ -1,6 +1,6 @@
 ---
 name: konstruado-kaj-testado
-description: Ŝargu ĉi tiun skill-on kiam vi konstruas, rulas aŭ testas la apon (Gradle-komandoj, JDK-postuloj, wasmJs-limigoj, instrumentitaj Android-testoj, emulilo, logcat) aŭ kiam platform-specifa kompilado aŭ testo fiaskas.
+description: Ŝargu ĉi tiun skill-on kiam vi konstruas, rulas aŭ testas la apon (Gradle-komandoj, JDK-postuloj, wasmJs-limigoj, instrumentitaj Android-testoj, Compose-UI-testoj, emulilo, logcat), kiam vi verkas testojn, aŭ kiam platform-specifa kompilado aŭ testo fiaskas.
 ---
 
 # Konstruado kaj testado de EsperantoRadio
@@ -16,7 +16,8 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64   # JDK 17 devas; JDK 21 man
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 # Nova apo
-./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI)
+./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI); 4 paralelaj JVM-forkoj (2026-11-24: 18 s → ~11 s)
+./gradlew :shared:desktopTest -Pekranfotoj   # inkluzivas EkranfotoTesto (PNG-oj por la dokumentaro; defaŭlte ekskludita)
 ./gradlew :desktopApp:run            # la desktop-apo
 ./gradlew :androidApp:assembleDebug  # la Android-APK
 ./gradlew :androidApp:connectedDebugAndroidTest            # instrumentitaj testoj (emulilo)
@@ -25,15 +26,14 @@ java -jar malnova/parse/build/libs/rssarkivserver.jar
 ./gradlew :desktopApp:radioTxtKomparilo   # komparas kanalkonfiguron kun esperanto-radio.com
 ```
 
-Konstruu post ĉiu kunfando de master kiu alportas kod-ŝanĝojn:
-`changelog-kontrolo`-CI nur kontrolas CHANGELOG-ŝanĝojn, ĝi NE konstruas — rulu
-`:shared:desktopTest` + `:androidApp:assembleDebug` post ĉiu merge. Por PR-oj
-nur kun tekstaj/agentaj dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.)
-tio ne necesas — nek loka konstruo nek atendo de la `testoj`-CI; merĝu tuj
-(2026-10-17, regulo de la uzanto). Tio validas ankaŭ por kod-dosieroj, kiam la
-ŝanĝoj tuŝas NUR komentojn aŭ dokumentadon — komentoj kaj dokumentoj ne ŝanĝas
-ion ajn en la konduto, do ankaŭ tiam nek konstruu nek atendu la CI; merĝu tuj
-(2026-10-25, regulo de la uzanto).
+Konstruu post ĉiu kunfando de master kiu alportas kod-ŝanĝojn (rulu
+`:shared:desktopTest` + `:androidApp:assembleDebug`): la `changelog-kontrolo`-CI
+nur kontrolas CHANGELOG-ŝanĝojn, ĝi NE konstruas. Por PR-oj nur kun tekstaj/agentaj
+dosieroj (AGENTS.md, `.vibe/skills/`, `docs/`, NOTOJ ktp.) tio ne necesas — nek loka
+konstruo nek atendo de `testoj`-CI (2026-10-17, regulo de la uzanto). Same por
+kod-dosieroj, kiam la ŝanĝoj tuŝas NUR komentojn aŭ dokumentadon (2026-10-25,
+regulo de la uzanto). **La kunfando mem restas sub L6 en AGENTS.md — ĉiam kun
+aparta, eksplikita aprobo de la uzanto, ankaŭ kiam konstruo/CI-atendo ne necesas.**
 
 Versioj ne estas listigitaj ĉi tie — unu fonto de vero:
 `gradle/libs.versions.toml` (Gradle: `gradle/wrapper/gradle-wrapper.properties`;
@@ -62,13 +62,10 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   estas eraro en Compose 1.10). Nur `wasmJs`-celo ekzistas (ne `js` — Skia-eraro).
 - **klib-ABI**: Wasm/Native-bibliotekoj (`.klib`) de pli nova Kotlin ne legeblas de
   la nuna → "Unresolved reference" NUR sur wasmJs (JVM/Android uzas jar).
-  Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version`.
-  (2026-10-17: la tiam nuna nav3-versio bone kompilas sur wasmJs — la malnova
-  timo ke ĉiu nav3-versio pli nova ol la eksperimenta 1.1.0-alfa rompos wasmJs
-  ne konfirmiĝis. Tamen kontrolu wasmJs-kompilon (`:webApp:compileKotlinWasmJs`)
-  post versi-bumo.)
-- **ksoup** funkcias kun la nuna Kotlin/CMP-kombino (CI-verda, 2026-10-17).
-  `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`; `selectFirst(...)` ekzistas.
+  Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version` kaj
+  rulu `:webApp:compileKotlinWasmJs` post versi-bumo.
+- **ksoup**: `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`;
+  `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —
   sen ĝi la MediaSession silente malsukcesas (`ClassNotFoundException:
   HlsMediaSource$Factory` en logcat).
@@ -82,6 +79,51 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   remetu `ktor-client-okhttp` kiel Android-motoron.
 - **iOS ne konstrueblas sur Linux** (`Unresolved reference 'foundation'` en
   iosMain — mankas Xcode/platform-bibliotekoj) — la iOS-celoj estas por macOS.
+
+## Compose-UI-testoj — kaptindaĵoj (validaj kaj por desktopTest kaj por instrumentitaj)
+
+- **`ModalNavigationDrawer` restas en la semantika arbo ankaŭ kiam la tirkesto
+  estas fermita** (2026-10-17) — `onNodeWithText("Agordoj")` trovas 2 nodojn
+  (ekrana titolo + tirkest-ero). Asertu laŭ enhava teksto (ekz. agordo-ŝaltilo),
+  ne laŭ ekrana titolo; por la tirkest-butono uzu unikan `contentDescription`
+  ("Naviga menuo" — ne "Menuo", kiu ekzistas sur ĉiu karto).
+- **Dialogoj kreas apartan komponan radikon** (2026-10-17): `AlertDialog`/`Dialog`
+  igas `onRoot()` fiaski per "Expected exactly 1 node but found 2". Kaptu la lastan
+  radikon per `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` kaj
+  `.get(indekso)` sur `SemanticsNodeInteractionCollection`. ATENTU: `isRoot` estas
+  ECO (`val`), ne funkcio — `it.isRoot()` donas la konfuzan eraron "Cannot infer
+  type for T/R … DeepRecursiveFunction.invoke". Krome `onNodeWithText` serĉas en
+  ĈIUJ radikoj: buton-teksto ekzistanta kaj en la dialogo kaj en la ekrano malantaŭ
+  ĝi (ekz. "Nuligi") ne estas unika — fermu la dialogon per teksto kiu aperas nur
+  en ĝi (ekz. "Bone").
+- **La subtitolo de MiniLudilbreto estas la kombinita teksto `"$subtitolo · $statTeksto"`
+  (2026-11-02, #167)** — aserti la tutan ĉenon (ekz.
+  `"20 - RadioStacio FM - … · Rekta elsendo"`), ne la partan programtitolon.
+- **Rulumado de LazyRow en Desktop-testoj (2026-11-24, #205):** la fenestro estas
+  ~1024×768 px; kartoj (150 dp + 12 dp interspaco) → horizontala vico bezonas ~7+
+  erojn por esti rulebla. Svingu specifan vicon per
+  `onRoot().performTouchInput { swipe(Offset(...y), Offset(...y)) }` kun
+  y-koordinato prenita el karta nodo (`positionInRoot.y + size.height/2f`); unu
+  plenlarĝa svingo flugos ĝis la fino. Du sama-tekstaj nodoj en malsamaj sekcioj
+  distingeblas per `fetchSemanticsNodes().maxBy { it.positionInRoot.y }` — la pli
+  suba estas la sekcio pli sube sur la ekrano. Nombro-asertoj estas nedeterminismaj
+  por kartoj apud la vidkampo-limo de la vico — prefere `assertIsDisplayed` sur
+  la elektita kopio.
+- **Scaffold-enhavo DEVAS ricevi la `padding`-on el la content-lambda** (2026-10-17,
+  PR #114): forgeso ne fiaskas en testoj (la nodo restas "displayed") — la TopAppBar
+  simple kovras la unuajn liniojn de la enhavo. Sub-komponaĵoj de la enhavo bezonas
+  `PaddingValues`-parametron.
+- **Se fona konstruo fiaskas sed vi vidis nur filtritan eligon** (`tail`/`grep` en
+  `process.start`, 2026-11-24, #205): la procez-reteno forĵetis la detalojn — rerulu
+  kun plena (aŭ `grep -E "FAILED|BUILD|e: "`) eligokapto antaŭ ol komenci diagnozon.
+
+## Medio
+
+- `git push --force` estas blokita de hoko (amendu nur nepuŝitajn komitojn).
+- `/tmp` estas blokita — uzu la skraŭĉdosierujon, ĉi tie praktike
+  `server/data/privata/` (gitignored).
+- Instrumentitaj testoj povas fiaski sub granda gastiganta ŝarĝo (load ~40+) —
+  komparu kun master en aparta worktree antaŭ ol atribui fiaskon al PR.
 
 ## Instrumentitaj Android-testoj (emulilo)
 
@@ -112,3 +154,18 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 - **Logcat-legado**: `adb logcat -d | grep FATAL` (kraŝoj) aŭ
   `grep -E "dk.nordfalk"` (apo). La bufro ciklas rapide dum la 27-kanala ŝargado —
   por diagnozo kaptu la logcaton frue aŭ rulu `adb logcat -c` antaŭ la testo.
+
+## Testrapideco kaj mezurado
+
+- **desktopTest rulas en 4 paralelaj JVM-forkoj** (`maxParallelForks` en
+  shared/build.gradle.kts, PR #209). Pli da forkoj (provitaj: 8) ne plu helpas:
+  la limo estas la klaso-interna sinsekvo (plej granda klaso: HejmoEkranoTest
+  ~3,5 s) plus la JVM-starto de ĉiu forko. **EkranfotoTesto** estas defaŭlte
+  ekskludita — ĝi ne estas konduttesto sed PNG-generatoro por la dokumentaro;
+  rulu ĝin per `-Pekranfotoj`.
+- **Ne mezuru test-daŭrojn en energiŝpara CPU-reĝimo** (2026-11-24, PR #209): la
+  unuaj mezuroj (489 testoj «57 s») estiĝis en energiŝpara modo kaj estis ~3×
+  troigitaj; en normala reĝimo la sama rulo daŭris 18 s (kun EkranfotoTesto kaj
+  1 forko), 11 s kun la nova agordo. Kontrolu la potenca-reĝimon/ŝarĝon de la
+  maŝino antaŭ ol atribui malrapidecon al la kodo aŭ ĝustigi Gradle-agordon
+  laŭ mezuroj.

@@ -43,7 +43,7 @@ import kotlin.test.assertTrue
 /**
  * Ekranfota testoj — kaptas ĉiun ekranon kiel PNG-dosieron.
  *
- * Rulu per: ./gradlew :shared:desktopTest --tests "*EkranfotoTesto*"
+ * Rulu per: ./gradlew :shared:desktopTest -Pekranfotoj   (defaŭlte EXKLUDITA de la norma test-rulo)
  * Dosieroj estas savitaj al shared/build/ekranfotoj/
  */
 @OptIn(ExperimentalTestApi::class)
@@ -312,6 +312,21 @@ class EkranfotoTesto {
         }
         waitForIdle()
         kaptuKajSavu(this, "10_hejmo_avertokarto")
+    }
+
+    @Test
+    fun ekranfoto_hejmo_versiokarto() = runComposeUiTest {
+        setContent {
+            MaterialTheme(colorScheme = temuKolorskemo(TemoNomo.ANTONIA, false), typography = MuzaikoTiparo, shapes = MuzaikoFormoj) {
+                HejmoEkrano(
+                    kanaloDeponejo = falsaKanaloDeponejo(),
+                    elsendoDeponejo = falsaElsendoDeponejo(),
+                    novaVersio = MutableStateFlow("9.9.9"),
+                )
+            }
+        }
+        waitForIdle()
+        kaptuKajSavu(this, "12_hejmo_versiokarto")
     }
 
     @Test

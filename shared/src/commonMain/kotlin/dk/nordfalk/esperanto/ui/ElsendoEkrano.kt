@@ -458,7 +458,8 @@ internal fun supraBildoUrl(elsendo: Elsendo, kanalo: Kanalo?): String? {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ElsendoEkranoKunSvipo(
-    komencaElsendo: Elsendo,
+    /** La malfermita elsendo — identigita nur per sia id (la paĝo serĉata en [elsendoj]). */
+    komencaId: String,
     elsendoj: List<Elsendo>,
     onReen: () -> Unit,
     /**
@@ -485,8 +486,10 @@ fun ElsendoEkranoKunSvipo(
     onLudvico: () -> Unit = {},
 ) {
     if (elsendoj.size <= 1) {
-        // Ne eblas svipi — montru nur la unuan elsendon
-        val e = elsendoj.firstOrNull() ?: komencaElsendo
+        // Ne eblas svipi — montru nur la unuan elsendon (la malplena listo ne
+        // povas okazi ĉe la vera eniro: ĝi ne vokas la paĝilon antaŭ ol la
+        // elsendo aperis en la fluo)
+        val e = elsendoj.firstOrNull() ?: return
         ElsendoEkrano(
             elsendo = e,
             onReen = onReen,
@@ -511,7 +514,7 @@ fun ElsendoEkranoKunSvipo(
         return
     }
 
-    val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
+    val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaId }.let { if (it < 0) 0 else it }
     val paĝoStato = rememberPagerState(initialPage = komencaPaĝo) { elsendoj.size }
 
     // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam paĝo ekvidiĝas (settledPage)

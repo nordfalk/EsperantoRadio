@@ -7,6 +7,15 @@
 
 # Ŝanĝoj — 2026-11-24
 
+## Aŭtomata rulumado de „Kio novas“ al la unua karto (PR: https://github.com/nordfalk/EsperantoRadio/pull/205)
+
+- **Celo**: kiam venas novaj elsendoj, la horizontala „Kio novas“-vico rulumu trankvile (animacie) al la unua karto — sed NE kiam la listo nur ŝanĝiĝas pro forlasoj (ludita, aĝo-limo, per-kanala `take(5)`).
+- **Evoluo tra 3 recenze-raŭndoj** (CodeRabbit): la unua UI-flanka solvo (ŝlosili-kontrolado de `LaunchedEffect` + `rememberSaveable` de la antaŭa unua ID + „ĉu-la-antaŭa-unua-ankoraŭ-estas-en-la-listo“-heuristiko) havis ĉiam novajn truojn: restarigo-pozicio, nuligita animacio meze de progresiva ŝargado, `take(5)`-forpeloj de la unua karto, kaj fine re-vidiĝo de eks-kaŝita elsendo.
+- **Fina desegno** (decido memorinda): la detekto de „vera alveno“ apartenas al la **datuma tavolo**, ne al la UI: `HejmoViewModel.plenigu` kreskigas `novajAldonojKalkulo` nur ĉe ID ne iam ajd vidita (persista aro `viditajElsendojIdj`, kompare al `ĉiujElsendoj` — ne al la FILTRITA listo). Ĉia listo-rekomputado (ludo-ŝanĝoj, `take(5)`, aĝo-limo) ne povas malvere signali. La UI restas triviala: `LaunchedEffect(Unit) { vm.novajAldonojKalkulo.drop(1).collect { animateScrollToItem(0) } }` + kaptado de `CancellationException` (gesto-interrompo ne mortigu la kolektanton; `coroutineContext.ensureActive()` disvastigas propran nuligon).
+- **`drop(1)`-ŝlosilo**: kalkulo okazinta antaŭ la komponado ne rulu — tio anstataŭas `rememberSaveable`-librotenadon en la UI kaj konservas la pozicion ĉe restarigo/re-eniro.
+- **Testilo**: 4-faza UI-testo (svingo for → aldono rulumas → forlaso konservas → aldono kun forpelo de la unua tamen rulumas) + VM-nivela testo pri la kalkulo. Test-dezajna leciono: datenoj de unu kanalo estu SUB la `take(5)`-limo por ke aldono/forigo de unu epizodo ne flank-efike revidigu aliajn (mia unua varianto fiaskis pro tio — kp:5 re-eniĝis kaj ŝajnis laŭ la diferenca kalkulo „nova“).
+- **Spegolo**: la sama baza ŝablono rulas por „Lastatempe ludata“ (`LaunchedEffect(lastatempeLudataj)` + `animateScrollToItem(0)`, ene de HejmoEkrano.kt) — ĝi ne havas la gesto-kapton nek alveno-detekton; ĉe estontaj ripetiĝoj oni povas konsideri ĝin unuigi al la novaj mekanismoj.
+
 ## Reproduktebla konstruo: fiksu rootProject.name (PR: https://github.com/nordfalk/EsperantoRadio/pull/203)
 
 - **Simptomo**: la `fdroid build`-tasko de la MR !55129 fiaskis per
@@ -392,15 +401,6 @@ polaretradio havis ripeton 0x44 = merkredo+dimanĉo, dum la teksto diris
   grandaj tiparoj.
 - Nova testaro: `ripetoTekstoGeneratasElKonfiguro` (AlarmoTest);
   `ekranfoto_alarmo_redaktilo` kaptas redaktilon + ambaŭ dialogojn.
-
-### Lecioj pri testado (ankaŭ en AGENTS.md)
-
-- `AlertDialog` estas aparta kompona radiko → `onRoot()` fiaskas per "found 2
-  nodes"; la ekranfoto-helpilo kaptas la lastan radikon per
-  `onAllNodes(SemanticsMatcher("estasRadiko") { it.isRoot })` — `isRoot` estas
-  eco, ne metodo.
-- `onNodeWithText` serĉas ĉiujn radikojn: "Nuligi" ekzistas kaj en dialogo kaj
-  en la ekrano malantaŭ ĝi — fermu per teksto unika en la dialogo.
 
 ## Post-revizio de PR #113: koda mapo ĝisdatigita + kompil-kaptindaĵoj en AGENTS.md
 

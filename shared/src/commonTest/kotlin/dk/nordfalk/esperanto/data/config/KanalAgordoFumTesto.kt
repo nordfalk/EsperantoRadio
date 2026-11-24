@@ -46,6 +46,15 @@ class KanalAgordoFumTesto {
         assertNotNull(agordo.android, "La android-sekcio devas ekzisti en la konfiguro")
         assertNotNull(agordo.android!!.apajNovaĵoj, "apaj_novaĵoj devas ekzisti en la konfiguro")
 
+        // aktualaVersio (C61a): devas esti aktuala versio-ĉeno „X.Y.Z“ —
+        // ĝi pelas la ĝisdatigo-indikilon de la ĉefekrano
+        val aktualaVersio = agordo.android!!.aktualaVersio
+        assertNotNull(aktualaVersio, "aktualaVersio devas ekzisti en la konfiguro")
+        assertTrue(
+            Regex("""\d+\.\d+\.\d+.*""").matches(aktualaVersio),
+            "aktualaVersio devas esti versio-ĉeno kiel „3.2.0“, havas „$aktualaVersio“",
+        )
+
         // Regulo P6.6: la kanaloj kun reklamaj priskriboj havas purigajn modelojn (PR #91)
         val varsoviavento = agordo.kanaloj.first { it.kodo == "varsoviavento" }
         assertTrue(varsoviavento.puriguModeloj.isNotEmpty(), "varsoviavento havas puriguModelojn")

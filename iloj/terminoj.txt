@@ -2420,3 +2420,9 @@ cdn
 dekso
 apksigcopier
 detalnivele
+versiokarto
+trovindaĵo
+kompariĝas
+generatoro
+testrapideco
+konduttesto

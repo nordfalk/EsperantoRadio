@@ -7,6 +7,28 @@ package dk.nordfalk.esperanto.ui
  */
 
 /**
+ * La platformo, sur kiu la apo ruliĝas. La aplikon oni povas kontroli laŭ
+ * ĝi — ekz. la versio-kontrolo de la konfiguro (`aktualaVersio`, FAROTA
+ * C61a) nur sur Android havas sencon (la sola platformo kun Google Play).
+ */
+enum class Platformo {
+    /** Android (poŝtelefono/tableto) — la ĉefa celo. */
+    ANDROIDO,
+    /** Desktop (JVM, `desktopApp`). */
+    DESKTOPO,
+    /** La retumilo (wasmJs, `webApp`). */
+    RETUMILO,
+    /** iOS — la Xcode-projekto ankoraŭ ne ekzistas (`iosMain` jam preparita). */
+    IOS,
+}
+
+/**
+ * La platformo de ĉi tiu konstruo — la actual-oj faras ĝin konstanto,
+ * do ĝi estas kompilece konata sen runtime-kontrolo.
+ */
+expect val platformo: Platformo
+
+/**
  * Malfermas URL-on en la defaŭlta krozilo de la platformo.
  */
 expect fun malfermuLigon(url: String)

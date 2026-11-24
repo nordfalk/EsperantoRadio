@@ -23,7 +23,7 @@
 | C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
 | C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
 | C54 | **SOLVITA 2026-11-20**: butono „Kopii RSS-URL“ en KanalEkrano + `kopiuTekston` (expect/actual por android/desktop/wasmJs/ios). Punkto forigita. |
-| C50, C51, C52, C55, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). C56 SOLVITA 2026-11-24: retversio gastigata samdevene je javabog.dk/apo/, nur-arkiva datumvojo, sono rekte el la fonto (PR/opo #210). |
+| C50, C51, C52, C55, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). C56 SOLVITA 2026-11-24: retversio gastigata samdevene je https://javabog.dk/esperanto-radio/apo/, nur-arkiva datumvojo, sono rekte el la fonto (PR/opo #210). |
 | C46 | **SOLVITA 2026-11-20**: lud-eraroj nun raportiĝas per 2-arg `logw` (videblaj en Sentry Logs); reprovo jam ekzistis (`ReprovoLogiko`). Punkto forigita. |
 | C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
 | C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |

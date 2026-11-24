@@ -11,6 +11,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -64,7 +65,10 @@ private suspend fun PointerInputScope.musaTrenado(
                     // La enhavo sekvas la muson: treni antaŭen → rulumi reen.
                     rulumu(-kvanto)
                 } catch (e: CancellationException) {
-                    throw e
+                    // Nuligo de la konkura scrollBy (MutatorMutex) ne mortigu la
+                    // konsumanton — la kanalo alie kreskus sen leganto; nur la
+                    // propra nuligo (forigo de la modifilo) disvastiĝu (#205).
+                    coroutineContext.ensureActive()
                 }
             }
         }
@@ -77,6 +81,9 @@ private suspend fun PointerInputScope.musaTrenado(
                 while (true) {
                     val evento = awaitPointerEvent(PointerEventPass.Initial)
                     val ŝanĝo = evento.changes.firstOrNull() ?: continue
+                    // NUR muso — tuŝgestoj apartenas al la denaska traktilo (aliel la
+                    // adaptilo duobligus ĉiun tuŝan trenadon sur Android).
+                    if (ŝanĝo.type != PointerType.Mouse) continue
                     when (evento.type) {
                         PointerEventType.Press -> {
                             premas = true
@@ -94,6 +101,7 @@ private suspend fun PointerInputScope.musaTrenado(
                             } else {
                                 if (abs(deltoY) > abs(deltoX)) deltoY else 0f
                             }
+                            trenMezuro += abs(delto)
                             if (abs(delto) >= 0.5f) rulumendoj.trySend(delto)
                         }
                         PointerEventType.Release, PointerEventType.Unknown -> {
@@ -132,7 +140,8 @@ private suspend fun PointerInputScope.musaRadetado(
                 try {
                     rulumu(kvanto)
                 } catch (e: CancellationException) {
-                    throw e
+                    // kiel en musaTrenado — konkura anuligo ne mortigu la konsumanton
+                    coroutineContext.ensureActive()
                 }
             }
         }

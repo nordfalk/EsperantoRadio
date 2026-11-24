@@ -147,3 +147,12 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 - **`grep -c ĉeno *.wasm` kasas erarojn**: kompila fiasko pere de
   `… | tail -1 && alia` montras «BUILD»-sukceson kaj publikiĝas malnova fasko —
   ĉiam kontrolu `grep -E "BUILD|e: "`, ne nur `tail`.
+
+- **Neniam forigu kodon per plur-linia ĉeno-kongruo sen relegi la rezulton**
+  (2026-11-24, PR #210): skriptita forigo de protokol-instrumentigo (`logd`-linioj)
+  forviŝis KUNE ankaŭ najbaran realan kodon — la muso-kaptilon
+  `if (ŝanĝo.type != PointerType.Mouse) continue` kaj `trenMezuro += abs(delto)`
+  — ĉar ambaŭ kuŝis inter la forigotaj linioj; CodeRabbit prave rimarkis la
+  regreson (duobla tuŝa rulado sur Android, klak-karto ĉe trenfino). Post ĉiu
+  amasa skripta prilaboro de fontkodo: `git diff` plu-legu la rezultajn
+  blokojn, ne nur la ŝanĝitajn liniojn.

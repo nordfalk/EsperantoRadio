@@ -5,6 +5,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.plugin
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,9 +51,10 @@ class NurArkivaVojoTest {
     @Test
     fun kunfandaVojoProvasAmbaŭFontojn() = runTest {
         val petoj = mutableListOf<String>()
+        val sekurigo = Mutex() // ambaŭ fontoj aldonas samtempe el apartaj fadenoj
         val klient = HttpClient(CIO)
         klient.plugin(HttpSend).intercept { peto ->
-            petoj.add(peto.url.toString())
+            sekurigo.withLock { petoj.add(peto.url.toString()) }
             throw IllegalStateException("Reto ne uzata en ĉi tiu testo")
         }
         val deponejo = ElsendoDeponejoImpl(

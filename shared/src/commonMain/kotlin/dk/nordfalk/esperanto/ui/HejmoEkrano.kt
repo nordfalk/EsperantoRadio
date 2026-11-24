@@ -441,6 +441,18 @@ fun HejmoEkrano(
         vm.aktualigiuLudatajn(nunaElsendoId)
     }
 
+    // "Kio novas": kiam venas novaj elsendoj (nova unua karto maldekstre),
+    // rulu la vicon trankvile al la unua (plej nova) karto
+    val kioNovasVicoStato = rememberLazyListState()
+    var antaŭaUnuaNovaId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(novajElsendoj) {
+        val unuaId = novajElsendoj.firstOrNull()?.id
+        if (unuaId != null && unuaId != antaŭaUnuaNovaId) {
+            antaŭaUnuaNovaId = unuaId
+            kioNovasVicoStato.animateScrollToItem(0)
+        }
+    }
+
     // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
     val luditajVicoStato = rememberLazyListState()
     var antaŭaUnuaLudataId by remember { mutableStateOf<String?>(null) }
@@ -581,7 +593,6 @@ fun HejmoEkrano(
                 if (novajElsendoj.isNotEmpty()) {
                     item { SekcioTitolo("Kio novas") }
                     item {
-                        val kioNovasVicoStato = rememberLazyListState()
                         LazyRow(
                             state = kioNovasVicoStato,
                             modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kioNovasVicoStato),

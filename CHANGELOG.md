@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Ŝanĝita
+
+- „Kio novas“ aŭtomate rulumas al la unua (plej nova) karto kiam venas nova elsendo (https://github.com/nordfalk/EsperantoRadio/pull/205)
+
 ### Aldonita
 
 - (nenio ankoraŭ)

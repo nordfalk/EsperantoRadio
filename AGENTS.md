@@ -180,7 +180,8 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   laboron en la PR (17 dosieroj anstataŭ la celataj 6). Do: `git fetch origin master`
   kaj `git switch -c MMdd-nomo origin/master`. Se la branĉo jam puŝiĝis malpure:
   eligu la proprajn komitojn per
-  `git log --no-merges --oneline origin/master..<malnova>` kaj cherry-picku ilin
+  `git log --no-merges --reverse --oneline origin/master..<malnova>` kaj
+  cherry-picku ilin
   ĈIUJN UNUOPE sur la nova branĉo (kunfandajn komitojn — ekz. de
   `git merge origin/master` — ne cherry-picku: sen `-m` git haltas ĉe ili, kaj
   ilian enhavon la nova branĉo ricevos per propra `git merge origin/master`);

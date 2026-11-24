@@ -282,6 +282,15 @@
   natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
   ĝi povus proponi la valoron por ĉiu kanalo.
 
+#### C60 — Regula (ĉiuhora/ĉiutaga) rulado de la servilaj taskoj — neniu cron ekzistas
+- **Statuso**: [ ]
+- **Fonto**: esplorado 2026-11-24 (C56): `crontab` je ambaŭ maŝinoj kaj `systemctl list-timers` estis kontrolitaj — NENIU temp-planita rulado ekzistas; ĉio ĝis nun rulis permane. La establon faros la posedanto mem.
+- **Priskribo**: nenio aŭtomate refreŝigas la arkivon. La perioda rulado devas kovri almenaŭ:
+  - **`:server:arkivKonstruilo`** — RSS-fluoj kaj la publikigota kanalkonfiguro; de PR #210 ĝi ankaŭ elŝutas novajn emblemojn/bildetojn al `publika/bildoj/`. Ekz. ĉiuhore aŭ ĉiutage.
+  - **AI-tekstoj** — la STT-pipelino (`server/data/privata/skriptoj/stt_chiujn.py` → `privata/transkriptoj/`) kaj la LLM-prilaboro al pretaj rezultoj (`privata/rezumoj/`). Kompute peza: ekz. ĉiunokte aŭ semajne, kun la limigoj `N_POR_KANALO` kaj `MAKS_DAURO_MIN`.
+  - **`rsync`-publikigo** — decidu, ĉu ĝi iĝu parto de la aŭtomato aŭ restu permana. Aktuala regulo: „neniam publikigu al la servilo sen eksplicita peto de la uzanto" — aŭtomata publikigo do bezonas apartan, eksplicitan aprobon de la posedanto (kun `--chmod=D755,F644` kaj `-L` por la ligiloj; vidu la skill-on `servilo-arkivo`).
+- **Sugesto**: unu `crontab`-linio sur la konstanta maŝino — tiu kun la kanona datum-arbo (`/home/j/Code/EsperantoRadio/server/data`) — ekz. `5 * * * *` (ĉiuhora) aŭ `17 4 * * *` (ĉiutage), kun protokolo al `tmp/`. Post-vidigo: `stato.json` (`lastaRulo`) kaj https://javabog.dk/esperanto-radio/kanaloj/ estas freŝaj; unu mortinta kanal-fluo ne haltigu la aliajn (A4).
+
 ---
 
 > **Pri la finitaj trovindikoj**: ekde 2026-11-20 ili ne plu listiĝas ĉi tie — vidu

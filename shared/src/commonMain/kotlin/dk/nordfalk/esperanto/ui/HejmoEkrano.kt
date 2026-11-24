@@ -535,8 +535,18 @@ fun HejmoEkrano(
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
-                // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»
-                title = { Text(if (AppStato.estasAlfaKonstruo) "EsperαntoRαdio alfa" else "EsperantoRadio", fontWeight = FontWeight.Bold) },
+                // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»;
+                // sur la retumilo ĝi signalas, ke la retversio estas beta, ne finpreta (C56)
+                title = {
+                    Text(
+                        when {
+                            AppStato.estasAlfaKonstruo -> "EsperαntoRαdio alfa"
+                            platformo == Platformo.RETUMILO -> "EsperantoRadio beta (ne finpreta)"
+                            else -> "EsperantoRadio"
+                        },
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 actions = {
                     // Ludvico-butono unue — nur videbla se la vico enhavas elementojn
                     ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }

@@ -18,24 +18,26 @@ object Emblemoj {
     }
 
     /**
-     * Dosiernoma sufikso el la `Content-Type` de la respondo. Se nekonata, nur
-     * konataj BILD-sufiksoj en la URL akceptiĝas (sufikso kiel `.php` aǔ `asp`
-     * ne rajtas iĝi dosiernomo — Apache mem decidus laŭ ĝi la MIME-specon de la
-     * servata dosiero); `jpg` kiel lasta rezervo (bildoj speguliĝas 1:1 — la
-     * sufikso nur nomas la dosieron, ĝi ne transformas la enhavon).
+     * Determinas la bild-formaton laŭ la ENHAVO de la elŝutitaj bitokoj (magiaj
+     * signoj), NE laŭ Content-Type aŭ dosiernomo — kadre de la XSS-ŝirmo (PR #210):
+     * nur enhavo, kiu vere estas legebla kiel PNG, JPEG aŭ GIF, speguliĝas
+     * (decido de la posedanto 2026-11-24). SVG (povus ruli skripton samdevene,
+     * CWE-79), HTML, erar-paĝoj, WebP kaj ĉio alia estas rifuzataj → `null`
+     * (la emblemo restas ĉe la originala URL, regulo A4).
      */
-    fun sufikso(contentType: String?, url: String): String {
-        val elTipo = when (contentType?.substringBefore(';')?.trim()?.lowercase()) {
-            "image/jpeg", "image/jpg" -> "jpg"
-            "image/png" -> "png"
-            "image/gif" -> "gif"
-            "image/webp" -> "webp"
-            "image/svg+xml" -> "svg"
+    fun formatoLaŭEnhavo(bitokoj: ByteArray): String? {
+        fun kongruas(vararg signoj: Int): Boolean {
+            if (bitokoj.size < signoj.size) return false
+            for (i in signoj.indices) if ((bitokoj[i].toInt() and 0xFF) != signoj[i]) return false
+            return true
+        }
+        return when {
+            kongruas(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A) -> "png"
+            kongruas(0xFF, 0xD8, 0xFF) -> "jpg"
+            kongruas(0x47, 0x49, 0x46, 0x38, 0x39, 0x61) -> "gif" // GIF89a
+            kongruas(0x47, 0x49, 0x46, 0x38, 0x37, 0x61) -> "gif" // GIF87a
             else -> null
         }
-        if (elTipo != null) return elTipo
-        val elUrl = url.substringBeforeLast('?').substringAfterLast('.').lowercase()
-        return if (elUrl in setOf("jpg", "jpeg", "png", "gif", "webp", "svg")) elUrl else "jpg"
     }
 
     /**

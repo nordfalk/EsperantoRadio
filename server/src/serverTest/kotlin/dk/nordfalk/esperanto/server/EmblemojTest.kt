@@ -19,17 +19,28 @@ class EmblemojTest {
         assertEquals("https://alia.example", Emblemoj.bazaBildaUrl("https://alia.example"))
     }
 
+    private fun bitokoj(vararg v: Int) = v.map { it.toByte() }.toByteArray()
+
     @Test
-    fun sufiksoElTipoValorasPliOlElUrl() {
-        assertEquals("png", Emblemoj.sufikso("image/png", "https://x.example/bildo.jpg"))
-        assertEquals("jpg", Emblemoj.sufikso("image/jpeg; charset=utf-8", "https://x.example/emblemo"))
-        assertEquals("webp", Emblemoj.sufikso("image/webp", "https://x.example/b"))
-        assertEquals("gif", Emblemoj.sufikso(null, "https://x.example/bildo.gif?size=300"))
-        assertEquals("jpg", Emblemoj.sufikso("text/html", "https://x.example/bildo.php"))
-        // nur konataj bild-sufiksoj akceptiĝas el la URL — .php/ajnaj ne iĝu dosiernomo
-        assertEquals("jpg", Emblemoj.sufikso(null, "https://x.example/emblemo"))
-        assertEquals("png", Emblemoj.sufikso(null, "https://x.example/emblemo.PNG?grando=120"))
-        assertEquals("svg", Emblemoj.sufikso("image/svg+xml", "https://x.example/l.svg"))
+    fun formatoLaŭEnhavoRekonasMagiajnSignojn() {
+        // PNG (89 50 4E 47 0D 0A 1A 0A)
+        assertEquals("png", Emblemoj.formatoLaŭEnhavo(bitokoj(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A) + bitokoj(1, 2, 3)))
+        // JPEG (FF D8 FF — SOI + marko)
+        assertEquals("jpg", Emblemoj.formatoLaŭEnhavo(bitokoj(0xFF, 0xD8, 0xFF, 0xE0) + bitokoj(0, 0x10)))
+        // GIF89a kaj GIF87a
+        assertEquals("gif", Emblemoj.formatoLaŭEnhavo("GIF89a1x".encodeToByteArray()))
+        assertEquals("gif", Emblemoj.formatoLaŭEnhavo("GIF87a1x".encodeToByteArray()))
+    }
+
+    @Test
+    fun formatoLaŭEnhavoRifuzasNeBildojn() {
+        // SVG — la XSS-vektoro (CWE-79): ne akceptebla eĉ kun image/png-kapo
+        assertEquals(null, Emblemoj.formatoLaŭEnhavo("<svg onload=alert(1)>".encodeToByteArray()))
+        // HTML-erarpaĝo, malplena/trunkita enhavo, nura kapo-prefikso
+        assertEquals(null, Emblemoj.formatoLaŭEnhavo("<html><body>404</body></html>".encodeToByteArray()))
+        assertEquals(null, Emblemoj.formatoLaŭEnhavo("GIF".encodeToByteArray())) // tro mallonga (nur 3 signoj)
+        assertEquals(null, Emblemoj.formatoLaŭEnhavo(bitokoj()))
+        assertEquals(null, Emblemoj.formatoLaŭEnhavo(bitokoj(0xFF, 0xD8))) // tro mallonga JPEG
     }
 
     @Test

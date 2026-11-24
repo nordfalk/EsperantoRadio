@@ -11,7 +11,6 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.time.Instant
@@ -160,14 +159,16 @@ object ArkivKonstruilo {
                     // Plena paĝo (ekz. 404-HTML) ne iĝu emblemo — Ktor defaŭlte ne
                     // ĵetas ĉe erarstatusoj (expectSuccess=false).
                     check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
-                    val sufikso = Emblemoj.sufikso(respondo.headers[HttpHeaders.ContentType], url)
-                    // SVG-on ni NE spegulas (CWE-79/XSS): samdevene servata SVG-dosiero
-                    // povas enteni skripton kaj ruliĝi sub la origino de la retversio.
-                    // La emblemo restas ĉe la originala URL (A4) kaj estas purigata
-                    // el la arkivo (vidu puriguArkaikajnEmblemojn).
-                    check(sufikso != "svg") { "SVG-emblemo ne spegulebla (XSS-risko, PR #210)" }
-                    val dosiero = File(bildujo, "${kanalo.slug}.$sufikso")
-                    dosiero.writeBytes(respondo.bodyAsBytes())
+                    val enhavo = respondo.bodyAsBytes()
+                    // XSS-ŝirmo (CWE-79, PR #210): la formato estas determinata laŭ
+                    // la ENHAVO de la bildo (magiaj signoj), ne laŭ Content-Type aŭ
+                    // dosiernomo. Nur vere legeblaj PNG/JPEG/GIF-speguliĝas; SVG
+                    // (skript-oruligebla samdevene), HTML kaj erar-paĝoj estas rifuzataj
+                    // — la emblemo restas ĉe la originala URL (A4).
+                    val formato = Emblemoj.formatoLaŭEnhavo(enhavo)
+                        ?: throw IllegalStateException("enhavo ne estas rekonebla PNG/JPEG/GIF (eble SVG/HTML) — ne spegulata")
+                    val dosiero = File(bildujo, "${kanalo.slug}.$formato")
+                    dosiero.writeBytes(enhavo)
                     "$bazo/bildoj/${dosiero.name}"
                 }
                 mapigo[url] = nova

@@ -162,11 +162,12 @@ object ArkivKonstruilo {
                     val enhavo = respondo.bodyAsBytes()
                     // XSS-ŝirmo (CWE-79, PR #210): la formato estas determinata laŭ
                     // la ENHAVO de la bildo (magiaj signoj), ne laŭ Content-Type aŭ
-                    // dosiernomo. Nur vere legeblaj PNG/JPEG/GIF-speguliĝas; SVG
-                    // (skript-oruligebla samdevene), HTML kaj erar-paĝoj estas rifuzataj
+                    // dosiernomo kaj validigata per VERA malkodado (ImageIO). Nur malkodatablaj
+                    // PNG/JPEG/GIF speguliĝas; SVG
+                    // (skript-ruligebla samdevene), HTML kaj erar-paĝoj estas rifuzataj
                     // — la emblemo restas ĉe la originala URL (A4).
-                    val formato = Emblemoj.formatoLaŭEnhavo(enhavo)
-                        ?: throw IllegalStateException("enhavo ne estas rekonebla PNG/JPEG/GIF (eble SVG/HTML) — ne spegulata")
+                    val formato = Emblemoj.formatoSeLegebla(enhavo)
+                        ?: throw IllegalStateException("enhavo ne estas malkodebla PNG/JPEG/GIF (eble SVG/HTML/koruptita) — ne spegulata")
                     val dosiero = File(bildujo, "${kanalo.slug}.$formato")
                     dosiero.writeBytes(enhavo)
                     "$bazo/bildoj/${dosiero.name}"

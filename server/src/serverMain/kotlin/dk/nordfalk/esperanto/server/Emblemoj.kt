@@ -1,5 +1,9 @@
 package dk.nordfalk.esperanto.server
 
+import dk.nordfalk.esperanto.logw
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
+
 /**
  * Emblemoj sur la arkiva servilo (FAROTA C56): la retversio (wasmJs) gastigas
  * samdevene apud la arkivo, sed la emblemoj de la kanaloj venas el la diversaj
@@ -37,6 +41,23 @@ object Emblemoj {
             kongruas(0x47, 0x49, 0x46, 0x38, 0x39, 0x61) -> "gif" // GIF89a
             kongruas(0x47, 0x49, 0x46, 0x38, 0x37, 0x61) -> "gif" // GIF87a
             else -> null
+        }
+    }
+
+    /**
+     * Kiel [formatoLaŭEnhavo], sed ankaŭ validigas ke la enhavo vere estas
+     * malkodebla bildo (ImageIO-malkodado de la tuta datumo — ne nur la magiaj
+     * signoj): trunkita, koruptita aŭ kaŝvestita enhavo kun ĝusta signaturo
+     * estas rifuzata (→ null; la emblemo restas ĉe la originala URL, A4).
+     */
+    fun formatoSeLegebla(bitokoj: ByteArray): String? {
+        val formato = formatoLaŭEnhavo(bitokoj) ?: return null
+        return try {
+            if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null
+        } catch (e: Exception) {
+            // A8: neniam silente engluti
+            logw("Emblemoj", "emblemo aspektas kiel $formato sed ne malkodeblas", e)
+            null
         }
     }
 

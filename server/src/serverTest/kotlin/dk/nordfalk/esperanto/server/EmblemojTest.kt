@@ -1,5 +1,7 @@
 package dk.nordfalk.esperanto.server
 
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -41,6 +43,35 @@ class EmblemojTest {
         assertEquals(null, Emblemoj.formatoLaŭEnhavo("GIF".encodeToByteArray())) // tro mallonga (nur 3 signoj)
         assertEquals(null, Emblemoj.formatoLaŭEnhavo(bitokoj()))
         assertEquals(null, Emblemoj.formatoLaŭEnhavo(bitokoj(0xFF, 0xD8))) // tro mallonga JPEG
+    }
+
+    private fun veraPng(): ByteArray {
+        val bildo = java.awt.image.BufferedImage(4, 4, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        val el = ByteArrayOutputStream()
+        ImageIO.write(bildo, "png", el)
+        return el.toByteArray()
+    }
+
+    @Test
+    fun formatoSeLegeblaAkceptasVeranBildon() {
+        // vera (per ImageIO generita) PNG malkodeblas
+        assertEquals("png", Emblemoj.formatoSeLegebla(veraPng()))
+    }
+
+    @Test
+    fun formatoSeLegeblaRifuzasKoruptitaJenJustaSignaturo() {
+        // 1) PNG-signaturo + sensenca resto: la nura signatura kontrolo
+        //    (formatoLaŭEnhavo) trapasus, sed la vera malkodado fiaskas
+        val kunSignaturoSedRuba = bitokoj(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A) + "rubo, ne bildo".encodeToByteArray()
+        assertEquals("png", Emblemoj.formatoLaŭEnhavo(kunSignaturoSedRuba), "averto: la nura signatura kontrolo trapasas rubon")
+        assertEquals(null, Emblemoj.formatoSeLegebla(kunSignaturoSedRuba))
+        // 2) vera PNG, duone fortranĉita: la kapo ĝustas, la malkodado fiaskas
+        val png = veraPng()
+        val trunkita = png.copyOf(png.size / 2) + bitokoj(1, 2, 3, 4)
+        assertEquals("png", Emblemoj.formatoLaŭEnhavo(trunkita), "averto: la nura signatura kontrolo trapasas trunkitan")
+        assertEquals(null, Emblemoj.formatoSeLegebla(trunkita))
+        // 3) SVG restas rifuzata ankaŭ per la plena kontrolo
+        assertEquals(null, Emblemoj.formatoSeLegebla("<svg onload=alert(1)>".encodeToByteArray()))
     }
 
     @Test

@@ -175,3 +175,16 @@
 > **Pri la finitaj trovindikoj**: ekde 2026-11-20 ili ne plu listiĝas ĉi tie — vidu
 > `git log` de FAROTA.md (la etikedoj K…, G…, C… restas spureblaj), la PR-ojn,
 > `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
+
+#### C62 — Apache: X-Content-Type-Options: nosniff por la elŝutejo
+- **Statuso**: [ ]
+- **Fonto**: CodeRabbit-sekureca recenzo 2026-11-24 (PR #210, CWE-79). La apo-verifikado
+  rifuzas ne-bildan embleman enhavon (Emblemoj.formatoSeLegebla, ImageIO-malkodado), sed
+  defenda kapo mankas: la servataj bildoj ne havas `X-Content-Type-Options: nosniff`.
+- **Priskribo**: `AllowOverride None` en la DocumentRoot (probita, vidu la skill-on
+  `servilo-arkivo`) mortigas iun ajn `.htaccess` — do la kapo devas esti en la
+  Apache-agordo mem (kiel la mime.types-fikso de .wasm):
+  `Header always set X-Content-Type-Options "nosniff"` en la koncerna
+  `<Directory>`/vhost, poste `sudo systemctl reload apache2`.
+- **Sugesto**: permane farenda de la posedanto sur javabog.dk; kontrolindoj per
+  `curl -sI https://javabog.dk/esperanto-radio/bildoj/muzaiko.png | grep -i nosniff`.

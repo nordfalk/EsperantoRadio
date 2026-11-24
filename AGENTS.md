@@ -428,10 +428,14 @@ La apo sendas protokolojn kaj erarojn al **Sentry.io** (organizo `esperantoradio
 projekto `KMP`). **Nur eldon-konstruoj sur realaj aparatoj raportas** —
 debug-konstruoj, Desktop kaj emuliloj ne inicialigas Sentry-n (2026-10-13, PR #109)
 — **kaj nur kiam la erar-raportado estas ŝaltita** (agordo `erar_raportado`;
-defaŭlto RUTEMPA laŭ la subskriba atestilo de la APK, PR #148/C50: fremda
-subskribo (F-Droid) = opt-in kun unufoja konsento-demando ĉe la unua starto;
-nia subskribo (Play/Aptoide/GitHub) = defaŭlte ŝaltita, malŝaltebla en
-Agordoj → Privateco). Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj,
+defaŭlto RUTEMPA laŭ la INSTAL-FONTO de la pako, ne la subskribo
+(2026-11-24, PR: riparo de la CodeRabbit-trovo en #200 — per RB F-Droid
+distribuas APK-on kun NIA atestilo, do la subskribo de PR #148 ne plu
+distingas la kanalojn): instalaĵo el KONATA ne-F-Droid-kanalo
+(`com.android.vending`, `com.android.packageinstaller`) = defaŭlte ŝaltita
+(opt-out), malŝaltebla en Agordoj → Privateco; ĉiu alia instala fonto
+(F-Droid `org.fdroid.*` kaj ĈIU NEKONATA) = opt-in kun unufoja
+konsento-demando ĉe la unua starto. Por legi/esplori Sentry-n (MCP-iloj, datumaro-kapabloj,
 kvoto-taksado) uzu la skill-on **`sentry-esplorado`**.
 
 Niveloj (`ProtokoloUtil.kt`). Ĉiuj Sentry-vojoj estas protektataj per la

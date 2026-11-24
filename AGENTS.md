@@ -203,9 +203,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **`gh pr edit` ne funkcias en ĉi tiu deponejo** (GraphQL projectCards-eraro) —
   uzu la REST API: `gh api -X PATCH repos/nordfalk/EsperantoRadio/pulls/N -f body="$(cat dosiero)"`.
 - **Afiŝitan PR-recenzon oni ne povas redakti per REST** (2026-10-20, PR #126):
-  `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 — korektu per
-  GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId` = `node_id`
-  de la recenzo). Kontrolu la AFIŜITAN tekston post la afiŝo.
+  `PATCH …/pulls/N/reviews/{id}` redonas 404 kaj `DELETE …` 422 ("non-pending") —
+  korektu per GraphQL `updatePullRequestReview` (mutacio kun `pullRequestReviewId`
+  = `node_id` de la recenzo). **Sed unu recenzo-KOMENTON oni ja povas korekti
+  per REST**: `gh api -X PATCH repos/…/pulls/comments/{id} -f body="…"` funkcias
+  (2026-11-24, PR #207: fuŝita respondo korektita tiel) — `{id}` estas la
+  komentar-ID, ne la recenz-ID. Kontrolu la AFIŜITAN tekston post la afiŝo.
 - **Recenzo-komentoj de la posedanto povas esti nudpunktaj** (2026-10-29, PR #143):
   «forigu» aŭ nura citita linio signifas forig-peton. Agu, respondu en la fadeno
   (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la

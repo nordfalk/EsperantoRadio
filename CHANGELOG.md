@@ -16,7 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
-- (nenio ankoraŭ)
+- Se haveblas nova versio en Google Play, la ĉefekrano montras indikilon; klako montras la novaĵojn kun butono „Ĝisdatigu“ (https://github.com/nordfalk/EsperantoRadio/pull/204)
 
 ## [3.2.0] - 2026-11-23
 

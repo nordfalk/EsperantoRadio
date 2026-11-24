@@ -1,5 +1,7 @@
 package dk.nordfalk.esperanto.ui
 
+actual val platformo: Platformo = Platformo.IOS
+
 // TODO (iOS ankoraŭ sen Xcode-projekto): deep links / universal links ankoraŭ ne estas
 // agorditaj — vidu FAROTA C58 ("white label"-ligilo) kaj C34 en la git-historio.
 

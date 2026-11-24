@@ -492,6 +492,48 @@ class HejmoEkranoTest {
     }
 
     @Test
+    fun versiokartoAperasKajMalfermasLaNovaĵojn() = runComposeUiTest {
+        val novaVersio = MutableStateFlow<String?>("9.9.9")
+        var novaĵojMalfermitaj = 0
+        setContent {
+            HejmoEkrano(
+                nunaDatumo = hodiaŭ,
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+                novaVersio = novaVersio,
+                onNovaVersio = { novaĵojMalfermitaj++ },
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithText("Nova versio 9.9.9 havebla").assertIsDisplayed()
+        onNodeWithText("Nova versio 9.9.9 havebla").performClick()
+        assertEquals(1, novaĵojMalfermitaj, "Klako sur la versiokarto devas malfermi la apajn novaĵojn")
+        // La karto malaperas kiam la ĝisdatigo ne plu estas havebla (ekz. la
+        // defora konfiguro refreŝiĝis aŭ la uzanto ĝisdatigis la apopaakon)
+        novaVersio.value = null
+        waitForIdle()
+        onNodeWithText("Nova versio 9.9.9 havebla").assertDoesNotExist()
+    }
+
+    @Test
+    fun versiokartoNeAperasSenNovaVersio() = runComposeUiTest {
+        setContent {
+            HejmoEkrano(
+                nunaDatumo = hodiaŭ,
+                kanaloDeponejo = falsaKanaloDeponejo(),
+                elsendoDeponejo = falsaElsendoDeponejo(),
+            )
+        }
+        waitForIdle()
+        // La ŝargado rulas en la propra VM-skopo — atendu ĝin eksplicite (KMP-X-riparo)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kio novas").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithText("Nova versio 3.2.0 havebla").assertDoesNotExist()
+        onNodeWithText("Tuŝu por legi la novaĵojn kaj ĝisdatigi").assertDoesNotExist()
+    }
+
+    @Test
     fun klakoSurSekcioTitoloKanalojVokasOnKanalaro() = runComposeUiTest {
         var kanalaroVokita = false
         setContent {

@@ -29,7 +29,7 @@
 | C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
 | C53 | Parte farita: HUMILOPINIE aldonita; restas kontroli "Una Vaga Idea"/"Cuéntame, Hermosura". |
 | C59 | Parte farita: `transsaltuKomenceSekundojn` ekzistas kun ĉiuj valoroj; restas (b) plena aŭtomatiĝo (`enkonduk-detekto`). |
-| C61 | Aktuala: `aktualaVersio`/`funkciaAnonco` ankoraŭ nenie legataj. |
+| C61 | Parte farita: `aktualaVersio` pelas la ĝisdatigo-indikilon (PR #204); restas decidi pri `funkciaAnonco`. |
 
 ## GRAVA
 
@@ -300,7 +300,17 @@
   ĝi povus proponi la valoron por ĉiu kanalo.
 
 #### C61 — Agord-ŝlosiloj `aktualaVersio` kaj `funkciaAnonco` ne estas legataj de iu ajn kodo
-- **Statuso**: [ ]
+- **Statuso**: [x] parte — `aktualaVersio` nun vivas (PR #204) (2026-11-24):
+  la apologio komparas ĝin kun `ApoVersio.VERSION` (nur sur Android — la enumo `Platformo` +
+  `platformo` en PlatformLigilo, expect/actual) kaj la ĉefekrano montras tiam
+  ĝisdatigo-karton („Nova versio X havebla“, klako → dialogo kun la apaj
+  novaĵoj + butono „Ĝisdatigu al versio X“ → `malfermuLigon(PLAY_STORE_LIGILO)`).
+  La valoro ĝisdatiĝas ankaŭ de la defora kanalkonfiguro (`alFreŝaAgordo`), do
+  oni povas anonci novan version sen eldoni apopaakon. La nom-stilo restas
+  camelCase (`aktualaVersio`) kiel `prizorgantaRetpoŝto` — `apaj_novaĵoj` estas
+  la escepto. RESTAS: `funkciaAnonco` ankoraŭ estas morta datumo — decidiĝu
+  ĉu realigi ĝin (provizora mesaĝo pri kanal-funkciado, ligita al la
+  diagnozo-sistemo) aŭ forigi ĝin de la konfiguro.
 - **Fonto**: recenz-komento pri PR #144, punkto 6 (2026-10-29)
 - **Priskribo**: la ŝlosiloj en la `android`-sekcio de `esperantoradio_konfiguro.json`
   (`aktualaVersio`, `funkciaAnonco`) estas nenie legataj — pure mortaj datumoj

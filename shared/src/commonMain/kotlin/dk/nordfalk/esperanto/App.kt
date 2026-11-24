@@ -42,6 +42,7 @@ import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ĝisdatiguSciigSkedon
 import dk.nordfalk.esperanto.domain.model.Elsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
+import dk.nordfalk.esperanto.domain.PLAY_STORE_LIGILO
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.domain.player.TranssaltaSciigo
@@ -313,6 +314,13 @@ fun EsperantoRadioApp(
                                 },
                                 diagnozoProblemoj = diagnozoRegilo.problemoj,
                                 kaŝitajAvertoj = agordojDeponejo.kaŝitajAvertoj,
+                                novaVersio = AppStato.novaVersio,
+                                onNovaVersio = {
+                                    // La versio-karto remalfermas la apajn novaĵojn —
+                                    // la dialogo montras tiam ankaŭ la ĝisdatig-butonon
+                                    logi("Nav", "versio-karto → montras la apajn novaĵojn")
+                                    novaĵojMontratajPerMenua = true
+                                },
                                 onElŝuti = { elsendo ->
                                     logi("Nav", "Hejmo: elŝutas ${elsendo.id}")
                                     scope.launch { elŝutDeponejo.elŝuti(elsendo) }
@@ -626,6 +634,7 @@ fun EsperantoRadioApp(
         // En evolua medio la aŭtomata dialogo ne montriĝas — ĉe freŝa instalaĵo
         // la haketaĵo forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
         val apajNovaĵoj by apajNovaĵojDeponejo.observuMontratan().collectAsState()
+        val novaVersio by AppStato.novaVersio.collectAsState()
         val montrataMesaĝo = apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedo }
             ?: if (novaĵojMontratajPerMenua) apajNovaĵojDeponejo.mesaĝo else null
         montrataMesaĝo?.let { mesaĝo ->
@@ -678,6 +687,19 @@ fun EsperantoRadioApp(
                                     HtmlVido(html = pasinta, uzuWebView = false, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
                                 }
                             }
+                        }
+
+                        // Ĝisdatigo-indikilo: la konfiguro portas version pli novan ol
+                        // la instalita apo (C61a; `novaVersio` estas ne-null nur sur
+                        // Android) — plej sube butono, kiu malfermas Google Play.
+                        novaVersio?.let { versio ->
+                            Button(
+                                onClick = {
+                                    logi("Novaĵoj", "Malfermas Google Play por ĝisdatigi al $versio")
+                                    malfermuLigon(PLAY_STORE_LIGILO)
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            ) { Text("Ĝisdatigu al versio $versio") }
                         }
                     }
                 },

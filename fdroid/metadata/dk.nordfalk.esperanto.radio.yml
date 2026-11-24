@@ -9,37 +9,23 @@ SourceCode: https://github.com/nordfalk/EsperantoRadio
 IssueTracker: https://github.com/nordfalk/EsperantoRadio/issues
 Changelog: https://github.com/nordfalk/EsperantoRadio/blob/master/CHANGELOG.md
 
-Name: EsperantoRadio
 AutoName: EsperantoRadio
-Description: |-
-  Aŭskultu Esperanton — 27 radiokanaloj kaj podkastoj el la tuta mondo en
-  unu apo: kanal-superrigardo, rektaj elsendoj, podkastoj, elŝutoj, plej
-  ŝatataj, serĉo kaj vekhorloĝo.
-
-  Inter la kanaloj: Muzaiko (24-hora Esperanto-retradio), Radio Vatikana
-  (ekde 1977), Varsovia Vento, Pola Retradio, Kernpunkto kaj La Malfamuloj.
 
 RepoType: git
 Repo: https://github.com/nordfalk/EsperantoRadio.git
+Binaries: https://github.com/nordfalk/EsperantoRadio/releases/download/v%v/EsperantoRadio-v%v.apk
 
 Builds:
-  - versionName: 3.1.1
-    versionCode: 253
-    commit: 10e3f13513ec00231e30148f4ee42cec6cb00c2a
+  - versionName: 3.2.0
+    versionCode: 258
+    commit: 05c474b6b120e86ba10a23a6533734b4fe6182b6
     subdir: androidApp
     gradle:
       - yes
     scanignore:
       - build.gradle.kts
 
-  - versionName: 3.2.0
-    versionCode: 258
-    commit: v3.2.0
-    subdir: androidApp
-    gradle:
-      - yes
-    scanignore:
-      - build.gradle.kts
+AllowedAPKSigningKeys: aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags

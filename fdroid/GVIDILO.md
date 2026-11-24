@@ -25,17 +25,18 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 
 | Kio | Stato |
 |---|---|
-| Metadateno (recepto) por 3.1.1/253, etikedo `v3.1.1` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`); kontraŭvalidigita kontraŭ la oficiala fdroiddata-skemo (`schemas/metadata.json`) |
-| Git-etikedo `v3.1.1` sur GitHub | ✅ (unu fonto de vero kun versionCode 253) |
+| Metadateno (recepto) por 3.2.0/258, etikedo `v3.2.0` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`); spegulas 1:1 la CI-pasan formon de la MR !55129 |
+| Git-etikedo `v3.2.0` sur GitHub + **APK-averto en la GitHub-eldono** | ✅ (necesa por `Binaries`, vidu sube) |
 | Nesubskribita konstruo ebla (F-Droid kondiĉo) | ✅ pruvita 2026-10-29 |
 | Permesilo GPL-3.0-or-later | ✅ `LICENSE` en la radiko |
 | Neniuj malliberaj dependejoj / binaroj en la deponejo | ✅ |
 | Sentry-erar-raportado **opt-in** en F-Droid-konstruoj | ✅ (PR #148 — sen tio ili atribuus la kontraŭecon "Tracking") |
 | **GitLab-konto** | ❌ vi devas krei ĝin (paso 2) |
 
-**Antaŭ ol daŭrigi**: la metadateno devas esti sur `master` (PR #148). Se la
-PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
-`https://github.com/nordfalk/EsperantoRadio/raw/1029-fdroid-aptoide/fdroid/metadata/dk.nordfalk.esperanto.radio.yml`
+**Antaŭ ol daŭrigi**: la metadateno devas esti sur `master`. La paŝoj 1–2 kaj
+la fork/MR (!55129) estas jam faritaj (2026-10-31/2026-11-23); por ĉiu nova
+versio restas nur la paŝo 3.2 (anstataŭigu la yml-on en la fork-branĉo) +
+la GitHub-eldono kun la APK-averto (vidu sekcion 6).
 
 ## 2. Kreu GitLab-konton (5 min)
 
@@ -77,19 +78,21 @@ changelog/images or anything that should be provided in upstream repo":
 
 1. **`metadata/dk.nordfalk.esperanto.radio.yml`** —
    https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio.yml
-   (kopiu SEN ŝanĝoj — `commit` jam estas la plena haketaĵo, ĉar la ŝablono
+   (kopiu SEN ŝanĝoj — de 2026-11-23 la yml sur nia master spegulas 1:1 la
+   CI-pasan formon, inkluzive `Binaries`/`AllowedAPKSigningKeys` kaj nur la
+   lastan konstruon; `commit` estas la plena haketaĵo, ĉar la ŝablono
    malpermesas etikedon/branon en la commit-kampo)
 
 En via fork (https://gitlab.com/nordfalk/fdroiddata): branĉo
 `dk.nordfalk.esperanto.radio` (NE `master`) → anstataŭigu la dosierenhavon;
 Commit message ekz. `New app: EsperantoRadio`.
 
-**Fina lini-salo devas resti**: algluo per la retredaktilo ofte perdas la
-lastan `\n` — `fdroid rewritemeta` tiam fiaskas per „\ No newline at end of
-file" (2026-10-31). Sekurega vojo: elŝutu la dosieron el la raw-ligilo kaj
-uzu **Replace**/alŝuton en la redaktilo anstataŭ kopii-alk. **Se lokaj dosierujoj
-(`metadata/dk.nordfalk.esperanto.radio/…`) restis de pli fruaj provoj, forigu
-ilin** — la ŝanĝoj-tabulo de la MR devas montri NUR la yml-on.
+**Fina lini-salo devas resti**: la retredaktilo de GitLab **forigas la lastan
+`\n` eĉ ĉe pura algluo** (2026-11-23: kvar sinsekvaj pipoj fiaskis je
+`fdroid rewritemeta` pro `\ No newline at end of file`). Post ĉiu komito
+kontrolu la lastan komiton: se la dismeto montras „\ No newline at end of
+file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
+**Enter** → Commit (aŭ uzu **Open in Web IDE**, kiu konservas la lini-salon).
 
 #### Kial la yml aspektas kiel ĝi aspektas (sen komentoj en la dosiero)
 
@@ -110,7 +113,21 @@ ilin** — la ŝanĝoj-tabulo de la MR devas montri NUR la yml-on.
   `tools/make-summary-translatable.py` mem migurus la Summary el la yml kaj
   fiaskigus la CI; resumo, priskribo, ŝanĝoprotokolo (`default.txt`) kaj
   bildoj venas el nia deponejo (Triple-T: `androidApp/src/main/play/
-  listings/en-US/`).
+  listings/en-US/`). Ankaŭ `Name:` kaj `Description:` estas malpermesataj
+  en fdroiddata (peto de la reviziantoj, 2026-11-23) — la ap-nomo venas de
+  `AutoName`, la priskribo el la Triple-T-strukturo.
+- `Binaries:` — URL-ŝablono al niaj GitHub-eldonaj APK-oj
+  (`v%v` anstataŭiĝas per `v3.2.0` ktp.; postulita de la reviziantoj,
+  2026-11-23). Konsekvenco por la eldona procezo: **ĉiu eldono devas alŝuti
+  la APK-on kiel averto al la GitHub-eldono `vX.Y.Z`** (vidu sekcion 6).
+- `AllowedAPKSigningKeys:` — SHA-256 de la subskriba atestilo de nia APK,
+  minuskle skribita heksa kodo, sen dupunktoj. Ĝi kredindigas la `Binaries`-URL-ojn: la
+  reviziantoj tiel scias, ke la binaroj venas de ni. Kalkulo (el la APK, ne
+  el la keystore — A12): `keytool -printcert -jarfile EsperantoRadio-vX.Y.Z.apk`
+  → SHA-256-valoro. Nia valoro: `aab92d2b…34eb16` (3.2.0).
+- **Nur la lasta konstruo restas en `Builds`** (peto de la reviziantoj,
+  2026-11-23): malnovaj versioj foriĝas el la yml — fdroiddata gardas la
+  version-historion en la git-historio de la yml mem.
 
 ### 3.3 Kontrolu la CI-on de via fork
 
@@ -249,18 +266,17 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
    konstruo-ciklo; praktike 1–3 tagojn. Kontrol-ligilo:
    https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/
    (paĝo "not found" = ankoraŭ ne).
-2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid.
-   Noto pri 3.1.1: F-Droid konstruas versionCode **253** (la etikedo), dum
-   la Play-eldono havas **254** — 253 estis konsumita en Play de interna
-   testo (3.1.1-beta29okt, PR #144). Tio estas normala kaj senproblema:
-   la F-Droid-versionumejo estas sendependa, kaj la etikedo kongruas kun
-   la metadateno (253). Ekde la sekva versio (v3.1.2+) la kodoj re kongruas. Nia eldona
-   procezo jam kreas la etikedon `vX.Y.Z` kaj puŝas ĝin; `AutoUpdateMode:
-   Version` + `UpdateCheckMode: Tags` igas la fdroiddata-robotojn malfermi
-   ĝisdatigo-MR-on mem. Reciprokaĵo: **ĉiu** eldonota versio bezonas etikedon
-   sur GitHub kun kongrua versionCode — nia `eldonado`-procezo jam tion faras.
+2. **Estontaj versioj**: la eldona procezo kreas la etikedon `vX.Y.Z` kaj
+   puŝas ĝin; **aldonu ankaŭ la subskribitan APK-on kiel averto al la
+   GitHub-eldono `vX.Y.Z`** (depost `Binaries`, 2026-11-23 — sen ĝi la
+   `Binaries`-URL-oj de la metadateno ne funkcias) kaj aldonu la novan
+   konstruaĵon al la yml (anstataŭigu la malnovan — nur la lasta versio
+   restas). Poste `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` igas
+   la fdroiddata-robotojn malfermi ĝisdatigo-MR-on mem; vi devas nur
+   anstataŭigi la yml-on en via fork-branĉo (paŝo 3.2).
    Se post ~1 semajno la nova versio ne aperas en F-Droid, kontrolu ilian
-   issue-trackero aŭ demandu min kontroli.
+   issue-trackero aŭ demandu min kontroli. (Historia noto pri 3.1.1:
+   F-Droid versionCode 253 vs. Play 254 — unufoja okazaĵo, PR #144.)
 3. **Emblemo**: kiam la paĝo ekzistas, ni aldonu al la README la oficialan
    "Get it on F-Droid"-emblemon (https://f-droid.org/docs/Badges/) kun la
    ligilo https://f-droid.org/packages/dk.nordfalk.esperanto.radio/.

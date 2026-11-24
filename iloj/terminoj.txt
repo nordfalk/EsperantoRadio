@@ -2412,3 +2412,6 @@ ekranvizito
 versiokarto
 trovindaĵo
 kompariĝas
+generatoro
+testrapideco
+konduttesto

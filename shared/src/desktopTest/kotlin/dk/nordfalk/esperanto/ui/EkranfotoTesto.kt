@@ -43,7 +43,7 @@ import kotlin.test.assertTrue
 /**
  * Ekranfota testoj — kaptas ĉiun ekranon kiel PNG-dosieron.
  *
- * Rulu per: ./gradlew :shared:desktopTest --tests "*EkranfotoTesto*"
+ * Rulu per: ./gradlew :shared:desktopTest -Pekranfotoj   (defaŭlte EXKLUDITA de la norma test-rulo)
  * Dosieroj estas savitaj al shared/build/ekranfotoj/
  */
 @OptIn(ExperimentalTestApi::class)

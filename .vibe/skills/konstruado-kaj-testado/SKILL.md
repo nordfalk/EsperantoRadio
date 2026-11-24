@@ -16,7 +16,8 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64   # JDK 17 devas; JDK 21 man
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 # Nova apo
-./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI)
+./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI); 4 paralelaj JVM-forkoj (2026-11-24: 18 s → ~11 s)
+./gradlew :shared:desktopTest -Pekranfotoj   # inkluzivas EkranfotoTesto (PNG-oj por la dokumentaro; defaŭlte ekskludita)
 ./gradlew :desktopApp:run            # la desktop-apo
 ./gradlew :androidApp:assembleDebug  # la Android-APK
 ./gradlew :androidApp:connectedDebugAndroidTest            # instrumentitaj testoj (emulilo)
@@ -112,3 +113,18 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 - **Logcat-legado**: `adb logcat -d | grep FATAL` (kraŝoj) aŭ
   `grep -E "dk.nordfalk"` (apo). La bufro ciklas rapide dum la 27-kanala ŝargado —
   por diagnozo kaptu la logcaton frue aŭ rulu `adb logcat -c` antaŭ la testo.
+
+## Testrapideco kaj mezurado
+
+- **desktopTest rulas en 4 paralelaj JVM-forkoj** (`maxParallelForks` en
+  shared/build.gradle.kts, PR #209). Pli da forkoj (provitaj: 8) ne plu helpas:
+  la limo estas la klaso-interna sinsekvo (plej granda klaso: HejmoEkranoTest
+  ~3,5 s) plus la JVM-starto de ĉiu forko. **EkranfotoTesto** estas defaŭlte
+  ekskludita — ĝi ne estas konduttesto sed PNG-generatoro por la dokumentaro;
+  rulu ĝin per `-Pekranfotoj`.
+- **Ne mezuru test-daŭrojn en energiŝpara CPU-reĝimo** (2026-11-24, PR #209): la
+  unuaj mezuroj (489 testoj «57 s») estiĝis en energiŝpara modo kaj estis ~3×
+  troigitaj; en normala reĝimo la sama rulo daŭris 18 s (kun EkranfotoTesto kaj
+  1 forko), 11 s kun la nova agordo. Kontrolu la potenca-reĝimon/ŝarĝon de la
+  maŝino antaŭ ol atribui malrapidecon al la kodo aŭ ĝustigi Gradle-agordon
+  laŭ mezuroj.

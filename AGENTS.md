@@ -183,7 +183,10 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (2026-10-25, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
-  (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.
+  (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj; ripetiĝis 2026-11-24,
+  PR #207: la PR-korpo mangliĝis). Ankaŭ REST-vokoj (`gh api -f body="..."`) havas la
+  saman minacon. Liveru la korpon ĉiam el dosiero: `--body-file` aŭ `-f body="$(cat dosiero)"`
+  (la dosier-enhavo ne reanaliziĝas).
 - **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
   dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
   skribis sen la intertempe postulita `mutex.withLock`).

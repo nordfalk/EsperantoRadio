@@ -120,7 +120,7 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   shared/build.gradle.kts, PR #209). Pli da forkoj (provitaj: 8) ne plu helpas:
   la limo estas la klaso-interna sinsekvo (plej granda klaso: HejmoEkranoTest
   ~3,5 s) plus la JVM-starto de ĉiu forko. **EkranfotoTesto** estas defaŭlte
-  ekskludita — ĝi ne estas kondut-testo sed PNG-generatoro por la dokumentaro;
+  ekskludita — ĝi ne estas konduttesto sed PNG-generatoro por la dokumentaro;
   rulu ĝin per `-Pekranfotoj`.
 - **Ne mezuru test-daŭrojn en energiŝpara CPU-reĝimo** (2026-11-24, PR #209): la
   unuaj mezuroj (489 testoj «57 s») estiĝis en energiŝpara modo kaj estis ~3×

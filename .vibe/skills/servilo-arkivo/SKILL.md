@@ -16,13 +16,16 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 kanonan arbon, do konstruiloj kaj rsync ĉie vidas unu saman datumaron. NE kreu apartan
 `server/data`-arbon en nova laborkopio — anstataŭigu ĝin per simbola ligilo al la kanona arbo.
 **Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
-`privata/tmp/`, ne al `privata/` mem.
+`tmp/` ĉe la radiko de la propra laborkopio (gitignorita) — NENIAM al la
+kanona arbo, kiu estas dividebla kun aliaj taskoj kaj agentoj.
+La prezentpaĝo (`publika/index.html`, `icon.png`) ne plu estas git-versiita:
+redaktu ĝin rekte en la kanona arbo; ĝi publikiĝas per la kutima rsync.
 
 ## Publika baz-URL
 
 ```
 https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
-├── index.html + icon.png                (prezentpaĝo, versioblaj en git)
+├── index.html + icon.png                (prezentpaĝo; de 2026-11-24 redaktebla nur en la kanona arbo — ne git-versiita)
 ├── esperantoradio_konfiguro.json        (purigita, strikta JSON; kopiiĝas je ĉiu rulo;
 │                                          la emblemoUrl-oj jam resskribitaj al bildoj/)
 ├── kanaloj/<slug>.xml                   (29 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
@@ -115,7 +118,8 @@ curl -s https://javabog.dk/esperanto-radio/kanaloj/ | head -3
 ```
 
 **Prezentpaĝo**: `server/data/publika/index.html` (+ `icon.png`) estas servata kiel
-`https://javabog.dk/esperanto-radio/` — ili estas versioblaj en git (escepto en .gitignore);
+`https://javabog.dk/esperanto-radio/` (la prezentpaĝo `index.html` redakteblas
+rekte en la kanona arbo — ne git-versiita depost la simbola ligilo);
 ne forgesu `--chmod=D755,F644` (alie Apache redonas 403).
 
 ## Regula rulado

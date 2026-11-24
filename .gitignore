@@ -67,11 +67,12 @@ ekranfoto.svg
 
 __pycache__/
 
-# Generita arkivo de la servilo (RSS, kaŝo, transskriptoj, stato) — ignorata,
-# krom la prezentpaĝo kaj emblemo de la publika retejo (publika/ = radiko de javabog.dk/esperanto-radio)
-server/data/*
-!server/data/publika/
-server/data/publika/*
-!server/data/publika/index.html
-!server/data/publika/icon.png
+# Servilaj datumoj vivas en la KANONA arbo (/home/j/Code/EsperantoRadio/server/data,
+# vidu .vibe/skills/servilo-arkivo); ĉi tie staras nur simbola ligilo. La prezentpaĝo
+# (publika/index.html, icon.png) ne plu git-versiadas — redaktu rekte en la kanona
+# arbo; ĝi publikiĝas per la kutima rsync.
+server/data
 iloj/vortaro/
+
+# Portempaj dosieroj de agentoj — ĉe la radiko de ĉiu laborkopio (2026-11-24)
+tmp/

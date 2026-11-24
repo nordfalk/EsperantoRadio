@@ -179,10 +179,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   la loka master povas antaŭeniĝi je nekunfandita laboro — branĉo el ĝi portus tiun
   laboron en la PR (17 dosieroj anstataŭ la celataj 6). Do: `git fetch origin master`
   kaj `git switch -c MMdd-nomo origin/master`. Se la branĉo jam puŝiĝis malpure:
-  rekonstruu per nova branĉo el `origin/master` + `git cherry-pick <komito>`,
-  forigu la foran branĉon per `git push origin --delete <nomo>` (tio fermas la
-  PR-on; la numero ŝoviĝas — ĝustigu la ligilojn per aparta commit) kaj kreu
-  novan PR-on; `--force` estas blokita de hoko. (La loka master mem restu netuŝita.)
+  rekonstruu per nova branĉo el `origin/master` kaj `git cherry-pick <unua>^..<lasta>`
+  (kopiu ĈIUJN celatajn komitojn, ne nur unu), kontrolu la rezultan diffon
+  kontraŭ `origin/master`, forigu la foran branĉon per `git push origin --delete <nomo>`
+  (tio fermas la PR-on; la numero ŝoviĝas — ĝustigu la ligilojn per aparta commit)
+  kaj kreu novan PR-on; `--force` estas blokita de hoko. La malpura loka branĉo
+  konserviĝu ĝis la nova PR estas kontrolita. (La loka master mem restu netuŝita.)
 - **Loka `remote.origin.fetch` estas limigita al master** (2026-10-14): `git fetch origin`
   (ankaŭ kun `--prune`) NE alportas PR-branĉojn. Por revizii PR-on, alportu la
   kap-branĉon eksplicite:

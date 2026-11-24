@@ -29,6 +29,10 @@ Kiam la uzanto petas ion kiel:
      al tiu URL, do tenu la dosiernomon `historio.html` fiksita.
    - Ne commitu la generitan HTML kunona kun aliaj ŝanĝoj se la uzanto volas nur
      legi ĝin — raportu la dosierindikon.
+   - `docs/historio.html` estas git-spurita kaj la skripto anstataŭigas ĝin SEN
+     averto — antaŭ ol ruli, kontrolu ke ĝi ne havas nekonservitajn lokajn
+     ŝanĝojn: `git status --porcelain -- docs/historio.html` (malplena eligo =
+     sekure).
 
    ```bash
    python3 .vibe/skills/seancorezumo/krei_html.py "$(pwd)" "$(pwd)/docs/historio.html"

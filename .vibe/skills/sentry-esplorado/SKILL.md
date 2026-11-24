@@ -79,9 +79,12 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
 - `find_projects` bezonas `organizationSlug` (sen ĝi: skemo-validiga eraro).
 - **La medioj nomiĝas `produktado`/`evoluo`, ne `production`** (2026-10-27):
   `search_errors` kun `environment:production` redonas malplenan rezulton SEN
-  averto. Protokoloj havas la medion `produktado`, erar-eventoj `evoluo`
-  — ĉe eraroj esploru do SEN medi-filtrilo, aŭ per
-  `environment:evoluo`; dubaj filtriloj nur kaŝas datumojn.
+  averto. Eldon-konstruoj raportas ĉion — protokoloj KAJ erar-eventoj — kun la
+  medio `produktado` (`initialiguSentry("produktado")`,
+  `options.environment` en `SentryAgordo.kt`; kontrolite kontraŭ la kodo
+  2026-11-24). Ĉe eraroj esploru do SEN medi-filtrilo, aŭ per
+  `environment:produktado`; dubaj filtriloj nur kaŝas datumojn. Eventoj kun
+  medio `evoluo` venas de evoluaj konstruoj — ne forgesu ilin ĉe tuta videbligo.
 - **`issue.id:KMP-X` ne funkcias en `search_errors`** (2026-10-27): ĝi postulas
   NUMERAN idon (400 "Invalid number"). Por krei dist-bildon de specifa problemo,
   filtu laŭ `error.type:` aŭ `message:"…"` kaj grupigu per `dist` anstataŭe.

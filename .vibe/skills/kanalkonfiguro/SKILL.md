@@ -90,12 +90,16 @@ enkondukon de Varsovia Vento). Uzu la temperitan formon `(?:(?!</p>).)` anstata�
 - **Varsovia Vento**: la `<audio>`-elementoj estas ene de CDATA en
   `<content:encoded>` — uzu `getElementsByTag("content:encoded").firstOrNull()?.text()`
   (ne `html()`), poste `Ksoup.parse(htmlEnhavo)` por trovi `<audio>`.
-- **Kanaloj sen RS-filtrilo (2026-11-22, radiofrei):** kelkaj retejoj (ekz.
+- **Kanaloj sen RSS-filtrilo (2026-11-22, radiofrei):** kelkaj retejoj (ekz.
   radio-frei.de) liveras RSS nur por la tuta stacio kaj ignoras la serĉan
   filtrilon en RSS-reĝimo — la filtrita listo estas akirebla nur kiel HTML.
   Por tiaj kanaloj la konfiguro havas `elsendojHtmlUrl` (model-kampo
-  `htmlFontoUrl`; `havasPodkastojn` = vera ankaŭ tiam). LA APON mem ne tuŝas
-  ĝin — la arkiv-servilo tiras la list-paĝojn (`HtmlFontoParsilo` en shared,
-  testita per fiksaĵoj), po artikolo la mp3-URL-on, kaj generas
-  `kanaloj/<slug>.xml`, kiun la apo legas kiel kutiman arkivan fluon.
+  `htmlFontoUrl`; `havasPodkastojn` = vera ankaŭ tiam) KAJ MALPLENAN
+  RSS-URL-on: la arkiv-konstruilo elektas la HTML-kolektilon nur kiam
+  `podkastaRssUrl.isNullOrBlank()` (`ArkivKonstruilo.kt:65`) — ĉe plena
+  RSS-URL ĝi restas ĉe la RSS-kolektilo kaj NE kolektas la HTML-liston.
+  LA APOn mem ne tuŝas ĝin — la arkiv-servilo tiras la list-paĝojn
+  (`HtmlFontoParsilo` en shared, testita per fiksaĵoj), po artikolo la
+  mp3-URL-on, kaj generas `kanaloj/<slug>.xml`, kiun la apo legas kiel
+  kutiman arkivan fluon.
 - Aliajn regulojn (P6.1–P6.7, Peranto/archive.org) vidu en `docs/nova/04`.

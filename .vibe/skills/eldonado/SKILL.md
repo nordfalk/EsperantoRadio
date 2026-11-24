@@ -74,6 +74,29 @@ description: Ŝargu ĉi tiun skill-on kiam la uzanto petas eldoni novan version 
    do la eldonita APK devus kongrui kun etikedita komito (ne eldonu el nekompromita
    laborarbo kiam eviteble; se tamen necesis, komitu la ĝustan fonton tuj poste —
    kiel farite por 249 per PR #109).
+   **Kreu ankaŭ la GitHub-eldonon `vX.Y.Z`** (https://github.com/nordfalk/EsperantoRadio/releases/new,
+   tago `vX.Y.Z`, titolon lasu kiel la etikedon) kaj **alŝutu la subskribitan APK-on
+   kiel averto** `EsperantoRadio-vX.Y.Z.apk` (el `androidApp/build/outputs/apk/release/`
+   aŭ `server/data/privata/`). De 2026-11-23 la F-Droid-metadateno havas
+   `Binaries: https://…/releases/download/v%v/EsperantoRadio-v%v.apk` — la averto
+   DEVAS ekzisti kun ĝuste tiu nomo, alie la fdroiddata CI/kontrolbotoj fiaskas.
+   **Invarianto (2026-11-24, pruvita per la fiasko de la MR !55129)**: la averto
+   devas esti konstruita el ĜUSTE la sama komito kiel la `commit`-kampo de la yml —
+   la APK entenas `META-INF/version-control-info.textproto` kun la git-revizio, kaj
+   `fdroid build` komparas ĉiun bitokon. `gh release upload` prenas la LOKAN
+   dosiernomon kiel averto-nomon — alŝutu dosieron, kiu jam nomiĝas
+   `EsperantoRadio-vX.Y.Z.apk` (anstataŭigo: `--clobber`, aŭ `gh release
+   delete-asset` kaj ree alŝuti; atentu ke la CDN servas la malnovan version
+   kelkajn minutojn post anstataŭigo).
+   En la eldon-priskribon algluu la eldonajn notojn (kopion de `internal.txt`) —
+   ne deviga, sed utila.
+   Poste ĝisdatigu la yml-on `fdroid/metadata/…yml` (novan konstruaĵon +
+   `CurrentVersion`, kanonigita per `fdroid rewritemeta` — vidu `fdroid/GVIDILO.md`)
+   kaj la fork-branĉon en GitLab — detaloj en `fdroid/GVIDILO.md`.
+   **Antaŭ ĉiu eldono certigu, ke la konstruo estas reproduktebla**: la
+   `rootProject.name` en `settings.gradle.kts` devas resti fiksa (PR #203) —
+   sen ĝi ĉiu dosieruja nomo fluas en `r8-map-id` en la dekso kaj la
+   Binaries-kontrolo de F-Droid fiaskas (detaloj: GVIDILO § 8).
 5. **Eldon-notoj** (intence en Esperanto, maks. 500 signoj):
    `androidApp/src/main/play/release-notes/en-US/internal.txt`.
    **GPP elektas la dosieron laŭ la TRAKO-nomo** — `internal.txt` (aŭ `default.txt`

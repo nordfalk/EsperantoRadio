@@ -25,17 +25,18 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 
 | Kio | Stato |
 |---|---|
-| Metadateno (recepto) por 3.1.1/253, etikedo `v3.1.1` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`); kontraŭvalidigita kontraŭ la oficiala fdroiddata-skemo (`schemas/metadata.json`) |
-| Git-etikedo `v3.1.1` sur GitHub | ✅ (unu fonto de vero kun versionCode 253) |
+| Metadateno (recepto) por 3.2.0/258, etikedo `v3.2.0` | ✅ en ĉi tiu deponejo (`fdroid/metadata/…`); spegulas 1:1 la CI-pasan formon de la MR !55129 |
+| Git-etikedo `v3.2.0` sur GitHub + **APK-averto en la GitHub-eldono** | ✅ (necesa por `Binaries`, vidu sube) |
 | Nesubskribita konstruo ebla (F-Droid kondiĉo) | ✅ pruvita 2026-10-29 |
 | Permesilo GPL-3.0-or-later | ✅ `LICENSE` en la radiko |
 | Neniuj malliberaj dependejoj / binaroj en la deponejo | ✅ |
 | Sentry-erar-raportado **opt-in** ĉe F-Droid-kaj-nekonataj instalaĵoj | ✅ (laŭ la instal-fonto, ne la subskribo — per RB F-Droid distribuas nian subskribitan APK-on; PR #148 + la instal-fonta riparo 2026-11-24) |
-| **GitLab-konto** | ❌ vi devas krei ĝin (paso 2) |
+| **GitLab-konto** | ✅ jam ekzistas (`nordfalk`, 2026-11-23) — vidu la noton «Jam farita» en 3.1 |
 
-**Antaŭ ol daŭrigi**: la metadateno devas esti sur `master` (PR #148). Se la
-PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
-`https://github.com/nordfalk/EsperantoRadio/raw/1029-fdroid-aptoide/fdroid/metadata/dk.nordfalk.esperanto.radio.yml`
+**Antaŭ ol daŭrigi**: la metadateno devas esti sur `master`. La paŝoj 1–2 kaj
+la fork/MR (!55129) estas jam faritaj (2026-10-31/2026-11-23); por ĉiu nova
+versio restas nur la paŝo 3.2 (anstataŭigu la yml-on en la fork-branĉo) +
+la GitHub-eldono kun la APK-averto (vidu sekcion 6).
 
 ## 2. Kreu GitLab-konton (5 min)
 
@@ -51,6 +52,15 @@ PR ne estas kunfandita, uzu en la paŝoj anstataŭe la branĉan ligilon:
 2. Dekstre supre klaku **Fork**.
 3. Lasu la agordon kiel estas (lasi la kampojn kiel ili estas: "Project name" = fdroiddata, videbleco = Private) → klaku **Fork project**.
 4. Vi nun havas `https://gitlab.com/VIA_UZANTNOMO/fdroiddata`.
+
+> **Jam farita (2026-11-23)**: la fork de ĉi tiu projekto estas
+> **https://gitlab.com/nordfalk/fdroiddata** (uzanto: `nordfalk`).
+> La MR-branĉo de la enmet-peto !55129 nomiĝas `dk.nordfalk.esperanto.radio`.
+> Rekta redakto-URL por ĝisdatigi la metadatenon en la retumilo (por estontaj
+> versioj — kopiu la ĝisdatan yml el nia master unue):
+> https://gitlab.com/nordfalk/fdroiddata/-/edit/dk.nordfalk.esperanto.radio/metadata/dk.nordfalk.esperanto.radio.yml
+> (formo `…/-/edit/<branĉo>/metadata/<aplid>.yml` — nur-lega varianto: `…/-/blob/…`).
+> Komito sur tiu branĉo aŭtomate aperas en la malferman MR-on.
 
 ### 3.2 Aldonu la metadatenon en via fork — UNU dosiero
 
@@ -68,27 +78,31 @@ changelog/images or anything that should be provided in upstream repo":
 
 1. **`metadata/dk.nordfalk.esperanto.radio.yml`** —
    https://github.com/nordfalk/EsperantoRadio/raw/master/fdroid/metadata/dk.nordfalk.esperanto.radio.yml
-   (kopiu SEN ŝanĝoj — `commit` jam estas la plena haketaĵo, ĉar la ŝablono
+   (kopiu SEN ŝanĝoj — de 2026-11-23 la yml sur nia master spegulas 1:1 la
+   CI-pasan formon, inkluzive `Binaries`/`AllowedAPKSigningKeys` kaj nur la
+   lastan konstruon; `commit` estas la plena haketaĵo, ĉar la ŝablono
    malpermesas etikedon/branon en la commit-kampo)
 
 En via fork (https://gitlab.com/nordfalk/fdroiddata): branĉo
 `dk.nordfalk.esperanto.radio` (NE `master`) → anstataŭigu la dosierenhavon;
 Commit message ekz. `New app: EsperantoRadio`.
 
-**Fina lini-salo devas resti**: algluo per la retredaktilo ofte perdas la
-lastan `\n` — `fdroid rewritemeta` tiam fiaskas per „\ No newline at end of
-file" (2026-10-31). Sekurega vojo: elŝutu la dosieron el la raw-ligilo kaj
-uzu **Replace**/alŝuton en la redaktilo anstataŭ kopii-alk. **Se lokaj dosierujoj
-(`metadata/dk.nordfalk.esperanto.radio/…`) restis de pli fruaj provoj, forigu
-ilin** — la ŝanĝoj-tabulo de la MR devas montri NUR la yml-on.
+**Fina lini-salo devas resti**: la retredaktilo de GitLab **forigas la lastan
+`\n` eĉ ĉe pura algluo** (2026-11-23: kvar sinsekvaj pipoj fiaskis je
+`fdroid rewritemeta` pro `\ No newline at end of file`). Post ĉiu komito
+kontrolu la lastan komiton: se la dismeto montras „\ No newline at end of
+file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
+**Enter** → Commit (aŭ uzu **Open in Web IDE**, kiu konservas la lini-salon).
 
 #### Kial la yml aspektas kiel ĝi aspektas (sen komentoj en la dosiero)
 
-- `scanignore: build.gradle.kts` — la radika konstrudosiero deklaras
-  `https://jcenter.bintray.com` (necesa por la MALNOVA apo, A1); la
-  F-Droid-skanilo rifuzas nekonatajn Maven-deponejojn. La nova apo neniam
-  efektive elŝutas de jcenter (ĉiuj ĝiaj dependejoj estas en
-  Maven Central/Google), do la skanilo sekure ignorigas tiun dosieron.
+- ~~`scanignore: build.gradle.kts`~~ — **FORIGITA (2026-11-24)**: la iam
+  necesa flank-ignoro (la malnova apo deklaris `https://jcenter.bintray.com`,
+  kiun la F-Droid-skanilo rifuzas) perdis validecon post la jcenter-forigo
+  el la konstrudosieroj; la skanilo tiam raportas
+  **„Unused scanignore path: build.gradle.kts“ — eraro, kiu fiaskigas
+  `fdroid build`**. Regulo: kiam `scanignore` ne plu respondas al reala
+  trovo, forigu ĝin el la yml.
 - `UpdateCheckName: Ignore` — la aŭtomata nom-serĉanto ne trovas nian
   manifeston (KMP-aranĝo: `src/androidMain/`) kaj prenus la nomon de la
   malnova apo („Esperanto-radio Muzaiko"); sen „Ignore" la ĝisdatig-boto
@@ -101,19 +115,49 @@ ilin** — la ŝanĝoj-tabulo de la MR devas montri NUR la yml-on.
   `tools/make-summary-translatable.py` mem migurus la Summary el la yml kaj
   fiaskigus la CI; resumo, priskribo, ŝanĝoprotokolo (`default.txt`) kaj
   bildoj venas el nia deponejo (Triple-T: `androidApp/src/main/play/
-  listings/en-US/`).
+  listings/en-US/`). Ankaŭ `Name:` kaj `Description:` estas malpermesataj
+  en fdroiddata (peto de la reviziantoj, 2026-11-23) — la ap-nomo venas de
+  `AutoName`, la priskribo el la Triple-T-strukturo.
+- **La lingvo de la tekstoj**: ni tenas ilin konscie en Esperanto —
+  recenzo-temo 2026-11-24 („en-US description isn't in english"): la apo
+  mem estas tute en Esperanto kaj celas esperantistojn; fdroiddata legas
+  la TEKSTON el nia `en-US`-listing (F-Droid ne postulas ke la enhavo estu
+  la angla), kaj `full-description.txt` jam entenas la plenan anglan
+  tradukon sube (post `--- ENGLISH ---`). Respondo en la MR-fadeno: intenca
+  elekto, neniuj aliaj lingvoj planataj.
+- `Binaries:` — URL-ŝablono al niaj GitHub-eldonaj APK-oj
+  (`v%v` anstataŭiĝas per `v3.2.0` ktp.; postulita de la reviziantoj,
+  2026-11-23). Konsekvenco por la eldona procezo: **ĉiu eldono devas alŝuti
+  la APK-on kiel averto al la GitHub-eldono `vX.Y.Z`** (vidu sekcion 6).
+- `Binaries:` kaj `AllowedAPKSigningKeys:` — atentu la formon en la yml
+  (2026-11-24, la fina verdigita pipo !55129): la CI akceptas `Binaries`
+  NUR flankigitan («Binaries: \n  <url>» — valoro en aparta daŭrig-linio,
+  indentigita per 2 spacoj; unulinia formo fiaskigas `rewritemeta`), dum
+  `AllowedAPKSigningKeys` restas UNU-LINIA. **Atentu**: la MALNOVA loka
+  fdroidserver 2.4.2 flankigus ankaŭ la identigilan kampon kaj do
+  ne kongruas kun la CI-master — ne fidu ĝin blinde ĉe tiuj
+  kampoj; la enmeta dosieroj sur nia master spegulas la CI-pasan formon,
+  do «kopiu sen ŝanĝoj» + eventualaj plibonigoj post la pipo estas la
+  sekura vojo.
+- `AllowedAPKSigningKeys:` — SHA-256 de la subskriba atestilo de nia APK,
+  minuskle skribita heksa kodo, sen dupunktoj. Ĝi kredindigas la `Binaries`-URL-ojn: la
+  reviziantoj tiel scias, ke la binaroj venas de ni. Kalkulo (el la APK, ne
+  el la keystore — A12): `keytool -printcert -jarfile EsperantoRadio-vX.Y.Z.apk`
+  → SHA-256-valoro. Nia valoro: `aab92d2b…34eb16` (3.2.0).
+- **Nur la lasta konstruo restas en `Builds`** (peto de la reviziantoj,
+  2026-11-23): malnovaj versioj foriĝas el la yml — fdroiddata gardas la
+  version-historion en la git-historio de la yml mem.
 
 ### 3.3 Kontrolu la CI-on de via fork
 
 1. En via fork iru al **Build → Pipelines**
    (aŭ "CI/CD → Pipelines" en la malnova fasado).
 2. Atendu la pipeline (typical 10–40 minutoj — ĝi vere provas konstrui la apon).
-3. **Verda (passed)** → daŭrigu ĉe 3.4. La ses taskoj (schema validation,
-   fdroid lint, fdroid rewritemeta, tools check scripts, checkupdates,
-   fdroid build) estis ĉiuj reproduktitaj VERDAJ loke per la samaj iloj
-   (fdroidserver + check-jsonschema + la tools/-skriptoj de fdroiddata,
-   2026-10-31) — se tamen io ruĝiĝas, aldonu la taskan eligilon al la
-   sekva laborsesio kun mi.
+3. **Verda (passed)** → daŭrigu ĉe 3.4. La naŭ taskoj (fdroid build +
+   check apk, check source code, checkupdates, fdroid lint, fdroid
+   rewritemeta, git redirect, schema validation, tools check scripts;
+   tute verda pipo: 2026-11-24, !55129) — se tamen io ruĝiĝas, aldonu la
+   taskan eligilon al la sekva laborsesio kun mi.
    **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
    aldonu la eligilon al la sekva laborsesio kun mi — la plej oftaj kaŭzoj
    estas YAML-tajperaro aŭ retaj eraretoj; ni riparos la metadatenon kaj vi
@@ -240,18 +284,17 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
    konstruo-ciklo; praktike 1–3 tagojn. Kontrol-ligilo:
    https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/
    (paĝo "not found" = ankoraŭ ne).
-2. **Estontaj versioj**: nenion plian vi devas fari ĉe F-Droid.
-   Noto pri 3.1.1: F-Droid konstruas versionCode **253** (la etikedo), dum
-   la Play-eldono havas **254** — 253 estis konsumita en Play de interna
-   testo (3.1.1-beta29okt, PR #144). Tio estas normala kaj senproblema:
-   la F-Droid-versionumejo estas sendependa, kaj la etikedo kongruas kun
-   la metadateno (253). Ekde la sekva versio (v3.1.2+) la kodoj re kongruas. Nia eldona
-   procezo jam kreas la etikedon `vX.Y.Z` kaj puŝas ĝin; `AutoUpdateMode:
-   Version` + `UpdateCheckMode: Tags` igas la fdroiddata-robotojn malfermi
-   ĝisdatigo-MR-on mem. Reciprokaĵo: **ĉiu** eldonota versio bezonas etikedon
-   sur GitHub kun kongrua versionCode — nia `eldonado`-procezo jam tion faras.
+2. **Estontaj versioj**: la eldona procezo kreas la etikedon `vX.Y.Z` kaj
+   puŝas ĝin; **aldonu ankaŭ la subskribitan APK-on kiel averto al la
+   GitHub-eldono `vX.Y.Z`** (depost `Binaries`, 2026-11-23 — sen ĝi la
+   `Binaries`-URL-oj de la metadateno ne funkcias) kaj aldonu la novan
+   konstruaĵon al la yml (anstataŭigu la malnovan — nur la lasta versio
+   restas). Poste `AutoUpdateMode: Version` + `UpdateCheckMode: Tags` igas
+   la fdroiddata-robotojn malfermi ĝisdatigo-MR-on mem; vi devas nur
+   anstataŭigi la yml-on en via fork-branĉo (paŝo 3.2).
    Se post ~1 semajno la nova versio ne aperas en F-Droid, kontrolu ilian
-   issue-trackero aŭ demandu min kontroli.
+   issue-trackero aŭ demandu min kontroli. (Historia noto pri 3.1.1:
+   F-Droid versionCode 253 vs. Play 254 — unufoja okazaĵo, PR #144.)
 3. **Emblemo**: kiam la paĝo ekzistas, ni aldonu al la README la oficialan
    "Get it on F-Droid"-emblemon (https://f-droid.org/docs/Badges/) kun la
    ligilo https://f-droid.org/packages/dk.nordfalk.esperanto.radio/.
@@ -268,10 +311,23 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - „AutoUpdateMode … does not match" → nuda `Version`
 - lokalizitaj kampoj en la yml → malpermesataj; tekstoj el la Triple-T
 - rewritemeta-dosiero → forigi ĉiujn `#`-komentojn; fina lini-salo ĉe EOF
+- rewritemeta-dosiero kun `Binaries` en unu linio → la kanona formo
+  flankigas ĝin al daŭrig-linio («Binaries: \n  <url>»);
+  `AllowedAPKSigningKeys` restas unulinie. La loka fdroidserver 2.4.2
+  flankigus ambaŭ — ne fidu ĝin detalnivele; la CI-pasa formo staras
+  sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
-- „Found unknown maven repo 'https://jcenter.bintray.com'" → `scanignore:
-  build.gradle.kts` (la malnova apo bezonas jcenter; la nova neniam ĝin uzas)
+- „Found unknown maven repo 'https://jcenter.bintray.com'“ → forigu la
+  deponejo-deklaron MEM el la konkernata konstrudosiero (flank-igo
+  (`scanignore`) ne forigas la deklaron kaj ne forigas la eraron; uzu
+  `scanignore` nur se la deklaro estas neevitebla). Historio: 2026-10-31 la
+  malnova apo ne povis sen jcenter kaj ni solvis per
+  `scanignore: build.gradle.kts` — ĝis la jcenter-forigo forigis la bezonon.
+- „Unused scanignore path: …“ → la flank-igita dosiero ne plu enhavas ion
+  riproĉindan laŭ la skanilo; forigu la neuzatan `scanignore`-eron el la
+  yml — neuzata `scanignore` estas mem eraro, kiu fiaskigas `fdroid build`
+  (2026-11-24: `build.gradle.kts`, post la jcenter-forigo)
 - `AutoName` ŝanĝiĝas per si mem („Esperanto-radio Muzaiko") → `UpdateCheckName:
   Ignore` (la KMP-manifesto ne troveblas de la nom-serĉanto)
 - „SigningConfig with name 'release' not found" → `findByName` (fdroidserver

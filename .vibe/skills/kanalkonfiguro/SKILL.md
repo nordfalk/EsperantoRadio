@@ -102,4 +102,10 @@ enkondukon de Varsovia Vento). Uzu la temperitan formon `(?:(?!</p>).)` anstata�
   (`HtmlFontoParsilo` en shared, testita per fiksaĵoj), po artikolo la
   mp3-URL-on, kaj generas `kanaloj/<slug>.xml`, kiun la apo legas kiel
   kutiman arkivan fluon.
+  **Limo**: `HtmlFontoParsilo` estas verkita por la strukturo de radio-frei.de —
+  ĝi legas nur artikolajn ligilojn kun `kartikel_id=<n>`; alispecaj ligiloj
+  (ekz. `/episode/123`) estas ignorataj, kaj sen kongruaj ligiloj la listo
+  revenas malplena (la konstruilo tiam povas generi malplenan
+  `kanaloj/<slug>.xml`). Por alia retejo unue adaptu la parsilon (kun testo
+  per fiksaĵo, A3), antaŭ ol agordi `elsendojHtmlUrl`.
 - Aliajn regulojn (P6.1–P6.7, Peranto/archive.org) vidu en `docs/nova/04`.

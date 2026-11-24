@@ -157,28 +157,31 @@ fun ElsendoEkrano(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IkonoButono(
-                        ikono = when (elŝutStato) {
-                            is ElŝutStato.Preta -> Icons.Filled.Check
-                            is ElŝutStato.Elŝutanta -> Icons.Filled.Stop
-                            else -> Icons.Filled.Download
-                        },
-                        label = when (elŝutStato) {
-                            is ElŝutStato.Elŝutanta -> "Haltigi elŝuton"
-                            else -> "Elŝuti"
-                        },
-                        onClick = {
-                            when (elŝutStato) {
-                                is ElŝutStato.NeElŝutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") }
-                                is ElŝutStato.Elŝutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") }
-                                is ElŝutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") }
-                                is ElŝutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
-                                is ElŝutStato.Paŭzita -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
-                                else -> {}
-                            }
-                        },
-                        onLongClick = { montruMesaĝon("Elŝuti") }
-                    )
+                    // Elŝuti nur sur platformoj kiuj subtenas elŝutojn (Android, Desktop)
+                    if (platformo == Platformo.ANDROIDO || platformo == Platformo.DESKTOPO) {
+                        IkonoButono(
+                            ikono = when (elŝutStato) {
+                                is ElŝutStato.Preta -> Icons.Filled.Check
+                                is ElŝutStato.Elŝutanta -> Icons.Filled.Stop
+                                else -> Icons.Filled.Download
+                            },
+                            label = when (elŝutStato) {
+                                is ElŝutStato.Elŝutanta -> "Haltigi elŝuton"
+                                else -> "Elŝuti"
+                            },
+                            onClick = {
+                                when (elŝutStato) {
+                                    is ElŝutStato.NeElŝutita -> { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") }
+                                    is ElŝutStato.Elŝutanta -> { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") }
+                                    is ElŝutStato.Preta -> { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") }
+                                    is ElŝutStato.Eraro -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
+                                    is ElŝutStato.Paŭzita -> { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") }
+                                    else -> {}
+                                }
+                            },
+                            onLongClick = { montruMesaĝon("Elŝuti") }
+                        )
+                    }
 
                     IkonoButono(
                         ikono = if (tiuElsendoLudas) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -362,34 +365,37 @@ fun ElsendoEkrano(
                     }
                 }
 
-                when (elŝutStato) {
-                    is ElŝutStato.NeElŝutita -> OutlinedButton(
-                        onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") },
-                        modifier = Modifier.weight(1f)
-                    ) { Icon(Icons.Filled.Download, contentDescription = null); Text(" Elŝuti") }
-
-                    is ElŝutStato.Elŝutanta -> {
-                        val p = (elŝutStato as ElŝutStato.Elŝutanta).progreso
-                        OutlinedButton(
-                            onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") },
+                // Elŝuti nur sur platformoj kiuj subtenas elŝutojn (Android, Desktop)
+                if (platformo == Platformo.ANDROIDO || platformo == Platformo.DESKTOPO) {
+                    when (elŝutStato) {
+                        is ElŝutStato.NeElŝutita -> OutlinedButton(
+                            onClick = { logi("Klako", "elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Elŝutanta…") },
                             modifier = Modifier.weight(1f)
-                        ) { Icon(Icons.Filled.Stop, contentDescription = null); Text(" ${((p * 100).toInt())}%") }
+                        ) { Icon(Icons.Filled.Download, contentDescription = null); Text(" Elŝuti") }
+
+                        is ElŝutStato.Elŝutanta -> {
+                            val p = (elŝutStato as ElŝutStato.Elŝutanta).progreso
+                            OutlinedButton(
+                                onClick = { logi("Klako", "haltigi elŝuton — ${elsendo.id}"); onHaltigiElŝuton(); montruMesaĝon("Elŝuto haltigita") },
+                                modifier = Modifier.weight(1f)
+                            ) { Icon(Icons.Filled.Stop, contentDescription = null); Text(" ${((p * 100).toInt())}%") }
+                        }
+
+                        is ElŝutStato.Preta -> OutlinedButton(
+                            onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") },
+                            modifier = Modifier.weight(1f)
+                        ) { Icon(Icons.Filled.Check, contentDescription = null); Text(" Elŝutita — Forigi") }
+
+                        is ElŝutStato.Eraro -> OutlinedButton(
+                            onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
+                            modifier = Modifier.weight(1f)
+                        ) { Icon(Icons.Filled.Warning, contentDescription = null); Text(" Eraro — reprovi") }
+
+                        is ElŝutStato.Paŭzita -> OutlinedButton(
+                            onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
+                            modifier = Modifier.weight(1f)
+                        ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzita — reprovi") }
                     }
-
-                    is ElŝutStato.Preta -> OutlinedButton(
-                        onClick = { logi("Klako", "forigi elŝuton — ${elsendo.id}"); onForigiElŝuton(); montruMesaĝon("Elŝuto forigita") },
-                        modifier = Modifier.weight(1f)
-                    ) { Icon(Icons.Filled.Check, contentDescription = null); Text(" Elŝutita — Forigi") }
-
-                    is ElŝutStato.Eraro -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
-                        modifier = Modifier.weight(1f)
-                    ) { Icon(Icons.Filled.Warning, contentDescription = null); Text(" Eraro — reprovi") }
-
-                    is ElŝutStato.Paŭzita -> OutlinedButton(
-                        onClick = { logi("Klako", "reprovi elŝuti — ${elsendo.id}"); onElŝuti(); montruMesaĝon("Reprovas elŝuti") },
-                        modifier = Modifier.weight(1f)
-                    ) { Icon(Icons.Filled.Pause, contentDescription = null); Text(" Paŭzita — reprovi") }
                 }
             }
 

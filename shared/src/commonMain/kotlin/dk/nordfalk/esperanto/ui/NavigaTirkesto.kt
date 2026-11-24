@@ -72,15 +72,19 @@ fun NavigaTirkesto(
         // ekrano — ĝi ne bezonas proprajn sistemajn enmetaĵojn
         windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
-        tirkestEroj().forEach { (ikono, etikedo, vojo) ->
-            if (vojo is Vojo.Elŝutoj) {
+        // Dividilo inter la ĉefekranoj kaj la flankaj — maksimume unu, antaŭ
+        // la unua nekaŝita flanka ero (la platformo povas kaŝi Elŝutojn/Vekhorloĝon)
+        val eroj = tirkestEroj(platformo)
+        val unuaFlankaEro = eroj.firstOrNull { it.vojo is Vojo.Elŝutoj || it.vojo is Vojo.Alarmoj || it.vojo is Vojo.Agordoj }
+        eroj.forEach { ero ->
+            if (ero === unuaFlankaEro) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
             NavigationDrawerItem(
-                icon = { Icon(ikono, contentDescription = null) },
-                label = { Text(etikedo) },
-                selected = nunaVojo?.let { it::class } == vojo::class,
-                onClick = { logi("Klako", "tirkesto: $etikedo"); onElektu(vojo) },
+                icon = { Icon(ero.ikono, contentDescription = null) },
+                label = { Text(ero.etikedo) },
+                selected = nunaVojo?.let { it::class } == ero.vojo::class,
+                onClick = { logi("Klako", "tirkesto: ${ero.etikedo}"); onElektu(ero.vojo) },
             )
         }
 
@@ -195,14 +199,23 @@ private fun HamburgeroSagoIkono(progreso: Float, koloro: Color, contentDescripti
     }
 }
 
-private data class TirkestEro(val ikono: ImageVector, val etikedo: String, val vojo: Vojo)
+internal data class TirkestEro(val ikono: ImageVector, val etikedo: String, val vojo: Vojo)
 
-private fun tirkestEroj() = listOf(
+/**
+ * La tirkest-eroj por la koncerna platformo. Ebloj kiuj mankas sur la
+ * platformo ne aperas: elŝutoj nur sur Android kaj Desktop (KtorElŝutDeponejo;
+ * wasmJs/iOS ricevas NoOp), vekhorloĝo nur sur Android (AlarmoSkedilo).
+ */
+internal fun tirkestEroj(platformo: Platformo) = listOfNotNull(
     TirkestEro(Icons.Filled.Home, "Hejmo", Vojo.Hejmo),
     TirkestEro(Icons.Filled.MusicNote, "Kanaloj", Vojo.Kanalaro),
     TirkestEro(Icons.Filled.Favorite, "Plej ŝatataj", Vojo.Plejŝatataj),
     TirkestEro(Icons.Filled.Search, "Serĉi", Vojo.Serĉo),
-    TirkestEro(Icons.Filled.Download, "Elŝutoj", Vojo.Elŝutoj),
-    TirkestEro(Icons.Filled.Alarm, "Vekhorloĝo", Vojo.Alarmoj),
+    if (platformo == Platformo.ANDROIDO || platformo == Platformo.DESKTOPO) {
+        TirkestEro(Icons.Filled.Download, "Elŝutoj", Vojo.Elŝutoj)
+    } else null,
+    if (platformo == Platformo.ANDROIDO) {
+        TirkestEro(Icons.Filled.Alarm, "Vekhorloĝo", Vojo.Alarmoj)
+    } else null,
     TirkestEro(Icons.Filled.Settings, "Agordoj", Vojo.Agordoj),
 )

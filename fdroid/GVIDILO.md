@@ -30,7 +30,7 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 | Nesubskribita konstruo ebla (F-Droid kondiĉo) | ✅ pruvita 2026-10-29 |
 | Permesilo GPL-3.0-or-later | ✅ `LICENSE` en la radiko |
 | Neniuj malliberaj dependejoj / binaroj en la deponejo | ✅ |
-| Sentry-erar-raportado **opt-in** en F-Droid-konstruoj | ✅ (PR #148 — sen tio ili atribuus la kontraŭecon "Tracking") |
+| Sentry-erar-raportado **opt-in** ĉe F-Droid-kaj-nekonataj instalaĵoj | ✅ (laŭ la instal-fonto, ne la subskribo — per RB F-Droid distribuas nian subskribitan APK-on; PR #148 + la instal-fonta riparo 2026-11-24) |
 | **GitLab-konto** | ❌ vi devas krei ĝin (paso 2) |
 
 **Antaŭ ol daŭrigi**: la metadateno devas esti sur `master` (PR #148). Se la
@@ -224,7 +224,7 @@ fdroiddata-klono. La vera konstruo tamen okazas en ilia CI — tio sufiĉas.)
 | Demando | Respondo |
 |---|---|
 | "Why is `subdir` not the repo root?" | The Gradle build needs the root (KMP: `settings.gradle.kts`, `gradle/wrapper`); running from `androidApp/` resolves `assembleRelease` to `:androidApp:assembleRelease` and gradlew-fdroid finds the root wrapper properties one level up. Verified locally and in fdroidserver's `common.py`. |
-| "Sentry = Tracking anti-feature?" | Reporting is opt-in in F-Droid builds: default off, one-time consent dialog on first launch, toggle in Settings → Privacy. Decided at runtime by the APK signing certificate (`estasSubskribitaPerNiaAtestilo()` in `EsperantoRadioAplikaĵo.kt`) — our signature: on; any other signature (incl. F-Droid's): opt-in. |
+| "Sentry = Tracking anti-feature?" | Reporting is opt-in in F-Droid installs: default off, one-time consent dialog on first launch, toggle in Settings → Privacy. Decided at runtime by the install source (`leguInstalanto()`/`erarRaportadaDefaŭltoLaŭInstalanto()`, 2026-11-24): only known non-F-Droid channels (Google Play, the system package installer) are on by default; any other install source — F-Droid clients AND unknown ones — is opt-in. |
 | "Why no RB?" (2026-11-22) | Reproducible builds are being enabled: build-time bake-outs removed (`BuildConfig.SEN_NIA_SUBSKRIBO` → runtime signing-cert check; `dependenciesInfo` disabled per fdroiddata#3330). Two clean builds of the same source produce a bit-identical APK (SHA-256 `9e6acc63…`, 2026-11-22). Next release (`v3.1.2+`, matching versionCode) ships a signed APK on GitHub releases + updated yml with `AllowedAPKSigningKeys` — see docs/nova/07_eldonado.md → "Reprodukteblaj konstruoj (RB)". |
 | "Description is not English" | Esperanto is the default text (the app's audience language); the en-US texts come from the Play listing in the repo (androidApp/src/main/play/listings/en-US). |
 | "Gradle 9/AGP 9 on the buildserver?" | gradlew-fdroid downloads Gradle 9.8.1 from our `gradle/wrapper` (SHA-256-verified via the gradle-transparency-log), independent of the buildserver's Gradle. |

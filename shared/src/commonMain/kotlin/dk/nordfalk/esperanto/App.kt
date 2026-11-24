@@ -825,9 +825,11 @@ fun EsperantoRadioApp(
         // Konsento pri erar-raportado (C50/F-Droid). Nur en konstruoj SEN nia
         // subskribo (tiel F-Droid konstruas) la defaŭlto estas malŝaltita kaj
         // la uzanto ricevas unufojan demandon ĉe la unua starto; "Jes" ŝaltas,
-        // "Ne" nur memoras la respondon. Konstruoj KUN nia subskribo (Google
-        // Play, Aptoide) raportas defaŭlte kaj neniam montras la demandon.
-        // En evolua medio ĝi ne montriĝas (sama logiko kiel la Apaj novaĵoj).
+        // "Ne" nur memoras la respondon. Nur instalaĵoj el KONATAJ ne-F-Droid-
+        // kanaloj (Google Play, la sistema surŝutilo) raportas defaŭlte kaj
+        // neniam vidas la demandon; F-Droid kaj ĉiu nekonata instala fonto
+        // demandas. En evolua medio ĝi ne montriĝas (sama logiko kiel la
+        // Apaj novaĵoj).
         val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
         val erarRaportadoDemandita by agordojDeponejo.erarRaportadoDemandita.collectAsState()
         if (!AppStato.estasEvoluaMedo && !erarRaportado && !erarRaportadoDemandita) {

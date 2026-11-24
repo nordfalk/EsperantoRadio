@@ -42,6 +42,7 @@ import dk.nordfalk.esperanto.data.config.kreuSettings
 import dk.nordfalk.esperanto.data.repository.AgordojDeponejoImpl
 import dk.nordfalk.esperanto.data.repository.ĝisdatiguSciigSkedon
 import dk.nordfalk.esperanto.domain.model.Elsendo
+import dk.nordfalk.esperanto.domain.model.ElŝutitaElsendo
 import dk.nordfalk.esperanto.domain.model.Sonfonto
 import dk.nordfalk.esperanto.domain.player.LudiloRegilo
 import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
@@ -114,6 +115,16 @@ internal fun puŝuVojon(backStack: MutableList<NavKey>, vojo: Vojo): Boolean {
     backStack.add(vojo)
     return anstataŭigis
 }
+
+/**
+ * La elsendo por la detala eniro: la kanala fluo venkas; se ĝi ne plu havas la
+ * elsendon, sed ĝi estas elŝutita, uzeblas la elŝutita kopio (eksterrete).
+ */
+internal fun trovuElsendonPorDetalo(
+    kanalajElsendoj: List<Elsendo>,
+    elŝutoj: Map<String, ElŝutitaElsendo>,
+    id: String,
+): Elsendo? = kanalajElsendoj.firstOrNull { it.id == id } ?: elŝutoj[id]?.elsendo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -490,12 +501,19 @@ fun EsperantoRadioApp(
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
                             val kanalo = kanaloj.find { it.slug == vojo.kanaloSlug }
-                            val elsendoj by elsendoDeponejo.observiElsendojn(vojo.kanaloSlug).collectAsState()
-                            val elsendo = elsendoj.firstOrNull { it.id == vojo.id }
-                            var netrovebla by remember(vojo.vizito) { mutableStateOf(false) }
+                            val kanalajElsendoj by elsendoDeponejo.observiElsendojn(vojo.kanaloSlug).collectAsState()
+                            val elŝutoj by elŝutDeponejo.observiElŝutojn().collectAsState()
+                            val elsendo = trovuElsendonPorDetalo(kanalajElsendoj, elŝutoj, vojo.id)
+                            var serĉoDaŭras by remember(vojo.vizito) { mutableStateOf(true) }
                             LaunchedEffect(vojo.vizito) {
-                                if (kanalo != null && elsendoDeponejo.trovuElsendon(kanalo, vojo.id) == null) {
-                                    netrovebla = true
+                                try {
+                                    if (kanalo != null && kanalajElsendoj.none { it.id == vojo.id }) {
+                                        elsendoDeponejo.trovuElsendon(kanalo, vojo.id)
+                                    }
+                                } catch (e: Exception) {
+                                    logw("Nav", "Serĉo de elsendo fiaskis: ${vojo.id}", e)
+                                } finally {
+                                    serĉoDaŭras = false
                                 }
                             }
                             if (elsendo == null) {
@@ -504,13 +522,15 @@ fun EsperantoRadioApp(
                                         mesaĝo = "La kanalo de tiu ĉi elsendo ne plu ekzistas (ĝia slug: ${vojo.kanaloSlug}).",
                                         onReen = { reen() },
                                     )
-                                    netrovebla -> NetroveblasEkrano(
+                                    // Ŝarg-indikilo NUR dum la serĉo daŭras; poste klarigo —
+                                    // neniu eterna ŝargado eĉ se la fluo intertempe perdis la elsendon
+                                    serĉoDaŭras -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        CircularProgressIndicator()
+                                    }
+                                    else -> NetroveblasEkrano(
                                         mesaĝo = "La elsendo ne troviĝas en la kanalo — eble ĝi estis forigita aŭ vi estas eksterrete.",
                                         onReen = { reen() },
                                     )
-                                    else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                        CircularProgressIndicator()
-                                    }
                                 }
                                 return@entry
                             }
@@ -518,7 +538,9 @@ fun EsperantoRadioApp(
                             // (eniro kaj svipoj) al la sekvanta regilo
                             ElsendoEkranoKunSvipo(
                                 komencaId = vojo.id,
-                                elsendoj = elsendoj,
+                                // Paĝilo: la tuta kanala fluo; sed se la fluo ne plu
+                                // havas la elsendon, nur la (elŝutita) kopio ĝis la fluo ree ŝargiĝos
+                                elsendoj = if (kanalajElsendoj.any { it.id == vojo.id }) kanalajElsendoj else listOf(elsendo),
                                 kanalo = kanalo,
                                 onKanalo = { k -> push(Vojo.KanaloDetalo(k.slug)) },
                                 onReen = { reen() },

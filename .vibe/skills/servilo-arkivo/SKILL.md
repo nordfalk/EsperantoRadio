@@ -13,23 +13,28 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 **`/home/j/Code/EsperantoRadio/server/data/`** estas la ĉefloko de la servilaj datumoj
 (la 2,7 GB kun: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
 Laborkopioj (ekz. `mobile-app4/`) divididas ĝin per **SUB-LIGILOJ, ne per
-tuta-direktoria ligilo**: `server/data/` mem estas reala dosierujo kun nur du
-ligiloj — `privata` kaj `publika` → la samnomaj kanonaj dosierujoj (la hereda
-`fluoj/` ne ligiĝas kaj restas nevidebla). Tiele konstruiloj kaj rsync ĉie vidas
-unu saman datumaron, sed akcidenta skribo en `server/data/<ion-stran>` restas
-LOKALA kaj ne poluas la dividatan arbon. En nova laborkopio do: `mkdir server/data`
-kaj la du `ln -s …` (NE kopiu la datumojn, NE ligu la tutan `server/data`).
+tuta-direktoria ligilo**: `server/data/` mem estas reala dosierujo, en kiu
+`privata` estas ligilo al la kanona privata (la hereda `fluoj/` ne ligiĝas kaj
+restas nevidebla), kaj `publika/` estas REALA dosierujo — en ĝi nur la prezentpaĝo
+(`index.html`, `icon.png`) estas realaj GIT-VERSIAJ dosieroj kaj `kanaloj/`,
+`bildoj/`, `apo/`, `esperantoradio_konfiguro.json` estas ligiloj al la kanonaj.
+Tiele konstruiloj kaj rsync ĉie vidas unu saman datumaron, akcidenta skribo en
+`server/data/<ion-stran>` restas LOKALA, kaj la prezentpaĝo restas PR-reviebla.
+En nova laborkopio: `mkdir server/data; ln -s <kanona>/privata server/data/privata;
+mkdir server/data/publika; cp <kanona>/publika/{index.html,icon.png} server/data/publika/;
+ln -s <kanona>/publika/{kanaloj,bildoj,apo,esperantoradio_konfiguro.json} server/data/publika/`.
 **Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
 `tmp/` ĉe la radiko de la propra laborkopio (gitignorita) — NENIAM al la
 kanona arbo, kiu estas dividebla kun aliaj taskoj kaj agentoj.
-La prezentpaĝo (`publika/index.html`, `icon.png`) ne plu estas git-versiita:
-redaktu ĝin rekte en la kanona arbo; ĝi publikiĝas per la kutima rsync.
+La prezentpaĝo (`publika/index.html`, `icon.png`) estas GIT-VERSIAJ realaj dosieroj —
+ŝanĝu per PR; post mergo SKRIBU ankaŭ la kanonan kopion (aŭ rulu la publikigan rsync -L,
+kiu publikigas la laborkopian version).
 
 ## Publika baz-URL
 
 ```
 https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
-├── index.html + icon.png                (prezentpaĝo; de 2026-11-24 redaktebla nur en la kanona arbo — ne git-versiita)
+├── index.html + icon.png                (prezentpaĝo — en laborkopio GIT-VERSIAJ realaj dosieroj)
 ├── esperantoradio_konfiguro.json        (purigita, strikta JSON; kopiiĝas je ĉiu rulo;
 │                                          la emblemoUrl-oj jam resskribitaj al bildoj/)
 ├── kanaloj/<slug>.xml                   (29 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
@@ -115,15 +120,15 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 ```bash
 # unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)
 # nur post eksplicita peto de la uzanto!
-rsync -avz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
+rsync -avLz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
 # ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:
 curl -s https://javabog.dk/esperanto-radio/kanaloj/ | head -3
 ```
 
 **Prezentpaĝo**: `server/data/publika/index.html` (+ `icon.png`) estas servata kiel
-`https://javabog.dk/esperanto-radio/` (la prezentpaĝo `index.html` redakteblas
-rekte en la kanona arbo — ne git-versiita depost la simbola ligilo);
+`https://javabog.dk/esperanto-radio/` (la prezentpaĝo `index.html` estas git-versia reala
+dosiero en la laborkopio — vidu malsupre);
 ne forgesu `--chmod=D755,F644` (alie Apache redonas 403).
 
 ## Regula rulado

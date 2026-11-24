@@ -318,7 +318,16 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
   sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
-- „Found unknown maven repo 'https://jcenter.bintray.com'“ → iam `scanignore: build.gradle.kts`; ekde la jcenter-forigo la scanignore devas esti FORIGITA tute — la mesaĝo „Unused scanignore path …“ estas eraro, kiu fiaskigas fdroid build (2026-11-24)
+- „Found unknown maven repo 'https://jcenter.bintray.com'“ → forigu la
+  deponejo-deklaron MEM el la konkernata konstrukradiko (flank-igo
+  (`scanignore`) ne forigas la deklaron kaj ne forigas la eraron; uzu
+  `scanignore` nur se la deklaro estas neevitebla). Historio: 2026-10-31 la
+  malnova apo ne povis sen jcenter kaj ni solvis per
+  `scanignore: build.gradle.kts` — ĝis la jcenter-forigo forigis la bezonon.
+- „Unused scanignore path: …“ → la flank-igita dosiero ne plu enhavas ion
+  riproĉindan laŭ la skanilo; forigu la neuzatan `scanignore`-eron el la
+  yml — neuzata `scanignore` estas mem eraro, kiu fiaskigas `fdroid build`
+  (2026-11-24: `build.gradle.kts`, post la jcenter-forigo)
 - `AutoName` ŝanĝiĝas per si mem („Esperanto-radio Muzaiko") → `UpdateCheckName:
   Ignore` (la KMP-manifesto ne troveblas de la nom-serĉanto)
 - „SigningConfig with name 'release' not found" → `findByName` (fdroidserver

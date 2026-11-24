@@ -11,10 +11,10 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 ## Kanona datum-loko (2026-11-24)
 
 **`/home/j/Code/EsperantoRadio/server/data/`** estas la ĉefloko de la servilaj datumoj
-(la operaciaumaj 3,2 GB: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
+(la 3,2 GB kun: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
 Ĉiuj laborkopioj (ekz. `mobile-app4/`) portas **simbolan ligilon** `server/data` → la
 kanonan arbon, do konstruiloj kaj rsync ĉie vidas unu saman datumaron. NE kreu apartan
-`server/data`-arbon en nova laborkopio — demandedu/livligu kanonan.
+`server/data`-arbon en nova laborkopio — anstataŭigu ĝin per simbola ligilo al la kanona arbo.
 **Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
 `privata/tmp/`, ne al `privata/` mem.
 

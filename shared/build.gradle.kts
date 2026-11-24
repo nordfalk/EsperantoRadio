@@ -164,3 +164,17 @@ android {
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
 }
+
+// Testoj en pluraj paralelaj JVM-forkoj (2026-11-24): ~85 % de la testo-tempo estas
+// Compose-UI-testoj, kaj la tasko defaŭlte uzis nur 1 forkon. La forkoj disdividas
+// testklasojn sur apartaj JVM-oj — sendanĝere, ĉar la provizoraj dosierujoj de la
+// datumtestoj (File.createTempFile) kaj la senargumentaj DeponejoImpl estas unikaj
+// po rulo resp. enmemoraj.
+tasks.withType<Test>().configureEach {
+    maxParallelForks = 4
+    // EkranfotoTesto nur savas PNG-dosierojn por la dokumentaro — ne kondut-testo.
+    // Rulu ĝin nur petita per: ./gradlew :shared:desktopTest -Pekranfotoj
+    if (!project.hasProperty("ekranfotoj")) {
+        filter { excludeTestsMatching("*EkranfotoTesto") }
+    }
+}

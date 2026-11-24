@@ -16,7 +16,8 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64   # JDK 17 devas; JDK 21 man
 java -jar malnova/parse/build/libs/rssarkivserver.jar
 
 # Nova apo
-./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI)
+./gradlew :shared:desktopTest        # ĉiuj KMP-testoj (unuoj + UI); 4 paralelaj JVM-forkoj (2026-11-24: 57 s → ~33 s)
+./gradlew :shared:desktopTest -Pekranfotoj   # inkluzivas EkranfotoTesto (PNG-oj por la dokumentaro; defaŭlte ekskludita)
 ./gradlew :desktopApp:run            # la desktop-apo
 ./gradlew :androidApp:assembleDebug  # la Android-APK
 ./gradlew :androidApp:connectedDebugAndroidTest            # instrumentitaj testoj (emulilo)

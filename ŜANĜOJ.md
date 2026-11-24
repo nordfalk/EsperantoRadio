@@ -7,6 +7,27 @@
 
 # Ŝanĝoj — 2026-11-24
 
+## Erar-raportado: distingo per la instal-fonto, ne la subskribo (PR: https://github.com/nordfalk/EsperantoRadio/pull/211)
+
+- **Kial**: la aŭtomata revizio en PR #200 trovis pravan truon: per
+  reprodukteblaj konstruoj (RB — `Binaries` + `AllowedAPKSigningKeys`)
+  F-Droid distribuas APK-on **subskribitan per nia atestilo**, do la
+  subskriba kontrolo de PR #148 (`estasSubskribitaPerNiaAtestilo`) ne plu
+  distingas la kanalojn — la F-Droid-instalaĵo estus defaŭlte raportinta
+  al Sentry sen konsento (kontraŭeco „Tracking"; kontraŭdiras la
+  enmet-ŝablonon de !55129).
+- **Decido de la posedanto**: nur KONATAJ ne-F-Droid-kanaloj raportas
+  defaŭlte (opt-out): `com.android.vending` (Play) kaj
+  `com.android.packageinstaller` (adb/dosieradministrilo);
+  `org.fdroid.*` (F-Droid-klientoj) kaj ĈIU NEKONATA instala fonto =
+  opt-in per la unufoja konsento-demando. Aptoide estos aldonita al la
+  blanklisto (`KONATAJ_NE_FDROID_INSTALANTOJ`) nur kiam la kanalo ekzistas.
+- **Sekvo por la F-Droid-fluo**: la averto de v3.2.0 estas rekonstruita el
+  `926dc4f` (tiu PR) kaj la yml-`commit: 926dc4f…` kongruas — atestite per
+  la tute verda pipo #311098952 (2026-11-24, la tasko `fdroid build`
+  bit-komparis sukcese kontraŭ la averto). Ceteraj lecionoj de la sesio:
+  `fdroid/GVIDILO.md` § 3.2/7/8 kaj `FAROTA.md` C50.
+
 ## Aŭtomata rulumado de „Kio novas“ al la unua karto (PR: https://github.com/nordfalk/EsperantoRadio/pull/205)
 
 - **Celo**: kiam venas novaj elsendoj, la horizontala „Kio novas“-vico rulumu trankvile (animacie) al la unua karto — sed NE kiam la listo nur ŝanĝiĝas pro forlasoj (ludita, aĝo-limo, per-kanala `take(5)`).

@@ -301,6 +301,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   `python3`-asserto), ne per la okulo; en python-ĉenoj uzu `\u015d`-eskapoliterojn,
   ne `\xc5\x9d`. Legu ankaŭ la erarmesaĝon mem — ĝi montras la plej proksiman
   kongruon kaj malkaŝas ĵus enŝtelintajn tiperojn.
+- **Kontrolu ĝeneritan Esperantan tekston je supersign-fuŝoj antaŭ ol afiŝi**
+  (2026-11-25): en tujgenerita teksto supersignoj povas mangliĝi al eskapoj
+  (`ambau~`, `g^isdatigo`, `kashig^as` — kvazaŭ x-sistemaj anstataŭaĵoj).
+  Antaŭ ol uzi tian dosieron (ekz. per `--body-file` aŭ REST), kontrolu ĝin per
+  `grep -n '[@~^]c\|[@~^]g\|[@~^]s\|u~'` — ne nur per la okulo, kiu glitas
+  preter la fuŝoj sur la ekrano.
 - **Post awk/sed-amasa prilaboro de longa dokumento (FAROTA.md), ĉiam kontrolu per
   `grep -c '^#### '` kaj listu la ID-ojn** — ŝajne sukcesa skripto povas silente
   forvori najbarajn sekciojn (2026-11-20: C5/C26/C27 perdiĝis; Statuso-linioj

@@ -3,30 +3,7 @@
 > **Kiel uzi** (ĝisdatigita 2026-11-20): ĉi tiu dosiero enhavas NUR la MALFERMAJN punktojn, ordigitaj laŭ graveco (KRITIKA → GRAVA → KONSILO). Kiam punkto estas solvita, FORIGU ĝin tute — ĝia priskribo kaj la historio de la riparo estas arkivitaj en `git log` de ĉi tiu dosiero, en la PR/CHANGELOG kaj en [`ŜANĜOJ.md`](ŜANĜOJ.md); la daŭre valida scio el finitaj punktoj staras en [`NOTOJ.md`](NOTOJ.md).
 > **Rilato al la aliaj dosieroj** (ekde 2026-10-11): [`NOTOJ.md`](NOTOJ.md) = konstanta scio laŭ temo; [`ŜANĜOJ.md`](ŜANĜOJ.md) = historio de la riparoj (problemo→kaŭzo→testo); `CHANGELOG.md` = uzantvida resumo.
 
-## GRAVA
-
-#### G44 — KMP-N k.a.: daŭraj RSS-malsukcesoj de specifaj kanaloj (1227 okazoj / 57 uzantoj ekde 2026-09-13)
-- **Statuso**: [ ]
-- **Fonto**: Sentry-analizo 2026-10-19 (issue [KMP-N](https://esperantoradio.sentry.io/issues/KMP-N) kaj parencaj; en la lasta semajno: spiritismavocxo, peranto, bitmono, radiovatikana, sano — ofte "uzas 0 kaŝenitajn elsendojn"; pli frue ankaŭ lamalfamuloj, babibejo, universeala-lindo, varsoviavento, kaliningrada, radioscienca, kernpunkto, vinilkosmo, movada-vidpunkto, polaretradio)
-- **Loko**: `esperantoradio_konfiguro.json` (fluo-URL-oj), `ElsendoDeponejoImpl.kt` (ŝargo), `NovajElsendojKontroloWorker.kt:119-121`
-- **Priskribo**: Parto estas pasemaj ret-problemoj (timeout/DNS ĉe spreaker, anchor.fm, blogspot — KMP-12/14/15/M/Q), sed la ripetiĝo ĉe la samaj kanaloj sugestas mortajn aŭ ŝanĝitajn fluojn. `radiovatikana` aperas ankaŭ en lud-eraroj (`UnknownHostException` por `media.vaticannews.va`) — eble la tuta gastigo estas morta.
-- **Sugesto**: kontroli ĉiun suspektatan fluon (curl: ĉu HTTP 200 + RSS?), ĝisdatigi la URL-on aŭ marki la kanalon neaktiva en la agordo (skill `kanalkonfiguro`); konsideri pli longan timeout/reprovon por malrapidaj gastigoj.
-- **Ĝisdatigo 2026-10-27** (Sentry 3.1.0/252, 14 tagoj + ekstera kontrolo): `radioscienca` fiaskas ankaŭ en la nuna eldono — ~15 eventoj ĉe ~5 uzantoj, ofte kun **0 kaŝenitaj elsendoj** (uzanto vidas malplenan kanalon). La fluo respondas HTTP 200 de ekstere (kontrolita per curl, ankaŭ kun Ktor/okhttp/apo-UA — do ne UA-blokado, sed intermita servila problemo de la gastiganto). Same aperas: `polaretradio`, `radiovatikana`, `spiritismavocxo` (0 kaŝenitaj), `lemondediplomatique`, `lamalfamuloj`, `vinilkosmo`. La DNS-avertoj (`UnresolvedAddressException`, 52 eventoj) venas de unu aparato sen reto kaj estas pritraktitaj ĝuste per kaŝmemoro.
-- **Ĝisdatigo 2026-11-20** (semajna Sentry-statistiko): ankoraŭ aktuala, kun novaj kaŭzoj:
-  anchor.fm redonas 403 `geofence:blocked` (Spotify-geobloko); krome substack/vaticannews
-  `ConnectTimeout`, ivoox 503, „Connection refused“ (3zzzenesperanto, peranto).
-
 ## KONSILO
-
-#### C5 — Subskrib-konfiguro: defaŭlta absoluta keystore-vojo en publika deponejo
-- **Statuso**: [ ]
-- **Loko**: `androidApp/build.gradle.kts:64` (`storeFile = file(System.getenv("KEYSTORE_PATH") ?: "/home/j/android/A_signaturer/jacobnordfalk.keystore")`, pasvortoj defaultas al `""`)
-- **Sugesto**: forigu la hardkoditan vojon; ĵetu eraron se `KEYSTORE_*` mankas ĉe eldon-konstruo (fail-fast). (La CI `eldonado.yml` faras tion ĝuste: GitHub-secrets → env.)
-
-#### C9 — Gradle-higieno: dependency verification, Dependabot, jcenter
-- **Statuso**: [ ]
-- **Loko**: radika `build.gradle.kts:25-27` (la jcenter-URL ankoraŭ registrita kiel `maven { url = ... }` — nur por malnovaj dependoj de `malnova/`); neniu `gradle/verification-metadata.xml`; `.github/dependabot.yml` ekzistas
-- **Sugesto**: aldonu Gradle-dependency-verification; enŝaltu OWASP `dependencyCheck` en CI; limigu la jcenter-repon al la malnova projekto aŭ forigu ĝin iam.
 
 #### C49 — Kontrolu ĉu `RespondoTroGrandaException` trafas realan fluon (limo 1 MB, G45)
 - **Statuso**: [ ] (neniu okazinta en 30 tagoj, kontrolite 2026-11-13→11-20 — plu observu kun malalta prioritato)
@@ -64,7 +41,9 @@
     Triple-T + `release-notes/en-US/default.txt`), `commit` = plena haketaĵo,
     `UpdateCheckName: Ignore` (la nom-boto prenus la nomon de la malnova
     apo — KMP-manifesto ne troveblas), `scanignore: build.gradle.kts`
-    (la skanilo rifuzas la jcenter-deklaron necesan por la malnova apo);
+    (la skanilo rifuzis la jcenter-deklaron necesan por la malnova apo; post la
+    jcenter-forigo en tiu ĉi PR la scanignore povas foriĝi ĉe la sekva
+    yml-ĝisdatigo);
     `fdroid checkupdates --auto` finas per „up to date" kaj nenia diff;
   - fdroid-internaĵoj esploritaj kaj dokumentitaj: `gradlew-fdroid` trovas la
     radikan `gradle/wrapper` ankaŭ el `subdir: androidApp`; la `gradle:`-kampo
@@ -114,20 +93,12 @@
 - **Priskribo**:
   (a) konigi/kunhavigi elsendon (neniu partigo-intento en la nova apo —
   `PlatformLigilo` malfermas nur ligilojn/retpoŝtojn);
-  (b) elektebla loko de elŝutitaj elsendoj / ekstera memoro, kaj averto pri libera
-  spaco (`Placering_af_hentede_udsendelser`, `Det_lykkedes_ikke_at_hente_...`);
-  (c) ~~konfirmo antaŭ forigo de elŝuto~~ — SOLVITA 2026-11-20 (dialogo en ElŝutitajEkrano + testo);
-  (d) "Ĉu ĉesi ludi? / Daŭrigi fone" ĉe fermo de la apo;
   (e) nombro da novaj elsendoj ĉe Plej ŝatataj, kaj nombroj (elŝutoj) + sekva
   alarmtempo en la naviga tirkesto — la malnova tirkesto-skizo montris ilin;
   (f) "Nun estas ludata" por la rekta elsendo — `rektaElsendaPriskriboUrl`
   (muzaiko.info/data.json) estas legata sed ne montrata;
   (g) Pri / Kontakto-ekrano;
   (h) averto ke la vekhorloĝo ne povas garantii kontraŭ teknikaj problemoj.
-  Jam faritaj (forigitaj el la listo): aŭtoludo ĉe malfermo (ekzistas), elŝut-forigo
-  (ekzistas, sen konfirmo — vidu (c)).
-- **Sugesto**: decidu intence kiuj indas; (c), (f) kaj (h) estas malmultekostaj;
-  (e) postulas nombradon de novaj elsendoj (kun C47/C48 observado).
 
 #### C52 — Ideoj kaj plibonigoj (konsideroj, ne deciditaj)
 - **Statuso**: [ ]
@@ -135,29 +106,10 @@
 - **Priskribo**:
   (a) animacioj pli ĉieaj — nun nur la mini-ludilbreto havas; mankas ekz. ĉe
   ŝargado-indikoj, listo-ŝanĝoj (la nunaj ekran-transiroj venis en PR #116);
-  (b) post aŭtomata ludado de kelkaj podkastaj elsendoj, aŭtomate transiri al la
-  rektaj elsendoj (ideo);
   (c) transskribo de elsendoj kun tempokodoj, montrataj dum ludado — por lerni
   Esperanton (ideo; la STT-flanko jam funkcias sur la arkiv-servilo — vidu la
   skill-on `servilo-arkivo`; restas la montrado en la apo).
 - **Sugesto**: (c) povus esti la unua praktika uzanto de la arkiv-servilo.
-
-#### C53 — Kontrolo de la ceteraj ManchaPod-fluoj
-- **Statuso**: [ ] („Ne Parolu pri Esperanto“ kaj „HUMILOPINIE“ jam estas en la
-  agordo; RESTAS: kontroli „Una Vaga Idea“ kaj „Cuéntame, Hermosura“ pri
-  Esperanto-epizodoj)
-- **Fonto**: ideo de la posedanto (2026-10-24); pod.ligiloj el https://allmylinks.com/manchapod
-- **Priskribo**: „Ne Parolu pri Esperanto“ (spreaker-show **5202159**, kodo
-  `neparolupriesperanto`) kaj „HUMILOPINIE“ (spreaker-show **6684993**, kodo
-  `humilopinie`) jam estas en la agordo — kontrolite 2026-11-24. La allmylinks-paĝo
-  listigas pliajn ManchaPod-elsendojn („Una Vaga Idea“, „Cuéntame, Hermosura“ —
-  parte nacilingvaj): kontrolu ĉu ili havas sufiĉe da Esperanto-epizodoj antaŭ ol
-  aldoni. Atentu G44 (pasemaj spreaker-tempolimoj, KMP-12/14/15).
-- **Sugesto**: sekvu la skill-on `kanalkonfiguro` (JSONC-kampoj, `puriguModeloj`-minacoj,
-  parsreguloj P6.1+, golden-testo laŭ A3); post aldono `radioTxtKomparilo` kaj
-  fluo-kontrolo (G44-stilo: ĉu HTTP 200 + RSS?). La kanalaj datumoj (emblemo,
-  retpoŝto, hejmpaĝo) jam vivas en la kanal-objekto (agordo, A5) — neniu nova
-  datumvojo necesas.
 
 #### C55 — Eldoni la komputilan (desktop) version
 - **Statuso**: [ ]
@@ -199,67 +151,6 @@
   kondutu nature); por la reta versio (C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
   Play-Stor-listo ligilojn (`assetlinks.json`-kontrolo) kaj memoru: la kanalo devas
   ekzisti en la agordo (A5).
-
-#### C59 — Transsalti ripetiĝan enkondukon de kanalo (kun detekta-ilo)
-- **Statuso**: [ ]
-  — listo de { "sekundoj": X, "ĝis": "YYYY-MM-DD" } (frakcieblaj valoroj; fina dato
-  inkluziva; la lasta ero sen „ĝis" validas ankaŭ por estontaj elsendoj; unuopa
-  valoro = unu ero sen „ĝis"; malplena listo = ne transsalti), efikas nur se la
-  uzanto jam aŭskultis ion de la sama kanalo dum la pasinta semajno
-  (TRANSSALTA_SEMAJNO_MS = 7 tagoj — 2026-10-30 decido de la posedanto, antaŭe
-  monato); komenco = max(savitaPozicio, transsalto).
-  Aldone (PR #144): snackbar „Transsaltis la enkondukon" kun klariga dialogo;
-  agordoj „Transsalti enkondukon" (ĉefa ŝaltilo) kaj „Sciigo pri transsaltita
-  enkondukon" („Bone" en la dialogo malŝaltas ĝin).
-  RESTAS: (b) plena aŭtomatiĝo (la skripto jam ekzistas kiel la skill-o
-  `enkonduk-detekto` kun `detekto.py`). Plena detekto farita 2026-10-29 (21 kanaloj
-  analizitaj, 5 plej freŝaj elsendoj po kanalo; 6 preterlasitaj: muzaiko rekta-kanalo,
-  radioscienca/spiritismavocxo/vinilkosmo/peranto/kaliningrada mortaj fluoj — G44):
-  kernpunkto = 0 laŭ decido de la posedanto (la komunaĵo 8-25 s estas antaŭata de
-  varianta antaŝanonco, kiun oni ne transsaltu),
-  **agorditaj valoroj**:
-  babibejo 50.0 (0-50 s identaj en ĉiuj 10 paroj), fremdulo 11.0, iro 21.0,
-  lemondediplomatique 11.0 (ĉiuj kun 10/10 koheraj paroj), universeala-lindo 39.0
-  kaj polaretradio 22.0 (nur 2 elsendoj haveblaj — malforta pruvo, rekontrolota).
-  **3zzzenesperanto** (2026-10-30, epok-konscia detekto de 95 elsendoj 2025-01…2026-10;
-  la unua 5-plej-freŝaj-rulo malsukcesis ĉar ĝi transiris epok-limon):
-  2025 = 27.0; ekde 2026-01-05 = 26.0; ekde 2026-07-20 = 37.0 (antaŭrolo ~10-14 s +
-  nova enkonduko); sen-enkondukaj unuopaj elsendoj = 0.0 (2025-01-13, 2025-06-09,
-  2026-05-04…25, 2026-08-31, 2026-10-12 — perdo konfirmita, revenis je 10-19;
-  decidoj de la posedanto: plena formul-a komenco, kaj 37 s por la antaŭrola epoko).
-  **Reviziite 2026-11-24** (30 plej novaj elsendoj po kanalo, fenestro 70 s — la
-  norma detekto.py vidas nur 30 s kaj kapablus nek konfirmi nek kontraŭpruvi
-  valorojn >30): 3zzz 37→21 ekde 2026-05-26 (la 37 tranĉis ĝis ~11 s en la enhavo
-  de la septembraj elsendoj — iliaj paroj finas ĉe 22–26 s); 2026-05-04…25 ne estas
-  „sen enkonduko“ sed kvar epizodoj kun inter si egala 62-s enkonduko (62.0).
-  babibejo ricevis epokojn (2021-05-30 = 0; ĝis 2022-06-15 = 38; 2022-10-17 = 6;
-  ekde 2022-10-25 = 50). fremdulo: la epizodoj ĝis 2021-04-20 ne havas la
-  enkondukon (0 ĝis tiam, 11 poste). iro: 21 konfirmita por 26/30 plej novaj;
-  sen-enkondukaj = 2026-01-08, 2026-05-06 kaj la lasta 2026-06-18 (kanalo dormas;
-  fina valoro 0). Konfirmitaj sen ŝanĝo: polaretradio 22 (nur 3 elŝuteblaj sonoj),
-  universeala-lindo 39, lemondediplomatique 11 (tutflue konstanta).
-  **Rifuzitaj**: movada-vidpunkto (dispersaj 19-35 s mini-segmentoj — nerekta
-  enkonduko), radiovatikana (bimodala 4/15 s laŭ epizodo — ne laŭ dato),
-  tuluzo (dispersaj 10-22 s), sano (posta epoko nur 7-8 s kaj kanalo dormas),
-  lamalfamuloj/rakontatempo/bitmono (malnova epoko kun nur 6-8-s komunaĵo — ne
-  indas), radiofmkubo (tute dispersaj 4-66 s), kernpunkto (komunaĵo estas — sed
-  ĝi validas nur post varia antaŭanonco, restas la decido de 2026-10-29 ĝis 0),
-  la ceteraj sen iu ajn komuna segmento.
-- **Fonto**: ideo de la posedanto (2026-10-24)
-- **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
-  kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas
-  transsalti en la komenco. (b) Eble eĉ krei ilon kiu trovas tion: komparas la
-  komencajn sekundojn de pluraj epizodoj kaj elkalkulas la ripetan longon.
-- **Sugesto**: (a) nova kampo en `esperantoradio_konfiguro.json` (ekz.
-  `saltiKomenceSekundojn` — daten-movita, A5; kontroli la JSONC-kampanimadon kaj la
-  parsajn regulojn P6.1+, ankaŭ la agord-kompateblecon kiam la kampo mankas);
-  la ludilo jam subtenas komencan pozicion — `LudiloRegilo.fiksiFonton(fonto,
-  komencoPozicioMs)` — do `LudvicoRegilo.ludiElsendon` transdonu
-  `max(komencoPozicioMs, savitaPozicio)` kaj la pozicio-indikilon ne montru la
-  transsaltitan parton (aŭ montru 0:xx de la komenco de la enhavo). (b) la detekta
-  ilo komparu la komencajn ~60 s (RMS/ampleks-envelopa korelacio aŭ audio-fingerprint);
-  natura loko: la estonta arkiv-servilo (docs/nova/06), kiu jam elŝutos la sonojn —
-  ĝi povus proponi la valoron por ĉiu kanalo.
 
 ---
 

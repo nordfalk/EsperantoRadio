@@ -120,15 +120,16 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
   (`v%v` anstataŭiĝas per `v3.2.0` ktp.; postulita de la reviziantoj,
   2026-11-23). Konsekvenco por la eldona procezo: **ĉiu eldono devas alŝuti
   la APK-on kiel averto al la GitHub-eldono `vX.Y.Z`** (vidu sekcion 6).
-- `Binaries:` kaj `AllowedAPKSigningKeys:` staras en la yml kiel
-  «ŝlosilo: \n  valoro» — la valoro en aparta daŭrig-linio, indeksita per
-  2 spacoj (2026-11-24: `fdroid rewritemeta` flankigas ĉiujn valorojn, kies
-  linio transpasas ~80 signojn; unulinia formo igas rewritemeta fiaski — tio
-  kaŭzis ruĝan pipon ankaŭ kiam la fina lini-salo jam estis en ordo).
-  **Sekura procedo post ĉiu yml-ŝanĝo**: rulu loke
-  `fdroid rewritemeta dk.nordfalk.esperanto.radio`
-  (ilo: `/home/j/.pyenv/shims/fdroid`, versio 2.4.2; kopiu la rezulton kiel
-  la novan yml-on — la rulo estas idempova: dua rulo ŝanĝas nenion).
+- `Binaries:` kaj `AllowedAPKSigningKeys:` — atentu la formon en la yml
+  (2026-11-24, la fina verdigita pipo !55129): la CI akceptas `Binaries`
+  NUR flankigitan («Binaries: \n  <url>» — valoro en aparta daŭrig-linio,
+  indentigita per 2 spacoj; unulinia formo fiaskigas `rewritemeta`), dum
+  `AllowedAPKSigningKeys` restas UNU-LINIA. **Atentu**: la MALNOVA loka
+  fdroidserver 2.4.2 flankigus ankaŭ la identigilan kampon kaj do
+  ne kongruas kun la CI-master — ne fidu senmare la lokan ilon ĉe tiuj
+  kampoj; la enmeta dosieroj sur nia master spegulas la CI-pasan formon,
+  do «kopiu sen ŝanĝoj» + eventuaj plibonigoj post la pipo estas la
+  sekura vojo.
 - `AllowedAPKSigningKeys:` — SHA-256 de la subskriba atestilo de nia APK,
   minuskle skribita heksa kodo, sen dupunktoj. Ĝi kredindigas la `Binaries`-URL-ojn: la
   reviziantoj tiel scias, ke la binaroj venas de ni. Kalkulo (el la APK, ne
@@ -302,9 +303,11 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - „AutoUpdateMode … does not match" → nuda `Version`
 - lokalizitaj kampoj en la yml → malpermesataj; tekstoj el la Triple-T
 - rewritemeta-dosiero → forigi ĉiujn `#`-komentojn; fina lini-salo ĉe EOF
-- rewritemeta-dosiero kun longaj valoroj (`Binaries`, `AllowedAPKSigningKeys`)
-  en unu linio → la kanona formo flankigas ilin al daŭrig-linio
-  («ŝlosilo: \n  valoro»); regeneru per `fdroid rewritemeta` (2026-11-24)
+- rewritemeta-dosiero kun `Binaries` en unu linio → la kanona formo
+  flankigas ĝin al daŭrig-linio («Binaries: \n  <url>»);
+  `AllowedAPKSigningKeys` restas unulini. La loka fdroidserver 2.4.2
+  reflankigus ambaŭ — ne fidu ĝin detalnivelen; la CI-pasa formo staras
+  sur nia master (2026-11-24)
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
 - „Found unknown maven repo 'https://jcenter.bintray.com'" → `scanignore:

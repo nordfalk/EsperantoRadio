@@ -26,8 +26,7 @@ Builds:
     scanignore:
       - build.gradle.kts
 
-AllowedAPKSigningKeys: 
-  aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16
+AllowedAPKSigningKeys: aab92d2bb6401743128fbe641ff86a0875ca95cb2cc5e15b1d4a7cd5e534eb16
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags

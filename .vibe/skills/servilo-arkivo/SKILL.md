@@ -12,17 +12,43 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 
 **`/home/j/Code/EsperantoRadio/server/data/`** estas la ĉefloko de la servilaj datumoj
 (la 2,7 GB kun: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
-Laborkopioj (ekz. `mobile-app4/`) divididas ĝin per **SUB-LIGILOJ, ne per
-tuta-direktoria ligilo**: `server/data/` mem estas reala dosierujo, en kiu
-`privata` estas ligilo al la kanona privata (la hereda `fluoj/` ne ligiĝas kaj
-restas nevidebla), kaj `publika/` estas REALA dosierujo — en ĝi nur la prezentpaĝo
-(`index.html`, `icon.png`) estas realaj GIT-VERSIAJ dosieroj kaj `kanaloj/`,
-`bildoj/`, `apo/`, `esperantoradio_konfiguro.json` estas ligiloj al la kanonaj.
-Tiele konstruiloj kaj rsync ĉie vidas unu saman datumaron, akcidenta skribo en
-`server/data/<ion-stran>` restas LOKALA, kaj la prezentpaĝo restas PR-reviebla.
-En nova laborkopio: `mkdir server/data; ln -s <kanona>/privata server/data/privata;
-mkdir server/data/publika; cp <kanona>/publika/{index.html,icon.png} server/data/publika/;
-ln -s <kanona>/publika/{kanaloj,bildoj,apo,esperantoradio_konfiguro.json} server/data/publika/`.
+### Fina decido pri la ligiloj (2026-11-24) — reproduktenda en ĈIU kontrolilo
+
+Laborkopioj (ekz. `mobile-app4/`) divididas la kanonan arbon per **SUB-LIGILOJ, ne
+per tuta-direktoria ligilo** (konsideritaj alternativoj: tuta ligilo — poluigebla
+de akcidentaj skriboj kaj tuteunuebliga por git; nur subligiloj en data/* —
+sen versiado de la prezentpaĝo). La fina strukturo:
+
+```
+server/data/                      ← REALA
+├── privata → <kanona>/privata    ← LIGILO (la hereda fluoj/ NE ligiĝas)
+└── publika/                      ← REALA
+    ├── index.html, icon.png      ← REALAJ, GIT-VERSIAJ (aŭtoritato)
+    ├── kanaloj/    → <kanona>/publika/kanaloj    ┐
+    ├── bildoj/     → <kanona>/publika/bildoj     │ LIGILOJ
+    ├── apo/        → <kanona>/publika/apo        │ (de PR #210 la
+    └── esperantoradio_konfiguro.json → <kanonan> ┘  apo-nomo malnova-speca)
+```
+
+**Kial**: `publika/` devas esti REALA, por ke git povu versii la prezentpaĝon;
+`privata` povas esti unu ligilo (nenio versienda); akcidenta skribo en
+`server/data/` restas LOKALA; la prezentpaĝo restas PR-reviebla. LA PUBLIKIGA
+RSYNC DEVAS UZI `-L`.
+
+**Recepto por nova kontrolilo** (post `git clone` la du realaj dosieroj jam
+ekzistas el git; nur la ligiloj mankas):
+
+```bash
+cd <repo>
+ln -s /home/j/Code/EsperantoRadio/server/data/privata  server/data/privata
+ln -s /home/j/Code/EsperantoRadio/server/data/publika/kanaloj  server/data/publika/kanaloj
+ln -s /home/j/Code/EsperantoRadio/server/data/publika/bildoj   server/data/publika/bildoj
+ln -s /home/j/Code/EsperantoRadio/server/data/publika/apo     server/data/publika/apo
+ln -s /home/j/Code/EsperantoRadio/server/data/publika/esperantoradio_konfiguro.json  server/data/publika/esperantoradio_konfiguro.json
+```
+
+(Ekzistanta kontrolilo SEN la versiita paro: antaŭe `cp` ankaŭ `index.html` kaj
+`icon.png` el la kanona publika.)
 **Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
 `tmp/` ĉe la radiko de la propra laborkopio (gitignorita) — NENIAM al la
 kanona arbo, kiu estas dividebla kun aliaj taskoj kaj agentoj.

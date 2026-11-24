@@ -265,9 +265,24 @@
   nova enkonduko); sen-enkondukaj unuopaj elsendoj = 0.0 (2025-01-13, 2025-06-09,
   2026-05-04…25, 2026-08-31, 2026-10-12 — perdo konfirmita, revenis je 10-19;
   decidoj de la posedanto: plena formul-a komenco, kaj 37 s por la antaŭrola epoko).
+  **Reviziite 2026-11-24** (30 plej novaj elsendoj po kanalo, fenestro 70 s — la
+  norma detekto.py vidas nur 30 s kaj kapablus nek konfirmi nek kontraŭpruvi
+  valorojn >30): 3zzz 37→21 ekde 2026-05-26 (la 37 tranĉis ĝis ~11 s en la enhavo
+  de la septembraj elsendoj — iliaj paroj finas ĉe 22–26 s); 2026-05-04…25 ne estas
+  „sen enkonduko“ sed kvar epizodoj kun inter si egala 62-s enkonduko (62.0).
+  babibejo ricevis epokojn (2021-05-30 = 0; ĝis 2022-06-15 = 38; 2022-10-17 = 6;
+  ekde 2022-10-25 = 50). fremdulo: la epizodoj ĝis 2021-04-20 ne havas la
+  enkondukon (0 ĝis tiam, 11 poste). iro: 21 konfirmita por 26/30 plej novaj;
+  sen-enkondukaj = 2026-01-08, 2026-05-06 kaj la lasta 2026-06-18 (kanalo dormas;
+  fina valoro 0). Konfirmitaj sen ŝanĝo: polaretradio 22 (nur 3 elŝuteblaj sonoj),
+  universeala-lindo 39, lemondediplomatique 11 (tutflue konstanta).
   **Rifuzitaj**: movada-vidpunkto (dispersaj 19-35 s mini-segmentoj — nerekta
-  enkonduko), radiovatikana (bimodala 4/15 s), tuluzo (4/6 paroj), sano (1/10),
-  la ceteraj sen iu ajn komuna segmento
+  enkonduko), radiovatikana (bimodala 4/15 s laŭ epizodo — ne laŭ dato),
+  tuluzo (dispersaj 10-22 s), sano (posta epoko nur 7-8 s kaj kanalo dormas),
+  lamalfamuloj/rakontatempo/bitmono (malnova epoko kun nur 6-8-s komunaĵo — ne
+  indas), radiofmkubo (tute dispersaj 4-66 s), kernpunkto (komunaĵo estas — sed
+  ĝi validas nur post varia antaŭanonco, restas la decido de 2026-10-29 ĝis 0),
+  la ceteraj sen iu ajn komuna segmento.
 - **Fonto**: ideo de la posedanto (2026-10-24)
 - **Priskribo**: kelkaj kanaloj ĉiam sonas ekzakte same dum la komenco — teda post
   kelkaj fojoj. (a) Enskribi en la kanalaj informoj kiom da sekundoj oni povas

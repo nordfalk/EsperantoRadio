@@ -19,3 +19,11 @@ kotlin {
         }
     }
 }
+
+val kopiuAlPublikaElsutejo by tasks.registering(Copy::class) {
+    group = "distribution"
+    description = "Kopias la produktaĵan wasmJs-faskon al server/data/publika/apo/ (C56)"
+    dependsOn("wasmJsBrowserDistribution")
+    from(layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
+    into(rootProject.file("server/data/publika/apo"))
+}

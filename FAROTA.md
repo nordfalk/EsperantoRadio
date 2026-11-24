@@ -23,7 +23,7 @@
 | C43 | **SOLVITA 2026-11-20** (FilCache-semantiko, per-jaraj arkivdosieroj kaj `httpKliento`/`ArchiveOrgDosiernomoKaŝo` dokumentitaj en `docs/nova/06`); punkto forigita. |
 | C44 | **SOLVITA 2026-11-20** parte: (c) regulo „>95 % → de 0“ reenkondukita (`LudvicoLogiko.komencaPozicio` + testo), (g) golden-testo kun kruda `&nbsp;`; la ceteraj konsideroj (a,b,d,e,f) intence ne reenkondukitaj. Punkto forigita. |
 | C54 | **SOLVITA 2026-11-20**: butono „Kopii RSS-URL“ en KanalEkrano + `kopiuTekston` (expect/actual por android/desktop/wasmJs/ios). Punkto forigita. |
-| C50, C51, C52, C55, C56, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). |
+| C50, C51, C52, C55, C58 | Ankoraŭ aktualaj (C51(f),(h) kaj C52(a) parte; C51(c) solvita). C56 SOLVITA 2026-11-24: retversio gastigata samdevene je javabog.dk/apo/, nur-arkiva datumvojo, sono rekte el la fonto (PR/opo #210). |
 | C46 | **SOLVITA 2026-11-20**: lud-eraroj nun raportiĝas per 2-arg `logw` (videblaj en Sentry Logs); reprovo jam ekzistis (`ReprovoLogiko`). Punkto forigita. |
 | C47 | Forigita 2026-11-20 laŭ decido de la posedanto (observa punkto, historio en git log). |
 | C49 | Nuntempe ne aktiva: neniu `RespondoTroGrandaException` en 30 tagoj. Plu observu malaltpriore. |
@@ -208,23 +208,6 @@
   unue traktu la konatajn limojn (C16: `saltiAl` estas ŝajnigo sur desktop-mp3spi;
   HLS ne funkcias — docs/nova/02) kaj provu sur sen-JDK-aparatoj (jlink/`jpackage`).
 
-#### C56 — Esploro: reta (WASM) versio kun datumoj de la servilo, ludado rekte el la fonto
-- **Statuso**: [ ]
-- **Fonto**: ideo de la posedanto (2026-10-24); modelo: https://esperanto-radio.com/
-- **Priskribo**: esplori ĉu la reta versio povus funkcii tiel, ke la fluo- kaj
-  metadatumoj venas de la estonta arkiv-servilo (docs/nova/06, C43), sed la ludado mem
-  estas reta HTML-komponento kiu ludas rekte de la fonto. Ŝlosila fakto: CORS blokas
-  `fetch`/XHR (pro tio plej multaj RSS-fluoj kaj ankaŭ la Coil-bildoj ne ŝargeblas en
-  la nuna reta versio), sed **ne** `<audio src>` — la rekt-ludado do funkcias sen
-  prokurilo, kaj `WasmJsLudiloRegilo` jam uzas HTML-`<audio>`-elementon. Do:
-  datumvojoj (RSS, bildoj) devas veni samdevene (el la servilo aŭ per `<img>`-etikedoj
-  anstataŭ Coil-fetch); la sono restas rekt-flua el la fonto (nur anchor.fm-MP3 nun
-  funkcias, ĉar ĝi jam estas CORS-permesa).
-- **Sugesto**: prototipo post kiam la arkiv-servilo havas JSON-API-on (docs/nova/06):
-  samdevena listo de kanaloj/elsendoj → la ekzistanta ŝarga-logiko, kun la bild-URL-oj
-  servataj de la servilo aŭ rekte `<img>`-ebligataj. Kvanto-specimenado: mezuru ĉu la
-  servila datumvojo povas esti subflue (sen CORS-kapoj) por ĉiuj 26 kanaloj.
-
 #### C58 — "White label"-ligilo por kanal-eldonantoj
 - **Statuso**: [ ]
 - **Fonto**: ideo de la posedanto (2026-10-24)
@@ -234,7 +217,7 @@
 - **Sugesto**: Android App Links / intenco-ŝablono (ekz. `…/kanalo/<kodo>`) → nav3
   deep-link (hodiaŭ la apo ne havas deep links — C34) → enscenigu `Vojo.KanaloDetalo`
   kiel komenca ekrano (eble kun `Vojo.Hejmo` sube en la stako, por ke reen-gesto
-  kondutu nature); por la reta versio (C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
+  kondutu nature); por la retversio (https://javabog.dk/esperanto-radio/apo/, ekde la solvo de C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
   Play-Stor-listo ligilojn (`assetlinks.json`-kontrolo) kaj memoru: la kanalo devas
   ekzisti en la agordo (A5).
 

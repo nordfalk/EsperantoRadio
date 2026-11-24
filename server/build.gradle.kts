@@ -15,6 +15,11 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
             }
         }
+        val serverTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }
 

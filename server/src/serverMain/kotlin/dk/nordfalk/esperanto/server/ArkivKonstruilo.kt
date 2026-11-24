@@ -11,6 +11,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.time.Instant
@@ -48,8 +49,9 @@ object ArkivKonstruilo {
         val nurTiuj = args.filter { !it.startsWith("--") }.toSet()
         val uzuKaŝon = "--kaŝo" in args
 
-        val kanaloj = KanalAgordoLeganto().legu(KONFIGO.readText()).kanaloj
-            .map { it.alKanalo() }
+        val agordo = KanalAgordoLeganto().legu(KONFIGO.readText())
+        val ĉiujKanaloj = agordo.kanaloj.map { it.alKanalo() }
+        val kanaloj = ĉiujKanaloj
             .filter { it.havasPodkastojn }
             .filter { nurTiuj.isEmpty() || it.slug in nurTiuj }
 
@@ -60,6 +62,11 @@ object ArkivKonstruilo {
         var stato = StatoLeganto.legu(File(PRIVATA, "stato.json"))
         val novajStatoj = stato.kanaloj.toMutableMap()
 
+        // FAROTA C56: spegulu la emblemojn al publika/bildoj/ kaj resskribu iliajn URL-ojn
+        // en la publikigota konfiguro (kaj en la fluoj) al la arkivaj URL-oj — la
+        // retversio gastigas samdevene kaj ne povas ŝargi bildojn el la originalaj gastigantoj (CORS).
+        val emblemaMapigo = elŝutuEmblemojn(ĉiujKanaloj, http, agordo.arkivoBazoUrl)
+
         for (kanalo in kanaloj) {
             try {
                 val elsendoj = if (kanalo.podkastaRssUrl.isNullOrBlank() && !kanalo.htmlFontoUrl.isNullOrBlank()) {
@@ -68,8 +75,12 @@ object ArkivKonstruilo {
                     kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
                 }
                 val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
+                // La fluo ankaŭ portu la spegulitan emblemo-URL-on (eksteraj legitimiloj)
+                val skriboKanalo = kanalo.emblemoUrl
+                    ?.let { malnova -> emblemaMapigo[malnova]?.let { kanalo.copy(emblemoUrl = it) } }
+                    ?: kanalo
                 FluSkribilo.skribu(
-                    kanalo, elsendoj, priskriboj, titoloj,
+                    skriboKanalo, elsendoj, priskriboj, titoloj,
                     File(PUBLIKA, "kanaloj/${kanalo.slug}.xml"),
                 )
                 novajStatoj[kanalo.slug] = KanalStato(
@@ -92,13 +103,58 @@ object ArkivKonstruilo {
 
         // la kanalkonfiguro estas publika: la apo elŝutas ĝin de la sama servilo.
         // Publikiĝas PURIGITA versio (sen JSONC-komentoj) — tiel striktaj JSON-legiloj
-        // (ankaŭ eksteraj) povas legi ĝin rekte.
+        // (ankaŭ eksteraj) povas legi ĝin rekte. La emblemo-URL-oj montras al la
+        // spegulitaj bildoj sur ĉi tiu servilo (C56) — la retversio gastigas samdevene.
         val leganto = KanalAgordoLeganto()
-        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(leganto.striptiguKomentojn(KONFIGO.readText()))
+        val puraKonfiguro = leganto.striptiguKomentojn(KONFIGO.readText())
+        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(
+            Emblemoj.resskribuEmblemojn(puraKonfiguro, emblemaMapigo)
+        )
         stato = stato.copy(lastaRulo = Instant.now().toString(), kanaloj = novajStatoj)
         StatoLeganto.skribu(File(PRIVATA, "stato.json"), stato)
         http.close()
         println(" preta. Stato: server/data/privata/stato.json")
+    }
+
+    /**
+     * Elŝutas la emblemojn de ĈIUJ kanaloj (ankaŭ la ne-podkastaj — la kanalaro
+     * montras ĉiujn) kaj spegulas ilin al `publika/bildoj/<slug>.<sufikso>`.
+     * Redonas mapigon malnova URL → arkiva URL por la resskribo en la publikigota
+     * konfiguro kaj la fluoj. Fiaskinta emblemo simple restas sen mapigo (A4:
+     * ne haltigas la konstruadon; sur Android/Desktop la originala URL plu funkcias).
+     */
+    private fun elŝutuEmblemojn(
+        kanaloj: List<dk.nordfalk.esperanto.domain.model.Kanalo>,
+        http: HttpClient,
+        arkivoBazoUrl: String?,
+    ): Map<String, String> {
+        if (arkivoBazoUrl.isNullOrBlank()) return emptyMap()
+        val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
+        val bildujo = File(PUBLIKA, "bildoj").apply { mkdirs() }
+        val mapigo = mutableMapOf<String, String>()
+        for (kanalo in kanaloj) {
+            val url = kanalo.emblemoUrl ?: continue
+            try {
+                val nova = runBlocking {
+                    val respondo = http.get(url)
+                    val sufikso = Emblemoj.sufikso(respondo.headers[HttpHeaders.ContentType], url)
+                    val dosiero = File(bildujo, "${kanalo.slug}.$sufikso")
+                    dosiero.writeBytes(respondo.bodyAsBytes())
+                    // forigu ev. pli fruan spegulon de la sama emblemo kun alia sufikso
+                    bildujo.listFiles()
+                        ?.filter { it.nameWithoutExtension == kanalo.slug && it.name != dosiero.name }
+                        ?.forEach { it.delete() }
+                    "$bazo/bildoj/${dosiero.name}"
+                }
+                mapigo[url] = nova
+                println("  emblemo ${kanalo.slug} -> bildoj/${nova.substringAfterLast('/')}")
+            } catch (e: Exception) {
+                // A4: unu fiaskinta emblemo ne haltigas la konstruadon; A8: protokolu kun stacktrace
+                logw("ArkivKonstruilo", "emblemo de ${kanalo.slug} ($url) ne elŝuteblis — la konfiguro tenas la originalan URL-on", e)
+            }
+        }
+        println("  emblemoj: ${mapigo.size}/${kanaloj.count { it.emblemoUrl != null }} spegulitaj al publika/bildoj/")
+        return mapigo
     }
 
     /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas

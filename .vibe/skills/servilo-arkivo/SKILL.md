@@ -13,9 +13,21 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 ```
 https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
 ├── index.html + icon.png                (prezentpaĝo, versioblaj en git)
-├── esperantoradio_konfiguro.json        (purigita, strikta JSON; kopiiĝas je ĉiu rulo)
-└── kanaloj/<slug>.xml                   (28 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
+├── esperantoradio_konfiguro.json        (purigita, strikta JSON; kopiiĝas je ĉiu rulo;
+│                                          la emblemoUrl-oj jam resskribitaj al bildoj/)
+├── kanaloj/<slug>.xml                   (29 riĉigitaj RSS-fluoj, RSS 2.0 + iTunes)
+├── bildoj/<slug>.<png|jpg|gif|webp>     (emblemo-spegulo — C56, por samdevena Coil-ŝargo)
+└── apo/                                 (produkta wasmJs-fasko de la retversio — C56:
+                                           .js/.wasm/index.html, ~17 MB; NENIAM privatajn
+                                           dosierojn ĉi tien)
 ```
+
+**La retversio (C56, 2026-11-24) gastigas samdevene** sub `apo/`: sur la retumilo
+`uzuOriginajnFluojn=false` (AppStato laŭ `platformo`) — nur la arkivaj fluoj kaj la
+spegulitaj bildoj estas ŝargataj (la originaloj estas CORS-blokitaj); la sono ludas
+rekte el la fonto per HTML-`<audio>` (ne CORS-bezona). Konstruo:
+`./gradlew :webApp:kopiuAlPublikaElsutejo` (kopias el
+`webApp/build/dist/wasmJs/productionExecutable/` al `publika/apo/`), poste la kutima rsync.
 
 La **apo konsumas tiujn fluojn kunfandante kun la originalaj**: `arkivoBazoUrl` en
 `esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` elŝutas paralele
@@ -100,6 +112,23 @@ ne forgesu `--chmod=D755,F644` (alie Apache redonas 403).
 
 cron/systemd: `./gradlew :server:arkivKonstruilo` + `rsync` (ekz. ĉiun horon).
 Unu kanalo fiaskanta ne haltigas la aliajn (regulo A4); eraroj en `privata/stato.json`.
+
+## Kaptilo: Apache kaj .wasm (C56, 2026-11-24)
+
+- Apache 2.4.29 je javabog.dk NE konas la typ-on `application/wasm` (`/etc/mime.types`
+  mankas la linion; **sen ĝi la retumilo rifuzas lanĉi la faskon** en `apo/`:
+  "Incorrect response MIME type. Expected 'application/wasm'"), kaj
+  `AllowOverride None` en la `DocumentRoot` (`/etc/apache2/sites-enabled/10_javabog*.conf`
+  → `<Directory /diverse/javabog/html>`) mortigas ĉiun `.htaccess` (probita: `AddType`
+  ne efikas). Sudo necesas por la permana sistem-fikso:
+  `echo "application/wasm wasm" | sudo tee -a /etc/mime.types && sudo systemctl reload apache2`
+  (elektita de la posedanto 2026-11-24). Kontrolu per
+  `curl -sI https://javabog.dk/esperanto-radio/apo/<hash>.wasm | grep -i content-type`.
+  Rezervvojo se mime.types ne korekteblas: mod_php 7.2 ruliĝas en tiu dosierujo —
+  `<hash>.wasm.php`-ĉirkaŭpakaĵo kun `header('Content-Type: application/wasm')` + ŝarg-intercepto.
+- La fasko-konstruo kopias per `:webApp:kopiuAlPublikaElsutejo` (ne permane) —
+  la elirejo estas `build/dist/wasmJs/productionExecutable/` (NE `browserProduction`;
+  2026-11-24: erara podo igis la Copy-taskon trankvile krei malplenan publikan dosierujon).
 
 ## Pliaj detaloj
 

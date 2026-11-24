@@ -242,7 +242,12 @@ object AppStato {
         )
         kanaloDeponejo = deponejoDeKanaloj
 
-        elsendoDeponejo = ElsendoDeponejoImpl(httpKliento!!, RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)), arkivoBazoUrl = agordo.arkivoBazoUrl)
+        elsendoDeponejo = ElsendoDeponejoImpl(
+            httpKliento!!,
+            RssParsilo(ArchiveOrgDosiernomoKaŝo(settings)),
+            arkivoBazoUrl = agordo.arkivoBazoUrl,
+            uzuOriginajnFluojn = platformo != Platformo.RETUMILO,
+        )
 
         kanalaroViewModel = KanalaroViewModel(kanaloDeponejo!!, elsendoDeponejo!!)
 

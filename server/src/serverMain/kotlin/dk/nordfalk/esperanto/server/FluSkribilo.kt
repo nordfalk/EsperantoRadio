@@ -46,7 +46,7 @@ object FluSkribilo {
             xml(sb, "      ", "pubDate", rfc822(e.dato))
             if (priskribo != null) xml(sb, "      ", "description", priskribo)
             if (retpaĝo != null) xml(sb, "      ", "link", retpaĝo)
-            sb.append("      <enclosure url=").append(citaĵo(e.fluo)).append(" type=\"audio/mpeg\"/>\n")
+            sb.append("      <enclosure url=").append(citaĵo(normiguFluanUrl(e.fluo))).append(" type=\"audio/mpeg\"/>\n")
             if (daŭro != null && daŭro > 0) {
                 sb.append("      <itunes:duration>%02d:%02d:%02d</itunes:duration>\n".format(daŭro / 3600, (daŭro / 60) % 60, daŭro % 60))
             }
@@ -55,6 +55,14 @@ object FluSkribilo {
         sb.append("  </channel>\n</rss>\n")
         celo.writeText(sb.toString())
     }
+
+    /**
+     * Normaligas la fluan URL-on de la housingo: archive.org disponigas https je la
+     * samnoma vojo, kaj `http://`-ligilo rompus sur https-retumilo-paĝo (miksita enhavo).
+     * Aliaj `http://`-URL-oj ne tuŝiĝas — ne ĉiu fonto havas https-ekvivalenton.
+     */
+    fun normiguFluanUrl(url: String): String =
+        if (url.startsWith("http://archive.org/")) "https://" + url.drop("http://".length) else url
 
     private fun xml(sb: StringBuilder, krommarĝeno: String, etikedo: String, teksto: String) {
         sb.append(krommarĝeno).append('<').append(etikedo).append('>')

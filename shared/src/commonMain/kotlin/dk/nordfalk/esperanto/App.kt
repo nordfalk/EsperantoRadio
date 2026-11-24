@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -63,7 +64,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
-private val navConfig = SavedStateConfiguration {
+// internal: la UI-testoj reuzezas ĝin por rememberNavBackStack (vidu PuŝoSenDuplikatoTest)
+internal val navConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
             subclass(Vojo.Hejmo::class, Vojo.Hejmo.serializer())
@@ -79,6 +81,38 @@ private val navConfig = SavedStateConfiguration {
             subclass(Vojo.ElsendoDetalo::class, Vojo.ElsendoDetalo.serializer())
         }
     }
+}
+
+/**
+ * Ĉu du nav-ŝlosiloj celas la SAMAN enirejon. La cel-identeco de la detalaj
+ * vojoj estas nur la identigilo (slug aŭ id+kanaloSlug) — la vizito-kodo ne
+ * gravas (ĉiu puŝo estas aparta vizito kun propra nav3-stato — vidu Vojoj.kt).
+ * Por ĉiuj aliaj vojoj valoro-egalo sufiĉas.
+ */
+internal fun estasSamaCelo(a: NavKey?, b: Vojo): Boolean = when {
+    a is Vojo.ElsendoDetalo && b is Vojo.ElsendoDetalo ->
+        a.id == b.id && a.kanaloSlug == b.kanaloSlug
+    a is Vojo.KanaloDetalo && b is Vojo.KanaloDetalo -> a.slug == b.slug
+    else -> a == b
+}
+
+/**
+ * Puŝas [vojo] al la nav-stako kaj antaŭe forigas ĉiun vojon de la SAMA celo
+ * (nav-ŝlosila egalo aŭ, por ElsendoDetalo, la sama id+kanaloSlug) el la TUTA stako — ne nur el la supro.
+ *
+ * Kial: nav3 ŝargas kaj konservas la staton de eniro per ĝia `contentKey`
+ * (`"$key:${key::class}"`), kiu dependas de la tuta VOJ-VALORO. La sama celo
+ * dufoje en la stako estus konfuza (revenigo trairus la saman detalon dufoje);
+ * la celo do aperu nur unufoje, ĉe la supro — revenigo el la nova eniro
+ * kondukas reen al la ekrano, el kiu oni puŝis (ekz. la kanal-ekranon
+ * anstataŭ malnova, forlasita detalo de la sama elsendo).
+ *
+ * @return ĉu estis forigita malnova vojo de la sama celo (anstataŭigo)
+ */
+internal fun puŝuVojon(backStack: MutableList<NavKey>, vojo: Vojo): Boolean {
+    val anstataŭigis = backStack.removeAll { estasSamaCelo(it, vojo) }
+    backStack.add(vojo)
+    return anstataŭigis
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -202,22 +236,26 @@ fun EsperantoRadioApp(
         }
 
         fun push(vojo: Vojo) {
-            // Evitu duplikatan ŝlosilon supre de la stako — ekz. klako sur la
-            // mini-ludilbreto dum la elsendo jam estas malfermita ne puŝu duan kopion
-            if (backStack.lastOrNull() == vojo) {
+            // Evitu duplikatan celon supre de la stako — ekz. klako sur la
+            // mini-ludilbreto dum la elsendo jam estas malfermita ne puŝu duan viziton
+            if (estasSamaCelo(backStack.lastOrNull(), vojo)) {
                 logi("Nav", "→ push preterlasita (jam supre): $vojo")
                 return
             }
             val antaŭa = nunaVojo?.let { it::class.simpleName } ?: "nenio"
             logi("Nav", "→ push: $vojo")
             if (raportadoAktiva) Sentry.addBreadcrumb(Breadcrumb.navigation(antaŭa, vojo::class.simpleName ?: "?"))
-            backStack.add(vojo)
+            // Forigu eventualan malnovan vojon de la sama celo el la tuta stako (vidu puŝuVojon):
+            // la sama detalo ne aperu dufoje en la stako
+            if (puŝuVojon(backStack, vojo)) {
+                logi("Nav", "→ anstataŭigis malnovan vojon de la sama celo (${vojo::class.simpleName})")
+            }
         }
 
         LaunchedEffect(atendantaElsendo) {
             atendantaElsendo?.let {
                 logi("Nav", "→ sciigo: malfermas elsendon ${it.id}")
-                push(Vojo.ElsendoDetalo(it))
+                push(Vojo.ElsendoDetalo(it.id, it.kanaloSlug))
                 dk.nordfalk.esperanto.data.repository.AtendantaElsendoNavigacio.setu(null)
             }
         }
@@ -295,11 +333,11 @@ fun EsperantoRadioApp(
                             HejmoEkrano(
                                 kanaloDeponejo = kanaloDeponejo,
                                 elsendoDeponejo = elsendoDeponejo,
-                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo.slug)) },
                                 onKanalaro = { switchTab(Vojo.Kanalaro) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
-                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo.id, elsendo.kanaloSlug)) },
                                 onLudi = { elsendo ->
                                     logi("Nav", "Hejmo: ludas elsendon ${elsendo.id}")
                                     scope.launch { ludvicoRegilo.ludiElsendon(elsendo) }
@@ -330,7 +368,7 @@ fun EsperantoRadioApp(
                         entry<Vojo.Kanalaro> {
                             KanalaroEkrano(
                                 viewModel = kanalaroViewModel,
-                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo.slug)) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
                                 onElŝutoj = { push(Vojo.Elŝutoj) },
@@ -355,7 +393,7 @@ fun EsperantoRadioApp(
                             PlejŝatatajEkrano(
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
                                 kanaloDeponejo = kanaloDeponejo,
-                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo.slug)) },
                                 ludvicoVico = ludvicoRegilo.vico,
                                 onLudvico = { push(Vojo.Ludvico) },
                                 tirkestStato = tirkestStato,
@@ -369,8 +407,8 @@ fun EsperantoRadioApp(
                                 onLudvico = { push(Vojo.Ludvico) },
                                 tirkestStato = tirkestStato,
                                 tirkestEnhavo = tirkestEnhavo,
-                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
-                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo.id, elsendo.kanaloSlug)) },
+                                onKanalo = { kanalo -> push(Vojo.KanaloDetalo(kanalo.slug)) },
                             )
                         }
                         entry<Vojo.Elŝutoj> {
@@ -391,14 +429,14 @@ fun EsperantoRadioApp(
                                         scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                                     }
                                 },
-                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo.id, elsendo.kanaloSlug)) },
                             )
                         }
                         entry<Vojo.Ludvico> {
                             LudvicoEkrano(
                                 ludvicoRegilo = ludvicoRegilo,
                                 onReen = { reen() },
-                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo.id, elsendo.kanaloSlug)) },
                             )
                         }
                         entry<Vojo.Alarmoj> {
@@ -423,8 +461,20 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.KanaloDetalo> { vojo ->
+                            // La vojo portas nur la slug (vidu Vojoj.kt): la Kanalo-objekton
+                            // prenu el la kanal-listo — ĝi estas tuj disponebla (la fluo estas
+                            // senborne semata el la konfiguro). Fine mankanta slug = kanalo
+                            // forigita el la konfiguro — tiam montru klarigon anstataŭ nenio.
+                            val kanalo = kanaloj.find { it.slug == vojo.slug }
+                            if (kanalo == null) {
+                                NetroveblasEkrano(
+                                    mesaĝo = "La kanalo ne plu ekzistas (ĝia slug: ${vojo.slug}).",
+                                    onReen = { reen() },
+                                )
+                                return@entry
+                            }
                             KanalEkranoKunSvipo(
-                                komencaKanalo = vojo.kanalo,
+                                komencaKanalo = kanalo,
                                 kanaloj = kanaloj,
                                 elsendoDeponejo = elsendoDeponejo,
                                 plejŝatatajDeponejo = plejŝatatajDeponejo,
@@ -432,9 +482,9 @@ fun EsperantoRadioApp(
                                 onReen = { reen() },
                                 onAgordoj = { push(Vojo.Agordoj) },
                                 onVidataKanalo = { sekvantaRegilo.vidisKanalon(it) },
-                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo)) },
+                                onElsendo = { elsendo -> push(Vojo.ElsendoDetalo(elsendo.id, elsendo.kanaloSlug)) },
                                 onLudi = { fonto ->
-                                    logi("Nav", "Ludas rekte: ${vojo.kanalo.slug}")
+                                    logi("Nav", "Ludas rekte: ${vojo.slug}")
                                     scope.launch { ludilo.fiksiFonton(fonto); ludilo.ludi() }
                                 },
                                 ludilo = ludilo,
@@ -443,28 +493,43 @@ fun EsperantoRadioApp(
                             )
                         }
                         entry<Vojo.ElsendoDetalo> { vojo ->
-                            // (FAROTA C11) La vojo povas porti MALDIKAN elsendon (el la
-                            // MediaMetadata.extras de la ludilo — sen priskriboj, por eviti
-                            // tro grandan binder-transakcion): reŝargu la plenan elsendon
-                            // el la deponejo, se ĝi estas kaŝita.
-                            var elsendo by remember(vojo.elsendo.id) { mutableStateOf(vojo.elsendo) }
-                            LaunchedEffect(vojo.elsendo.id) {
-                                elsendoDeponejo.getElsendo(vojo.elsendo.id)?.let { elsendo = it }
-                            }
-                            val kanalo = kanaloj.find { it.slug == elsendo.kanaloSlug }
-                            val elsendoj by elsendoDeponejo.observiElsendojn(elsendo.kanaloSlug).collectAsState()
-                            LaunchedEffect(kanalo?.slug) {
-                                if (kanalo != null && elsendoj.isEmpty()) {
-                                    elsendoDeponejo.ŝargiElsendojnPorKanal(kanalo)
+                            // La vojo portas nur la identigilojn (vidu Vojoj.kt): la plenan
+                            // elsendon prenu el la deponejo (LaunchedEffect sube iras tra
+                            // trovuElsendon — kutima ŝargo, unua forta refreŝigo) kaj la
+                            // fluo „observiElsendojn“ aŭtomate ĝisdatigas la vidon. Se ne
+                            // eblas trovi ĝin, montru klarigon — neniu eterna ŝarg-indikilo.
+                            val kanalo = kanaloj.find { it.slug == vojo.kanaloSlug }
+                            val elsendoj by elsendoDeponejo.observiElsendojn(vojo.kanaloSlug).collectAsState()
+                            val elsendo = elsendoj.firstOrNull { it.id == vojo.id }
+                            var netrovebla by remember(vojo.vizito) { mutableStateOf(false) }
+                            LaunchedEffect(vojo.vizito) {
+                                if (kanalo != null && elsendoDeponejo.trovuElsendon(kanalo, vojo.id) == null) {
+                                    netrovebla = true
                                 }
+                            }
+                            if (elsendo == null) {
+                                when {
+                                    kanalo == null -> NetroveblasEkrano(
+                                        mesaĝo = "La kanalo de tiu ĉi elsendo ne plu ekzistas (ĝia slug: ${vojo.kanaloSlug}).",
+                                        onReen = { reen() },
+                                    )
+                                    netrovebla -> NetroveblasEkrano(
+                                        mesaĝo = "La elsendo ne troviĝas en la kanalo — eble ĝi estis forigita aŭ vi estas eksterrete.",
+                                        onReen = { reen() },
+                                    )
+                                    else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                                return@entry
                             }
                             // La vidata elsendon raportas ElsendoEkranoKunSvipo mem
                             // (eniro kaj svipoj) al la sekvanta regilo
                             ElsendoEkranoKunSvipo(
-                                komencaElsendo = elsendo,
+                                komencaId = vojo.id,
                                 elsendoj = elsendoj,
                                 kanalo = kanalo,
-                                onKanalo = { k -> push(Vojo.KanaloDetalo(k)) },
+                                onKanalo = { k -> push(Vojo.KanaloDetalo(k.slug)) },
                                 onReen = { reen() },
                                 onVidataElsendo = { sekvantaRegilo.vidisElsendon(it) },
                                 onLudi = { e ->
@@ -584,11 +649,11 @@ fun EsperantoRadioApp(
                 // ĝia ekrano — tiam la klako ludas la enhavon (vidu onClick malsupre)
                 val sekvantaVojo: Vojo? = when {
                     k != null ->
-                        if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.kanalo.slug == k.slug) null
-                        else Vojo.KanaloDetalo(k)
+                        if (nunaVojo is Vojo.KanaloDetalo && nunaVojo.slug == k.slug) null
+                        else Vojo.KanaloDetalo(k.slug)
                     e != null ->
-                        if (nunaVojo is Vojo.ElsendoDetalo && nunaVojo.elsendo.id == e.id) null
-                        else Vojo.ElsendoDetalo(e)
+                        if (nunaVojo is Vojo.ElsendoDetalo && nunaVojo.id == e.id) null
+                        else Vojo.ElsendoDetalo(e.id, e.kanaloSlug)
                     else -> null
                 }
 
@@ -607,9 +672,9 @@ fun EsperantoRadioApp(
                     onClick = {
                         val fonto = ludantoStato.nunaFonto
                         when (fonto) {
-                            is Sonfonto.ElsendoFonto -> push(Vojo.ElsendoDetalo(fonto.elsendo))
-                            is Sonfonto.LokaElsendo -> push(Vojo.ElsendoDetalo(fonto.elsendo))
-                            is Sonfonto.RektaKanalo -> push(Vojo.KanaloDetalo(fonto.kanalo))
+                            is Sonfonto.ElsendoFonto -> push(Vojo.ElsendoDetalo(fonto.elsendo.id, fonto.elsendo.kanaloSlug))
+                            is Sonfonto.LokaElsendo -> push(Vojo.ElsendoDetalo(fonto.elsendo.id, fonto.elsendo.kanaloSlug))
+                            is Sonfonto.RektaKanalo -> push(Vojo.KanaloDetalo(fonto.kanalo.slug))
                             // Nenio ludas: navigu al la sekvanta enhavo; se oni jam
                             // estas sur ĝia ekrano (ekz. klako sur la breto sur la
                             // kanala ekrano), ludu ĝin kiel la lud-butono de la ekrano
@@ -756,6 +821,26 @@ fun EsperantoRadioApp(
                     }) { Text("Ne, dankon") }
                 },
             )
+        }
+    }
+}
+
+/**
+ * Fina stato de detala eniro kiam la enhavo NE povas aperi: kanalo aŭ elsendo
+ * ne plu ekzistas (forigita el la konfiguro / la fluo) resp. la elsendo ne
+ * troviĝas eĉ post forta refreŝigo (forigita / eksterrete). Anstataŭ eterna
+ * ŝarg-indikilo la uzanto ricevas klarigon kaj elirejon.
+ */
+@Composable
+fun NetroveblasEkrano(
+    mesaĝo: String,
+    onReen: () -> Unit,
+) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // ne troveblas: malklara fino de la ŝargado — klarigo + elirejo
+            Text(mesaĝo, Modifier.padding(32.dp), textAlign = TextAlign.Center)
+            OutlinedButton(onClick = onReen) { Text("Reen") }
         }
     }
 }

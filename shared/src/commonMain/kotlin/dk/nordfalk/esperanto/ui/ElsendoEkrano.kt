@@ -458,7 +458,8 @@ internal fun supraBildoUrl(elsendo: Elsendo, kanalo: Kanalo?): String? {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ElsendoEkranoKunSvipo(
-    komencaElsendo: Elsendo,
+    /** La malfermita elsendo — identigita nur per sia id (la paĝo serĉata en [elsendoj]). */
+    komencaId: String,
     elsendoj: List<Elsendo>,
     onReen: () -> Unit,
     /**
@@ -485,8 +486,10 @@ fun ElsendoEkranoKunSvipo(
     onLudvico: () -> Unit = {},
 ) {
     if (elsendoj.size <= 1) {
-        // Ne eblas svipi — montru nur la unuan elsendon
-        val e = elsendoj.firstOrNull() ?: komencaElsendo
+        // Ne eblas svipi — montru nur la unuan elsendon (la malplena listo ne
+        // povas okazi ĉe la vera eniro: ĝi ne vokas la paĝilon antaŭ ol la
+        // elsendo aperis en la fluo)
+        val e = elsendoj.firstOrNull() ?: return
         ElsendoEkrano(
             elsendo = e,
             onReen = onReen,
@@ -511,8 +514,14 @@ fun ElsendoEkranoKunSvipo(
         return
     }
 
-    val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaElsendo.id }.let { if (it < 0) 0 else it }
+    val komencaPaĝo = elsendoj.indexOfFirst { it.id == komencaId }.let { if (it < 0) 0 else it }
     val paĝoStato = rememberPagerState(initialPage = komencaPaĝo) { elsendoj.size }
+
+    // Neniu paĝo-korekto necesas: la nav3-ŝlosilo de eniro (Vojo.ElsendoDetalo)
+    // portas vizito-kodon unikan po malfermo, do nova vizito komenciĝas freŝe ĉe
+    // komencaPaĝo, dum rotacio/rekreado restaŭras la staton de ĝuste tiu vizito —
+    // la legita svipo-paĝo pluvivas; antaŭa vizito ne povas heredigi sian paĝon
+    // (2026-11-24: klako sur la 1-a elsendo malfermis la 3-an).
 
     // Sekvu svipojn: la vidata elsendo ŝanĝiĝas kiam paĝo ekvidiĝas (settledPage)
     LaunchedEffect(paĝoStato.settledPage, elsendoj) {

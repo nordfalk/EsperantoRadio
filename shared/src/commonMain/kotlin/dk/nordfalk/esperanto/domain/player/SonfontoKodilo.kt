@@ -16,8 +16,8 @@ import kotlinx.serialization.json.Json
  * la pezajn kampojn de la enmetita [Elsendo] — `priskribo` kaj `priskriboHtml`
  * (riĉaj HTML-priskriboj kun enkorpigitaj `<audio>` povas esti dekoj da KB).
  * Ĉiu konsumanto de la malkodita fonto uzas nur id/kanaloSlug/titolo/kanaloNomo/
- * dato/fluo/bildoUrl; la detala ekrano reŝargas la plenan elsendon per
- * `ElsendoDeponejo.getElsendo(id)`.
+ * dato/fluo/bildoUrl; la detala ekrano (Vojo.ElsendoDetalo portas nur id+kanaloSlug)
+ * reŝargas la plenan elsendon el `ElsendoDeponejo`.
  */
 object SonfontoKodilo {
     /** Ŝlosilo en `MediaMetadata.extras`. */

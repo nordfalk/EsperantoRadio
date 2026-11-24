@@ -68,9 +68,11 @@ ekranfoto.svg
 __pycache__/
 
 # Servilaj datumoj vivas en la KANONA arbo (/home/j/Code/EsperantoRadio/server/data,
-# vidu .vibe/skills/servilo-arkivo); ĉi tie staras nur simbola ligilo. La prezentpaĝo
-# (publika/index.html, icon.png) ne plu git-versiadas — redaktu rekte en la kanona
-# arbo; ĝi publikiĝas per la kutima rsync.
+# vidu .vibe/skills/servilo-arkivo). La laborkopio havas SUB-LIGILAN privatan/publikan
+# ligilaron: server/data/ estas VERAdirektorio kun nur du ligiloj (privata, publika →
+# kanonaj) — tiele akcidentaj skriboj en server/data/ restas LOKALAJ kaj ne poluas la
+# dividatan arbon. La prezentpaĝo (publika/index.html, icon.png) ne plu git-versiadas —
+# redaktu rekte en la kanona arbo; ĝi publikiĝas per la kutima rsync.
 server/data
 iloj/vortaro/
 

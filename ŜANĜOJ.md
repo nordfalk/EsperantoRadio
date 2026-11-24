@@ -7,6 +7,42 @@
 
 # Ŝanĝoj — 2026-11-24
 
+## Reproduktebla konstruo: fiksu rootProject.name (PR: https://github.com/nordfalk/EsperantoRadio/pull/203)
+
+- **Simptomo**: la `fdroid build`-tasko de la MR !55129 fiaskis per
+  „compared built binary to supplied reference binary but failed“ —
+  `classes.dex` kaj `assets/dexopt/baseline.prof` diferencis inter nia
+  eldona APK kaj la rekonstruo de F-Droid el la sama commit (`05c474b`,
+  etikedo `v3.2.0`).
+- **Diagnoza ĉeno** (bitnivelaj eksperimentoj, puraj worktree-aj
+  rekonstruoj ĉe la etikedo):
+  1. Eĉ nia propra pura rekonstruo en alia dosierujo diferencis de la
+     eldona APK — la konstruo do ne estis reproduktebla, ne temis pri
+     la F-Droid-medio.
+  2. La tuta diferenco de la dekso estis la ĉeno `r8-map-id-<64 hekso>`
+     (+ deksa kapo: kontrolsumo kaj SHA-1-subskribo). `baseline.prof`
+     diferencas nur ĉar ĝi entenas la dekso-kontrolsumon.
+  3. `r8-map-id` = haketaĵo de la enhavo de `mapping.txt` (`pg_map_id` /
+     `pg_map_hash` en ĝia kapo) — kaj la mapa enhavo entenas la nomojn de
+     la sintezaj aliriloj de Kotlin-inline-funkcioj
+     (`…getLambda$…$<vojo>_shared_release()`), kiuj devenas de
+     `rootProject.name`.
+  4. `settings.gradle.kts` ne fiksas `rootProject.name` → Gradle prenas
+     la dosierujan nomon: `EsperantoRadio` (nia eldono), `rb-test`/`rb-test2`
+     (provejoj), `dk.nordfalk.esperanto.radio` (la F-Droid-servilo) — tri
+     nomoj, tri `pg_map_id`, tri malkongruaj deksoj.
+- **Riparo**: unu linio en `settings.gradle.kts`:
+  `rootProject.name = "EsperantoRadio"` (komentita). Pruvita: kun la fiksa
+  nomo, konstruo en tute alia dosierujo produktas dekson **bit-identan** al
+  la eldona APK (map-id `fb85ca43…` en ambaŭ; `diff -r` montras neniun
+  diferon ekster la subskribaj/versi-administraj dosieroj).
+- **Konsekvenco por F-Droid**: la yml-`commit` devas esti komito, kiu
+  ENHAVAS tiun ĉi riparon. La GitHub-eldona APK-averto devas esti
+  rekonstruita el ĝuste tiu komito (la `META-INF/version-control-info.textproto`
+  en la APK enhavas la git-revizion — konstruo el alia komito neatendite
+  malsamigus ĝin). Estontaj eldonoj: la averto devas ĉiam deveni el la
+  sama komito kiel la yml-`commit`-kampo (vidu la `eldonado`-skill-on).
+
 ## Ripetaj enkondukoj: reviziitaj transsaltaj valoroj el 30-specimena detekto (PR: https://github.com/nordfalk/EsperantoRadio/pull/202)
 
 - **Kial revizio**: la kontrolo de la 30 plej novaj elsendoj de ĉiuj kanaloj

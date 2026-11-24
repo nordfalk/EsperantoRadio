@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +61,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.Clock
@@ -194,6 +195,15 @@ class HejmoViewModel(
 
     private val _novajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val novajElsendoj = _novajElsendoj.asStateFlow()
+
+    /**
+     * Kreskas po ĉiu rekomputo de "Kio novas" kiu aldonas almenaŭ unu ID ne antaŭe
+     * viditan en la listo. Nura FORLASO de kartoj (iĝis ludita, passis la aĝo-limon,
+     * per-kanala take(5)) ne kalkuliĝas. La hejmo rulumas al la unua karto kiam
+     * tiu ĉi kalkulo kreskas (vidu HejmoEkrano).
+     */
+    private val _novajAldonojKalkulo = MutableStateFlow(0)
+    val novajAldonojKalkulo = _novajAldonojKalkulo.asStateFlow()
 
     private val _popularajElsendoj = MutableStateFlow<List<Elsendo>>(emptyList())
     val popularajElsendoj = _popularajElsendoj.asStateFlow()
@@ -336,6 +346,10 @@ class HejmoViewModel(
             .flatMap { (_, grupo) -> grupo.sortedByDescending { it.dato }.take(5) }
             .sortedByDescending { it.dato }
             .take(50)
+        // Aldono-detekto — kreskas la kalkulo nur se eniĝas ID ne antaŭe vidita;
+        // forlaso de la antaŭa unua karto (ekz. per-kanala take(5)) ne malhelpas tion
+        val antaŭajNovajIdj = _novajElsendoj.value.mapTo(HashSet()) { it.id }
+        if (novaj.any { it.id !in antaŭajNovajIdj }) _novajAldonojKalkulo.value++
         _novajElsendoj.value = novaj
 
         // "Lastatempe ludata" — elsendoj kiuj estis luditaj, ordigitaj laŭ lasteLudita
@@ -442,21 +456,14 @@ fun HejmoEkrano(
         vm.aktualigiuLudatajn(nunaElsendoId)
     }
 
-    // "Kio novas": kiam eniĝas nova, pli freŝa elsendo (nova unua karto), rulu la
-    // vicon trankvile al ĝi. Ŝlosilo estas nur la unua ID (ne la tuta listo), por ke
-    // progresivaj list-ĝisdatigoj (plenigu) ne nuligu ruladon meze de la animacio;
-    // rememberSaveable kongruas kun la restarigo de la rulpozicio. Vera ALDONO
-    // (la antaŭa unua karto daŭre estas en la listo) ekigas la ruladon — se ĝi nur
-    // FORLASIS la liston (ekz. iĝis ludita), la rulpozicio restas.
+    // "Kio novas": kiam eniĝas novaj elsendoj (la VM kalkulas la aldonojn — la
+    // listo ŝanĝiĝas ankaŭ pro forlasoj, ekz. luditaj elsendoj aŭ la per-kanala
+    // limo), rulu la vicon trankvile al la unua karto. drop(1) preterlasas la
+    // kalkulon jam faritan antaŭ la komponado — restarigo de la ekrano konservas
+    // la rulpozicion de la vico (rememorigita LazyListState).
     val kioNovasVicoStato = rememberLazyListState()
-    val unuaNovaId = novajElsendoj.firstOrNull()?.id
-    var antaŭaUnuaNovaId by rememberSaveable { mutableStateOf<String?>(null) }
-    LaunchedEffect(unuaNovaId) {
-        if (unuaNovaId != null && unuaNovaId != antaŭaUnuaNovaId) {
-            val estasAldono = antaŭaUnuaNovaId != null && novajElsendoj.any { it.id == antaŭaUnuaNovaId }
-            antaŭaUnuaNovaId = unuaNovaId
-            if (estasAldono) kioNovasVicoStato.animateScrollToItem(0)
-        }
+    LaunchedEffect(Unit) {
+        vm.novajAldonojKalkulo.drop(1).collect { kioNovasVicoStato.animateScrollToItem(0) }
     }
 
     // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin

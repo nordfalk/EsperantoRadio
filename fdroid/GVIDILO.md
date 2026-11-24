@@ -31,7 +31,7 @@ F-Droid estas VENDUMILA ŜANĜO rilate al Google Play:
 | Permesilo GPL-3.0-or-later | ✅ `LICENSE` en la radiko |
 | Neniuj malliberaj dependejoj / binaroj en la deponejo | ✅ |
 | Sentry-erar-raportado **opt-in** en F-Droid-konstruoj | ✅ (PR #148 — sen tio ili atribuus la kontraŭecon "Tracking") |
-| **GitLab-konto** | ❌ vi devas krei ĝin (paso 2) |
+| **GitLab-konto** | ✅ jam ekzistas (`nordfalk`, 2026-11-23) — vidu la noton «Jam farita» en 3.1 |
 
 **Antaŭ ol daŭrigi**: la metadateno devas esti sur `master`. La paŝoj 1–2 kaj
 la fork/MR (!55129) estas jam faritaj (2026-10-31/2026-11-23); por ĉiu nova
@@ -116,6 +116,13 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
   listings/en-US/`). Ankaŭ `Name:` kaj `Description:` estas malpermesataj
   en fdroiddata (peto de la reviziantoj, 2026-11-23) — la ap-nomo venas de
   `AutoName`, la priskribo el la Triple-T-strukturo.
+- **La lingvo de la tekstoj**: ni tenas ilin konscie en Esperanto —
+  recenzo-temo 2026-11-24 („en-US description isn't in english"): la apo
+  mem estas tute en Esperanto kaj celas esperantistojn; fdroiddata legas
+  la TEKSTON el nia `en-US`-listing (F-Droid ne postulas ke la enhavo estu
+  la angla), kaj `full-description.txt` jam entenas la plenan anglan
+  tradukon sube (post `--- ENGLISH ---`). Respondo en la MR-fadeno: intenca
+  elekto, neniuj aliaj lingvoj planataj.
 - `Binaries:` — URL-ŝablono al niaj GitHub-eldonaj APK-oj
   (`v%v` anstataŭiĝas per `v3.2.0` ktp.; postulita de la reviziantoj,
   2026-11-23). Konsekvenco por la eldona procezo: **ĉiu eldono devas alŝuti
@@ -144,12 +151,11 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
 1. En via fork iru al **Build → Pipelines**
    (aŭ "CI/CD → Pipelines" en la malnova fasado).
 2. Atendu la pipeline (typical 10–40 minutoj — ĝi vere provas konstrui la apon).
-3. **Verda (passed)** → daŭrigu ĉe 3.4. La ses taskoj (schema validation,
-   fdroid lint, fdroid rewritemeta, tools check scripts, checkupdates,
-   fdroid build) estis ĉiuj reproduktitaj VERDAJ loke per la samaj iloj
-   (fdroidserver + check-jsonschema + la tools/-skriptoj de fdroiddata,
-   2026-10-31) — se tamen io ruĝiĝas, aldonu la taskan eligilon al la
-   sekva laborsesio kun mi.
+3. **Verda (passed)** → daŭrigu ĉe 3.4. La naŭ taskoj (fdroid build +
+   check apk, check source code, checkupdates, fdroid lint, fdroid
+   rewritemeta, git redirect, schema validation, tools check scripts;
+   tute verda pipo: 2026-11-24, !55129) — se tamen io ruĝiĝas, aldonu la
+   taskan eligilon al la sekva laborsesio kun mi.
    **Ruĝa (failed)** → malfermu la malsukcesan taskon, legu la eraron kaj
    aldonu la eligilon al la sekva laborsesio kun mi — la plej oftaj kaŭzoj
    estas YAML-tajperaro aŭ retaj eraretoj; ni riparos la metadatenon kaj vi

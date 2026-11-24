@@ -79,7 +79,25 @@
     numero), subskribita APK en GitHub-releases, ĝisdatigita yml
     (+ `AllowedAPKSigningKeys`/`Binaries`), respondo en la MR-fadeno.
     Detaloj: docs/nova/07_eldonado.md -> „Reprodukteblaj konstruoj (RB)".
-- **Restas poste**: (1) post mergo de !55129 — 1–3 tagoj ĝis la paĝo
+- **Stato (2026-11-24)**: la „RESTAS"-listo de 2026-11-22 estas plenumita kaj
+  **la pipo de !55129 estas TUTE VERDA** — ĉiuj 9 taskoj, inkl. `fdroid build`,
+  kiu konstruas el nia fonto kaj bit-egale konfirmas kontraŭ la GitHub-averto
+  (https://gitlab.com/nordfalk/fdroiddata/-/pipelines/3106165849). Necesis tri
+  riparoj (lecionoj en `fdroid/GVIDILO.md` § 3.2/7/8 kaj la `eldonado`-skill-o):
+  - **reproducebleco** (PR #203): sen fiksa `rootProject.name` la
+    dosieruja nomo fluas en `r8-map-id` en la dekso — `fdroid build` fiaskis
+    per „compared built binary to supplied reference binary but failed";
+  - **kanona yml-formo**: `Binaries` devas esti flankigita (daŭrig-linio),
+    `AllowedAPKSigningKeys` restas unulini (la CI-master malsamas de la
+    malnova loka fdroidserver 2.4.2, kiu flankigus ambaŭ); nur la lasta
+    konstruo restas en `Builds` (peto de la revizianto);
+  - **averto-invarianto**: la GitHub-averto de `v3.2.0` estas rekonstruita
+    el ĝuste la yml-`commit` (`f9124b3` = la RB-riparo), ĉar la APK entenas
+    la git-revizion en `version-control-info.textproto`.
+  Ambaŭ recenz-komentoj estas responditaj (RB-peto; „en-US description isn't
+  in english" — la priskribo restas Esperanto-unue kun plena angla traduko
+  sube en `full-description.txt`, intenca por esperantista celpubliko).
+- **Restas poste**: (1) F-Droid-kunfando de !55129 — poste 1–3 tagoj ĝis la paĝo
   https://f-droid.org/en/packages/dk.nordfalk.esperanto.radio/ ekvivos, tiam
   „Get it on F-Droid"-emblemo al la README (GVIDILO § 6); (2) Aptoide
   Connect-konto + posedo-pruvo + alŝuto de la subskribita APK; (3) PR #144

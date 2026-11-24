@@ -425,6 +425,10 @@ fun HejmoEkrano(
     onKaŝuHejmajnAvertojn: () -> Unit = {},
     diagnozoProblemoj: StateFlow<List<DiagnozoRezulto>> = MutableStateFlow(emptyList()),
     kaŝitajAvertoj: StateFlow<Set<DiagnozoTipo>> = MutableStateFlow(emptySet()),
+    /** Havebla ĝisdatigo el la konfiguro (`aktualaVersio`) aŭ `null` (C61a). */
+    novaVersio: StateFlow<String?> = MutableStateFlow(null),
+    /** Klako sur la ĝisdatigo-karto — malfermas la dialogon kun la apaj novaĵoj. */
+    onNovaVersio: () -> Unit = {},
     onElŝuti: (Elsendo) -> Unit = {},
     onAldoniAlVico: (Elsendo) -> Unit = {},
     ludatojDeponejo: LudatojDeponejo? = null,
@@ -447,6 +451,7 @@ fun HejmoEkrano(
     val problemoj by diagnozoProblemoj.collectAsState()
     val kaŝitaj by kaŝitajAvertoj.collectAsState()
     val neKaŝitajProblemoj = problemoj.filter { it.tipo !in kaŝitaj }
+    val ĝisdatigoVersio by novaVersio.collectAsState()
 
     val ludatojMapo by (ludatojDeponejo?.observiLudatojn()?.collectAsState() ?: remember { mutableStateOf(emptyMap()) })
 
@@ -594,6 +599,14 @@ fun HejmoEkrano(
                                 }
                             },
                         )
+                    }
+                }
+
+                // Ĝisdatigo-indikilo — la konfiguro portas version pli novan ol la instalita apo (C61a)
+                val versio = ĝisdatigoVersio
+                if (versio != null) {
+                    item {
+                        VersioĜisdatigoKarto(novaVersio = versio, onMalfermu = onNovaVersio)
                     }
                 }
 
@@ -1035,6 +1048,55 @@ private fun DiagnozoAvertoKarto(
         }
     }
 }
+
+/**
+ * Karto pri havebla ĝisdatigo — montrata supre de la ĉefekrano same kiel la
+ * diagnoza averto, kiam la konfiguro portas version pli novan ol la instalita
+ * apo (`aktualaVersio`, C61a). Klako malfermas la dialogon kun la apaj
+ * novaĵoj kaj la ĝisdatig-butono (nur Android).
+ */
+@Composable
+private fun VersioĜisdatigoKarto(
+    novaVersio: String,
+    onMalfermu: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { logi("Klako", "versio-karto (Hejmo) → apaj novaĵoj"); onMalfermu() },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                Icons.Filled.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "Nova versio $novaVersio havebla",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+                Text(
+                    "Tuŝu por legi la novaĵojn kaj ĝisdatigi",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalTime::class)
 @Preview(name = "HejmoEkrano", showBackground = true, heightDp = 600)

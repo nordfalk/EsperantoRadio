@@ -5,6 +5,8 @@ import java.net.URI
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 
+actual val platformo: Platformo = Platformo.DESKTOPO
+
 actual fun malfermuLigon(url: String) {
     logi("Ligilo", "Malfermas: $url")
     try {

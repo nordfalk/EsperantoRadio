@@ -3,6 +3,8 @@ package dk.nordfalk.esperanto.ui
 import dk.nordfalk.esperanto.logi
 import dk.nordfalk.esperanto.logw
 
+actual val platformo: Platformo = Platformo.RETUMILO
+
 /** JavaScript `encodeURIComponent` — en Kotlin/Wasm `js(...)` devas esti la tuta korpo de supra-nivela funkcio. */
 private fun kodiguUriKomponanton(teksto: String): String = js("encodeURIComponent(teksto)")
 

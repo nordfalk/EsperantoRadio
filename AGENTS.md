@@ -183,7 +183,10 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (2026-10-25, regulo de la uzanto).
 - **Neniam enmetu kodo-pecojn (backtick-ojn) en komandojn kun duoblaj citiloj** —
   precipe `gh pr create --body "..."`: bash plenumas ilin kiel komand-anstataŭigon
-  (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj). Uzu `--body-file`.
+  (2026-10-08, PR #80: akcidentaj git-tag/push/gradle-plenumoj; ripetiĝis 2026-11-24,
+  PR #207: la PR-korpo mangliĝis). Ankaŭ REST-vokoj (`gh api -f body="..."`) havas la
+  saman minacon. Liveru la korpon ĉiam el dosiero: `--body-file` aŭ `-f body="$(cat dosiero)"`
+  (la dosier-enhavo ne reanaliziĝas).
 - **Post mergo de master, reviziu la novajn invariantojn** en la kunfanditaj
   dosieroj — nova metodo povas malobservi novaĵon de master (2026-10-11: `markiLudita`
   skribis sen la intertempe postulita `mutex.withLock`).
@@ -358,6 +361,8 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 - **Kaŝu jam-parsitajn datumojn kiel JSON, ne nur krudan tekston (2026-11-21):** la diska kaŝo havas nun `<slug>.rss` (kruda, rezervo) kaj `<slug>.json` (parsitaj `Elsendo`, @Serializable) — la starto malkodas la JSON unue (~10× pli rapide ol Ksoup-reparsado: peranto 250 eroj = 714 ms parse vs 69 ms decode). Legado de la kaŝo okazas paralele sur `Dispatchers.Default` kaj liveras rezultojn progresive (`leguĈiujnKaŝitajnElsendojn(poKanalRicevita=…)`), por ke Hejmo montru enhavon tuj.
 - **Antaŭ commit komparu la staging-diff kun la commit-mesaĝo:** la posedanto povas intertempe forigi aferojn el la dosiero.
 - **wasmJs-webapo: material3 devas resti parigita kun CMP (2026-11-22):** `compose-material3 = "1.13.0-alpha01"` (PR #118) kun `compose-multiplatform = "1.12.2"` produktas skiko-malkongruon (0.150.1 vs 0.152.0-alpha02) — la apo kompiliĝas, sed en la retumilo mortas per `LinkError: WebAssembly.instantiate(): Import … "./skiko.mjs" … requires a callable`. Reiro al `1.12.0-alpha03` funkciigas la web-appon. Lanĉo: `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (sen -Xmx4g la ligilo mortas per OutOfMemoryError; laŭbezone unue `./gradlew kotlinWasmUpgradeYarnLock`).
+
+- **nav3-vojoj estas VALOR-bazitaj ŝlosiloj — ŝlosil-egalo signifas komunan vizito-ŝtaton (2026-11-24):** nav3 ŝargas kaj konservas la staton de eniro per `contentKey = "$key:${key::class}"` (la TUTA voja valoro, datumklasa toString). Du egalaj vojoj do dividas staton — klako sur la 1-a elsendo malfermis la 3-an (heredita svipo-paĝo de pli frua vizito). Solvo: `Vojo.ElsendoDetalo(id, kanaloSlug, vizito)` — `vizito` estas hazarda kodo unika po malfermo, do ĉiu vizito havas propran contentKey: remalfermo komenciĝas freŝe ĉe la klakita elsendo, rotacio/rekreado restaŭras la staton de ĝuste tiu vizito (la legita pozicio pluvivas). NE reenkonduku paĝ-korektojn en `ElsendoEkranoKunSvipo` — ili rompas la rotacian pozicion kaj ne estas necesaj. La cel-identecon por la navigado komparas nur la identigilojn (`id`+`kanaloSlug` ĉe ElsendoDetalo, `slug` ĉe KanaloDetalo) per `estasSamaCelo` (App.kt); uzu `puŝuVojon`, ne `backStack.add`. Fine, neniu detal-eniro restas ĉe ŝarg-indikilo eterne: mankanta kanalo aŭ elsendo montras `NetroveblasEkrano` (kanalo: tuj; elsendo: post la ŝarg-kaskado `ElsendoDeponejoImpl.trovuElsendon` = kaŝo → kutima ŝargo → unu forta refreŝigo). Same `KanaloDetalo(slug, vizito)` portas nur la identigilon.
 
 ## Terminaro — kanonaj terminoj
 

@@ -199,6 +199,25 @@ class KanalAgordoLegantoTest {
     }
 
     @Test
+    fun legasAktualanVersion() {
+        val jsonc = """
+            {
+                "android": {
+                    "aktualaVersio": "3.2.0"
+                },
+                "kanaloj": []
+            }
+        """.trimIndent()
+
+        val agordo = leganto.legu(jsonc)
+
+        assertNotNull(agordo.android)
+        assertEquals("3.2.0", agordo.android!!.aktualaVersio)
+        // Mankanta ŝlosilo → null (agord-kompatibileco de pli malnovaj fluoj)
+        assertNull(KanalAgordoLeganto().legu("""{"android":{}, "kanaloj":[]}""").android!!.aktualaVersio)
+    }
+
+    @Test
     fun legasKomencaKanalon() {
         val jsonc = """
             {

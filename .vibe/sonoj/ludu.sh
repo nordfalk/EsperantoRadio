@@ -7,14 +7,22 @@
 #   ludu.sh demando   kiam la agento demandas vin
 #   ludu.sh fino      kiam la vico finiĝas
 
-grep -q '"parent_session_id": *"' && exit 0  # subagentoj
+# kiam la aviz-sono de `.vibe/sonoj/ludu.sh` ne aŭdiĝas post pasivigo de la komputilo, sufiĉas restartigi la uzant-nivelan sonservon:
+# systemctl --user restart pipewire wireplumber pipewire-pulse
+
+# Subagentoj: legu stdin nur se ĝi ne estas terminalo — mane vokite la skripto
+# alie blokus je grep, kiu atendas EOF de la klavaro.
+if [ ! -t 0 ]; then
+  grep -q '"parent_session_id": *"' && exit 0  # subagentoj
+fi
 
 cd "$(dirname "$0")"
 
 case "$(git rev-parse --show-toplevel)" in
   "/home/j/Code/EsperantoRadio")  sono=unu.wav ;;
   "/home/j/Code/EsperantoRadio2") sono=du.wav ;;
-  "/home/j/Code/mobile-app4")     sono=tri.wav ;;
+  "/home/j/Code/EsperantoRadio3") sono=tri.wav ;;
+  "/home/j/Code/mobile-app4")     sono=kvar.wav ;;
   *) exit 0 ;;
 esac
 

@@ -513,6 +513,8 @@ class HejmoEkranoTest {
     /**
      * Kiam venas nova elsendo en "Kio novas", la vico aŭtomate ruliĝas trankvile
      * al la unua (plej nova) karto — eĉ se la uzanto antaŭe rulis la vicon dekstren.
+     * Kiam la unua karto tamen nur FORLASAS la liston (ekz. ĝi iĝas ludita), la
+     * rulpozicio devas resti — tion devas ekigi nur vera aldono.
      *
      * 10 elsendoj po-kanale (maks 5 po kanalo en "Kio novas") certigas ke la vico
      * necesas horizontalan ruladon ankaŭ en la plata testfenestro.
@@ -577,6 +579,21 @@ class HejmoEkranoTest {
         val kioNovasKopioIndekso = kp0Nodoj.fetchSemanticsNodes().indices.maxBy { kp0Nodoj.fetchSemanticsNodes()[it].positionInRoot.y }
         kp0Nodoj.get(kioNovasKopioIndekso).assertIsDisplayed()
         onAllNodesWithText("Varsovia Vento epizodo 1").assertCountEquals(2)
+
+        // Kontraŭokazo: la nuna unua karto (kp:0) FORLASAS la liston (ekz. ĝi iĝas
+        // ludita) — tio ne estas nova elsendo, do la rulpozicio devas resti.
+        // Denove svingu la vicon dekstren, poste forigu kp:0 per re-plenigo de la baza listo
+        repeat(3) {
+            onRoot().performTouchInput { swipe(Offset(width * 0.8f, y), Offset(width * 0.2f, y)) }
+            waitForIdle()
+        }
+        assertEquals(1, onAllNodesWithText("Kernpunkto epizodo 0").fetchSemanticsNodes().size, "La svingo devas forruli la unuan karton el \"Kio novas\" (restas la \"Kanaloj\"-kopio)")
+        vm.plenigu(testKanaloj, bazaElsendoj)
+        waitUntil(timeoutMillis = 5_000) { onAllNodesWithText("Kernpunkto epizodo 0").fetchSemanticsNodes().isEmpty() }
+        waitForIdle()
+        // La sekvanto (vv:1) iĝis la unua karto sen aldono — ĝia "Kio novas"-kopio
+        // ne revenu en la vidkampon, do nur la "Kanaloj"-kopio estas komponita
+        assertEquals(1, onAllNodesWithText("Varsovia Vento epizodo 1").fetchSemanticsNodes().size, "Forlaso de la unua karto ne devas rulumi la \"Kio novas\"-vicen")
     }
 
     /**

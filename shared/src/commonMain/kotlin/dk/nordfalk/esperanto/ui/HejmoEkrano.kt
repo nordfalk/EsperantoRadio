@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -441,15 +442,20 @@ fun HejmoEkrano(
         vm.aktualigiuLudatajn(nunaElsendoId)
     }
 
-    // "Kio novas": kiam venas novaj elsendoj (nova unua karto maldekstre),
-    // rulu la vicon trankvile al la unua (plej nova) karto
+    // "Kio novas": kiam eniĝas nova, pli freŝa elsendo (nova unua karto), rulu la
+    // vicon trankvile al ĝi. Ŝlosilo estas nur la unua ID (ne la tuta listo), por ke
+    // progresivaj list-ĝisdatigoj (plenigu) ne nuligu ruladon meze de la animacio;
+    // rememberSaveable kongruas kun la restarigo de la rulpozicio. Vera ALDONO
+    // (la antaŭa unua karto daŭre estas en la listo) ekigas la ruladon — se ĝi nur
+    // FORLASIS la liston (ekz. iĝis ludita), la rulpozicio restas.
     val kioNovasVicoStato = rememberLazyListState()
-    var antaŭaUnuaNovaId by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(novajElsendoj) {
-        val unuaId = novajElsendoj.firstOrNull()?.id
-        if (unuaId != null && unuaId != antaŭaUnuaNovaId) {
-            antaŭaUnuaNovaId = unuaId
-            kioNovasVicoStato.animateScrollToItem(0)
+    val unuaNovaId = novajElsendoj.firstOrNull()?.id
+    var antaŭaUnuaNovaId by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(unuaNovaId) {
+        if (unuaNovaId != null && unuaNovaId != antaŭaUnuaNovaId) {
+            val estasAldono = antaŭaUnuaNovaId != null && novajElsendoj.any { it.id == antaŭaUnuaNovaId }
+            antaŭaUnuaNovaId = unuaNovaId
+            if (estasAldono) kioNovasVicoStato.animateScrollToItem(0)
         }
     }
 

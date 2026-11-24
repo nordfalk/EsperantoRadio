@@ -99,7 +99,7 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
 - ~~`scanignore: build.gradle.kts`~~ — **FORIGITA (2026-11-24)**: la iam
   necesa flank-ignoro (la malnova apo deklaris `https://jcenter.bintray.com`,
   kiun la F-Droid-skanilo rifuzas) perdis validecon post la jcenter-forigo
-  el la konstrukradikoj; la skanilo tiam raportas
+  el la konstrudosieroj; la skanilo tiam raportas
   **„Unused scanignore path: build.gradle.kts“ — eraro, kiu fiaskigas
   `fdroid build`**. Regulo: kiam `scanignore` ne plu respondas al reala
   trovo, forigu ĝin el la yml.
@@ -319,7 +319,7 @@ kaŭzoj kaj kialoj staras ĉe la koncernaj kampoj supre):
 - „Unused file at …/.gitkeep" → forigu la `.gitkeep`-ojn (neniam kreu
   malplenajn dosierujojn per ili)
 - „Found unknown maven repo 'https://jcenter.bintray.com'“ → forigu la
-  deponejo-deklaron MEM el la konkernata konstrukradiko (flank-igo
+  deponejo-deklaron MEM el la konkernata konstrudosiero (flank-igo
   (`scanignore`) ne forigas la deklaron kaj ne forigas la eraron; uzu
   `scanignore` nur se la deklaro estas neevitebla). Historio: 2026-10-31 la
   malnova apo ne povis sen jcenter kaj ni solvis per

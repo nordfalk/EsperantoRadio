@@ -11,10 +11,14 @@ Nia servilo estas **simplaj elŝuteblaj dosieroj** (ne HTTP-API ankoraŭ): la en
 ## Kanona datum-loko (2026-11-24)
 
 **`/home/j/Code/EsperantoRadio/server/data/`** estas la ĉefloko de la servilaj datumoj
-(la 3,2 GB kun: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
-Ĉiuj laborkopioj (ekz. `mobile-app4/`) portas **simbolan ligilon** `server/data` → la
-kanonan arbon, do konstruiloj kaj rsync ĉie vidas unu saman datumaron. NE kreu apartan
-`server/data`-arbon en nova laborkopio — anstataŭigu ĝin per simbola ligilo al la kanona arbo.
+(la 2,7 GB kun: `privata/audio/`, `modelo/`, `transkriboj/`, `rezumoj/` …).
+Laborkopioj (ekz. `mobile-app4/`) divididas ĝin per **SUB-LIGILOJ, ne per
+tuta-direktoria ligilo**: `server/data/` mem estas reala dosierujo kun nur du
+ligiloj — `privata` kaj `publika` → la samnomaj kanonaj dosierujoj (la hereda
+`fluoj/` ne ligiĝas kaj restas nevidebla). Tiele konstruiloj kaj rsync ĉie vidas
+unu saman datumaron, sed akcidenta skribo en `server/data/<ion-stran>` restas
+LOKALA kaj ne poluas la dividatan arbon. En nova laborkopio do: `mkdir server/data`
+kaj la du `ln -s …` (NE kopiu la datumojn, NE ligu la tutan `server/data`).
 **Portempaj dosieroj** (logaroj, prov-skriptoj, mezuradoj) apartenas al
 `tmp/` ĉe la radiko de la propra laborkopio (gitignorita) — NENIAM al la
 kanona arbo, kiu estas dividebla kun aliaj taskoj kaj agentoj.

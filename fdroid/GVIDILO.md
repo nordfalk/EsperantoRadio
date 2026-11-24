@@ -126,7 +126,7 @@ file" ĉe la fino, redaktu denove → iru al la fino de la dosiero → premu
   indentigita per 2 spacoj; unulinia formo fiaskigas `rewritemeta`), dum
   `AllowedAPKSigningKeys` restas UNU-LINIA. **Atentu**: la MALNOVA loka
   fdroidserver 2.4.2 flankigus ankaŭ la identigilan kampon kaj do
-  ne kongruas kun la CI-master — ne fidu senmare la lokan ilon ĉe tiuj
+  ne kongruas kun la CI-master — ne fidu ĝin blinde ĉe tiuj
   kampoj; la enmeta dosieroj sur nia master spegulas la CI-pasan formon,
   do «kopiu sen ŝanĝoj» + eventuaj plibonigoj post la pipo estas la
   sekura vojo.

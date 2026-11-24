@@ -618,6 +618,31 @@ class HejmoEkranoTest {
     }
 
     /**
+     * La alveno-kalkulo (novajAldonojKalkulo) kreskas nur ĉe VERAJ alvenoj —
+     * ne kiam eks-kaŝita elsendo revidiĝas: kanalo kun 6 elsendoj montras nur 5
+     * en "Kio novas" (per-kanala limo take(5)); kiam forlaso (ekz. elsendo iĝas
+     * ludita) liberigas sloton, la sesa REVIDIĜAS sen ke io nova alvenis.
+     */
+    @Test
+    fun novajAldonojKalkuloRekonasNurVeranAlvenon() {
+        val vm = HejmoViewModel(falsaKanaloDeponejo(), falsaElsendoDeponejo(), hodiaŭ = { hodiaŭ })
+        val ses = (1..6).map {
+            Elsendo(id = "kp:$it", kanaloSlug = "kernpunkto", titolo = "Kernpunkto epizodo $it", fluo = "", dato = datoAntaŭ(it * 7))
+        }
+        vm.plenigu(testKanaloj, ses)
+        assertEquals(1, vm.novajAldonojKalkulo.value, "La komenca plenigu kalkulas kiel unu alveno")
+
+        // Forlaso de kp:2 (ekz. ĝi iĝis ludita) — la sesa revidiĝas en "Kio novas",
+        // sed neniu nova elsendo alvenis
+        vm.plenigu(testKanaloj, ses.filter { it.id != "kp:2" })
+        assertEquals(1, vm.novajAldonojKalkulo.value, "Re-vidiĝo de eks-kaŝita elsendo ne kalkuliĝu")
+
+        // Vera alveno kreskigas la kalkulon
+        vm.plenigu(testKanaloj, ses.filter { it.id != "kp:2" } + Elsendo(id = "kp:nova", kanaloSlug = "kernpunkto", titolo = "Kernpunkto freŝa", fluo = "", dato = datoAntaŭ(1)))
+        assertEquals(2, vm.novajAldonojKalkulo.value, "Vera alveno kreskigu la kalkulon")
+    }
+
+    /**
      * Falsa tirkest-enhavo kun reala larĝo — sen ĝi la ankroj degeneras al nul
      * kaj neniu tiro povas movi la tirkeston.
      */

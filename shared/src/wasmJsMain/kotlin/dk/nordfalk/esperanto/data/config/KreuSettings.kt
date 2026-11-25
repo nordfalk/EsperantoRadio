@@ -1,13 +1,30 @@
 package dk.nordfalk.esperanto.data.config
 
 import com.russhwolf.settings.Settings
+import com.russhwolf.settings.StorageSettings
+import dk.nordfalk.esperanto.logw
 
 /**
- * wasmJs: provizore no-op (neniu persisto sur web).
- * TODO: Aldoni localStorage-bazitan `Settings`-implementon.
+ * wasmJs: persistas la agordojn en la localStorage de la retumilo
+ * (StorageSettings de multiplatform-settings, defaŭlte window.localStorage).
+ * La pseŭdonimo, plej ŝatataj kaj aliaj agordoj do transvivas reŝargon.
+ *
+ * Se la retumilo rifuzas aliron al la konservado (SecurityError ĉe blokitaj
+ * retejaj datumoj aŭ sekurigita enkadrigo), la apo tamen lanĉiĝas —
+ * kun ne-persistanta rezerva agordaro (A4: unu medio ne paneigu la apon).
  */
-actual fun kreuSettings(): Settings = NoOpSettings()
+actual fun kreuSettings(): Settings = try {
+    StorageSettings()
+} catch (e: Throwable) {
+    logw("KreuSettings", "localStorage ne alirebla — uzas ne-persistantan rezervan agordaron", e)
+    NoOpSettings()
+}
 
+/**
+ * Ne-persistanta rezerva agordaro por retumiloj, kiuj rifuzas localStorage-on.
+ * Konservu la konduton de la antaŭa versio (neniu persisto), por ke la apo
+ * funkcias same kiel antaŭ ĉi tiu PR ankaŭ en tiu flanka kazo.
+ */
 private class NoOpSettings : Settings {
     override val keys: Set<String> get() = emptySet()
     override val size: Int get() = 0

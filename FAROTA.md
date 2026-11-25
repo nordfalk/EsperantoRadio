@@ -177,7 +177,9 @@
 > `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
 
 #### C62 — Apache: X-Content-Type-Options: nosniff por la elŝutejo
-- **Statuso**: [ ]
+- **Statuso**: [x] SOLVITA 2026-11-24: la posedanto aldonis `Header always set
+  X-Content-Type-Options "nosniff"` en la `<Directory>`-bloko de la DocumentRoot
+  kaj reloadis apache2; kontrolita per curl (200 kaj 404 respondas kun la kapo).
 - **Fonto**: CodeRabbit-sekureca recenzo 2026-11-24 (PR #210, CWE-79). La apo-verifikado
   rifuzas ne-bildan embleman enhavon (Emblemoj.formatoSeLegebla, ImageIO-malkodado), sed
   defenda kapo mankas: la servataj bildoj ne havas `X-Content-Type-Options: nosniff`.

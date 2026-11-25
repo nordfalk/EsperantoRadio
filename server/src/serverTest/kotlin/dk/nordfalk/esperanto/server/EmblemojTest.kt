@@ -48,6 +48,10 @@ class EmblemojTest {
         assertTrue(Emblemoj.estasIpLiteralo("[::1]"))   // kiel URI.host redonas IPv6-literalon
         assertTrue(Emblemoj.estasIpLiteralo("::1"))    // sendepende de krampoj
         assertTrue(Emblemoj.estasIpLiteralo("1.2.3.4"))
+        // la mallongaj numeraj formoj, kiujn InetAddress ankaŭ interpretas kiel IPv4
+        assertTrue(Emblemoj.estasIpLiteralo("134744072")) // = 8.8.8.8
+        assertTrue(Emblemoj.estasIpLiteralo("1.2.3"))
+        assertTrue(Emblemoj.estasIpLiteralo("1.2"))
         // nomoj NENIAM estas IP-literaloj — eĉ ne kun ciferoj
         assertFalse(Emblemoj.estasIpLiteralo("example.com"))
         assertFalse(Emblemoj.estasIpLiteralo("bilder3.example.org"))
@@ -66,6 +70,8 @@ class EmblemojTest {
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://10.0.0.1/bildo.png"))
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://93.184.216.34/bildo.png")) // eĉ publika
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://[::1]/bildo.png"))
+        // la unuparta numera formo, kiun InetAddress interpretas kiel IPv4 (8.8.8.8)
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://134744072/bildo.png"))
         // NOMO kiu resolvas al NE-publika adreso (localhost → loopback, sen reto)
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost/bildo.png"))
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost:1234/bildo.png"))

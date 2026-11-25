@@ -123,15 +123,17 @@ object Emblemoj {
     }
 
     /**
-     * Ĉu la gastiganto estas IP-LITERALO (ne DNS-nomo): IPv4 (`1.2.3.4`) aŭ
-     * IPv6 (`[::1]`, kun aŭ sen krampoj). Tia „IP-adreso anstataŭ nomo" estas
-     * nenormala por podkasto-bildo kaj rifuziĝas sen eĉ provi resolvon.
+     * Ĉu la gastiganto estas IP-LITERALO (ne DNS-nomo): IPv4 (`1.2.3.4`, sed ankaŭ
+     * la pli mallongaj numeraj formoj `1.2.3`, `1.2`, `134744072`, kiujn
+     * InetAddress same interpretas kiel IPv4) aŭ IPv6 (`[::1]`, kun aŭ sen
+     * krampoj). Tia „IP-adreso anstataŭ nomo" estas nenormala por
+     * podkasto-bildo kaj rifuziĝas sen eĉ provi resolvon.
      */
     fun estasIpLiteralo(gastiganto: String): Boolean {
         val nuda = gastiganto.removePrefix("[").removeSuffix("]")
         if (':' in nuda) return true
         val pecoj = nuda.split('.')
-        return pecoj.size == 4 && pecoj.all { it.isNotEmpty() && it.all(Char::isDigit) }
+        return pecoj.size in 1..4 && pecoj.all { it.isNotEmpty() && it.all(Char::isDigit) }
     }
 
     /**

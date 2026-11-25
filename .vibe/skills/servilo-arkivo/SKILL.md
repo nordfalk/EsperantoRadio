@@ -157,9 +157,19 @@ curl -s https://javabog.dk/esperanto-radio/kanaloj/ | head -3
 dosiero en la laborkopio — vidu malsupre);
 ne forgesu `--chmod=D755,F644` (alie Apache redonas 403).
 
-## Regula rulado
+## Regula rulado (FAROTA C60, ekde 2026-11-25)
 
-cron/systemd: `./gradlew :server:arkivKonstruilo` + `rsync` (ekz. ĉiun horon).
+Crontab sur la konstanta maŝino (uzanto `j`, `crontab -l`):
+- **STT** ĉiunokte `03:17` → `server/data/privata/skriptoj/cron_stt.sh`
+  (10/30/4; flok; protokolo `tmp/cron-stt.log`; **absoluta pyenv-pythonvojo** —
+  la PATH de cron ne havas la shimson, kaj `/usr/bin/python3` ne havas
+  `onnxruntime`).
+- **`:server:arkivKonstruilo`** → `server/data/privata/skriptoj/cron_arkivkonstruilo.sh`
+  (protokolo `tmp/cron-arkivkonstruilo.log`) — la ritmo-ne undecided de la posedanto;
+  la linio staras KOMENTA en la crontab (ekz. `5 * * * *`).
+- **rsync-publikigo restas PERMANA** — neniam en cron (regulo 2026-11-20).
+- **LLM-paŝo** (transkriptoj→rezumoj) ne estas skriptita — agenta sesia laboro.
+
 Unu kanalo fiaskanta ne haltigas la aliajn (regulo A4); eraroj en `privata/stato.json`.
 
 ## Kaptilo: Apache kaj .wasm (C56, 2026-11-24)

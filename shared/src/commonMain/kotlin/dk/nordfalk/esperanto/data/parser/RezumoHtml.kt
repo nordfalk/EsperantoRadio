@@ -120,3 +120,35 @@ fun derivuTitolon(unuaLinio: String, originalaTitolo: String): String? {
 
 private fun esc(s: String): String =
     s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+/** Ĉu la teksto enhavas HTML-etikedon (aŭ CDATA-komenco) — do jam estas HTML-esprimata. */
+private val HTML_ETIKEDO = Regex("<[a-zA-Z/!]")
+
+/**
+ * Unu parto de priskribo al HTML: pura teksto estas eskapata kaj envolvata en
+ * `<p>` (liniosaltoj iĝas `<br/>`); teksto kiu jam estas HTML restas nedifektita
+ * (la kanalo mem difinis la formatadon — ekz. `<em>`-a kursiva teksto).
+ */
+fun priskriboPartoAlHtml(teksto: String): String {
+    val t = teksto.trim()
+    if (t.isEmpty()) return ""
+    return if (HTML_ETIKEDO.containsMatchIn(t)) t
+    else "<p>" + esc(t).replace("\n", "<br/>") + "</p>"
+}
+
+/**
+ * Kunigas la priskribon de elsendo kun AI-rezumo: unue la (eventuala) originala
+ * priskribo, poste la kursivigita averto pri la AI-fonto, poste la rezumo-HTML.
+ * La originala priskribo restas ĉiam videbla (la rezumo aldoniĝas, ne anstataŭas).
+ */
+fun kuniguPriskribonKunRezumo(
+    originalaPriskribo: String?,
+    avertaFrazo: String,
+    rezumoHtml: String,
+): String {
+    val partoj = mutableListOf<String>()
+    priskriboPartoAlHtml(originalaPriskribo.orEmpty()).takeIf { it.isNotEmpty() }?.let { partoj.add(it) }
+    partoj.add("<p><em>${esc(avertaFrazo)}</em></p>")
+    partoj.add(rezumoHtml)
+    return partoj.joinToString("\n")
+}

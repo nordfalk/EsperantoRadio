@@ -98,4 +98,48 @@ class RezumoHtmlTest {
         )
         assertEquals("Post sia apostola vojaĝo al Urugvajo, Argentino kaj Peruo (6.–16.11.)", titolo)
     }
+
+    // === kuniguPriskribonKunRezumo ===
+
+    private val avertoNova = "Jen rezumo farita de la sondosiero per AI. Eraroj povas okazi:"
+
+    @Test
+    fun malplenaPriskriboNurAvertoKajRezumo() {
+        val r = kuniguPriskribonKunRezumo(null, avertoNova, "<ul>\n<li>punkto</li>\n</ul>")
+        assertEquals(
+            "<p><em>$avertoNova</em></p>\n<ul>\n<li>punkto</li>\n</ul>",
+            r
+        )
+    }
+
+    @Test
+    fun purTekstaPriskriboEstasEnvolvataKajRezumoSekvas() {
+        val r = kuniguPriskribonKunRezumo("Novaĵoj semajnaj.", avertoNova, "<p>punkto unu</p>")
+        assertEquals(
+            "<p>Novaĵoj semajnaj.</p>\n<p><em>$avertoNova</em></p>\n<p>punkto unu</p>",
+            r
+        )
+    }
+
+    @Test
+    fun htmlPriskriboRestasKiaĜiEstas() {
+        val r = kuniguPriskribonKunRezumo("<p>Legado de <em>La Ovo</em></p>", avertoNova, "<p>punkto unu</p>")
+        assertEquals(
+            "<p>Legado de <em>La Ovo</em></p>\n<p><em>$avertoNova</em></p>\n<p>punkto unu</p>",
+            r
+        )
+    }
+
+    @Test
+    fun puraTekstoEskapigasHtmlSignojnKajLinisaltoj() {
+        assertEquals(
+            "<p>A &amp; B<br/>C</p>",
+            priskriboPartoAlHtml("A & B\nC")
+        )
+    }
+
+    @Test
+    fun malplenaPartoRedonasMalplenanĈenon() {
+        assertEquals("", priskriboPartoAlHtml("   \n "))
+    }
 }

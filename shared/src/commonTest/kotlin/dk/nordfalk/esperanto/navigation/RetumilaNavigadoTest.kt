@@ -3,8 +3,7 @@ package dk.nordfalk.esperanto.navigation
 import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.assertNull
 
 /**
  * Testoj de la retumila historia sinkronigo (unu historia eniro po nav-nivelo)
@@ -16,54 +15,31 @@ class RetumilaNavigadoTest {
     // --- historia sinkronigo ---
 
     @Test
-    fun puŝoProfundigasLaHistorion() {
-        assertTrue(estasHistoriaPuŝo(nunaProfundo = 1, novaProfundo = 2))
-        assertTrue(estasHistoriaPuŝo(nunaProfundo = 2, novaProfundo = 4))
-        assertFalse(estasHistoriaPuŝo(nunaProfundo = 2, novaProfundo = 2)) // langet-ŝanĝo
+    fun enpropraReenigoRetrompasLaHistorionRetumilaNe() {
+        // Enpropra reen-ago (reen-sago, tirkesta restartigo): la retumilo NE iris
+        // reen — la historio postrestas kaj oni devas fari history.back()
+        assertEquals(1, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 2))
+        assertEquals(2, historiaReeniro(memoritaNavProfundo = 3, novaNavProfundo = 1, historiaProfundoNun = 3))
+        // Retumila reen-butono (popstate direktis la nav-popon): la historio JAM
+        // egalas la novan profundecon — nul = ne iru reen dufoje (tio forlasus la paĝon)
+        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 1))
+        // Puŝo aŭ langet-ŝanĝo (novaj profundoj ne malpliiĝis) neniam tuŝas la historion
+        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 2, historiaProfundoNun = 2))
+        assertNull(historiaReeniro(memoritaNavProfundo = 1, novaNavProfundo = 3, historiaProfundoNun = 1))
     }
 
     @Test
-    fun reenigoPostulasHistoryBack() {
-        assertEquals(1, historiaReenNiveloj(nunaProfundo = 3, novaProfundo = 2))
-        assertEquals(2, historiaReenNiveloj(nunaProfundo = 3, novaProfundo = 1)) // ekz. tirkesta restartigo
-        assertEquals(0, historiaReenNiveloj(nunaProfundo = 2, novaProfundo = 2))
-        assertEquals(0, historiaReenNiveloj(nunaProfundo = 1, novaProfundo = 3)) // neniam negativa
-    }
-
-    @Test
-    fun enpropraReenSagoRetrompuSedRetumilaReenNe() {
-        // Enpropra reen-sago: la historio ankoraŭ staras sur la malnova profundo
-        assertTrue(estuHistoryBack(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 2))
-        // Retumila reen-butono: la historio JAM egalas la novan profundo — ne iru reen dufoje!
-        assertFalse(estuHistoryBack(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 1))
-        // Langet-ŝanĝo (sama profundo) neniam retrompas
-        assertFalse(estuHistoryBack(memoritaNavProfundo = 2, novaNavProfundo = 2, historiaProfundoNun = 2))
-    }
-
-    @Test
-    fun popstateReenigoKongruasKunLaHistoriaSalto() {
-        // Retumila reen-butono: la historia profundo postrestas je unu nivelo
-        assertEquals(1, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 2))
-        // Pluraj niveloj samtempe (historia menuo de la retumilo): popu po unu
-        assertEquals(2, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 3))
-        assertEquals(3, popstateReenigoj(historiaProfundo = 0, memoritaNavProfundo = 3))
-        // Nia propra history.back() post la reen-sago: la profundo ĝisdatiĝis
-        // antaŭ la evento — la valoroj kongruas (0 = ne navigu)
-        assertEquals(0, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 1))
-        // Antaŭen (aŭ eksterstaka) — ne tuŝas la nav-stakon
-        assertEquals(0, popstateReenigoj(historiaProfundo = 2, memoritaNavProfundo = 1))
-    }
-
-    @Test
-    fun memoritaPostPopstateSekvasRapidajnSinsekvajnEventojn() {
-        // Du popstate-eventoj antaŭ la stak-efekto rulas: ĉiu devas vidi la
-        // profundecon, kiun la ANTAŬA evento atingis (4 -> 3 -> 2, ne 4 -> 3 -> 1)
-        assertEquals(3, memoritaPostPopstate(memoritaNavProfundo = 4, historiaProfundo = 3))
-        assertEquals(2, memoritaPostPopstate(memoritaNavProfundo = 3, historiaProfundo = 2))
-        // Antaŭen-trairo ne tuŝas la nav-stakon — la memorita profundo restu
-        assertEquals(3, memoritaPostPopstate(memoritaNavProfundo = 3, historiaProfundo = 4))
-        // Stato sen {d} (null -> 0) neniam malleviĝas la profundecon sub la radikon
-        assertEquals(1, memoritaPostPopstate(memoritaNavProfundo = 2, historiaProfundo = 0))
+    fun popstateTraktadoDistingasNivelonKajDirekton() {
+        // UNU retumila reen-paŝo: la internaj traktiloj rajtas unue konsumi ĝin
+        assertEquals(PopstateTraktado.Ununivela, popstateTraktado(memoritaNavProfundo = 2, historiaProfundo = 1))
+        assertEquals(PopstateTraktado.Ununivela, popstateTraktado(memoritaNavProfundo = 5, historiaProfundo = 4))
+        // PLURAJ niveloj samtempe (historia menuo de la retumilo): pura plurigo
+        assertEquals(PopstateTraktado.Plurnivela(2), popstateTraktado(memoritaNavProfundo = 3, historiaProfundo = 1))
+        assertEquals(PopstateTraktado.Plurnivela(3), popstateTraktado(memoritaNavProfundo = 3, historiaProfundo = 0))
+        // Antaŭen-trairo aŭ nia propra sinkronigo (history.back() el la
+        // stak-efekto): neniu ago — la valoroj kongruas
+        assertEquals(PopstateTraktado.Nenio, popstateTraktado(memoritaNavProfundo = 1, historiaProfundo = 1))
+        assertEquals(PopstateTraktado.Nenio, popstateTraktado(memoritaNavProfundo = 1, historiaProfundo = 2))
     }
 
     // --- paĝotitolo (langeta titolo) ---

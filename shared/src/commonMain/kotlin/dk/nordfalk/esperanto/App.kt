@@ -282,7 +282,23 @@ fun EsperantoRadioApp(
         // Retumila integrigo — finfajnigo de la reta versio (C56): je la retumilo la reen-butono de la
         // retumilo navigu en la apo (Historio-API) anstataŭ forlasi la paĝon,
         // kaj la langeta titolo (document.title) sekvu la aktualan ekranon.
-        LaunchedEffect(Unit) { RetumilaNavigado.startu { reen() } }
+        // La reen-prioritato spegulas la platforman reen-butonon: unue la internaj
+        // traktiloj (kolapso de la elfaldita mini-ludilbreto — por Android ĝi vivas en la
+        // NavigationBackHandler malsupre), nur poste la nav-stako.
+        LaunchedEffect(Unit) {
+            RetumilaNavigado.startu(
+                onReen = { reen() },
+                onReenProponata = {
+                    if (elfaldita) {
+                        logi("Nav", "← reen (retumilo): enfoldigas ludilbreton")
+                        elfaldita = false
+                        true
+                    } else {
+                        false
+                    }
+                },
+            )
+        }
         val paĝotitolo = vojaTitolo(nunaVojo, kanaloj)
         LaunchedEffect(nunaVojo, backStack.size, paĝotitolo) {
             RetumilaNavigado.stakŜanĝiĝis(backStack.size, paĝotitolo)

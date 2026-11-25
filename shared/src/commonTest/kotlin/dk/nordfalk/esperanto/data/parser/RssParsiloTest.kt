@@ -312,6 +312,44 @@ class RssParsiloTest {
         assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
     }
 
+    // === Panama Radio en Esperanto — ĝenerala parsado; propra fluo kun tri interplektitaj serioj ===
+    // (Panama Raporto 2004–2005, Panama Radio 2010, nova serio ekde 2023 — eroj venas en fluo-ordo, ne laŭ dato)
+
+    @Test
+    fun parsasPanamaRadion() = kotlinx.coroutines.test.runTest {
+        val fluo = leguFiksaĵon("panamaradio_feed.xml")
+        val kanalo = Kanalo(
+            slug = "panamaradio",
+            nomo = "Panama Radio en Esperanto",
+            podkastaRssUrl = "https://roberto.perez-franco.com/feeds/panama-radio-en-esperanto.xml"
+        )
+
+        val elsendoj = parsilo.parsuRss(fluo, kanalo)
+
+        assertEquals(24, elsendoj.size, "La fiksaĵo havas 24 elsendojn")
+
+        // La unua ero de la fluo: 1-a Elsendo de Panama Radio (2010-10-10, 6:04 = 364 s)
+        val unua = elsendoj.first()
+        assertEquals("1-a Elsendo", unua.titolo)
+        assertEquals("2010-10-10", unua.dato)
+        assertEquals(364L, unua.daŭro, "Daŭro devas esti 364 s (6:04)")
+        assertTrue(unua.id.startsWith("panamaradio:"), "ID devas komenciĝi per 'panamaradio:': ${unua.id}")
+
+        // La plej nova elsendo de la fiksaĵo: 7-a Elsendo (2023-11-04)
+        val plejNova = elsendoj.first { it.dato == "2023-11-04" }
+        assertEquals("7-a Elsendo", plejNova.titolo)
+        assertTrue(plejNova.fluo.startsWith("https://roberto.au/media/podcasts/panama-radio-en-esperanto/"), "Fluo: ${plejNova.fluo}")
+        assertTrue(plejNova.fluo.endsWith(".mp3"), "Fluo devas finii per .mp3: ${plejNova.fluo}")
+
+        // Ĉiuj elsendoj venas de la propra roberto.au-gastiganto kaj havas datumojn
+        for (e in elsendoj) {
+            assertTrue(e.fluo.startsWith("https://roberto.au/media/podcasts/panama-radio-en-esperanto/"), "Fluo devas esti https roberto.au: ${e.fluo}")
+            assertNotNull(e.dato, "Dato ne estu nul por ${e.titolo.take(40)}")
+            assertTrue(e.priskribo?.isNotEmpty() == true, "Priskribo ne estu malplena por ${e.titolo}")
+        }
+        assertEquals(elsendoj.size, elsendoj.map { it.id }.distinct().size, "ID-oj devas esti unikaj")
+    }
+
     // === Regulo P6.2 — Varsovia Vento (pluraj <audio> po ero) ===
 
     @Test

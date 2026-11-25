@@ -262,14 +262,14 @@ object ArkivKonstruilo {
         val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
         val bildujo = File(PUBLIKA, "bildoj/elsendoj").apply { mkdirs() }
         val mapigo = mutableMapOf<String, String>()
-        fun novaUrl(url: String, dosiero: java.io.File): String = "$bazo/bildoj/elsendoj/${dosiero.name}"
+        fun novaUrl(dosiero: java.io.File): String = "$bazo/bildoj/elsendoj/${dosiero.name}"
 
         fun spegulu(url: String): String {
             mapigo[url]?.let { return it }
             val radiko = Emblemoj.bildetaRadiko(url)
             val ekzistanta = bildujo.listFiles()?.firstOrNull { it.isFile && it.nameWithoutExtension == radiko }
             val nova = if (ekzistanta != null) {
-                novaUrl(url, ekzistanta) // jam spegulita en pli frua rulo
+                novaUrl(ekzistanta) // jam spegulita en pli frua rulo
             } else {
                 try {
                     runBlocking {
@@ -291,7 +291,7 @@ object ArkivKonstruilo {
                             // post fiaskinta SKRIBO aŭ renomo la restinta .part foriĝas
                             provizora.delete()
                         }
-                        novaUrl(url, dosiero)
+                        novaUrl(dosiero)
                     }
                 } catch (e: Exception) {
                     // A4: unu fiaskinta bildeto ne haltigas la kanalon; A8: protokolu

@@ -16,6 +16,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Aldonita
 
+- Signife pli multaj elsendoj havas priskribojn faritajn de AI el la sondosiero — ankaŭ elsendoj kun tre mallonga originala priskribo (https://github.com/nordfalk/EsperantoRadio/pull/218)
 - Reta versio funkcias en la retumilo: https://javabog.dk/esperanto-radio/apo/ — kanaloj kaj elsendoj el nia arkiva servilo, sono rekte el la fonto (https://github.com/nordfalk/EsperantoRadio/pull/210)
 - Reta versio (beta): musa navigado de la kartaj vicoj kaj listoj — per la radeto kaj per muso-treno (https://github.com/nordfalk/EsperantoRadio/pull/210)
 
@@ -33,6 +34,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Riparita
 
 - La kanalo „Universeala Lindo" ricevis emblemon (ĝis nun ĝi aperis senbilda) (https://github.com/nordfalk/EsperantoRadio/pull/217)
+- Reta versio: la agordoj (pseŭdonimo, plej ŝatataj, ludpozicioj k.a.) nun konserviĝas en la retumilo kaj transvivas reŝargon de la paĝo (https://github.com/nordfalk/EsperantoRadio/pull/215)
 - Remalfermo de elsendo aŭ kanalo montras ĝin mem anstataŭ la postlasitan svipan pozicion de la antaŭa vizito; rotacio kaj restartigo konservas la legitan pozicion; eltirita elsendo aŭ forigita kanalo montras klarigon anstataŭ senfina ŝargado; elŝutita elsendo malfermeblas ankaŭ kiam ĝi malaperis el la fluo (https://github.com/nordfalk/EsperantoRadio/pull/206)
 
 ## [3.2.0] - 2026-11-23

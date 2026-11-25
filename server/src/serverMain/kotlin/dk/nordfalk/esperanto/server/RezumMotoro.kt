@@ -10,17 +10,19 @@ interface RezumMotoro {
     fun rezumu(teksto: String, titolo: String): String
 }
 
-/** Apendita al ĉiu AI-generita rezulto — travidebleco pri la fonto. */
-const val AI_AVERTO = "Rezumo farita de la sondosiero per AI. Eraroj povas okazi"
+/** Ensluita antaŭ ĉiu AI-generita rezulto — travidebleco pri la fonto. */
+const val AI_AVERTO = "Jen rezumo farita de la sondosiero per AI. Eraroj povas okazi:"
 
 /**
  * Ekstrakta rezumanto: prenas la unuajn frazojn ĝis 4–9 linioj (~90 signoj po linio),
  * evitante tro mallongajn frazojn komence. Se la teksto mem estas mallonga, redonas ĝin.
+ * La averto ne aldoniĝas ĉi tie — ĝi estas aldonata centra-loke en
+ * [ArkivKonstruilo.riĉigu] (kuniguPriskribonKunRezumo), antaŭ la rezumo.
  */
 class EkstraktaRezumMotoro : RezumMotoro {
     override fun rezumu(teksto: String, titolo: String): String {
         val plata = teksto.replace(Regex("\\s+"), " ").trim()
-        if (plata.isEmpty()) return AI_AVERTO
+        if (plata.isEmpty()) return ""
         // frazoj: fina punkto sekvata de spaceto kaj majusklo, aŭ fino de teksto
         val frazoj = plata.split(Regex("(?<=[.!?])\\s+(?=[A-ZĜĈŜĴŬ])")).map { it.trim() }.filter { it.isNotEmpty() }
         if (frazoj.size >= 4) {
@@ -33,7 +35,7 @@ class EkstraktaRezumMotoro : RezumMotoro {
                 if (linioj >= 4 && elektitaj.size >= 4) break
                 if (linioj >= 9) break
             }
-            return elektitaj.joinToString("\n") + "\n\n" + AI_AVERTO
+            return elektitaj.joinToString("\n")
         }
         // Malmulte da frazoj (ekz. STT-eligo sen punktigo): tranĉu la tekston laŭ vortoj
         // en linioj de ~90 signoj kaj prenu 4–6 liniojn.
@@ -51,6 +53,6 @@ class EkstraktaRezumMotoro : RezumMotoro {
         }
         if (nuna.isNotEmpty() && linioj.size < 6) linioj.add(nuna.toString())
         val elektitaj = if (linioj.size >= 4) linioj else listOf(plata)
-        return elektitaj.joinToString("\n") + "\n\n" + AI_AVERTO
+        return elektitaj.joinToString("\n")
     }
 }

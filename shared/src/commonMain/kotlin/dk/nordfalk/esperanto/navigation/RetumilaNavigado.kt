@@ -59,7 +59,7 @@ fun popstateReenigoj(historiaProfundo: Int, memoritaNavProfundo: Int): Int =
 
 /**
  * La memorita profundo DESTINATA post popstate-evento: la retumila trairo povas
- * superi la rekunmetaĝon (la stak-efekto en App.kt rulas ASINĦRONE), do sinsekvaj
+ * superi la rekunmetaĵon (la stak-efekto en App.kt rulas asinkrone), do sinsekvaj
  * popstate-eventoj devas vidi la profundecon, kiun la ANTAŬA evento atingis —
  * NUR pli malalta valoro validas (antaŭena trairo devas lasi la memoritan
  * profundecon netuŝita, ĉar la nav-stako ne ŝanĝiĝas).

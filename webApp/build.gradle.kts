@@ -28,4 +28,11 @@ val kopiuAlPublikaElsutejo by tasks.registering(Sync::class) {
     dependsOn("wasmJsBrowserDistribution")
     from(layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
     into(rootProject.file("server/data/publika/apo"))
+    doLast {
+        // Enmetu la version en index.html (Sentry-release) — la deponeja fonto
+        // de vero: gradle/libs.versions.toml (same kiel ApoVersio en :shared)
+        val versio = libs.versions.apoversio.get()
+        val index = destinationDirectory.get().asFile.resolve("index.html")
+        index.writeText(index.readText().replace("__APOVERSIIO__", versio))
+    }
 }

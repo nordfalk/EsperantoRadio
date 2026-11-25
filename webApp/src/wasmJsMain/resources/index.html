@@ -72,8 +72,13 @@
                     },
                 });
                 // Deveno de la gasto (ekz. "javabog.dk/esperanto-radio/apo-beta/") —
-                // distingas beta-n kaj produktadon ankaux ekster la release-dimensiono
+                // distingas beta-n kaj produktadon ankaux ekster la release-dimensiono.
+                // setTag → erar-eventoj; setAttribute → ankaŭ protokoloj kaj metrikoj
+                // (captureLogEvent kopias atributojn de la amplekso, sed ne etikedojn)
                 window.Sentry.setTag("retadreso", location.host + location.pathname);
+                if (window.Sentry.setAttribute) {
+                    window.Sentry.setAttribute("retadreso", location.host + location.pathname);
+                }
             },
             // nivelo: "info" | "warn" | "error"  → Sentry logs
             protokolo: function (level, msg) {

@@ -11,6 +11,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import dk.nordfalk.esperanto.data.repository.RespondoTroGrandaException
 import io.ktor.client.request.get
+import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
@@ -58,7 +59,7 @@ object ArkivKonstruilo {
 
     /**
      * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj): SENVOLA
-     * alidirekto — ĉiun salton validigas `petuKunSsrfŜirmo` mem (SSRF-ŝirmo,
+     * alidirekto — ĉiun salton validigas `elŝutuBildonKunŜirmo` mem (SSRF-ŝirmo,
      * CWE-918: aŭtoro de ekstera fluo alie povus devigi la konstruilon peti
      * internajn adresojn).
      */
@@ -179,8 +180,7 @@ object ArkivKonstruilo {
             val url = kanalo.emblemoUrl ?: continue
             try {
                 val nova = runBlocking {
-                    val respondo = petuKunSsrfŜirmo(url) // ankaŭ la statuskontrolon (200..299)
-                    val enhavo = leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
+                    val enhavo = elŝutuBildonKunŜirmo(url)
                     // XSS-ŝirmo (CWE-79, PR #210): la formato estas determinata laŭ
                     // la ENHAVO de la bildo (magiaj signoj), ne laŭ Content-Type aŭ
                     // dosiernomo kaj validigata per VERA malkodado (ImageIO). Nur malkodatablaj
@@ -253,8 +253,7 @@ object ArkivKonstruilo {
             } else {
                 try {
                     runBlocking {
-                        val respondo = petuKunSsrfŜirmo(url) // ankaŭ la statuskontrolon (200..299)
-                        val enhavo = leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
+                        val enhavo = elŝutuBildonKunŜirmo(url)
                         val formato = Emblemoj.formatoSeLegebla(enhavo)
                             ?: throw IllegalStateException("ne malkodebla PNG/JPEG/GIF (eble SVG/HTML)")
                         val dosiero = File(bildujo, "$radiko.$formato")
@@ -262,10 +261,15 @@ object ArkivKonstruilo {
                         // interrompita skribo ne kredigu al la sekva rulo koruptitan
                         // dosieron kiel jam-spegulitan (la ekzisto-kontrolo rigardas radikon).
                         val provizora = File(bildujo, "${dosiero.name}.part")
-                        provizora.writeBytes(enhavo)
-                        if (!provizora.renameTo(dosiero)) {
+                        try {
+                            provizora.writeBytes(enhavo)
+                            if (!provizora.renameTo(dosiero)) {
+                                throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
+                            }
+                        } finally {
+                            // post sukcesa renomo la .part ne ekzistas (delete senefika);
+                            // post fiaskinta SKRIBO aŭ renomo la restinta .part foriĝas
                             provizora.delete()
-                            throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
                         }
                         novaUrl(url, dosiero)
                     }
@@ -293,28 +297,36 @@ object ArkivKonstruilo {
     }
 
     /**
-     * Bildo-peto kun SSRF-ŝirmo (CWE-918): la celo de ĉIU salto (ankaŭ alidirektoj)
-     * devas esti http(s) kaj publika adreso — la konstruilo alie povus fariĝi
-     * perilo por atingi nepublikajn internajn adresojn. [bildaHttp] sekvas NENIUJN
-     * saltojn; ĉi tie ili estas sekvataj MANE, ĝis 5, validigante ĉiun per
-     * [estasPublikaCelo]. Refuzo traktiĝas kiel ĉiu alia elŝuta eraro (la alvokanto
-     * kaptas kaj daŭrigas, regulo A4).
+     * Elŝutas la bildo-korpon kun SSRF-ŝirmo kaj fluanta grandec-limo.
+     *
+     * La celo de ĉIU salto (ankaŭ alidirektoj) devas esti http(s) kaj publika
+     * adreso (CWE-918) — [bildaHttp] sekvas NENIUJN saltojn, do ĉi tien ili estas
+     * sekvataj MANE (ĝis 5), ĉiu validigata per [estasPublikaCelo] antaŭ la peto.
+     * La korpo legiĝas FLUE per prepareGet-execute (HttpClient.get enmemorigus la
+     * tutan korpon antaŭ kontrolo — Ktor 3.6, HttpStatement) kaj la legado ĉesas
+     * tuj ĉe transpaso de la limo. Refuzoj traktiĝas kiel ordinara elŝuta eraro
+     * (la alvokanto kaptas kaj daŭrigas, regulo A4).
      */
-    private suspend fun petuKunSsrfŜirmo(url: String): HttpResponse {
+    private suspend fun elŝutuBildonKunŜirmo(url: String): ByteArray {
         var nuna = url
         var saltoj = 0
         while (true) {
             check(saltoj++ < 5) { "tro da alidirektoj (≥ 5) ekde $url" }
             check(estasPublikaCelo(nuna)) { "ne-publika/ne-http(s) celo (SSRF-ŝirmo): $nuna" }
-            val respondo = bildaHttp.get(nuna)
-            if (respondo.status.value in 300..399) {
-                val loko = respondo.headers[HttpHeaders.Location]
-                check(!loko.isNullOrBlank()) { "HTTP ${respondo.status.value} sen Location" }
-                nuna = URI(nuna).resolve(loko).toString()
-                continue
+            var alidirekto: String? = null
+            val enhavo: ByteArray? = bildaHttp.prepareGet(nuna).execute { respondo ->
+                if (respondo.status.value in 300..399) {
+                    val loko = respondo.headers[HttpHeaders.Location]
+                    check(!loko.isNullOrBlank()) { "HTTP ${respondo.status.value} sen Location" }
+                    alidirekto = URI(nuna).resolve(loko).toString()
+                    null
+                } else {
+                    check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
+                    leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
+                }
             }
-            check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
-            return respondo
+            enhavo?.let { return it }
+            nuna = alidirekto ?: throw IllegalStateException("alidirekto sen sekva celo: $nuna")
         }
     }
 
@@ -328,10 +340,10 @@ object ArkivKonstruilo {
         return try {
             val uri = URI(url)
             if (uri.scheme !in setOf("http", "https") || uri.host.isNullOrBlank()) return false
-            InetAddress.getAllByName(uri.host).all {
-                !it.isAnyLocalAddress && !it.isLoopbackAddress && !it.isSiteLocalAddress &&
-                    !it.isLinkLocalAddress && !it.isMulticastAddress
-            }
+            // ĈIU resolvita adreso devas esti publika laŭ la striktaj intervaloj
+            // en Emblemoj.ĉuPublikaAdreso (kaj fd00::1 kaj 100.64.0.1 rifuzataj —
+            // la InetAddress-oportunaj kontroloj ne sufiĉas).
+            InetAddress.getAllByName(uri.host).all { Emblemoj.ĉuPublikaAdreso(it) }
         } catch (e: Exception) {
             false
         }

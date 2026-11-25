@@ -2,6 +2,8 @@ package dk.nordfalk.esperanto.server
 
 import dk.nordfalk.esperanto.logw
 import java.io.ByteArrayInputStream
+import java.net.Inet6Address
+import java.net.InetAddress
 import java.security.MessageDigest
 import javax.imageio.ImageIO
 
@@ -60,6 +62,52 @@ object Emblemoj {
     fun bildetaRadiko(url: String): String =
         MessageDigest.getInstance("SHA-1").digest(url.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }
+
+    /**
+     * Ĉu la adreso estas PUBLIKA — pli strikta ol la InetAddress- oportunaj
+     * kontroloj (tiuj akceptas ekz. `fd00::1` (IPv6-ULA) kaj `100.64.0.1`
+     * (CGNAT-IPv4)). Kovritaj: IPv4 0/8, 10/8, 127/8, 172.16/12, 192.168/16,
+     * 169.254/16, 100.64/10, 198.18/15, 224/4 (multicast), 240/4 (rezervita);
+     * IPv6 ::1, fe80::/10, fc00::/7 (ULA), ff00::/8, IPv4-mapeitaj (::ffff:),
+     * 6to4 (2002::/16) kaj teredo (2001:0::/32) kun enkopigitaj privataj IPv4.
+     * (SSRF-ŝirmo de la bildo-spegele, CWE-918, PR #214.)
+     */
+    fun ĉuPublikaAdreso(adreso: InetAddress): Boolean {
+        val b = adreso.address
+        if (adreso is Inet6Address) {
+            // IPv4-mapeita adreso ::ffff:a.b.c.d → kontrolu kiel IPv4
+            if (b.size == 16 && (0 until 10).all { b[it].toInt() == 0 } &&
+                (b[10].toInt() and 0xFF) == 0xFF && (b[11].toInt() and 0xFF) == 0xFF
+            ) return ipv4Publika(b, 12)
+            val o0 = b[0].toInt() and 0xFF
+            val o1 = b[1].toInt() and 0xFF
+            return when {
+                (o0 and 0xFE) == 0xFC -> false                       // fc00::/7 (ULA, fd00::1)
+                o0 == 0xFE && (o1 and 0xC0) == 0x80 -> false          // fe80::/10 (link-local)
+                o0 == 0xFF -> false                                   // ff00::/8 (multicast)
+                o0 == 0x20 && o1 == 0x02 -> ipv4Publika(b, 2)          // 6to4 2002::/16
+                o0 == 0x20 && o1 == 0x01 && b[2].toInt() == 0 && b[3].toInt() == 0 ->
+                    ipv4Publika(b, 12)                                 // teredo 2001:0::/32
+                else -> true
+            }
+        }
+        return ipv4Publika(b)
+    }
+
+    /** IPv4-intervaloj, kiuj NE estas publike. [de] = komenco de la 4 adres-bitokoj. */
+    private fun ipv4Publika(b: ByteArray, de: Int = 0): Boolean {
+        val o0 = b[de].toInt() and 0xFF
+        val o1 = b[de + 1].toInt() and 0xFF
+        return !(o0 == 0 ||                                          // 0.0.0.0/8
+            o0 == 10 || o0 == 127 ||                                // 10/8, 127/8
+            (o0 == 172 && o1 in 16..31) ||                          // 172.16/12
+            (o0 == 192 && o1 == 168) ||                             // 192.168/16
+            (o0 == 169 && o1 == 254) ||                              // 169.254/16
+            (o0 == 100 && (o1 and 0xC0) == 64) ||                    // 100.64/10 (CGNAT)
+            (o0 == 198 && (o1 == 18 || o1 == 19)) ||                 // 198.18/15
+            (o0 and 0xF0) == 0xE0 ||                                 // 224/4 (multicast)
+            o0 >= 240)                                               // 240/4 (rezervita)
+    }
 
     fun formatoSeLegebla(bitokoj: ByteArray): String? {
         val formato = formatoLaŭEnhavo(bitokoj) ?: return null

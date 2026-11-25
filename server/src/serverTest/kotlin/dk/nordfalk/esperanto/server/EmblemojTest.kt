@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.server
 
 import java.io.ByteArrayOutputStream
+import java.net.InetAddress
 import javax.imageio.ImageIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,6 +13,28 @@ import kotlin.test.assertTrue
  * konstruilo uzas por gastigi bildojn samdevene kaj forigi http-ligilojn.
  */
 class EmblemojTest {
+
+    @Test
+    fun publikajAdresojAkceptiĝas() {
+        assertTrue(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("93.184.216.34")))
+        assertTrue(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("2606:4700:4700::1111")))
+    }
+
+    @Test
+    fun nepublikajAdresojRifuziĝas() {
+        // IPv4: 0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 127/8, 100.64/10 (CGNAT),
+        //       198.18/15, 224/4, 240/4 — plus IPv6 ULA, link-local, multicast,
+        //       IPv4-mapeitaj, 6to4 kaj teredo kun enkopigitaj privataj IPv4.
+        val nepublikaj = listOf(
+            "0.0.0.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "169.254.1.1",
+            "127.0.0.1", "100.64.0.1", "198.18.0.1", "224.0.0.1", "250.1.2.3",
+            "fd00::1", "fe80::1", "ff02::1", "::ffff:127.0.0.1",
+            "2002:0a00:0001::1", "2001:0000:0000:0000:0000:0000:0a00:0001",
+        )
+        for (a in nepublikaj) {
+            assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName(a)), "devus rifuziĝi: $a")
+        }
+    }
 
     @Test
     fun bazaBildaUrlDerivasLaRadikon() {

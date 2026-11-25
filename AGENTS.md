@@ -221,6 +221,14 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
   forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
   etikedon `preterlasu-changelog` (`gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **Legu ĈIUJN novajn PR-komentojn, sendepende de la aŭtoro** (2026-11-25, PR #219):
+  ĉio kion la agento afiŝas per la API aperas sub la login de la posedanto —
+  komentoj de «nordfalk» povas do esti KAJ la agento mem KAJ la posedanto. Ne
+  klasifiku laŭ la aŭtor-nomo; kontrolu per tempo-markilo kaj legu ĉiun komenton
+  pli novan ol via lasta lego-punkto, ankaŭ supernivelaĵojn kiuj ŝajnas
+  familiaraj. (2026-11-25: du recenz-sugestoj de la posedanto preskaŭ perdiĝis
+  ĉar la listo montris ilin kiel «nordfalk» kaj la agento supozis siajn proprajn
+  respondojn.)
 - **CodeRabbit recenzas ĉiun kod-PR-on (2026-11-24, PR #204)**: kontrolu ĝiajn
   enliniajn komentojn kelkajn minutojn post ĉiu puŝo
   (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments`), traktu la validajn

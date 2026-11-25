@@ -69,7 +69,7 @@ object ArkivKonstruilo {
     /**
      * Priskriboj ĝis tiu longo ricevas AI-rezumon (aldonatan sub la originalo);
      * pli longaj priskriboj estas jam sufiĉe informaj kaj restas senŝanĝaj
-     * (decido de la posedanto, 2026-11-25 — la limo konserveme super la analysezo,
+     * (decido de la posedanto, 2026-11-25 — la limo konserveme super la analizo,
      * kie la originaj priskriboj ekportas aŭtorojn, gastojn kaj ligilojn).
      */
     private const val AI_PRISKRIBO_JE_LONGO_MALPLI_OL = 150

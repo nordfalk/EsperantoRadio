@@ -161,6 +161,7 @@ object ArkivKonstruilo {
         stato = stato.copy(lastaRulo = Instant.now().toString(), kanaloj = novajStatoj)
         StatoLeganto.skribu(File(PRIVATA, "stato.json"), stato)
         http.close()
+        bildaHttp.close()
         println(" preta. Stato: server/data/privata/stato.json")
     }
 
@@ -199,7 +200,17 @@ object ArkivKonstruilo {
                     val formato = Emblemoj.formatoSeLegebla(enhavo)
                         ?: throw IllegalStateException("enhavo ne estas malkodebla PNG/JPEG/GIF (eble SVG/HTML/koruptita) — ne spegulata")
                     val dosiero = File(bildujo, "${kanalo.slug}.$formato")
-                    dosiero.writeBytes(enhavo)
+                    // Transakcie kiel ĉe la elsendlaj bildetoj: .part + rename —
+                    // interrompita skribo ne lasu koruptitan emblemon servotan.
+                    val provizora = File(bildujo, "${dosiero.name}.part")
+                    try {
+                        provizora.writeBytes(enhavo)
+                        if (!provizora.renameTo(dosiero)) {
+                            throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
+                        }
+                    } finally {
+                        provizora.delete()
+                    }
                     "$bazo/bildoj/${dosiero.name}"
                 }
                 mapigo[url] = nova

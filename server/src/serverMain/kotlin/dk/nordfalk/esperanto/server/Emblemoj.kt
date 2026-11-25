@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.server
 
 import dk.nordfalk.esperanto.logw
 import java.io.ByteArrayInputStream
+import java.security.MessageDigest
 import javax.imageio.ImageIO
 
 /**
@@ -50,6 +51,16 @@ object Emblemoj {
      * signoj): trunkita, koruptita aŭ kaŝvestita enhavo kun ĝusta signaturo
      * estas rifuzata (→ null; la emblemo restas ĉe la originala URL, A4).
      */
+    /**
+     * Dosiernoma radiko por spegulata elsenda bildeto: SHA-1 de la originala URL
+     * (40 hex-signoj). La sama URL ĉiam ricevas la saman nomon — tial la
+     * ekzisto-kontrolo sutas: jam spegulita bildeto neniam re-elŝutiĝas, kaj
+     * pluraj kanaloj kun la sama bildo kunhavas unun spegulon.
+     */
+    fun bildetaRadiko(url: String): String =
+        MessageDigest.getInstance("SHA-1").digest(url.toByteArray(Charsets.UTF_8))
+            .joinToString("") { "%02x".format(it) }
+
     fun formatoSeLegebla(bitokoj: ByteArray): String? {
         val formato = formatoLaŭEnhavo(bitokoj) ?: return null
         return try {

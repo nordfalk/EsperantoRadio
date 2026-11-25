@@ -1,6 +1,7 @@
 package dk.nordfalk.esperanto.server
 
 import dk.nordfalk.esperanto.data.config.KanalAgordoLeganto
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logw
 import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.parser.HtmlFontoParsilo
@@ -40,6 +41,9 @@ object ArkivKonstruilo {
     // HTML-fontoj (mediatheko sen RSS, ekz. radiofrei): pli da paĝoj kaj eroj ol RSS
     private const val MAKS_HTML_PAĜOJ = 30
     private const val MAKS_HTML_EROJ = 300
+    // Elsenda bildeto (bildoUrl): sufiĉe por kovrilo/kontribuaĵo-foto, tro por erarpaĝo aŭ
+    // kaŝvestitaĵo (C56 — la bildo servatas samdevene por la retversio).
+    private const val MAKS_BILDETA_GRANDECO_BITOKOJ = 5L * 1024 * 1024
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
@@ -84,12 +88,16 @@ object ArkivKonstruilo {
                     kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
                 }
                 val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
+                // Elsendaj bildetoj speguliĝas antaŭ la skribo — la fluo ricevas
+                // samdevenan URL-on kiel <itunes:image> (C56: CORS blokas eksterajn
+                // bildojn en la retversio; FluSkribilo skribas ĝin po ero).
+                val spegulitajElsendoj = speguluElsendajnBildetojn(elsendoj, http, agordo.arkivoBazoUrl)
                 // La fluo ankaŭ portu la spegulitan emblemo-URL-on (eksteraj legitimiloj)
                 val skriboKanalo = kanalo.emblemoUrl
                     ?.let { malnova -> emblemoj.mapigo[malnova]?.let { kanalo.copy(emblemoUrl = it) } }
                     ?: kanalo
                 FluSkribilo.skribu(
-                    skriboKanalo, elsendoj, priskriboj, titoloj,
+                    skriboKanalo, spegulitajElsendoj, priskriboj, titoloj,
                     File(PUBLIKA, "kanaloj/${kanalo.slug}.xml"),
                 )
                 // Nur NUN la arkiva fluo de tiu kanalo referencas la novan spegulon —
@@ -200,6 +208,69 @@ object ArkivKonstruilo {
         bildujo.listFiles()
             ?.filter { it.isFile && it.nameWithoutExtension == slug && (novaNomo == null || it.name != novaNomo) }
             ?.forEach { it.delete() }
+    }
+
+    /**
+     * Spegulas la elsendlajn bildetojn ([dk.nordfalk.esperanto.domain.model.Elsendo.bildoUrl]
+     * : la `RssParsilo` elektas ĝin kiel la unuan `<img>` el la priskribo) al
+     * `publika/bildoj/elsendoj/<sha1(url)>.<ekst>` kaj redonas la elsendojn kun
+     * samdevena URL-o (C56: la retversio ne povas ŝargi eksterajn bildojn — CORS).
+     * Jam spegulita bildeto (ekzistanta dosiero kun la sama radiko) ne re-elŝutiĝas.
+     * Fiaskinta elŝuto (reta eraro, tro granda, ne malkodebla enhavo) lasas la
+     * ORIGINALAN URL-on (regulo A4) — sur Android/Desktop ĝi plu funkcias; la
+     * retversio tiam ne montras la bildeton.
+     */
+    private fun speguluElsendajnBildetojn(
+        elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
+        http: HttpClient,
+        arkivoBazoUrl: String?,
+    ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
+        if (arkivoBazoUrl.isNullOrBlank()) return elsendoj
+        val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
+        val bildujo = File(PUBLIKA, "bildoj/elsendoj").apply { mkdirs() }
+        val mapigo = mutableMapOf<String, String>()
+        fun novaUrl(url: String, dosiero: java.io.File): String = "$bazo/bildoj/elsendoj/${dosiero.name}"
+
+        fun spegulu(url: String): String {
+            mapigo[url]?.let { return it }
+            val radiko = Emblemoj.bildetaRadiko(url)
+            val ekzistanta = bildujo.listFiles()?.firstOrNull { it.isFile && it.nameWithoutExtension == radiko }
+            val nova = if (ekzistanta != null) {
+                novaUrl(url, ekzistanta) // jam spegulita en pli frua rulo
+            } else {
+                try {
+                    runBlocking {
+                        val respondo = http.get(url)
+                        check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
+                        val enhavo = respondo.bodyAsBytes()
+                        check(enhavo.size.toLong() <= MAKS_BILDETA_GRANDECO_BITOKOJ) { "tro granda: ${enhavo.size} bitokoj" }
+                        val formato = Emblemoj.formatoSeLegebla(enhavo)
+                            ?: throw IllegalStateException("ne malkodebla PNG/JPEG/GIF (eble SVG/HTML)")
+                        val dosiero = File(bildujo, "$radiko.$formato")
+                        dosiero.writeBytes(enhavo)
+                        novaUrl(url, dosiero)
+                    }
+                } catch (e: Exception) {
+                    // A4: unu fiaskinta bildeto ne haltigas la kanalon; A8: protokolu
+                    logw("ArkivKonstruilo", "elsenda bildeto ne spegulebla: $url — la originala URL restas", e)
+                    url
+                }
+            }
+            mapigo[url] = nova
+            return nova
+        }
+
+        var spegulitaj = 0
+        val rezulto = elsendoj.map { e ->
+            val bildo = e.bildoUrl ?: return@map e
+            if (bildo.startsWith(bazo)) e // jam samdevena (pli frua rulo)
+            else {
+                spegulitaj++
+                e.copy(bildoUrl = spegulu(bildo))
+            }
+        }
+        if (spegulitaj > 0) logd("ArkivKonstruilo", "elsendaj bildetoj: ${mapigo.size} unikaj, $spegulitaj spegulotaj")
+        return rezulto
     }
 
     /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas

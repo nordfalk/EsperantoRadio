@@ -229,6 +229,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   familiaraj. (2026-11-25: du recenz-sugestoj de la posedanto preskaŭ perdiĝis
   ĉar la listo montris ilin kiel «nordfalk» kaj la agento supozis siajn proprajn
   respondojn.)
+- **Ĉiu GitHub-komento de la agento portu subskribon** (2026-11-25): ĉiu
+  komento/fadena respondo afiŝita de la agento en GitHub finiĝu per la linio
+  `— Skribita de Mistral Vibe` (same kiel la commit-mesaĝoj portas sian
+  kun-aŭtoran linion). Pri „nordfalk“-komento SEN la subskribo oni do supozu
+  la POSEDANTON kaj traktu ĝin tuj kiel direktivon (recenz-sugesto, korekto,
+  forig-peto), ne kiel propran reson.
 - **CodeRabbit recenzas ĉiun kod-PR-on (2026-11-24, PR #204)**: kontrolu ĝiajn
   enliniajn komentojn kelkajn minutojn post ĉiu puŝo
   (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments`), traktu la validajn

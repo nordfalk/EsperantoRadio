@@ -64,6 +64,14 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   la nuna → "Unresolved reference" NUR sur wasmJs (JVM/Android uzas jar).
   Kontrolu per `unzip -p <klib> default/manifest | grep compiler_version` kaj
   rulu `:webApp:compileKotlinWasmJs` post versi-bumo.
+- **wasmJs JS-interop en Kotlin 2.4 (2026-11-25, PR #216)**: `@JsFun` NE plu ekzistas
+  ("Unresolved reference 'JsFun'") — uzu la `js()`-funkcion el `kotlin.js`
+  (`@file:OptIn(ExperimentalWasmJsInterop::class)`): `js()` estu la sola esprimo en
+  la funkcikorpo; en esprima kunteksto unuopa JS-esprimo, en korpo pluraj instrukcioj;
+  la PARAMETROJ de la vokata funkcio estas rekte uzeblaj en la JS-kodo (ankaŭ
+  lambdoj, kiujn la JS-kodo povas alvoki). La Historio-API-integrigo de la reta
+  versio (`navigation/RetumilaNavigado.wasmJs.kt`) estas referenca ekzemplo.
+  MEZURU retan konduton per Playwright (`tmp/` — vidu la sekcion "Reta versio").
 - **ksoup**: `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`;
   `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —

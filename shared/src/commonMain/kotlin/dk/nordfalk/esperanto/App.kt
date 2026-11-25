@@ -53,7 +53,9 @@ import dk.nordfalk.compose.material3.rememberDrawerState
 import dk.nordfalk.esperanto.logi
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
+import dk.nordfalk.esperanto.navigation.RetumilaNavigado
 import dk.nordfalk.esperanto.navigation.Vojo
+import dk.nordfalk.esperanto.navigation.vojaTitolo
 import dk.nordfalk.esperanto.ui.*
 import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
@@ -275,6 +277,15 @@ fun EsperantoRadioApp(
         fun reen() {
             logi("Nav", "← reen")
             if (backStack.size > 1) backStack.removeLastOrNull()
+        }
+
+        // Retumila integrigo — finfajnigo de la reta versio (C56): je la retumilo la reen-butono de la
+        // retumilo navigu en la apo (Historio-API) anstataŭ forlasi la paĝon,
+        // kaj la langeta titolo (document.title) sekvu la aktualan ekranon.
+        LaunchedEffect(Unit) { RetumilaNavigado.startu { reen() } }
+        val paĝotitolo = vojaTitolo(nunaVojo, kanaloj)
+        LaunchedEffect(nunaVojo, backStack.size, paĝotitolo) {
+            RetumilaNavigado.stakŜanĝiĝis(backStack.size, paĝotitolo)
         }
 
         // Flankaj ekranoj (dua nivelo) estas tutekranoj sen mini-ludilbreto —

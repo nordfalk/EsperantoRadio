@@ -259,7 +259,7 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
 - **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
 - **Web (wasmJs)**: produkta gastigado ĉe https://javabog.dk/esperanto-radio/apo/ (samdevene apud la arkivo, FATOTO→solvita C56, 2026-11-24):
-  datumoj kaj emblemoj venas NUR el la arkiva servilo (la originalaj fluoj kaj bild-gastigantoj estas CORS-blokitaj kaj estas preterlasataj sur la retumilo), la sono ludas rekte el la fonto per HTML-`<audio>`. Konstruo: `./gradlew :webApp:kopiuAlPublikaElsutejo` + rsync.
+  datumoj kaj emblemoj venas NUR el la arkiva servilo (la originalaj fluoj kaj bild-gastigantoj estas CORS-blokitaj kaj estas preterlasataj sur la retumilo), la sono ludas rekte el la fonto per HTML-`<audio>`. Konstruo: `./gradlew :webApp:kopiuAlApoBetaElsutejo` + rsync.
   Loka provado per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (tie ankaŭ la nur-arkiva datumvojo provas la realan javabog.dk-arkivon).
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
 

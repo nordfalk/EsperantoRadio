@@ -97,8 +97,15 @@
                     window.ert.startigu();
                 } else if (window.sentryStartita) {
                     // Malŝaltu ankaŭ la sendependan sesian telemetrion —
-                    // ne nur per beforeSend (kovertoj ĝin preterpasas)
+                    // ne nur per beforeSend (kovertoj ĝin preterpasas).
+                    // ANTŬ ol close(): malebligu la klienton — close() unue
+                    // elbufras (flush) kaj sendus ankaŭ jam bufritajn
+                    // protokolojn; kun enabled=false sendEnvelope rifuzas.
                     window.sentryStartita = false;
+                    try {
+                        var opcioj = window.Sentry.getCurrentClient().getOptions();
+                        if (opcioj) opcioj.enabled = false;
+                    } catch (e) { /* interna API-varianto — daŭrigu ĉiuokaze */ }
                     try { window.Sentry.close(); } catch (e) { /* jam fermita */ }
                 }
             }

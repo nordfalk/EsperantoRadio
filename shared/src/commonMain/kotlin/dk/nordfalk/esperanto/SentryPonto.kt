@@ -10,25 +10,25 @@ package dk.nordfalk.esperanto
  *
  * - **wasmJs**: transdonas al la `window.ert`-ponto (`SentryPonto.wasmJs.kt`);
  * - **ĉiuj aliaj platformoj**: no-op — la KMP-SDK mem raportas
- *   (`SentryPontoPlat.kt`).
+ *   (`SentryPontoPlatforme.kt`).
  *
  * La alirrajton ("raportadoAktiva") ĉiam kontrolas la alvokanto (ProtokoloUtil)
  * — la ponto mem nur plenumas.
  */
-internal expect fun sentryProtokoluPlat(nivelo: String, teksto: String)
+internal expect fun sentryProtokoluPlatforme(nivelo: String, teksto: String)
 
 /**
  * Vera escepto — error-evento, kiu konsumas la monatan erarojn-kvoton
  * (spegulo de `Sentry.captureException` sur wasmJs).
  */
-internal expect fun sentryEsceptoPlat(teksto: String, staktraco: String)
+internal expect fun sentryKaptuEsceptonPlatforme(teksto: String, staktraco: String)
 
 /** Etikedo (tag) sur ĉiuj eventoj — ekz. la pseŭdonimo kiel "uzanto". */
-internal expect fun sentryEtikedoPlat(ŝlosilo: String, valoro: String)
+internal expect fun sentryEtikeduPlatforme(ŝlosilo: String, valoro: String)
 
 /**
  * Sinkronigas la konsento-flagon al la platformo. Necesa nur sur wasmJs,
  * kie la JS-flago `window.erarRaportadoAktiva` ankaŭ regas la sendependajn
  * JS-erarojn (window.onerror) per `beforeSend`.
  */
-internal expect fun sinkroniguRaportadanKonsentonPlat(aktiva: Boolean)
+internal expect fun sinkroniguRaportadanKonsentonPlatforme(aktiva: Boolean)

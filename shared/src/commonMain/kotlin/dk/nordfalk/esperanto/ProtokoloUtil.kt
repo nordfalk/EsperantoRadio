@@ -26,7 +26,7 @@ var raportadoAktiva: Boolean = false
     // regas ankaŭ la sendependajn JS-erarojn per beforeSend. Aliaj platformoj: no-op.
     set(value) {
         field = value
-        sinkroniguRaportadanKonsentonPlat(value)
+        sinkroniguRaportadanKonsentonPlatforme(value)
     }
 
 @Volatile
@@ -40,7 +40,7 @@ fun logi(tag: String, msg: String) {
     platformLogi(tag, msg)
     if (raportadoAktiva && protokoloDetala) {
         Sentry.logger.info("[$tag] $msg")
-        sentryProtokoluPlat("info", "[$tag] $msg")
+        sentryProtokoluPlatforme("info", "[$tag] $msg")
     }
 }
 
@@ -54,7 +54,7 @@ fun logGrava(tag: String, msg: String) {
     platformLogi(tag, msg)
     if (raportadoAktiva) {
         Sentry.logger.info("[$tag] $msg")
-        sentryProtokoluPlat("info", "[$tag] $msg")
+        sentryProtokoluPlatforme("info", "[$tag] $msg")
     }
 }
 
@@ -62,7 +62,7 @@ fun logw(tag: String, msg: String) {
     platformLogw(tag, msg)
     if (raportadoAktiva) {
         Sentry.logger.warn("[$tag] $msg")
-        sentryProtokoluPlat("warn", "[$tag] $msg")
+        sentryProtokoluPlatforme("warn", "[$tag] $msg")
     }
 }
 
@@ -70,7 +70,7 @@ fun loge(tag: String, msg: String) {
     platformLoge(tag, msg)
     if (raportadoAktiva) {
         Sentry.logger.error("[$tag] $msg")
-        sentryProtokoluPlat("error", "[$tag] $msg")
+        sentryProtokoluPlatforme("error", "[$tag] $msg")
     }
 }
 
@@ -90,7 +90,7 @@ fun loge(tag: String, msg: String, e: Throwable) {
     if (raportadoAktiva) {
         Sentry.captureException(e)
         // wasmJs: la KMP-SDK estas no-op — la escepto iras tra la JS-ponto
-        sentryEsceptoPlat(plenaMsg, e.stackTraceToString())
+        sentryKaptuEsceptonPlatforme(plenaMsg, e.stackTraceToString())
     }
 }
 
@@ -107,7 +107,7 @@ fun logw(tag: String, msg: String, e: Throwable) {
     if (raportadoAktiva) {
         Sentry.logger.warn("[$tag] $plenaMsg")
         Sentry.logger.warn("[$tag] " + e.stackTraceToString())
-        sentryProtokoluPlat("warn", "[$tag] $plenaMsg")
-        sentryProtokoluPlat("warn", "[$tag] " + e.stackTraceToString())
+        sentryProtokoluPlatforme("warn", "[$tag] $plenaMsg")
+        sentryProtokoluPlatforme("warn", "[$tag] " + e.stackTraceToString())
     }
 }

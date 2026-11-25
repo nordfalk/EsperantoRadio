@@ -54,7 +54,7 @@ fun initialiguSentry(medio: String = "evoluo") {
 fun agorduSentryEtikedon(ŝlosilo: String, valoro: String) {
     Sentry.configureScope { scope -> scope.setTag(ŝlosilo, valoro) }
     // wasmJs: la KMP-SDK estas no-op — la etikedo iras tra la JS-ponto
-    sentryEtikedoPlat(ŝlosilo, valoro)
+    sentryEtikeduPlatforme(ŝlosilo, valoro)
 }
 
 /**

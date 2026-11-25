@@ -7,19 +7,19 @@ package dk.nordfalk.esperanto
  * La js()-vokoj estas esprimoj kun mallongigo (&&) — se la ponto mankas
  * (unuo-testoj, frua starto), ĉio restas sendanĝere silenta.
  */
-actual fun sentryProtokoluPlat(nivelo: String, teksto: String) {
+actual fun sentryProtokoluPlatforme(nivelo: String, teksto: String) {
     sentryPontoProtokolo(nivelo, teksto)
 }
 
-actual fun sentryEsceptoPlat(teksto: String, staktraco: String) {
+actual fun sentryKaptuEsceptonPlatforme(teksto: String, staktraco: String) {
     sentryPontoEscepto(teksto, staktraco)
 }
 
-actual fun sentryEtikedoPlat(ŝlosilo: String, valoro: String) {
+actual fun sentryEtikeduPlatforme(ŝlosilo: String, valoro: String) {
     sentryPontoEtikedo(ŝlosilo, valoro)
 }
 
-actual fun sinkroniguRaportadanKonsentonPlat(aktiva: Boolean) {
+actual fun sinkroniguRaportadanKonsentonPlatforme(aktiva: Boolean) {
     sentryPontoKonsento(aktiva)
 }
 

@@ -484,7 +484,7 @@ Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
   plenigas la kvoton).
 - Ĉiu `catch` devas protokoli (regulo A8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
   kun stacktrace — neniam engluti escepton silente.
-- En produktado eraroj estas 50 %-specimenataj (`options.sampleRate`, PR #109).
+- Eraroj NE estas specimenataj (`options.sampleRate = 1.0`, decido de la posedanto 2026-11-25; antaŭe 50 % en produktado de PR #109 — malŝaltita ĉar la kvoto restis trankvila).
   Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston — ne
   malmolu versio-listojn en la apo (la provo kaj retiro staras en ŜANĜOJ,
   „Forĵeto de eraroj de malnovaj versioj“).

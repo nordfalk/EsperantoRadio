@@ -61,8 +61,10 @@
                     dsn: "https://764998823a401d936a5e227d1453951e@o4512078664564736.ingest.de.sentry.io/4512078868185168",
                     release: "esperantoradio@__APOVERSIIO__",
                     environment: "produktado",
-                    // Erar-eventoj 50 %-specimenataj — same kiel Android (PR #109, G46)
-                    sampleRate: 0.5,
+                    // Erar-eventoj NE specimenataj (100 %) — same kiel Android ekde
+                    // 2026-11-25 (decido de la posedanto); la erarojn-kvoto restas
+                    // trankvila (~200 eventoj/monato ≈ 4 % de 5 000)
+                    sampleRate: 1.0,
                     // Sentry.logger.* (protokoloj) — aparta kvoto, ne la erarojn-kvoto
                     enableLogs: true,
                     beforeSend: function (event) {

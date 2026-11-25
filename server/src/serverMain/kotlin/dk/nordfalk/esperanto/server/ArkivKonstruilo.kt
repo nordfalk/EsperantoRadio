@@ -354,7 +354,7 @@ object ArkivKonstruilo {
      * antaŭkontrolo de Content-Length KAJ ĉesigo dum la flu-legado — neniam
      * senlima enmemorigo (OutOfMemoryError ne estas kaptata de catch(Exception)).
      */
-    private suspend fun leguBitokojnLimigite(respondo: HttpResponse, limo: Long): ByteArray {
+    internal suspend fun leguBitokojnLimigite(respondo: HttpResponse, limo: Long): ByteArray {
         val deklarita = respondo.headers[HttpHeaders.ContentLength]?.toLongOrNull()
         if (deklarita != null && deklarita > limo) throw RespondoTroGrandaException(deklarita, limo)
         val kanalo = respondo.bodyAsChannel()

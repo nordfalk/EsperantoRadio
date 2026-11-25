@@ -121,7 +121,6 @@ fun derivuTitolon(unuaLinio: String, originalaTitolo: String): String? {
 private fun esc(s: String): String =
     s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-/** Ĉu la teksto enhavas HTML-etikedon (aŭ CDATA-komenco) — do jam estas HTML-esprimata. */
 /**
  * Rekonas VERAN HTML-etikedon (konatan etikednomon) — ne nur ajnan «<litero»-on:
  * pura teksto kiel «5<n» (matematiko) tial ne erare traktiĝas kiel HTML,

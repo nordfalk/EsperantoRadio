@@ -142,4 +142,9 @@ class RezumoHtmlTest {
     fun malplenaPartoRedonasMalplenanĈenon() {
         assertEquals("", priskriboPartoAlHtml("   \n "))
     }
+    @Test
+    fun matematikaSignoNeErareKonsiderataHtml() {
+        // «5 < n» estas pura teksto, ne HTML — malgraŭ «<l»-a ŝajna komenco
+        assertEquals("<p>5 &lt; n kaj x&gt;y</p>", priskriboPartoAlHtml("5 < n kaj x>y"))
+    }
 }

@@ -123,4 +123,23 @@ class RiĉiguPriskribojnPerAITest {
             dir.deleteRecursively()
         }
     }
+
+    @Test
+    fun jamRicigitaPriskriboNeRicigigasDuanFojon() {
+        // priskribo re-legita el la arkivo jam portas la averton — ĝi restas netuŝita
+        val dir = provizorujo("Temo.\n- punkto unu")
+        try {
+            val kanalo = Kanalo(slug = "tests", nomo = "Testo")
+            val elsendo = Elsendo(
+                id = "tests:abc", kanaloSlug = kanalo.slug, kanaloNomo = kanalo.nomo,
+                titolo = "Elsendo 01.01.2026",
+                priskribo = "Io pri la elsendo. $averto Jen la rezumo de tiu ĉi elsendo, jam en la arkivo.",
+                dato = "2026-01-01", fluo = "https://x/a.mp3",
+            )
+            val (priskriboj, _) = ArkivKonstruilo.riĉigu(kanalo, listOf(elsendo), dir)
+            assertEquals(emptyMap(), priskriboj)
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
 }

@@ -122,7 +122,17 @@ private fun esc(s: String): String =
     s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 /** Ĉu la teksto enhavas HTML-etikedon (aŭ CDATA-komenco) — do jam estas HTML-esprimata. */
-private val HTML_ETIKEDO = Regex("<[a-zA-Z/!]")
+/**
+ * Rekonas VERAN HTML-etikedon (konatan etikednomon) — ne nur ajnan «<litero»-on:
+ * pura teksto kiel «5<n» (matematiko) tial ne erare traktiĝas kiel HTML,
+ * dum «<p>…</p>» aŭ «<br/>» jes. RSS-priskriboj ne portas eksplicitan
+ * format-informon, do rekono laŭ etiked-blanklisto estas la plej profunde
+ * diegebla proksimumaĵo (la apo mem same distingas per sia parsilo).
+ */
+private val HTML_ETIKEDO = Regex(
+    """</?(p|br|em|strong|b|i|u|s\b|ul|ol|li|a|div|span|h[1-6]|img|blockquote|code|pre|hr|table|thead|tbody|tr|td|th|sub|sup|strike)\b""",
+    RegexOption.IGNORE_CASE,
+)
 
 /**
  * Unu parto de priskribo al HTML: pura teksto estas eskapata kaj envolvata en

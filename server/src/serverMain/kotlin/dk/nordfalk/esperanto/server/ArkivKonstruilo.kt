@@ -360,6 +360,8 @@ object ArkivKonstruilo {
         val titoloj = mutableMapOf<String, String>()
         for (e in elsendoj) {
             val krudaPriskribo = e.priskribo.orEmpty().trim()
+            // Jam riĉigita priskribo (re-legita el la arkivo) ne riĉiĝu duan fojon
+            if (krudaPriskribo.contains(AI_AVERTO)) continue
             if (krudaPriskribo.length > AI_PRISKRIBO_JE_LONGO_MALPLI_OL) continue
             val nomo = transkriptoDosieroNomo(e.id)
             val rezumoDosiero = File(privata, "rezumoj/${kanalo.slug}/$nomo.txt")

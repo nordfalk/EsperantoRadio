@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.data.config
 
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -71,6 +72,44 @@ class KanalkonfiguroDeforaTest {
     fun senKonservitoUziĝasLaPaktita() {
         val agordo = leguAgordonKunRezervo(leganto, { agordoTeksto("paktita") }, { null }, {})
         assertEquals(listOf("paktita"), agordo.kanaloj.map { it.kodo })
+    }
+
+    // ---------- evolua medio: la defora konfiguro tute ne uziĝas ----------
+
+    @Test
+    fun enEvoluaMedioLaPaktitaVenkasEĉKunKonservito() {
+        // Debug-konstruo/emulilo: novaj kanaloj el Git devas testiĝi sen rsync —
+        // la persistigita defora konfiguro (eble plurajn semajnojn malnova) IGNORIĜAS
+        val persisto = MemorPersisto()
+        persisto.teksto = agordoTeksto("defora")
+        AppStato.estasEvoluaMedo = true
+        try {
+            val agordo = leguAgordonKunRezervo(leganto, { agordoTeksto("paktita") }, persisto.legu, persisto.forigu)
+            assertEquals(listOf("paktita"), agordo.kanaloj.map { it.kodo })
+            // La persistigita defora teksto NE tuŝiĝas (nek legita, nek forigita):
+            // ĝi validos plu por produktadaj konstruoj
+            assertEquals(agordoTeksto("defora"), persisto.teksto)
+            assertEquals(0, persisto.forigitaj)
+        } finally {
+            AppStato.estasEvoluaMedo = false
+        }
+    }
+
+    @Test
+    fun malpermesoDeDeforaKonfiguroFunkciasAnkaŭSenEvoluaMedoFlago() {
+        // La parametron oni povas doni eksplicite (ekz. estontaj iloj) —
+        // sendepende de la AppStato-flago
+        val persisto = MemorPersisto()
+        persisto.teksto = agordoTeksto("defora")
+        val agordo = leguAgordonKunRezervo(
+            leganto,
+            paktitaTeksto = { agordoTeksto("paktita") },
+            leguKonservitan = persisto.legu,
+            foriguKonservitan = persisto.forigu,
+            uzuDeforanKonfiguron = false,
+        )
+        assertEquals(listOf("paktita"), agordo.kanaloj.map { it.kodo })
+        assertEquals(0, persisto.forigitaj)
     }
 
     // ---------- KanaloDeponejoImpl.refreŝiguDefore ----------

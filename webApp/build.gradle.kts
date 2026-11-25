@@ -33,8 +33,10 @@ val kopiuAlApoBetaElsutejo by tasks.registering(Sync::class) {
     into(rootProject.file("server/data/publika/apo-beta"))
     doLast {
         // Enmetu la version en index.html (Sentry-release) — la deponeja fonto
-        // de vero: gradle/libs.versions.toml (same kiel ApoVersio en :shared)
-        val versio = libs.versions.apoversio.get()
+        // de vero: gradle/libs.versions.toml (same kiel ApoVersio en :shared).
+        // La sufikso "-beta" distingas la kanalon en Sentry (release estas
+        // unua-ranga dimensio: eraroj, protokoloj, sesioj, Releases-pagxo).
+        val versio = libs.versions.apoversio.get() + "-beta"
         val index = destinationDirectory.get().asFile.resolve("index.html")
         index.writeText(index.readText().replace("__APOVERSIIO__", versio))
     }
@@ -49,6 +51,7 @@ val kopiuAlApoElsutejo by tasks.registering(Sync::class) {
     from(layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
     into(rootProject.file("server/data/publika/apo"))
     doLast {
+        // Sen sufikso — la produktada release (aparte de la beta en Sentry)
         val versio = libs.versions.apoversio.get()
         val index = destinationDirectory.get().asFile.resolve("index.html")
         index.writeText(index.readText().replace("__APOVERSIIO__", versio))

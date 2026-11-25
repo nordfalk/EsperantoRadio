@@ -71,6 +71,9 @@
                         return window.erarRaportadoAktiva ? event : null;
                     },
                 });
+                // Deveno de la gasto (ekz. "javabog.dk/esperanto-radio/apo-beta/") —
+                // distingas beta-n kaj produktadon ankaux ekster la release-dimensiono
+                window.Sentry.setTag("retadreso", location.host + location.pathname);
             },
             // nivelo: "info" | "warn" | "error"  → Sentry logs
             protokolo: function (level, msg) {

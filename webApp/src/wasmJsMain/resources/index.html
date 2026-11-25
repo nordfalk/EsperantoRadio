@@ -11,6 +11,121 @@
 </head>
 <body>
     <div id="ComposeTarget"></div>
+
+    <!--
+      Erar-raportado (Sentry) por la reta versio.
+      La KMP-SDK ne ekzistas por wasmJs (ĝi estas no-op tie), tial la paĝo ŝargas
+      la Sentry-JavaScript-SDK-n kaj la KMP-kodo parolas al ĝi per la window.ert-ponto
+      (vidu SentryPonto.wasmJs.kt).
+
+      Ordo gravas: la konsento legiĝas ANTAŬ la SDK, por ke ankaŭ la sendependaj
+      JS-eraroj (window.onerror k.a.) respektu ĝin per beforeSend.
+    -->
+    <script>
+        window.erarRaportadoAktiva = true;
+        try {
+            // SettingsKeys.ERAR_RAPORTADO — persistas en localStorage (StorageSettings)
+            if (localStorage.getItem("erar_raportado") === "false") window.erarRaportadoAktiva = false;
+        } catch (e) {
+            // localStorage rifuzita (sekurecaj agordoj de la retumilo) — restu ĉe la defaŭlto
+        }
+        // Nur la produktada retejo raportas — loka evoluado ne polu Sentry
+        window.sentryEblas =
+            location.hostname === "javabog.dk" || location.hostname === "www.javabog.dk";
+        // Ĉu Sentry estas aktive inicialigita (startigu/close paro)
+        window.sentryStartita = false;
+    </script>
+
+    <!-- Sentry-JavaScript-SDK (la DSN kongruas kun SentryAgordo.kt). La versio enmetiĝas de
+         kopiuAlApoBetaElsutejo (webApp/build.gradle.kts) anstataŭ __APOVERSIIO__.
+         ATENTU: la npm-pakaĵo @sentry/browser ne distribuas CDN-faskojn ekde v7 —
+         uzu la ofican Sentry-CDN-on (browser.sentry-cdn.com); bundle.logs.metrics.min.js
+         enhavas la protokolan subtenon (Sentry.logger.*). -->
+    <script src="https://browser.sentry-cdn.com/11.18.0/bundle.logs.metrics.min.js" crossorigin="anonymous"></script>
+
+    <script>
+        // Ponto por la KMP-kodo. Ĉiuj funkcioj estas sendanĝeraj ankaŭ kiam
+        // la SDK mankas (evolua rulado, blokiloj): simple nenio okazas.
+        window.ert = {
+            // Inicialigo — NUR kun konsento (erarRaportadoAktiva): la defaŭlta
+            // sesia integraĵo (browserSessionIntegration) sendas kovertojn, kiuj
+            // NE trapasas beforeSend — ne-inicialigita SDK estas do la sola certa
+            // silento; kaj la reto ne devas malsami de Android (tie Sentry nur
+            // ekas, kiam la raportado estas ŝaltita). Reŝalto dum la seanco
+            // funkcias (konsento → startigu).
+            startigu: function () {
+                if (!window.sentryEblas || !window.Sentry || window.sentryStartita) return;
+                if (!window.erarRaportadoAktiva) return;
+                window.sentryStartita = true;
+                Sentry.init({
+                    dsn: "https://764998823a401d936a5e227d1453951e@o4512078664564736.ingest.de.sentry.io/4512078868185168",
+                    release: "esperantoradio@__APOVERSIIO__",
+                    environment: "produktado",
+                    // Erar-eventoj NE specimenataj (100 %) — same kiel Android ekde
+                    // 2026-11-25 (decido de la posedanto); la erarojn-kvoto restas
+                    // trankvila (~200 eventoj/monato ≈ 4 % de 5 000)
+                    sampleRate: 1.0,
+                    // Sentry.logger.* (protokoloj) — aparta kvoto, ne la erarojn-kvoto
+                    enableLogs: true,
+                    beforeSend: function (event) {
+                        return window.erarRaportadoAktiva ? event : null;
+                    },
+                });
+                // Deveno de la gasto (ekz. "javabog.dk/esperanto-radio/apo-beta/") —
+                // distingas beta-n kaj produktadon ankaux ekster la release-dimensiono.
+                // setTag → erar-eventoj; setAttribute → ankaŭ protokoloj kaj metrikoj
+                // (captureLogEvent kopias atributojn de la amplekso, sed ne etikedojn)
+                window.Sentry.setTag("retadreso", location.host + location.pathname);
+                if (window.Sentry.setAttribute) {
+                    window.Sentry.setAttribute("retadreso", location.host + location.pathname);
+                }
+            },
+            // nivelo: "info" | "warn" | "error"  → Sentry logs
+            protokolo: function (level, msg) {
+                if (!window.sentryStartita || !window.erarRaportadoAktiva || !window.Sentry) return;
+                var s = window.Sentry, l = s.logger;
+                if (!l) return; // fasko sen protokoloj — prefere silenti ol eraro-eventojn plenigi
+                if (level === "warn") l.warn(msg);
+                else if (level === "error") l.error(msg);
+                else l.info(msg);
+            },
+            // Vera eraro → error-evento (konsumas la monatan erarojn-kvoton)
+            escepto: function (msg, stack) {
+                if (!window.sentryStartita || !window.erarRaportadoAktiva || !window.Sentry) return;
+                var err = new Error(msg);
+                if (stack) err.stack = msg + "\n" + stack;
+                window.Sentry.captureException(err);
+            },
+            etikedo: function (key, value) {
+                if (!window.sentryStartita || !window.Sentry) return;
+                window.Sentry.setTag(key, value);
+            },
+            // Konsento-ŝanĝo dum la rulado (Agordoj → Privateco)
+            konsento: function (active) {
+                window.erarRaportadoAktiva = !!active;
+                if (active) {
+                    window.ert.startigu();
+                } else if (window.sentryStartita) {
+                    // Malŝaltu ankaŭ la sendependan sesian telemetrion —
+                    // ne nur per beforeSend (kovertoj ĝin preterpasas).
+                    // ANTŬ ol close(): malebligu la klienton — close() unue
+                    // elbufras (flush) kaj sendus ankaŭ jam bufritajn
+                    // protokolojn; kun enabled=false sendEnvelope rifuzas.
+                    window.sentryStartita = false;
+                    try {
+                        // getClient() — la publika API; getCurrentClient ne ekzistas
+                        // en la CDN-fasko (kontrolite en 11.18.0) kaj ĵetus TypeError
+                        var opcioj = window.Sentry.getClient().getOptions();
+                        if (opcioj) opcioj.enabled = false;
+                    } catch (e) { /* interna API-varianto — daŭrigu ĉiuokaze */ }
+                    try { window.Sentry.close(); } catch (e) { /* jam fermita */ }
+                }
+            }
+        };
+
+        if (window.erarRaportadoAktiva) window.ert.startigu();
+    </script>
+
     <script src="webApp.js"></script>
 </body>
 </html>

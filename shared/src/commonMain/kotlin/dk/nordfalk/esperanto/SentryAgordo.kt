@@ -27,11 +27,11 @@ fun initialiguSentry(medio: String = "evoluo") {
         options.logs.enabled = true
         // Kaptu 100 % da traktadoj nur en evoluo; 10 % en produktado (PR #93)
         options.tracesSampleRate = if (medio == "produktado") 0.1 else 1.0
-        // Erar-specimenado: en produktado nur 50 % — la monata eraroj-kvoto
-        // estis preskaŭ elĉerpita (4 004/5 000, 2026-10-13). Sentry grupigas la
-        // eventojn al problemoj, do la grupoj plu formiĝas; nur la nombroj
-        // malpreciziĝas.
-        options.sampleRate = if (medio == "produktado") 0.5 else 1.0
+        // Erar-specimenado: NENIU (100 %) ekde 2026-11-25, decido de la posedanto —
+        // la kvoto estas trankvila (~200 eventoj/monato ≈ 4 % de 5 000; la krizo
+        // de 2026-10-13, 4 004/5 000, ne revenis — ĝin bremsis G46 kaj la
+        // F-Droid-opt-in, ne la specimenado). Historio: 50 % en produktado de PR #109.
+        options.sampleRate = 1.0
         // Montru kion la SDK faras dum provado
         // options.debug = true
         options.attachThreads = false
@@ -53,6 +53,8 @@ fun initialiguSentry(medio: String = "evoluo") {
  */
 fun agorduSentryEtikedon(ŝlosilo: String, valoro: String) {
     Sentry.configureScope { scope -> scope.setTag(ŝlosilo, valoro) }
+    // wasmJs: la KMP-SDK estas no-op — la etikedo iras tra la JS-ponto
+    sentryEtikeduPlatforme(ŝlosilo, valoro)
 }
 
 /**

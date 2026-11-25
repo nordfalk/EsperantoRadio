@@ -22,7 +22,8 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Ŝanĝita
 
-- Emblemoj de kanaloj servatas de nia arkiva servilo (pli rapide kaj ankaŭ uzeblaj en la retumilo) (https://github.com/nordfalk/EsperantoRadio/pull/210)
+- Reta versio: eraroj kaj protokoloj de la retumilo nun atingas Sentry-n (respektante la privatecan agordon en Agordoj → Privateco) (https://github.com/nordfalk/EsperantoRadio/pull/219)
+- Emblemoj de kanaloj venas de nia arkiva servilo (pli rapide kaj ankaŭ uzeblaj en la retumilo) (https://github.com/nordfalk/EsperantoRadio/pull/210)
 
 - „Kio novas“ aŭtomate rulumas al la unua (plej nova) karto kiam venas nova elsendo (https://github.com/nordfalk/EsperantoRadio/pull/205)
 - Nehaveblaj ebloj ne plu montriĝas: la vekhorloĝo nur sur Android, elŝutoj nur sur Android kaj Desktop (https://github.com/nordfalk/EsperantoRadio/pull/212)

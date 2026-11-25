@@ -221,6 +221,20 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   (`gh api -X POST …/pulls/N/comments/{id}/replies -f body="…"`), kaj se la
   forigo malplenigas CHANGELOG-diferon de PR kiu tuŝas `*Main`, aldonu la
   etikedon `preterlasu-changelog` (`gh api -X POST …/issues/N/labels -f "labels[]=preterlasu-changelog"`).
+- **Legu ĈIUJN novajn PR-komentojn, sendepende de la aŭtoro** (2026-11-25, PR #219):
+  ĉio kion la agento afiŝas per la API aperas sub la login de la posedanto —
+  komentoj de «nordfalk» povas do esti KAJ la agento mem KAJ la posedanto. Ne
+  klasifiku laŭ la aŭtor-nomo; kontrolu per tempo-markilo kaj legu ĉiun komenton
+  pli novan ol via lasta lego-punkto, ankaŭ supernivelaĵojn kiuj ŝajnas
+  familiaraj. (2026-11-25: du recenz-sugestoj de la posedanto preskaŭ perdiĝis
+  ĉar la listo montris ilin kiel «nordfalk» kaj la agento supozis siajn proprajn
+  respondojn.)
+- **Ĉiu GitHub-komento de la agento portu subskribon** (2026-11-25): ĉiu
+  komento/fadena respondo afiŝita de la agento en GitHub finiĝu per la linio
+  `— Skribita de Mistral Vibe` (same kiel la commit-mesaĝoj portas sian
+  kun-aŭtoran linion). Pri „nordfalk“-komento SEN la subskribo oni do supozu
+  la POSEDANTON kaj traktu ĝin tuj kiel direktivon (recenz-sugesto, korekto,
+  forig-peto), ne kiel propran reson.
 - **CodeRabbit recenzas ĉiun kod-PR-on (2026-11-24, PR #204)**: kontrolu ĝiajn
   enliniajn komentojn kelkajn minutojn post ĉiu puŝo
   (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments`), traktu la validajn
@@ -484,7 +498,7 @@ Avertoj neniam iĝas error-eventoj kaj ne konsumas la erarojn-kvoton.
   plenigas la kvoton).
 - Ĉiu `catch` devas protokoli (regulo A8): `logw(tag, msg, e)` aŭ `loge(tag, msg, e)`
   kun stacktrace — neniam engluti escepton silente.
-- En produktado eraroj estas 50 %-specimenataj (`options.sampleRate`, PR #109).
+- Eraroj NE estas specimenataj (`options.sampleRate = 1.0`, decido de la posedanto 2026-11-25; antaŭe 50 % en produktado de PR #109 — malŝaltita ĉar la kvoto restis trankvila).
   Versio-bazita forĵeto (beforeSend) bezonas ĝisdateblan centran liston — ne
   malmolu versio-listojn en la apo (la provo kaj retiro staras en ŜANĜOJ,
   „Forĵeto de eraroj de malnovaj versioj“).

@@ -105,7 +105,9 @@
                     // protokolojn; kun enabled=false sendEnvelope rifuzas.
                     window.sentryStartita = false;
                     try {
-                        var opcioj = window.Sentry.getCurrentClient().getOptions();
+                        // getClient() — la publika API; getCurrentClient ne ekzistas
+                        // en la CDN-fasko (kontrolite en 11.18.0) kaj ĵetus TypeError
+                        var opcioj = window.Sentry.getClient().getOptions();
                         if (opcioj) opcioj.enabled = false;
                     } catch (e) { /* interna API-varianto — daŭrigu ĉiuokaze */ }
                     try { window.Sentry.close(); } catch (e) { /* jam fermita */ }

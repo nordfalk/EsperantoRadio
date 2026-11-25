@@ -70,12 +70,16 @@ https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
                                            dosierojn ĉi tien)
 ```
 
-**La retversio (C56, 2026-11-24) gastigas samdevene** sub `apo/`: sur la retumilo
+**La retversio (C56, 2026-11-24) gastigas samdevene**: la PRODUKTA retejo estas
+`https://javabog.dk/esperanto-radio/apo/`; novaj konstruoj tamen iras UNUE al
+`apo-beta/` (REGULO 2026-11-25, vidu «Publikigi»). Sur la retumilo
 `uzuOriginajnFluojn=false` (AppStato laŭ `platformo`) — nur la arkivaj fluoj kaj la
 spegulitaj bildoj estas ŝargataj (la originaloj estas CORS-blokitaj); la sono ludas
 rekte el la fonto per HTML-`<audio>` (ne CORS-bezona). Konstruo:
 `./gradlew :webApp:kopiuAlApoBetaElsutejo` (kopias el
-`webApp/build/dist/wasmJs/productionExecutable/` al `publika/apo-beta/`), poste la kutima rsync.
+`webApp/build/dist/wasmJs/productionExecutable/` al `publika/apo-beta/`), poste la
+kutima rsync. La produktan `apo/` oni ĝisdatigas NUR per `:webApp:kopiuAlApoElsutejo` +
+la aparta apo-rsync — laŭ eksplicita peto de la posedanto.
 
 La **apo konsumas tiujn fluojn kunfandante kun la originalaj**: `arkivoBazoUrl` en
 `esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` elŝutas paralele

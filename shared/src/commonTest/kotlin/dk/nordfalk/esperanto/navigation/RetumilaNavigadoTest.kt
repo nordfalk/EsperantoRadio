@@ -41,14 +41,17 @@ class RetumilaNavigadoTest {
     }
 
     @Test
-    fun popstateNaviguReenNurKiamLaRetumiloIrisReen() {
-        // Retumila reen-butono: la historia profundo malantaŭas la nav-stakon
-        assertTrue(popstateBezonasReenigon(historiaProfundo = 1, memoritaNavProfundo = 2))
-        // Nia propra history.back() post la reen-sago: la profundo estis
-        // ĝisdatigita antaŭ la evento — la valoroj kongruas
-        assertFalse(popstateBezonasReenigon(historiaProfundo = 1, memoritaNavProfundo = 1))
+    fun popstateReenigoKongruasKunLaHistoriaSalto() {
+        // Retumila reen-butono: la historia profundo postrestas je unu nivelo
+        assertEquals(1, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 2))
+        // Pluraj niveloj samtempe (historia menuo de la retumilo): popu po unu
+        assertEquals(2, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 3))
+        assertEquals(3, popstateReenigoj(historiaProfundo = 0, memoritaNavProfundo = 3))
+        // Nia propra history.back() post la reen-sago: la profundo ĝisdatiĝis
+        // antaŭ la evento — la valoroj kongruas (0 = ne navigu)
+        assertEquals(0, popstateReenigoj(historiaProfundo = 1, memoritaNavProfundo = 1))
         // Antaŭen (aŭ eksterstaka) — ne tuŝas la nav-stakon
-        assertFalse(popstateBezonasReenigon(historiaProfundo = 2, memoritaNavProfundo = 1))
+        assertEquals(0, popstateReenigoj(historiaProfundo = 2, memoritaNavProfundo = 1))
     }
 
     // --- paĝotitolo (langeta titolo) ---

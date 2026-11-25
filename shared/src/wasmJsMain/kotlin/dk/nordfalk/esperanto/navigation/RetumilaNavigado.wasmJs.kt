@@ -64,7 +64,9 @@ internal actual object RetumilaNavigado {
         memoritaProfundo = 1
         historyAnstataŭiguStaton(1)
         popstateAŭsktilo { d ->
-            if (popstateBezonasReenigon(d, memoritaProfundo)) onReen()
+            // La retumilo povas salti plurajn nivelojn samtempe (historia menuo) —
+            // popu po unu vojo ĝis la elektita profundo (riparo de la CodeRabbit-trovo #216).
+            repeat(popstateReenigoj(d, memoritaProfundo)) { onReen() }
         }
         kaŝuŜarĝEkranon()
     }
@@ -79,8 +81,8 @@ internal actual object RetumilaNavigado {
             }
             // La profundo ĝisdatiĝas SINHRONE: popstate de nia propra history.back()
             // alvenos poste kun la nova profundo kaj ne aktivigos reenigon;
-            // popstate de la RETUMILA reen-butono alkroĉiĝas bezonatan reenigon
-            // (vidu popstateBezonasReenigon kaj estuHistoryBack).
+            // popstate de la RETUMILA reen-butono postulas la reenigon
+            // (vidu popstateReenigojn kaj estuHistoryBack).
             memoritaProfundo = novaProfundo
         }
         if (titolo != null) agorduPaĝotitolon(titolo)

@@ -47,13 +47,14 @@ fun estuHistoryBack(
 ): Boolean = novaNavProfundo < memoritaNavProfundo && historiaProfundoNun > novaNavProfundo
 
 /**
- * Ĉu popstate-evento (kun la historia profund-indego en la stato) signifas,
- * ke la retumilo iris REEN kaj la APO devas navigi reen (pop provizora vojo)?
- * Propraj sinkronigoj (reen-sago en la apo) ĝisdatigas la memoratan profundecon
- * ANTAŬ la popstate alvenas, do ili ne passagegas ĉi-tiun kontrolon.
+ * Kiom da vojojn la APO devas popi kiam popstate-evento alvenas (la retumilo
+ * navigis — eble plurajn nivelojn samtempe, per la historia menuo de la retumilo:
+ * longa klako sur la reen-butono aŭ la historia flanka breto).
+ * 0 = ne navigu: trairo ANTAŬEN, aŭ nia propra sinkronigo (la memorita
+ * profundo jam ĝisdatiĝis antaŭ la evento alvenis).
  */
-fun popstateBezonasReenigon(historiaProfundo: Int, memoritaNavProfundo: Int): Boolean =
-    historiaProfundo < memoritaNavProfundo
+fun popstateReenigoj(historiaProfundo: Int, memoritaNavProfundo: Int): Int =
+    (memoritaNavProfundo - historiaProfundo).coerceAtLeast(0)
 
 /**
  * Integrigo inter la nav-stako kaj la RETUMILO (Historio-API, `document.title`,

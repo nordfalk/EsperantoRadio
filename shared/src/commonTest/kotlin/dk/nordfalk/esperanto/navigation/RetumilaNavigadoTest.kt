@@ -49,7 +49,8 @@ class RetumilaNavigadoTest {
 
     @Test
     fun radikaKajBazajEkranojOrdigasSin() {
-        assertEquals("EsperantoRadio beta", vojaTitolo(null, kanaloj))
+        // null (malplena stako) ne povas okazi dum rulado — same kiel Hejmo
+        assertEquals("EsperantoRadio", vojaTitolo(null, kanaloj))
         assertEquals("EsperantoRadio", vojaTitolo(Vojo.Hejmo, kanaloj))
         assertEquals("Ĉiuj kanaloj · EsperantoRadio", vojaTitolo(Vojo.Kanalaro, kanaloj))
         assertEquals("Serĉo · EsperantoRadio", vojaTitolo(Vojo.Serĉo, kanaloj))

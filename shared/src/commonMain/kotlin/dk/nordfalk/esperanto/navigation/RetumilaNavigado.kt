@@ -5,11 +5,11 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 
 /**
  * La paĝotitolo (langeta titolo) por la nuna vojo — sur la retumilo ĝi iĝas
- * `document.title`, do ĝi estu homlegebla anstataŭ teknika.
- * La beta-sufikso spegulas la retversian supran breton (HejmoEkrano).
+ * `document.title`, do ĝi estu homlegebla anstataŭ teknika. La beta-averto de
+ * la retversio vivas en la videbla supra breto kaj en index.html, ne en la titolo.
  */
 fun vojaTitolo(vojo: NavKey?, kanaloj: List<Kanalo>): String {
-    val bazo = if (vojo == null) "EsperantoRadio beta" else "EsperantoRadio"
+    val bazo = "EsperantoRadio"
     fun kanalNomo(slug: String) = kanaloj.firstOrNull { it.slug == slug }?.nomo ?: slug
     return when (vojo) {
         null, is Vojo.Hejmo -> bazo

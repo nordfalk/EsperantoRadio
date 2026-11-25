@@ -17,6 +17,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 ### Aldonita
 
 - Reta versio montras ankaŭ la bildetojn de unuopaj elsendoj — la arkiva servilo nun spegulas ilin samdevene (https://github.com/nordfalk/EsperantoRadio/pull/214)
+- Signife pli multaj elsendoj havas priskribojn faritajn de AI el la sondosiero — ankaŭ elsendoj kun tre mallonga originala priskribo (https://github.com/nordfalk/EsperantoRadio/pull/218)
 - Reta versio funkcias en la retumilo: https://javabog.dk/esperanto-radio/apo/ — kanaloj kaj elsendoj el nia arkiva servilo, sono rekte el la fonto (https://github.com/nordfalk/EsperantoRadio/pull/210)
 - Reta versio (beta): musa navigado de la kartaj vicoj kaj listoj — per la radeto kaj per muso-treno (https://github.com/nordfalk/EsperantoRadio/pull/210)
 

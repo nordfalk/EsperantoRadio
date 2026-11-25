@@ -1,5 +1,6 @@
 package dk.nordfalk.esperanto.server
 
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logw
 import java.io.ByteArrayInputStream
 import java.net.Inet6Address
@@ -27,6 +28,13 @@ object Emblemoj {
      * (vidu [formatoSeLegebla]); 25 MP kovras ĉiun realistican emblemon.
      */
     const val MAKS_BILDAJ_PIKSELOJ: Long = 25_000_000L
+
+    /**
+     * Maksimuma nombro da kadroj de spegulata bildo (animacia GIF ktp.) —
+     * dua vojo de la malkonprem-bombo-ŝirmo (CWE-409): multmil-kadra GIF
+     * estus malkodita frame post frame ankaŭ se unu kadro estas malgranda.
+     */
+    const val MAKS_BILDAJ_KADROJ: Long = 300L
 
     /** Baza URL de la spegulitaj emblemoj, derivita el `arkivoBazoUrl` (`…/kanaloj/` → la radiko). */
     fun bazaBildaUrl(arkivoBazoUrl: String): String {
@@ -58,12 +66,6 @@ object Emblemoj {
     }
 
     /**
-     * Kiel [formatoLaŭEnhavo], sed ankaŭ validigas ke la enhavo vere estas
-     * malkodebla bildo (ImageIO-malkodado de la tuta datumo — ne nur la magiaj
-     * signoj): trunkita, koruptita aŭ kaŝvestita enhavo kun ĝusta signaturo
-     * estas rifuzata (→ null; la emblemo restas ĉe la originala URL, A4).
-     */
-    /**
      * Dosiernoma radiko por spegulata elsenda bildeto: SHA-1 de la originala URL
      * (40 hex-signoj). La sama URL ĉiam ricevas la saman nomon — tial la
      * ekzisto-kontrolo sutas: jam spegulita bildeto neniam re-elŝutiĝas, kaj
@@ -89,6 +91,8 @@ object Emblemoj {
             if (b.size == 16 && (0 until 10).all { b[it].toInt() == 0 } &&
                 (b[10].toInt() and 0xFF) == 0xFF && (b[11].toInt() and 0xFF) == 0xFF
             ) return ipv4Publika(b, 12)
+            // :: (nedifinita) kaj ::1 (loopback): ĉiuj bitokoj nul krom eventuale la lasta
+            if (b.all { it.toInt() == 0 } || (b.dropLast(1).all { it.toInt() == 0 } && (b[15].toInt() and 0xFF) == 1)) return false
             val o0 = b[0].toInt() and 0xFF
             val o1 = b[1].toInt() and 0xFF
             return when {
@@ -96,8 +100,11 @@ object Emblemoj {
                 o0 == 0xFE && (o1 and 0xC0) == 0x80 -> false          // fe80::/10 (link-local)
                 o0 == 0xFF -> false                                   // ff00::/8 (multicast)
                 o0 == 0x20 && o1 == 0x02 -> ipv4Publika(b, 2)          // 6to4 2002::/16
-                o0 == 0x20 && o1 == 0x01 && b[2].toInt() == 0 && b[3].toInt() == 0 ->
-                    ipv4Publika(b, 12)                                 // teredo 2001:0::/32
+                o0 == 0x20 && o1 == 0x01 && b[2].toInt() == 0 && b[3].toInt() == 0 -> {
+                    // teredo 2001:0::/32: la klienta IPv4 estas OBFUSKATA per
+                    // bit-inversigo de ĉiu bitoko (RFC 4380) — malkodu antaŭ la kontrolo
+                    ipv4Publika(b.map { (it.toInt() and 0xFF).inv().toByte() }.toByteArray(), 12)
+                }
                 else -> true
             }
         }
@@ -119,28 +126,66 @@ object Emblemoj {
             o0 >= 240)                                               // 240/4 (rezervita)
     }
 
+    /**
+     * Kiel [formatoLaŭEnhavo], sed ankaŭ validigas ke la enhavo vere estas
+     * malkodebla bildo (plena ImageIO-malkodado): trunkita, koruptita aŭ
+     * kaŝvestita enhavo kun ĝusta signaturo estas rifuzata (→ null; la
+     * emblemo restas ĉe la originala URL, A4).
+     *
+     * Datum-ŝirmoj antaŭ la malkodado (CWE-409 — malkonprem-bomboj), legitaj el
+     * la kapo per [javax.imageio.ImageReader] SEN malkodi pikselojn:
+     * - dimensio: maks. [MAKS_BILDAJ_PIKSELOJ] pikseloj (ekz. 5-MB-PNG kun
+     *   kapo 50000×50000 estus postulinta multajn GiB da piksela memoro);
+     * - kadroj: maks. [MAKS_BILDAJ_KADROJ] (animacia GIF kun miloj da kadroj).
+     */
     fun formatoSeLegebla(bitokoj: ByteArray): String? {
         val formato = formatoLaŭEnhavo(bitokoj) ?: return null
-        // Dimensia kontrolo ANTAŬ la plena malkodado (CWE-409): el la kapo
-        // legeblas la larĝo kaj alto sen malkodi eĉ unu pikselon. Bildo kiu
-        // asertas superdimensiojn (aŭ nelegeblan kapon) estas rifuzata
-        // ankoraŭ antaŭ ol ImageIO.read povus eksplodigi la memoron.
-        try {
-            val enigo = ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj))
+        // Kap-kontroloj ANTAŬ la plena malkodado: la ImageReader legas
+        // larĝon, alton kaj kadro-nombron el la metadatumoj — neniuj
+        // pikseloj estas malkodataj ĝis la fina validigo sube.
+        val enigo = ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj))
+        val leganto = try {
             val legantoj = ImageIO.getImageReaders(enigo)
-            if (!legantoj.hasNext()) return null
-            val leganto = legantoj.next()
-            leganto.input = enigo
+            if (!legantoj.hasNext()) {
+                enigo.close()
+                return null
+            }
+            val l = legantoj.next()
+            l.input = enigo
+            l
+        } catch (e: Exception) {
+            // A8 + nelegebla kapo ne estas akceptebla bildo
+            logw("Emblemoj", "ne eblis legi la bildan kapon — rifuzata", e)
+            enigo.close()
+            return null
+        }
+        try {
             val larĝo = leganto.getWidth(0).toLong()
             val alto = leganto.getHeight(0).toLong()
             if (larĝo <= 0 || alto <= 0 || larĝo * alto > MAKS_BILDAJ_PIKSELOJ) {
                 logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
                 return null
             }
+            // Kadro-nombro (CWE-409, dua vojo): animacia GIF kun multegaj kadroj
+            val kadroj = try {
+                leganto.getNumImages(true).toLong()
+            } catch (e: Exception) {
+                // iuj legantoj ne subtenas la nombradon — atendata, ne eraro
+                logd("Emblemoj", "kadro-nombro ne legebla per ${leganto::class.simpleName} — preterlasata: ${e::class.simpleName}: ${e.message}")
+                null
+            }
+            if (kadroj != null && kadroj > MAKS_BILDAJ_KADROJ) {
+                logw("Emblemoj", "bildo rifuzata pro kadro-nombro $kadroj (limo: $MAKS_BILDAJ_KADROJ)")
+                return null
+            }
         } catch (e: Exception) {
             // A8: neniam silente engluti — kaj nelegebla kapo ne estas akceptebla bildo
             logw("Emblemoj", "ne eblis legi la bildan kap-dimensionon — rifuzata", e)
             return null
+        } finally {
+            // purigu la risurcojn en ĈIU vojo — ankaŭ frua rifuzo/escepto
+            leganto.dispose()
+            enigo.close()
         }
         return try {
             if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null

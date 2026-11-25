@@ -28,8 +28,13 @@ class EmblemojTest {
         val nepublikaj = listOf(
             "0.0.0.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "169.254.1.1",
             "127.0.0.1", "100.64.0.1", "198.18.0.1", "224.0.0.1", "250.1.2.3",
+            "::", "::1",
             "fd00::1", "fe80::1", "ff02::1", "::ffff:127.0.0.1",
-            "2002:0a00:0001::1", "2001:0000:0000:0000:0000:0000:0a00:0001",
+            "2002:0a00:0001::1",
+            // teredo 2001:0::/32: la klienta IPv4 estas BIT-INVERSIGITA po bitoko
+            // (RFC 4380) — 0a00:0001 = 10.0.0.1 malrekte; la korekta formo de 10.0.0.1:
+            "2001:0000:0000:0000:0000:0000:f5ff:fffe",
+            "2001:0000:0000:0000:0000:0000:0a00:0001",
         )
         for (a in nepublikaj) {
             assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName(a)), "devus rifuziĝi: $a")
@@ -73,6 +78,32 @@ class EmblemojTest {
         val el = ByteArrayOutputStream()
         ImageIO.write(bildo, "png", el)
         return el.toByteArray()
+    }
+
+    /** Generas animacian GIF-on kun [kadroj] 1x1-kadroj per ImageIO-sekvenco. */
+    private fun animaciaGif(kadroj: Int): ByteArray {
+        val bildo = java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        val skribanto = ImageIO.getImageWritersByFormatName("gif").next()
+        val el = java.io.ByteArrayOutputStream()
+        val fluo = ImageIO.createImageOutputStream(el)
+        try {
+            skribanto.output = fluo
+            skribanto.prepareWriteSequence(null)
+            repeat(kadroj) { skribanto.writeToSequence(javax.imageio.IIOImage(bildo, null, null), null) }
+            skribanto.endWriteSequence()
+        } finally {
+            skribanto.dispose()
+            fluo.close()
+        }
+        return el.toByteArray()
+    }
+
+    @Test
+    fun kadroBomboRifuziĝasAntaŭPlenaMalkodado() {
+        // 301-kadra GIF (ĉiuj 1x1) — la limo estas 300 kadroj
+        assertEquals(null, Emblemoj.formatoSeLegebla(animaciaGif(kadroj = (Emblemoj.MAKS_BILDAJ_KADROJ + 1).toInt())))
+        // 60-kadra GIF (~normala animacia emblemo) validas
+        assertEquals("gif", Emblemoj.formatoSeLegebla(animaciaGif(kadroj = 60)))
     }
 
     @Test

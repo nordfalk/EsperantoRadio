@@ -65,8 +65,12 @@ internal actual object RetumilaNavigado {
         historyAnstataŭiguStaton(1)
         popstateAŭsktilo { d ->
             // La retumilo povas salti plurajn nivelojn samtempe (historia menuo) —
-            // popu po unu vojo ĝis la elektita profundo (riparo de la CodeRabbit-trovo #216).
+            // popu po unu vojo ĝis la elektita profundo (CodeRabbit-fadeno de #216).
+            // La memorita profondo ĝisdatiĝas TUJE ankaŭ ĉi tie: sinsekvaj popstate-
+            // eventoj povas superi la rekunmetaĝon de la stak-efekto. Antaŭen-trairo
+            // ne tuŝas la nav-stakon, do memoritaPostPopstate akceptas nur pli malaltan.
             repeat(popstateReenigoj(d, memoritaProfundo)) { onReen() }
+            memoritaProfundo = memoritaPostPopstate(memoritaProfundo, d)
         }
         kaŝuŜarĝEkranon()
     }

@@ -2,6 +2,7 @@ package dk.nordfalk.esperanto.navigation
 
 import androidx.navigation3.runtime.NavKey
 import dk.nordfalk.esperanto.domain.model.Kanalo
+import kotlin.math.min
 
 /**
  * La paĝotitolo (langeta titolo) por la nuna vojo — sur la retumilo ĝi iĝas
@@ -55,6 +56,16 @@ fun estuHistoryBack(
  */
 fun popstateReenigoj(historiaProfundo: Int, memoritaNavProfundo: Int): Int =
     (memoritaNavProfundo - historiaProfundo).coerceAtLeast(0)
+
+/**
+ * La memorita profundo DESTINATA post popstate-evento: la retumila trairo povas
+ * superi la rekunmetaĝon (la stak-efekto en App.kt rulas ASINĦRONE), do sinsekvaj
+ * popstate-eventoj devas vidi la profundecon, kiun la ANTAŬA evento atingis —
+ * NUR pli malalta valoro validas (antaŭena trairo devas lasi la memoritan
+ * profundecon netuŝita, ĉar la nav-stako ne ŝanĝiĝas).
+ */
+fun memoritaPostPopstate(memoritaNavProfundo: Int, historiaProfundo: Int): Int =
+    min(memoritaNavProfundo, historiaProfundo.coerceAtLeast(1))
 
 /**
  * Integrigo inter la nav-stako kaj la RETUMILO (Historio-API, `document.title`,

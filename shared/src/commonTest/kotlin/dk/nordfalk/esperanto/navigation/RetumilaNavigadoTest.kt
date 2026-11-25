@@ -54,6 +54,18 @@ class RetumilaNavigadoTest {
         assertEquals(0, popstateReenigoj(historiaProfundo = 2, memoritaNavProfundo = 1))
     }
 
+    @Test
+    fun memoritaPostPopstateSekvasRapidajnSinsekvajnEventojn() {
+        // Du popstate-eventoj antaŭ la stak-efekto rulas: ĉiu devas vidi la
+        // profundecon, kiun la ANTAŬA evento atingis (4 -> 3 -> 2, ne 4 -> 3 -> 1)
+        assertEquals(3, memoritaPostPopstate(memoritaNavProfundo = 4, historiaProfundo = 3))
+        assertEquals(2, memoritaPostPopstate(memoritaNavProfundo = 3, historiaProfundo = 2))
+        // Antaŭen-trairo ne tuŝas la nav-stakon — la memorita profundo restu
+        assertEquals(3, memoritaPostPopstate(memoritaNavProfundo = 3, historiaProfundo = 4))
+        // Stato sen {d} (null -> 0) neniam malleviĝas la profundecon sub la radikon
+        assertEquals(1, memoritaPostPopstate(memoritaNavProfundo = 2, historiaProfundo = 0))
+    }
+
     // --- paĝotitolo (langeta titolo) ---
 
     private fun kanalo(slug: String, nomo: String) = Kanalo(slug = slug, nomo = nomo)

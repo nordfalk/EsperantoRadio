@@ -95,8 +95,10 @@ internal actual object RetumilaNavigado {
     actual fun stakŜanĝiĝis(novaProfundo: Int, titolo: String?) {
         if (startigita) {
             if (novaProfundo > memoritaProfundo) {
-                // La nav-stako profundiĝis (puŝo) — nova historia eniro
-                historyPuŝuStaton(novaProfundo)
+                // La nav-stako profundiĝis (puŝo) — UNU historia eniro po nivelo:
+                // du rapidaj puŝoj antaŭ la efekto rulas povas salti plurajn nivelojn
+                // (ekz. 1→3); unu po nivelo tenas la servon de la reen-butono (CodeRabbit, PR #216)
+                for (profundo in memoritaProfundo + 1..novaProfundo) historyPuŝuStaton(profundo)
             } else {
                 // Nur kiam la retumilo NE mem iris reen (enpropra reen-sago ktp.):
                 // history.back(); nul = la historio jam kongruas (popstate direktis)

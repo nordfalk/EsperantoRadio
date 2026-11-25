@@ -9,22 +9,22 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
  * la retversio vivas en la videbla supra breto kaj en index.html, ne en la titolo.
  */
 fun vojaTitolo(vojo: NavKey?, kanaloj: List<Kanalo>): String {
-    val bazo = "EsperantoRadio"
     fun kanalNomo(slug: String) = kanaloj.firstOrNull { it.slug == slug }?.nomo ?: slug
-    return when (vojo) {
-        null, is Vojo.Hejmo -> bazo
-        is Vojo.Kanalaro -> "Ĉiuj kanaloj · EsperantoRadio"
-        is Vojo.Plejŝatataj -> "Plej ŝatataj · EsperantoRadio"
-        is Vojo.Serĉo -> "Serĉo · EsperantoRadio"
-        is Vojo.Elŝutoj -> "Elŝutoj · EsperantoRadio"
-        is Vojo.Ludvico -> "Ludvico · EsperantoRadio"
-        is Vojo.Alarmoj -> "Alarmoj · EsperantoRadio"
-        is Vojo.Agordoj -> "Agordoj · EsperantoRadio"
-        is Vojo.Diagnozo -> "Diagnozo · EsperantoRadio"
-        is Vojo.KanaloDetalo -> "${kanalNomo(vojo.slug)} · EsperantoRadio"
-        is Vojo.ElsendoDetalo -> "${kanalNomo(vojo.kanaloSlug)} · EsperantoRadio"
-        else -> bazo
+    // null = Hejmo, nekonata vojo: sola marka titolo sen ekrannomo
+    val ekrano = when (vojo) {
+        is Vojo.Kanalaro -> "Ĉiuj kanaloj"
+        is Vojo.Plejŝatataj -> "Plej ŝatataj"
+        is Vojo.Serĉo -> "Serĉo"
+        is Vojo.Elŝutoj -> "Elŝutoj"
+        is Vojo.Ludvico -> "Ludvico"
+        is Vojo.Alarmoj -> "Alarmoj"
+        is Vojo.Agordoj -> "Agordoj"
+        is Vojo.Diagnozo -> "Diagnozo"
+        is Vojo.KanaloDetalo -> kanalNomo(vojo.slug)
+        is Vojo.ElsendoDetalo -> kanalNomo(vojo.kanaloSlug)
+        else -> null
     }
+    return if (ekrano == null) "EsperantoRadio" else "$ekrano · EsperantoRadio"
 }
 
 /**
@@ -40,7 +40,9 @@ fun historiaReeniro(
     historiaProfundoNun: Int,
 ): Int? =
     if (novaNavProfundo < memoritaNavProfundo && historiaProfundoNun > novaNavProfundo) {
-        memoritaNavProfundo - novaNavProfundo
+        // Eliri de la REALA historia pozicio: post antaŭen-trairo (ŝargita de la
+        // efiko) ĝi povas superi la memoritan profundecon (CodeRabbit, PR #216)
+        historiaProfundoNun - novaNavProfundo
     } else {
         null
     }

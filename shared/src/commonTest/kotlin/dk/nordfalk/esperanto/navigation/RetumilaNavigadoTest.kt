@@ -20,6 +20,9 @@ class RetumilaNavigadoTest {
         // reen — la historio postrestas kaj oni devas fari history.back()
         assertEquals(1, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 2))
         assertEquals(2, historiaReeniro(memoritaNavProfundo = 3, novaNavProfundo = 1, historiaProfundoNun = 3))
+        // Post antaŭen-trairo la reala historia pozicio povas superi la memoritan
+        // profundecon (memorita=2, historio=3): la paŝo devas eliri de la pozicio
+        assertEquals(2, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 3))
         // Retumila reen-butono (popstate direktis la nav-popon): la historio JAM
         // egalas la novan profundecon — nul = ne iru reen dufoje (tio forlasus la paĝon)
         assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 1))

@@ -32,6 +32,7 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ### Riparita
 
+- Reta versio: la agordoj (pseŭdonimo, plej ŝatataj, ludpozicioj k.a.) nun konserviĝas en la retumilo kaj transvivas reŝargon de la paĝo (https://github.com/nordfalk/EsperantoRadio/pull/214)
 - Remalfermo de elsendo aŭ kanalo montras ĝin mem anstataŭ la postlasitan svipan pozicion de la antaŭa vizito; rotacio kaj restartigo konservas la legitan pozicion; eltirita elsendo aŭ forigita kanalo montras klarigon anstataŭ senfina ŝargado; elŝutita elsendo malfermeblas ankaŭ kiam ĝi malaperis el la fluo (https://github.com/nordfalk/EsperantoRadio/pull/206)
 
 ## [3.2.0] - 2026-11-23

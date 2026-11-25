@@ -76,6 +76,25 @@ class EmblemojTest {
     }
 
     @Test
+    fun dimensiaBomboRifuziĝasAntaŭPlenaMalkodado() {
+        // Vera 4x4-png, kies IHDR-kapo estas repaĉita al 50000x50000
+        // (2,5 miliardoj da pikseloj — malkonprem-bombo, CWE-409). La dimensia
+        // kontrolo legas la KAPON kaj rifuzas ANTAŬ ImageIO.read povus
+        // enmemorigi gigantojn da pikseloj.
+        val b = veraPng().copyOf()
+        fun skribu32(ofseto: Int, valoro: Int) {
+            b[ofseto] = (valoro ushr 24).toByte()
+            b[ofseto + 1] = (valoro ushr 16).toByte()
+            b[ofseto + 2] = (valoro ushr 8).toByte()
+            b[ofseto + 3] = valoro.toByte()
+        }
+        // PNG: 8 signoj da signaturo + 4 longo + 4 "IHDR", poste larĝo kaj alto (big-endian)
+        skribu32(16, 50_000)
+        skribu32(20, 50_000)
+        assertEquals(null, Emblemoj.formatoSeLegebla(b))
+    }
+
+    @Test
     fun formatoSeLegeblaAkceptasVeranBildon() {
         // vera (per ImageIO generita) PNG malkodeblas
         assertEquals("png", Emblemoj.formatoSeLegebla(veraPng()))

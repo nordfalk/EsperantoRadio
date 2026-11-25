@@ -18,6 +18,16 @@ import javax.imageio.ImageIO
  */
 object Emblemoj {
 
+    /**
+     * Maksimuma nombro da pikseloj de spegulata bildo — ŝirmo kontraŭ
+     * malkonprem-bomboj (CWE-409, PR #214): 5-MB-dosiero povas aserti eĉ
+     * 50 000×50 000 pikselojn kaj la plena malkodado estus enmemorigi
+     * multajn gigabitokojn da pikseloj antaŭ ol iu kontrolo povus rifuzi.
+     * La dimensioj estas kontrolataj el la kapo ANTAŬ la malkodado
+     * (vidu [formatoSeLegebla]); 25 MP kovras ĉiun realistican emblemon.
+     */
+    const val MAKS_BILDAJ_PIKSELOJ: Long = 25_000_000L
+
     /** Baza URL de la spegulitaj emblemoj, derivita el `arkivoBazoUrl` (`…/kanaloj/` → la radiko). */
     fun bazaBildaUrl(arkivoBazoUrl: String): String {
         val radiko = arkivoBazoUrl.trimEnd('/')
@@ -111,6 +121,27 @@ object Emblemoj {
 
     fun formatoSeLegebla(bitokoj: ByteArray): String? {
         val formato = formatoLaŭEnhavo(bitokoj) ?: return null
+        // Dimensia kontrolo ANTAŬ la plena malkodado (CWE-409): el la kapo
+        // legeblas la larĝo kaj alto sen malkodi eĉ unu pikselon. Bildo kiu
+        // asertas superdimensiojn (aŭ nelegeblan kapon) estas rifuzata
+        // ankoraŭ antaŭ ol ImageIO.read povus eksplodigi la memoron.
+        try {
+            val enigo = ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj))
+            val legantoj = ImageIO.getImageReaders(enigo)
+            if (!legantoj.hasNext()) return null
+            val leganto = legantoj.next()
+            leganto.input = enigo
+            val larĝo = leganto.getWidth(0).toLong()
+            val alto = leganto.getHeight(0).toLong()
+            if (larĝo <= 0 || alto <= 0 || larĝo * alto > MAKS_BILDAJ_PIKSELOJ) {
+                logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
+                return null
+            }
+        } catch (e: Exception) {
+            // A8: neniam silente engluti — kaj nelegebla kapo ne estas akceptebla bildo
+            logw("Emblemoj", "ne eblis legi la bildan kap-dimensionon — rifuzata", e)
+            return null
+        }
         return try {
             if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null
         } catch (e: Exception) {

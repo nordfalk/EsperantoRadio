@@ -3,8 +3,9 @@ package dk.nordfalk.esperanto.server
 import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logw
 import java.io.ByteArrayInputStream
-import java.net.Inet6Address
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.URI
 import java.security.MessageDigest
 import javax.imageio.ImageIO
 
@@ -76,45 +77,17 @@ object Emblemoj {
             .joinToString("") { "%02x".format(it) }
 
     /**
-     * Ĉu la adreso estas PUBLIKA — pli strikta ol la InetAddress- oportunaj
-     * kontroloj (tiuj akceptas ekz. `fd00::1` (IPv6-ULA) kaj `100.64.0.1`
-     * (CGNAT-IPv4)). Kovritaj: IPv4 0/8, 10/8, 127/8, 172.16/12, 192.168/16,
-     * 169.254/16, 100.64/10, 198.18/15, 224/4 (multicast), 240/4 (rezervita);
-     * IPv6 ::1, fe80::/10, fc00::/7 (ULA), ff00::/8, IPv4-mapeitaj (::ffff:),
-     * 6to4 (2002::/16) kaj teredo (2001:0::/32) kun enkopigitaj privataj IPv4.
-     * (SSRF-ŝirmo de la bildo-spegele, CWE-918, PR #214.)
+     * Permes-lista regulo de la posedanto (2026-11-25): bildo-celo akceptiĝas
+     * NUR se ĝi estas PUBLIKA IPv4-adreso. Ĉio alia estas „nenormala" kaj
+     * rifuzata sen kompenso — ĉIU IPv6 (ankaŭ publika kiel 2606:4700…, ULA,
+     * link-local, teredo, 6to4, IPv4-mapeita), privata, loopback, link-local,
+     * CGNAT, benchmark-, multicast- kaj rezervita IPv4. (SSRF-ŝirmo de la
+     * bildo-spegele, CWE-918, PR #214; simpligita laŭ posedanto-decido.)
      */
     fun ĉuPublikaAdreso(adreso: InetAddress): Boolean {
-        val b = adreso.address
-        if (adreso is Inet6Address) {
-            // IPv4-mapeita adreso ::ffff:a.b.c.d → kontrolu kiel IPv4
-            if (b.size == 16 && (0 until 10).all { b[it].toInt() == 0 } &&
-                (b[10].toInt() and 0xFF) == 0xFF && (b[11].toInt() and 0xFF) == 0xFF
-            ) return ipv4Publika(b, 12)
-            // :: (nedifinita) kaj ::1 (loopback): ĉiuj bitokoj nul krom eventuale la lasta
-            if (b.all { it.toInt() == 0 } || (b.dropLast(1).all { it.toInt() == 0 } && (b[15].toInt() and 0xFF) == 1)) return false
-            val o0 = b[0].toInt() and 0xFF
-            val o1 = b[1].toInt() and 0xFF
-            return when {
-                (o0 and 0xFE) == 0xFC -> false                       // fc00::/7 (ULA, fd00::1)
-                o0 == 0xFE && (o1 and 0xC0) == 0x80 -> false          // fe80::/10 (link-local)
-                o0 == 0xFF -> false                                   // ff00::/8 (multicast)
-                o0 == 0x20 && o1 == 0x02 -> ipv4Publika(b, 2)          // 6to4 2002::/16
-                o0 == 0x20 && o1 == 0x01 && b[2].toInt() == 0 && b[3].toInt() == 0 -> {
-                    // teredo 2001:0::/32: la klienta IPv4 estas OBFUSKATA per
-                    // bit-inversigo de ĉiu bitoko (RFC 4380) — malkodu antaŭ la kontrolo
-                    ipv4Publika(b.map { (it.toInt() and 0xFF).inv().toByte() }.toByteArray(), 12)
-                }
-                else -> true
-            }
-        }
-        return ipv4Publika(b)
-    }
-
-    /** IPv4-intervaloj, kiuj NE estas publike. [de] = komenco de la 4 adres-bitokoj. */
-    private fun ipv4Publika(b: ByteArray, de: Int = 0): Boolean {
-        val o0 = b[de].toInt() and 0xFF
-        val o1 = b[de + 1].toInt() and 0xFF
+        if (adreso !is Inet4Address) return false // nenia IPv6, kia ajn ĝi estas
+        val o0 = adreso.address[0].toInt() and 0xFF
+        val o1 = adreso.address[1].toInt() and 0xFF
         return !(o0 == 0 ||                                          // 0.0.0.0/8
             o0 == 10 || o0 == 127 ||                                // 10/8, 127/8
             (o0 == 172 && o1 in 16..31) ||                          // 172.16/12
@@ -124,6 +97,41 @@ object Emblemoj {
             (o0 == 198 && (o1 == 18 || o1 == 19)) ||                 // 198.18/15
             (o0 and 0xF0) == 0xE0 ||                                 // 224/4 (multicast)
             o0 >= 240)                                               // 240/4 (rezervita)
+    }
+
+    /** Skemoj permesataj por bildo-elŝuto (permes-listo: ĉiu alia skemo estas „nenormala"). */
+    private val SKEMOJ = setOf("http", "https")
+
+    /**
+     * Ĉu la bildo-URL tute estas akceptebla laŭ la permes-listo (posedanto-decido
+     * 2026-11-25 — „ĉio nenormala → rifuzu"):
+     * - skemo http(s) kaj gastiganto estas NOMO, ne IP-literalo;
+     * - ĈIU adreso, al kiu la nomo resolvas, estas publika IPv4
+     *   ([ĉuPublikaAdreso]) — neniu IPv6, neniu interna/privata reto.
+     * Malplena/neparsebla URL, nekonata skemo, IP-literalo, neresolvebla aŭ
+     * ne-publika resolvo → false (la bildo restas ĉe la originala URL, A4).
+     */
+    fun ĉuAkcepteblaBildaCelo(url: String): Boolean {
+        return try {
+            val uri = URI(url)
+            val gastiganto = uri.host ?: return false
+            uri.scheme in SKEMOJ && !estasIpLiteralo(gastiganto) &&
+                InetAddress.getAllByName(gastiganto).all { ĉuPublikaAdreso(it) }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Ĉu la gastiganto estas IP-LITERALO (ne DNS-nomo): IPv4 (`1.2.3.4`) aŭ
+     * IPv6 (`[::1]`, kun aŭ sen krampoj). Tia „IP-adreso anstataŭ nomo" estas
+     * nenormala por podkasto-bildo kaj rifuziĝas sen eĉ provi resolvon.
+     */
+    fun estasIpLiteralo(gastiganto: String): Boolean {
+        val nuda = gastiganto.removePrefix("[").removeSuffix("]")
+        if (':' in nuda) return true
+        val pecoj = nuda.split('.')
+        return pecoj.size == 4 && pecoj.all { it.isNotEmpty() && it.all(Char::isDigit) }
     }
 
     /**

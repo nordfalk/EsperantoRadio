@@ -17,28 +17,58 @@ class EmblemojTest {
     @Test
     fun publikajAdresojAkceptiĝas() {
         assertTrue(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("93.184.216.34")))
-        assertTrue(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("2606:4700:4700::1111")))
+    }
+
+    @Test
+    fun ipv6TuteRifuziĝasEĉPublika() {
+        // Permes-lista decido de la posedanto (2026-11-25): NENIU IPv6 estas
+        // akceptebla — ankaŭ ne publika (2606:4700… estas Cloudflare).
+        assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("2606:4700:4700::1111")))
     }
 
     @Test
     fun nepublikajAdresojRifuziĝas() {
-        // IPv4: 0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 127/8, 100.64/10 (CGNAT),
-        //       198.18/15, 224/4, 240/4 — plus IPv6 ULA, link-local, multicast,
-        //       IPv4-mapeitaj, 6to4 kaj teredo kun enkopigitaj privataj IPv4.
+        // Publika IPv4 0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 127/8,
+        // 100.64/10 (CGNAT), 198.18/15, 224/4, 240/4 — plus ĉiu IPv6 ::, ::1,
+        // fd00 (ULA), fe80 (link-local), ff02 (multicast), IPv4-mapeita.
         val nepublikaj = listOf(
             "0.0.0.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "169.254.1.1",
             "127.0.0.1", "100.64.0.1", "198.18.0.1", "224.0.0.1", "250.1.2.3",
-            "::", "::1",
-            "fd00::1", "fe80::1", "ff02::1", "::ffff:127.0.0.1",
-            "2002:0a00:0001::1",
-            // teredo 2001:0::/32: la klienta IPv4 estas BIT-INVERSIGITA po bitoko
-            // (RFC 4380) — 0a00:0001 = 10.0.0.1 malrekte; la korekta formo de 10.0.0.1:
-            "2001:0000:0000:0000:0000:0000:f5ff:fffe",
-            "2001:0000:0000:0000:0000:0000:0a00:0001",
+            "::", "::1", "fd00::1", "fe80::1", "ff02::1", "::ffff:127.0.0.1",
         )
         for (a in nepublikaj) {
             assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName(a)), "devus rifuziĝi: $a")
         }
+    }
+
+    @Test
+    fun ipLiteralojRekoniĝas() {
+        assertTrue(Emblemoj.estasIpLiteralo("127.0.0.1"))
+        assertTrue(Emblemoj.estasIpLiteralo("10.0.0.1"))
+        assertTrue(Emblemoj.estasIpLiteralo("[::1]"))   // kiel URI.host redonas IPv6-literalon
+        assertTrue(Emblemoj.estasIpLiteralo("::1"))    // sendepende de krampoj
+        assertTrue(Emblemoj.estasIpLiteralo("1.2.3.4"))
+        // nomoj NENIAM estas IP-literaloj — eĉ ne kun ciferoj
+        assertFalse(Emblemoj.estasIpLiteralo("example.com"))
+        assertFalse(Emblemoj.estasIpLiteralo("bilder3.example.org"))
+        assertFalse(Emblemoj.estasIpLiteralo("1.2.3.4.5"))
+        assertFalse(Emblemoj.estasIpLiteralo("3zzz.net"))
+    }
+
+    @Test
+    fun bildaCeloPermesListaRifuzasNenormalaĵojn() {
+        // ne-normaj URL/konstruo kaj skemoj
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("ftp://example.com/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("ne-url"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http:///radiko.png")) // sen gastiganto
+        // IP-LITERALO anstataŭ nomo — rifuzata sen eĉ resolvo
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://127.0.0.1/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://10.0.0.1/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://93.184.216.34/bildo.png")) // eĉ publika
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://[::1]/bildo.png"))
+        // NOMO kiu resolvas al NE-publika adreso (localhost → loopback, sen reto)
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost:1234/bildo.png"))
     }
 
     @Test

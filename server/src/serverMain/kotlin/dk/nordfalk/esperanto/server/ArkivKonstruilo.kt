@@ -18,8 +18,6 @@ import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpHeaders
 import io.ktor.utils.io.readAvailable
-import java.net.InetAddress
-import java.net.URI
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -59,10 +57,9 @@ object ArkivKonstruilo {
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
     /**
-     * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj): SENVOLA
-     * alidirekto — ĉiun salton validigas `elŝutuBildonKunŜirmo` mem (SSRF-ŝirmo,
-     * CWE-918: aŭtoro de ekstera fluo alie povus devigi la konstruilon peti
-     * internajn adresojn).
+     * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj): SENVOLA —
+     * alidirektoj (3xx) estas „nenormalaj" kaj rifuzataj (posedanto-decido
+     * 2026-11-25), ne sekvataj nek validigataj (SSRF-ŝirmo, CWE-918).
      */
     private val bildaHttp: HttpClient = HttpClient(CIO) { followRedirects = false }
 
@@ -317,55 +314,23 @@ object ArkivKonstruilo {
     }
 
     /**
-     * Elŝutas la bildo-korpon kun SSRF-ŝirmo kaj fluanta grandec-limo.
-     *
-     * La celo de ĉIU salto (ankaŭ alidirektoj) devas esti http(s) kaj publika
-     * adreso (CWE-918) — [bildaHttp] sekvas NENIUJN saltojn, do ĉi tien ili estas
-     * sekvataj MANE (ĝis 5), ĉiu validigata per [estasPublikaCelo] antaŭ la peto.
-     * La korpo legiĝas FLUE per prepareGet-execute (HttpClient.get enmemorigus la
-     * tutan korpon antaŭ kontrolo — Ktor 3.6, HttpStatement) kaj la legado ĉesas
-     * tuj ĉe transpaso de la limo. Refuzoj traktiĝas kiel ordinara elŝuta eraro
-     * (la alvokanto kaptas kaj daŭrigas, regulo A4).
+     * Elŝutas la bildo-korpon kun permes-lista ŝirmo kaj fluanta grandec-limo.
+     * Regulo de la posedanto (2026-11-25): ĉio nenormala → rifuzu; la bildo
+     * restas ĉe la originala URL (regulo A4 — la fluo/kanalo daŭras):
+     * - la celo estu http(s) kun NOMO kiel gastiganto, kiu resolvu nur al
+     *   publika IPv4 — IP-literaloj kaj interna/IPv6-resolvo rifuzataj ANTAŬ
+     *   la peto (SSRF-ŝirmo, CWE-918; Emblemoj.ĉuAkcepteblaBildaCelo);
+     * - NENIU alidirekto: [bildaHttp] estas senvola kaj ĉiu 3xx estas rifuzata
+     *   kiel nenormala — bildoj gastigitaj malantaŭ alidirekto ne speguliĝas;
+     * - la korpo legiĝas FLUE per prepareGet-execute (HttpClient.get enmemorigus
+     *   la tutan korpon antaŭ kontrolo — Ktor 3.6, HttpStatement) kaj la legado
+     *   ĉesas tuj ĉe transpaso de la limo (leguBitokojnLimigite).
      */
     private suspend fun elŝutuBildonKunŜirmo(url: String): ByteArray {
-        var nuna = url
-        var saltoj = 0
-        while (true) {
-            check(saltoj++ < 5) { "tro da alidirektoj (≥ 5) ekde $url" }
-            check(estasPublikaCelo(nuna)) { "ne-publika/ne-http(s) celo (SSRF-ŝirmo): $nuna" }
-            var alidirekto: String? = null
-            val enhavo: ByteArray? = bildaHttp.prepareGet(nuna).execute { respondo ->
-                if (respondo.status.value in 300..399) {
-                    val loko = respondo.headers[HttpHeaders.Location]
-                    check(!loko.isNullOrBlank()) { "HTTP ${respondo.status.value} sen Location" }
-                    alidirekto = URI(nuna).resolve(loko).toString()
-                    null
-                } else {
-                    check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
-                    leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
-                }
-            }
-            enhavo?.let { return it }
-            nuna = alidirekto ?: throw IllegalStateException("alidirekto sen sekva celo: $nuna")
-        }
-    }
-
-    /**
-     * Ĉu la URL-celo estas publika: skemo http(s) kaj ĉiuj resolvitaj adresoj
-     * estas neniu el: any-local, loopback, site-local (privata), link-local,
-     * multicast. Neresolvebla gastiganto → false (la normala elŝuto same
-     * fiaskus — rifuzu frue).
-     */
-    private fun estasPublikaCelo(url: String): Boolean {
-        return try {
-            val uri = URI(url)
-            if (uri.scheme !in setOf("http", "https") || uri.host.isNullOrBlank()) return false
-            // ĈIU resolvita adreso devas esti publika laŭ la striktaj intervaloj
-            // en Emblemoj.ĉuPublikaAdreso (kaj fd00::1 kaj 100.64.0.1 rifuzataj —
-            // la InetAddress-oportunaj kontroloj ne sufiĉas).
-            InetAddress.getAllByName(uri.host).all { Emblemoj.ĉuPublikaAdreso(it) }
-        } catch (e: Exception) {
-            false
+        check(Emblemoj.ĉuAkcepteblaBildaCelo(url)) { "rifuzita bildo-celo (permes-listo): $url" }
+        return bildaHttp.prepareGet(url).execute { respondo ->
+            check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}: $url" }
+            leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
         }
     }
 

@@ -246,6 +246,11 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   — solvu ilin konservante ambaŭ flankojn.
 - **`mergeStateStatus: UNSTABLE`** = mergeable, sed la status-kontroloj ankoraŭ
   kuras — gravas nur la fina konkludo de la kontroloj.
+- **`mergeStateStatus: DIRTY` = la CI-fluoj NE startas** (2026-11-24, PR #210):
+  `pull_request`-fluoj ruliĝas el la merga referenco de la PR; ĉe konflikto kun
+  master la merga komito ne ekzistas, do `testoj-kaj-konstruo` kaj
+  `changelog-kontrolo` silente ne ruliĝas. Kunfandu `origin/master` en la PR-branĉon
+  (L8) kaj puŝu — nur tiam la kontroloj rekomencas.
 - **«faru beta-eldonon» = interna testo (2026-11-19, decido de la posedanto):** la
   posedanto ĉiam celas la trakon `internal` de Google Play (li testas mem kaj
   poste promocias al produktado); la trako `beta` uziĝu nur se li eksplicite diras
@@ -366,11 +371,22 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
 
 ### Servilo kaj publikigo
 
+- **Kanona datum-arbo kaj ligiloj (2026-11-24):** la servilaj datumoj vivas en
+  `/home/j/Code/EsperantoRadio/server/data/` (koneje: 2,7 GB `privata/` + `publika/`).
+  ĈIU kontrolilo ligas ĝin per SUB-LIGILOJ, ne per tuta-direktoria ligilo:
+  `server/data/privata` → kanona `privata`; `server/data/publika/` estas REALA
+  dosierujo, en kiu nur `index.html` kaj `icon.png` estas realaj (git-versiaj) kaj
+  `kanaloj/`, `bildoj/`, `apo/`, `esperantoradio_konfiguro.json` estas ligiloj al
+  la kanonaj. La kopieblan recepton por nova kontrolilo vidu en la skill-o
+  `servilo-arkivo`. Portempaj dosieroj iras al `tmp/` ĉe la radiko de la laborkopio
+  (gitignorita) — NENIAM en la kanonan arbon.
 - **Ne publikigu al la servilo sen eksplicita peto (2026-11-20):** `rsync …
   javabog.dk:javabog.dk/esperanto-radio/` (aŭ ĉiu alia ekster-retea publikigo)
   okazas NUR post kiam la uzanto tion eksplicite petas („kopiu al la servilo“).
   Loka konstruado kaj loka rsync-simulado estas en ordo; la reala rsync ĉiam
-  atendas la aprobon (detaloj: skill-o `servilo-arkivo`).
+  atendas la aprobon (detaloj: skill-o `servilo-arkivo`). La publikiga rsync
+  devas uzi `-L` (la `publika/`-subvojoj estas simbolaj ligiloj) kaj
+  `--chmod=D755,F644`.
 - **GitHub ne vidigas `.html`-dosierojn en la deponejo** (2026-10-29): ili montriĝas
   kiel fontokodo. Solvo: **GitHub Pages** el `master:/docs` (aktivigita; rekonstruas
   je ĉiu puŝo al master). Ligiloj al `.html`-dosieroj en README/dokumentoj iru al la

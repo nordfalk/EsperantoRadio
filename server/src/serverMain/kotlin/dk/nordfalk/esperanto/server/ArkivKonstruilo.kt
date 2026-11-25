@@ -43,13 +43,24 @@ object ArkivKonstruilo {
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
+    /**
+     * Rezulto de elŝutuEmblemojn: la URL-mapigo por la resskribo plus la nova
+     * dosiernomo po kanalo-slug. La purigado de arkaikaj speguloj bezonas ĝin
+     * (ĝi okazas POSTE, en la ĉefa ciklo — vidu puriguArkaikajnEmblemojn).
+     */
+    private data class EmblemaRezulto(
+        val mapigo: Map<String, String>,
+        val novaNomoLaŭSlug: Map<String, String>,
+    )
+
     @JvmStatic
     fun main(args: Array<String>) {
         val nurTiuj = args.filter { !it.startsWith("--") }.toSet()
         val uzuKaŝon = "--kaŝo" in args
 
-        val kanaloj = KanalAgordoLeganto().legu(KONFIGO.readText()).kanaloj
-            .map { it.alKanalo() }
+        val agordo = KanalAgordoLeganto().legu(KONFIGO.readText())
+        val ĉiujKanaloj = agordo.kanaloj.map { it.alKanalo() }
+        val kanaloj = ĉiujKanaloj
             .filter { it.havasPodkastojn }
             .filter { nurTiuj.isEmpty() || it.slug in nurTiuj }
 
@@ -60,6 +71,11 @@ object ArkivKonstruilo {
         var stato = StatoLeganto.legu(File(PRIVATA, "stato.json"))
         val novajStatoj = stato.kanaloj.toMutableMap()
 
+        // FAROTA C56: spegulu la emblemojn al publika/bildoj/ kaj resskribu iliajn URL-ojn
+        // en la publikigota konfiguro (kaj en la fluoj) al la arkivaj URL-oj — la
+        // retversio gastigas samdevene kaj ne povas ŝargi bildojn el la originalaj gastigantoj (CORS).
+        val emblemoj = elŝutuEmblemojn(ĉiujKanaloj, http, agordo.arkivoBazoUrl)
+
         for (kanalo in kanaloj) {
             try {
                 val elsendoj = if (kanalo.podkastaRssUrl.isNullOrBlank() && !kanalo.htmlFontoUrl.isNullOrBlank()) {
@@ -68,10 +84,18 @@ object ArkivKonstruilo {
                     kolektuElsendojn(kanalo, parsilo, http, uzuKaŝon)
                 }
                 val (priskriboj, titoloj) = riĉigu(kanalo, elsendoj)
+                // La fluo ankaŭ portu la spegulitan emblemo-URL-on (eksteraj legitimiloj)
+                val skriboKanalo = kanalo.emblemoUrl
+                    ?.let { malnova -> emblemoj.mapigo[malnova]?.let { kanalo.copy(emblemoUrl = it) } }
+                    ?: kanalo
                 FluSkribilo.skribu(
-                    kanalo, elsendoj, priskriboj, titoloj,
+                    skriboKanalo, elsendoj, priskriboj, titoloj,
                     File(PUBLIKA, "kanaloj/${kanalo.slug}.xml"),
                 )
+                // Nur NUN la arkiva fluo de tiu kanalo referencas la novan spegulon —
+                // sekure forigi arkaikajn (aliajn sufiksojn). Parta rulo (--args=slug)
+                // ne tuŝas la dosierojn de aliaj kanaloj.
+                puriguArkaikajnEmblemojn(kanalo.slug, emblemoj.novaNomoLaŭSlug[kanalo.slug])
                 novajStatoj[kanalo.slug] = KanalStato(
                     lastaSukceso = Instant.now().toString(),
                     nombroDaElsendoj = elsendoj.size,
@@ -92,13 +116,90 @@ object ArkivKonstruilo {
 
         // la kanalkonfiguro estas publika: la apo elŝutas ĝin de la sama servilo.
         // Publikiĝas PURIGITA versio (sen JSONC-komentoj) — tiel striktaj JSON-legiloj
-        // (ankaŭ eksteraj) povas legi ĝin rekte.
+        // (ankaŭ eksteraj) povas legi ĝin rekte. La emblemo-URL-oj montras al la
+        // spegulitaj bildoj sur ĉi tiu servilo (C56) — la retversio gastigas samdevene.
         val leganto = KanalAgordoLeganto()
-        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(leganto.striptiguKomentojn(KONFIGO.readText()))
+        val puraKonfiguro = leganto.striptiguKomentojn(KONFIGO.readText())
+        File(PUBLIKA, "esperantoradio_konfiguro.json").writeText(
+            Emblemoj.resskribuEmblemojn(puraKonfiguro, emblemoj.mapigo)
+        )
         stato = stato.copy(lastaRulo = Instant.now().toString(), kanaloj = novajStatoj)
         StatoLeganto.skribu(File(PRIVATA, "stato.json"), stato)
         http.close()
         println(" preta. Stato: server/data/privata/stato.json")
+    }
+
+    /**
+     * Elŝutas la emblemojn de ĈIUJ kanaloj (ankaŭ la ne-podkastaj — la kanalaro
+     * montras ĉiujn) kaj spegulas ilin al `publika/bildoj/<slug>.<sufikso>`.
+     * Redonas mapigon malnova URL → arkiva URL por la resskribo en la publikigota
+     * konfiguro kaj la fluoj (EmblemaRezulto.mapigo) plus la nova dosiernomo po
+     * slug (EmblemaRezulto.novaNomoLaŭSlug) por la prokrastita purigado.
+     * Fiaskinta emblemo simple restas sen mapigo (A4: ne haltigas la konstruadon;
+     * sur Android/Desktop la originala URL plu funkcias). La forigo de arkaikaj
+     * speguloj okazas NE ĉi tie sed nur post sukcesa FluSkribilo.skribu (vidu
+     * puriguArkaikajnEmblemojn) — alie parta rulo (--args=slug) forigus dosierojn
+     * kiujn la ne-rekonstruitaj fluoj ankoraŭ referencas.
+     */
+    private fun elŝutuEmblemojn(
+        kanaloj: List<dk.nordfalk.esperanto.domain.model.Kanalo>,
+        http: HttpClient,
+        arkivoBazoUrl: String?,
+    ): EmblemaRezulto {
+        if (arkivoBazoUrl.isNullOrBlank()) return EmblemaRezulto(emptyMap(), emptyMap())
+        val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
+        val bildujo = File(PUBLIKA, "bildoj").apply { mkdirs() }
+        val mapigo = mutableMapOf<String, String>()
+        val novaNomoLaŭSlug = mutableMapOf<String, String>()
+        for (kanalo in kanaloj) {
+            val url = kanalo.emblemoUrl ?: continue
+            try {
+                val nova = runBlocking {
+                    val respondo = http.get(url)
+                    // Plena paĝo (ekz. 404-HTML) ne iĝu emblemo — Ktor defaŭlte ne
+                    // ĵetas ĉe erarstatusoj (expectSuccess=false).
+                    check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
+                    val enhavo = respondo.bodyAsBytes()
+                    // XSS-ŝirmo (CWE-79, PR #210): la formato estas determinata laŭ
+                    // la ENHAVO de la bildo (magiaj signoj), ne laŭ Content-Type aŭ
+                    // dosiernomo kaj validigata per VERA malkodado (ImageIO). Nur malkodatablaj
+                    // PNG/JPEG/GIF speguliĝas; SVG
+                    // (skript-ruligebla samdevene), HTML kaj erar-paĝoj estas rifuzataj
+                    // — la emblemo restas ĉe la originala URL (A4).
+                    val formato = Emblemoj.formatoSeLegebla(enhavo)
+                        ?: throw IllegalStateException("enhavo ne estas malkodebla PNG/JPEG/GIF (eble SVG/HTML/koruptita) — ne spegulata")
+                    val dosiero = File(bildujo, "${kanalo.slug}.$formato")
+                    dosiero.writeBytes(enhavo)
+                    "$bazo/bildoj/${dosiero.name}"
+                }
+                mapigo[url] = nova
+                novaNomoLaŭSlug[kanalo.slug] = nova.substringAfterLast('/')
+                println("  emblemo ${kanalo.slug} -> bildoj/${nova.substringAfterLast('/')}")
+            } catch (e: Exception) {
+                // A4: unu fiaskinta emblemo ne haltigas la konstruadon; A8: protokolu kun stacktrace
+                logw("ArkivKonstruilo", "emblemo de ${kanalo.slug} ($url) ne elŝuteblis — la konfiguro tenas la originalan URL-on", e)
+            }
+        }
+        println("  emblemoj: ${mapigo.size}/${kanaloj.count { it.emblemoUrl != null }} spegulitaj al publika/bildoj/")
+        return EmblemaRezulto(mapigo, novaNomoLaŭSlug)
+    }
+
+    /**
+     * Forigas arkaikajn emblemo-spegulojn de unu kanalo (sama slug, alia dosiernomo
+     * – ekz. malnova .jpg post ŝanĝo al .png). Vokata NUR post sukcesa skribo de la
+     * arkiva fluo de tiu kanalo, por ke neniu publika fluo/konfiguro plu referencas
+     * la forigotan dosieron (partaj ruloj --args=slug lasas aliajn kanalojn netuŝitaj).
+     * novaNomo == null (emblemo fiaskis aŭ estis rifuzita, ekz. SVG) forigas ĈIUJN
+     * spegulojn de la slug.
+     */
+    private fun puriguArkaikajnEmblemojn(slug: String, novaNomo: String?) {
+        val bildujo = File(PUBLIKA, "bildoj")
+        // novaNomo == null → la emblemo ne mapigis (fiasko aŭ rifuzita SVG):
+        // la eventuala spegulo de tiu slug ne plu estas referencata de la
+        // ĵus skribita fluo — forigu ĝin (malhelpas samdevenan SVG-reston).
+        bildujo.listFiles()
+            ?.filter { it.isFile && it.nameWithoutExtension == slug && (novaNomo == null || it.name != novaNomo) }
+            ?.forEach { it.delete() }
     }
 
     /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas

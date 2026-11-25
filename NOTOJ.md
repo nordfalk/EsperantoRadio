@@ -258,16 +258,20 @@ La nova KMP-apo estas en konstruado. Jen la fazoj kaj ilia stato:
 - **Nova apo — refreŝigo**: malsupren-tiro (`PullToRefreshBox`) sur Hejmo, Kanaloj kaj kanalvido — `ŝargi(fortoRefresigi = true)` preterpasas la memoran kaŝmemoron
 - **Nova apo — reprovo**: `LudvicoRegilo` reprovas pasemajn erarojn (`LudantoStato.Eraro.reprovebla`) ĝis 10 fojojn (1s, 2s, 4s … maks 30s, `ReprovoLogiko`), de la sama pozicio; MiniLudilbreto montras "Konektas… (provo n/10)". Daŭraj eraroj (HTTP 404, formato) tuj saltas al la sekva.
 - **Testoj**: KMP-testoj sur Desktop, ĉiuj pasas
-- **Web (wasmJs)**: konstruiĝas kaj rulas per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g`.
-  Montras nur kanalojn kies fluoj permesas CORS (nun la anchor.fm-podkastoj) — vidu "Kio NE funkcias"
+- **Web (wasmJs)**: produkta gastigado ĉe https://javabog.dk/esperanto-radio/apo/ (samdevene apud la arkivo, FATOTO→solvita C56, 2026-11-24):
+  datumoj kaj emblemoj venas NUR el la arkiva servilo (la originalaj fluoj kaj bild-gastigantoj estas CORS-blokitaj kaj estas preterlasataj sur la retumilo), la sono ludas rekte el la fonto per HTML-`<audio>`. Konstruo: `./gradlew :webApp:kopiuAlPublikaElsutejo` + rsync.
+  Loka provado per `./gradlew :webApp:wasmJsBrowserDevelopmentRun -Pkotlin.daemon.jvmargs=-Xmx4g` (tie ankaŭ la nur-arkiva datumvojo provas la realan javabog.dk-arkivon).
 - **radioTxtKomparilo**: Desktop-ilo kiu komparas la kanalkonfiguron kun `esperanto-radio.com/radio.txt` — identigas mankantajn kanalojn kaj elsendojn (`./gradlew :desktopApp:radioTxtKomparilo`)
 
 ### Kio NE funkcias ankoraŭ
 
 - Aŭtomata resumigo: pozicio-restarigo okazas nur kiam oni reiras al la elsendo kaj klakas "Aŭskulti"; ne aŭtomate kiam oni malfermas la apoon kaj la ludilo daŭras en fono
 - iOS-ludado (no-op, bezonas AVPlayer)
-- Web: plej multaj RSS-fluoj estas blokitaj de CORS (neniu `Access-Control-Allow-Origin`) — bezonas
-  servilon/prokurilon (vidu `docs/nova/06_servilo_arkivo.md`); bildoj ankaŭ ne aperas
+- Web, nur kiam la fasko malfermiĝas de ALIA deveno ol javabog.dk (ekz. `wasmJsBrowserDevelopmentRun`
+  surbaze de loka servilo, aŭ kopio al alia gastiganto): la originalaj RSS-fluoj kaj la fremdaj
+  emblemoj restas CORS-blokitaj — la apo tiam montras nur la enhavon de la arkivaj fluoj de
+  javabog.dk nur se tiu sama deveno servas ilin (larĝa gastigo ekster javabog.dk bezonus
+  `Access-Control-Allow-Origin`-kapojn sur la servilo)
 - Hejmekrana widget, Chromecast, parolsintezo
 
 ## Deponeja koda mapo (translokigita el AGENTS.md, 2026-10-14; ĝisdatigita kontraŭ la reala arbo 2026-10-17)

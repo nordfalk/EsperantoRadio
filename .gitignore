@@ -67,11 +67,19 @@ ekranfoto.svg
 
 __pycache__/
 
-# Generita arkivo de la servilo (RSS, kaŝo, transskriptoj, stato) — ignorata,
-# krom la prezentpaĝo kaj emblemo de la publika retejo (publika/ = radiko de javabog.dk/esperanto-radio)
+# Servilaj datumoj vivas en la KANONA arbo (/home/j/Code/EsperantoRadio/server/data,
+# vidu .vibe/skills/servilo-arkivo). La laborkopio ligas SUB-DOSIERUJOJN, ne la tuton:
+# server/data/privata → kanona privata; server/data/publika/ estas REALA dosierujo,
+# en kiu nur la prezentpaĝo (index.html, icon.png) estas realaj GIT-VERSIAJ dosieroj kaj
+# kanaloj/, bildoj/, apo/, esperantoradio_konfiguro.json estas ligiloj al la kanonaj.
+# Tiele akcidentaj skriboj en server/data/ restas LOKALAJ, kaj la prezentpaĝo restas
+# PR-reviebla. LA PUBLIKIGA RSYNC DEVAS UZI -L (sekvigu la ligilojn — kopiu ilian celon)!
 server/data/*
 !server/data/publika/
 server/data/publika/*
 !server/data/publika/index.html
 !server/data/publika/icon.png
 iloj/vortaro/
+
+# Portempaj dosieroj de agentoj — ĉe la radiko de ĉiu laborkopio (2026-11-24)
+tmp/

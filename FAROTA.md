@@ -140,7 +140,10 @@
   HLS ne funkcias — docs/nova/02) kaj provu sur sen-JDK-aparatoj (jlink/`jpackage`).
 
 #### C56 — Esploro: reta (WASM) versio kun datumoj de la servilo, ludado rekte el la fonto
-- **Statuso**: [ ]
+- **Statuso**: [x] SOLVITA 2026-11-24 (PR #210): beta-retversio gastigata samdevene
+  je https://javabog.dk/esperanto-radio/apo/ — nur-arkiva datumvojo (bildoj kaj fluoj
+  el la servilo), sono rekte el la fonto. Restas: finfajnigo de la reta UI por la
+  eldono (vidu la CHANGELOG-on de PR #210).
 - **Fonto**: ideo de la posedanto (2026-10-24); modelo: https://esperanto-radio.com/
 - **Priskribo**: esplori ĉu la reta versio povus funkcii tiel, ke la fluo- kaj
   metadatumoj venas de la arkiv-servilo (fazo 1 funkcias; JSON-API = fazo 2 —
@@ -166,7 +169,7 @@
 - **Sugesto**: Android App Links / intenco-ŝablono (ekz. `…/kanalo/<kodo>`) → nav3
   deep-link (hodiaŭ la apo ne havas deep links — C34) → enscenigu `Vojo.KanaloDetalo`
   kiel komenca ekrano (eble kun `Vojo.Hejmo` sube en la stako, por ke reen-gesto
-  kondutu nature); por la reta versio (C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
+  kondutu nature); por la retversio (https://javabog.dk/esperanto-radio/apo/, ekde la solvo de C56) sufiĉas URL-parametro. Aldonu ankaŭ al la
   Play-Stor-listo ligilojn (`assetlinks.json`-kontrolo) kaj memoru: la kanalo devas
   ekzisti en la agordo (A5).
 
@@ -175,3 +178,33 @@
 > **Pri la finitaj trovindikoj**: ekde 2026-11-20 ili ne plu listiĝas ĉi tie — vidu
 > `git log` de FAROTA.md (la etikedoj K…, G…, C… restas spureblaj), la PR-ojn,
 > `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
+
+#### C60 — Regula (ĉiuhora/ĉiutaga) rulado de la servilaj taskoj — neniu cron ekzistas
+- **Statuso**: [ ]
+- **Fonto**: esplorado 2026-11-24 (C56): `crontab` je ambaŭ maŝinoj kaj `systemctl list-timers` estis kontrolitaj — NENIU temp-planita rulado ekzistas; ĉio ĝis nun rulis permane. La establon faros la posedanto mem.
+- **Priskribo**: nenio aŭtomate refreŝigas la arkivon. La perioda rulado devas kovri almenaŭ:
+  - **`:server:arkivKonstruilo`** — RSS-fluoj kaj la publikigota kanalkonfiguro; de PR #210 ĝi ankaŭ elŝutas novajn emblemojn/bildetojn al `publika/bildoj/`. Ekz. ĉiuhore aŭ ĉiutage.
+  - **AI-tekstoj** — la STT-pipelino (`server/data/privata/skriptoj/stt_chiujn.py` → `privata/transkriptoj/`) kaj la LLM-prilaboro al pretaj rezultoj (`privata/rezumoj/`). Kompute peza: ekz. ĉiunokte aŭ semajne, kun la limigoj `N_POR_KANALO` kaj `MAKS_DAURO_MIN`.
+  - **`rsync`-publikigo** — decidu, ĉu ĝi iĝu parto de la aŭtomato aŭ restu permana. Aktuala regulo: „neniam publikigu al la servilo sen eksplicita peto de la uzanto" — aŭtomata publikigo do bezonas apartan, eksplicitan aprobon de la posedanto (kun `--chmod=D755,F644` kaj `-L` por la ligiloj; vidu la skill-on `servilo-arkivo`).
+- **Sugesto**: unu `crontab`-linio sur la konstanta maŝino — tiu kun la kanona datum-arbo (`/home/j/Code/EsperantoRadio/server/data`) — ekz. `5 * * * *` (ĉiuhora) aŭ `17 4 * * *` (ĉiutage), kun protokolo al `tmp/`. Post-vidigo: `stato.json` (`lastaRulo`) kaj https://javabog.dk/esperanto-radio/kanaloj/ estas freŝaj; unu mortinta kanal-fluo ne haltigu la aliajn (A4).
+
+---
+
+> **Pri la finitaj trovindikoj**: ekde 2026-11-20 ili ne plu listiĝas ĉi tie — vidu
+> `git log` de FAROTA.md (la etikedoj K…, G…, C… restas spureblaj), la PR-ojn,
+> `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
+
+#### C62 — Apache: X-Content-Type-Options: nosniff por la elŝutejo
+- **Statuso**: [x] SOLVITA 2026-11-24: la posedanto aldonis `Header always set
+  X-Content-Type-Options "nosniff"` en la `<Directory>`-bloko de la DocumentRoot
+  kaj reloadis apache2; kontrolita per curl (200 kaj 404 respondas kun la kapo).
+- **Fonto**: CodeRabbit-sekureca recenzo 2026-11-24 (PR #210, CWE-79). La apo-verifikado
+  rifuzas ne-bildan embleman enhavon (Emblemoj.formatoSeLegebla, ImageIO-malkodado), sed
+  defenda kapo mankas: la servataj bildoj ne havas `X-Content-Type-Options: nosniff`.
+- **Priskribo**: `AllowOverride None` en la DocumentRoot (probita, vidu la skill-on
+  `servilo-arkivo`) mortigas iun ajn `.htaccess` — do la kapo devas esti en la
+  Apache-agordo mem (kiel la mime.types-fikso de .wasm):
+  `Header always set X-Content-Type-Options "nosniff"` en la koncerna
+  `<Directory>`/vhost, poste `sudo systemctl reload apache2`.
+- **Sugesto**: permane farenda de la posedanto sur javabog.dk; kontrolindoj per
+  `curl -sI https://javabog.dk/esperanto-radio/bildoj/muzaiko.png | grep -i nosniff`.

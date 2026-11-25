@@ -489,6 +489,8 @@ fun HejmoEkrano(
 
     // "Lastatempe ludata": kiam nova karto aldoniĝas maldekstre, rulu la vicon por montri ĝin
     val luditajVicoStato = rememberLazyListState()
+    // La ĉefa kolumno (C56-beta): musa radeto/treno sur la retversio kaj Desktop
+    val hejmaKolumnStato = rememberLazyListState()
     var antaŭaUnuaLudataId by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(lastatempeLudataj) {
         val unuaId = lastatempeLudataj.firstOrNull()?.id
@@ -535,8 +537,18 @@ fun HejmoEkrano(
         topBar = {
             TopAppBar(
                 navigationIcon = { TirkestButono(tirkestStato) },
-                // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»
-                title = { Text(if (AppStato.estasAlfaKonstruo) "EsperαntoRαdio alfa" else "EsperantoRadio", fontWeight = FontWeight.Bold) },
+                // En alfaversio (debug-konstruo) la titolo montras «EsperαntoRαdio alfa»;
+                // sur la retumilo ĝi signalas, ke la retversio estas beta, ne finpreta (C56)
+                title = {
+                    Text(
+                        when {
+                            AppStato.estasAlfaKonstruo -> "EsperαntoRαdio alfa"
+                            platformo == Platformo.RETUMILO -> "EsperantoRadio beta (ne finpreta)"
+                            else -> "EsperantoRadio"
+                        },
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 actions = {
                     // Ludvico-butono unue — nur videbla se la vico enhavas elementojn
                     ludvicoVico?.let { LudvicoButono(vico = it, onLudvico = onLudvico) }
@@ -575,7 +587,8 @@ fun HejmoEkrano(
             modifier = Modifier.fillMaxSize(),
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().rulumuKolumnonPerMuso(hejmaKolumnStato),
+                state = hejmaKolumnStato,
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
 
@@ -621,7 +634,7 @@ fun HejmoEkrano(
                         val kanalaroVicoStato = rememberLazyListState()
                         LazyRow(
                             state = kanalaroVicoStato,
-                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kanalaroVicoStato),
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kanalaroVicoStato).rulumuViconPerMuso(kanalaroVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -640,7 +653,7 @@ fun HejmoEkrano(
                     item {
                         LazyRow(
                             state = kioNovasVicoStato,
-                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kioNovasVicoStato),
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, kioNovasVicoStato).rulumuViconPerMuso(kioNovasVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -668,7 +681,7 @@ fun HejmoEkrano(
                     item {
                         LazyRow(
                             state = luditajVicoStato,
-                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, luditajVicoStato),
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, luditajVicoStato).rulumuViconPerMuso(luditajVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -696,7 +709,7 @@ fun HejmoEkrano(
                         val aliajVicoStato = rememberLazyListState()
                         LazyRow(
                             state = aliajVicoStato,
-                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, aliajVicoStato),
+                            modifier = Modifier.tirkestoJeTroRulo(tirkestStato, aliajVicoStato).rulumuViconPerMuso(aliajVicoStato),
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {

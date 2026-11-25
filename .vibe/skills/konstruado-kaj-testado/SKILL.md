@@ -169,3 +169,31 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   1 forko), 11 s kun la nova agordo. Kontrolu la potenca-reĝimon/ŝarĝon de la
   maŝino antaŭ ol atribui malrapidecon al la kodo aŭ ĝustigi Gradle-agordon
   laŭ mezuroj.
+
+## Reta versio (wasmJs) — musa navigado kaj mezurado (2026-11-24, C56/PR #210)
+
+- **La nuna CMP-versio ne ligas la musan radeton al `LazyRow`** (kaj muso-treno ne
+  movas ruleblajn ujoj): `LazyColumn` ja ruliĝas per radeto DENASKE, sed la
+  kartaj vicoj bezonas propran trakton — `ui/VicRulado.kt`
+  (`rulumuViconPerMuso`/`rulumuKolumnonPerMuso`) observas `PointerEventType.Scroll`
+  kaj `PointerType.Mouse` en la Initial-/Main-pasoj kaj vokas `scrollBy`.
+- **Hejma kolumno ofte NE havas rulum-amplekson** en altaj fenestroj (la enhavo
+  preskaŭ plenigas la ekranon) — `scrollBy` tiam konsumas 0 sen eraro. Ekzamenu
+  en malalta fenestro (ekz. 420 px) antaŭ ol konkludi, ke io ne funkcias.
+- **Mezuru la retan UI-n per Playwright** (`playwright-core` instalita en
+  `tmp/` ĉe la radiko de la laborkopio — gitignorita, vidu servilo-arkivo;
+  sistema Chrome): `page.on('console')` kaptas `logd` de la apo;
+  `chromium.launch({executablePath: '/usr/bin/google-chrome'})`;
+  tuŝgestoj per `CDPSession Input.dispatchTouchEvent`.
+- **`grep -c ĉeno *.wasm` kasas erarojn**: kompila fiasko pere de
+  `… | tail -1 && alia` montras «BUILD»-sukceson kaj publikiĝas malnova fasko —
+  ĉiam kontrolu `grep -E "BUILD|e: "`, ne nur `tail`.
+
+- **Neniam forigu kodon per plur-linia ĉeno-kongruo sen relegi la rezulton**
+  (2026-11-24, PR #210): skriptita forigo de protokol-instrumentigo (`logd`-linioj)
+  forviŝis KUNE ankaŭ najbaran realan kodon — la muso-kaptilon
+  `if (ŝanĝo.type != PointerType.Mouse) continue` kaj `trenMezuro += abs(delto)`
+  — ĉar ambaŭ kuŝis inter la forigotaj linioj; CodeRabbit prave rimarkis la
+  regreson (duobla tuŝa rulado sur Android, klak-karto ĉe trenfino). Post ĉiu
+  amasa skripta prilaboro de fontkodo: `git diff` plu-legu la rezultajn
+  blokojn, ne nur la ŝanĝitajn liniojn.

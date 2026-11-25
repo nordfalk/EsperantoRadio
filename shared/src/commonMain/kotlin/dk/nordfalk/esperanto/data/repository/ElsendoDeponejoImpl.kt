@@ -61,6 +61,14 @@ open class ElsendoDeponejoImpl(
     private val parsilo: RssParsilo = RssParsilo(),
     /** Bazo de nia arkiv-servilo (riĉigitaj fluoj). Se difinita: provi unue `<bazo><slug>.xml`, poste la originalan fluon. */
     private val arkivoBazoUrl: String? = null,
+    /**
+     * Ĉu ankaŭ la originalan fluon (`podkastaRssUrl`) elŝuti kiel aldona fonto apud la
+     * arkivo (la arkivo venkas, la originalo aldonas ĝis tiam ne-arkivitajn elsendojn).
+     * Sur la retumilo (wasmJs) la originalaj fluoj estas CORS-blokitaj (FAROTA C56):
+     * la retversio gastigas samdevene apud la arkivo (javabog.dk/esperanto-radio/apo/)
+     * kaj uzas nur la arkivan datumvojon — `AppStato` ŝaltas tion laŭ la platformo.
+     */
+    private val uzuOriginajnFluojn: Boolean = true,
 ) : ElsendoDeponejo {
 
     /**
@@ -165,7 +173,13 @@ open class ElsendoDeponejoImpl(
             if (!arkivoBazoUrl.isNullOrBlank()) {
                 add(Fonto(arkivoBazoUrl.trimEnd('/') + "/" + kanalo.slug + ".xml", deArkivo = true))
             }
-            kanalo.podkastaRssUrl?.let { add(Fonto(it, deArkivo = false)) }
+            if (uzuOriginajnFluojn) {
+                kanalo.podkastaRssUrl?.let { add(Fonto(it, deArkivo = false)) }
+            } else if (kanalo.podkastaRssUrl != null) {
+                // C56: sur la retumilo la originalaj fluoj estas CORS-blokitaj — ilia peto
+                // ĉiukaze fiaskus (post konsiderinda atendo), do tute ne elŝutu ilin.
+                logd("ElsendoDeponejo", "${kanalo.slug}: nur-arkiva datumvojo (C56) — preterlasas ${kanalo.podkastaRssUrl}")
+            }
         }.distinctBy { it.url }
         if (fontoj.isEmpty()) {
             logw("ElsendoDeponejo", "${kanalo.slug}: neniu RSS-URL — saltas")

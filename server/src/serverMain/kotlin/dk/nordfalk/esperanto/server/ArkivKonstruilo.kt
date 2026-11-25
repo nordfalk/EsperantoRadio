@@ -9,8 +9,15 @@ import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.parser.analizuRezumon
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import dk.nordfalk.esperanto.data.repository.RespondoTroGrandaException
 import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsBytes
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.HttpHeaders
+import io.ktor.utils.io.readAvailable
+import java.net.InetAddress
+import java.net.URI
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -41,11 +48,21 @@ object ArkivKonstruilo {
     // HTML-fontoj (mediatheko sen RSS, ekz. radiofrei): pli da paĝoj kaj eroj ol RSS
     private const val MAKS_HTML_PAĜOJ = 30
     private const val MAKS_HTML_EROJ = 300
-    // Elsenda bildeto (bildoUrl): sufiĉe por kovrilo/kontribuaĵo-foto, tro por erarpaĝo aŭ
-    // kaŝvestitaĵo (C56 — la bildo servatas samdevene por la retversio).
-    private const val MAKS_BILDETA_GRANDECO_BITOKOJ = 5L * 1024 * 1024
+    // Spegulata bildo (kanal-emblemo aŭ elsenda bildeto): sufiĉe por kovrilo aŭ
+    // kontribuaĵo-foto, tro por erarpaĝo aŭ kaŝvestitaĵo (C56 — la bildoj estas
+    // servataj samdevene por la retversio). La legado ĉesas fluante ĉe transpaso
+    // (vidu leguBitokojnLimigite) — neniam senlima enmemorigo de la korpo.
+    private const val MAKS_BILDA_GRANDECO_BITOKOJ = 5L * 1024 * 1024
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
+
+    /**
+     * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj): SENVOLA
+     * alidirekto — ĉiun salton validigas `petuKunSsrfŜirmo` mem (SSRF-ŝirmo,
+     * CWE-918: aŭtoro de ekstera fluo alie povus devigi la konstruilon peti
+     * internajn adresojn).
+     */
+    private val bildaHttp: HttpClient = HttpClient(CIO) { followRedirects = false }
 
     /**
      * Rezulto de elŝutuEmblemojn: la URL-mapigo por la resskribo plus la nova
@@ -78,7 +95,7 @@ object ArkivKonstruilo {
         // FAROTA C56: spegulu la emblemojn al publika/bildoj/ kaj resskribu iliajn URL-ojn
         // en la publikigota konfiguro (kaj en la fluoj) al la arkivaj URL-oj — la
         // retversio gastigas samdevene kaj ne povas ŝargi bildojn el la originalaj gastigantoj (CORS).
-        val emblemoj = elŝutuEmblemojn(ĉiujKanaloj, http, agordo.arkivoBazoUrl)
+        val emblemoj = elŝutuEmblemojn(ĉiujKanaloj, agordo.arkivoBazoUrl)
 
         for (kanalo in kanaloj) {
             try {
@@ -151,7 +168,6 @@ object ArkivKonstruilo {
      */
     private fun elŝutuEmblemojn(
         kanaloj: List<dk.nordfalk.esperanto.domain.model.Kanalo>,
-        http: HttpClient,
         arkivoBazoUrl: String?,
     ): EmblemaRezulto {
         if (arkivoBazoUrl.isNullOrBlank()) return EmblemaRezulto(emptyMap(), emptyMap())
@@ -163,11 +179,8 @@ object ArkivKonstruilo {
             val url = kanalo.emblemoUrl ?: continue
             try {
                 val nova = runBlocking {
-                    val respondo = http.get(url)
-                    // Plena paĝo (ekz. 404-HTML) ne iĝu emblemo — Ktor defaŭlte ne
-                    // ĵetas ĉe erarstatusoj (expectSuccess=false).
-                    check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
-                    val enhavo = respondo.bodyAsBytes()
+                    val respondo = petuKunSsrfŜirmo(url) // ankaŭ la statuskontrolon (200..299)
+                    val enhavo = leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
                     // XSS-ŝirmo (CWE-79, PR #210): la formato estas determinata laŭ
                     // la ENHAVO de la bildo (magiaj signoj), ne laŭ Content-Type aŭ
                     // dosiernomo kaj validigata per VERA malkodado (ImageIO). Nur malkodatablaj
@@ -240,14 +253,20 @@ object ArkivKonstruilo {
             } else {
                 try {
                     runBlocking {
-                        val respondo = http.get(url)
-                        check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
-                        val enhavo = respondo.bodyAsBytes()
-                        check(enhavo.size.toLong() <= MAKS_BILDETA_GRANDECO_BITOKOJ) { "tro granda: ${enhavo.size} bitokoj" }
+                        val respondo = petuKunSsrfŜirmo(url) // ankaŭ la statuskontrolon (200..299)
+                        val enhavo = leguBitokojnLimigite(respondo, MAKS_BILDA_GRANDECO_BITOKOJ)
                         val formato = Emblemoj.formatoSeLegebla(enhavo)
                             ?: throw IllegalStateException("ne malkodebla PNG/JPEG/GIF (eble SVG/HTML)")
                         val dosiero = File(bildujo, "$radiko.$formato")
-                        dosiero.writeBytes(enhavo)
+                        // Transakcie: skribu al .part kaj alinomu nur post plena skribo —
+                        // interrompita skribo ne kredigu al la sekva rulo koruptitan
+                        // dosieron kiel jam-spegulitan (la ekzisto-kontrolo rigardas radikon).
+                        val provizora = File(bildujo, "${dosiero.name}.part")
+                        provizora.writeBytes(enhavo)
+                        if (!provizora.renameTo(dosiero)) {
+                            provizora.delete()
+                            throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
+                        }
                         novaUrl(url, dosiero)
                     }
                 } catch (e: Exception) {
@@ -263,7 +282,7 @@ object ArkivKonstruilo {
         var spegulitaj = 0
         val rezulto = elsendoj.map { e ->
             val bildo = e.bildoUrl ?: return@map e
-            if (bildo.startsWith(bazo)) e // jam samdevena (pli frua rulo)
+            if (bildo.startsWith("$bazo/")) e // jam samdevena (pli frua rulo)
             else {
                 spegulitaj++
                 e.copy(bildoUrl = spegulu(bildo))
@@ -271,6 +290,79 @@ object ArkivKonstruilo {
         }
         if (spegulitaj > 0) logd("ArkivKonstruilo", "elsendaj bildetoj: ${mapigo.size} unikaj, $spegulitaj spegulotaj")
         return rezulto
+    }
+
+    /**
+     * Bildo-peto kun SSRF-ŝirmo (CWE-918): la celo de ĉIU salto (ankaŭ alidirektoj)
+     * devas esti http(s) kaj publika adreso — la konstruilo alie povus fariĝi
+     * perilo por atingi nepublikajn internajn adresojn. [bildaHttp] sekvas NENIUJN
+     * saltojn; ĉi tie ili estas sekvataj MANE, ĝis 5, validigante ĉiun per
+     * [estasPublikaCelo]. Refuzo traktiĝas kiel ĉiu alia elŝuta eraro (la alvokanto
+     * kaptas kaj daŭrigas, regulo A4).
+     */
+    private suspend fun petuKunSsrfŜirmo(url: String): HttpResponse {
+        var nuna = url
+        var saltoj = 0
+        while (true) {
+            check(saltoj++ < 5) { "tro da alidirektoj (≥ 5) ekde $url" }
+            check(estasPublikaCelo(nuna)) { "ne-publika/ne-http(s) celo (SSRF-ŝirmo): $nuna" }
+            val respondo = bildaHttp.get(nuna)
+            if (respondo.status.value in 300..399) {
+                val loko = respondo.headers[HttpHeaders.Location]
+                check(!loko.isNullOrBlank()) { "HTTP ${respondo.status.value} sen Location" }
+                nuna = URI(nuna).resolve(loko).toString()
+                continue
+            }
+            check(respondo.status.value in 200..299) { "HTTP ${respondo.status.value}" }
+            return respondo
+        }
+    }
+
+    /**
+     * Ĉu la URL-celo estas publika: skemo http(s) kaj ĉiuj resolvitaj adresoj
+     * estas neniu el: any-local, loopback, site-local (privata), link-local,
+     * multicast. Neresolvebla gastiganto → false (la normala elŝuto same
+     * fiaskus — rifuzu frue).
+     */
+    private fun estasPublikaCelo(url: String): Boolean {
+        return try {
+            val uri = URI(url)
+            if (uri.scheme !in setOf("http", "https") || uri.host.isNullOrBlank()) return false
+            InetAddress.getAllByName(uri.host).all {
+                !it.isAnyLocalAddress && !it.isLoopbackAddress && !it.isSiteLocalAddress &&
+                    !it.isLinkLocalAddress && !it.isMulticastAddress
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Fluanta korpo-legado kun grandec-limo (la G45-skemo el KorpaLegilo, bitokoj):
+     * antaŭkontrolo de Content-Length KAJ ĉesigo dum la flu-legado — neniam
+     * senlima enmemorigo (OutOfMemoryError ne estas kaptata de catch(Exception)).
+     */
+    private suspend fun leguBitokojnLimigite(respondo: HttpResponse, limo: Long): ByteArray {
+        val deklarita = respondo.headers[HttpHeaders.ContentLength]?.toLongOrNull()
+        if (deklarita != null && deklarita > limo) throw RespondoTroGrandaException(deklarita, limo)
+        val kanalo = respondo.bodyAsChannel()
+        val pecoj = mutableListOf<ByteArray>()
+        val buf = ByteArray(64 * 1024)
+        var totalo = 0L
+        while (true) {
+            val n = kanalo.readAvailable(buf)
+            if (n <= 0) break
+            totalo += n
+            if (totalo > limo) throw RespondoTroGrandaException(totalo, limo)
+            pecoj.add(buf.copyOf(n))
+        }
+        val ĉiuj = ByteArray(totalo.toInt())
+        var pozicio = 0
+        for (peco in pecoj) {
+            peco.copyInto(ĉiuj, pozicio)
+            pozicio += peco.size
+        }
+        return ĉiuj
     }
 
     /** Elŝutas la fluon (aŭ legas kaŝon) kaj sekvas rel="next" ĝis MAKS_PAĜOJ — sed ĉesas

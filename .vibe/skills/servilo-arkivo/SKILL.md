@@ -143,14 +143,14 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
 **REGULO (2026-11-20): neniam lanĉu la rsync al la servilo sen eksplicita peto de la uzanto** („kopiu al la servilo“ k.s.). Loka konstruado kaj kontrolo de `server/data/publika/` estas en ordo; la publikigo ĉiam atendas aprobon.
 
-**REGULO (posedanto, 2026-11-25): `publika/apo/` (la produkta reta apo) ne ŝanĝiĝas sen eksplicita peto.**
+**(REGULO (posedanto, 2026-11-25): `publika/apo/` (la produkta reta apo) ne ŝanĝiĝas sen eksplicita peto.**
 Ŝanĝoj al la reta apo inter eldonoj iras al **`publika/apo-beta/`**
 (https://javabog.dk/esperanto-radio/apo-beta/) — la defaŭlta Gradle-tasko estas
 `:webApp:kopiuAlApoBetaElsutejo` (ĝi kreas la dosierujon mem kaj enmetas la Sentry-version);
-la kutima rsync de `publika/` publikigas la betaon AŬTOMATE (ĝi estas ja parto de `publika/`).
+la kutima rsync de `publika/` publikigas ankaŭ tiun dosierujon AŬTOMATE (ĝi estas ja parto de `publika/`).
 `publika/apo/` tuŝiĝas NUR per `:webApp:kopiuAlApoElsutejo` kiam la posedanto diras
 ekz. «publikigu la novan version de la reta apo al apo/». Sur la servilo `apo-beta/`
-ekzistas ekde 2026-11-25 (lok-tenila index.html).
+ekzistas ekde 2026-11-25 (loko-tenila index.html).
 
 ```bash
 # unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)

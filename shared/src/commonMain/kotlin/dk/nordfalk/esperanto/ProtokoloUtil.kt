@@ -21,6 +21,13 @@ import kotlin.concurrent.Volatile
  */
 @Volatile
 var raportadoAktiva: Boolean = false
+    // Ĉiu ŝanĝo sinkronigas ankaŭ la platform-flankon: sur wasmJs la flago
+    // speguliĝas al window.erarRaportadoAktiva (window.ert.konsento), kiu
+    // regas ankaŭ la sendependajn JS-erarojn per beforeSend. Aliaj platformoj: no-op.
+    set(value) {
+        field = value
+        sinkroniguRaportadanKonsentonPlatforme(value)
+    }
 
 @Volatile
 var protokoloDetala: Boolean = false
@@ -31,7 +38,10 @@ fun logd(tag: String, msg: String) {
 
 fun logi(tag: String, msg: String) {
     platformLogi(tag, msg)
-    if (raportadoAktiva && protokoloDetala) Sentry.logger.info("[$tag] $msg")
+    if (raportadoAktiva && protokoloDetala) {
+        Sentry.logger.info("[$tag] $msg")
+        sentryProtokoluPlatforme("info", "[$tag] $msg")
+    }
 }
 
 /**
@@ -42,17 +52,26 @@ fun logi(tag: String, msg: String) {
  */
 fun logGrava(tag: String, msg: String) {
     platformLogi(tag, msg)
-    if (raportadoAktiva) Sentry.logger.info("[$tag] $msg")
+    if (raportadoAktiva) {
+        Sentry.logger.info("[$tag] $msg")
+        sentryProtokoluPlatforme("info", "[$tag] $msg")
+    }
 }
 
 fun logw(tag: String, msg: String) {
     platformLogw(tag, msg)
-    if (raportadoAktiva) Sentry.logger.warn("[$tag] $msg")
+    if (raportadoAktiva) {
+        Sentry.logger.warn("[$tag] $msg")
+        sentryProtokoluPlatforme("warn", "[$tag] $msg")
+    }
 }
 
 fun loge(tag: String, msg: String) {
     platformLoge(tag, msg)
-    if (raportadoAktiva) Sentry.logger.error("[$tag] $msg")
+    if (raportadoAktiva) {
+        Sentry.logger.error("[$tag] $msg")
+        sentryProtokoluPlatforme("error", "[$tag] $msg")
+    }
 }
 
 /**
@@ -68,7 +87,11 @@ fun loge(tag: String, msg: String, e: Throwable) {
     val plenaMsg = "$msg: ${e::class.simpleName}: ${e.message}"
     platformLoge(tag, plenaMsg)
     platformLoge(tag, e.stackTraceToString())
-    if (raportadoAktiva) Sentry.captureException(e)
+    if (raportadoAktiva) {
+        Sentry.captureException(e)
+        // wasmJs: la KMP-SDK estas no-op — la escepto iras tra la JS-ponto
+        sentryKaptuEsceptonPlatforme(plenaMsg, e.stackTraceToString())
+    }
 }
 
 /**
@@ -83,6 +106,8 @@ fun logw(tag: String, msg: String, e: Throwable) {
     platformLogw(tag, e.stackTraceToString())
     if (raportadoAktiva) {
         Sentry.logger.warn("[$tag] $plenaMsg")
-        Sentry.logger.warn("[$tag] "+e.stackTraceToString())
+        Sentry.logger.warn("[$tag] " + e.stackTraceToString())
+        sentryProtokoluPlatforme("warn", "[$tag] $plenaMsg")
+        sentryProtokoluPlatforme("warn", "[$tag] " + e.stackTraceToString())
     }
 }

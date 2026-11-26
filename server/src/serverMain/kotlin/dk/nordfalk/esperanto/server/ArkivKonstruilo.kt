@@ -6,6 +6,7 @@ import dk.nordfalk.esperanto.data.config.alKanalo
 import dk.nordfalk.esperanto.data.parser.HtmlFontoParsilo
 import dk.nordfalk.esperanto.data.parser.RssParsilo
 import dk.nordfalk.esperanto.data.parser.analizuRezumon
+import dk.nordfalk.esperanto.data.parser.kuniguPriskribonKunRezumo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -42,6 +43,14 @@ object ArkivKonstruilo {
     private const val MAKS_HTML_EROJ = 300
 
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
+
+    /**
+     * Priskriboj ĝis tiu longo ricevas AI-rezumon (aldonatan sub la originalo);
+     * pli longaj priskriboj estas jam sufiĉe informaj kaj restas senŝanĝaj
+     * (decido de la posedanto, 2026-11-25 — la limo konserveme super la analyszo,
+     * kie la originaj priskriboj ekportas aŭtorojn, gastojn kaj ligilojn).
+     */
+    private const val AI_PRISKRIBO_JE_LONGO_MALPLI_OL = 150
 
     /**
      * Rezulto de elŝutuEmblemojn: la URL-mapigo por la resskribo plus la nova
@@ -332,7 +341,9 @@ object ArkivKonstruilo {
     }
 
     /**
-     * Riĉigas erojn sen priskribo per AI-rezulto (4–9 linioj + averto).
+     * Riĉigas erojn kies priskribo estas malplena aŭ maks. [AI_PRISKRIBO_JE_LONGO_MALPLI_OL]
+     * signoj longa per AI-rezulto: la originala priskribo restas unue (gni ĉiam
+     * videbla), poste la kursivigita averto pri la AI-fonto kaj la rezumo mem.
      * Prioritato: preta rezumo el la rezumo-kaŝo (privata/rezumoj/ — LLM-prilaborita);
      * se mankas, ekstrakta rezumo el la kaŝita transskribo (privata/transkriptoj/).
      * Transskriboj kaj rezumoj estas PRIVATAJ — la publika fluo ricevas nur la pretan
@@ -340,41 +351,39 @@ object ArkivKonstruilo {
      * Redonas: priskriboj (HTML) kaj titoloj (anstataŭaĵoj laŭ id — ekz. se la
      * originala titolo estas nur „<kanalo> <dato>“, oni uzas la temon el la rezumo).
      */
-    private fun riĉigu(
+    internal fun riĉigu(
         kanalo: dk.nordfalk.esperanto.domain.model.Kanalo,
         elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
+        privata: File = PRIVATA,
     ): Pair<Map<String, String>, Map<String, String>> {
         val priskriboj = mutableMapOf<String, String>()
         val titoloj = mutableMapOf<String, String>()
         for (e in elsendoj) {
-            if (!e.priskribo.isNullOrBlank()) continue
+            val krudaPriskribo = e.priskribo.orEmpty().trim()
+            // Jam riĉigita priskribo (re-legita el la arkivo) ne riĉiĝu duan fojon
+            if (krudaPriskribo.contains(AI_AVERTO)) continue
+            if (krudaPriskribo.length > AI_PRISKRIBO_JE_LONGO_MALPLI_OL) continue
             val nomo = transkriptoDosieroNomo(e.id)
-            val rezumoDosiero = File(PRIVATA, "rezumoj/${kanalo.slug}/$nomo.txt")
-            val transkriptoDosiero = File(PRIVATA, "transkriptoj/${kanalo.slug}/$nomo.txt")
+            val rezumoDosiero = File(privata, "rezumoj/${kanalo.slug}/$nomo.txt")
+            val transkriptoDosiero = File(privata, "transkriptoj/${kanalo.slug}/$nomo.txt")
             var elRezumoKaŝo = false
             val kruda = when {
-                rezumoDosiero.isFile -> { elRezumoKaŝo = true; certiguAverton(rezumoDosiero.readText()) }
+                rezumoDosiero.isFile -> { elRezumoKaŝo = true; rezumoDosiero.readText() }
                 transkriptoDosiero.isFile -> rezumMotoro.rezumu(transkriptoDosiero.readText(), e.titolo)
                 else -> {
-                    println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
+                    if (krudaPriskribo.isEmpty()) println("    ${e.id}: sen priskribo kaj sen transskribo — rezulto ne generita")
                     null
                 }
             }
-            if (kruda != null) {
+            if (!kruda.isNullOrBlank()) {
                 // el la rezumo-kaŝo la unua linio estas la temo (titolo-stila), el la ekstrakta
                 // rezumo ĝi estas nur la unua frazo de fluanta teksto
                 val analizita = analizuRezumon(kruda, e.titolo, AI_AVERTO, unuaLinioTitolo = elRezumoKaŝo)
-                priskriboj[e.id] = analizita.priskriboHtml
+                priskriboj[e.id] = kuniguPriskribonKunRezumo(e.priskriboHtml ?: e.priskribo, AI_AVERTO, analizita.priskriboHtml)
                 analizita.titolo?.let { titoloj[e.id] = it }
             }
         }
         return priskriboj to titoloj
-    }
-
-    /** certigas, ke la rezulto finiĝas per la AI-averta frazo */
-    private fun certiguAverton(rezumo: String): String {
-        val t = rezumo.trim()
-        return if (t.endsWith(AI_AVERTO)) t else "$t\n\n$AI_AVERTO"
     }
 
     /**

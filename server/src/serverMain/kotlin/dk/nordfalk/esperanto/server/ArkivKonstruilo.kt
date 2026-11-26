@@ -72,6 +72,10 @@ object ArkivKonstruilo {
             // config-locale ricevas la OkHttpClient.Builder kiel this
             config {
                 dns(Emblemoj.SekuraBildaDns)
+                // NENIU prokurilo: kun HTTP-prokurilo OkHttp solvas la prokurilon
+                // per la Dns-hoko kaj la prokurilo mem solvas la celon — la
+                // valida rezolvo tiel ne plu kontrolias la vojon al la celo.
+                proxy(java.net.Proxy.NO_PROXY)
             }
         }
     }

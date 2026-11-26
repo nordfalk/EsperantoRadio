@@ -125,9 +125,11 @@ object Emblemoj {
                 (o0 and 0xF0) == 0xE0 ||                             // 224/4 (multicast)
                 o0 >= 240)                                           // 240/4 (rezervita)
         }
-        // IPv6: nur la PUBLIKA pasas (ULA, link-local, loopback, multicast, :: ne)
+        // IPv6: nur la PUBLIKA pasas (:: , ::1, ULA, site-local fec0::/10,
+        // link-local, multicast rifuzataj)
         val o0 = adreso.address[0].toInt() and 0xFF
         return !(adreso.isAnyLocalAddress || adreso.isLoopbackAddress ||
+            adreso.isSiteLocalAddress ||                              // fec0::/10 (site-local)
             adreso.isLinkLocalAddress || adreso.isMulticastAddress ||
             (o0 and 0xFE) == 0xFC)                                   // fc00::/7 (ULA)
     }

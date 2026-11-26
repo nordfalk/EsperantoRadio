@@ -36,7 +36,7 @@ class EmblemojTest {
         val nepublikaj = listOf(
             "0.0.0.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "169.254.1.1",
             "127.0.0.1", "100.64.0.1", "198.18.0.1", "224.0.0.1", "250.1.2.3",
-            "::", "::1", "fd00::1", "fe80::1", "ff02::1", "::ffff:127.0.0.1",
+            "::", "::1", "fd00::1", "fe80::1", "fec0::1", "ff02::1", "::ffff:127.0.0.1",
         )
         for (a in nepublikaj) {
             assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName(a)), "devus rifuziĝi: $a")

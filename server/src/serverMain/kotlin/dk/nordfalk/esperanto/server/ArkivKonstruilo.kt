@@ -10,6 +10,7 @@ import dk.nordfalk.esperanto.data.parser.analizuRezumon
 import dk.nordfalk.esperanto.data.parser.kuniguPriskribonKunRezumo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import dk.nordfalk.esperanto.data.repository.RespondoTroGrandaException
 import io.ktor.client.request.get
 import io.ktor.client.request.prepareGet
@@ -57,11 +58,23 @@ object ArkivKonstruilo {
     private val rezumMotoro: RezumMotoro = EkstraktaRezumMotoro()
 
     /**
-     * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj): SENVOLA —
-     * alidirektoj (3xx) estas „nenormalaj" kaj rifuzataj (posedanto-decido
-     * 2026-11-25), ne sekvataj nek validigataj (SSRF-ŝirmo, CWE-918).
+     * Kliento por BILDO-elŝutoj (emblemoj kaj elsendlaj bildetoj):
+     * - SENVOLA — alidirektoj (3xx) estas „nenormalaj" kaj rifuzataj
+     *   (posedanto-decido 2026-11-25);
+     * - OkHttp-motoro kun [Emblemoj.SekuraBildaDns]: la konekto povas atingi NUR
+     *   publikajn adresojn — la DNS-rebinding-fenestro (CWE-918) estas fermita
+     *   konstruite, sen propra TLS-kodo (SNI-kapo kaj atestokontrolo restas de
+     *   OkHttp laŭ la originala gastiganto-nomo).
      */
-    private val bildaHttp: HttpClient = HttpClient(CIO) { followRedirects = false }
+    private val bildaHttp: HttpClient = HttpClient(OkHttp) {
+        followRedirects = false
+        engine {
+            // config-locale ricevas la OkHttpClient.Builder kiel this
+            config {
+                dns(Emblemoj.SekuraBildaDns)
+            }
+        }
+    }
 
     /**
      * Priskriboj ĝis tiu longo ricevas AI-rezumon (aldonatan sub la originalo);

@@ -6,6 +6,7 @@ import javax.imageio.ImageIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 /**
@@ -109,6 +110,14 @@ class EmblemojTest {
         assertFalse(Emblemoj.dimensioEnLimo(0, 0))
         assertFalse(Emblemoj.dimensioEnLimo(-1, 100))
         assertTrue(Emblemoj.dimensioEnLimo(1, 1))
+    }
+
+    @Test
+    fun sekuraDnsRifuzasNepublikajnResolvojn() {
+        // localhost → 127.0.0.1/::1: neniu publika adreso → escepto (sen reto)
+        assertFailsWith<java.net.UnknownHostException> {
+            Emblemoj.SekuraBildaDns.lookup("localhost")
+        }
     }
 
     @Test

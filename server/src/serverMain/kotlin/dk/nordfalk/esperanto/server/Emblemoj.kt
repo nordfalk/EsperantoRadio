@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.URI
+import java.net.UnknownHostException
 import java.security.MessageDigest
 import javax.imageio.ImageIO
 
@@ -75,6 +76,27 @@ object Emblemoj {
     fun bildetaRadiko(url: String): String =
         MessageDigest.getInstance("SHA-1").digest(url.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }
+
+    /**
+     * La DNS-hoko de la BILDA kliento (OkHttp-motoro): anstataŭ la systema
+     * rezolvo la transporto ricevas NUR la publikajn adresojn el la respondo —
+     * la konekto do povas atingi nur validigitajn adresojn, kaj la klasika
+     * TOCTOU/DNS-rebinding-fenestro (CWE-918; kontrolo en unu resolvo, konekto
+     * en alia) estas fermita KONSTRUKTE: la valida rezolvo mem estas tiu, kiun
+     * la motoro uzas por konekti. Malplena rezulto → UnknownHostException →
+     * la ekzistanta catch (A4). SNI-kapo kaj atestokontrolo restas aŭetermine
+     * de OkHttp laŭ la originala gastiganto-nomo.
+     */
+    internal object SekuraBildaDns : okhttp3.Dns {
+        override fun lookup(hostname: String): List<InetAddress> {
+            val adresoj = InetAddress.getAllByName(hostname).toList()
+            val sekuraj = adresoj.filter { ĉuPublikaAdreso(it) }
+            if (sekuraj.isEmpty()) throw UnknownHostException(
+                "neniu publika adreso por $hostname (rifuzita: ${adresoj.joinToString()})"
+            )
+            return sekuraj
+        }
+    }
 
     /**
      * Permes-lista regulo de la posedanto (2026-11-25): la bildo-celo devas esti
@@ -148,14 +170,11 @@ object Emblemoj {
      * neresolvebla aŭ ne-publika resolvo → false (la bildo restas ĉe la
      * originala URL, A4).
      *
-     * KONATA, AKCEPTITA RISKO (posedanto-decido 2026-11-26, CWE-918): la
-     * transporto (Ktor CIO) solvas la nomon DENOVE dum la konekto — DNS-rebinding
-     * inter ambaŭ resolvoj povus direkti la petigon al interna adreso (blind-GET;
-     * la respondo publikiĝas nur se ĝi malkodeblas kiel bildo kaj la peto portas
-     * la publikan Host-valoron). La fenestro estas milisekundoj; plena ŝirmo
-     * postulus pin je la kontrolita IP kun SNI/atestokontrolo de la originala
-     * nomo (propra HTTPS-kliento) — kosto juĝita neproporcia por la
-     * bildospegulelo de konataj komunumaj fluoj.
+     * Rimarko pri DNS-rebinding (CWE-918): ĉi tiu antaŭkontrolo estas nur
+     * frua rifuzo; la DECIDA ŝirmo estas [SekuraBildaDns] — la Dns-hoko de la
+     * OkHttp-motoro, kiu faras la validigan rezolvon mem uzata por la konekto
+     * (posedanto-decido 2026-11-26: uzi bibliotekan solvon anstataŭ akcepti
+     * la restantan fenestron aŭ programe propran klienton).
      */
     fun ĉuAkcepteblaBildaCelo(url: String): Boolean {
         return try {

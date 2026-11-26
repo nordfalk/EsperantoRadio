@@ -67,7 +67,7 @@ object AppStato {
      *   konfiguro venkas, por ke ŝanĝoj el la Git-branĉo tuj testiĝu sen
      *   rsync al la servilo.
      */
-    var estasEvoluaMedo: Boolean = false
+    var estasEvoluaMedio: Boolean = false
 
     /**
      * Ĉu temas pri debug-konstruo (alfaversio). La Android-enirpunkto ŝaltas
@@ -307,7 +307,7 @@ object AppStato {
         // Evolua medio (debug-konstruo/emulilo, Desktop/Web): NE rulu — la
         // defora konfiguro anstataŭigus la ĵus ŝanĝitan paktitan (vidu
         // leguAgordonKunRezervo); testado de novaj kanaloj restas ĉe Git.
-        if (!estasEvoluaMedo) {
+        if (!estasEvoluaMedio) {
             CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
                 try {
                     deponejoDeKanaloj.refreŝiguDefore()

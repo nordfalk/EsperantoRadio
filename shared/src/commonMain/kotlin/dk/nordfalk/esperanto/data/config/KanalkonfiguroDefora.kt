@@ -74,7 +74,7 @@ fun leguAgordonKunRezervo(
     paktitaTeksto: () -> String,
     leguKonservitan: () -> String? = { leguKaŝonJson(KANALKONFIGURO_KAŜNOMO) },
     foriguKonservitan: () -> Unit = { foriguKaŝon(KANALKONFIGURO_KAŜNOMO) },
-    uzuDeforanKonfiguron: Boolean = !AppStato.estasEvoluaMedo,
+    uzuDeforanKonfiguron: Boolean = !AppStato.estasEvoluaMedio,
 ): KanalAgordo {
     if (!uzuDeforanKonfiguron) {
         logd("Kanalkonfiguro", "Evolua medio — uzas nur la paktitan kanalkonfiguron")

@@ -44,7 +44,7 @@ class EsperantoRadioAplikaĵo : Application() {
         val estasDebug = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
         // Evolua medio (debug-konstruo aŭ emulilo): ekz. la "Apaj novaĵoj"-
         // dialogo ne montriĝu — ĝi aperus ĉe ĉiu freŝa instalaĵo
-        AppStato.estasEvoluaMedo = estasDebug || estasEmulilo()
+        AppStato.estasEvoluaMedio = estasDebug || estasEmulilo()
         // Debug-konstruo = alfaversio: titolo «EsperαntoRαdio alfa» en la hejmoekrano
         AppStato.estasAlfaKonstruo = estasDebug
         // Branĉnomo (malplena ĉe master) — montriĝas en Agordoj post la versio
@@ -52,7 +52,7 @@ class EsperantoRadioAplikaĵo : Application() {
         // Instalaĵo-specifa defaŭlto de la erar-raportado (vidu la klasan KDoc-on):
         // konata ne-F-Droid-kanalo → defaŭlte ŝaltita; F-Droid/nekonata → opt-in demando.
         AppStato.erarRaportadoDefaŭlta = erarRaportadaDefaŭltoLaŭInstalanto(leguInstalanton())
-        if (AppStato.estasEvoluaMedo) {
+        if (AppStato.estasEvoluaMedio) {
             logi("Sentry", "Ne raportas al Sentry (${if (estasDebug) "debug-konstruo" else "emulilo"})")
             return
         }

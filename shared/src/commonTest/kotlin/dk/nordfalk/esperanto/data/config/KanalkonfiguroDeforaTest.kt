@@ -82,7 +82,7 @@ class KanalkonfiguroDeforaTest {
         // la persistigita defora konfiguro (eble plurajn semajnojn malnova) IGNORIĜAS
         val persisto = MemorPersisto()
         persisto.teksto = agordoTeksto("defora")
-        AppStato.estasEvoluaMedo = true
+        AppStato.estasEvoluaMedio = true
         try {
             val agordo = leguAgordonKunRezervo(leganto, { agordoTeksto("paktita") }, persisto.legu, persisto.forigu)
             assertEquals(listOf("paktita"), agordo.kanaloj.map { it.kodo })
@@ -91,7 +91,7 @@ class KanalkonfiguroDeforaTest {
             assertEquals(agordoTeksto("defora"), persisto.teksto)
             assertEquals(0, persisto.forigitaj)
         } finally {
-            AppStato.estasEvoluaMedo = false
+            AppStato.estasEvoluaMedio = false
         }
     }
 

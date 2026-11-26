@@ -67,7 +67,10 @@ fun kreuDeforanElŝutilon(httpKliento: HttpClient): suspend (url: String) -> Str
  * PAKTITA konfiguro uziĝas ĉiam, kaj ankaŭ la defora refreŝigo ne ruliĝas
  * (vidu [KanaloDeponejoImpl.refreŝiguDefore]). Tiel novaj kanaloj el la
  * Git-branĉo testiĝas sen rsync al la servilo — la defora konfiguro venkus
- * la novan paktitan liston ĝis la sekva eldono.
+ * la novan paktitan liston ĝis la sekva eldono. La retumilo havas evoluan
+ * medion nur por LOKAJ ruloj (localhost); la publikigita retversio uzas la
+ * deforan konfiguron — la paktitaj emblemo-URL-oj estas CORS-blokataj en la
+ * retumilo kaj la servila versio portas la spegulitajn (2026-11-26).
  */
 fun leguAgordonKunRezervo(
     leganto: KanalAgordoLeganto,

@@ -173,6 +173,8 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
 
 ## Testrapideco kaj mezurado
 
+- **La `wasmJs`-produktada Optimize-fazo (binaryen `wasm-opt`) daŭras LONGE** (2026-11-26): po `.wasm`-fazo ~5–10 minutojn ĉe ŝarĝo ≥ 15 — la tuta `:webApp:kopiuAlApoElsutejo` povas daŭri 6+ minutojn SEN ajna eligo (tasko ŝajnas "pendigita" sed la `wasm-opt`-procezo brulas je 400%+ CPU). Kontrolu per `ps aux | grep wasm-opt` antaŭ ol konkludi pri mortinta konstruo; ne interrompu. Du faskoj (`apo/` + `apo-beta/`) reuzas la saman Optimize-eligibleon, do unu konstruo sufiĉas por ambaŭ.
+
 - **desktopTest rulas en 4 paralelaj JVM-forkoj** (`maxParallelForks` en
   shared/build.gradle.kts, PR #209). Pli da forkoj (provitaj: 8) ne plu helpas:
   la limo estas la klaso-interna sinsekvo (plej granda klaso: HejmoEkranoTest

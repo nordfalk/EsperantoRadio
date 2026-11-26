@@ -65,7 +65,10 @@ object AppStato {
      * - la DEFORA kanalkonfiguro tute ne uziĝas (nek la persistigita kopio
      *   ĉe starto, nek la refreŝigo — [leguAgordonKunRezervo]): la paktita
      *   konfiguro venkas, por ke ŝanĝoj el la Git-branĉo tuj testiĝu sen
-     *   rsync al la servilo.
+     *   rsync al la servilo. La retumilo agordas la flagon nur por LOKAJ
+     *   ruloj (localhost, la evoluiga servilo); la publikigita retversio
+     *   havas ĝin falsa — ĝi bezonas la servilajn spegulitajn emblemojn
+     *   (CORS-bloko de la paktitaj emblemo-URL-oj, malkovrite 2026-11-26).
      */
     var estasEvoluaMedio: Boolean = false
 
@@ -304,7 +307,7 @@ object AppStato {
         // konservita/paktita versio; se la servilo havas novan (kaj parsigeblan)
         // konfiguron, la kanallisto, apaj novaĵoj kaj prizorganto-retpoŝto
         // ĝisdatiĝas vive kaj la teksto persistiĝas por la sekva starto.
-        // Evolua medio (debug-konstruo/emulilo, Desktop/Web): NE rulu — la
+        // Evolua medio (debug-konstruo/emulilo, loka retversio): NE rulu — la
         // defora konfiguro anstataŭigus la ĵus ŝanĝitan paktitan (vidu
         // leguAgordonKunRezervo); testado de novaj kanaloj restas ĉe Git.
         if (!estasEvoluaMedio) {

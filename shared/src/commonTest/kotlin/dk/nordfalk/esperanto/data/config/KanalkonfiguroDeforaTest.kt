@@ -5,6 +5,7 @@ import dk.nordfalk.esperanto.data.repository.KanaloDeponejoImpl
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -78,8 +79,10 @@ class KanalkonfiguroDeforaTest {
 
     @Test
     fun enEvoluaMedioLaPaktitaVenkasEĉKunKonservito() {
-        // Debug-konstruo/emulilo: novaj kanaloj el Git devas testiĝi sen rsync —
-        // la persistigita defora konfiguro (eble plurajn semajnojn malnova) IGNORIĜAS
+        // Evolua medio (Android-debug/emulilo; LOKA retversio): novaj kanaloj el
+        // Git devas testiĝi sen rsync — la persistigita defora konfiguro (eble
+        // plurajn semajnojn malnova) IGNORIĜAS. La publikigita retversio havas
+        // la flagon falsa kaj tial uzas la deforan konfiguron (CORS-emblemoj).
         val persisto = MemorPersisto()
         persisto.teksto = agordoTeksto("defora")
         AppStato.estasEvoluaMedio = true
@@ -96,9 +99,10 @@ class KanalkonfiguroDeforaTest {
     }
 
     @Test
-    fun malpermesoDeDeforaKonfiguroFunkciasAnkaŭSenEvoluaMedoFlago() {
-        // La parametron oni povas doni eksplicite (ekz. estontaj iloj) —
-        // sendepende de la AppStato-flago
+    fun malpermesoDeDeforaKonfiguroFunkciasAnkaŭSenRegilo() {
+        // La parametron oni povas doni eksplicite — sendepende de la regilo:
+        // novaj kanaloj el Git devas testiĝi sen rsync, la persistigita
+        // defora konfiguro (eble plurajn semajnojn malnova) IGNORIĜAS netuŝite
         val persisto = MemorPersisto()
         persisto.teksto = agordoTeksto("defora")
         val agordo = leguAgordonKunRezervo(
@@ -109,6 +113,9 @@ class KanalkonfiguroDeforaTest {
             uzuDeforanKonfiguron = false,
         )
         assertEquals(listOf("paktita"), agordo.kanaloj.map { it.kodo })
+        // La persistigita defora teksto NE tuŝiĝas (nek legita, nek forigita):
+        // ĝi validos plu por produktadaj konstruoj
+        assertEquals(agordoTeksto("defora"), persisto.teksto)
         assertEquals(0, persisto.forigitaj)
     }
 

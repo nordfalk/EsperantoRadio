@@ -2425,6 +2425,16 @@ generatoro
 testrapideco
 konduttesto
 instal
+enpropra
+eksterstaka
+antaŭen-trairo
+antaŭen
+retrompas
+popu
+ŝarĝekrano
+funkcikorpo
+plurnivela
+rekunmetaĵo
 svipa
 svipan
 ert

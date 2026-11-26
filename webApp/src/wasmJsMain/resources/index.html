@@ -3,13 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- La koloroj de la ANTONIA-temo (Temo.kt): malhela fono #1A1424, hela #FFFFFF -->
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1A1424">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF">
+    <link rel="icon" href="../icon.png">
     <title>EsperantoRadio beta (ne finpreta)</title>
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+        html { background: #1A1424; }
+        @media (prefers-color-scheme: light) { html { background: #FFFFFF; } }
         #ComposeTarget { width: 100%; height: 100%; display: block; }
+
+        /* Ŝarĝekrano — videbla dum la .wasm-fasko (pluraj MB) elŝutiĝas kaj ekraniĝas.
+           La apo malaperigas ĝin kiam la unua ekrano pretiĝas (RetumilaNavigado.startu). */
+        #ŝarĝekrano {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 18px; background: #1A1424; color: #E8E2E8;
+            font-family: system-ui, sans-serif; font-size: 17px;
+            transition: opacity .4s ease;
+        }
+        @media (prefers-color-scheme: light) {
+            #ŝarĝekrano { background: #FFFFFF; color: #2A1D40; }
+        }
+        #ŝarĝekrano .rado {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 4px solid #3A3030; border-top-color: #EABDC5;
+            animation: ŝarĝejturno 1s linear infinite;
+        }
+        @keyframes ŝarĝejturno { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+    <div id="ŝarĝekrano" role="status" aria-label="Ŝargas">
+        <div class="rado"></div>
+        <div>EsperantoRadio — ŝargas…</div>
+        <div style="font-size: 13px; opacity: .6">Se nenio okazas post longa tempo, provu per ĝisdatigita retumilo.</div>
+    </div>
     <div id="ComposeTarget"></div>
 
     <!--

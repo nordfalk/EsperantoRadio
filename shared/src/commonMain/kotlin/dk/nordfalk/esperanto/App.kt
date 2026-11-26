@@ -52,7 +52,9 @@ import dk.nordfalk.esperanto.domain.player.kreuDefaŭltanLudiloRegilon
 import dk.nordfalk.compose.material3.rememberDrawerState
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
+import dk.nordfalk.esperanto.navigation.RetumilaNavigado
 import dk.nordfalk.esperanto.navigation.Vojo
+import dk.nordfalk.esperanto.navigation.vojaTitolo
 import dk.nordfalk.esperanto.ui.*
 import dk.nordfalk.esperanto.ui.MuzaikoTiparo
 import dk.nordfalk.esperanto.ui.MuzaikoFormoj
@@ -65,7 +67,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
-// internal: la UI-testoj reuzezas ĝin por rememberNavBackStack (vidu PuŝoSenDuplikatoTest)
+// internal: la UI-testoj reuzas ĝin por rememberNavBackStack (vidu PuŝoSenDuplikatoTest)
 internal val navConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
@@ -274,6 +276,31 @@ fun EsperantoRadioApp(
         fun reen() {
             logi("Nav", "← reen")
             if (backStack.size > 1) backStack.removeLastOrNull()
+        }
+
+        // Retumila integrigo — finfajnigo de la reta versio (C56): je la retumilo la reen-butono de la
+        // retumilo navigu en la apo (Historio-API) anstataŭ forlasi la paĝon,
+        // kaj la langeta titolo (document.title) sekvu la aktualan ekranon.
+        // La reen-prioritato spegulas la platforman reen-butonon: unue la internaj
+        // traktiloj (kolapso de la elfaldita mini-ludilbreto — por Android ĝi vivas en la
+        // NavigationBackHandler malsupre), nur poste la nav-stako.
+        LaunchedEffect(Unit) {
+            RetumilaNavigado.startu(
+                onReen = { reen() },
+                onReenProponata = {
+                    if (elfaldita) {
+                        logi("Nav", "← reen (retumilo): enfoldigas ludilbreton")
+                        elfaldita = false
+                        true
+                    } else {
+                        false
+                    }
+                },
+            )
+        }
+        val paĝotitolo = vojaTitolo(nunaVojo, kanaloj)
+        LaunchedEffect(nunaVojo, backStack.size, paĝotitolo) {
+            RetumilaNavigado.stakŜanĝiĝis(backStack.size, paĝotitolo)
         }
 
         // Flankaj ekranoj (dua nivelo) estas tutekranoj sen mini-ludilbreto —

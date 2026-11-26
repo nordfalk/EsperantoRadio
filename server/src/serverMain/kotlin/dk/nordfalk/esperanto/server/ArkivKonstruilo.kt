@@ -338,12 +338,16 @@ object ArkivKonstruilo {
         var spegulitaj = 0
         val rezulto = elsendoj.map { e ->
             val bildo = e.bildoUrl ?: return@map e
-            if (bildo.startsWith("$bazo/")) {
+            if (bildo.startsWith("$bazo/bildoj/elsendoj/")) { // nur NIAJ elsendlaj speguloj
                 // Jam samdevena (pli frua rulo) — sed KONTROLU la dosieron: se la
                 // spegulo perdiĝis, la fluo portas mortintan ligilon kaj la normala
                 // prefikso-kontrolo eterne preterlasus ĝin (la originalo ne plu estas
                 // eltrovebla el la fluo). Resanigu per la originala <img> el la
                 // priskribo (RssParsilo.elektuBildeton — A2: la elekto-logiko en unu loko).
+                // LIMIGO (akceptita de la posedanto 2026-11-26): por bildetoj kies
+                // fonto estis NUR <itunes:image> de la originala fluo, la fonta URL
+                // ne konserviĝas en la arkivo — la resanigo povas uzi nur priskriban
+                // <img>, kiu por tiaj eroj povas esti alia bildo (aŭ neniu).
                 if (File(bildujo, bildo.substringAfterLast('/')).isFile) return@map e
                 val originalo = parsilo.elektuBildeton(e.priskriboHtml ?: e.priskribo.orEmpty())
                 if (originalo == null || originalo.startsWith("$bazo/")) {

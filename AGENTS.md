@@ -237,10 +237,12 @@ enskribon. La samo ne devas aperi duoble — CHANGELOG donas la koncizan fakton,
   forig-peto), ne kiel propran reson.
 - **CodeRabbit recenzas ĉiun kod-PR-on (2026-11-24, PR #204)**: kontrolu ĝiajn
   enliniajn komentojn kelkajn minutojn post ĉiu puŝo
-  (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments` — ĈIAM kun `--paginate`:
+  (`gh api repos/nordfalk/EsperantoRadio/pulls/N/comments --paginate` —
 la API-redono portas maks. 30 komentojn po paĝo, do kun multaj respondoj la
 NOVAJ komentoj transpaĝiĝas kaj restas nevidataj; 2026-11-26, PR #214: 5
-CodeRabbit-trovitaĵoj kaŝiĝis sur la 2-a paĝo), traktu la validajn
+CodeRabbit-trovitaĵoj kaŝiĝis sur la 2-a paĝo; kaj NE filtru laŭ tempo-ŝablono:
+  komparu la maksimuman jam-viditan koment-ID-on — temp-filtro preterlasis la 00:55–01:06-serion,
+  kiun mi ankoraŭ ne vidis (2026-11-26, PR #214), traktu la validajn
   trovaĵojn kaj respondu en la fadeno — la vojo bezonas la PR-numeron
   (`pulls/N/comments/{id}/replies`; sen N ĝi redonas 404). Lasu la posedanton
   trarigardi antaŭ ol komiti. La bot-lego povas vidi malnovan revizion kaj

@@ -180,8 +180,27 @@
 > `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
 
 #### C60 — Regula (ĉiuhora/ĉiutaga) rulado de la servilaj taskoj — neniu cron ekzistas
-- **Statuso**: [ ]
-- **Fonto**: esplorado 2026-11-24 (C56): `crontab` je ambaŭ maŝinoj kaj `systemctl list-timers` estis kontrolitaj — NENIU temp-planita rulado ekzistas; ĉio ĝis nun rulis permane. La establon faros la posedanto mem.
+- **Statuso**: [x] PLENIGITA 2026-11-25 (kun unu malferma decido, vidu malsupre)
+- **Fonto**: esplorado 2026-11-24 (C56): `crontab` je ambaŭ maŝinoj kaj `systemctl list-timers` estis kontrolitaj — NENIU temp-planita rulado ekzistas; ĉio ĝis nun rulis permane.
+- **Farita (2026-11-25)**: la konstanta maŝino havas nun `crontab` (uzanto `j`):
+  - **STT-transskribo**: ĉiunokte `03:17` — pako-skripto
+    `server/data/privata/skriptoj/cron_stt.sh` (parametroj laŭ decido de la
+    posedanto: `N_POR_KANALO=10 MAKS_DAURO_MIN=30 WORKERS=4`; flok-marrisko
+    kontraŭ surmetiĝo; protokolo `tmp/cron-stt.log`). ATENTU: la skripto uzas
+    la absolutan pyenv-pythonon (`~/.pyenv/versions/3.11.8/bin/python3`) —
+    la PATH de cron ne havas la shimson kaj `/usr/bin/python3` ne havas
+    `onnxruntime`.
+  - **`:server:arkivKonstruilo`**: pako-skripto pretas kaj provita
+    (`cron_arkivkonstruilo.sh`, 35 s; protokolo `tmp/cron-arkivkonstruilo.log`) —
+    sed la **ritmo ne estas ankoraŭ decidita de la posedanto**; la crontab-linio
+    staras KOMENTA (ekz. `5 * * * *`); malfluigu ĝin kiam vi elektis.
+  - **rsync-publikigo restas PERMANA** (regulo 2026-11-20; decido de la
+    posedanto 2026-11-25) — neniam aŭtomata.
+  - **LLM-paŝo** (transkriptoj → rezumoj) ne estas skriptita — ĝin faras la
+    agento en sesioj; cron kovras nur la STT-paŝon.
+- **Post-vidigo de ĉiuhora/cortata rulado**: `stato.json` (`lastaRulo`) kaj
+  https://javabog.dk/esperanto-radio/kanaloj/ estas freŝaj; unu mortinta
+  kanal-fluo ne haltigu la aliajn (A4).
 - **Priskribo**: nenio aŭtomate refreŝigas la arkivon. La perioda rulado devas kovri almenaŭ:
   - **`:server:arkivKonstruilo`** — RSS-fluoj kaj la publikigota kanalkonfiguro; de PR #210 ĝi ankaŭ elŝutas novajn emblemojn/bildetojn al `publika/bildoj/`. Ekz. ĉiuhore aŭ ĉiutage.
   - **AI-tekstoj** — la STT-pipelino (`server/data/privata/skriptoj/stt_chiujn.py` → `privata/transkriptoj/`) kaj la LLM-prilaboro al pretaj rezultoj (`privata/rezumoj/`). Kompute peza: ekz. ĉiunokte aŭ semajne, kun la limigoj `N_POR_KANALO` kaj `MAKS_DAURO_MIN`.

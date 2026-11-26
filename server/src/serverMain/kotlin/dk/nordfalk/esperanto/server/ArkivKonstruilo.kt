@@ -290,16 +290,17 @@ object ArkivKonstruilo {
      * ORIGINALAN URL-on (regulo A4) — sur Android/Desktop ĝi plu funkcias; la
      * retversio tiam ne montras la bildeton.
      */
-    private fun speguluElsendajnBildetojn(
+    internal fun speguluElsendajnBildetojn(
         elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
         http: HttpClient,
         arkivoBazoUrl: String?,
         parsilo: RssParsilo,
         retumado: Boolean,
+        // injektebla nur por testoj; la produktada vojo uzas la publikan dosierujon
+        bildujo: File = File(PUBLIKA, "bildoj/elsendoj").apply { mkdirs() },
     ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
         if (arkivoBazoUrl.isNullOrBlank()) return elsendoj
         val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
-        val bildujo = File(PUBLIKA, "bildoj/elsendoj").apply { mkdirs() }
         val mapigo = mutableMapOf<String, String>()
         fun novaUrl(dosiero: java.io.File): String = "$bazo/bildoj/elsendoj/${dosiero.name}"
 
@@ -338,7 +339,12 @@ object ArkivKonstruilo {
         var spegulitaj = 0
         val rezulto = elsendoj.map { e ->
             val bildo = e.bildoUrl ?: return@map e
-            if (bildo.startsWith("$bazo/bildoj/elsendoj/")) { // nur NIAJ elsendlaj speguloj
+            if (bildo.startsWith("$bazo/")) {
+                // ALIA samdevena URL (ekz. kanal-emblemo kiel <itunes:image>, aŭ
+                // bildo gastigata ĉe nia servilo) restas SENŜANĜE — la retversio
+                // ŝargas ĝin sen CORS; re-spegulado estus nenecesa kaj povus anstataŭigi
+                // ĝin per alia bildo.
+                if (!bildo.startsWith("$bazo/bildoj/elsendoj/")) return@map e
                 // Jam samdevena (pli frua rulo) — sed KONTROLU la dosieron: se la
                 // spegulo perdiĝis, la fluo portas mortintan ligilon kaj la normala
                 // prefikso-kontrolo eterne preterlasus ĝin (la originalo ne plu estas

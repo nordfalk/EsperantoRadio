@@ -72,6 +72,14 @@ laŭdaŭre: migrado al `com.android.kotlin.multiplatform.library`).
   lambdoj, kiujn la JS-kodo povas alvoki). La Historio-API-integrigo de la reta
   versio (`navigation/RetumilaNavigado.wasmJs.kt`) estas referenca ekzemplo.
   MEZURU retan konduton per Playwright (`tmp/` — vidu la sekcion "Reta versio").
+- **Historio-API estas NESINKRONA (2026-11-26, PR #216)**: `history.go()`/`back()`
+  ĝisdatigas `history.state` nur post la sekva tasko — du rapidaj agoj legantaj
+  `history.state` planas saltojn de la MALNOVA pozicio kaj povas eliri el la paĝo.
+  Solvo: propra sinkrona modelo de la planita pozicio
+  (`RetumilaNavigado.planitaProfundo` + `historiajPuŝoj`/`historiaReeniro` en
+  commonMain, puraj kaj testeblaj). Krome `pushState` ĉiam KREAS novan eniron —
+  post antaŭen-trairo reuzu la ekzistantajn (`historiajPuŝoj`), alie duobla `{d}`
+  senmovigas la sekvan reenigon.
 - **ksoup**: `Ksoup.parseXml(teksto, "")` / `Ksoup.parse(teksto)`;
   `selectFirst(...)` ekzistas.
 - **HLS (.m3u8) sur Android** postulas `androidx.media3:media3-exoplayer-hls` —

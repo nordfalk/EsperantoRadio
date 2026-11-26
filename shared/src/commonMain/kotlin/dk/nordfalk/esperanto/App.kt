@@ -68,7 +68,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
-// internal: la UI-testoj reuzezas ĝin por rememberNavBackStack (vidu PuŝoSenDuplikatoTest)
+// internal: la UI-testoj reuzas ĝin por rememberNavBackStack (vidu PuŝoSenDuplikatoTest)
 internal val navConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {

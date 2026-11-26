@@ -33,19 +33,41 @@ fun vojaTitolo(vojo: NavKey?, kanaloj: List<Kanalo>): String {
  * se la historio devas resti netuŝita: la retumilo MEM jam iris reen
  * (popstate direktis la nav-popon, la profundoj kongruas) kaj dua `back()`
  * forlasus la paĝon.
+ *
+ * [planitaHistoriaProfundo] estas nia SINKRONA modelo de la historia pozicio —
+ * inkluzive de trairoj jam planitaj per `history.go()`, kiuj `history.state`
+ * ankoraŭ NE reflektas (ĝi ĝisdatiĝas nur nesinkrone). Du rapidaj enpropraj
+ * reen-agoj legantaj `history.state` do povus plani tro saltojn kaj eliri
+ * el la paĝo; la planita pozicio ne povas. (CodeRabbit, PR #216)
  */
 fun historiaReeniro(
     memoritaNavProfundo: Int,
     novaNavProfundo: Int,
-    historiaProfundoNun: Int,
+    planitaHistoriaProfundo: Int,
 ): Int? =
-    if (novaNavProfundo < memoritaNavProfundo && historiaProfundoNun > novaNavProfundo) {
-        // Eliri de la REALA historia pozicio: post antaŭen-trairo (ŝargita de la
-        // efiko) ĝi povas superi la memoritan profundecon (CodeRabbit, PR #216)
-        historiaProfundoNun - novaNavProfundo
+    if (novaNavProfundo < memoritaNavProfundo && planitaHistoriaProfundo > novaNavProfundo) {
+        // Post antaŭen-trairo la planita pozicio povas superi la memoritan
+        // profundecon — la paŝo devas eliri de ĝi. Defende: neniam iru sub
+        // historian pozicion 1 (tio elirus el la apo).
+        (planitaHistoriaProfundo - novaNavProfundo).coerceAtMost(planitaHistoriaProfundo - 1)
     } else {
         null
     }
+
+/**
+ * La profund-indikoj ({d}) de la historiaj eniroj, kiujn nova puŝo de la
+ * nav-stako devas KREI per `pushState`. Malplena, se neniu mankas: post
+ * antaŭen-trairo la antaŭen-restantaj eniroj REUZIĜAS por la novaj niveloj —
+ * `pushState` ĉiam kreas NOVAN eniron, kaj dua eniro kun la sama {d} igus la
+ * sekvan retumilan reeniron senefika (la popstate de la malnova eniro
+ * kongruus kun la memorita profundo kaj ŝajnus nenio). (CodeRabbit, PR #216)
+ */
+fun historiajPuŝoj(
+    memoritaNavProfundo: Int,
+    planitaHistoriaProfundo: Int,
+    novaNavProfundo: Int,
+): IntRange =
+    (maxOf(memoritaNavProfundo, planitaHistoriaProfundo) + 1)..novaNavProfundo
 
 /**
  * Kiel traktu popstate-eventon (la retumilo navigis — eventuale plurajn

@@ -4,6 +4,7 @@ import dk.nordfalk.esperanto.domain.model.Kanalo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Testoj de la retumila historia sinkronigo (unu historia eniro po nav-nivelo)
@@ -18,17 +19,39 @@ class RetumilaNavigadoTest {
     fun enpropraReenigoRetrompasLaHistorionRetumilaNe() {
         // Enpropra reen-ago (reen-sago, tirkesta restartigo): la retumilo NE iris
         // reen — la historio postrestas kaj oni devas fari history.back()
-        assertEquals(1, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 2))
-        assertEquals(2, historiaReeniro(memoritaNavProfundo = 3, novaNavProfundo = 1, historiaProfundoNun = 3))
-        // Post antaŭen-trairo la reala historia pozicio povas superi la memoritan
-        // profundecon (memorita=2, historio=3): la paŝo devas eliri de la pozicio
-        assertEquals(2, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 3))
+        assertEquals(1, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, planitaHistoriaProfundo = 2))
+        assertEquals(2, historiaReeniro(memoritaNavProfundo = 3, novaNavProfundo = 1, planitaHistoriaProfundo = 3))
+        // Post antaŭen-trairo la planita pozicio povas superi la memoritan
+        // profundecon (memorita=2, planita=3): la paŝo devas eliri de la pozicio
+        assertEquals(2, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, planitaHistoriaProfundo = 3))
+        // DU RAPIDAJ reen-agoj: la dua eliras de la pozicio, kiun la unua jam
+        // PLANIS (ne de history.state — kiu ankoraŭ montras la malnovan) —
+        // sume oni atingas la celon, ne la eliron el la paĝo
+        assertEquals(1, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, planitaHistoriaProfundo = 2))
         // Retumila reen-butono (popstate direktis la nav-popon): la historio JAM
         // egalas la novan profundecon — nul = ne iru reen dufoje (tio forlasus la paĝon)
-        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, historiaProfundoNun = 1))
+        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 1, planitaHistoriaProfundo = 1))
+        // Defende: la plano neniam iras sub historian pozicion 1 (nova=0 ne
+        // povas okazi — la nav-stako ĉiam havas almenaŭ Hejmon)
+        assertEquals(2, historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 0, planitaHistoriaProfundo = 3))
         // Puŝo aŭ langet-ŝanĝo (novaj profundoj ne malpliiĝis) neniam tuŝas la historion
-        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 2, historiaProfundoNun = 2))
-        assertNull(historiaReeniro(memoritaNavProfundo = 1, novaNavProfundo = 3, historiaProfundoNun = 1))
+        assertNull(historiaReeniro(memoritaNavProfundo = 2, novaNavProfundo = 2, planitaHistoriaProfundo = 2))
+        assertNull(historiaReeniro(memoritaNavProfundo = 1, novaNavProfundo = 3, planitaHistoriaProfundo = 1))
+    }
+
+    @Test
+    fun puŝoKreasUnuEnironPoNiveloKajReuzasAntaŭenajn() {
+        // Normala puŝo: unu nova eniro po nivelo
+        assertEquals(listOf(3, 4), historiajPuŝoj(memoritaNavProfundo = 2, planitaHistoriaProfundo = 2, novaNavProfundo = 4).toList())
+        assertEquals(listOf(2, 3), historiajPuŝoj(memoritaNavProfundo = 1, planitaHistoriaProfundo = 1, novaNavProfundo = 3).toList())
+        // Post antaŭen-trairo (memorita=2, retumilo ĉe 3): PUŜO al profundo 3
+        // REUZAS la ekzistan antaŭen-eniron — alie estiĝus duobla {d:3} kaj la
+        // sekva retumila reenigo ŝajnus nenio (du premoj por unu ekrano)
+        assertTrue(historiajPuŝoj(memoritaNavProfundo = 2, planitaHistoriaProfundo = 3, novaNavProfundo = 3).isEmpty())
+        // ...kaj puŝo du nivelojn reuzas nur la unuan
+        assertEquals(listOf(4), historiajPuŝoj(memoritaNavProfundo = 2, planitaHistoriaProfundo = 3, novaNavProfundo = 4).toList())
+        // Malpliiĝo (reenigo) neniam puŝas
+        assertTrue(historiajPuŝoj(memoritaNavProfundo = 3, planitaHistoriaProfundo = 2, novaNavProfundo = 2).isEmpty())
     }
 
     @Test

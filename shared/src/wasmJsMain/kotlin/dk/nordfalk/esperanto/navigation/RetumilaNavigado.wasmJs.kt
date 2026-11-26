@@ -29,11 +29,6 @@ private fun popstateAŭsktilo(a: (Int) -> Unit) {
     )
 }
 
-/** La profund-indego ({d}) de la historia eniro, kie la retumilo NUN estas. */
-private fun historiaProfundoNun(): Int {
-    js("return (history.state && history.state.d != null ? history.state.d : 0);")
-}
-
 private fun agorduPaĝotitolon(titolo: String) {
     js("document.title = titolo;")
 }
@@ -57,13 +52,27 @@ internal actual object RetumilaNavigado {
     /** La nav-staka profundo, kiun ni laste reportis al la retumila historio. */
     private var memoritaProfundo = 1
 
+    /**
+     * Nia SINKRONA modelo de la historia pozicio, kie la retumilo staras AŬ
+     * STAROS post jam planitaj trairoj. `history.state` ĝisdatiĝas NUR
+     * nesinkrone post `history.go()` — dum rapida sinsekvo da agoj ĝi do
+     * mensogas, kaj du `go()`-saltoj laŭ ĝi povas eliri el la paĝo (CodeRabbit,
+     * PR #216). Ĉiu popstate re-sinkronigas ĝin kun la realo.
+     */
+    private var planitaProfundo = 1
+
     actual fun startu(onReen: () -> Unit, onReenProponata: () -> Boolean) {
         if (startigita) return
         startigita = true
         memoritaProfundo = 1
+        planitaProfundo = 1
         historyAnstataŭiguStaton(1)
         popstateAŭsktilo { d ->
-            when (val traktado = popstateTraktado(memoritaProfundo, d)) {
+            // La popstate montras la veran pozicion — unue sinkronigu la modelon,
+            // poste traktu laŭ la MEMORITA (antaŭa) profundo.
+            val traktado = popstateTraktado(memoritaProfundo, d)
+            planitaProfundo = d.coerceAtLeast(1)
+            when (traktado) {
                 PopstateTraktado.Nenio -> Unit
 
                 PopstateTraktado.Ununivela -> {
@@ -74,6 +83,7 @@ internal actual object RetumilaNavigado {
                     // restu kongruaj kaj la SEKVA reen-butono popu la ekranon.
                     if (onReenProponata()) {
                         historyPuŝuStaton(memoritaProfundo)
+                        planitaProfundo = memoritaProfundo
                     } else {
                         onReen()
                         memoritaProfundo = d.coerceAtLeast(1)
@@ -97,12 +107,22 @@ internal actual object RetumilaNavigado {
             if (novaProfundo > memoritaProfundo) {
                 // La nav-stako profundiĝis (puŝo) — UNU historia eniro po nivelo:
                 // du rapidaj puŝoj antaŭ la efekto rulas povas salti plurajn nivelojn
-                // (ekz. 1→3); unu po nivelo tenas la servon de la reen-butono (CodeRabbit, PR #216)
-                for (profundo in memoritaProfundo + 1..novaProfundo) historyPuŝuStaton(profundo)
+                // (ekz. 1→3). Post antaŭen-trairo la eniroj super la nuna pozicio
+                // jam kovras parton de la niveloj — REUZU ilin (pushState kun la
+                // sama {d} kreiĝus duoble kaj skuus la sekvan reeniron).
+                for (profundo in historiajPuŝoj(memoritaProfundo, planitaProfundo, novaProfundo)) {
+                    historyPuŝuStaton(profundo)
+                }
+                planitaProfundo = maxOf(planitaProfundo, novaProfundo)
             } else {
                 // Nur kiam la retumilo NE mem iris reen (enpropra reen-sago ktp.):
-                // history.back(); nul = la historio jam kongruas (popstate direktis)
-                historiaReeniro(memoritaProfundo, novaProfundo, historiaProfundoNun())?.let(::historyIruReen)
+                // history.back(); nul = la historio jam kongruas (popstate direktis).
+                // La paŝo eliras de la PLANITA pozicio — ne de history.state, kiu
+                // post history.go() ankoraŭ montras la malnovan pozicion.
+                historiaReeniro(memoritaProfundo, novaProfundo, planitaProfundo)?.let { paŝo ->
+                    historyIruReen(paŝo)
+                    planitaProfundo = planitaProfundo - paŝo
+                }
             }
             // La profundo ĝisdatiĝas SINHRONE: popstate de nia propra history.back()
             // alvenos poste kun la nova profundo kaj ne aktivigos reenigon;

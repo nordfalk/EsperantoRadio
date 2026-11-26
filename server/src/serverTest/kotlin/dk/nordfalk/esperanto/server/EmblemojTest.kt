@@ -204,6 +204,29 @@ class EmblemojTest {
     }
 
     @Test
+    fun gardaRifuzoNevokasPlenanMalkodadon() {
+        // Observebla kaptilo (peto de CodeRabbit): la repaĉita 5000×5000-kapo
+        // rifuziĝas per la GARDO — la plena malkodado NE estu vokata.
+        // La kaptila malkodilo malsukcesigas la teston se ĝi estas atingita.
+        val b = veraPng().copyOf()
+        fun skribu32(ofseto: Int, valoro: Int) {
+            b[ofseto] = (valoro ushr 24).toByte()
+            b[ofseto + 1] = (valoro ushr 16).toByte()
+            b[ofseto + 2] = (valoro ushr 8).toByte()
+            b[ofseto + 3] = valoro.toByte()
+        }
+        skribu32(16, 50_001)
+        skribu32(20, 50_000)
+        var vokita = false
+        val rezulto = Emblemoj.formatoSeLegebla(b) {
+            vokita = true
+            null
+        }
+        assertEquals(null, rezulto)
+        assertFalse(vokita, "la dimensia gardo devas rifuzi ANTAŬ la plena malkodado")
+    }
+
+    @Test
     fun formatoSeLegeblaAkceptasVeranBildon() {
         // vera (per ImageIO generita) PNG malkodeblas
         assertEquals("png", Emblemoj.formatoSeLegebla(veraPng()))

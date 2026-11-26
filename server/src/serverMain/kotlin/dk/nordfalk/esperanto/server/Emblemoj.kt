@@ -201,8 +201,12 @@ object Emblemoj {
      * - dimensio: maks. [MAKS_BILDAJ_PIKSELOJ] pikseloj (ekz. 5-MB-PNG kun
      *   kapo 50000×50000 estus postulinta multajn GiB da piksela memoro);
      * - kadroj: maks. [MAKS_BILDAJ_KADROJ] (animacia GIF kun miloj da kadroj).
+     *
+     * [malkodilo] (la fina plena malkodado) estas injektebla nur por testoj:
+     * kaptilo, kiu pruvas ke rifuzita bildo NENIAM atingas la malkodadon;
+     * la defaŭlto estas ImageIO.read.
      */
-    fun formatoSeLegebla(bitokoj: ByteArray): String? {
+    fun formatoSeLegebla(bitokoj: ByteArray, malkodilo: (ByteArray) -> java.awt.image.BufferedImage? = { ImageIO.read(ByteArrayInputStream(it)) }): String? {
         val formato = formatoLaŭEnhavo(bitokoj) ?: return null
         // Kap-kontroloj ANTAŬ la plena malkodado: la ImageReader legas
         // larĝon, alton kaj kadro-nombron el la metadatumoj — neniuj
@@ -252,7 +256,7 @@ object Emblemoj {
             }
         }
         return try {
-            if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null
+            if (malkodilo(bitokoj) != null) formato else null
         } catch (e: Exception) {
             // A8: neniam silente engluti
             logw("Emblemoj", "emblemo aspektas kiel $formato sed ne malkodeblas", e)

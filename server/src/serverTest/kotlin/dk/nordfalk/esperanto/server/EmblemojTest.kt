@@ -20,17 +20,18 @@ class EmblemojTest {
     }
 
     @Test
-    fun ipv6TuteRifuziĝasEĉPublika() {
-        // Permes-lista decido de la posedanto (2026-11-25): NENIU IPv6 estas
-        // akceptebla — ankaŭ ne publika (2606:4700… estas Cloudflare).
-        assertFalse(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("2606:4700:4700::1111")))
+    fun ipv6PublikaAkceptiĝasInternaRifuziĝas() {
+        // Du-stackaj gastigantoj (A + publikaj AAAA — ekz. blogger.googleusercontent.com,
+        // 17 el 28 nunaj bildogastigantoj) devas trairi: publika IPv6 estas publika.
+        assertTrue(Emblemoj.ĉuPublikaAdreso(InetAddress.getByName("2606:4700:4700::1111")))
     }
 
     @Test
     fun nepublikajAdresojRifuziĝas() {
-        // Publika IPv4 0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 127/8,
-        // 100.64/10 (CGNAT), 198.18/15, 224/4, 240/4 — plus ĉiu IPv6 ::, ::1,
-        // fd00 (ULA), fe80 (link-local), ff02 (multicast), IPv4-mapeita.
+        // Ne-publikaj IPv4 (0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 127/8,
+        // 100.64/10, 198.18/15, 224/4, 240/4) plus IPv6: :: kaj ::1 (nedifinita/
+        // loopback), fd00 (ULA), fe80 (link-local), ff02 (multicast),
+        // IPv4-mapeita 127.0.0.1 (Java konvertas ĝin al IPv4-objekto).
         val nepublikaj = listOf(
             "0.0.0.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "169.254.1.1",
             "127.0.0.1", "100.64.0.1", "198.18.0.1", "224.0.0.1", "250.1.2.3",

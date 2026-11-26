@@ -77,26 +77,37 @@ object Emblemoj {
             .joinToString("") { "%02x".format(it) }
 
     /**
-     * Permes-lista regulo de la posedanto (2026-11-25): bildo-celo akceptiĝas
-     * NUR se ĝi estas PUBLIKA IPv4-adreso. Ĉio alia estas „nenormala" kaj
-     * rifuzata sen kompenso — ĉIU IPv6 (ankaŭ publika kiel 2606:4700…, ULA,
-     * link-local, teredo, 6to4, IPv4-mapeita), privata, loopback, link-local,
-     * CGNAT, benchmark-, multicast- kaj rezervita IPv4. (SSRF-ŝirmo de la
-     * bildo-spegele, CWE-918, PR #214; simpligita laŭ posedanto-decido.)
+     * Permes-lista regulo de la posedanto (2026-11-25): la bildo-celo devas esti
+     * PUBLIKA — neniu interna/privata elemento en la resolvo (SSRF-ŝirmo de la
+     * bildo-spegele, CWE-918, PR #214):
+     * - IPv4 publika: rifuzataj estas 0/8, 10/8, 127/8, 172.16/12, 192.168/16,
+     *   169.254/16, 100.64/10 (CGNAT), 198.18/15, 224/4 kaj 240/4;
+     * - IPv6 publika: rifuzataj estas :: kaj ::1 (nedifinita/loopback),
+     *   fc00::/7 (ULA), fe80::/10 (link-local) kaj ff00::/8 (multicast).
+     * Teredo/6to4/IPv4-mapeitaj formoj ne estas special-kontrolataj: mapeitajn
+     * formojn Java mem konvertas al IPv4-objekto (do la IPv4-kontrolo ilin
+     * kaptas), kaj la eksotikaj tunelaj formoj postulus aktivan subskribon de
+     * la konstruilo — laŭ la regulo „io ajn nenormala → rifuzu” ni ne provas.
      */
     fun ĉuPublikaAdreso(adreso: InetAddress): Boolean {
-        if (adreso !is Inet4Address) return false // nenia IPv6, kia ajn ĝi estas
+        if (adreso is Inet4Address) {
+            val o0 = adreso.address[0].toInt() and 0xFF
+            val o1 = adreso.address[1].toInt() and 0xFF
+            return !(o0 == 0 ||                                      // 0.0.0.0/8
+                o0 == 10 || o0 == 127 ||                            // 10/8, 127/8
+                (o0 == 172 && o1 in 16..31) ||                      // 172.16/12
+                (o0 == 192 && o1 == 168) ||                         // 192.168/16
+                (o0 == 169 && o1 == 254) ||                          // 169.254/16
+                (o0 == 100 && (o1 and 0xC0) == 64) ||                // 100.64/10 (CGNAT)
+                (o0 == 198 && (o1 == 18 || o1 == 19)) ||             // 198.18/15
+                (o0 and 0xF0) == 0xE0 ||                             // 224/4 (multicast)
+                o0 >= 240)                                           // 240/4 (rezervita)
+        }
+        // IPv6: nur la PUBLIKA pasas (ULA, link-local, loopback, multicast, :: ne)
         val o0 = adreso.address[0].toInt() and 0xFF
-        val o1 = adreso.address[1].toInt() and 0xFF
-        return !(o0 == 0 ||                                          // 0.0.0.0/8
-            o0 == 10 || o0 == 127 ||                                // 10/8, 127/8
-            (o0 == 172 && o1 in 16..31) ||                          // 172.16/12
-            (o0 == 192 && o1 == 168) ||                             // 192.168/16
-            (o0 == 169 && o1 == 254) ||                              // 169.254/16
-            (o0 == 100 && (o1 and 0xC0) == 64) ||                    // 100.64/10 (CGNAT)
-            (o0 == 198 && (o1 == 18 || o1 == 19)) ||                 // 198.18/15
-            (o0 and 0xF0) == 0xE0 ||                                 // 224/4 (multicast)
-            o0 >= 240)                                               // 240/4 (rezervita)
+        return !(adreso.isAnyLocalAddress || adreso.isLoopbackAddress ||
+            adreso.isLinkLocalAddress || adreso.isMulticastAddress ||
+            (o0 and 0xFE) == 0xFC)                                   // fc00::/7 (ULA)
     }
 
     /** Skemoj permesataj por bildo-elŝuto (permes-listo: ĉiu alia skemo estas „nenormala"). */
@@ -106,8 +117,11 @@ object Emblemoj {
      * Ĉu la bildo-URL tute estas akceptebla laŭ la permes-listo (posedanto-decido
      * 2026-11-25 — „ĉio nenormala → rifuzu"):
      * - skemo http(s) kaj gastiganto estas NOMO, ne IP-literalo;
-     * - ĈIU adreso, al kiu la nomo resolvas, estas publika IPv4
-     *   ([ĉuPublikaAdreso]) — neniu IPv6, neniu interna/privata reto.
+     * - la nomo resolvu al almenaŭ unu PUBLIKA IPv4 (per tio la konstruilo
+     *   efektive konektas) kaj NENIU el la resolvoj — iu ajn familio — estu
+     *   ne-publika ([ĉuPublikaAdreso]).
+     * Du-stackaj gastigantoj (A + publikaj AAAA, ekz. blogger.googleusercontent.com)
+     * tial AKCEPTIĜAS; „sama listo sed kun ::1 aŭ fd00 en la resolvo“ rifuziĝas.
      * Malplena/neparsebla URL, nekonata skemo, IP-literalo, neresolvebla aŭ
      * ne-publika resolvo → false (la bildo restas ĉe la originala URL, A4).
      */
@@ -115,8 +129,10 @@ object Emblemoj {
         return try {
             val uri = URI(url)
             val gastiganto = uri.host ?: return false
-            uri.scheme in SKEMOJ && !estasIpLiteralo(gastiganto) &&
-                InetAddress.getAllByName(gastiganto).all { ĉuPublikaAdreso(it) }
+            if (uri.scheme !in SKEMOJ || estasIpLiteralo(gastiganto)) return false
+            val adresoj = InetAddress.getAllByName(gastiganto)
+            adresoj.any { it is Inet4Address && ĉuPublikaAdreso(it) } &&
+                adresoj.all { ĉuPublikaAdreso(it) }
         } catch (e: Exception) {
             false
         }

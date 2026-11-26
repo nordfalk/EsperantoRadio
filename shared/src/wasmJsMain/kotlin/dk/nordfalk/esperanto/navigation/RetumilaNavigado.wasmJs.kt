@@ -110,10 +110,19 @@ internal actual object RetumilaNavigado {
                 // (ekz. 1→3). Post antaŭen-trairo la eniroj super la nuna pozicio
                 // jam kovras parton de la niveloj — REUZU ilin (pushState kun la
                 // sama {d} kreiĝus duoble kaj skuus la sekvan reeniron).
-                for (profundo in historiajPuŝoj(memoritaProfundo, planitaProfundo, novaProfundo)) {
-                    historyPuŝuStaton(profundo)
+                val korekto = historiaKorekto(planitaProfundo, novaProfundo)
+                if (korekto != null) {
+                    // La retumilo restis ANTAŬE de la nova profundo (du aŭ pli
+                    // antaŭen-paŝoj post retumilaj reenigoj): la nova ekrano reuzas
+                    // la ekzistan eniron {d: novaProfundo} — silenta trairo al ĝi.
+                    // Ĝia popstate kongruos kun la memorita profundo (Nenio).
+                    historyIruReen(korekto)
+                } else {
+                    for (profundo in historiajPuŝoj(memoritaProfundo, planitaProfundo, novaProfundo)) {
+                        historyPuŝuStaton(profundo)
+                    }
                 }
-                planitaProfundo = maxOf(planitaProfundo, novaProfundo)
+                planitaProfundo = novaProfundo
             } else {
                 // Nur kiam la retumilo NE mem iris reen (enpropra reen-sago ktp.):
                 // history.back(); nul = la historio jam kongruas (popstate direktis).

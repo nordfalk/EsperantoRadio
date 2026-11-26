@@ -70,6 +70,24 @@ fun historiajPuŝoj(
     (maxOf(memoritaNavProfundo, planitaHistoriaProfundo) + 1)..novaNavProfundo
 
 /**
+ * Kiom da nivelojn la retumilo devas iri REEN ĉe puŝo, kiam ĝi restis
+ * ANTAŬE de la nova profundo (plurnivela antaŭen-trairo post retumila reenigo)
+ * — aŭ NULL, se la historio bezonas neniun korekton (pura puŝo, aŭ reuzo).
+ * La nova ekrano REUZAS la ekzistan eniron {d: novaNavProfundo} — ĝi nepre
+ * ekzistas pli sube, ĉar la nav-stako iam estis almenaŭ tiel profunda.
+ * (CodeRabbit, PR #216)
+ *
+ * La popstate de la korekta trairo alvenos kun `d == novaNavProfundo`, kiu
+ * jam kongruas kun la (sinkrone ĝisdatigita) memorita profundo — do ĝi
+ * traktiĝas kiel Nenio kaj ne ŝajnigu retumilan reenigon.
+ */
+fun historiaKorekto(
+    planitaHistoriaProfundo: Int,
+    novaNavProfundo: Int,
+): Int? =
+    if (planitaHistoriaProfundo > novaNavProfundo) planitaHistoriaProfundo - novaNavProfundo else null
+
+/**
  * Kiel traktu popstate-eventon (la retumilo navigis — eventuale plurajn
  * nivelojn samtempe, per la historia menuo de la retumilo).
  */

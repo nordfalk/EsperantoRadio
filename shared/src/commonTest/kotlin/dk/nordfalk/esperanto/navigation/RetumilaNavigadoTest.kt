@@ -55,6 +55,17 @@ class RetumilaNavigadoTest {
     }
 
     @Test
+    fun puŝoPostPlurnivelaAntaŭenigoKorektigasLaPozicion() {
+        // La retumilo restis ANTAŬE de la nova profundo (1→4, reen al 2, antaŭen
+        // al 4, poste puŝo al 3): necesa korekta trairo al la reuzebla eniro {d:3}
+        assertEquals(1, historiaKorekto(planitaHistoriaProfundo = 4, novaNavProfundo = 3))
+        assertEquals(2, historiaKorekto(planitaHistoriaProfundo = 5, novaNavProfundo = 3))
+        // Pura puŝo aŭ reuzo (la retumilo NE antaŭas la novan profundecon): neniom
+        assertNull(historiaKorekto(planitaHistoriaProfundo = 2, novaNavProfundo = 3))
+        assertNull(historiaKorekto(planitaHistoriaProfundo = 3, novaNavProfundo = 3))
+    }
+
+    @Test
     fun popstateTraktadoDistingasNivelonKajDirekton() {
         // UNU retumila reen-paŝo: la internaj traktiloj rajtas unue konsumi ĝin
         assertEquals(PopstateTraktado.Ununivela, popstateTraktado(memoritaNavProfundo = 2, historiaProfundo = 1))

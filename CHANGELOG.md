@@ -14,6 +14,10 @@ La protokolo komenciĝas ĉe 3.0.0. La historio de la malnova apo (2.x, ĝis
 
 ## [Neeldonita]
 
+### Riparita
+
+- La retversio denove uzas la servilan kanal-konfiguron — la kanal-emblemoj ree ŝargeblas sen CORS-eraroj, kaj la apaj novaĵoj montriĝas ankaŭ rete (https://github.com/nordfalk/EsperantoRadio/pull/222)
+
 ### Aldonita
 
 - Reta versio montras ankaŭ la bildetojn de unuopaj elsendoj — la arkiva servilo nun spegulas ilin samdevene (https://github.com/nordfalk/EsperantoRadio/pull/214)

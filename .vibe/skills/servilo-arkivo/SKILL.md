@@ -81,6 +81,14 @@ rekte el la fonto per HTML-`<audio>` (ne CORS-bezona). Konstruo:
 kutima rsync. La produktan `apo/` oni ĝisdatigas NUR per `:webApp:kopiuAlApoElsutejo` +
 la aparta apo-rsync — laŭ eksplicita peto de la posedanto.
 
+**REGULO (posedanto, 2026-11-25): `publika/apo/` ne ŝanĝiĝas sen eksplicita peto.**
+Ŝanĝoj al la reta apo inter eldonoj iras al `publika/apo-beta/`
+(https://javabog.dk/esperanto-radio/apo-beta/) — kreu tiun dosierujon per
+`mkdir -p server/data/publika/apo-beta` kaj kopiu la konstruaĵon tien; la kutima
+rsync publikigas ĝin AŬTOMATE (ĝi estas ja parto de `publika/`). Ekzistas tie
+lokohava `index.html`. `publika/apo/` tuŝiĝas NUR kiam la posedanto diras
+ekz. «publikigu la novan version de la reta apo al apo/».
+
 La **apo konsumas tiujn fluojn kunfandante kun la originalaj**: `arkivoBazoUrl` en
 `esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` elŝutas paralele
 `<arkivoBazoUrl><slug>.xml` kaj la originalan `elsendojRssUrl` kaj kunfandas la rezultojn

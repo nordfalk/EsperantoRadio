@@ -29,7 +29,7 @@ class AgordojErarRaportadoTest {
 
     @BeforeTest
     fun preparu() {
-        AppStato.estasEvoluaMedo = true
+        AppStato.estasEvoluaMedio = true
         AppStato.erarRaportadoDefaŭlta = false
     }
 
@@ -37,7 +37,7 @@ class AgordojErarRaportadoTest {
     fun purigu() {
         nodo.removeNode()
         raportadoAktiva = false
-        AppStato.estasEvoluaMedo = false
+        AppStato.estasEvoluaMedio = false
         AppStato.erarRaportadoDefaŭlta = false
     }
 

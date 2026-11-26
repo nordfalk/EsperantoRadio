@@ -50,7 +50,6 @@ import dk.nordfalk.esperanto.domain.player.SciigoKontroloj
 import dk.nordfalk.esperanto.domain.player.TranssaltaSciigo
 import dk.nordfalk.esperanto.domain.player.kreuDefaŭltanLudiloRegilon
 import dk.nordfalk.compose.material3.rememberDrawerState
-import dk.nordfalk.esperanto.logi
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import dk.nordfalk.esperanto.navigation.Vojo
@@ -713,7 +712,7 @@ fun EsperantoRadioApp(
         // la haketaĵo forestas kaj la dialogo aperus ĉiufoje, ĝene dum programado.
         val apajNovaĵoj by apajNovaĵojDeponejo.observuMontratan().collectAsState()
         val novaVersio by AppStato.novaVersio.collectAsState()
-        val montrataMesaĝo = apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedo }
+        val montrataMesaĝo = apajNovaĵoj?.takeIf { !AppStato.estasEvoluaMedio }
             ?: if (novaĵojMontratajPerMenua) apajNovaĵojDeponejo.mesaĝo else null
         montrataMesaĝo?.let { mesaĝo ->
             LaunchedEffect(mesaĝo) {
@@ -832,7 +831,7 @@ fun EsperantoRadioApp(
         // Apaj novaĵoj).
         val erarRaportado by agordojDeponejo.erarRaportado.collectAsState()
         val erarRaportadoDemandita by agordojDeponejo.erarRaportadoDemandita.collectAsState()
-        if (!AppStato.estasEvoluaMedo && !erarRaportado && !erarRaportadoDemandita) {
+        if (!AppStato.estasEvoluaMedio && !erarRaportado && !erarRaportadoDemandita) {
             AlertDialog(
                 // Kiel ĉe Apaj novaĵoj: nur la butonoj fermas la dialogon
                 onDismissRequest = { },

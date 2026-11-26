@@ -12,7 +12,7 @@ fun main() = application {
     // initialiguSentry()
     // Evolua medio: ekz. la "Apaj novaĵoj"-dialogo ne montriĝu (ĝi aperus
     // ĉe ĉiu freŝa instalaĵo kaj ĝenus dum programado)
-    AppStato.estasEvoluaMedo = true
+    AppStato.estasEvoluaMedio = true
     Window(
         onCloseRequest = ::exitApplication,
         title = "EsperantoRadio"

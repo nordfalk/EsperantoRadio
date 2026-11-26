@@ -11,7 +11,7 @@ import dk.nordfalk.esperanto.initialiguSentry
 fun main() {
     // Web-rulado ĉiam estas evolu-rulado — la "Apaj novaĵoj"-dialogo ne
     // montriĝu (ĝi aperus ĉe ĉiu freŝa ŝargo kaj ĝenus dum programado)
-    AppStato.estasEvoluaMedo = true
+    AppStato.estasEvoluaMedio = true
     // La erar-raportado defaŭlte ŜALTITA: la retejo estas nia propra kanalo
     // (kiel Play/Aptoide, ne F-Droid) — do defaŭlto ŝaltita, malŝaltebla
     // en Agordoj → Privateco; la opt-in-regolo de PR #148 ne aplikiĝas.

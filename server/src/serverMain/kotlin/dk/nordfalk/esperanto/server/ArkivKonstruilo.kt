@@ -180,6 +180,26 @@ object ArkivKonstruilo {
     }
 
     /**
+     * Skriba transakcio por spegulata bildo: unue al <nomo>.<PID>.part, poste
+     * alinumo al la fina dosiero — interrompita skribo ne lasu koruptitan
+     * dosieron servotan, kaj la PID-sufikso malebligas ke du paralelaj ruloj
+     * (permana + cron) interfrapu la saman provizoran dosieron.
+     */
+    private fun skribuTransakcie(bildujo: File, enhavo: ByteArray, dosiero: File) {
+        val provizora = File(bildujo, "${dosiero.name}.${ProcessHandle.current().pid()}.part")
+        try {
+            provizora.writeBytes(enhavo)
+            if (!provizora.renameTo(dosiero)) {
+                throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
+            }
+        } finally {
+            // post sukcesa renomo la .part ne plu ekzistas (delete senefika);
+            // post fiaskinta skribo aŭ renomo la restinta .part foriĝas
+            provizora.delete()
+        }
+    }
+
+    /**
      * Elŝutas la emblemojn de ĈIUJ kanaloj (ankaŭ la ne-podkastaj — la kanalaro
      * montras ĉiujn) kaj spegulas ilin al `publika/bildoj/<slug>.<sufikso>`.
      * Redonas mapigon malnova URL → arkiva URL por la resskribo en la publikigota
@@ -227,19 +247,7 @@ object ArkivKonstruilo {
                     val formato = Emblemoj.formatoSeLegebla(enhavo)
                         ?: throw IllegalStateException("enhavo ne estas malkodebla PNG/JPEG/GIF (eble SVG/HTML/koruptita) — ne spegulata")
                     val dosiero = File(bildujo, "${kanalo.slug}.$formato")
-                    // Transakcie kiel ĉe la elsendlaj bildetoj: .part + rename —
-                    // interrompita skribo ne lasu koruptitan emblemon servotan.
-                    // La .part portas la PID-on: du PARALELaj ruloj (permana + cron)
-                    // skribantaj la saman emblemon ne interfrapu la saman .part-dosieron.
-                    val provizora = File(bildujo, "${dosiero.name}.${ProcessHandle.current().pid()}.part")
-                    try {
-                        provizora.writeBytes(enhavo)
-                        if (!provizora.renameTo(dosiero)) {
-                            throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
-                        }
-                    } finally {
-                        provizora.delete()
-                    }
+                    skribuTransakcie(bildujo, enhavo, dosiero)
                     "$bazo/bildoj/${dosiero.name}"
                 }
                 mapigo[url] = nova
@@ -314,22 +322,7 @@ object ArkivKonstruilo {
                         val formato = Emblemoj.formatoSeLegebla(enhavo)
                             ?: throw IllegalStateException("ne malkodebla PNG/JPEG/GIF (eble SVG/HTML)")
                         val dosiero = File(bildujo, "$radiko.$formato")
-                        // Transakcie: skribu al .part kaj alinomu nur post plena skribo —
-                        // interrompita skribo ne kredigu al la sekva rulo koruptitan
-                        // dosieron kiel jam-spegulitan (la ekzisto-kontrolo rigardas radikon).
-                        // PID-sufikso: du PARALELaj ruloj (permana + cron) elŝutantaj
-                        // la saman bildeton ne interfrapu la saman .part-dosieron.
-                        val provizora = File(bildujo, "${dosiero.name}.${ProcessHandle.current().pid()}.part")
-                        try {
-                            provizora.writeBytes(enhavo)
-                            if (!provizora.renameTo(dosiero)) {
-                                throw IllegalStateException("ne eblis alinumi ${provizora.name} al ${dosiero.name}")
-                            }
-                        } finally {
-                            // post sukcesa renomo la .part ne ekzistas (delete senefika);
-                            // post fiaskinta SKRIBO aŭ renomo la restinta .part foriĝas
-                            provizora.delete()
-                        }
+                        skribuTransakcie(bildujo, enhavo, dosiero)
                         novaUrl(dosiero)
                     }
                 } catch (e: Exception) {
@@ -373,11 +366,10 @@ object ArkivKonstruilo {
      * Elŝutas la bildo-korpon kun permes-lista ŝirmo kaj fluanta grandec-limo.
      * Regulo de la posedanto (2026-11-25): ĉio nenormala → rifuzu; la bildo
      * restas ĉe la originala URL (regulo A4 — la fluo/kanalo daŭras):
-     * - la celo estu http(s) kun NOMO kiel gastiganto sur normala haveno
-     *   (80/http, 443/https), kies resolvo entenas publikan IPv4 kaj neniom
-     *   ne-publikan — IP-literaloj kaj internaj celoj rifuzataj ANTAŬ la peto
-     *   (SSRF-ŝirmo, CWE-918; detaloj kaj la akceptita restanta DNS-rebinding-risko:
-     *   [Emblemoj.ĉuAkcepteblaBildaCelo]);
+     * - frua rifuzo de nenormalaj celoj (skemo, haveno, IP-literalo —
+     *   [Emblemoj.ĉuAkcepteblaBildaCelo]) kaj DECIDA filtrado de la konekta
+     *   rezolvo al publikaj adresoj ([Emblemoj.SekuraBildaDns] — la Dns-hoko
+     *   de la OkHttp-motoro; SSRF-ŝirmo CWE-918, inkluzive DNS-rebinding);
      * - NENIU alidirekto: [bildaHttp] estas senvola kaj ĉiu 3xx estas rifuzata
      *   kiel nenormala — bildoj gastigitaj malantaŭ alidirekto ne speguliĝas;
      * - la korpo legiĝas FLUE per prepareGet-execute (HttpClient.get enmemorigus

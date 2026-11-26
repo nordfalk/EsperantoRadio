@@ -151,41 +151,26 @@ object Emblemoj {
     /**
      * Ĉu la el la bilda kapo legitaj dimensioj eniras la pikselan limon
      * ([MAKS_BILDAJ_PIKSELOJ], inkluzive) — la gardo kontraŭ malkonprem-bomboj
-     * (CWE-409), aplikata ANTAŭ la plena malkodado. Elprenita kiel propra
+     * (CWE-409), aplikata ANTAŬ la plena malkodado. Elprenita kiel propra
      * funkcio, por ke la limo mem estu testebla ĉe la rando.
      */
     fun dimensioEnLimo(larĝo: Long, alto: Long): Boolean =
         larĝo > 0 && alto > 0 && larĝo * alto <= MAKS_BILDAJ_PIKSELOJ
 
     /**
-     * Ĉu la bildo-URL tute estas akceptebla laŭ la permes-listo (posedanto-decido
-     * 2026-11-25 — „ĉio nenormala → rifuzu"):
-     * - skemo http(s) kaj gastiganto estas NOMO, ne IP-literalo;
-     * - nur la normala haveno de la skemo (implicite, aŭ eksplicite 80/http,
-     *   443/https — stranga haveno estas la plej rekta vojo al internaj servoj);
-     * - la nomo resolvu al almenaŭ unu PUBLIKA IPv4 (per tio la konstruilo
-     *   efektive konektas) kaj NENIU el la resolvoj — iu ajn familio — estu
-     *   ne-publika ([ĉuPublikaAdreso]).
-     * Du-stackaj gastigantoj (A + publikaj AAAA, ekz. blogger.googleusercontent.com)
-     * tial AKCEPTIĜAS; „sama listo sed kun ::1 aŭ fd00 en la resolvo“ rifuziĝas.
-     * Malplena/neparsebla URL, nekonata skemo, IP-literalo, stranga haveno,
-     * neresolvebla aŭ ne-publika resolvo → false (la bildo restas ĉe la
-     * originala URL, A4).
-     *
-     * Rimarko pri DNS-rebinding (CWE-918): ĉi tiu antaŭkontrolo estas nur
-     * frua rifuzo; la DECIDA ŝirmo estas [SekuraBildaDns] — la Dns-hoko de la
-     * OkHttp-motoro, kiu faras la validigan rezolvon mem uzata por la konekto
-     * (posedanto-decido 2026-11-26: uzi bibliotekan solvon anstataŭ akcepti
-     * la restantan fenestron aŭ programe propran klienton).
+     * Frua (antaŭ-peta) kontrolo de la bildo-URL: skemo http(s) sur la normala
+     * haveno de la skemo, kaj gastiganto estu NOMO, ne IP-literalo (posedanto-
+     * decido 2026-11-25). La DECIDA adreso-validigo estas [SekuraBildaDns] —
+     * la Dns-hoko de la OkHttp-motoro, kiu filtras la rezolvon mem uzatan por
+     * la konekto al publikaj adresoj kaj rifuzas per UnknownHostException, se
+     * neniu restas. Nenioma DNS-resolvo okazas ĉi tie: unu demando po bildo
+     * sufiĉas, kaj neniu fenestro restas inter kontrolo kaj konekto.
      */
     fun ĉuAkcepteblaBildaCelo(url: String): Boolean {
         return try {
             val uri = URI(url)
             val gastiganto = uri.host ?: return false
-            if (!skemoKajHavenoAkceptebla(uri.scheme, uri.port) || estasIpLiteralo(gastiganto)) return false
-            val adresoj = InetAddress.getAllByName(gastiganto)
-            adresoj.any { it is Inet4Address && ĉuPublikaAdreso(it) } &&
-                adresoj.all { ĉuPublikaAdreso(it) }
+            skemoKajHavenoAkceptebla(uri.scheme, uri.port) && !estasIpLiteralo(gastiganto)
         } catch (e: Exception) {
             false
         }

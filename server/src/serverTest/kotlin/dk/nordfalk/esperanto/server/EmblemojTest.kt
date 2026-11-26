@@ -79,10 +79,9 @@ class EmblemojTest {
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://example.com:8080/bildo.png"))
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://example.com:443/bildo.png"))
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("https://example.com:80/bildo.png"))
-        // NOMO kiu resolvas al NE-publika adreso (localhost → loopback, sen reto) —
-        // haveno 80 mem estas normala kaj trairas, la RESOLVO rifuzas
-        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost/bildo.png"))
-        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost:80/bildo.png"))
+        // Noto: la ADRES-validigo (publikaj adresoj, localhost ktp.) ne okazas
+        // en ĉi tiu frua kontrolo — ĝin faras la Dns-hoko de la motoro
+        // (vidu sekuraDnsRifuzasNepublikajnResolvojn).
     }
 
     @Test

@@ -85,6 +85,33 @@ class EmblemojTest {
     }
 
     @Test
+    fun skemoKajHavenoUseklecIndiferenta() {
+        // majusklaj skemoj estas validaj (RFC 3986 §3.1) — java.net.URI ne normigas ilin
+        assertTrue(Emblemoj.skemoKajHavenoAkceptebla("HTTP", -1))
+        assertTrue(Emblemoj.skemoKajHavenoAkceptebla("HTTPS", 443))
+        assertTrue(Emblemoj.skemoKajHavenoAkceptebla("https", -1))
+        assertTrue(Emblemoj.skemoKajHavenoAkceptebla("http", 80))
+        // nenormalaj paroj
+        assertFalse(Emblemoj.skemoKajHavenoAkceptebla("https", 80))
+        assertFalse(Emblemoj.skemoKajHavenoAkceptebla("http", 443))
+        assertFalse(Emblemoj.skemoKajHavenoAkceptebla("http", 8080))
+        assertFalse(Emblemoj.skemoKajHavenoAkceptebla(null, -1))
+        assertFalse(Emblemoj.skemoKajHavenoAkceptebla("ftp", -1))
+    }
+
+    @Test
+    fun dimensiaLimoTesteblaCheRando() {
+        // la gardon mem (larĝo×alto el la kapo, ANTAŬ la plena malkodado) oni
+        // devas povi testi sen barakti per plenmalkodada fiasko: la limo estas
+        // INKLUZIVA — 5000×5000 = precize 25 MP eniras, 5001×5000 ne plu
+        assertTrue(Emblemoj.dimensioEnLimo(5000, 5000))
+        assertFalse(Emblemoj.dimensioEnLimo(5001, 5000))
+        assertFalse(Emblemoj.dimensioEnLimo(0, 0))
+        assertFalse(Emblemoj.dimensioEnLimo(-1, 100))
+        assertTrue(Emblemoj.dimensioEnLimo(1, 1))
+    }
+
+    @Test
     fun bazaBildaUrlDerivasLaRadikon() {
         assertEquals("https://javabog.dk/esperanto-radio", Emblemoj.bazaBildaUrl("https://javabog.dk/esperanto-radio/kanaloj/"))
         assertEquals("https://javabog.dk/esperanto-radio", Emblemoj.bazaBildaUrl("https://javabog.dk/esperanto-radio/kanaloj"))

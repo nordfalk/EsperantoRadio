@@ -96,7 +96,7 @@ class RssParsilo(
      *
      * @return la bildeto-URL, aŭ null se neniu taŭga bildo trovita
      */
-    internal fun elektuBildeton(html: String, jamBildetoUrl: String? = null): String? {
+    fun elektuBildeton(html: String, jamBildetoUrl: String? = null): String? {
         if (jamBildetoUrl != null) return jamBildetoUrl
         return unuaTaŭgaBildo(Ksoup.parse(html))
     }

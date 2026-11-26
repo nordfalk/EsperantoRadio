@@ -102,7 +102,7 @@ object ArkivKonstruilo {
         // FAROTA C56: spegulu la emblemojn al publika/bildoj/ kaj resskribu iliajn URL-ojn
         // en la publikigota konfiguro (kaj en la fluoj) al la arkivaj URL-oj — la
         // retversio gastigas samdevene kaj ne povas ŝargi bildojn el la originalaj gastigantoj (CORS).
-        val emblemoj = elŝutuEmblemojn(ĉiujKanaloj, agordo.arkivoBazoUrl)
+        val emblemoj = elŝutuEmblemojn(ĉiujKanaloj, agordo.arkivoBazoUrl, retumado = !uzuKaŝon)
 
         for (kanalo in kanaloj) {
             try {
@@ -115,7 +115,7 @@ object ArkivKonstruilo {
                 // Elsendaj bildetoj speguliĝas antaŭ la skribo — la fluo ricevas
                 // samdevenan URL-on kiel <itunes:image> (C56: CORS blokas eksterajn
                 // bildojn en la retversio; FluSkribilo skribas ĝin po ero).
-                val spegulitajElsendoj = speguluElsendajnBildetojn(elsendoj, http, agordo.arkivoBazoUrl)
+                val spegulitajElsendoj = speguluElsendajnBildetojn(elsendoj, http, agordo.arkivoBazoUrl, parsilo, retumado = !uzuKaŝon)
                 // La fluo ankaŭ portu la spegulitan emblemo-URL-on (eksteraj legitimiloj)
                 val skriboKanalo = kanalo.emblemoUrl
                     ?.let { malnova -> emblemoj.mapigo[malnova]?.let { kanalo.copy(emblemoUrl = it) } }
@@ -177,6 +177,7 @@ object ArkivKonstruilo {
     private fun elŝutuEmblemojn(
         kanaloj: List<dk.nordfalk.esperanto.domain.model.Kanalo>,
         arkivoBazoUrl: String?,
+        retumado: Boolean,
     ): EmblemaRezulto {
         if (arkivoBazoUrl.isNullOrBlank()) return EmblemaRezulto(emptyMap(), emptyMap())
         val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
@@ -185,6 +186,18 @@ object ArkivKonstruilo {
         val novaNomoLaŭSlug = mutableMapOf<String, String>()
         for (kanalo in kanaloj) {
             val url = kanalo.emblemoUrl ?: continue
+            if (!retumado) {
+                // Kaŝreĝimo (--kaŝo, sen reto): reuzu spegulon jam sur disko;
+                // mankanta emblemo restas sencela — la konfiguro/fluo tenas la
+                // originalan URL-on ĝis la venonta reta rulo (neniu lanco en la reto).
+                bildujo.listFiles()
+                    ?.firstOrNull { it.isFile && it.nameWithoutExtension == kanalo.slug }
+                    ?.let {
+                        mapigo[url] = "$bazo/bildoj/${it.name}"
+                        novaNomoLaŭSlug[kanalo.slug] = it.name
+                    }
+                continue
+            }
             try {
                 val nova = runBlocking {
                     val enhavo = elŝutuBildonKunŜirmo(url)
@@ -199,7 +212,9 @@ object ArkivKonstruilo {
                     val dosiero = File(bildujo, "${kanalo.slug}.$formato")
                     // Transakcie kiel ĉe la elsendlaj bildetoj: .part + rename —
                     // interrompita skribo ne lasu koruptitan emblemon servotan.
-                    val provizora = File(bildujo, "${dosiero.name}.part")
+                    // La .part portas la PID-on: du PARALELaj ruloj (permana + cron)
+                    // skribantaj la saman emblemon ne interfrapu la saman .part-dosieron.
+                    val provizora = File(bildujo, "${dosiero.name}.${ProcessHandle.current().pid()}.part")
                     try {
                         provizora.writeBytes(enhavo)
                         if (!provizora.renameTo(dosiero)) {
@@ -254,6 +269,8 @@ object ArkivKonstruilo {
         elsendoj: List<dk.nordfalk.esperanto.domain.model.Elsendo>,
         http: HttpClient,
         arkivoBazoUrl: String?,
+        parsilo: RssParsilo,
+        retumado: Boolean,
     ): List<dk.nordfalk.esperanto.domain.model.Elsendo> {
         if (arkivoBazoUrl.isNullOrBlank()) return elsendoj
         val bazo = Emblemoj.bazaBildaUrl(arkivoBazoUrl)
@@ -267,6 +284,12 @@ object ArkivKonstruilo {
             val ekzistanta = bildujo.listFiles()?.firstOrNull { it.isFile && it.nameWithoutExtension == radiko }
             val nova = if (ekzistanta != null) {
                 novaUrl(ekzistanta) // jam spegulita en pli frua rulo
+            } else if (!retumado) {
+                // Kaŝreĝimo (sen reto): ekzistantaj speguloj reuziĝas supre;
+                // mankanta bildeto ne elŝutiĝas — la originala URL restas
+                // ĝis la venonta reta rulo (la fluo tiam ne nomas mortintan spegulan ligilon).
+                logd("ArkivKonstruilo", "bildeto ne spegulita (kaŝreĝimo): $url")
+                url
             } else {
                 try {
                     runBlocking {
@@ -277,7 +300,9 @@ object ArkivKonstruilo {
                         // Transakcie: skribu al .part kaj alinomu nur post plena skribo —
                         // interrompita skribo ne kredigu al la sekva rulo koruptitan
                         // dosieron kiel jam-spegulitan (la ekzisto-kontrolo rigardas radikon).
-                        val provizora = File(bildujo, "${dosiero.name}.part")
+                        // PID-sufikso: du PARALELaj ruloj (permana + cron) elŝutantaj
+                        // la saman bildeton ne interfrapu la saman .part-dosieron.
+                        val provizora = File(bildujo, "${dosiero.name}.${ProcessHandle.current().pid()}.part")
                         try {
                             provizora.writeBytes(enhavo)
                             if (!provizora.renameTo(dosiero)) {
@@ -303,7 +328,21 @@ object ArkivKonstruilo {
         var spegulitaj = 0
         val rezulto = elsendoj.map { e ->
             val bildo = e.bildoUrl ?: return@map e
-            if (bildo.startsWith("$bazo/")) e // jam samdevena (pli frua rulo)
+            if (bildo.startsWith("$bazo/")) {
+                // Jam samdevena (pli frua rulo) — sed KONTROLU la dosieron: se la
+                // spegulo perdiĝis, la fluo portas mortintan ligilon kaj la normala
+                // prefikso-kontrolo eterne preterlasus ĝin (la originalo ne plu estas
+                // eltrovebla el la fluo). Resanigu per la originala <img> el la
+                // priskribo (RssParsilo.elektuBildeton — A2: la elekto-logiko en unu loko).
+                if (File(bildujo, bildo.substringAfterLast('/')).isFile) return@map e
+                val originalo = parsilo.elektuBildeton(e.priskriboHtml ?: e.priskribo.orEmpty())
+                if (originalo == null || originalo.startsWith("$bazo/")) {
+                    // A8: protokolu — la priskribo ne plu portas uzigeblan originalon
+                    logw("ArkivKonstruilo", "spegulita bildeto perdiĝis kaj la priskribo ne portas originalon: $bildo")
+                    return@map e
+                }
+                e.copy(bildoUrl = spegulu(originalo))
+            }
             else {
                 spegulitaj++
                 e.copy(bildoUrl = spegulu(bildo))

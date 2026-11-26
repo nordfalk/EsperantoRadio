@@ -111,6 +111,29 @@ object Emblemoj {
     }
 
     /**
+     * Ĉu la skemo-haveno-paro estas normala bildo-celo (posedanto-decido:
+     * nur la implicita haveno de la skemo aŭ ĝia eksplicita normo — 80/http,
+     * 443/https; stranga haveno estas la plej rekta vojo al internaj servoj).
+     * La skemo kompariĝas usklec-indiferente (RFC 3986 §3.1): realaj fluoj enhavas
+     * ankaŭ majusklajn skemojn (ekz. HTTPS://…) — kaj java.net.URI NE normigas
+     * la usklecon, do la kontrolo mem devas minuskligi ĝon.
+     */
+    fun skemoKajHavenoAkceptebla(skemo: String?, porto: Int): Boolean = when (skemo?.lowercase()) {
+        "http" -> porto == -1 || porto == 80
+        "https" -> porto == -1 || porto == 443
+        else -> false
+    }
+
+    /**
+     * Ĉu la el la bilda kapo legitaj dimensioj eniras la pikselan limon
+     * ([MAKS_BILDAJ_PIKSELOJ], inkluzive) — la gardo kontraŭ malkonprem-bomboj
+     * (CWE-409), aplikata ANTAŭ la plena malkodado. Elprenita kiel propra
+     * funkcio, por ke la limo mem estu testebla ĉe la rando.
+     */
+    fun dimensioEnLimo(larĝo: Long, alto: Long): Boolean =
+        larĝo > 0 && alto > 0 && larĝo * alto <= MAKS_BILDAJ_PIKSELOJ
+
+    /**
      * Ĉu la bildo-URL tute estas akceptebla laŭ la permes-listo (posedanto-decido
      * 2026-11-25 — „ĉio nenormala → rifuzu"):
      * - skemo http(s) kaj gastiganto estas NOMO, ne IP-literalo;
@@ -138,12 +161,7 @@ object Emblemoj {
         return try {
             val uri = URI(url)
             val gastiganto = uri.host ?: return false
-            val havenoAkceptebla = when (uri.scheme) {
-                "http" -> uri.port == -1 || uri.port == 80
-                "https" -> uri.port == -1 || uri.port == 443
-                else -> false
-            }
-            if (!havenoAkceptebla || estasIpLiteralo(gastiganto)) return false
+            if (!skemoKajHavenoAkceptebla(uri.scheme, uri.port) || estasIpLiteralo(gastiganto)) return false
             val adresoj = InetAddress.getAllByName(gastiganto)
             adresoj.any { it is Inet4Address && ĉuPublikaAdreso(it) } &&
                 adresoj.all { ĉuPublikaAdreso(it) }
@@ -201,7 +219,7 @@ object Emblemoj {
                 leganto.input = enigo
                 val larĝo = leganto.getWidth(0).toLong()
                 val alto = leganto.getHeight(0).toLong()
-                if (larĝo <= 0 || alto <= 0 || larĝo * alto > MAKS_BILDAJ_PIKSELOJ) {
+                if (!dimensioEnLimo(larĝo, alto)) {
                     logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
                     return null
                 }

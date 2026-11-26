@@ -1,7 +1,13 @@
 package dk.nordfalk.esperanto.server
 
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.logw
 import java.io.ByteArrayInputStream
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.URI
+import java.net.UnknownHostException
+import java.security.MessageDigest
 import javax.imageio.ImageIO
 
 /**
@@ -14,6 +20,23 @@ import javax.imageio.ImageIO
  * (ajn platformo — Coil ŝargas per HTTP) estas samdevena kaj sen CORS.
  */
 object Emblemoj {
+
+    /**
+     * Maksimuma nombro da pikseloj de spegulata bildo — ŝirmo kontraŭ
+     * malkonprem-bomboj (CWE-409, PR #214): 5-MB-dosiero povas aserti eĉ
+     * 50 000×50 000 pikselojn kaj la plena malkodado estus enmemorigi
+     * multajn gigabitokojn da pikseloj antaŭ ol iu kontrolo povus rifuzi.
+     * La dimensioj estas kontrolataj el la kapo ANTAŬ la malkodado
+     * (vidu [formatoSeLegebla]); 25 MP kovras ĉiun realistican emblemon.
+     */
+    const val MAKS_BILDAJ_PIKSELOJ: Long = 25_000_000L
+
+    /**
+     * Maksimuma nombro da kadroj de spegulata bildo (animacia GIF ktp.) —
+     * dua vojo de la malkonprem-bombo-ŝirmo (CWE-409): multmil-kadra GIF
+     * estus malkodita frame post frame ankaŭ se unu kadro estas malgranda.
+     */
+    const val MAKS_BILDAJ_KADROJ: Long = 300L
 
     /** Baza URL de la spegulitaj emblemoj, derivita el `arkivoBazoUrl` (`…/kanaloj/` → la radiko). */
     fun bazaBildaUrl(arkivoBazoUrl: String): String {
@@ -45,15 +68,195 @@ object Emblemoj {
     }
 
     /**
-     * Kiel [formatoLaŭEnhavo], sed ankaŭ validigas ke la enhavo vere estas
-     * malkodebla bildo (ImageIO-malkodado de la tuta datumo — ne nur la magiaj
-     * signoj): trunkita, koruptita aŭ kaŝvestita enhavo kun ĝusta signaturo
-     * estas rifuzata (→ null; la emblemo restas ĉe la originala URL, A4).
+     * Dosiernoma radiko por spegulata elsenda bildeto: SHA-1 de la originala URL
+     * (40 hex-signoj). La sama URL ĉiam ricevas la saman nomon — tial la
+     * ekzisto-kontrolo sutas: jam spegulita bildeto neniam re-elŝutiĝas, kaj
+     * pluraj kanaloj kun la sama bildo kunhavas unun spegulon.
      */
-    fun formatoSeLegebla(bitokoj: ByteArray): String? {
-        val formato = formatoLaŭEnhavo(bitokoj) ?: return null
+    fun bildetaRadiko(url: String): String =
+        MessageDigest.getInstance("SHA-1").digest(url.toByteArray(Charsets.UTF_8))
+            .joinToString("") { "%02x".format(it) }
+
+    /**
+     * La DNS-hoko de la BILDA kliento (OkHttp-motoro): anstataŭ la systema
+     * rezolvo la transporto ricevas NUR la publikajn adresojn el la respondo —
+     * la konekto do povas atingi nur validigitajn adresojn, kaj la klasika
+     * TOCTOU/DNS-rebinding-fenestro (CWE-918; kontrolo en unu resolvo, konekto
+     * en alia) estas fermita KONSTRUKTE: la valida rezolvo mem estas tiu, kiun
+     * la motoro uzas por konekti. Malplena rezulto → UnknownHostException →
+     * la ekzistanta catch (A4). SNI-kapo kaj atestokontrolo restas aŭetermine
+     * de OkHttp laŭ la originala gastiganto-nomo.
+     */
+    internal object SekuraBildaDns : okhttp3.Dns {
+        override fun lookup(hostname: String): List<InetAddress> {
+            val adresoj = InetAddress.getAllByName(hostname).toList()
+            val sekuraj = adresoj.filter { ĉuPublikaAdreso(it) }
+            if (sekuraj.isEmpty()) throw UnknownHostException(
+                "neniu publika adreso por $hostname (rifuzita: ${adresoj.joinToString()})"
+            )
+            return sekuraj
+        }
+    }
+
+    /**
+     * Permes-lista regulo de la posedanto (2026-11-25): la bildo-celo devas esti
+     * PUBLIKA — neniu interna/privata elemento en la resolvo (SSRF-ŝirmo de la
+     * bildo-spegele, CWE-918, PR #214):
+     * - IPv4 publika: rifuzataj estas 0/8, 10/8, 127/8, 172.16/12, 192.168/16,
+     *   169.254/16, 100.64/10 (CGNAT), 198.18/15, 224/4 kaj 240/4;
+     * - IPv6 publika: rifuzataj estas :: kaj ::1 (nedifinita/loopback),
+     *   fc00::/7 (ULA), fe80::/10 (link-local) kaj ff00::/8 (multicast).
+     * Teredo/6to4/IPv4-mapeitaj formoj ne estas special-kontrolataj: mapeitajn
+     * formojn Java mem konvertas al IPv4-objekto (do la IPv4-kontrolo ilin
+     * kaptas), kaj la eksotikaj tunelaj formoj postulus aktivan subskribon de
+     * la konstruilo — laŭ la regulo „io ajn nenormala → rifuzu” ni ne provas.
+     */
+    fun ĉuPublikaAdreso(adreso: InetAddress): Boolean {
+        if (adreso is Inet4Address) {
+            val o0 = adreso.address[0].toInt() and 0xFF
+            val o1 = adreso.address[1].toInt() and 0xFF
+            return !(o0 == 0 ||                                      // 0.0.0.0/8
+                o0 == 10 || o0 == 127 ||                            // 10/8, 127/8
+                (o0 == 172 && o1 in 16..31) ||                      // 172.16/12
+                (o0 == 192 && o1 == 168) ||                         // 192.168/16
+                (o0 == 169 && o1 == 254) ||                          // 169.254/16
+                (o0 == 100 && (o1 and 0xC0) == 64) ||                // 100.64/10 (CGNAT)
+                (o0 == 198 && (o1 == 18 || o1 == 19)) ||             // 198.18/15
+                (o0 and 0xF0) == 0xE0 ||                             // 224/4 (multicast)
+                o0 >= 240)                                           // 240/4 (rezervita)
+        }
+        // IPv6: nur la PUBLIKA pasas (:: , ::1, ULA, site-local fec0::/10,
+        // link-local, multicast rifuzataj)
+        val o0 = adreso.address[0].toInt() and 0xFF
+        return !(adreso.isAnyLocalAddress || adreso.isLoopbackAddress ||
+            adreso.isSiteLocalAddress ||                              // fec0::/10 (site-local)
+            adreso.isLinkLocalAddress || adreso.isMulticastAddress ||
+            (o0 and 0xFE) == 0xFC)                                   // fc00::/7 (ULA)
+    }
+
+    /**
+     * Ĉu la skemo-haveno-paro estas normala bildo-celo (posedanto-decido:
+     * nur la implicita haveno de la skemo aŭ ĝia eksplicita normo — 80/http,
+     * 443/https; stranga haveno estas la plej rekta vojo al internaj servoj).
+     * La skemo kompariĝas usklec-indiferente (RFC 3986 §3.1): realaj fluoj enhavas
+     * ankaŭ majusklajn skemojn (ekz. HTTPS://…) — kaj java.net.URI NE normigas
+     * la usklecon, do la kontrolo mem devas minuskligi ĝon.
+     */
+    fun skemoKajHavenoAkceptebla(skemo: String?, porto: Int): Boolean = when (skemo?.lowercase()) {
+        "http" -> porto == -1 || porto == 80
+        "https" -> porto == -1 || porto == 443
+        else -> false
+    }
+
+    /**
+     * Ĉu la el la bilda kapo legitaj dimensioj eniras la pikselan limon
+     * ([MAKS_BILDAJ_PIKSELOJ], inkluzive) — la gardo kontraŭ malkonprem-bomboj
+     * (CWE-409), aplikata ANTAŬ la plena malkodado. Elprenita kiel propra
+     * funkcio, por ke la limo mem estu testebla ĉe la rando.
+     */
+    fun dimensioEnLimo(larĝo: Long, alto: Long): Boolean =
+        larĝo > 0 && alto > 0 && larĝo * alto <= MAKS_BILDAJ_PIKSELOJ
+
+    /**
+     * Frua (antaŭ-peta) kontrolo de la bildo-URL: skemo http(s) sur la normala
+     * haveno de la skemo, kaj gastiganto estu NOMO, ne IP-literalo (posedanto-
+     * decido 2026-11-25). La DECIDA adreso-validigo estas [SekuraBildaDns] —
+     * la Dns-hoko de la OkHttp-motoro, kiu filtras la rezolvon mem uzatan por
+     * la konekto al publikaj adresoj kaj rifuzas per UnknownHostException, se
+     * neniu restas. Nenioma DNS-resolvo okazas ĉi tie: unu demando po bildo
+     * sufiĉas, kaj neniu fenestro restas inter kontrolo kaj konekto.
+     */
+    fun ĉuAkcepteblaBildaCelo(url: String): Boolean {
         return try {
-            if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null
+            val uri = URI(url)
+            val gastiganto = uri.host ?: return false
+            skemoKajHavenoAkceptebla(uri.scheme, uri.port) && !estasIpLiteralo(gastiganto)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Ĉu la gastiganto estas IP-LITERALO (ne DNS-nomo): IPv4 (`1.2.3.4`, sed ankaŭ
+     * la pli mallongaj numeraj formoj `1.2.3`, `1.2`, `134744072`, kiujn
+     * InetAddress same interpretas kiel IPv4) aŭ IPv6 (`[::1]`, kun aŭ sen
+     * krampoj). Tia „IP-adreso anstataŭ nomo" estas nenormala por
+     * podkasto-bildo kaj rifuziĝas sen eĉ provi resolvon.
+     */
+    fun estasIpLiteralo(gastiganto: String): Boolean {
+        val nuda = gastiganto.removePrefix("[").removeSuffix("]")
+        if (':' in nuda) return true
+        val pecoj = nuda.split('.')
+        return pecoj.size in 1..4 && pecoj.all { it.isNotEmpty() && it.all(Char::isDigit) }
+    }
+
+    /**
+     * Kiel [formatoLaŭEnhavo], sed ankaŭ validigas ke la enhavo vere estas
+     * malkodebla bildo (plena ImageIO-malkodado): trunkita, koruptita aŭ
+     * kaŝvestita enhavo kun ĝusta signaturo estas rifuzata (→ null; la
+     * emblemo restas ĉe la originala URL, A4).
+     *
+     * Datum-ŝirmoj antaŭ la malkodado (CWE-409 — malkonprem-bomboj), legitaj el
+     * la kapo per [javax.imageio.ImageReader] SEN malkodi pikselojn:
+     * - dimensio: maks. [MAKS_BILDAJ_PIKSELOJ] pikseloj (ekz. 5-MB-PNG kun
+     *   kapo 50000×50000 estus postulinta multajn GiB da piksela memoro);
+     * - kadroj: maks. [MAKS_BILDAJ_KADROJ] (animacia GIF kun miloj da kadroj).
+     *
+     * [malkodilo] (la fina plena malkodado) estas injektebla nur por testoj:
+     * kaptilo, kiu pruvas ke rifuzita bildo NENIAM atingas la malkodadon;
+     * la defaŭlto estas ImageIO.read.
+     */
+    fun formatoSeLegebla(bitokoj: ByteArray, malkodilo: (ByteArray) -> java.awt.image.BufferedImage? = { ImageIO.read(ByteArrayInputStream(it)) }): String? {
+        val formato = formatoLaŭEnhavo(bitokoj) ?: return null
+        // Kap-kontroloj ANTAŬ la plena malkodado: la ImageReader legas
+        // larĝon, alton kaj kadro-nombron el la metadatumoj — neniuj
+        // pikseloj estas malkodataj ĝis la fina validigo sube.
+        //
+        // Risurc-hierarkio: enigo fermiĝas per use() en ĈIU vojo (ankaŭ se
+        // dispose() ĵetas), leganto akiriĝas kaj tuj eniras sian try/finally,
+        // do ĝi dispose-iĝas ankaŭ se la input-agordo aŭ kap-legado ĵetas.
+        ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj)).use { enigo ->
+            val leganto = try {
+                val legantoj = ImageIO.getImageReaders(enigo)
+                if (!legantoj.hasNext()) return null
+                legantoj.next()
+            } catch (e: Exception) {
+                // A8: neniam silente engluti — sen leganto ne estas akceptebla bildo
+                logw("Emblemoj", "ne eblis akiri la bildan leganton — rifuzata", e)
+                return null
+            }
+            try {
+                leganto.input = enigo
+                val larĝo = leganto.getWidth(0).toLong()
+                val alto = leganto.getHeight(0).toLong()
+                if (!dimensioEnLimo(larĝo, alto)) {
+                    logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
+                    return null
+                }
+                // Kadro-nombro (CWE-409, dua vojo): animacia GIF kun multegaj kadroj
+                val kadroj = try {
+                    leganto.getNumImages(true).toLong()
+                } catch (e: Exception) {
+                    // iuj legantoj ne subtenas la nombradon — atendata, ne eraro
+                    logd("Emblemoj", "kadro-nombro ne legebla per ${leganto::class.simpleName} — preterlasata: ${e::class.simpleName}: ${e.message}")
+                    null
+                }
+                if (kadroj != null && kadroj > MAKS_BILDAJ_KADROJ) {
+                    logw("Emblemoj", "bildo rifuzata pro kadro-nombro $kadroj (limo: $MAKS_BILDAJ_KADROJ)")
+                    return null
+                }
+            } catch (e: Exception) {
+                // A8: neniam silente engluti — kaj nelegebla kapo ne estas akceptebla bildo
+                logw("Emblemoj", "ne eblis legi la bildan kap-dimensionon — rifuzata", e)
+                return null
+            } finally {
+                // purigu la leganton en ĈIU vojo — ankaŭ frua rifuzo/escepto;
+                // eĉ se dispose() mem ĵetus, use() tamen fermas enigo
+                leganto.dispose()
+            }
+        }
+        return try {
+            if (malkodilo(bitokoj) != null) formato else null
         } catch (e: Exception) {
             // A8: neniam silente engluti
             logw("Emblemoj", "emblemo aspektas kiel $formato sed ne malkodeblas", e)

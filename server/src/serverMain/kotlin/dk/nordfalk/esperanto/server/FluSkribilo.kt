@@ -46,6 +46,13 @@ object FluSkribilo {
             xml(sb, "      ", "pubDate", rfc822(e.dato))
             if (priskribo != null) xml(sb, "      ", "description", priskribo)
             if (retpaĝo != null) xml(sb, "      ", "link", retpaĝo)
+            // C56: la bildeto de la ero (ekde PR #214 ankaŭ spegulata samdevene).
+            // La klienta RssParsilo preferas <itunes:image> antaŭ la unua <img> el
+            // la priskribo — la retversio ne povas ŝargi eksterajn bildojn (CORS).
+            val bildeto = e.bildoUrl
+            if (bildeto != null) {
+                sb.append("      <itunes:image href=").append(citaĵo(bildeto)).append("/>\n")
+            }
             sb.append("      <enclosure url=").append(citaĵo(normiguFluanUrl(e.fluo))).append(" type=\"audio/mpeg\"/>\n")
             if (daŭro != null && daŭro > 0) {
                 sb.append("      <itunes:duration>%02d:%02d:%02d</itunes:duration>\n".format(daŭro / 3600, (daŭro / 60) % 60, daŭro % 60))

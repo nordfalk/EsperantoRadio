@@ -194,6 +194,16 @@
 > `git log` de FAROTA.md (la etikedoj K…, G…, C… restas spureblaj), la PR-ojn,
 > `CHANGELOG.md`, [`ŜANĜOJ.md`](ŜANĜOJ.md) kaj [`NOTOJ.md`](NOTOJ.md).
 
+#### C63 — arkivKonstruilo: --kaŝo ne petu la reton kiam kaŝdosiero mankas
+- **Statuso**: [ ]
+- **Fonto**: CodeRabbit-recenzo de PR #214 (2026-11-26): ekde #214 la BILDOJ ne plu
+  tuŝas la reton en kaŝreĝimo (speguloj reuziĝas, mankantaj restas sencelaj) — sed se
+  RSS-a aŭ HTML-a kaŝdosiero mankas, la konstruilo tamen elŝutas ĝin (kolektuElsendojn /
+  kolektuElHtmlFonto). La dokumentita „senreta“ rulo („el kaŝo (sen reto)“) do povas
+  ektuŝi la reton.
+- **Priskribo**: en kaŝreĝimo mankanta kaŝdosiero devus fiaski nur tiun kanalon
+  (kun protokolo, A8) kaj lasi la aliajn daŭri (A4) — ne silente elŝuti el la reto.
+
 #### C62 — Apache: X-Content-Type-Options: nosniff por la elŝutejo
 - **Statuso**: [x] SOLVITA 2026-11-24: la posedanto aldonis `Header always set
   X-Content-Type-Options "nosniff"` en la `<Directory>`-bloko de la DocumentRoot

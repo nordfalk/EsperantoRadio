@@ -30,6 +30,11 @@ server/data/                      ← REALA
     └── esperantoradio_konfiguro.json → <kanonan> ┘  apo-nomo malnova-speca)
 ```
 
+`publika/bildoj/` enhavas `kanalajn emblemojn` (`<slug>.<ekst>`) kaj ekde
+PR #214 ankaŭ `elsendoj/<sha1(url)>.<ekst>` — la elsendlaj bildetoj, kiujn
+`ArkivKonstruilo.speguluElsendajnBildetojn` spegulas samdevene (C56: CORS);
+`FluSkribilo` skribas ilin kiel ero-nivelan `<itunes:image>` en la fluojn.
+
 **Kial**: `publika/` devas esti REALA, por ke git povu versii la prezentpaĝon;
 `privata` povas esti unu ligilo (nenio versienda); akcidenta skribo en
 `server/data/` restas LOKALA; la prezentpaĝo restas PR-reviebla. LA PUBLIKIGA

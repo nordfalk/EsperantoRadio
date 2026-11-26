@@ -196,10 +196,10 @@
 
 #### C63 — arkivKonstruilo: --kaŝo ne petu la reton kiam kaŝdosiero mankas
 - **Statuso**: [ ]
-- **Fonto**: CodeRabbit-recenzo de PR #214 (2026-11-26): ekde #214 la BILOJ ne plu
+- **Fonto**: CodeRabbit-recenzo de PR #214 (2026-11-26): ekde #214 la BILDOJ ne plu
   tuŝas la reton en kaŝreĝimo (speguloj reuziĝas, mankantaj restas sencelaj) — sed se
   RSS-a aŭ HTML-a kaŝdosiero mankas, la konstruilo tamen elŝutas ĝin (kolektuElsendojn /
-  kolektuElHtmlFonto). La dokumentita „sereta“ rulo („el kaŝo (sen reto)“) do povas
+  kolektuElHtmlFonto). La dokumentita „senreta“ rulo („el kaŝo (sen reto)“) do povas
   ektuŝi la reton.
 - **Priskribo**: en kaŝreĝimo mankanta kaŝdosiero devus fiaski nur tiun kanalon
   (kun protokolo, A8) kaj lasi la aliajn daŭri (A4) — ne silente elŝuti el la reto.

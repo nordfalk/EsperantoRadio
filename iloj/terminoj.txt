@@ -1,6 +1,5 @@
 # Aŭtomate generita permeslisto (--generu-permesliston). Ne forigu la kontrolitan vortaron supre.
 # Aldonu permane uzatajn novajn terminojn suben.
-
 aab
 aac
 aar
@@ -2384,7 +2383,6 @@ serializable
 decode
 encode
 reparsado
-
 # (2026-11-22, PR #195) terminoj de la defora kanalkonfiguro — legitimaj Esperanto-kunmetaĵoj kaj danaj historiaj identigiloj
 asinkrone
 enmemore
@@ -2427,3 +2425,6 @@ generatoro
 testrapideco
 konduttesto
 instal
+svipa
+svipan
+ert

@@ -239,8 +239,14 @@ class AgordojDeponejoImpl(
         if (ŝaltita) {
             // Sur ne-evolua Android-konstruo ŝaltu Sentry tuj — la uzanto ĵus
             // enŝaltis; la flago unue, por ke la protokolo pri la ŝanĝo mem iru al Sentry
-            if (!AppStato.estasEvoluaMedo) initialiguSentry("produktado")
+            if (!AppStato.estasEvoluaMedio) initialiguSentry("produktado")
             raportadoAktiva = true
+            // Reapliku la pseŭdonimo-etikedon: se la starto havis raportadon
+            // malŝaltitan, la init-bloko ĝin ne agordis (ĝi kondiĉas je
+            // raportadoAktiva). Nun raportadoAktiva jam estas vera — sur wasmJs
+            // la konsento-sinkronigo (la flago-setter) jam startigis Sentry-n,
+            // do la etikedo sekuratingas la SDK-on ankaŭ tie.
+            agorduSentryEtikedon("uzanto", _pseŭdonimo.value)
             if (!antaŭa) {
                 // Atestu en Sentry, ke la uzanto (re)ŝaltis la raportadon
                 logGrava("Agordoj", "Erar-raportado (re)ŝaltita de la uzanto")

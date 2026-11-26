@@ -61,9 +61,13 @@ object AppStato {
      * Android; Desktop kaj Web ĉiam). La platforma enirpunkto ŝaltas ĝin
      * ĉe starto, antaŭ la unua kunmetaĵo. En evolua medio la
      * "Apaj novaĵoj"-dialogo ne montriĝas — ĝi aperus ĉe ĉiu freŝa
-     * instalaĵo (agordoj malaperas) kaj ĝenus dum programado.
+     * instalaĵo (agordoj malaperas) kaj ĝenus dum programado;
+     * - la DEFORA kanalkonfiguro tute ne uziĝas (nek la persistigita kopio
+     *   ĉe starto, nek la refreŝigo — [leguAgordonKunRezervo]): la paktita
+     *   konfiguro venkas, por ke ŝanĝoj el la Git-branĉo tuj testiĝu sen
+     *   rsync al la servilo.
      */
-    var estasEvoluaMedo: Boolean = false
+    var estasEvoluaMedio: Boolean = false
 
     /**
      * Ĉu temas pri debug-konstruo (alfaversio). La Android-enirpunkto ŝaltas
@@ -300,12 +304,19 @@ object AppStato {
         // konservita/paktita versio; se la servilo havas novan (kaj parsigeblan)
         // konfiguron, la kanallisto, apaj novaĵoj kaj prizorganto-retpoŝto
         // ĝisdatiĝas vive kaj la teksto persistiĝas por la sekva starto.
-        CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
-            try {
-                deponejoDeKanaloj.refreŝiguDefore()
-            } catch (e: Exception) {
-                logw("AppStato", "Defora refreŝigo de la kanalkonfiguro fiaskis", e)
+        // Evolua medio (debug-konstruo/emulilo, Desktop/Web): NE rulu — la
+        // defora konfiguro anstataŭigus la ĵus ŝanĝitan paktitan (vidu
+        // leguAgordonKunRezervo); testado de novaj kanaloj restas ĉe Git.
+        if (!estasEvoluaMedio) {
+            CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
+                try {
+                    deponejoDeKanaloj.refreŝiguDefore()
+                } catch (e: Exception) {
+                    logw("AppStato", "Defora refreŝigo de la kanalkonfiguro fiaskis", e)
+                }
             }
+        } else {
+            logd("AppStato", "Evolua medio — ne elŝutas la deforan kanalkonfiguron")
         }
 
         // Aŭtomata rapida kontrolo en la fono — por montri avertosignon sur la

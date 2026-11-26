@@ -75,12 +75,24 @@ https://javabog.dk/esperanto-radio/        (= server/data/publika/ lokale)
                                            dosierojn ĉi tien)
 ```
 
-**La retversio (C56, 2026-11-24) gastigas samdevene** sub `apo/`: sur la retumilo
+**La retversio (C56, 2026-11-24) gastigas samdevene**: la PRODUKTA retejo estas
+`https://javabog.dk/esperanto-radio/apo/`; novaj konstruoj tamen iras UNUE al
+`apo-beta/` (REGULO 2026-11-25, vidu «Publikigi»). Sur la retumilo
 `uzuOriginajnFluojn=false` (AppStato laŭ `platformo`) — nur la arkivaj fluoj kaj la
 spegulitaj bildoj estas ŝargataj (la originaloj estas CORS-blokitaj); la sono ludas
 rekte el la fonto per HTML-`<audio>` (ne CORS-bezona). Konstruo:
-`./gradlew :webApp:kopiuAlPublikaElsutejo` (kopias el
-`webApp/build/dist/wasmJs/productionExecutable/` al `publika/apo/`), poste la kutima rsync.
+`./gradlew :webApp:kopiuAlApoBetaElsutejo` (kopias el
+`webApp/build/dist/wasmJs/productionExecutable/` al `publika/apo-beta/`), poste la
+kutima rsync. La produktan `apo/` oni ĝisdatigas NUR per `:webApp:kopiuAlApoElsutejo` +
+la aparta apo-rsync — laŭ eksplicita peto de la posedanto.
+
+**REGULO (posedanto, 2026-11-25): `publika/apo/` ne ŝanĝiĝas sen eksplicita peto.**
+Ŝanĝoj al la reta apo inter eldonoj iras al `publika/apo-beta/`
+(https://javabog.dk/esperanto-radio/apo-beta/) — kreu tiun dosierujon per
+`mkdir -p server/data/publika/apo-beta` kaj kopiu la konstruaĵon tien; la kutima
+rsync publikigas ĝin AŬTOMATE (ĝi estas ja parto de `publika/`). Ekzistas tie
+lokohava `index.html`. `publika/apo/` tuŝiĝas NUR kiam la posedanto diras
+ekz. «publikigu la novan version de la reta apo al apo/».
 
 La **apo konsumas tiujn fluojn kunfandante kun la originalaj**: `arkivoBazoUrl` en
 `esperantoradio_konfiguro.json` → `ElsendoDeponejoImpl` elŝutas paralele
@@ -148,13 +160,31 @@ restas sen priskribo (kaj tio notiĝas en la konzolo kaj `privata/stato.json`).
 
 **REGULO (2026-11-20): neniam lanĉu la rsync al la servilo sen eksplicita peto de la uzanto** („kopiu al la servilo“ k.s.). Loka konstruado kaj kontrolo de `server/data/publika/` estas en ordo; la publikigo ĉiam atendas aprobon.
 
+**(REGULO (posedanto, 2026-11-25): `publika/apo/` (la produkta reta apo) ne ŝanĝiĝas sen eksplicita peto.**
+Ŝanĝoj al la reta apo inter eldonoj iras al **`publika/apo-beta/`**
+(https://javabog.dk/esperanto-radio/apo-beta/) — la defaŭlta Gradle-tasko estas
+`:webApp:kopiuAlApoBetaElsutejo` (ĝi kreas la dosierujon mem kaj enmetas la Sentry-version);
+la kutima rsync de `publika/` publikigas ankaŭ tiun dosierujon AŬTOMATE (ĝi estas ja parto de `publika/`).
+`publika/apo/` tuŝiĝas NUR per `:webApp:kopiuAlApoElsutejo` kiam la posedanto diras
+ekz. «publikigu la novan version de la reta apo al apo/». Sur la servilo `apo-beta/`
+ekzistas ekde 2026-11-25 (loko-tenila index.html).
+
 ```bash
-# unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro)
+# unu rsync — publika/ estas la tuta radiko de la retejo (index.html, icon.png, kanaloj/, konfiguro, apo-beta/)
 # nur post eksplicita peto de la uzanto!
-rsync -avLz --chmod=D755,F644 server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
+# --exclude='/apo/': la PRODUKTA reta apo neniam kromveturu (REGULO 2026-11-25) —
+#   ĝi publikiĝas nur per la aparta apo-komando malsupre
+rsync -avLz --chmod=D755,F644 --exclude='/apo/' server/data/publika/ javabog.dk:javabog.dk/esperanto-radio/
 # ATENTU: --chmod=644 (sen D755) detruas la plenumilon de dosierujoj — tiam Apache redonas 403 por ĉio
 # kontrolo:
 curl -s https://javabog.dk/esperanto-radio/kanaloj/ | head -3
+```
+
+```bash
+# Produkta apo/ — NUR kiam la posedanto eksplicite petas
+# («publikigu la novan version de la reta apo al apo/»; REGULO 2026-11-25):
+rsync -avLz --chmod=D755,F644 server/data/publika/apo/ javabog.dk:javabog.dk/esperanto-radio/apo/
+# antaŭe: ./gradlew :webApp:kopiuAlApoElsutejo (aŭ certigu, ke publika/apo/ spegulas la produktan stanon)
 ```
 
 **Prezentpaĝo**: `server/data/publika/index.html` (+ `icon.png`) estas servata kiel
@@ -180,7 +210,7 @@ Unu kanalo fiaskanta ne haltigas la aliajn (regulo A4); eraroj en `privata/stato
   `curl -sI https://javabog.dk/esperanto-radio/apo/<hash>.wasm | grep -i content-type`.
   Rezervvojo se mime.types ne korekteblas: mod_php 7.2 ruliĝas en tiu dosierujo —
   `<hash>.wasm.php`-ĉirkaŭpakaĵo kun `header('Content-Type: application/wasm')` + ŝarg-intercepto.
-- La fasko-konstruo kopias per `:webApp:kopiuAlPublikaElsutejo` (ne permane) —
+- La fasko-konstruo kopias per `:webApp:kopiuAlApoBetaElsutejo` (ne permane) —
   la elirejo estas `build/dist/wasmJs/productionExecutable/` (NE `browserProduction`;
   2026-11-24: erara podo igis la Copy-taskon trankvile krei malplenan publikan dosierujon).
 

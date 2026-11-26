@@ -112,8 +112,10 @@ La oficiala servilo `https://mcp.sentry.dev/mcp` estas konektita kiel `mcp_sentr
 
 - La **erar-kvoto** (5 000/monato) konsumiĝas nur de `captureException`
   (`loge(tag, msg, e)`) — `Sentry.logger.*` (protokoloj) estas aparta kvoto.
-- Ekde 249: eraroj estas **50 %-specimenataj** en produktado (`options.sampleRate`)
-  — krudaj nombroj de 249 estas duone intence reduktitaj; atendataj fiaskoj
+- Eraroj NE estas specimenataj ekde 2026-11-25 (`options.sampleRate = 1.0`, decido
+  de la posedanto — la kvoto restis trankvila, ~200 eventoj/monato ≈ 4 % de 5 000).
+  Versioj de PR #109 (ekde 2026-10-13) ĝis tiam havis 50 %-specimenadon —
+  iliaj krudaj nombroj estas duone intence reduktitaj; atendataj fiaskoj
   (reto/ludado/elŝuto/serĉo) estas `logw` kaj tute ne aperas kiel erar-eventoj.
 - Malnovaj versioj (≤ 248) ankoraŭ generas la malnovajn erarojn — komparu laŭ `dist`.
 

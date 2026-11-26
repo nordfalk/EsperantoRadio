@@ -70,6 +70,9 @@ class KanaloDeponejoImpl(
      * fluo de la malnova apo `hentEvtNyeGrunddata`: komparo kontraŭ la konservita
      * teksto, pars-provo en freŝa objekto (neniam rompu la nunan staton), nur post
      * sukceso skribo kaj anstataŭigo. Fiasko estas atendata kaj nur protokoliĝas.
+     *
+     * ATENTU: en EVOLUA medio la lanĉanto (AppStato) NENIAM vokas tion —
+     * tie la paktita konfiguro devas venki (vidu leguAgordonKunRezervo).
      */
     suspend fun refreŝiguDefore() {
         val elŝutilo = elŝutuDefore ?: return

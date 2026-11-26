@@ -375,6 +375,17 @@
 			"retpoŝto": "canalesperantocuba@gmail.com",
 			"hejmpaĝoButono": "https://radioambitooficial.blogspot.com/"
 		}
+	,{
+			"kodo": "panamaradio",
+			"nomo": "Panama Radio en Esperanto",
+			"priskribo": "Novaĵelsendoj pri Panamo en Esperanto, de Roberto Peres-Franko: politiko, historio kaj tradicioj de la lando (serioj Panama Raporto 2004–2005, Panama Radio 2010 kaj la nuna serio ekde 2023).",
+			"elsendojRssUrl": "https://roberto.perez-franco.com/feeds/panama-radio-en-esperanto.xml",
+			// La propra fluo ne havas kanal-bildon; uzu la emblemon el la Anchor-/iTunes-listo
+			"emblemoUrl": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/38903562/38903562-1699059263258-c88b24c5239f3.jpg",
+			"montruTitolojn": "true",
+			"retpoŝto": "retadreso@roberto.au",
+			"hejmpaĝoButono": "https://roberto.perez-franco.com/eo/podkastoj/"
+	}
 	],
 
 	"FORPRENITAJ_KANALOJ" : [

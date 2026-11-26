@@ -1,9 +1,11 @@
 package dk.nordfalk.esperanto.data.config
 
+import dk.nordfalk.esperanto.AppStato
 import dk.nordfalk.esperanto.data.repository.leguKaŝonJson
 import dk.nordfalk.esperanto.data.repository.leguKorponLimigite
 import dk.nordfalk.esperanto.data.repository.foriguKaŝon
 import dk.nordfalk.esperanto.data.repository.skribuKaŝonJson
+import dk.nordfalk.esperanto.logd
 import dk.nordfalk.esperanto.loge
 import dk.nordfalk.esperanto.logw
 import io.ktor.client.HttpClient
@@ -60,13 +62,24 @@ fun kreuDeforanElŝutilon(httpKliento: HttpClient): suspend (url: String) -> Str
  * versio el la diska kaŝmemoro, kun rezervo al la paktita risurco. Se la
  * persistigita teksto ne estas parsigebla (ekz. duone skribita dosiero), ĝi
  * forgesiĝas kaj la paktita uziĝas (regulo A4: unu eraro ne rajtas panei la apon).
+ *
+ * En EVOLUA medio ([uzuDeforanKonfiguron] = falsa) neniom da tio okazas: la
+ * PAKTITA konfiguro uziĝas ĉiam, kaj ankaŭ la defora refreŝigo ne ruliĝas
+ * (vidu [KanaloDeponejoImpl.refreŝiguDefore]). Tiel novaj kanaloj el la
+ * Git-branĉo testiĝas sen rsync al la servilo — la defora konfiguro venkus
+ * la novan paktitan liston ĝis la sekva eldono.
  */
 fun leguAgordonKunRezervo(
     leganto: KanalAgordoLeganto,
     paktitaTeksto: () -> String,
     leguKonservitan: () -> String? = { leguKaŝonJson(KANALKONFIGURO_KAŜNOMO) },
     foriguKonservitan: () -> Unit = { foriguKaŝon(KANALKONFIGURO_KAŜNOMO) },
+    uzuDeforanKonfiguron: Boolean = !AppStato.estasEvoluaMedo,
 ): KanalAgordo {
+    if (!uzuDeforanKonfiguron) {
+        logd("Kanalkonfiguro", "Evolua medio — uzas nur la paktitan kanalkonfiguron")
+        return leganto.legu(paktitaTeksto())
+    }
     val konservita = try {
         leguKonservitan()
     } catch (e: Exception) {

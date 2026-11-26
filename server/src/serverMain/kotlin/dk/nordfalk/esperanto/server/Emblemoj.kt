@@ -153,49 +153,49 @@ object Emblemoj {
         // Kap-kontroloj ANTAŬ la plena malkodado: la ImageReader legas
         // larĝon, alton kaj kadro-nombron el la metadatumoj — neniuj
         // pikseloj estas malkodataj ĝis la fina validigo sube.
-        val enigo = ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj))
-        val leganto = try {
-            val legantoj = ImageIO.getImageReaders(enigo)
-            if (!legantoj.hasNext()) {
-                enigo.close()
-                return null
-            }
-            val l = legantoj.next()
-            l.input = enigo
-            l
-        } catch (e: Exception) {
-            // A8 + nelegebla kapo ne estas akceptebla bildo
-            logw("Emblemoj", "ne eblis legi la bildan kapon — rifuzata", e)
-            enigo.close()
-            return null
-        }
-        try {
-            val larĝo = leganto.getWidth(0).toLong()
-            val alto = leganto.getHeight(0).toLong()
-            if (larĝo <= 0 || alto <= 0 || larĝo * alto > MAKS_BILDAJ_PIKSELOJ) {
-                logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
-                return null
-            }
-            // Kadro-nombro (CWE-409, dua vojo): animacia GIF kun multegaj kadroj
-            val kadroj = try {
-                leganto.getNumImages(true).toLong()
+        //
+        // Risurc-hierarkio: enigo fermiĝas per use() en ĈIU vojo (ankaŭ se
+        // dispose() ĵetas), leganto akiriĝas kaj tuj eniras sian try/finally,
+        // do ĝi dispose-iĝas ankaŭ se la input-agordo aŭ kap-legado ĵetas.
+        ImageIO.createImageInputStream(ByteArrayInputStream(bitokoj)).use { enigo ->
+            val leganto = try {
+                val legantoj = ImageIO.getImageReaders(enigo)
+                if (!legantoj.hasNext()) return null
+                legantoj.next()
             } catch (e: Exception) {
-                // iuj legantoj ne subtenas la nombradon — atendata, ne eraro
-                logd("Emblemoj", "kadro-nombro ne legebla per ${leganto::class.simpleName} — preterlasata: ${e::class.simpleName}: ${e.message}")
-                null
-            }
-            if (kadroj != null && kadroj > MAKS_BILDAJ_KADROJ) {
-                logw("Emblemoj", "bildo rifuzata pro kadro-nombro $kadroj (limo: $MAKS_BILDAJ_KADROJ)")
+                // A8: neniam silente engluti — sen leganto ne estas akceptebla bildo
+                logw("Emblemoj", "ne eblis akiri la bildan leganton — rifuzata", e)
                 return null
             }
-        } catch (e: Exception) {
-            // A8: neniam silente engluti — kaj nelegebla kapo ne estas akceptebla bildo
-            logw("Emblemoj", "ne eblis legi la bildan kap-dimensionon — rifuzata", e)
-            return null
-        } finally {
-            // purigu la risurcojn en ĈIU vojo — ankaŭ frua rifuzo/escepto
-            leganto.dispose()
-            enigo.close()
+            try {
+                leganto.input = enigo
+                val larĝo = leganto.getWidth(0).toLong()
+                val alto = leganto.getHeight(0).toLong()
+                if (larĝo <= 0 || alto <= 0 || larĝo * alto > MAKS_BILDAJ_PIKSELOJ) {
+                    logw("Emblemoj", "bildo rifuzata pro dimensio $larĝo×$alto (limo: $MAKS_BILDAJ_PIKSELOJ pikseloj)")
+                    return null
+                }
+                // Kadro-nombro (CWE-409, dua vojo): animacia GIF kun multegaj kadroj
+                val kadroj = try {
+                    leganto.getNumImages(true).toLong()
+                } catch (e: Exception) {
+                    // iuj legantoj ne subtenas la nombradon — atendata, ne eraro
+                    logd("Emblemoj", "kadro-nombro ne legebla per ${leganto::class.simpleName} — preterlasata: ${e::class.simpleName}: ${e.message}")
+                    null
+                }
+                if (kadroj != null && kadroj > MAKS_BILDAJ_KADROJ) {
+                    logw("Emblemoj", "bildo rifuzata pro kadro-nombro $kadroj (limo: $MAKS_BILDAJ_KADROJ)")
+                    return null
+                }
+            } catch (e: Exception) {
+                // A8: neniam silente engluti — kaj nelegebla kapo ne estas akceptebla bildo
+                logw("Emblemoj", "ne eblis legi la bildan kap-dimensionon — rifuzata", e)
+                return null
+            } finally {
+                // purigu la leganton en ĈIU vojo — ankaŭ frua rifuzo/escepto;
+                // eĉ se dispose() mem ĵetus, use() tamen fermas enigo
+                leganto.dispose()
+            }
         }
         return try {
             if (ImageIO.read(ByteArrayInputStream(bitokoj)) != null) formato else null

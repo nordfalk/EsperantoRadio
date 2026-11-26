@@ -73,9 +73,15 @@ class EmblemojTest {
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://[::1]/bildo.png"))
         // la unuparta numera formo, kiun InetAddress interpretas kiel IPv4 (8.8.8.8)
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://134744072/bildo.png"))
-        // NOMO kiu resolvas al NE-publika adreso (localhost → loopback, sen reto)
+        // STRANGAJ HAVENOJ rifuzataj (la plej rekta vojo al internaj servoj) —
+        // http nur 80 (implicite aŭ eksplicite), https nur 443
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://example.com:8080/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://example.com:443/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("https://example.com:80/bildo.png"))
+        // NOMO kiu resolvas al NE-publika adreso (localhost → loopback, sen reto) —
+        // haveno 80 mem estas normala kaj trairas, la RESOLVO rifuzas
         assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost/bildo.png"))
-        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost:1234/bildo.png"))
+        assertFalse(Emblemoj.ĉuAkcepteblaBildaCelo("http://localhost:80/bildo.png"))
     }
 
     @Test

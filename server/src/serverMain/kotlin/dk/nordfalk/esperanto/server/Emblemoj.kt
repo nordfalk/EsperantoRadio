@@ -110,26 +110,40 @@ object Emblemoj {
             (o0 and 0xFE) == 0xFC)                                   // fc00::/7 (ULA)
     }
 
-    /** Skemoj permesataj por bildo-elŝuto (permes-listo: ĉiu alia skemo estas „nenormala"). */
-    private val SKEMOJ = setOf("http", "https")
-
     /**
      * Ĉu la bildo-URL tute estas akceptebla laŭ la permes-listo (posedanto-decido
      * 2026-11-25 — „ĉio nenormala → rifuzu"):
      * - skemo http(s) kaj gastiganto estas NOMO, ne IP-literalo;
+     * - nur la normala haveno de la skemo (implicite, aŭ eksplicite 80/http,
+     *   443/https — stranga haveno estas la plej rekta vojo al internaj servoj);
      * - la nomo resolvu al almenaŭ unu PUBLIKA IPv4 (per tio la konstruilo
      *   efektive konektas) kaj NENIU el la resolvoj — iu ajn familio — estu
      *   ne-publika ([ĉuPublikaAdreso]).
      * Du-stackaj gastigantoj (A + publikaj AAAA, ekz. blogger.googleusercontent.com)
      * tial AKCEPTIĜAS; „sama listo sed kun ::1 aŭ fd00 en la resolvo“ rifuziĝas.
-     * Malplena/neparsebla URL, nekonata skemo, IP-literalo, neresolvebla aŭ
-     * ne-publika resolvo → false (la bildo restas ĉe la originala URL, A4).
+     * Malplena/neparsebla URL, nekonata skemo, IP-literalo, stranga haveno,
+     * neresolvebla aŭ ne-publika resolvo → false (la bildo restas ĉe la
+     * originala URL, A4).
+     *
+     * KONATA, AKCEPTITA RISKO (posedanto-decido 2026-11-26, CWE-918): la
+     * transporto (Ktor CIO) solvas la nomon DENOVE dum la konekto — DNS-rebinding
+     * inter ambaŭ resolvoj povus direkti la petigon al interna adreso (blind-GET;
+     * la respondo publikiĝas nur se ĝi malkodeblas kiel bildo kaj la peto portas
+     * la publikan Host-valoron). La fenestro estas milisekundoj; plena ŝirmo
+     * postulus pin je la kontrolita IP kun SNI/atestokontrolo de la originala
+     * nomo (propra HTTPS-kliento) — kosto juĝita neproporcia por la
+     * bildospegulelo de konataj komunumaj fluoj.
      */
     fun ĉuAkcepteblaBildaCelo(url: String): Boolean {
         return try {
             val uri = URI(url)
             val gastiganto = uri.host ?: return false
-            if (uri.scheme !in SKEMOJ || estasIpLiteralo(gastiganto)) return false
+            val havenoAkceptebla = when (uri.scheme) {
+                "http" -> uri.port == -1 || uri.port == 80
+                "https" -> uri.port == -1 || uri.port == 443
+                else -> false
+            }
+            if (!havenoAkceptebla || estasIpLiteralo(gastiganto)) return false
             val adresoj = InetAddress.getAllByName(gastiganto)
             adresoj.any { it is Inet4Address && ĉuPublikaAdreso(it) } &&
                 adresoj.all { ĉuPublikaAdreso(it) }

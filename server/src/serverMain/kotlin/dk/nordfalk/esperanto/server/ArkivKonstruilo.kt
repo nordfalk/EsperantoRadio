@@ -317,9 +317,11 @@ object ArkivKonstruilo {
      * Elŝutas la bildo-korpon kun permes-lista ŝirmo kaj fluanta grandec-limo.
      * Regulo de la posedanto (2026-11-25): ĉio nenormala → rifuzu; la bildo
      * restas ĉe la originala URL (regulo A4 — la fluo/kanalo daŭras):
-     * - la celo estu http(s) kun NOMO kiel gastiganto, kiu resolvu nur al
-     *   publika IPv4 — IP-literaloj kaj interna/IPv6-resolvo rifuzataj ANTAŬ
-     *   la peto (SSRF-ŝirmo, CWE-918; Emblemoj.ĉuAkcepteblaBildaCelo);
+     * - la celo estu http(s) kun NOMO kiel gastiganto sur normala haveno
+     *   (80/http, 443/https), kies resolvo entenas publikan IPv4 kaj neniom
+     *   ne-publikan — IP-literaloj kaj internaj celoj rifuzataj ANTAŬ la peto
+     *   (SSRF-ŝirmo, CWE-918; detaloj kaj la akceptita restanta DNS-rebinding-risko:
+     *   [Emblemoj.ĉuAkcepteblaBildaCelo]);
      * - NENIU alidirekto: [bildaHttp] estas senvola kaj ĉiu 3xx estas rifuzata
      *   kiel nenormala — bildoj gastigitaj malantaŭ alidirekto ne speguliĝas;
      * - la korpo legiĝas FLUE per prepareGet-execute (HttpClient.get enmemorigus
